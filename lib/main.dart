@@ -25,7 +25,7 @@ class MyApp extends ConsumerWidget {
     final locale = ref.watch(localeNotifierProvider);
 
     return MaterialApp.router(
-      title: 'Flutter Boilerplate',
+      title: 'Walima',
       debugShowCheckedModeBanner: false,
 
       // Theme

@@ -24,6 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkAuth() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      prefs.setString(_tokenKey, 'HasToken');
       final token = prefs.getString(_tokenKey);
 
       // Small delay so splash is visible for a moment
