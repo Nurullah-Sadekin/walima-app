@@ -3,6 +3,9 @@ import 'package:flutter_boilerplate/features/home/presentation/screens/home_scre
 import 'package:flutter_boilerplate/features/settings/presentation/screens/settings_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_boilerplate/features/home/presentation/screens/splash_screen.dart';
+import 'package:flutter_boilerplate/features/anchor_point/anchor_point.dart';
+import 'package:flutter_boilerplate/features/login/presentation/login_screen.dart';
 
 part 'app_router.g.dart';
 
@@ -15,8 +18,18 @@ GoRouter goRouter(GoRouterRef ref) {
     routes: [
       GoRoute(
         path: '/',
-        name: 'home',
-        builder: (context, state) => const HomeScreen(),
+        name: 'splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: '/anchor',
+        name: 'anchor',
+        builder: (context, state) => const AnchorPointScreen(),
+      ),
+      GoRoute(
+        path: '/login',
+        name: 'login',
+        builder: (context, state) => const LoginScreen(),
       ),
       GoRoute(
         path: '/settings',
