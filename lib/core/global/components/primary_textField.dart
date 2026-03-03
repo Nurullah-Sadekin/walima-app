@@ -199,7 +199,10 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
                 padding: EdgeInsets.only(right: screenWidth * 0.025),
                 child: _suffixIcon(screenWidth),
               )
-            : widget.suffix,
+            : Padding(
+              padding:  EdgeInsets.only(right: screenWidth * 0.025),
+              child: widget.suffix,
+            ),
         suffixIconConstraints: BoxConstraints(
           minHeight: screenHeight * 0.025,
         ),

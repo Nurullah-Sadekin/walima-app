@@ -53,6 +53,7 @@ class HomeScreen extends ConsumerWidget {
                 onChanged: (value) {
 
                   }, errorText: null, onTap: () {  },
+                suffix: const Icon(Icons.check_circle, color: Colors.green, size: 20),
               ),
               PrimaryTextField(
                 controller: _emailController,
