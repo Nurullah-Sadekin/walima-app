@@ -42,8 +42,8 @@ class HomeScreen extends ConsumerWidget {
               //     Expanded(child: Buttons(style: ButtonsStyle.activeSecondaryButton, onTap: () {},title: 'Continue',)),
               //   ],
               // ),
-              Buttons(buttonStyle: ButtonsStyle.iconicDynamicButton, onTap: () {},title: 'Continue',icon: const Icon(Icons.arrow_forward,size: 15,),borderColor: Colors.green,textColor: AppColors.primary,iconLeftPosition: false),
-
+              Buttons(buttonStyle: ButtonsStyle.iconicDynamicButton, onTap: () {},title: 'Iconic Dynamic Button',icon: const Icon(Icons.arrow_forward,size: 15,),borderColor: Colors.green,textColor: AppColors.primary,iconLeftPosition: false),
+              Buttons(buttonStyle: ButtonsStyle.authButton, onTap: () {},title: 'Auth Dynamic Button',icon: const Icon(Icons.arrow_forward,size: 15,),borderColor: Colors.green,textColor: AppColors.primary),
             ],
           ),
         ),

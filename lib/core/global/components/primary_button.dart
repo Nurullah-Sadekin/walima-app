@@ -31,16 +31,24 @@ class Buttons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     switch (buttonStyle) {
+
       case (ButtonsStyle.activePrimaryButton):
         return activePrimaryButton(onTap, title, icon, context);
-      case (ButtonsStyle.iconicDynamicButton):
-        return iconicDynamicButton(onTap, title, icon, context,bgColor,borderColor,textColor);
-      case (ButtonsStyle.cancelButton):
-        return cancelButton(title, context, onTap);
-      case (ButtonsStyle.disableButton):
-        return disableButton(title, context, onTap);
+
       case (ButtonsStyle.activeSecondaryButton):
         return activeSecondaryButton(onTap, title, icon, context);
+
+      case (ButtonsStyle.iconicDynamicButton):
+        return iconicDynamicButton(onTap, title, icon, context,bgColor,borderColor,textColor);
+
+      case (ButtonsStyle.cancelButton):
+        return cancelButton(title, context, onTap);
+
+      case (ButtonsStyle.disableButton):
+        return disableButton(title, context, onTap);
+
+      case (ButtonsStyle.authButton):
+        return authButton(onTap, title, icon, context,bgColor,borderColor,textColor);
       }
   }
 
@@ -189,6 +197,38 @@ class Buttons extends StatelessWidget {
     );
   }
 
+  Widget authButton(VoidCallback onClick, String? title, Widget? icon, context,Color? bgColor,Color? borderColor,Color? textColor) {
+    return GestureDetector(
+      onTap: onClick,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14,horizontal: 10),
+        decoration: BoxDecoration(
+          color: bgColor,
+            border: Border.all(color: borderColor ?? Colors.transparent, width: 1),
+            borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            icon ?? const SizedBox(width: 10),
+            const SizedBox(width: 10,),
+            Text(
+              title ?? '',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: textColor ?? Colors.white,
+                fontSize: TextSize.font16(context),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
 }
 
 enum ButtonsStyle {
@@ -197,4 +237,5 @@ enum ButtonsStyle {
   disableButton,
   cancelButton,
   iconicDynamicButton,
+  authButton
 }
