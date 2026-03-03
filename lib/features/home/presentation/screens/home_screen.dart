@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
+import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_boilerplate/generated/l10n/app_localizations.dart';
@@ -13,7 +14,7 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-
+    final TextEditingController _emailController = TextEditingController();
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.home),
@@ -44,6 +45,17 @@ class HomeScreen extends ConsumerWidget {
               // ),
               Buttons(buttonStyle: ButtonsStyle.iconicDynamicButton, onTap: () {},title: 'Iconic Dynamic Button',icon: const Icon(Icons.arrow_forward,size: 15,),borderColor: Colors.green,textColor: AppColors.primary,iconLeftPosition: false),
               Buttons(buttonStyle: ButtonsStyle.authButton, onTap: () {},title: 'Auth Dynamic Button',icon: const Icon(Icons.arrow_forward,size: 15,),borderColor: Colors.green,textColor: AppColors.primary),
+              PrimaryTextField(
+                controller: _emailController,
+                headLine: 'Email Address',
+                hintText: 'Enter your email',
+
+                keyboardType: TextInputType.emailAddress,
+                prefix: const Icon(Icons.email_outlined, color: Colors.grey),
+                onChanged: (value) {
+
+                  }, errorText: null, onTap: () {  },
+              ),
             ],
           ),
         ),
