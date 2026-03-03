@@ -6,10 +6,14 @@ class AppColors {
   AppColors._(); // Private constructor to prevent instantiation
 
   // Primary Colors
-  static const Color primary = Color(0xFF6200EE);
-  static const Color primaryVariant = Color(0xFF3700B3);
+  static const Color primary = Color(0xFFFD297B);
+  static const Color primaryVariant = Color(0xFFFEF1F7);
   static const Color secondary = Color(0xFF03DAC6);
   static const Color secondaryVariant = Color(0xFF018786);
+
+  //Disable Colors
+  static const Color disableBackground = Color(0xFFF7F7F7);
+  static const Color disableText = Color(0xFFD1D1D1);
 
   // Background Colors
   static const Color backgroundLight = Color(0xFFFFFFFF);
@@ -20,7 +24,7 @@ class AppColors {
   // Text Colors
   static const Color textPrimaryLight = Color(0xFF000000);
   static const Color textPrimaryDark = Color(0xFFFFFFFF);
-  static const Color textSecondaryLight = Color(0xFF757575);
+  static const Color textSecondaryLight = Color(0xFF171717);
   static const Color textSecondaryDark = Color(0xFFB0B0B0);
 
   // Semantic Colors
@@ -33,7 +37,7 @@ class AppColors {
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
   static const Color grey = Color(0xFF9E9E9E);
-  static const Color greyLight = Color(0xFFE0E0E0);
+  static const Color greyLight = Color(0xFFEBEBEB);
   static const Color greyDark = Color(0xFF424242);
 
   // Transparent
@@ -47,9 +51,4 @@ class AppColors {
   static const Color cardLight = Color(0xFFFFFFFF);
   static const Color cardDark = Color(0xFF1E1E1E);
 
-  // Accent Colors
-  static const Color accent1 = Color(0xFFFF6B6B);
-  static const Color accent2 = Color(0xFF4ECDC4);
-  static const Color accent3 = Color(0xFF45B7D1);
-  static const Color accent4 = Color(0xFFFFA07A);
 }
