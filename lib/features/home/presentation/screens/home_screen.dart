@@ -49,7 +49,7 @@ class HomeScreen extends ConsumerWidget {
                 controller: _emailController,
                 headLine: 'Email Address',
                 hintText: 'Enter your email',
-                noPrefix: true,
+                prefixIcon: Icons.email_outlined,
                 onChanged: (value) {
 
                   }, errorText: null, onTap: () {  },
