@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
@@ -20,11 +21,11 @@ class HomeScreen extends ConsumerWidget {
     final moodList = [
       {
         "title": "Myself",
-        "image": "assets/icons/me.png",
+        "image": AppImages.meIcon,
       },
       {
         "title": "My Son",
-        "image": "assets/icons/me.png",
+        "image": AppImages.mySonIcon,
       },
     ];
     return Scaffold(
