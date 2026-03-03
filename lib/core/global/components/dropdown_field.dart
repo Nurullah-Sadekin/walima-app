@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
-import 'bottom.dart'; // Make sure this imports BottomSheetUtils
+import 'bottom_sheet.dart'; // Make sure this imports BottomSheetUtils
 
 class DropDownField extends StatefulWidget {
   final String? hintText;
@@ -55,7 +56,7 @@ class _DropDownFieldState extends State<DropDownField> {
       enabled: widget.enabled,
       controller: widget.controller,
       errorText: widget.errorText,
-      noPrefix: widget.noPrefix,
+      noPrefix: true,
       onTap: () async {
         // Call the provided onTap callback if it exists
         if (widget.onTap != null) {
@@ -67,7 +68,10 @@ class _DropDownFieldState extends State<DropDownField> {
           context: context,
           items: widget.items,
           header: widget.popUpHeader,
-          selectedValue: widget.selectedValue,
+          // prefer controller text (current selection) so the sheet highlights the previously selected item
+          selectedValue: (widget.controller != null && (widget.controller!.text).isNotEmpty)
+              ? widget.controller!.text
+              : widget.selectedValue,
           hintText: widget.hintText,
 
         );
@@ -85,12 +89,10 @@ class _DropDownFieldState extends State<DropDownField> {
       },
       hintText: widget.hintText,
       icon: widget.icon,
-      suffix: widget.suffix ?? const Padding(
-        padding: EdgeInsets.only(right: 10),
-        child: Icon(
-          Icons.keyboard_arrow_down,
-          size: 40,
-        ),
+      suffix: widget.suffix ?? const Icon(
+        Icons.keyboard_arrow_down_outlined,
+        size: 26,
+        color: Color(0xFFA3A3A3),
       ),
       readOnly: true,
       headLine: widget.headLine,
