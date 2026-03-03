@@ -110,7 +110,7 @@ class Buttons extends StatelessWidget {
                 style: TextStyle(
                   color: AppColors.primary,
                   fontSize: titleSize ?? TextSize.font14(context),
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
@@ -186,7 +186,7 @@ class Buttons extends StatelessWidget {
               style: TextStyle(
                 color: textColor ?? Colors.white,
                 fontSize: TextSize.font14(context),
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w500,
               ),
             ),
             if (!iconLeftPosition! && icon != null) const SizedBox(width: 10),
