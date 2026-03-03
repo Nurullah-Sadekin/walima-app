@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 
-class Buttons extends StatelessWidget {
-  const Buttons({
+class PrimaryButtons extends StatelessWidget {
+  const PrimaryButtons({
     super.key,
     required this.buttonStyle,
     required this.onTap,
@@ -95,7 +95,7 @@ class Buttons extends StatelessWidget {
           color: Colors.white,
           shape: RoundedRectangleBorder(
             side: const BorderSide(width: 1, color: AppColors.primary),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(6),
           ),
         ),
         child: Row(

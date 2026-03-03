@@ -3,6 +3,7 @@ import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_type_card.dart';
+import 'package:flutter_boilerplate/core/global/components/selected_button.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_boilerplate/generated/l10n/app_localizations.dart';
@@ -42,35 +43,28 @@ class HomeScreen extends ConsumerWidget {
           child: Column(
             spacing: 10,
             children: [
-              Buttons(
+              PrimaryButtons(
                 buttonStyle: ButtonsStyle.activePrimaryButton,
                 onTap: () {},
                 title: 'Active Primary Button',
               ),
-              Buttons(
+              PrimaryButtons(
                 buttonStyle: ButtonsStyle.disableButton,
                 onTap: () {},
                 title: 'Disable Button',
               ),
-              Buttons(
+              PrimaryButtons(
                 buttonStyle: ButtonsStyle.activeSecondaryButton,
                 onTap: () {},
                 title: 'Active Secondary Button',
               ),
-              Buttons(
+              PrimaryButtons(
                 buttonStyle: ButtonsStyle.cancelButton,
                 onTap: () {},
                 title: 'Cancel',
               ),
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.center,
-              //   children: [
-              //     Expanded(child: Buttons(style: ButtonsStyle.activePrimaryButton, onTap: () {},title: 'Continue',)),
-              //
-              //     Expanded(child: Buttons(style: ButtonsStyle.activeSecondaryButton, onTap: () {},title: 'Continue',)),
-              //   ],
-              // ),
-              Buttons(
+
+              PrimaryButtons(
                   buttonStyle: ButtonsStyle.iconicDynamicButton,
                   onTap: () {},
                   title: 'Iconic Dynamic Button',
@@ -81,7 +75,7 @@ class HomeScreen extends ConsumerWidget {
                   borderColor: Colors.green,
                   textColor: AppColors.primary,
                   iconLeftPosition: false),
-              Buttons(
+              PrimaryButtons(
                   buttonStyle: ButtonsStyle.authButton,
                   onTap: () {},
                   title: 'Auth Dynamic Button',
@@ -167,6 +161,20 @@ class HomeScreen extends ConsumerWidget {
                     ),
                   ),
                 ],
+              ),
+              SelectedButtons(
+                buttonStyle: SelectedButtonsStyle.primeSelectedButton,
+                onTap: () {
+                },
+                isSelected: true,
+                title: 'Prime Selected Button',
+              ),
+              SelectedButtons(
+                buttonStyle: SelectedButtonsStyle.secondarySelectedButton,
+                onTap: () {
+                },
+                isSelected: false,
+                title: 'Secondary Selected Button',
               ),
 
             ],
