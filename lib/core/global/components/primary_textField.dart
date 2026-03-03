@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/input_border_style.dart';
+import 'package:intl/intl.dart';
 
 class PrimaryTextField extends StatefulWidget {
   const PrimaryTextField({
@@ -23,7 +24,7 @@ class PrimaryTextField extends StatefulWidget {
     this.borderRadius,
     this.readOnly,
     required this.onTap,
-    this.prefix,
+    this.prefixIcon,
     this.validator,
     this.showPassIcon,
     this.forgotPass,
@@ -60,7 +61,7 @@ class PrimaryTextField extends StatefulWidget {
   final int? maxLine;
   final double? borderRadius;
   final bool? readOnly;
-  final Widget? prefix;
+  final IconData? prefixIcon;
   final bool? showPassIcon;
 
   @override
@@ -69,6 +70,7 @@ class PrimaryTextField extends StatefulWidget {
 
 class _PrimaryTextFieldState extends State<PrimaryTextField> {
   bool viewPassword = true;
+  TextEditingController? _internalController;
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +83,9 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
             ? const SizedBox.shrink()
             : _headLine(),
         _inputField(screenWidth, screenHeight),
-        widget.forgotPass== true ? _forgotPassField(screenHeight) : const SizedBox.shrink(),
+        widget.forgotPass == true
+            ? _forgotPassField(screenHeight)
+            : const SizedBox.shrink(),
       ],
     );
   }
@@ -89,15 +93,59 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
   Widget _inputField(double screenWidth, double screenHeight) {
     return TextFormField(
       enabled: widget.enabled,
-      controller: widget.controller,
+      controller: widget.controller ?? _internalController,
       minLines: widget.minLine ?? 1,
       maxLines: widget.maxLine ?? 1,
       obscureText: widget.showPassIcon != null
           ? viewPassword
           : widget.obscureText ?? false,
       keyboardType: widget.keyboardType,
-      readOnly: widget.readOnly ?? false,
-      onTap: () => widget.onTap != null ? widget.onTap!() : null,
+      readOnly: widget.datePicker == true ? true : (widget.readOnly ?? false),
+      onTap: () async {
+        if (widget.datePicker == true) {
+          if (widget.controller == null && _internalController == null) {
+            _internalController = TextEditingController();
+
+            setState(() {});
+          }
+
+          DateTime initialDate = DateTime.now();
+          try {
+            final existing =
+                widget.controller?.text ?? _internalController?.text ?? '';
+            if (existing.isNotEmpty) {
+              try {
+                initialDate = DateTime.parse(existing);
+              } catch (_) {
+                initialDate = DateFormat('yyyy-MM-dd').parseLoose(existing);
+              }
+            }
+          } catch (_) {}
+
+          final picked = await showDatePicker(
+            context: context,
+            initialDate: initialDate,
+            firstDate: DateTime(1900),
+            lastDate: DateTime(2100),
+          );
+
+          if (picked != null) {
+            final formatted = DateFormat('yyyy-MM-dd').format(picked);
+            if (widget.controller != null) {
+              widget.controller!.text = formatted;
+            } else if (_internalController != null) {
+              _internalController!.text = formatted;
+            }
+            if (widget.onChanged != null) widget.onChanged!(formatted);
+            // rebuild to update visuals if needed
+            setState(() {});
+          }
+
+          if (widget.onTap != null) widget.onTap!();
+          return;
+        }
+        if (widget.onTap != null) widget.onTap!();
+      },
       onChanged: (value) =>
           widget.onChanged != null ? widget.onChanged!(value) : null,
       validator: widget.validator,
@@ -120,10 +168,16 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
             : null,
         prefixIcon: widget.noPrefix != null && true
             ? const SizedBox()
-            : widget.prefix ?? _prefixIcon(screenWidth),
+            : Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Icon(widget.prefixIcon, color: widget.controller?.text != null ? AppColors.primary : const Color(0xFFA3A3A3)),
+              ),
         border: InputBorderStyle.border(6, borderColor: widget.borderColor),
         focusedBorder: InputBorderStyle.focusedBorder(6),
-        enabledBorder: (widget.controller?.text ?? '').isNotEmpty
+        enabledBorder: (widget.controller?.text ??
+                    _internalController?.text ??
+                    '')
+                .isNotEmpty
             ? InputBorderStyle.validBorder(6, borderColor: widget.borderColor)
             : InputBorderStyle.border(6),
         focusedErrorBorder: InputBorderStyle.focusedErrorBorder(6),
@@ -176,22 +230,6 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
         ),
         const SizedBox(height: 6),
       ],
-    );
-  }
-
-  Widget _prefixIcon(double screenWidth) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: screenWidth * 0.025,
-        right: screenWidth * 0.025,
-      ),
-      child: const Icon(Icons.add),
-      // child: SvgPicture.asset(
-      //   'svgs/${widget.icon ?? 'user-circle'}.svg',
-      //   colorFilter: ColorFilter.mode(_prefixColor(), BlendMode.srcIn),
-      //   height: screenHeight * 0.03,
-      //   width: screenWidth * 0.03,
-      // ),
     );
   }
 
@@ -249,5 +287,11 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
           ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    _internalController?.dispose();
+    super.dispose();
   }
 }

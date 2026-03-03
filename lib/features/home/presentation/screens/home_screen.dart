@@ -53,8 +53,18 @@ class HomeScreen extends ConsumerWidget {
                 onChanged: (value) {
 
                   }, errorText: null, onTap: () {  },
+              ),
+              PrimaryTextField(
+                controller: _emailController,
+                headLine: 'Date of Birth',
+                hintText: 'DD/MM/YYYY',
+                onChanged: (value) {
+
+                }, errorText: null, onTap: () {  },
                 datePicker: true,
                 readOnly: true,
+                prefixIcon: Icons.calendar_month,
+
               ),
               PrimaryTextField(
                 controller: _emailController,
