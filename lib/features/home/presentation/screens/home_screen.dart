@@ -29,7 +29,6 @@ class HomeScreen extends ConsumerWidget {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
-            spacing: 10,
             children: [
               Buttons(buttonStyle: ButtonsStyle.activePrimaryButton, onTap: () {},title: 'Active Primary Button',),
               Buttons(buttonStyle: ButtonsStyle.disableButton, onTap: () {},title: 'Disable Button',),
@@ -49,12 +48,22 @@ class HomeScreen extends ConsumerWidget {
                 controller: _emailController,
                 headLine: 'Email Address',
                 hintText: 'Enter your email',
-
-                keyboardType: TextInputType.emailAddress,
-                prefix: const Icon(Icons.email_outlined, color: Colors.grey),
+                noPrefix: true,
                 onChanged: (value) {
 
                   }, errorText: null, onTap: () {  },
+                datePicker: true,
+                readOnly: true,
+              ),
+              PrimaryTextField(
+                controller: _emailController,
+                hintText: 'Enter your email',
+                noPrefix: true,
+                onChanged: (value) {
+
+                }, errorText: null, onTap: () {  },
+                showPassIcon: true,
+                forgotPass: true,
               ),
             ],
           ),

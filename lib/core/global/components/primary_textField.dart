@@ -27,7 +27,7 @@ class PrimaryTextField extends StatefulWidget {
     this.validator,
     this.showPassIcon,
     this.forgotPass,
-    this.forgotPassOntap,
+    this.forgotPassOnTap,
     this.datePicker,
     this.noPrefix,
     this.contentPadding,
@@ -51,7 +51,7 @@ class PrimaryTextField extends StatefulWidget {
   final bool? datePicker;
   final TextInputType? keyboardType;
   final bool? obscureText;
-  final VoidCallback? forgotPassOntap;
+  final VoidCallback? forgotPassOnTap;
   final bool? noPrefix;
   final bool? forgotPass;
   final void Function(String)? onChanged;
@@ -81,7 +81,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
             ? const SizedBox.shrink()
             : _headLine(),
         _inputField(screenWidth, screenHeight),
-        _forgotPassField(screenHeight)
+        widget.forgotPass== true ? _forgotPassField(screenHeight) : const SizedBox.shrink(),
       ],
     );
   }
@@ -106,39 +106,32 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
       },
       style: TextStyle(
         color: widget.textColor ?? Colors.black,
-        fontSize: TextSize.font16(context),
-        fontWeight: FontWeight.w300,
+        fontSize: TextSize.font14(context),
+        fontWeight: FontWeight.w400,
       ),
       decoration: InputDecoration(
         isDense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         prefix: widget.noPrefix != null && true
             ? Container(
                 color: Colors.green,
                 child: const Padding(padding: EdgeInsets.only(left: 15)))
             : null,
         prefixIcon: widget.noPrefix != null && true
-            ? null
+            ? const SizedBox()
             : widget.prefix ?? _prefixIcon(screenWidth),
-        border: InputBorderStyle.border(
-            widget.maxLine != null ? 60 / widget.maxLine! : 60,
-            borderColor: widget.borderColor),
-        focusedBorder: InputBorderStyle.focusedBorder(
-            widget.maxLine != null ? 60 / widget.maxLine! : 60),
+        border: InputBorderStyle.border(6, borderColor: widget.borderColor),
+        focusedBorder: InputBorderStyle.focusedBorder(6),
         enabledBorder: (widget.controller?.text ?? '').isNotEmpty
-            ? InputBorderStyle.validBorder(
-                widget.maxLine != null ? 60 / widget.maxLine! : 60,
-                borderColor: widget.borderColor)
-            : InputBorderStyle.border(
-                widget.maxLine != null ? 60 / widget.maxLine! : 60),
-        focusedErrorBorder: InputBorderStyle.focusedErrorBorder(
-            widget.maxLine != null ? 60 / widget.maxLine! : 60),
-        errorBorder: InputBorderStyle.errorBorder(
-            widget.maxLine != null ? 60 / widget.maxLine! : 60),
+            ? InputBorderStyle.validBorder(6, borderColor: widget.borderColor)
+            : InputBorderStyle.border(6),
+        focusedErrorBorder: InputBorderStyle.focusedErrorBorder(6),
+        errorBorder: InputBorderStyle.errorBorder(6),
         hintStyle: TextStyle(
-          color: const Color(0xFF818092),
-          fontSize: TextSize.font16(context),
-          fontWeight: FontWeight.w300,
+          color: const Color(0xFFA3A3A3),
+          fontSize: TextSize.font14(context),
+          fontWeight: FontWeight.w400,
         ),
         hintText: widget.hintText ?? 'Your Username',
         errorText: widget.errorText == "" ? null : widget.errorText,
@@ -181,6 +174,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
               ),
           ],
         ),
+        const SizedBox(height: 6),
       ],
     );
   }
@@ -189,7 +183,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
     return Padding(
       padding: EdgeInsets.only(
         left: screenWidth * 0.025,
-        right: screenWidth * 0.02,
+        right: screenWidth * 0.025,
       ),
       child: const Icon(Icons.add),
       // child: SvgPicture.asset(
@@ -227,7 +221,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
           Row(
             children: [
               GestureDetector(
-                onTap: widget.forgotPassOntap,
+                onTap: widget.forgotPassOnTap,
                 child: Container(
                   color: Colors.transparent,
                   child: Row(

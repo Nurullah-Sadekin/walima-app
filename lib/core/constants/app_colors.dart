@@ -53,7 +53,7 @@ class AppColors {
 
   static const Color inputBorder = Color(0xFFE6E6E9);
   static const Color errorBorderColor = Color(0xFFF75555);
-  static const Color competeBorderColor = Color(0xFF887BE6);
+  static const Color competeBorderColor = Color(0xFFFD297B);
   static const Color inputBorderColor = Color(0xFFE6E6E9);
   static const Color inActiveBorderColor = Color(0xFF818092);
 
