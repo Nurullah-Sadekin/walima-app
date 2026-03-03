@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -76,6 +77,14 @@ class HomeScreen extends ConsumerWidget {
                 showPassIcon: true,
                 forgotPass: true,
               ),
+              DropDownField(
+                headLine: 'Select Country',
+                hintText: 'Choose your country',
+                items: ['USA', 'Canada', 'UK', 'Australia'],
+                controller: _emailController,
+                onTap: () {  }, popUpHeader: '', isSearch: true,
+              ),
+
             ],
           ),
         ),
