@@ -9,6 +9,7 @@ class PrimaryTextField extends StatefulWidget {
     super.key,
     this.controller,
     this.hintText,
+    this.headLineInfoIcon,
     this.icon,
     this.textColor,
     this.borderColor,
@@ -63,6 +64,7 @@ class PrimaryTextField extends StatefulWidget {
   final bool? readOnly;
   final IconData? prefixIcon;
   final bool? showPassIcon;
+  final bool? headLineInfoIcon;
 
   @override
   State<PrimaryTextField> createState() => _PrimaryTextFieldState();
@@ -221,6 +223,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
+          spacing: 4,
           children: [
             if (widget.headLine != null)
               Text(
@@ -229,6 +232,8 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
                     fontSize: TextSize.font14(context),
                     fontWeight: FontWeight.w500),
               ),
+            if (widget.headLineInfoIcon == true && widget.headLine != null)
+              Icon(Icons.info, size: TextSize.font13(context), color:AppColors.disableText),
           ],
         ),
         const SizedBox(height: 6),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'bottom_sheet.dart'; // Make sure this imports BottomSheetUtils
@@ -20,6 +21,7 @@ class DropDownField extends StatefulWidget {
   final bool? hideHeadline;
   final Function(String searchKey)? searchItemList;
   final bool isSearch;
+  final bool? headLineInfoIcon;
   final String? selectedValue;
 
   const DropDownField({
@@ -41,6 +43,7 @@ class DropDownField extends StatefulWidget {
     required this.isSearch,
     this.onTap,
     this.selectedValue,
+    this.headLineInfoIcon = false,
   });
 
   @override
@@ -56,6 +59,7 @@ class _DropDownFieldState extends State<DropDownField> {
       enabled: widget.enabled,
       controller: widget.controller,
       errorText: widget.errorText,
+      headLineInfoIcon: widget.headLineInfoIcon,
       noPrefix: true,
       onTap: () async {
         // Call the provided onTap callback if it exists
@@ -89,10 +93,10 @@ class _DropDownFieldState extends State<DropDownField> {
       },
       hintText: widget.hintText,
       icon: widget.icon,
-      suffix: widget.suffix ?? const Icon(
+      suffix: widget.suffix ??  Icon(
         Icons.keyboard_arrow_down_outlined,
-        size: 26,
-        color: Color(0xFFA3A3A3),
+        size: TextSize.font20(context),
+        color: AppColors.grey,
       ),
       readOnly: true,
       headLine: widget.headLine,
