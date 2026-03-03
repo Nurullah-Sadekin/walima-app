@@ -64,7 +64,6 @@ class HomeScreen extends ConsumerWidget {
                 datePicker: true,
                 readOnly: true,
                 prefixIcon: Icons.calendar_month,
-
               ),
               PrimaryTextField(
                 controller: _emailController,

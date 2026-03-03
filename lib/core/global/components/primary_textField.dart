@@ -170,7 +170,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
             ? const SizedBox()
             : Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Icon(widget.prefixIcon, color: widget.controller?.text != null ? AppColors.primary : const Color(0xFFA3A3A3)),
+                child: Icon(widget.prefixIcon, color: const Color(0xFFA3A3A3)),
               ),
         border: InputBorderStyle.border(6, borderColor: widget.borderColor),
         focusedBorder: InputBorderStyle.focusedBorder(6),
