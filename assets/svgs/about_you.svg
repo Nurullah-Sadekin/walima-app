@@ -1,0 +1,21 @@
+<svg width="82" height="82" viewBox="0 0 82 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_d_1_45387)">
+<path d="M2 40C2 18.4609 19.4609 1 41 1C62.5391 1 80 18.4609 80 40C80 61.5391 62.5391 79 41 79C19.4609 79 2 61.5391 2 40Z" fill="white"/>
+<path d="M22.6641 40C22.6641 32.2218 22.6641 28.3327 25.3489 25.9164C28.0338 23.5 32.355 23.5 40.9974 23.5C49.6397 23.5 53.9611 23.5 56.6458 25.9164C59.3307 28.3327 59.3307 32.2218 59.3307 40C59.3307 47.7781 59.3307 51.6673 56.6458 54.0837C53.9611 56.5 49.6397 56.5 40.9974 56.5C32.355 56.5 28.0338 56.5 25.3489 54.0837C22.6641 51.6673 22.6641 47.7781 22.6641 40Z" stroke="#FD297B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M28.1641 48.25C30.3793 43.518 38.6364 43.2067 40.9974 48.25M38.2474 35.4167C38.2474 37.4418 36.6058 39.0833 34.5807 39.0833C32.5557 39.0833 30.9141 37.4418 30.9141 35.4167C30.9141 33.3916 32.5557 31.75 34.5807 31.75C36.6058 31.75 38.2474 33.3916 38.2474 35.4167Z" stroke="#FD297B" stroke-width="2" stroke-linecap="round"/>
+<path d="M46.5 36.332H53.8333" stroke="#FD297B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M46.5 43.668H53.8333" stroke="#FD297B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<filter id="filter0_d_1_45387" x="0" y="0" width="82" height="82" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.0392157 0 0 0 0 0.0509804 0 0 0 0 0.0784314 0 0 0 0.03 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_45387"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_45387" result="shape"/>
+</filter>
+</defs>
+</svg>
