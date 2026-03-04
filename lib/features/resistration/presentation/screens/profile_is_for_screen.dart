@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
+import 'package:flutter_boilerplate/core/global/components/profile_type_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/resistration/presentation/providers/resistration_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -31,9 +34,32 @@ class _IsProfileForScreenState extends ConsumerState<IsProfileForScreen> {
         ),
         body: provider.screenStates == RegistrationScreenStates.isProfileFor
             ? const Loading()
-            : const Center(
-                child: Text('Is Profile For Screen'),
+            :  Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Column(
+                children: [
+                  ShowImage(
+                    imagePath: AppImages.isProfileFor,
+                    width: 110,
+                    height: 110,
+                  ),
+                  Column(
+                    spacing: 10,
+                    children: List.generate(provider.profileForList.length, (index) {
+                      final mood = provider.profileForList[index];
+                      return MoodItemWidget(
+                        title: mood.name ,
+                        imagePath: mood.emoji,
+                        isSelected: mood.isSelected,
+                        onTap: () {
+                         // selectedIndex = index;
+                        },
+                      );
+                    }),
+                  ),
+                ],
               ),
+            ),
       ),
     );
   }

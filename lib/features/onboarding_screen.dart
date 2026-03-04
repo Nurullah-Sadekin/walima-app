@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/config/text_responsive.dart';
+import 'package:flutter_boilerplate/core/constants/app_colors.dart';
+import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:go_router/go_router.dart';
@@ -22,46 +25,78 @@ class OnboardingScreen extends StatelessWidget {
             height: double.infinity,
             width: double.infinity,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0,vertical: 40),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ShowImage(
-                    imagePath: 'assets/svgs/walima.svg',
-                    width: 270,
-                    height: 72,
-                  ),
-                  const Text(
-                    'Welcome Back',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                  Padding(
+                    padding:  EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.15),
+                    child: ShowImage(
+                      imagePath: 'assets/svgs/walima.svg',
+                      width: 270,
+                      height: 72,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Please login to your account',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white70,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  PrimaryButtons(
-                    buttonStyle: ButtonsStyle.activePrimaryButton,
-                    onTap: () {
-                      context.push('/login');
-                    },
-                    title: 'Login',
-                  ),
-                  const SizedBox(height: 16),
-                  PrimaryButtons(
-                    buttonStyle: ButtonsStyle.activePrimaryButton,
-                    onTap: () {
-                      context.push('/isProfileFor');
-                    },
-                    title: 'Sign Up',
+                  Column(
+                    children: [
+                      PrimaryButtons(
+                        buttonStyle: ButtonsStyle.authButton,
+                        svgIconPath: AppImages.email,
+                        svgIconColor: AppColors.primary,
+                        textColor: AppColors.primary,
+                        bgColor: Colors.white,
+                        onTap: () {
+                          context.push('/isProfileFor');
+                        },
+                        title: 'Sign Up with Email',
+                      ),
+                      const SizedBox(height: 16),
+                      PrimaryButtons(
+                        buttonStyle: ButtonsStyle.authButton,
+                        svgIconPath: AppImages.logout,
+                        borderColor: Colors.white,
+                        bgColor: Colors.black12,
+                        onTap: () {
+                          context.push('/isProfileFor');
+                        },
+                        title: 'Sign Up with OTP',
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('Already have an account?',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: TextSize.font16(context),
+                                    fontWeight: FontWeight.w500)
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(left: 10),
+                              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+                              ),
+                              child: GestureDetector(
+                                onTap: () {
+                                  context.push('/login');
+                                },
+                                child: Text('Login',
+                                    style: TextStyle(
+                                        color: AppColors.white,
+                                        fontSize: TextSize.font16(context),
+                                        fontWeight: FontWeight.w500)
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      )
+                    ],
                   ),
                 ],
               ),

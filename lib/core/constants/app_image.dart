@@ -11,4 +11,12 @@ class AppImages {
   static const String mySisterIcon = 'assets/icons/my_sister.png';
   static const String mySonIcon = 'assets/icons/my_son.png';
 
+
+  // svg icon paths
+  static const String email = 'assets/svg_icons/email.svg';
+  static const String logout = 'assets/svg_icons/logout.svg';
+
+  // svg image paths
+  static const String isProfileFor = 'assets/svgs/isProfileFor.svg';
+
 }

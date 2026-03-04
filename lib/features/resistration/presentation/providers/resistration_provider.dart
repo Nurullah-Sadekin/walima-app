@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/features/resistration/domain/profile_for_model.dart';
 
 class RegistrationProvider extends BaseChangeNotifier {
   List<ProfileFor> profileForList = [
-    ProfileFor(name: 'Myself', emoji: const Icon(Icons.person)),
-    ProfileFor(name: 'Someone else', emoji: const Icon(Icons.people)),
+    ProfileFor(name: 'Myself', emoji: AppImages.meIcon),
+    ProfileFor(name: 'My Son', emoji: AppImages.mySonIcon),
   ];
+
+
+
 
   RegistrationScreenStates screenStates = RegistrationScreenStates.defaultLoading;
   RegistrationScreenStates loaderState = RegistrationScreenStates.defaultLoading;

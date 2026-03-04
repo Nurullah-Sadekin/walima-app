@@ -10,7 +10,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  static const _tokenKey = 'token'; // Assumption: token is stored under this key
+  static const _tokenKey = 'hasToken'; // Assumption: token is stored under this key
 
   @override
   void initState() {

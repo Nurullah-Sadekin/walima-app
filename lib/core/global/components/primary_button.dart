@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
+import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 
 class PrimaryButtons extends StatelessWidget {
   const PrimaryButtons({
@@ -13,7 +14,9 @@ class PrimaryButtons extends StatelessWidget {
     this.textColor,
     this.bgColor,
     this.borderColor,
+    this.svgIconColor,
     this.icon,
+    this.svgIconPath,
     this.iconLeftPosition = true,
   });
 
@@ -25,13 +28,14 @@ class PrimaryButtons extends StatelessWidget {
   final Color? textColor;
   final Color? bgColor;
   final Color? borderColor;
+  final Color? svgIconColor;
   final Widget? icon;
   final bool? iconLeftPosition;
+  final String? svgIconPath;
 
   @override
   Widget build(BuildContext context) {
     switch (buttonStyle) {
-
       case (ButtonsStyle.activePrimaryButton):
         return activePrimaryButton(onTap, title, icon, context);
 
@@ -39,7 +43,8 @@ class PrimaryButtons extends StatelessWidget {
         return activeSecondaryButton(onTap, title, icon, context);
 
       case (ButtonsStyle.iconicDynamicButton):
-        return iconicDynamicButton(onTap, title, icon, context,bgColor,borderColor,textColor);
+        return iconicDynamicButton(
+            onTap, title, icon, context, bgColor, borderColor, textColor);
 
       case (ButtonsStyle.cancelButton):
         return cancelButton(title, context, onTap);
@@ -48,15 +53,19 @@ class PrimaryButtons extends StatelessWidget {
         return disableButton(title, context, onTap);
 
       case (ButtonsStyle.authButton):
-        return authButton(onTap, title, icon, context,bgColor,borderColor,textColor);
-      }
+        return authButton(
+            onTap, title, icon, context, bgColor, borderColor, textColor);
+    }
   }
 
-  Widget activePrimaryButton(VoidCallback onClick, String? title, Widget? icon, context) {
+  Widget activePrimaryButton(
+      VoidCallback onClick, String? title, Widget? icon, context) {
     return GestureDetector(
       onTap: onClick,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10,),
+        padding: const EdgeInsets.symmetric(
+          vertical: 10,
+        ),
         decoration: ShapeDecoration(
           color: AppColors.primary,
           shape: RoundedRectangleBorder(
@@ -86,7 +95,8 @@ class PrimaryButtons extends StatelessWidget {
     );
   }
 
-  Widget activeSecondaryButton(VoidCallback onClick, String? title, Widget? icon, context) {
+  Widget activeSecondaryButton(
+      VoidCallback onClick, String? title, Widget? icon, context) {
     return GestureDetector(
       onTap: onClick,
       child: Container(
@@ -121,7 +131,8 @@ class PrimaryButtons extends StatelessWidget {
     );
   }
 
-  Widget disableButton(String? title, BuildContext context, VoidCallback onTap) {
+  Widget disableButton(
+      String? title, BuildContext context, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -130,8 +141,9 @@ class PrimaryButtons extends StatelessWidget {
             vertical: 10,
           ),
           decoration: BoxDecoration(
-              color: AppColors.disableBackground,
-              borderRadius: BorderRadius.circular(6),),
+            color: AppColors.disableBackground,
+            borderRadius: BorderRadius.circular(6),
+          ),
           child: Text(
             title ?? '',
             style: TextStyle(
@@ -147,11 +159,14 @@ class PrimaryButtons extends StatelessWidget {
       onTap: onTap,
       child: Container(
         alignment: Alignment.center,
-        padding: const EdgeInsets.symmetric(vertical: 10,),
+        padding: const EdgeInsets.symmetric(
+          vertical: 10,
+        ),
         decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: AppColors.greyLight, width: 1),),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: AppColors.greyLight, width: 1),
+        ),
         child: Text(
           title ?? '',
           style: TextStyle(
@@ -163,15 +178,17 @@ class PrimaryButtons extends StatelessWidget {
     );
   }
 
-  Widget iconicDynamicButton(VoidCallback onClick, String? title, Widget? icon, context,Color? bgColor,Color? borderColor,Color? textColor) {
+  Widget iconicDynamicButton(VoidCallback onClick, String? title, Widget? icon,
+      context, Color? bgColor, Color? borderColor, Color? textColor) {
     return GestureDetector(
       onTap: onClick,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
           color: bgColor,
-            border: Border.all(color: borderColor ?? Colors.transparent, width: 1),
-            borderRadius: BorderRadius.circular(6),
+          border:
+              Border.all(color: borderColor ?? Colors.transparent, width: 1),
+          borderRadius: BorderRadius.circular(6),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.max,
@@ -197,23 +214,34 @@ class PrimaryButtons extends StatelessWidget {
     );
   }
 
-  Widget authButton(VoidCallback onClick, String? title, Widget? icon, context,Color? bgColor,Color? borderColor,Color? textColor) {
+  Widget authButton(VoidCallback onClick, String? title, Widget? icon, context,
+      Color? bgColor, Color? borderColor, Color? textColor) {
     return GestureDetector(
       onTap: onClick,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14,horizontal: 10),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
         decoration: BoxDecoration(
           color: bgColor,
-            border: Border.all(color: borderColor ?? Colors.transparent, width: 1),
-            borderRadius: BorderRadius.circular(12),
+          border:
+              Border.all(color: borderColor ?? Colors.transparent, width: 1),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            icon ?? const SizedBox(width: 10),
-            const SizedBox(width: 10,),
+            svgIconPath != null
+                ? ShowImage(
+                    imagePath: svgIconPath,
+                    width: 20,
+                    height: 20,
+                    color: svgIconColor,
+                  )
+                : icon ?? const SizedBox(width: 10),
+            const SizedBox(
+              width: 10,
+            ),
             Text(
               title ?? '',
               textAlign: TextAlign.center,
@@ -228,7 +256,6 @@ class PrimaryButtons extends StatelessWidget {
       ),
     );
   }
-
 }
 
 enum ButtonsStyle {
