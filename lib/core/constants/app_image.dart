@@ -15,8 +15,10 @@ class AppImages {
   // svg icon paths
   static const String email = 'assets/svg_icons/email.svg';
   static const String logout = 'assets/svg_icons/logout.svg';
+  static const String calendarSvg = 'assets/svg_icons/calendar.svg';
 
   // svg image paths
   static const String isProfileFor = 'assets/svgs/isProfileFor.svg';
+  static const String aboutYou = 'assets/svgs/about_you.svg';
 
 }

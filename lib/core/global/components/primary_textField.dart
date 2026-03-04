@@ -230,7 +230,9 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
                 widget.headLine!,
                 style: TextStyle(
                     fontSize: TextSize.font14(context),
-                    fontWeight: FontWeight.w500),
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF171717)
+                ),
               ),
             if (widget.headLineInfoIcon == true && widget.headLine != null)
               Icon(Icons.info, size: TextSize.font13(context), color:AppColors.disableText),
