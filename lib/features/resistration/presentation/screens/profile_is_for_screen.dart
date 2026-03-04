@@ -46,11 +46,11 @@ class _IsProfileForScreenState extends ConsumerState<IsProfileForScreen> {
                   Column(
                     spacing: 10,
                     children: List.generate(provider.profileForList.length, (index) {
-                      final mood = provider.profileForList[index];
-                      return MoodItemWidget(
-                        title: mood.name ,
-                        imagePath: mood.emoji,
-                        isSelected: mood.isSelected,
+                      final isProfileFor = provider.profileForList[index];
+                      return IsProfileForItemWidget(
+                        title: isProfileFor.name ,
+                        imagePath: isProfileFor.emoji,
+                        isSelected: isProfileFor.isSelected,
                         onTap: () {
                          // selectedIndex = index;
                         },

@@ -10,8 +10,6 @@ class RegistrationProvider extends BaseChangeNotifier {
   ];
 
 
-
-
   RegistrationScreenStates screenStates = RegistrationScreenStates.defaultLoading;
   RegistrationScreenStates loaderState = RegistrationScreenStates.defaultLoading;
 

@@ -132,7 +132,7 @@ class HomeScreen extends ConsumerWidget {
               Column(
                 children: List.generate(moodList.length, (index) {
                   final mood = moodList[index];
-                  return MoodItemWidget(
+                  return IsProfileForItemWidget(
                     title: mood['title'] ?? '',
                     imagePath: mood['image'] ?? '',
                     isSelected: selectedIndex == index,
@@ -146,7 +146,7 @@ class HomeScreen extends ConsumerWidget {
                 spacing: 8,
                 children: [
                   Expanded(
-                    child: MoodItemWidget(
+                    child: IsProfileForItemWidget(
                       title: moodList[0]['title'] ?? '', // Access first item's title
                       imagePath: moodList[0]['image'] ?? '', // Access first item's image
                       isSelected: selectedIndex == 0, onTap: () {  },
@@ -154,7 +154,7 @@ class HomeScreen extends ConsumerWidget {
                     ),
                   ),
                   Expanded(
-                    child: MoodItemWidget(
+                    child: IsProfileForItemWidget(
                       title: moodList[1]['title'] ?? '', // Access first item's title
                       imagePath: moodList[1]['image'] ?? '', // Access first item's image
                       isSelected: selectedIndex == 1, onTap: () {  },

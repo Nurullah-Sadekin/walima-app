@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 
-class MoodItemWidget extends StatelessWidget {
-  final String title;
-  final String imagePath;
-  final bool isSelected;
-  final VoidCallback onTap;
+class IsProfileForItemWidget extends StatelessWidget {
 
-  const MoodItemWidget({
+  const IsProfileForItemWidget({
     super.key,
     required this.title,
     required this.imagePath,
     required this.isSelected,
     required this.onTap,
   });
+  final String title;
+  final String imagePath;
+  final bool isSelected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
