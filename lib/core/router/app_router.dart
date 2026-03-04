@@ -9,6 +9,8 @@ import 'package:flutter_boilerplate/features/splash_screen.dart';
 import 'package:flutter_boilerplate/features/anchor_point/anchor_point.dart';
 import 'package:flutter_boilerplate/features/login/presentation/login_screen.dart';
 
+import 'route_name.dart';
+
 part 'app_router.g.dart';
 
 /// GoRouter configuration
@@ -44,8 +46,8 @@ GoRouter goRouter(GoRouterRef ref) {
         builder: (context, state) => const OnboardingScreen(),
       ),
       GoRoute(
-        path: '/isProfileFor',
-        name: 'isProfileFor',
+        path: Paths.isProfileFor,
+        name: Routes.isProfileFor,
         builder: (context, state) => const IsProfileForScreen(),
       ),
     ],
