@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/features/onboarding_screen.dart';
-import 'package:flutter_boilerplate/features/home/presentation/screens/home_screen.dart';
-import 'package:flutter_boilerplate/features/resistration/presentation/screens/profile_is_for_screen.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/about_you.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/profile_is_for_screen.dart';
 import 'package:flutter_boilerplate/features/settings/presentation/screens/settings_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -49,6 +49,11 @@ GoRouter goRouter(GoRouterRef ref) {
         path: Paths.isProfileFor,
         name: Routes.isProfileFor,
         builder: (context, state) => const IsProfileForScreen(),
+      ),
+      GoRoute(
+        path: Paths.aboutYou,
+        name: Routes.aboutYou,
+        builder: (context, state) => const AboutYou(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

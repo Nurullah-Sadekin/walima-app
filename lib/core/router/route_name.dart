@@ -6,6 +6,7 @@ abstract class Paths {
   static const settings = '/settings';
   static const onboarding = '/onboarding';
   static const isProfileFor = '/isProfileFor';
+  static const aboutYou = '/aboutYou';
 }
 
 abstract class Routes {
@@ -16,4 +17,5 @@ abstract class Routes {
   static const settings = 'settings';
   static const onboarding = 'onboarding';
   static const isProfileFor = 'isProfileFor';
+  static const aboutYou = 'aboutYou';
 }

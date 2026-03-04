@@ -98,18 +98,7 @@ class HomeScreen extends ConsumerWidget {
                 suffix: const Icon(Icons.check_circle,
                     color: Colors.green, size: 20),
               ),
-              PrimaryTextField(
-                controller: emailController,
-                headLine: 'Date of Birth',
-                hintText: 'DD/MM/YYYY',
-                onChanged: (value) {},
-                headLineInfoIcon: true,
-                errorText: null,
-                onTap: () {},
-                datePicker: true,
-                readOnly: true,
-                prefixIcon: Icons.calendar_month,
-              ),
+
               PrimaryTextField(
                 controller: emailController,
                 hintText: 'Enter your password',

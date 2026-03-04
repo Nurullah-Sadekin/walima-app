@@ -1,6 +1,7 @@
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/features/resistration/domain/profile_for_model.dart';
+import 'package:flutter_boilerplate/features/registration/domain/profile_for_model.dart';
 
 class RegistrationProvider extends BaseChangeNotifier {
 
@@ -10,6 +11,15 @@ class RegistrationProvider extends BaseChangeNotifier {
 
   String? selectedProfileName;
   String? selectedGenderName;
+  final TextEditingController firstName = TextEditingController();
+  final TextEditingController lastName = TextEditingController();
+  final TextEditingController dateOfBirth = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+
+
+
 
   List<ProfileFor> profileForList = profileForListInserted;
   List<ProfileFor> genderForList = genderForListInserted;

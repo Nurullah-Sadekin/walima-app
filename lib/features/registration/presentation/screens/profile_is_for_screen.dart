@@ -7,9 +7,11 @@ import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_type_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
-import 'package:flutter_boilerplate/features/resistration/presentation/providers/resistration_provider.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class IsProfileForScreen extends ConsumerStatefulWidget {
   const IsProfileForScreen({super.key});
@@ -162,6 +164,11 @@ class _IsProfileForScreenState extends ConsumerState<IsProfileForScreen> {
           : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
+        if (provider.selectedProfileName == null ||
+            provider.selectedGenderName == null) {
+          return;
+        }
+        context.push(Paths.aboutYou);
         // Handle continue action
       },
     );
