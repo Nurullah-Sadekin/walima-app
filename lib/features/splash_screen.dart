@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/features/anchor_point/anchor_point.dart';
-import 'package:flutter_boilerplate/features/login/presentation/login_screen.dart';
-
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -24,7 +21,8 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkAuth() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      prefs.setString(_tokenKey, 'HasToken');
+      // prefs.setString(_tokenKey, 'HasToken');
+      // prefs.clear();
       final token = prefs.getString(_tokenKey);
 
       // Small delay so splash is visible for a moment
@@ -41,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
         context.go('/anchor');
       } else {
         if (!mounted) return;
-        context.go('/login');
+        context.go('/onboarding');
       }
     } catch (e) {
       // In case of any error, go to login
@@ -56,9 +54,9 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Container(
         color: Theme.of(context).scaffoldBackgroundColor,
         alignment: Alignment.center,
-        child: Column(
+        child: const Column(
           mainAxisSize: MainAxisSize.min,
-          children: const [
+          children: [
             FlutterLogo(size: 88),
             SizedBox(height: 16),
             Text(

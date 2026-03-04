@@ -1,7 +1,12 @@
 import 'package:flutter_boilerplate/features/login/presentation/providers/login_provider.dart';
+import 'package:flutter_boilerplate/features/resistration/presentation/providers/resistration_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final loginProvider = ChangeNotifierProvider<LoginProviderNotifier>((ref) {
-  return LoginProviderNotifier();
+final loginProvider = ChangeNotifierProvider<LoginProvider>((ref) {
+  return LoginProvider();
+});
+
+final registrationProvider = ChangeNotifierProvider<RegistrationProvider>((ref) {
+  return RegistrationProvider();
 });
 
