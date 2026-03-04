@@ -6,11 +6,7 @@ import 'package:flutter_boilerplate/core/constants/app_texts.dart';
 /// Singleton Dio client for handling all API calls
 /// Includes status code handling and pretty logger
 class DioClient {
-  // Singleton instance
-  static final DioClient _instance = DioClient._internal();
   factory DioClient() => _instance;
-
-  late Dio _dio;
 
   DioClient._internal() {
     _dio = Dio(
@@ -63,6 +59,10 @@ class DioClient {
       ),
     );
   }
+  // Singleton instance
+  static final DioClient _instance = DioClient._internal();
+
+  late Dio _dio;
 
   /// Get Dio instance
   Dio get dio => _dio;
@@ -383,10 +383,6 @@ class DioClient {
 
 /// API Response wrapper class
 class ApiResponse<T> {
-  final bool isSuccess;
-  final String message;
-  final T? data;
-  final int statusCode;
 
   ApiResponse({
     required this.isSuccess,
@@ -420,6 +416,10 @@ class ApiResponse<T> {
       statusCode: statusCode,
     );
   }
+  final bool isSuccess;
+  final String message;
+  final T? data;
+  final int statusCode;
 
   @override
   String toString() {
