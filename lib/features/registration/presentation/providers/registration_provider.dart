@@ -14,6 +14,9 @@ class RegistrationProvider extends BaseChangeNotifier {
   final TextEditingController firstName = TextEditingController();
   final TextEditingController lastName = TextEditingController();
   final TextEditingController dateOfBirth = TextEditingController();
+  final TextEditingController religion = TextEditingController();
+  final TextEditingController community = TextEditingController();
+  final TextEditingController livingIn = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 

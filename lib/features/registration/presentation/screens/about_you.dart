@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
@@ -9,7 +11,6 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
-import 'package:flutter_boilerplate/core/global/components/profile_type_card.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:go_router/go_router.dart';
@@ -137,8 +138,7 @@ class _IsProfileForScreenState extends ConsumerState<AboutYou> {
                     fontWeight: FontWeight.w500,
                     color: AppColors.grey,
                   ),
-                )
-            )
+                ))
           ],
         ),
       ],
@@ -154,11 +154,13 @@ class _IsProfileForScreenState extends ConsumerState<AboutYou> {
           : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
-        if (provider.selectedProfileName == null ||
-            provider.selectedGenderName == null) {
+        if ((provider.firstName.text.isNotEmpty &&
+                provider.lastName.text.isNotEmpty &&
+                provider.dateOfBirth.text.isNotEmpty) ==
+            true) {
           return;
         }
-        context.push(Paths.aboutYou);
+        context.push(Paths.yourReligion);
         // Handle continue action
       },
     );
