@@ -47,7 +47,7 @@ class OnboardingScreen extends StatelessWidget {
                         textColor: AppColors.primary,
                         bgColor: Colors.white,
                         onTap: () {
-                          context.push('/isProfileFor');
+                          context.push(Paths.isProfileFor);
                         },
                         title: 'Sign Up with Email',
                       ),
@@ -58,7 +58,7 @@ class OnboardingScreen extends StatelessWidget {
                         borderColor: Colors.white,
                         bgColor: Colors.black12,
                         onTap: () {
-                          context.push('/isProfileFor');
+                          context.push(Paths.isProfileFor);
                         },
                         title: 'Sign Up with OTP',
                       ),

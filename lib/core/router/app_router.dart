@@ -17,32 +17,32 @@ part 'app_router.g.dart';
 @riverpod
 GoRouter goRouter(GoRouterRef ref) {
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: Paths.splash,
     debugLogDiagnostics: true,
     routes: [
       GoRoute(
-        path: '/',
-        name: 'splash',
+        path: Paths.splash,
+        name: Routes.splash,
         builder: (context, state) => const SplashScreen(),
       ),
       GoRoute(
-        path: '/anchor',
-        name: 'anchor',
+        path: Paths.anchor,
+        name: Routes.anchor,
         builder: (context, state) => const AnchorPointScreen(),
       ),
       GoRoute(
-        path: '/login',
-        name: 'login',
+        path: Paths.login,
+        name: Routes.login,
         builder: (context, state) => const LoginScreen(),
       ),
       GoRoute(
-        path: '/settings',
-        name: 'settings',
+        path: Paths.settings,
+        name: Routes.settings,
         builder: (context, state) => const SettingsScreen(),
       ),   
       GoRoute(
-        path: '/onboarding',
-        name: 'onboarding',
+        path: Paths.onboarding,
+        name: Routes.onboarding,
         builder: (context, state) => const OnboardingScreen(),
       ),
       GoRoute(
@@ -71,7 +71,7 @@ GoRouter goRouter(GoRouterRef ref) {
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () => context.go('/'),
+              onPressed: () => context.go(Paths.splash),
               child: const Text('Go to Home'),
             ),
           ],

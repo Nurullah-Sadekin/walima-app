@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -36,15 +37,15 @@ class _SplashScreenState extends State<SplashScreen> {
 
         // Navigate to the anchor point (main app)
         if (!mounted) return;
-        context.go('/anchor');
+        context.go(Paths.anchor);
       } else {
         if (!mounted) return;
-        context.go('/onboarding');
+        context.go(Paths.onboarding);
       }
     } catch (e) {
       // In case of any error, go to login
       if (!mounted) return;
-      context.go('/login');
+      context.go(Paths.login);
     }
   }
 

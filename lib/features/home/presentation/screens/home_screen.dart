@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_boilerplate/generated/l10n/app_localizations.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -34,7 +35,7 @@ class HomeScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () => context.push('/settings'),
+            onPressed: () => context.push(Paths.settings),
           ),
         ],
       ),
