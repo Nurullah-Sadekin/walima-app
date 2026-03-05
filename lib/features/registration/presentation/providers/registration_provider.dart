@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/features/registration/domain/diet_model.dart';
+import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/is_with_family_status_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/profile_for_model.dart';
 
@@ -15,6 +15,10 @@ class RegistrationProvider extends BaseChangeNotifier {
   String? selectedGenderName;
   String? selectedIsWithFamilyStatus;
   String? selectedDietStatus;
+  String? selectedIncomePeriodStatus;
+  String? selectedIncomeRange;
+  String? selectedYourWork;
+  String? selectedYouWorkAs;
 
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
@@ -34,22 +38,27 @@ class RegistrationProvider extends BaseChangeNotifier {
   final TextEditingController instituteController = TextEditingController();
   final TextEditingController anotherInstituteController = TextEditingController();
 
+  // controllers for new dropdowns
+  final TextEditingController incomeRangeController = TextEditingController();
+  final TextEditingController yourWorkController = TextEditingController();
+  final TextEditingController youWorkAsController = TextEditingController();
+
   VoidCallback? _controllersListener;
 
   List<ProfileForModel> profileForList = profileForListInserted;
   List<GenderProfileForModel> genderForList = genderForListInserted;
   List<IsWithFamilyModel> isWithFamilyDataList = isWithFamilyDataListInserted;
-  List<DietModel> dietDataList = dietDataListInserted;
+  List<IsWithFamilyModel> incomePeriodDataList= incomePeriodDataListInserted;
+  List<SingleStringModel> dietDataList = dietDataListInserted;
+  List<SingleStringModel> incomeRangeList = incomeRangeListInserted;
+  List<SingleStringModel> yourWorkList = yourWorkListInserted;
+  List<SingleStringModel> youWorkAsList = youWorkAsListInserted;
+
+
+
 
   Future<void> getInitialData() async {
     // Simulate a delay for fetching data
-    // updateViewState(screenStates: RegistrationScreenStates.isProfileFor);
-    // await Future.delayed(const Duration(seconds: 2));
-    // updateViewState(screenStates: RegistrationScreenStates.loadingComplete);
-    // await Future.delayed(const Duration(seconds: 3));
-    // updateViewState(loadingState: RegistrationScreenStates.isProfileFor);
-    // await Future.delayed(const Duration(seconds: 2));
-    // updateViewState(loadingState: RegistrationScreenStates.loadingComplete);
   }
 
   /// Call this once (e.g., from a widget's initState via ref.read) to attach
@@ -113,6 +122,21 @@ class RegistrationProvider extends BaseChangeNotifier {
     try {
       phoneController.addListener(_controllersListener!);
     } catch (_) {}
+    // new dropdown controllers
+    try {
+      incomeRangeController.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      yourWorkController.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      youWorkAsController.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      currentCompanyNameController.addListener(_controllersListener!);
+    } catch (_) {}
+
+
   }
 
   /// Remove attached listeners. Call this from the widget's dispose or when
@@ -170,7 +194,22 @@ class RegistrationProvider extends BaseChangeNotifier {
     try {
       phoneController.removeListener(_controllersListener!);
     } catch (_) {}
+    // new dropdown controllers
+    try {
+      incomeRangeController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      yourWorkController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      youWorkAsController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      currentCompanyNameController.removeListener(_controllersListener!);
+    } catch (_) {}
+
     _controllersListener = null;
+
   }
 
   void selectedProfileFor(int index) {
@@ -208,6 +247,37 @@ class RegistrationProvider extends BaseChangeNotifier {
     }
     selectedDietStatus = dietDataList[index].name;
 
+    notifyListeners();
+  }
+
+  void selectedIncomePeriod(int index) {
+    if (index < 0 || index >= incomePeriodDataList.length) return;
+    for (var i = 0; i < incomePeriodDataList.length; i++) {
+      incomePeriodDataList[i].isSelected = i == index;
+    }
+    selectedIncomePeriodStatus = incomePeriodDataList[index].name;
+
+    notifyListeners();
+  }
+
+  void selectIncomeRange(String? value) {
+    if (value == null) return;
+    incomeRangeController.text = value;
+    selectedIncomeRange = value;
+    notifyListeners();
+  }
+
+  void selectYourWork(String? value) {
+    if (value == null) return;
+    yourWorkController.text = value;
+    selectedYourWork = value;
+    notifyListeners();
+  }
+
+  void selectYouWorkAs(String? value) {
+    if (value == null) return;
+    youWorkAsController.text = value;
+    selectedYouWorkAs = value;
     notifyListeners();
   }
 

@@ -107,6 +107,18 @@ class BottomSheetUtils {
       dynamic selectedValue,
       Function(dynamic) onItemSelected,
       ) {
+    String _display(dynamic item) {
+      try {
+        if (item == null) return '';
+        if (item is String) return item;
+        if (item is Map) return (item['name'] ?? item['title'] ?? item.toString()).toString();
+        final dynamic name = item.name ?? item.title;
+        return (name ?? item.toString()).toString();
+      } catch (_) {
+        return item.toString();
+      }
+    }
+
     if (items.isEmpty) {
       return const Center(
         child: Column(
@@ -141,17 +153,19 @@ class BottomSheetUtils {
       ),
       itemBuilder: (context, index) {
         final item = items[index];
-        final isSelected = item == selectedValue;
+        final displayText = _display(item);
+        final selectedText = selectedValue != null ? selectedValue.toString() : '';
+        final isSelected = displayText == selectedText;
 
         return Container(
           color: isSelected ? AppColors.primaryVariant : Colors.transparent,
           child: ListTile(
             onTap: () {
-              // Update selection visually
-              onItemSelected(item);
+              // Update selection visually with the display string
+              onItemSelected(displayText);
 
-              // Close bottom sheet and return the selected item
-              Navigator.pop(context, item);
+              // Close bottom sheet and return the display string so controller gets a readable value
+              Navigator.pop(context, displayText);
             },
             trailing: isSelected
                 ? Container(
@@ -172,7 +186,7 @@ class BottomSheetUtils {
               size: TextSize.font18(context),
             ),
             title: Text(
-              item.toString(),
+              displayText,
               style: TextStyle(
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 color: isSelected ? AppColors.primary : Colors.black87,

@@ -25,3 +25,8 @@ List<IsWithFamilyModel> isWithFamilyDataListInserted = [
   IsWithFamilyModel(name: 'Yes'),
   IsWithFamilyModel(name: 'No',),
 ];
+
+List<IsWithFamilyModel> incomePeriodDataListInserted = [
+  IsWithFamilyModel(name: 'Yearly'),
+  IsWithFamilyModel(name: 'Monthly',),
+];
