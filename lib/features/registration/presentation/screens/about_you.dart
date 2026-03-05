@@ -25,15 +25,19 @@ class _IsProfileForScreenState extends ConsumerState<AboutYou> {
   @override
   void initState() {
     super.initState();
+    // cache provider so we don't call ref inside dispose
+    provider = ref.read(registrationProvider);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(registrationProvider).getInitialData();
-      ref.read(registrationProvider).initControllersListener();
+      provider.getInitialData();
+      provider.initControllersListener();
     });
   }
 
   @override
   void dispose() {
-    ref.read(registrationProvider).disposeControllersListener();
+    // use cached provider instead of calling ref.read here
+    provider.disposeControllersListener();
     super.dispose();
   }
 
@@ -83,7 +87,7 @@ class _IsProfileForScreenState extends ConsumerState<AboutYou> {
       spacing: 10,
       children: [
         PrimaryTextField(
-          controller: provider.firstName,
+          controller: provider.firstNameController,
           headLine: 'Your Name',
           hintText: 'First Name',
           noPrefix: true,
@@ -91,7 +95,7 @@ class _IsProfileForScreenState extends ConsumerState<AboutYou> {
           onTap: () {},
         ),
         PrimaryTextField(
-          controller: provider.lastName,
+          controller: provider.lastNameController,
           hideHeadline: true,
           hintText: 'Last Name',
           noPrefix: true,
@@ -105,7 +109,7 @@ class _IsProfileForScreenState extends ConsumerState<AboutYou> {
           children: [
             Expanded(
               child: PrimaryTextField(
-                controller: provider.dateOfBirth,
+                controller: provider.dateOfBirthController,
                 headLine: 'Date of Birth',
                 hintText: 'DD/MM/YYYY',
                 errorText: null,
@@ -144,17 +148,17 @@ class _IsProfileForScreenState extends ConsumerState<AboutYou> {
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: provider.firstName.text.isNotEmpty &&
-              provider.lastName.text.isNotEmpty &&
-              provider.dateOfBirth.text.isNotEmpty
+      buttonStyle: provider.firstNameController.text.isNotEmpty &&
+              provider.lastNameController.text.isNotEmpty &&
+              provider.dateOfBirthController.text.isNotEmpty
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
         // block if any field is empty
-        if (provider.firstName.text.isEmpty ||
-            provider.lastName.text.isEmpty ||
-            provider.dateOfBirth.text.isEmpty) {
+        if (provider.firstNameController.text.isEmpty ||
+            provider.lastNameController.text.isEmpty ||
+            provider.dateOfBirthController.text.isEmpty) {
           return;
         }
         context.push(Paths.yourReligion);

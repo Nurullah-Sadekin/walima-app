@@ -87,17 +87,6 @@ class HomeScreen extends ConsumerWidget {
                   ),
                   borderColor: Colors.green,
                   textColor: AppColors.primary),
-              PrimaryTextField(
-                controller: emailController,
-                headLine: 'Email Address',
-                hintText: 'Enter your email',
-                prefixIcon: Icons.email_outlined,
-                onChanged: (value) {},
-                errorText: null,
-                onTap: () {},
-                suffix: const Icon(Icons.check_circle,
-                    color: Colors.green, size: 20),
-              ),
 
               PrimaryTextField(
                 controller: emailController,

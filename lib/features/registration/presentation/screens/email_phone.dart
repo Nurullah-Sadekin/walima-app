@@ -79,37 +79,36 @@ class _YourRegionState extends ConsumerState<EmailPhone> {
     return Column(
       spacing: 20,
       children: [
-        DropDownField(
-          headLine: 'Your Religion',
-          hintText: 'Select',
-          popUpHeader: 'Select Religion',
-          items: const ['Islam', 'Hinduism', 'Buddhism', 'Christianity'],
-          controller: provider.religion,
+        PrimaryTextField(
+          controller: provider.emailController,
+          headLine: 'Email Address',
+          hintText: 'hello@aliguni.com',
+          keyboardType: TextInputType.emailAddress,
+          prefixIcon: ShowImage(
+            imagePath: AppImages.email,
+            width: TextSize.font18(context),
+            height: TextSize.font18(context),
+            color: provider.emailController.text.isNotEmpty ? AppColors.textPrimaryLight : AppColors.hintTextColor,
+          ),
+          errorText: null,
           onTap: () {},
-          isSearch: true,
         ),
-        provider.religion.text.isEmpty
-            ? const SizedBox.shrink()
-            : DropDownField(
-                headLine: 'Community',
-                hintText: 'Select',
-                popUpHeader: 'Select Community',
-                headLineInfoIcon: true,
-                items: const ['Islam', 'Hinduism', 'Buddhism', 'Christianity'],
-                controller: provider.community,
-                onTap: () {},
-                isSearch: true,
-              ),
-
+        PrimaryTextField(
+          controller: provider.phoneController,
+          headLine: 'Phone Number',
+          hintText: '(555) 000-0000',
+          errorText: null,
+          noPrefix: true,
+          onTap: () {},
+        ),
       ],
     );
   }
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: provider.religion.text.isNotEmpty &&
-              provider.community.text.isNotEmpty &&
-              provider.livingIn.text.isNotEmpty
+      buttonStyle: provider.emailController.text.isNotEmpty ||
+              provider.phoneController.text.isNotEmpty
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,
       title: 'Continue',

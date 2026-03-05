@@ -62,7 +62,7 @@ class PrimaryTextField extends StatefulWidget {
   final int? maxLine;
   final double? borderRadius;
   final bool? readOnly;
-  final IconData? prefixIcon;
+  final Widget? prefixIcon;
   final bool? showPassIcon;
   final bool? headLineInfoIcon;
 
@@ -155,7 +155,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
         FocusManager.instance.primaryFocus?.unfocus();
       },
       style: TextStyle(
-        color: widget.textColor ?? Colors.black,
+        color: widget.textColor ?? AppColors.textPrimaryLight,
         fontSize: TextSize.font14(context),
         fontWeight: FontWeight.w400,
       ),
@@ -171,8 +171,8 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
         prefixIcon: widget.noPrefix != null && true
             ? const SizedBox()
             : Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Icon(widget.prefixIcon, color: const Color(0xFFA3A3A3)),
+                padding: const EdgeInsets.only(left: 16.0,right: 4),
+                child: widget.prefixIcon,
               ),
         border: InputBorderStyle.border(6, borderColor: widget.borderColor),
         focusedBorder: InputBorderStyle.focusedBorder(6),

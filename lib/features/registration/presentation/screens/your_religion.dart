@@ -1,20 +1,14 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:go_router/go_router.dart';
 
 class YourReligion extends ConsumerStatefulWidget {
@@ -29,9 +23,20 @@ class _YourRegionState extends ConsumerState<YourReligion> {
   @override
   void initState() {
     super.initState();
+    // cache the provider instance so we don't call `ref` inside dispose
+    provider = ref.read(registrationProvider);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(registrationProvider).getInitialData();
+      provider.getInitialData();
+      provider.initControllersListener();
     });
+  }
+
+  @override
+  void dispose() {
+    // use the cached provider instance rather than calling ref.read here
+    provider.disposeControllersListener();
+    super.dispose();
   }
 
   @override
@@ -84,12 +89,12 @@ class _YourRegionState extends ConsumerState<YourReligion> {
           hintText: 'Select',
           popUpHeader: 'Select Religion',
           items: const ['Islam', 'Hinduism', 'Buddhism', 'Christianity'],
-          controller: provider.religion,
+          controller: provider.religionController,
           onTap: () {
           },
           isSearch: true,
         ),
-        provider.religion.text.isEmpty
+        provider.religionController.text.isEmpty
             ? const SizedBox.shrink()
             : DropDownField(
                 headLine: 'Community',
@@ -97,19 +102,19 @@ class _YourRegionState extends ConsumerState<YourReligion> {
                 popUpHeader: 'Select Community',
                 headLineInfoIcon: true,
                 items: const ['Islam', 'Hinduism', 'Buddhism', 'Christianity'],
-                controller: provider.community,
+                controller: provider.communityController,
                 onTap: () {
                 },
                 isSearch: true,
               ),
-        provider.religion.text.isEmpty && provider.community.text.isEmpty
+        provider.religionController.text.isEmpty || provider.communityController.text.isEmpty
             ? const SizedBox.shrink()
             : DropDownField(
                 headLine: 'Living In',
                 hintText: 'Select',
                 popUpHeader: 'Select Living In',
                 items: const ['Islam', 'Hinduism', 'Buddhism', 'Christianity'],
-                controller: provider.livingIn,
+                controller: provider.livingInController,
                 onTap: () {},
                 isSearch: true,
               ),
@@ -119,16 +124,17 @@ class _YourRegionState extends ConsumerState<YourReligion> {
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: provider.religion.text.isNotEmpty &&
-              provider.community.text.isNotEmpty &&
-              provider.livingIn.text.isNotEmpty
+      buttonStyle: provider.religionController.text.isNotEmpty &&
+              provider.communityController.text.isNotEmpty &&
+              provider.livingInController.text.isNotEmpty
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
-        if (provider.religion.text.isEmpty &&
-            provider.community.text.isEmpty &&
-            provider.livingIn.text.isEmpty) {
+        // block if any field is empty
+        if (provider.religionController.text.isEmpty ||
+            provider.communityController.text.isEmpty ||
+            provider.livingInController.text.isEmpty) {
           return;
         }
         context.push(Paths.emailPhone);

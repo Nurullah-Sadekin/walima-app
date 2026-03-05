@@ -9,13 +9,14 @@ class RegistrationProvider extends BaseChangeNotifier {
 
   String? selectedProfileName;
   String? selectedGenderName;
-  final TextEditingController firstName = TextEditingController();
-  final TextEditingController lastName = TextEditingController();
-  final TextEditingController dateOfBirth = TextEditingController();
-  final TextEditingController religion = TextEditingController();
-  final TextEditingController community = TextEditingController();
-  final TextEditingController livingIn = TextEditingController();
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
+  final TextEditingController dateOfBirthController = TextEditingController();
+  final TextEditingController religionController = TextEditingController();
+  final TextEditingController communityController = TextEditingController();
+  final TextEditingController livingInController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   VoidCallback? _controllersListener;
@@ -34,33 +35,69 @@ class RegistrationProvider extends BaseChangeNotifier {
     // updateViewState(loadingState: RegistrationScreenStates.loadingComplete);
   }
 
+  /// Call this once (e.g., from a widget's initState via ref.read) to attach
+  /// listeners to TextEditingControllers owned by the provider. When any
+  /// controller changes, the provider will call notifyListeners().
   void initControllersListener() {
-
+    // avoid attaching multiple times
     if (_controllersListener != null) return;
 
     _controllersListener = () => notifyListeners();
 
     try {
-      firstName.addListener(_controllersListener!);
+      firstNameController.addListener(_controllersListener!);
     } catch (_) {}
     try {
-      lastName.addListener(_controllersListener!);
+      lastNameController.addListener(_controllersListener!);
     } catch (_) {}
     try {
-      dateOfBirth.addListener(_controllersListener!);
+      dateOfBirthController.addListener(_controllersListener!);
+    } catch (_) {}
+    // additional controllers used across registration screens
+    try {
+      religionController.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      communityController.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      livingInController.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      emailController.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      passwordController.addListener(_controllersListener!);
     } catch (_) {}
   }
 
+  /// Remove attached listeners. Call this from the widget's dispose or when
+  /// provider no longer needs to forward controller changes.
   void disposeControllersListener() {
     if (_controllersListener == null) return;
     try {
-      firstName.removeListener(_controllersListener!);
+      firstNameController.removeListener(_controllersListener!);
     } catch (_) {}
     try {
-      lastName.removeListener(_controllersListener!);
+      lastNameController.removeListener(_controllersListener!);
     } catch (_) {}
     try {
-      dateOfBirth.removeListener(_controllersListener!);
+      dateOfBirthController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      religionController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      communityController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      livingInController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      emailController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      passwordController.removeListener(_controllersListener!);
     } catch (_) {}
     _controllersListener = null;
   }
