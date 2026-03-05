@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
@@ -9,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
@@ -30,7 +27,14 @@ class _IsProfileForScreenState extends ConsumerState<AboutYou> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(registrationProvider).getInitialData();
+      ref.read(registrationProvider).initControllersListener();
     });
+  }
+
+  @override
+  void dispose() {
+    ref.read(registrationProvider).disposeControllersListener();
+    super.dispose();
   }
 
   @override
@@ -147,9 +151,10 @@ class _IsProfileForScreenState extends ConsumerState<AboutYou> {
           : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
-        if (provider.firstName.text.isEmpty &&
-                provider.lastName.text.isEmpty &&
-                provider.dateOfBirth.text.isEmpty) {
+        // block if any field is empty
+        if (provider.firstName.text.isEmpty ||
+            provider.lastName.text.isEmpty ||
+            provider.dateOfBirth.text.isEmpty) {
           return;
         }
         context.push(Paths.yourReligion);
