@@ -3,20 +3,10 @@ import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 
 class CustomExpansionTile extends StatelessWidget {
-  final String title;
-  final Widget child;
-  final Color? borderColor;
-  final double? borderRadius;
-  final Color? backgroundColor;
-  final Color? collapsedIconColor;
-  final Color? iconColor;
-  final EdgeInsetsGeometry? padding;
-  final bool initiallyExpanded;
-  final CrossAxisAlignment? crossAxisAlignment; // Added for alignment
-  final MainAxisAlignment? mainAxisAlignment; // Added for alignment
+  // Added for alignment
 
   const CustomExpansionTile({
-    Key? key,
+    super.key,
     required this.title,
     required this.child,
     this.borderColor,
@@ -28,17 +18,25 @@ class CustomExpansionTile extends StatelessWidget {
     this.initiallyExpanded = false,
     this.crossAxisAlignment = CrossAxisAlignment.start, // Default to left
     this.mainAxisAlignment = MainAxisAlignment.start, // Default to left
-  }) : super(key: key);
+  });
+  final String title;
+  final Widget child;
+  final Color? borderColor;
+  final double? borderRadius;
+  final Color? backgroundColor;
+  final Color? collapsedIconColor;
+  final Color? iconColor;
+  final EdgeInsetsGeometry? padding;
+  final bool initiallyExpanded;
+  final CrossAxisAlignment? crossAxisAlignment; // Added for alignment
+  final MainAxisAlignment? mainAxisAlignment;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: backgroundColor ?? AppColors.white,
-        border: Border.all(
-            color: borderColor ?? AppColors.greyLight,
-            width: 1
-        ),
+        border: Border.all(color: borderColor ?? AppColors.greyLight, width: 1),
         borderRadius: BorderRadius.all(
           Radius.circular(borderRadius ?? 8),
         ),
@@ -48,7 +46,6 @@ class CustomExpansionTile extends StatelessWidget {
           dividerColor: Colors.transparent,
         ),
         child: ExpansionTile(
-          initiallyExpanded: initiallyExpanded,
           collapsedIconColor: collapsedIconColor ?? AppColors.hintTextColor,
           iconColor: iconColor ?? AppColors.hintTextColor,
           title: Text(
@@ -60,11 +57,12 @@ class CustomExpansionTile extends StatelessWidget {
             ),
           ),
           children: [
-            Container( // Added Container for better alignment control
-              width: double.infinity, // Take full width
+            Container(
+              width: double.infinity,
               padding: padding ?? const EdgeInsets.all(16.0),
               child: Column(
-                crossAxisAlignment: crossAxisAlignment ?? CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    crossAxisAlignment ?? CrossAxisAlignment.start,
                 mainAxisAlignment: mainAxisAlignment ?? MainAxisAlignment.start,
                 children: [
                   child,
