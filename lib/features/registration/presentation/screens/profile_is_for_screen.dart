@@ -10,6 +10,7 @@ import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/widgets/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -44,7 +45,7 @@ class _IsProfileForScreenState extends ConsumerState<IsProfileForScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const CustomBackAppBar(),
+                    const UpperLayer(imagePath: AppImages.isProfileFor),
                     body(),
                   ],
                 ),
@@ -60,14 +61,6 @@ class _IsProfileForScreenState extends ConsumerState<IsProfileForScreen> {
         child: Column(
           spacing: 10,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: ShowImage(
-                imagePath: AppImages.isProfileFor,
-                width: 110,
-                height: 110,
-              ),
-            ),
 
             isProfileForView(),
 

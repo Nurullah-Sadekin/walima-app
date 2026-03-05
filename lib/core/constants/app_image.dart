@@ -21,5 +21,6 @@ class AppImages {
   static const String isProfileFor = 'assets/svgs/isProfileFor.svg';
   static const String aboutYou = 'assets/svgs/about_you.svg';
   static const String religion = 'assets/svgs/religion.svg';
+  static const String emailPhone = 'assets/svgs/emailPhone.svg';
 
 }

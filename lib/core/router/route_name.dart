@@ -8,6 +8,18 @@ abstract class Paths {
   static const isProfileFor = '/isProfileFor';
   static const aboutYou = '/aboutYou';
   static const yourReligion = '/yourReligion';
+  static const emailPhone = '/emailPhone';
+  static const location = '/location';
+  static const maritalStatus = '/maritalStatus';
+  static const qualification = '/qualification';
+  static const profession = '/profession';
+  static const aboutYourself = '/aboutYourself';
+  static const verifyNumber = '/verifyNumber';
+  static const photoUpload = '/photoUpload';
+  static const hobbiesInterests = '/hobbiesInterests';
+  static const familyDetails = '/familyDetails';
+  static const financialStatus = '/financialStatus';
+
 }
 
 abstract class Routes {
@@ -20,4 +32,15 @@ abstract class Routes {
   static const isProfileFor = 'isProfileFor';
   static const aboutYou = 'aboutYou';
   static const yourReligion = 'yourReligion';
+  static const emailPhone = 'emailPhone';
+  static const location = 'location';
+  static const maritalStatus = 'maritalStatus';
+  static const qualification = 'qualification';
+  static const profession = 'profession';
+  static const aboutYourself = 'aboutYourself';
+  static const verifyNumber = 'verifyNumber';
+  static const photoUpload = 'photoUpload';
+  static const hobbiesInterests = 'hobbiesInterests';
+  static const familyDetails = 'familyDetails';
+  static const financialStatus = 'financialStatus';
 }

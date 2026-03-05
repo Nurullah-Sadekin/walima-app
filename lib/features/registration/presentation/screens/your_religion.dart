@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/widgets/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
@@ -48,7 +49,7 @@ class _YourRegionState extends ConsumerState<YourReligion> {
               ? const Loading()
               : Column(
                   children: [
-                    const CustomBackAppBar(),
+                    const UpperLayer(imagePath: AppImages.religion),
                     body(),
                   ],
                 ),
@@ -64,14 +65,6 @@ class _YourRegionState extends ConsumerState<YourReligion> {
         child: Column(
           spacing: 10,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: ShowImage(
-                imagePath: AppImages.religion,
-                width: 110,
-                height: 110,
-              ),
-            ),
             textField(),
             const Spacer(),
             bottomAction(),
@@ -133,15 +126,12 @@ class _YourRegionState extends ConsumerState<YourReligion> {
           : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
-        log(provider.religion.text);
-        log(provider.community.text);
-        log(provider.livingIn.text);
         if (provider.religion.text.isEmpty &&
             provider.community.text.isEmpty &&
             provider.livingIn.text.isEmpty) {
           return;
         }
-        context.push(Paths.yourReligion);
+        context.push(Paths.emailPhone);
       },
     );
   }

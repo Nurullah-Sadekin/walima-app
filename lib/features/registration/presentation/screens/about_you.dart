@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/widgets/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
@@ -47,7 +48,7 @@ class _IsProfileForScreenState extends ConsumerState<AboutYou> {
               ? const Loading()
               : Column(
                   children: [
-                    const CustomBackAppBar(),
+                    const UpperLayer(imagePath: AppImages.aboutYou),
                     body(),
                   ],
                 ),
@@ -63,14 +64,6 @@ class _IsProfileForScreenState extends ConsumerState<AboutYou> {
         child: Column(
           spacing: 10,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: ShowImage(
-                imagePath: AppImages.aboutYou,
-                width: 110,
-                height: 110,
-              ),
-            ),
             textField(),
             const Spacer(),
             bottomAction(),

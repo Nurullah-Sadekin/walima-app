@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/features/onboarding_screen.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/about_you.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/email_phone.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/profile_is_for_screen.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/your_religion.dart';
 import 'package:flutter_boilerplate/features/settings/presentation/screens/settings_screen.dart';
@@ -40,7 +41,7 @@ GoRouter goRouter(GoRouterRef ref) {
         path: Paths.settings,
         name: Routes.settings,
         builder: (context, state) => const SettingsScreen(),
-      ),   
+      ),
       GoRoute(
         path: Paths.onboarding,
         name: Routes.onboarding,
@@ -59,6 +60,51 @@ GoRouter goRouter(GoRouterRef ref) {
       GoRoute(
         path: Paths.yourReligion,
         name: Routes.yourReligion,
+        builder: (context, state) => const YourReligion(),
+      ),
+      GoRoute(
+        path: Paths.emailPhone,
+        name: Routes.emailPhone,
+        builder: (context, state) => const EmailPhone(),
+      ),
+      GoRoute(
+        path: Paths.location,
+        name: Routes.location,
+        builder: (context, state) => const YourReligion(),
+      ),
+      GoRoute(
+        path: Paths.maritalStatus,
+        name: Routes.maritalStatus,
+        builder: (context, state) => const YourReligion(),
+      ),
+      GoRoute(
+        path: Paths.qualification,
+        name: Routes.qualification,
+        builder: (context, state) => const YourReligion(),
+      ),
+      GoRoute(
+        path: Paths.profession,
+        name: Routes.profession,
+        builder: (context, state) => const YourReligion(),
+      ),
+      GoRoute(
+        path: Paths.aboutYourself,
+        name: Routes.aboutYourself,
+        builder: (context, state) => const YourReligion(),
+      ),
+      GoRoute(
+        path: Paths.verifyNumber,
+        name: Routes.verifyNumber,
+        builder: (context, state) => const YourReligion(),
+      ),
+      GoRoute(
+        path: Paths.photoUpload,
+        name: Routes.photoUpload,
+        builder: (context, state) => const YourReligion(),
+      ),
+      GoRoute(
+        path: Paths.hobbiesInterests,
+        name: Routes.hobbiesInterests,
         builder: (context, state) => const YourReligion(),
       ),
     ],
