@@ -154,10 +154,9 @@ class _IsProfileForScreenState extends ConsumerState<AboutYou> {
           : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
-        if ((provider.firstName.text.isNotEmpty &&
-                provider.lastName.text.isNotEmpty &&
-                provider.dateOfBirth.text.isNotEmpty) ==
-            true) {
+        if (provider.firstName.text.isEmpty &&
+                provider.lastName.text.isEmpty &&
+                provider.dateOfBirth.text.isEmpty) {
           return;
         }
         context.push(Paths.yourReligion);

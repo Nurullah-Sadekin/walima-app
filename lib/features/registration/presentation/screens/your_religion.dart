@@ -90,7 +90,9 @@ class _YourRegionState extends ConsumerState<YourReligion> {
           popUpHeader: 'Select Religion',
           items: const ['Islam', 'Hinduism', 'Buddhism', 'Christianity'],
           controller: provider.religion,
-          onTap: () {},
+          onTap: () {
+
+          },
           isSearch: true,
         ),
         provider.religion.text.isEmpty
