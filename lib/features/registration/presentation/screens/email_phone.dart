@@ -113,15 +113,12 @@ class _YourRegionState extends ConsumerState<EmailPhone> {
           : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
-        // log(provider.religion.text);
-        // log(provider.community.text);
-        // log(provider.livingIn.text);
-        // if (provider.religion.text.isEmpty &&
-        //     provider.community.text.isEmpty &&
-        //     provider.livingIn.text.isEmpty) {
-        //   return;
-        // }
-        // context.push(Paths.yourReligion);
+
+        if (provider.emailController.text.isEmpty ||
+            provider.phoneController.text.isEmpty ) {
+          return;
+        }
+        context.push(Paths.location);
       },
     );
   }

@@ -18,6 +18,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController professionController = TextEditingController();
 
   VoidCallback? _controllersListener;
 
@@ -69,6 +70,9 @@ class RegistrationProvider extends BaseChangeNotifier {
     try {
       passwordController.addListener(_controllersListener!);
     } catch (_) {}
+    try {
+      professionController.addListener(_controllersListener!);
+    } catch (_) {}
   }
 
   /// Remove attached listeners. Call this from the widget's dispose or when
@@ -98,6 +102,9 @@ class RegistrationProvider extends BaseChangeNotifier {
     } catch (_) {}
     try {
       passwordController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      professionController.removeListener(_controllersListener!);
     } catch (_) {}
     _controllersListener = null;
   }

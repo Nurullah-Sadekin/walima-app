@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/features/onboarding_screen.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/about_you.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/email_phone.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/profile_is_for_screen.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/profile_is_for.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/your_religion.dart';
 import 'package:flutter_boilerplate/features/settings/presentation/screens/settings_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +10,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_boilerplate/features/splash_screen.dart';
 import 'package:flutter_boilerplate/features/anchor_point/anchor_point.dart';
 import 'package:flutter_boilerplate/features/login/presentation/login_screen.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/location.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/marital_status.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/qualification.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/profession.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/about_yourself.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/verify_number.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/photo_upload.dart';
 
 import 'route_name.dart';
 
@@ -70,37 +77,37 @@ GoRouter goRouter(GoRouterRef ref) {
       GoRoute(
         path: Paths.location,
         name: Routes.location,
-        builder: (context, state) => const YourReligion(),
+        builder: (context, state) => const LocationScreen(),
       ),
       GoRoute(
         path: Paths.maritalStatus,
         name: Routes.maritalStatus,
-        builder: (context, state) => const YourReligion(),
+        builder: (context, state) => const MaritalStatusScreen(),
       ),
       GoRoute(
         path: Paths.qualification,
         name: Routes.qualification,
-        builder: (context, state) => const YourReligion(),
+        builder: (context, state) => const QualificationScreen(),
       ),
       GoRoute(
         path: Paths.profession,
         name: Routes.profession,
-        builder: (context, state) => const YourReligion(),
+        builder: (context, state) => const ProfessionScreen(),
       ),
       GoRoute(
         path: Paths.aboutYourself,
         name: Routes.aboutYourself,
-        builder: (context, state) => const YourReligion(),
+        builder: (context, state) => const AboutYourselfScreen(),
       ),
       GoRoute(
         path: Paths.verifyNumber,
         name: Routes.verifyNumber,
-        builder: (context, state) => const YourReligion(),
+        builder: (context, state) => const VerifyNumberScreen(),
       ),
       GoRoute(
         path: Paths.photoUpload,
         name: Routes.photoUpload,
-        builder: (context, state) => const YourReligion(),
+        builder: (context, state) => const PhotoUploadScreen(),
       ),
       GoRoute(
         path: Paths.hobbiesInterests,

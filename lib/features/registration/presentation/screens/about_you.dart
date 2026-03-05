@@ -121,7 +121,7 @@ class _IsProfileForScreenState extends ConsumerState<AboutYou> {
                   imagePath: AppImages.calendarSvg,
                   width: TextSize.font20(context),
                   height: TextSize.font20(context),
-                  color: AppColors.primary,
+                  color: provider.dateOfBirthController.text.isNotEmpty ? AppColors.textPrimaryLight : AppColors.hintTextColor,
                 ),
               ),
             ),
