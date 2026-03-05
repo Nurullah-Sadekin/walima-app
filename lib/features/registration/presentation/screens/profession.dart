@@ -49,7 +49,7 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.religion),
+                    const UpperLayer(imagePath: AppImages.profession),
                     body(),
                   ],
                 ),
@@ -80,10 +80,11 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
       spacing: 20,
       children: [
         PrimaryTextField(
-          controller: provider.professionController,
-          headLine: 'Profession',
-          hintText: 'Type your profession',
+          controller: provider.currentCompanyNameController,
+          headLine: 'Your Current Company Name',
+          hintText: 'Write here',
           errorText: null,
+          noPrefix: true,
           onTap: () {},
         ),
       ],
@@ -92,7 +93,7 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: provider.professionController.text.isNotEmpty
+      buttonStyle: provider.currentCompanyNameController.text.isNotEmpty
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,
       title: 'Continue',

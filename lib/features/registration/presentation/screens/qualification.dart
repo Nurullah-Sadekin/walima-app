@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
+import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
@@ -8,6 +10,7 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
+import 'package:go_router/go_router.dart';
 
 class QualificationScreen extends ConsumerStatefulWidget {
   const QualificationScreen({super.key});
@@ -49,7 +52,7 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.religion),
+                    const UpperLayer(imagePath: AppImages.qualification),
                     body(),
                   ],
                 ),
@@ -79,14 +82,29 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
     return Column(
       spacing: 20,
       children: [
-        DropDownField(
+        PrimaryTextField(
+          controller: provider.highestQualification,
           headLine: 'Highest Qualification',
-          hintText: 'Select',
-          popUpHeader: 'Select Qualification',
-          items: const ['High School', 'Bachelor', 'Master', 'PhD'],
-          controller: provider.communityController,
+          hintText: 'Write here',
+          errorText: null,
+          noPrefix: true,
           onTap: () {},
-          isSearch: true,
+        ),
+        PrimaryTextField(
+          controller: provider.instituteController,
+          headLine: 'Institute Name',
+          hintText: 'Write here',
+          errorText: null,
+          noPrefix: true,
+          onTap: () {},
+        ),
+        PrimaryTextField(
+          controller: provider.anotherInstituteController,
+          headLine: 'Another Institute Name',
+          hintText: 'Write here',
+          errorText: null,
+          noPrefix: true,
+          onTap: () {},
         ),
       ],
     );
@@ -94,11 +112,18 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: provider.communityController.text.isNotEmpty
+      buttonStyle: provider.highestQualification.text.isNotEmpty &&  provider.instituteController.text.isNotEmpty && provider.anotherInstituteController.text.isNotEmpty
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,
       title: 'Continue',
-      onTap: () {},
+      onTap: () {
+        if (provider.highestQualification.text.isEmpty ||
+            provider.instituteController.text.isEmpty ||  provider.anotherInstituteController.text.isEmpty) {
+          return;
+        }
+        context.push(Paths.profession);
+        // proceed
+      },
     );
   }
 }

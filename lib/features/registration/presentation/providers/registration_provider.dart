@@ -5,15 +5,16 @@ import 'package:flutter_boilerplate/features/registration/domain/is_with_family_
 import 'package:flutter_boilerplate/features/registration/domain/profile_for_model.dart';
 
 class RegistrationProvider extends BaseChangeNotifier {
-  RegistrationScreenStates screenStates = RegistrationScreenStates.defaultLoading;
-  RegistrationScreenStates loaderState = RegistrationScreenStates.defaultLoading;
+  RegistrationScreenStates screenStates =
+      RegistrationScreenStates.defaultLoading;
+  RegistrationScreenStates loaderState =
+      RegistrationScreenStates.defaultLoading;
   bool isLoading = false;
 
   String? selectedProfileName;
   String? selectedGenderName;
   String? selectedIsWithFamilyStatus;
   String? selectedDietStatus;
-
 
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
@@ -24,13 +25,14 @@ class RegistrationProvider extends BaseChangeNotifier {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController professionController = TextEditingController();
+  final TextEditingController currentCompanyNameController = TextEditingController();
   final TextEditingController cityController = TextEditingController();
   final TextEditingController residencyStatusController = TextEditingController();
   final TextEditingController maritalStatusController = TextEditingController();
   final TextEditingController heightController = TextEditingController();
-
-
+  final TextEditingController highestQualification = TextEditingController();
+  final TextEditingController instituteController = TextEditingController();
+  final TextEditingController anotherInstituteController = TextEditingController();
 
   VoidCallback? _controllersListener;
 
@@ -85,13 +87,31 @@ class RegistrationProvider extends BaseChangeNotifier {
       passwordController.addListener(_controllersListener!);
     } catch (_) {}
     try {
-      professionController.addListener(_controllersListener!);
+      currentCompanyNameController.addListener(_controllersListener!);
     } catch (_) {}
     try {
       cityController.addListener(_controllersListener!);
     } catch (_) {}
     try {
       residencyStatusController.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      maritalStatusController.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      heightController.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      highestQualification.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      instituteController.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      anotherInstituteController.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      phoneController.addListener(_controllersListener!);
     } catch (_) {}
   }
 
@@ -124,7 +144,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       passwordController.removeListener(_controllersListener!);
     } catch (_) {}
     try {
-      professionController.removeListener(_controllersListener!);
+      currentCompanyNameController.removeListener(_controllersListener!);
     } catch (_) {}
     try {
       cityController.removeListener(_controllersListener!);
@@ -132,10 +152,26 @@ class RegistrationProvider extends BaseChangeNotifier {
     try {
       residencyStatusController.removeListener(_controllersListener!);
     } catch (_) {}
+    try {
+      maritalStatusController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      heightController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      highestQualification.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      instituteController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      anotherInstituteController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      phoneController.removeListener(_controllersListener!);
+    } catch (_) {}
     _controllersListener = null;
   }
-
-
 
   void selectedProfileFor(int index) {
     if (index < 0 || index >= profileForList.length) return;
@@ -175,8 +211,9 @@ class RegistrationProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
-
-  void updateViewState({RegistrationScreenStates? screenStates, RegistrationScreenStates? loadingState}) {
+  void updateViewState(
+      {RegistrationScreenStates? screenStates,
+      RegistrationScreenStates? loadingState}) {
     if (screenStates != null) {
       this.screenStates = screenStates;
       loaderState = RegistrationScreenStates.defaultLoading;
@@ -184,7 +221,6 @@ class RegistrationProvider extends BaseChangeNotifier {
     if (loadingState != null) loaderState = loadingState;
     notifyListeners();
   }
-
 }
 
 enum RegistrationScreenStates {

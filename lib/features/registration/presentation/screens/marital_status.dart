@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
 import 'package:flutter_boilerplate/core/global/components/selected_button.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
+import 'package:go_router/go_router.dart';
 
 class MaritalStatusScreen extends ConsumerStatefulWidget {
   const MaritalStatusScreen({super.key});
@@ -106,6 +108,8 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Row(
+              spacing: 4,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
                   'Diet',
@@ -114,6 +118,8 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
+
+                Icon(Icons.info, size: TextSize.font13(context), color:AppColors.disableText),
               ],
             ),
 
@@ -152,11 +158,17 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: provider.communityController.text.isNotEmpty
+      buttonStyle: provider.maritalStatusController.text.isNotEmpty &&  provider.heightController.text.isNotEmpty && provider.selectedDietStatus != null
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
+        if (provider.maritalStatusController.text.isEmpty ||
+            provider.heightController.text.isEmpty ||
+            provider.selectedDietStatus == null) {
+          return;
+        }
+        context.push(Paths.qualification);
         // proceed
       },
     );
