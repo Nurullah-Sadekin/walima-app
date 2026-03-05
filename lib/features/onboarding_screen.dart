@@ -84,7 +84,7 @@ class OnboardingScreen extends StatelessWidget {
                               ),
                               child: GestureDetector(
                                 onTap: () {
-                                  context.push( Paths.isProfileFor);
+                                  context.push( Paths.anchor);
                                 },
                                 child: Text('Login',
                                     style: TextStyle(
