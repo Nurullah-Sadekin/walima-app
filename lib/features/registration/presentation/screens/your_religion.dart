@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -91,7 +93,6 @@ class _YourRegionState extends ConsumerState<YourReligion> {
           items: const ['Islam', 'Hinduism', 'Buddhism', 'Christianity'],
           controller: provider.religion,
           onTap: () {
-
           },
           isSearch: true,
         ),
@@ -132,6 +133,14 @@ class _YourRegionState extends ConsumerState<YourReligion> {
           : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
+        log(provider.religion.text);
+        log(provider.community.text);
+        log(provider.livingIn.text);
+        if (provider.religion.text.isEmpty &&
+            provider.community.text.isEmpty &&
+            provider.livingIn.text.isEmpty) {
+          return;
+        }
         context.push(Paths.yourReligion);
       },
     );
