@@ -22,5 +22,11 @@ class AppImages {
   static const String aboutYou = 'assets/svgs/about_you.svg';
   static const String religion = 'assets/svgs/religion.svg';
   static const String emailPhone = 'assets/svgs/emailPhone.svg';
+  static const String location = 'assets/svgs/location.svg';
+  static const String photoUpload = 'assets/svgs/photo_upload.svg';
+  static const String maritalStatus = 'assets/svgs/maritalStatus.svg';
+  static const String profession = 'assets/svgs/profession.svg';
+  static const String qualification = 'assets/svgs/qualification.svg';
+
 
 }

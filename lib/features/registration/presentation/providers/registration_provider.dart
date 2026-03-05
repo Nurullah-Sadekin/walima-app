@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
+import 'package:flutter_boilerplate/features/registration/domain/diet_model.dart';
+import 'package:flutter_boilerplate/features/registration/domain/is_with_family_status_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/profile_for_model.dart';
 
 class RegistrationProvider extends BaseChangeNotifier {
@@ -9,6 +11,10 @@ class RegistrationProvider extends BaseChangeNotifier {
 
   String? selectedProfileName;
   String? selectedGenderName;
+  String? selectedIsWithFamilyStatus;
+  String? selectedDietStatus;
+
+
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController dateOfBirthController = TextEditingController();
@@ -19,11 +25,19 @@ class RegistrationProvider extends BaseChangeNotifier {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController professionController = TextEditingController();
+  final TextEditingController cityController = TextEditingController();
+  final TextEditingController residencyStatusController = TextEditingController();
+  final TextEditingController maritalStatusController = TextEditingController();
+  final TextEditingController heightController = TextEditingController();
+
+
 
   VoidCallback? _controllersListener;
 
-  List<ProfileFor> profileForList = profileForListInserted;
-  List<ProfileFor> genderForList = genderForListInserted;
+  List<ProfileForModel> profileForList = profileForListInserted;
+  List<GenderProfileForModel> genderForList = genderForListInserted;
+  List<IsWithFamilyModel> isWithFamilyDataList = isWithFamilyDataListInserted;
+  List<DietModel> dietDataList = dietDataListInserted;
 
   Future<void> getInitialData() async {
     // Simulate a delay for fetching data
@@ -73,6 +87,12 @@ class RegistrationProvider extends BaseChangeNotifier {
     try {
       professionController.addListener(_controllersListener!);
     } catch (_) {}
+    try {
+      cityController.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      residencyStatusController.addListener(_controllersListener!);
+    } catch (_) {}
   }
 
   /// Remove attached listeners. Call this from the widget's dispose or when
@@ -106,8 +126,16 @@ class RegistrationProvider extends BaseChangeNotifier {
     try {
       professionController.removeListener(_controllersListener!);
     } catch (_) {}
+    try {
+      cityController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      residencyStatusController.removeListener(_controllersListener!);
+    } catch (_) {}
     _controllersListener = null;
   }
+
+
 
   void selectedProfileFor(int index) {
     if (index < 0 || index >= profileForList.length) return;
@@ -126,6 +154,27 @@ class RegistrationProvider extends BaseChangeNotifier {
     selectedGenderName = genderForList[index].name;
     notifyListeners();
   }
+
+  void selectedIsWithFamily(int index) {
+    if (index < 0 || index >= isWithFamilyDataList.length) return;
+    for (var i = 0; i < isWithFamilyDataList.length; i++) {
+      isWithFamilyDataList[i].isSelected = i == index;
+    }
+    selectedIsWithFamilyStatus = isWithFamilyDataList[index].name;
+
+    notifyListeners();
+  }
+
+  void selectedDiet(int index) {
+    if (index < 0 || index >= dietDataList.length) return;
+    for (var i = 0; i < dietDataList.length; i++) {
+      dietDataList[i].isSelected = i == index;
+    }
+    selectedDietStatus = dietDataList[index].name;
+
+    notifyListeners();
+  }
+
 
   void updateViewState({RegistrationScreenStates? screenStates, RegistrationScreenStates? loadingState}) {
     if (screenStates != null) {

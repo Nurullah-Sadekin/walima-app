@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
+import 'package:flutter_boilerplate/core/global/components/selected_button.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
@@ -49,7 +51,7 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.religion),
+                    const UpperLayer(imagePath: AppImages.maritalStatus),
                     body(),
                   ],
                 ),
@@ -77,6 +79,7 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
 
   Widget textField() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 20,
       children: [
         DropDownField(
@@ -84,9 +87,64 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
           hintText: 'Select',
           popUpHeader: 'Select Marital Status',
           items: const ['Single', 'Married', 'Divorced', 'Widowed'],
-          controller: provider.communityController,
+          controller: provider.maritalStatusController,
           onTap: () {},
           isSearch: false,
+        ),
+        DropDownField(
+          headLine: 'Height',
+          hintText: 'Select',
+          popUpHeader: 'Select Height',
+          items: const ['170 cm', '171 cm', '172 cm', '173 cm', '174 cm', '175 cm'],
+          controller: provider.heightController,
+          onTap: () {},
+          isSearch: false,
+        ),
+        Column(
+          spacing: 10,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  'Diet',
+                  style: TextStyle(
+                    fontSize: TextSize.font14(context),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+
+            // Use LayoutBuilder to compute number of columns responsively
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final double availableWidth = constraints.maxWidth;
+                const double spacing = 10.0;
+                const double minItemWidth = 140.0; // adjust as needed
+
+                return Wrap(
+                  spacing: spacing,
+                  runSpacing: spacing,
+                  children: List.generate(provider.dietDataList.length, (index) {
+                    final dietItems = provider.dietDataList[index];
+
+                    return SelectedButtons(
+                      buttonStyle: dietItems.isSelected
+                          ? SelectedButtonsStyle.primeSelectedButton
+                          : SelectedButtonsStyle.secondarySelectedButton,
+                      onTap: () {
+                        provider.selectedDiet(index);
+                      },
+                      isSelected: dietItems.isSelected,
+                      title: dietItems.name,
+                    );
+                  }),
+                );
+              },
+            ),
+          ],
         ),
       ],
     );

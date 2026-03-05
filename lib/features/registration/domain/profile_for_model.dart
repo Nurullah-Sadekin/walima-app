@@ -1,8 +1,8 @@
 // ProfileFor Model Class
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 
-class ProfileFor {
-  ProfileFor({
+class ProfileForModel {
+  ProfileForModel({
     required this.name,
     required this.emoji,
     this.isSelected = false
@@ -13,12 +13,12 @@ class ProfileFor {
   bool isSelected;
 
   // Optional: Add a copyWith method for easy updating
-  ProfileFor copyWith({
+  ProfileForModel copyWith({
     String? name,
     String? emoji,
     bool? isSelected,
   }) {
-    return ProfileFor(
+    return ProfileForModel(
       name: name ?? this.name,
       emoji: emoji ?? this.emoji,
       isSelected: isSelected ?? this.isSelected,
@@ -26,8 +26,8 @@ class ProfileFor {
   }
 }
 
-class GenderProfileFor {
-  GenderProfileFor({
+class GenderProfileForModel {
+  GenderProfileForModel({
     required this.name,
     required this.emoji,
     this.isSelected = false
@@ -38,12 +38,12 @@ class GenderProfileFor {
   bool isSelected;
 
   // Optional: Add a copyWith method for easy updating
-  GenderProfileFor copyWith({
+  GenderProfileForModel copyWith({
     String? name,
     String? emoji,
     bool? isSelected,
   }) {
-    return GenderProfileFor(
+    return GenderProfileForModel(
       name: name ?? this.name,
       emoji: emoji ?? this.emoji,
       isSelected: isSelected ?? this.isSelected,
@@ -52,17 +52,17 @@ class GenderProfileFor {
 }
 
 // Your ProfileFor List
-List<ProfileFor> profileForListInserted = [
-  ProfileFor(name: 'Myself', emoji: AppImages.meIcon),
-  ProfileFor(name: 'My Son', emoji: AppImages.mySonIcon),
-  ProfileFor(name: 'My Daughter', emoji: AppImages.myDaughterIcon),
-  ProfileFor(name: 'My Brother', emoji: AppImages.maleIcon),
-  ProfileFor(name: 'My Sister', emoji: AppImages.mySisterIcon),
-  ProfileFor(name: 'My Friend', emoji: AppImages.myFriendIcon),
+List<ProfileForModel> profileForListInserted = [
+  ProfileForModel(name: 'Myself', emoji: AppImages.meIcon),
+  ProfileForModel(name: 'My Son', emoji: AppImages.mySonIcon),
+  ProfileForModel(name: 'My Daughter', emoji: AppImages.myDaughterIcon),
+  ProfileForModel(name: 'My Brother', emoji: AppImages.maleIcon),
+  ProfileForModel(name: 'My Sister', emoji: AppImages.mySisterIcon),
+  ProfileForModel(name: 'My Friend', emoji: AppImages.myFriendIcon),
 ];
 
 // Your ProfileFor List
-List<ProfileFor> genderForListInserted = [
-  ProfileFor(name: 'Male', emoji: AppImages.maleIcon),
-  ProfileFor(name: 'Female', emoji: AppImages.femaleIcon),
+List<GenderProfileForModel> genderForListInserted = [
+  GenderProfileForModel(name: 'Male', emoji: AppImages.maleIcon),
+  GenderProfileForModel(name: 'Female', emoji: AppImages.femaleIcon),
 ];
