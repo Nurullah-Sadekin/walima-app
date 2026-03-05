@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
+import 'package:flutter_boilerplate/core/global/components/custom_expansion_tile.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
@@ -50,7 +54,11 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.emailPhone),
+                    const CustomBackAppBar(
+                      isTrailing: true,
+                      trailingText: 'Add Photos Later',
+                      //onTrailingTap: () => context.push(Paths.photoUpload),
+                    ),
                     body(),
                   ],
                 ),
@@ -66,8 +74,104 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
         child: Column(
           spacing: 10,
           children: [
-            const SizedBox(height: 20),
-            const Center(child: Text('Photo upload placeholder')),
+            const SizedBox(
+              height: 10,
+            ),
+            Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(32.0),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  border: Border.all(color: AppColors.greyLight, width: 1),
+                  borderRadius: const BorderRadius.all(
+                    Radius.circular(8),
+                  ),
+                ),
+                child: Column(
+                  spacing: 20,
+                  children: [
+                    ShowImage(
+                      imagePath: AppImages.photoUpload,
+                      width: 110,
+                      height: 110,
+                    ),
+                    Center(
+                        child: Text('Upload Image',
+                            style: TextStyle(
+                                fontSize: TextSize.font14(context),
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.textSecondaryLight))),
+                     Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            height: 1,
+                            color: AppColors.greyLight,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          child: Text('OR',
+                              style: TextStyle(
+                                  fontSize: TextSize.font14(context),
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.textSecondaryLight),),
+                        ),
+                        Expanded(
+                          child: Container(
+                            height: 1,
+                            color: AppColors.greyLight,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(10.0),
+                      decoration: const BoxDecoration(
+                        color: AppColors.primaryVariant,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(6),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.camera_alt_outlined,
+                            size: TextSize.font18(context),
+                            color: AppColors.primary,
+                          ),
+                          const SizedBox(width: 6),
+                          Text('Use Camera',
+                              style: TextStyle(
+                                  fontSize: TextSize.font14(context),
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.primary)),
+                        ],
+                      ),
+                    )
+                  ],
+                )),
+            CustomExpansionTile(
+              title: 'Photo Guidelines',
+              child: ShowImage(
+                imagePath: AppImages.photoGuidelines,
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height * 0.3,
+                fit: BoxFit.fill,
+              ),
+            ),
+            const CustomExpansionTile(
+              title: 'Know More',
+              child: Column(
+                children: [
+                  Text('data'),
+                  Text('data'),
+                  Text('data'),
+                  Text('data'),
+                ],
+              ),
+            ),
             const Spacer(),
             bottomAction(),
             const SizedBox(height: 20),
@@ -85,4 +189,3 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
     );
   }
 }
-
