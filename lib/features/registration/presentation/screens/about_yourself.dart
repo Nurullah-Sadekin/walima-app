@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
@@ -51,7 +52,7 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.aboutYou),
+                    const UpperLayer(imagePath: AppImages.aboutYourself),
                     body(),
                   ],
                 ),
@@ -82,12 +83,13 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
       spacing: 20,
       children: [
         PrimaryTextField(
-          controller: provider.firstNameController,
+          controller: provider.aboutYourselfController,
           headLine: 'About Yourself',
-          hintText: 'Write something about yourself',
+          hintText: 'Write here ',
           errorText: null,
           onTap: () {},
           maxLine: 5,
+          minLine: 5,
         ),
       ],
     );
@@ -95,11 +97,15 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: provider.firstNameController.text.isNotEmpty
+      buttonStyle: provider.aboutYourselfController.text.isNotEmpty
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,
       title: 'Continue',
-      onTap: () {},
+      onTap: () {
+        if (provider.aboutYourselfController.text.isNotEmpty) {
+          context.push(Paths.verifyNumber);
+        }
+      },
     );
   }
 }

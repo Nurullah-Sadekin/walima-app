@@ -170,7 +170,7 @@ class PrimaryButtons extends StatelessWidget {
         child: Text(
           title ?? '',
           style: TextStyle(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.textPrimaryLight,
               fontWeight: FontWeight.w500,
               fontSize: titleSize ?? TextSize.font14(context)),
         ),

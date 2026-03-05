@@ -96,6 +96,7 @@ class _YourRegionState extends ConsumerState<EmailPhone> {
         PrimaryTextField(
           controller: provider.phoneController,
           headLine: 'Phone Number',
+          keyboardType: TextInputType.phone,
           hintText: '(555) 000-0000',
           errorText: null,
           noPrefix: true,

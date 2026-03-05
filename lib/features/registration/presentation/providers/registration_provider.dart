@@ -37,6 +37,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   final TextEditingController highestQualification = TextEditingController();
   final TextEditingController instituteController = TextEditingController();
   final TextEditingController anotherInstituteController = TextEditingController();
+  final TextEditingController aboutYourselfController = TextEditingController();
 
   // controllers for new dropdowns
   final TextEditingController incomeRangeController = TextEditingController();
@@ -135,6 +136,10 @@ class RegistrationProvider extends BaseChangeNotifier {
     try {
       currentCompanyNameController.addListener(_controllersListener!);
     } catch (_) {}
+    try {
+      aboutYourselfController.addListener(_controllersListener!);
+    } catch (_) {}
+
 
 
   }
@@ -206,6 +211,9 @@ class RegistrationProvider extends BaseChangeNotifier {
     } catch (_) {}
     try {
       currentCompanyNameController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      aboutYourselfController.removeListener(_controllersListener!);
     } catch (_) {}
 
     _controllersListener = null;

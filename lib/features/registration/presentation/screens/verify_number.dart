@@ -51,7 +51,7 @@ class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.emailPhone),
+                    const UpperLayer(imagePath: AppImages.verifyNumber),
                     body(),
                   ],
                 ),
@@ -67,7 +67,64 @@ class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
         child: Column(
           spacing: 10,
           children: [
+            Text(
+              'Verify Number',
+              style: TextStyle(
+                  fontSize: TextSize.font18(context),
+                  color: AppColors.textPrimaryLight,
+                  fontWeight: FontWeight.w500),
+            ),
+            Row(
+              spacing: 8,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'We\'ve sent a code to ' '+${provider.phoneController.text}',
+                  style: TextStyle(
+                      fontSize: TextSize.font14(context),
+                      color: AppColors.textSecondaryLight,
+                      fontWeight: FontWeight.w400),
+                ),
+                InkWell(
+                  onTap: () {},
+                  child: Row(
+                    spacing: 2,
+                    children: [
+                      Icon(Icons.edit_outlined,
+                          size: TextSize.font14(context),
+                          color: AppColors.primary),
+                      Text(
+                        'Edit',
+                        style: TextStyle(
+                            fontSize: TextSize.font14(context),
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
             textField(),
+            Text(
+              'Experiencing issues receiving the code?',
+              style: TextStyle(
+                  fontSize: TextSize.font14(context),
+                  color: AppColors.textSecondaryLight,
+                  fontWeight: FontWeight.w400),
+            ),
+            Text(
+              'Resend Code',
+              style: TextStyle(
+                fontSize: TextSize.font14(context),
+                color: AppColors.textPrimaryLight,
+                fontWeight: FontWeight.w500,
+                decoration: TextDecoration.underline,
+                decorationColor: AppColors.textPrimaryLight,
+                decorationThickness: 2,
+              ),
+            ),
+
             const Spacer(),
             bottomAction(),
             const SizedBox(height: 20),
@@ -102,4 +159,3 @@ class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
     );
   }
 }
-
