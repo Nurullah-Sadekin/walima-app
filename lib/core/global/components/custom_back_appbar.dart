@@ -3,7 +3,6 @@ import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 
 class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
-
   const CustomBackAppBar({
     super.key,
     this.backgroundColor = Colors.transparent,
@@ -11,18 +10,22 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.iconColor,
     this.iconSize,
     this.onBackPressed,
-    this.actions,
     this.title,
     this.leadingPadding = 12.0,
+    this.isTrailing = false,
+    this.trailingText,
+    this.onTrailingTap,
   });
   final Color? backgroundColor;
   final double? elevation;
   final Color? iconColor;
   final double? iconSize;
   final VoidCallback? onBackPressed;
-  final List<Widget>? actions;
   final Widget? title;
   final double? leadingPadding;
+  final bool? isTrailing;
+  final String? trailingText;
+  final VoidCallback? onTrailingTap;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +35,6 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
         backgroundColor: backgroundColor,
         elevation: elevation,
         title: title,
-        actions: actions,
         leading: Padding(
           padding: EdgeInsets.all(leadingPadding ?? 12.0),
           child: Material(
@@ -43,19 +45,58 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
                 shape: BoxShape.circle,
               ),
               child: InkWell(
-                onTap: onBackPressed ?? () {
-                  Navigator.pop(context);
-                },
+                onTap: onBackPressed ??
+                    () {
+                      Navigator.pop(context);
+                    },
                 borderRadius: BorderRadius.circular(20),
                 child: Icon(
                   Icons.arrow_back_ios_new_rounded,
                   size: iconSize ?? TextSize.font16(context),
-                  color: iconColor ?? AppColors.textPrimaryLight,
+                  color: iconColor ?? AppColors.textSecondaryLight,
                 ),
               ),
             ),
           ),
         ),
+        centerTitle: true,
+        actions: isTrailing == true
+            ? [
+                InkWell(
+                  focusColor: Colors.transparent,
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  hoverColor: Colors.transparent,
+                  onTap: onTrailingTap ??
+                      () {
+                        Navigator.pop(context);
+                      },
+                  child: Padding(
+                    padding: EdgeInsets.all(leadingPadding ?? 12.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      spacing: 6,
+                      children: [
+                        Text(
+                          trailingText ?? '',
+                          style: TextStyle(
+                            fontSize: TextSize.font14(context),
+                            color: AppColors.textSecondaryLight,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          size: iconSize ?? TextSize.font14(context),
+                          color: iconColor ?? AppColors.textSecondaryLight,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ]
+            : null,
       ),
     );
   }

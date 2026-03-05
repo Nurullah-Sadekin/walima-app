@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
@@ -19,6 +20,11 @@ class VerifyNumberScreen extends ConsumerStatefulWidget {
 
 class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
   late RegistrationProvider provider;
+  final List<TextEditingController> _otpControllers = List.generate(
+    5,
+    (_) => TextEditingController(),
+  );
+  final List<FocusNode> _otpFocusNodes = List.generate(5, (_) => FocusNode());
 
   @override
   void initState() {
@@ -33,6 +39,12 @@ class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
   @override
   void dispose() {
     provider.disposeControllersListener();
+    for (final c in _otpControllers) {
+      c.dispose();
+    }
+    for (final f in _otpFocusNodes) {
+      f.dispose();
+    }
     super.dispose();
   }
 
@@ -51,7 +63,12 @@ class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.verifyNumber),
+                    UpperLayer(
+                      imagePath: AppImages.verifyNumber,
+                      isTrailing: true,
+                      trailingText: 'Skip',
+                      onTrailingTap: () => context.push(Paths.photoUpload),
+                    ),
                     body(),
                   ],
                 ),
@@ -105,7 +122,10 @@ class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
                 )
               ],
             ),
-            textField(),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10.0),
+              child: textField(),
+            ),
             Text(
               'Experiencing issues receiving the code?',
               style: TextStyle(
@@ -124,7 +144,6 @@ class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
                 decorationThickness: 2,
               ),
             ),
-
             const Spacer(),
             bottomAction(),
             const SizedBox(height: 20),
@@ -138,24 +157,95 @@ class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
     return Column(
       spacing: 20,
       children: [
-        PrimaryTextField(
-          controller: provider.phoneController,
-          headLine: 'Verification Code',
-          hintText: 'Enter code',
-          errorText: null,
-          onTap: () {},
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(5, (index) {
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 6),
+                  width: 52,
+                  height: 52,
+                  child: TextField(
+                    controller: _otpControllers[index],
+                    focusNode: _otpFocusNodes[index],
+                    textAlign: TextAlign.center,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    maxLength: 1,
+                    style: TextStyle(
+                      fontSize: TextSize.font18(context),
+                      fontWeight: FontWeight.w600,
+                    ),
+                    decoration: InputDecoration(
+                      counterText: '',
+                      fillColor: Colors.transparent,
+                      contentPadding: const EdgeInsets.all(0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: AppColors.grey),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide:
+                            const BorderSide(color: AppColors.greyLight),
+                      ),
+                    ),
+                    onChanged: (value) {
+                      // Handle paste (multiple chars) and normal single char entry
+                      if (value.length > 1) {
+                        final chars = value.split('');
+                        for (var i = 0;
+                            i < chars.length &&
+                                (index + i) < _otpControllers.length;
+                            i++) {
+                          _otpControllers[index + i].text = chars[i];
+                        }
+                        final next = index + chars.length;
+                        if (next >= _otpFocusNodes.length) {
+                          _otpFocusNodes.last.requestFocus();
+                          _otpFocusNodes.last.unfocus();
+                        } else {
+                          _otpFocusNodes[next].requestFocus();
+                        }
+                        setState(() {});
+                        return;
+                      }
+
+                      if (value.isNotEmpty) {
+                        if (index + 1 < _otpFocusNodes.length) {
+                          _otpFocusNodes[index + 1].requestFocus();
+                        } else {
+                          _otpFocusNodes[index].unfocus();
+                        }
+                      } else if (index - 1 >= 0) {
+                        _otpFocusNodes[index - 1].requestFocus();
+                      }
+                      setState(() {});
+                    },
+                  ),
+                );
+              }),
+            ),
+          ],
         ),
       ],
     );
   }
 
   Widget bottomAction() {
-    return PrimaryButtons(
-      buttonStyle: provider.phoneController.text.isNotEmpty
-          ? ButtonsStyle.activePrimaryButton
-          : ButtonsStyle.disableButton,
-      title: 'Verify',
-      onTap: () {},
+    final otpCode = _otpControllers.map((c) => c.text).join();
+    return Column(
+      children: [
+        PrimaryButtons(
+          buttonStyle: otpCode.length == 5
+              ? ButtonsStyle.activePrimaryButton
+              : ButtonsStyle.disableButton,
+          title: 'Continue',
+          onTap: otpCode.length == 5 ? () => provider.updateViewState() : () {},
+        ),
+      ],
     );
   }
 }
