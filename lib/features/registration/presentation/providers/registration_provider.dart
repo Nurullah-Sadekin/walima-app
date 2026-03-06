@@ -29,7 +29,6 @@ class RegistrationProvider extends BaseChangeNotifier {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController currentCompanyNameController = TextEditingController();
   final TextEditingController cityController = TextEditingController();
   final TextEditingController residencyStatusController = TextEditingController();
   final TextEditingController maritalStatusController = TextEditingController();
@@ -39,7 +38,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   final TextEditingController anotherInstituteController = TextEditingController();
   final TextEditingController aboutYourselfController = TextEditingController();
 
-  // controllers for new dropdowns
+  final TextEditingController currentCompanyNameController = TextEditingController();
   final TextEditingController incomeRangeController = TextEditingController();
   final TextEditingController yourWorkController = TextEditingController();
   final TextEditingController youWorkAsController = TextEditingController();
@@ -95,10 +94,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     } catch (_) {}
     try {
       passwordController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      currentCompanyNameController.addListener(_controllersListener!);
-    } catch (_) {}
+    } catch (_) {} catch (_) {}
     try {
       cityController.addListener(_controllersListener!);
     } catch (_) {}
@@ -171,9 +167,6 @@ class RegistrationProvider extends BaseChangeNotifier {
     } catch (_) {}
     try {
       passwordController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      currentCompanyNameController.removeListener(_controllersListener!);
     } catch (_) {}
     try {
       cityController.removeListener(_controllersListener!);

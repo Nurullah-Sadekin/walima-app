@@ -157,7 +157,7 @@ class _IsProfileForScreenState extends ConsumerState<IsProfileForScreen> {
           : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
-        if (provider.selectedProfileName == null &&
+        if (provider.selectedProfileName == null ||
             provider.selectedGenderName == null) {
           return;
         }
