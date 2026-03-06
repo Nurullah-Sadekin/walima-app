@@ -3,6 +3,7 @@ import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_expansion_tile.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/widgets/know_more_item.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
@@ -125,13 +126,21 @@ class _ProfessionScreenState extends ConsumerState<FamilyFinancialStatusScreen> 
             ),
           ],
         ),
-        CustomExpansionTile(
-          title: 'Photo Guidelines',
-          child: ShowImage(
-            imagePath: AppImages.photoGuidelines,
-            width: double.infinity,
-            height: MediaQuery.of(context).size.height * 0.3,
-            fit: BoxFit.fill,
+
+        const CustomExpansionTile(
+          title: 'Elite',
+          borderColor: AppColors.primary,
+          backgroundColor: AppColors.primaryVariant,
+          child: Column(
+            spacing: 8,
+            children: [
+              KnowMoreItemCard(
+                text:
+                'Your Photo should be front facing and your entire face should be visible.',
+                icon: Icons.check_circle,
+                iconColor: AppColors.primary,
+              ),
+            ],
           ),
         ),
 
