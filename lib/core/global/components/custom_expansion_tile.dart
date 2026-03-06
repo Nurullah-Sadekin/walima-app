@@ -59,16 +59,25 @@ class CustomExpansionTile extends StatelessWidget {
           children: [
             Container(
               width: double.infinity,
-              padding: padding ?? const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment:
-                    crossAxisAlignment ?? CrossAxisAlignment.start,
-                mainAxisAlignment: mainAxisAlignment ?? MainAxisAlignment.start,
-                children: [
-                  child,
-                ],
-              ),
+              padding: padding ?? const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Builder(builder: (context) {
+                final maxChildHeight = MediaQuery.of(context).size.height * 0.6;
+                return ConstrainedBox(
+                  constraints: BoxConstraints(maxHeight: maxChildHeight),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment:
+                          crossAxisAlignment ?? CrossAxisAlignment.start,
+                      mainAxisAlignment: mainAxisAlignment ?? MainAxisAlignment.start,
+                      children: [
+                        child,
+                      ],
+                    ),
+                  ),
+                );
+              }),
             ),
+            const SizedBox(height: 12,),
           ],
         ),
       ),
