@@ -161,11 +161,17 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
                     ),
                     CustomExpansionTile(
                       title: 'Photo Guidelines',
-                      child: ShowImage(
-                        imagePath: AppImages.photoGuidelines,
-                        width: double.infinity,
-                        height: MediaQuery.of(context).size.height * 0.3,
-                        fit: BoxFit.fill,
+                      child: Column(
+                        children: [
+                          ShowImage(
+                            imagePath: AppImages.photoGuidelines,
+                            width: double.infinity,
+                            height: MediaQuery.of(context).size.height * 0.3,
+                            fit: BoxFit.fill,
+                          ),
+
+                          const SizedBox(height: 12),
+                        ],
                       ),
                     ),
                     const SizedBox(
@@ -212,6 +218,8 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
                             icon: Icons.cancel,
                             iconColor: Colors.red,
                           ),
+
+                          const SizedBox(height: 12),
                         ],
                       ),
                     ),
