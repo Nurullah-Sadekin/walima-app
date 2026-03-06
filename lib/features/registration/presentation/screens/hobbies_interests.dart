@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/hobbies_interests_custom_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class HobbiesInterestsScreen extends ConsumerStatefulWidget {
   const HobbiesInterestsScreen({super.key});
@@ -53,10 +55,10 @@ class _PhotoUploadScreenState extends ConsumerState<HobbiesInterestsScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const CustomBackAppBar(
+                     CustomBackAppBar(
                       isTrailing: true,
                       trailingText: 'Skip',
-                      //onTrailingTap: () => context.push(Paths.photoUpload),
+                      onTrailingTap: () => context.push(Paths.familyDetails),
                     ),
                     body(),
                   ],
@@ -145,7 +147,7 @@ class _PhotoUploadScreenState extends ConsumerState<HobbiesInterestsScreen> {
       onTap: () {
         // show the save selected hobbies dialog
         log('Selected Hobbies: ${provider.selectedHobbies}');
-       // context.push('/registration/verification');
+        context.push(Paths.familyDetails);
       },
     );
   }

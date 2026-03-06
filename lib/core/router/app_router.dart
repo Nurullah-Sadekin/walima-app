@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/features/onboarding_screen.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/about_you.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/email_phone.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/family_details.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/family_financial_status.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/hobbies_interests.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/profile_is_for.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/your_religion.dart';
@@ -114,6 +116,16 @@ GoRouter goRouter(GoRouterRef ref) {
         path: Paths.hobbiesInterests,
         name: Routes.hobbiesInterests,
         builder: (context, state) => const HobbiesInterestsScreen(),
+      ),
+      GoRoute(
+        path: Paths.familyDetails,
+        name: Routes.familyDetails,
+        builder: (context, state) => const FamilyDetailsScreen(),
+      ),
+      GoRoute(
+        path: Paths.financialStatus,
+        name: Routes.financialStatus,
+        builder: (context, state) => const FamilyFinancialStatusScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

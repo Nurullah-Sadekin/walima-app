@@ -40,6 +40,10 @@ class RegistrationProvider extends BaseChangeNotifier {
   final TextEditingController incomeRangeController = TextEditingController();
   final TextEditingController yourWorkController = TextEditingController();
   final TextEditingController youWorkAsController = TextEditingController();
+  final TextEditingController motherDetailsController = TextEditingController();
+  final TextEditingController fatherDetailsController = TextEditingController();
+  final TextEditingController noOfSisterController = TextEditingController();
+  final TextEditingController noOfBrotherController = TextEditingController();
 
   final List<String> selectedHobbies = [];
 
@@ -56,6 +60,9 @@ class RegistrationProvider extends BaseChangeNotifier {
   List<SingleStringModel> funItemList = funItemListDataInserted;
   List<SingleStringModel> fitnessItemList = fitnessItemListDataInserted;
   List<SingleStringModel> otherInterestsItemList = otherInterestsItemListDataInserted;
+  List<SingleStringModel> motherDetailsItemList = motherDetailsItemListDataInserted;
+  List<SingleStringModel> fatherDetailsItemList = fatherDetailsItemListDataInserted;
+  List<SingleStringModel> siblingCountList = siblingCountListDataInserted;
 
   static const int hobbiesSelectionMax = 5;
 
@@ -238,9 +245,18 @@ class RegistrationProvider extends BaseChangeNotifier {
     try {
       aboutYourselfController.addListener(_controllersListener!);
     } catch (_) {}
-
-
-
+    try {
+      motherDetailsController.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      fatherDetailsController.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      noOfSisterController.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      noOfBrotherController.addListener(_controllersListener!);
+    } catch (_) {}
   }
 
   void disposeControllersListener() {
@@ -308,6 +324,18 @@ class RegistrationProvider extends BaseChangeNotifier {
     } catch (_) {}
     try {
       aboutYourselfController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      motherDetailsController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      fatherDetailsController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      noOfSisterController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      noOfBrotherController.removeListener(_controllersListener!);
     } catch (_) {}
 
     _controllersListener = null;

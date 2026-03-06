@@ -33,4 +33,5 @@ class AppImages {
   static const String qualification = 'assets/svgs/qualification.svg';
   static const String aboutYourself = 'assets/svgs/aboutYourself.svg';
   static const String verifyNumber = 'assets/svgs/verify_number.svg';
+  static const String familyDetails = 'assets/svgs/familyDetails.svg';
 }

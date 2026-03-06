@@ -122,3 +122,33 @@ List<SingleStringModel> otherInterestsItemListDataInserted = [
   SingleStringModel(name: 'Home decor'),
   SingleStringModel(name: 'Investments'),
 ];
+List<SingleStringModel> motherDetailsItemListDataInserted = [
+  SingleStringModel(name: 'Housewife'),
+  SingleStringModel(name: 'Working'),
+  SingleStringModel(name: 'Government job'),
+  SingleStringModel(name: 'Retired'),
+  SingleStringModel(name: 'Teacher'),
+  SingleStringModel(name: 'NGO worker'),
+  SingleStringModel(name: 'Business'),
+  SingleStringModel(name: 'Other'),
+
+
+];
+List<SingleStringModel> fatherDetailsItemListDataInserted = [
+  SingleStringModel(name: 'Engineer'),
+  SingleStringModel(name: 'Doctor'),
+  SingleStringModel(name: 'Teacher'),
+  SingleStringModel(name: 'Business'),
+  SingleStringModel(name: 'Retired'),
+  SingleStringModel(name: 'Government job'),
+  SingleStringModel(name: 'Other'),
+
+];
+List<SingleStringModel> siblingCountListDataInserted = [
+  SingleStringModel(name: '0'),
+  SingleStringModel(name: '1'),
+  SingleStringModel(name: '2'),
+  SingleStringModel(name: '3'),
+  SingleStringModel(name: '4'),
+  SingleStringModel(name: '5 or more'),
+];
