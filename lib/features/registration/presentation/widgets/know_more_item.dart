@@ -9,6 +9,8 @@ class KnowMoreItemCard extends StatelessWidget {
     required this.text,
     required this.icon,
     required this.iconColor,
+    this.iconPadding,
+    this.iconSize,
     this.maxLines = 2,
     this.textStyle,
     this.spacing = 8,
@@ -16,6 +18,8 @@ class KnowMoreItemCard extends StatelessWidget {
   final String text;
   final IconData icon;
   final Color iconColor;
+  final double? iconPadding;
+  final double? iconSize;
   final int? maxLines;
   final TextStyle? textStyle;
   final double spacing;
@@ -28,11 +32,11 @@ class KnowMoreItemCard extends StatelessWidget {
       spacing: spacing,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2.0),
+          padding:  EdgeInsets.symmetric(vertical: iconPadding ?? 2.0),
           child: Icon(
             icon,
             color: iconColor,
-            size: TextSize.font18(context),
+            size: iconSize ?? TextSize.font18(context),
           ),
         ),
         Expanded(

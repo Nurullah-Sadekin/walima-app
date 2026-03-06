@@ -45,9 +45,6 @@ class RegistrationProvider extends BaseChangeNotifier {
   final TextEditingController noOfSisterController = TextEditingController();
   final TextEditingController noOfBrotherController = TextEditingController();
 
-  final List<String> selectedHobbies = [];
-
-
   List<ProfileForModel> profileForList = profileForListInserted;
   List<GenderProfileForModel> genderForList = genderForListInserted;
   List<IsWithFamilyModel> isWithFamilyDataList = isWithFamilyDataListInserted;
@@ -65,7 +62,34 @@ class RegistrationProvider extends BaseChangeNotifier {
   List<SingleStringModel> siblingCountList = siblingCountListDataInserted;
 
   static const int hobbiesSelectionMax = 5;
+  // Names of selected hobbies across all lists (keeps a flattened record)
+  final List<String> selectedHobbies = [];
 
+  // Track whether each section is selected (for section-level leading radio)
+  bool creativeSectionSelected = false;
+  bool funSectionSelected = false;
+  bool fitnessSectionSelected = false;
+  bool otherInterestsSectionSelected = false;
+
+  void setCreativeSectionSelected(bool v) {
+    creativeSectionSelected = v;
+    notifyListeners();
+  }
+
+  void setFunSectionSelected(bool v) {
+    funSectionSelected = v;
+    notifyListeners();
+  }
+
+  void setFitnessSectionSelected(bool v) {
+    fitnessSectionSelected = v;
+    notifyListeners();
+  }
+
+  void setOtherInterestsSectionSelected(bool v) {
+    otherInterestsSectionSelected = v;
+    notifyListeners();
+  }
 
   Future<void> getInitialData() async {
     // Simulate a delay for fetching data

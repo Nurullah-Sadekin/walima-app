@@ -20,10 +20,12 @@ import 'package:go_router/go_router.dart';
 class FamilyFinancialStatusScreen extends ConsumerStatefulWidget {
   const FamilyFinancialStatusScreen({super.key});
   @override
-  ConsumerState<FamilyFinancialStatusScreen> createState() => _ProfessionScreenState();
+  ConsumerState<FamilyFinancialStatusScreen> createState() =>
+      _ProfessionScreenState();
 }
 
-class _ProfessionScreenState extends ConsumerState<FamilyFinancialStatusScreen> {
+class _ProfessionScreenState
+    extends ConsumerState<FamilyFinancialStatusScreen> {
   late RegistrationProvider provider;
 
   @override
@@ -56,11 +58,11 @@ class _ProfessionScreenState extends ConsumerState<FamilyFinancialStatusScreen> 
           child: provider.screenStates == RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
-            children: [
-              const UpperLayer(imagePath: AppImages.familyDetails),
-              body(),
-            ],
-          ),
+                  children: [
+                    const UpperLayer(imagePath: AppImages.familyDetails),
+                    Expanded(child: body()),
+                  ],
+                ),
         ),
       ),
     );
@@ -73,7 +75,7 @@ class _ProfessionScreenState extends ConsumerState<FamilyFinancialStatusScreen> 
         child: Column(
           spacing: 10,
           children: [
-            textField(),
+            Expanded(child: textField()),
             const Spacer(),
             bottomAction(),
             const SizedBox(height: 20),
@@ -84,75 +86,178 @@ class _ProfessionScreenState extends ConsumerState<FamilyFinancialStatusScreen> 
   }
 
   Widget textField() {
-    return Column(
-      spacing: 20,
-      children: [
-
-        Column(
-          spacing: 10,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Live with Family',
-              style: TextStyle(
-                fontSize: TextSize.font14(context),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children:
-              List.generate(provider.isWithFamilyDataList.length, (index) {
-                final incomePeriod = provider.isWithFamilyDataList[index];
-
-                double screenWidth = MediaQuery.of(context).size.width - 40;
-                double itemWidth = (screenWidth - 10) / 2;
-
-                return SizedBox(
-                  width: itemWidth,
-                  child: SelectionCard(
-                    buttonStyle: incomePeriod.isSelected
-                        ? SelectionStyle.selectedRadio
-                        : SelectionStyle.unSelectedRadio,
-                    onTap: () {
-                      provider.selectedIsWithFamily(index);
-                    },
-                    isSelected: incomePeriod.isSelected,
-                    title: incomePeriod.name,
-                  ),
-                );
-              }),
-            ),
-          ],
-        ),
-
-        const CustomExpansionTile(
-          title: 'Elite',
-          borderColor: AppColors.primary,
-          backgroundColor: AppColors.primaryVariant,
-          child: Column(
-            spacing: 8,
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 10,
+        children: [
+          Column(
+            spacing: 10,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              KnowMoreItemCard(
-                text:
-                'Your Photo should be front facing and your entire face should be visible.',
-                icon: Icons.check_circle,
-                iconColor: AppColors.primary,
+              Text(
+                'Live with Family',
+                style: TextStyle(
+                  fontSize: TextSize.font14(context),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: List.generate(provider.isWithFamilyDataList.length,
+                    (index) {
+                  final incomePeriod = provider.isWithFamilyDataList[index];
+
+                  double screenWidth = MediaQuery.of(context).size.width - 40;
+                  double itemWidth = (screenWidth - 10) / 2;
+
+                  return SizedBox(
+                    width: itemWidth,
+                    child: SelectionCard(
+                      buttonStyle: incomePeriod.isSelected
+                          ? SelectionStyle.selectedRadio
+                          : SelectionStyle.unSelectedRadio,
+                      onTap: () {
+                        provider.selectedIsWithFamily(index);
+                      },
+                      isSelected: incomePeriod.isSelected,
+                      title: incomePeriod.name,
+                    ),
+                  );
+                }),
               ),
             ],
           ),
-        ),
-
-      ],
+          const SizedBox(
+            height: 10,
+          ),
+          Text(
+            'Family\'s Financial Status',
+            style: TextStyle(
+              fontSize: TextSize.font14(context),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          Expanded(
+              child: SingleChildScrollView(
+            child: Column(
+              children: [
+                CustomExpansionTile(
+                  title: 'Elite',
+                  borderColor: AppColors.primary,
+                  backgroundColor: AppColors.primaryVariant,
+                  isLeading: true,
+                  child: Column(
+                    spacing: 8,
+                    children: [
+                      const SizedBox(
+                        height: 12,
+                      ),
+                      KnowMoreItemCard(
+                        text:
+                            'Your Photo should be front facing and your entire face should be visible.',
+                        icon: Icons.circle,
+                        iconSize: TextSize.font10(context) / 2,
+                        iconPadding: TextSize.font10(context) / 2,
+                        iconColor: AppColors.primary,
+                      ),
+                      const SizedBox(
+                        height: 12,
+                      )
+                    ],
+                  ),
+                ),
+                CustomExpansionTile(
+                  title: 'High',
+                  borderColor: AppColors.primary,
+                  backgroundColor: AppColors.primaryVariant,
+                  isLeading: true,
+                  child: Column(
+                    spacing: 8,
+                    children: [
+                      const SizedBox(
+                        height: 12,
+                      ),
+                      KnowMoreItemCard(
+                        text:
+                            'Your Photo should be front facing and your entire face should be visible.',
+                        icon: Icons.circle,
+                        iconSize: TextSize.font10(context) / 2,
+                        iconPadding: TextSize.font10(context) / 2,
+                        iconColor: AppColors.primary,
+                      ),
+                      const SizedBox(
+                        height: 12,
+                      )
+                    ],
+                  ),
+                ),
+                CustomExpansionTile(
+                  title: 'Middle',
+                  borderColor: AppColors.primary,
+                  backgroundColor: AppColors.primaryVariant,
+                  isLeading: true,
+                  child: Column(
+                    spacing: 8,
+                    children: [
+                      const SizedBox(
+                        height: 12,
+                      ),
+                      KnowMoreItemCard(
+                        text:
+                            'Your Photo should be front facing and your entire face should be visible.',
+                        icon: Icons.circle,
+                        iconSize: TextSize.font10(context) / 2,
+                        iconPadding: TextSize.font10(context) / 2,
+                        iconColor: AppColors.primary,
+                      ),
+                      const SizedBox(
+                        height: 12,
+                      )
+                    ],
+                  ),
+                ),
+                CustomExpansionTile(
+                  title: 'Aspiring',
+                  borderColor: AppColors.primary,
+                  backgroundColor: AppColors.primaryVariant,
+                  isLeading: true,
+                  child: Column(
+                    spacing: 8,
+                    children: [
+                      const SizedBox(
+                        height: 12,
+                      ),
+                      KnowMoreItemCard(
+                        text:
+                            'Your Photo should be front facing and your entire face should be visible.',
+                        icon: Icons.circle,
+                        iconSize: TextSize.font10(context) / 2,
+                        iconPadding: TextSize.font10(context) / 2,
+                        iconColor: AppColors.primary,
+                      ),
+                      const SizedBox(
+                        height: 12,
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ))
+        ],
+      ),
     );
   }
 
   Widget bottomAction() {
-    final hasAnyValue = provider.selectedIsWithFamilyStatus == null ;
+    final hasAnyValue = provider.selectedIsWithFamilyStatus == null;
 
     return PrimaryButtons(
-      buttonStyle: provider.selectedIsWithFamilyStatus != null ? ButtonsStyle.activePrimaryButton : ButtonsStyle.disableButton,
+      buttonStyle: provider.selectedIsWithFamilyStatus != null
+          ? ButtonsStyle.activePrimaryButton
+          : ButtonsStyle.disableButton,
       title: 'Continue & Submit',
       onTap: () {
         if (hasAnyValue) return;
