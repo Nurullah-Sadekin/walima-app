@@ -32,8 +32,11 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 8.0),
       child: AppBar(
-        backgroundColor: backgroundColor,
-        elevation: elevation,
+        backgroundColor: backgroundColor ?? Colors.transparent,
+        elevation: elevation ?? 0,
+        shadowColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0.0,
         title: title,
         leading: Padding(
           padding: EdgeInsets.all(leadingPadding ?? 12.0),

@@ -108,7 +108,7 @@ class _YourRegionState extends ConsumerState<EmailPhone> {
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: provider.emailController.text.isNotEmpty ||
+      buttonStyle: provider.emailController.text.isNotEmpty &&
               provider.phoneController.text.isNotEmpty
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,

@@ -33,6 +33,12 @@ List<SingleStringModel> dietDataListInserted = [
   SingleStringModel(name: 'Low Sugar'),
   SingleStringModel(name: 'Low Salt'),
   SingleStringModel(name: 'No Preferences'),
+  SingleStringModel(name: 'Low Fat'),
+  SingleStringModel(name: 'Low Sodium'),
+  SingleStringModel(name: 'Low Cholesterol'),
+  SingleStringModel(name: 'Low Sugar'),
+  SingleStringModel(name: 'Low Salt'),
+  SingleStringModel(name: 'No Preferences'),
 ];
 
 List<SingleStringModel> incomeRangeListInserted = [

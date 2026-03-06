@@ -44,6 +44,7 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
     return TransparentLoading(
       isLoading: provider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
+        extendBodyBehindAppBar: true,
         backgroundColor: Colors.transparent,
         body: Container(
           decoration: BoxDecoration(
@@ -70,7 +71,7 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
           spacing: 10,
           children: [
             textField(),
-            const Spacer(),
+
             bottomAction(),
             const SizedBox(height: 20),
           ],
@@ -80,79 +81,74 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
   }
 
   Widget textField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 20,
-      children: [
-        DropDownField(
-          headLine: 'Marital Status',
-          hintText: 'Select',
-          popUpHeader: 'Select Marital Status',
-          items: const ['Single', 'Married', 'Divorced', 'Widowed'],
-          controller: provider.maritalStatusController,
-          onTap: () {},
-          isSearch: false,
-        ),
-        DropDownField(
-          headLine: 'Height',
-          hintText: 'Select',
-          popUpHeader: 'Select Height',
-          items: const ['170 cm', '171 cm', '172 cm', '173 cm', '174 cm', '175 cm'],
-          controller: provider.heightController,
-          onTap: () {},
-          isSearch: false,
-        ),
-        Column(
-          spacing: 10,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Row(
-              spacing: 4,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  'Diet',
-                  style: TextStyle(
-                    fontSize: TextSize.font14(context),
-                    fontWeight: FontWeight.w500,
-                  ),
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 20,
+        children: [
+          DropDownField(
+            headLine: 'Marital Status',
+            hintText: 'Select',
+            popUpHeader: 'Select Marital Status',
+            items: const ['Single', 'Married', 'Divorced', 'Widowed'],
+            controller: provider.maritalStatusController,
+            onTap: () {},
+            isSearch: false,
+          ),
+          DropDownField(
+            headLine: 'Height',
+            hintText: 'Select',
+            popUpHeader: 'Select Height',
+            items: const ['170 cm', '171 cm', '172 cm', '173 cm', '174 cm', '175 cm'],
+            controller: provider.heightController,
+            onTap: () {},
+            isSearch: false,
+          ),
+          Row(
+            spacing: 4,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                'Diet',
+                style: TextStyle(
+                  fontSize: TextSize.font14(context),
+                  fontWeight: FontWeight.w500,
                 ),
+              ),
 
-                Icon(Icons.info, size: TextSize.font13(context), color:AppColors.disableText),
-              ],
+              Icon(Icons.info, size: TextSize.font13(context), color:AppColors.disableText),
+            ],
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  const double spacing = 10.0;
+                  return Wrap(
+                    spacing: spacing,
+                    runSpacing: spacing,
+                    children: List.generate(provider.dietDataList.length, (index) {
+                      final dietItems = provider.dietDataList[index];
+
+                      return SelectedButtons(
+                        buttonStyle: dietItems.isSelected
+                            ? SelectedButtonsStyle.primeSelectedButton
+                            : SelectedButtonsStyle.secondarySelectedButton,
+                        onTap: () {
+                          provider.selectedDiet(index);
+                        },
+                        isSelected: dietItems.isSelected,
+                        title: dietItems.name,
+                      );
+                    }),
+                  );
+                },
+              ),
             ),
-
-            // Use LayoutBuilder to compute number of columns responsively
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final double availableWidth = constraints.maxWidth;
-                const double spacing = 10.0;
-                const double minItemWidth = 140.0; // adjust as needed
-
-                return Wrap(
-                  spacing: spacing,
-                  runSpacing: spacing,
-                  children: List.generate(provider.dietDataList.length, (index) {
-                    final dietItems = provider.dietDataList[index];
-
-                    return SelectedButtons(
-                      buttonStyle: dietItems.isSelected
-                          ? SelectedButtonsStyle.primeSelectedButton
-                          : SelectedButtonsStyle.secondarySelectedButton,
-                      onTap: () {
-                        provider.selectedDiet(index);
-                      },
-                      isSelected: dietItems.isSelected,
-                      title: dietItems.name,
-                    );
-                  }),
-                );
-              },
-            ),
-          ],
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 
