@@ -41,6 +41,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   final TextEditingController yourWorkController = TextEditingController();
   final TextEditingController youWorkAsController = TextEditingController();
 
+  final List<String> selectedHobbies = [];
 
 
   List<ProfileForModel> profileForList = profileForListInserted;
@@ -132,15 +133,38 @@ class RegistrationProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
-  // HOBBIES: toggle selection of a hobby by index. Allows multiple selections.
-  void toggleHobbySelection(int index, List<SingleStringModel> dataList) {
+  void toggleHobbySelection(int index, List<SingleStringModel> dataList, {BuildContext? context}) {
     if (index < 0 || index >= dataList.length) return;
-    dataList[index].isSelected = !dataList[index].isSelected;
+
+    final currentlySelected = dataList[index].isSelected;
+
+    if (!currentlySelected) {
+      if (selectedHobbies.length >= hobbiesSelectionMax) {
+        if (context != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('You can select up to $hobbiesSelectionMax hobbies.'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+        return;
+      }
+      // allow selection
+      dataList[index].isSelected = true;
+      selectedHobbies.add(dataList[index].name);
+    } else {
+      // Deselect
+      dataList[index].isSelected = false;
+      // remove from flattened selection list
+      selectedHobbies.remove(dataList[index].name);
+    }
+
     notifyListeners();
   }
 
   int selectedHobbiesCount() {
-    return creativeItemList.where((h) => h.isSelected).length;
+    return selectedHobbies.length;
   }
 
   void initControllersListener() {
@@ -173,7 +197,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     } catch (_) {}
     try {
       passwordController.addListener(_controllersListener!);
-    } catch (_) {} catch (_) {}
+    } catch (_) {}
     try {
       cityController.addListener(_controllersListener!);
     } catch (_) {}
