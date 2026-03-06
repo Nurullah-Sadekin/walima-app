@@ -5,11 +5,10 @@ import 'package:flutter_boilerplate/features/registration/domain/is_with_family_
 import 'package:flutter_boilerplate/features/registration/domain/profile_for_model.dart';
 
 class RegistrationProvider extends BaseChangeNotifier {
-  RegistrationScreenStates screenStates =
-      RegistrationScreenStates.defaultLoading;
-  RegistrationScreenStates loaderState =
-      RegistrationScreenStates.defaultLoading;
+  RegistrationScreenStates screenStates = RegistrationScreenStates.defaultLoading;
+  RegistrationScreenStates loaderState = RegistrationScreenStates.defaultLoading;
   bool isLoading = false;
+  VoidCallback? _controllersListener;
 
   String? selectedProfileName;
   String? selectedGenderName;
@@ -37,13 +36,12 @@ class RegistrationProvider extends BaseChangeNotifier {
   final TextEditingController instituteController = TextEditingController();
   final TextEditingController anotherInstituteController = TextEditingController();
   final TextEditingController aboutYourselfController = TextEditingController();
-
   final TextEditingController currentCompanyNameController = TextEditingController();
   final TextEditingController incomeRangeController = TextEditingController();
   final TextEditingController yourWorkController = TextEditingController();
   final TextEditingController youWorkAsController = TextEditingController();
 
-  VoidCallback? _controllersListener;
+
 
   List<ProfileForModel> profileForList = profileForListInserted;
   List<GenderProfileForModel> genderForList = genderForListInserted;
@@ -53,33 +51,98 @@ class RegistrationProvider extends BaseChangeNotifier {
   List<SingleStringModel> incomeRangeList = incomeRangeListInserted;
   List<SingleStringModel> yourWorkList = yourWorkListInserted;
   List<SingleStringModel> youWorkAsList = youWorkAsListInserted;
-  // Hobbies / interests - initialize with sample categories (re-use SingleStringModel)
-  List<SingleStringModel> hobbiesInterestsList = [
-    SingleStringModel(name: 'Writing'),
-    SingleStringModel(name: 'Cooking'),
-    SingleStringModel(name: 'Singing'),
-    SingleStringModel(name: 'Photography'),
-    SingleStringModel(name: 'Playing instruments'),
-    SingleStringModel(name: 'Painting'),
-    SingleStringModel(name: 'DIY crafts'),
-    SingleStringModel(name: 'Dancing'),
-    SingleStringModel(name: 'Acting'),
-    SingleStringModel(name: 'Poetry'),
-    SingleStringModel(name: 'Gardening'),
-    SingleStringModel(name: 'Blogging'),
-  ];
+  List<SingleStringModel> creativeItemList = creativeItemListDataInserted;
+  List<SingleStringModel> funItemList = funItemListDataInserted;
+  List<SingleStringModel> fitnessItemList = fitnessItemListDataInserted;
+  List<SingleStringModel> otherInterestsItemList = otherInterestsItemListDataInserted;
+
   static const int hobbiesSelectionMax = 5;
-
-
 
 
   Future<void> getInitialData() async {
     // Simulate a delay for fetching data
   }
 
-  /// Call this once (e.g., from a widget's initState via ref.read) to attach
-  /// listeners to TextEditingControllers owned by the provider. When any
-  /// controller changes, the provider will call notifyListeners().
+  void selectedProfileFor(int index) {
+    if (index < 0 || index >= profileForList.length) return;
+    for (var i = 0; i < profileForList.length; i++) {
+      profileForList[i].isSelected = i == index;
+    }
+    selectedProfileName = profileForList[index].name;
+    notifyListeners();
+  }
+
+  void selectedGender(int index) {
+    if (index < 0 || index >= genderForList.length) return;
+    for (var i = 0; i < genderForList.length; i++) {
+      genderForList[i].isSelected = i == index;
+    }
+    selectedGenderName = genderForList[index].name;
+    notifyListeners();
+  }
+
+  void selectedIsWithFamily(int index) {
+    if (index < 0 || index >= isWithFamilyDataList.length) return;
+    for (var i = 0; i < isWithFamilyDataList.length; i++) {
+      isWithFamilyDataList[i].isSelected = i == index;
+    }
+    selectedIsWithFamilyStatus = isWithFamilyDataList[index].name;
+
+    notifyListeners();
+  }
+
+  void selectedDiet(int index) {
+    if (index < 0 || index >= dietDataList.length) return;
+    for (var i = 0; i < dietDataList.length; i++) {
+      dietDataList[i].isSelected = i == index;
+    }
+    selectedDietStatus = dietDataList[index].name;
+
+    notifyListeners();
+  }
+
+  void selectedIncomePeriod(int index) {
+    if (index < 0 || index >= incomePeriodDataList.length) return;
+    for (var i = 0; i < incomePeriodDataList.length; i++) {
+      incomePeriodDataList[i].isSelected = i == index;
+    }
+    selectedIncomePeriodStatus = incomePeriodDataList[index].name;
+
+    notifyListeners();
+  }
+
+  void selectIncomeRange(String? value) {
+    if (value == null) return;
+    incomeRangeController.text = value;
+    selectedIncomeRange = value;
+    notifyListeners();
+  }
+
+  void selectYourWork(String? value) {
+    if (value == null) return;
+    yourWorkController.text = value;
+    selectedYourWork = value;
+    notifyListeners();
+  }
+
+  void selectYouWorkAs(String? value) {
+    if (value == null) return;
+    youWorkAsController.text = value;
+    selectedYouWorkAs = value;
+    notifyListeners();
+  }
+
+  // HOBBIES: toggle selection of a hobby by index. Allows multiple selections.
+  void toggleHobbySelection(int index, List<SingleStringModel> dataList) {
+    if (index < 0 || index >= dataList.length) return;
+    dataList[index].isSelected = !dataList[index].isSelected;
+    notifyListeners();
+  }
+
+  int selectedHobbiesCount() {
+    return creativeItemList.where((h) => h.isSelected).length;
+  }
+
   void initControllersListener() {
     // avoid attaching multiple times
     if (_controllersListener != null) return;
@@ -156,8 +219,6 @@ class RegistrationProvider extends BaseChangeNotifier {
 
   }
 
-  /// Remove attached listeners. Call this from the widget's dispose or when
-  /// provider no longer needs to forward controller changes.
   void disposeControllersListener() {
     if (_controllersListener == null) return;
     try {
@@ -227,86 +288,6 @@ class RegistrationProvider extends BaseChangeNotifier {
 
     _controllersListener = null;
 
-  }
-
-  void selectedProfileFor(int index) {
-    if (index < 0 || index >= profileForList.length) return;
-    for (var i = 0; i < profileForList.length; i++) {
-      profileForList[i].isSelected = i == index;
-    }
-    selectedProfileName = profileForList[index].name;
-    notifyListeners();
-  }
-
-  void selectedGender(int index) {
-    if (index < 0 || index >= genderForList.length) return;
-    for (var i = 0; i < genderForList.length; i++) {
-      genderForList[i].isSelected = i == index;
-    }
-    selectedGenderName = genderForList[index].name;
-    notifyListeners();
-  }
-
-  void selectedIsWithFamily(int index) {
-    if (index < 0 || index >= isWithFamilyDataList.length) return;
-    for (var i = 0; i < isWithFamilyDataList.length; i++) {
-      isWithFamilyDataList[i].isSelected = i == index;
-    }
-    selectedIsWithFamilyStatus = isWithFamilyDataList[index].name;
-
-    notifyListeners();
-  }
-
-  void selectedDiet(int index) {
-    if (index < 0 || index >= dietDataList.length) return;
-    for (var i = 0; i < dietDataList.length; i++) {
-      dietDataList[i].isSelected = i == index;
-    }
-    selectedDietStatus = dietDataList[index].name;
-
-    notifyListeners();
-  }
-
-  void selectedIncomePeriod(int index) {
-    if (index < 0 || index >= incomePeriodDataList.length) return;
-    for (var i = 0; i < incomePeriodDataList.length; i++) {
-      incomePeriodDataList[i].isSelected = i == index;
-    }
-    selectedIncomePeriodStatus = incomePeriodDataList[index].name;
-
-    notifyListeners();
-  }
-
-  void selectIncomeRange(String? value) {
-    if (value == null) return;
-    incomeRangeController.text = value;
-    selectedIncomeRange = value;
-    notifyListeners();
-  }
-
-  void selectYourWork(String? value) {
-    if (value == null) return;
-    yourWorkController.text = value;
-    selectedYourWork = value;
-    notifyListeners();
-  }
-
-  void selectYouWorkAs(String? value) {
-    if (value == null) return;
-    youWorkAsController.text = value;
-    selectedYouWorkAs = value;
-    notifyListeners();
-  }
-
-  // HOBBIES: toggle selection of a hobby by index. Allows multiple selections.
-  void toggleHobbySelection(int index) {
-    if (index < 0 || index >= hobbiesInterestsList.length) return;
-    hobbiesInterestsList[index].isSelected = !hobbiesInterestsList[index].isSelected;
-    notifyListeners();
-  }
-
-  int selectedHobbiesCount() {
-    return hobbiesInterestsList.where((h) => h.isSelected).length;
   }
 
   void updateViewState(

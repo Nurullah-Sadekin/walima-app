@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_expansion_tile.dart';
 import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/widgets/hobbies_interests_custom_card.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/know_more_item.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
@@ -15,7 +16,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class HobbiesInterestsScreen extends ConsumerStatefulWidget {
   const HobbiesInterestsScreen({super.key});
   @override
-  ConsumerState<HobbiesInterestsScreen> createState() => _PhotoUploadScreenState();
+  ConsumerState<HobbiesInterestsScreen> createState() =>
+      _PhotoUploadScreenState();
 }
 
 class _PhotoUploadScreenState extends ConsumerState<HobbiesInterestsScreen> {
@@ -52,22 +54,30 @@ class _PhotoUploadScreenState extends ConsumerState<HobbiesInterestsScreen> {
           child: provider.screenStates == RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
-            children: [
-              const CustomBackAppBar(
-                isTrailing: true,
-                trailingText: 'Add Photos Later',
-                //onTrailingTap: () => context.push(Paths.photoUpload),
-              ),
-              _bodyScrollable(context),
-            ],
-          ),
+                  children: [
+                    const CustomBackAppBar(
+                      isTrailing: true,
+                      trailingText: 'Skip',
+                      //onTrailingTap: () => context.push(Paths.photoUpload),
+                    ),
+                    body(),
+                  ],
+                ),
         ),
-        bottomNavigationBar: SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-            child: bottomAction(),
-          ),
+      ),
+    );
+  }
+
+  Widget body() {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0,vertical: 10),
+        child: Column(
+          children: [
+            _bodyScrollable(context),
+            bottomAction(),
+            const SizedBox(height: 20)
+          ],
         ),
       ),
     );
@@ -75,61 +85,46 @@ class _PhotoUploadScreenState extends ConsumerState<HobbiesInterestsScreen> {
 
   Widget _bodyScrollable(BuildContext context) {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: SingleChildScrollView(
-          child: Column(
-            spacing: 16,
-            children: [
-              const SizedBox(height: 12),
-              // Header
-              Text('Add Hobbies & Interests',
-                  style: TextStyle(
-                      fontSize: TextSize.font18(context), fontWeight: FontWeight.w600)),
-              const SizedBox(height: 6),
-
-              // Show grouped chips using Wrap
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: List.generate(provider.hobbiesInterestsList.length, (index) {
-                    final item = provider.hobbiesInterestsList[index];
-                    return SelectionCard(
-                      buttonStyle: item.isSelected ? SelectionStyle.selectedItem : SelectionStyle.unSelectedItem,
-                      isSelected: item.isSelected,
-                      onTap: () {
-                        provider.toggleHobbySelection(index);
-                      },
-                      title: item.name,
-                    );
-                  }),
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // Optional help / know more
-              const CustomExpansionTile(
-                title: 'Know More',
-                child: Column(
-                  spacing: 8,
-                  children: [
-                    KnowMoreItemCard(
-                      text: 'Select up to 5 hobbies you enjoy. These help personalize your profile.',
-                      icon: Icons.info,
-                      iconColor: Colors.blue,
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // Continue button will be displayed via bottomAction in the scaffold (keeps sticky)
-            ],
-          ),
+      child: SingleChildScrollView(
+        child: Column(
+          spacing: 10,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Add Hobbies & Interests',
+                style: TextStyle(
+                    fontSize: TextSize.font14(context),
+                    color: AppColors.textPrimaryLight,
+                    fontWeight: FontWeight.w500)),
+            HobbiesInterestsCard(
+              dataList: provider.creativeItemList,
+              title: 'Creative',
+              onItemTap: (index) {
+                provider.toggleHobbySelection(index, provider.creativeItemList);
+              },
+            ),
+            HobbiesInterestsCard(
+              dataList: provider.funItemList,
+              title: 'Fun',
+              onItemTap: (index) {
+                provider.toggleHobbySelection(index, provider.funItemList);
+              },
+            ),
+            HobbiesInterestsCard(
+              dataList: provider.fitnessItemList,
+              title: 'Fitness',
+              onItemTap: (index) {
+                provider.toggleHobbySelection(index, provider.fitnessItemList);
+              },
+            ),
+            HobbiesInterestsCard(
+              dataList: provider.otherInterestsItemList,
+              title: 'Other Interests',
+              onItemTap: (index) {
+                provider.toggleHobbySelection(index, provider.otherInterestsItemList);
+              },
+            ),
+            const SizedBox(height: 20,)
+          ],
         ),
       ),
     );
@@ -139,9 +134,9 @@ class _PhotoUploadScreenState extends ConsumerState<HobbiesInterestsScreen> {
     final selected = provider.selectedHobbiesCount();
     return PrimaryButtons(
       buttonStyle: ButtonsStyle.activePrimaryButton,
-      title: 'Save & Continue ($selected/${RegistrationProvider.hobbiesSelectionMax})',
+      title:
+          'Save & Continue ($selected/${RegistrationProvider.hobbiesSelectionMax})',
       onTap: () {
-        // proceed to next step
         context.push('/registration/verification');
       },
     );
