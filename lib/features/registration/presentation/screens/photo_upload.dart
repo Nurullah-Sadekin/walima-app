@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_expansion_tile.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/know_more_item.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/widgets/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
@@ -12,6 +12,7 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
+import 'package:go_router/go_router.dart';
 
 class PhotoUploadScreen extends ConsumerStatefulWidget {
   const PhotoUploadScreen({super.key});
@@ -54,17 +55,15 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const CustomBackAppBar(
+                     CustomBackAppBar(
                       isTrailing: true,
                       trailingText: 'Add Photos Later',
-                      //onTrailingTap: () => context.push(Paths.photoUpload),
+                      onTrailingTap: () => context.push(Paths.hobbiesInterests),
                     ),
                     _bodyScrollable(context),
-
                   ],
                 ),
         ),
-
       ),
     );
   }
@@ -157,7 +156,9 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    const SizedBox(height: 10,),
+                    const SizedBox(
+                      height: 10,
+                    ),
                     CustomExpansionTile(
                       title: 'Photo Guidelines',
                       child: ShowImage(
@@ -167,34 +168,47 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
                         fit: BoxFit.fill,
                       ),
                     ),
-                    const SizedBox(height: 10,),
+                    const SizedBox(
+                      height: 10,
+                    ),
                     const CustomExpansionTile(
                       title: 'Know More',
                       child: Column(
                         spacing: 8,
                         children: [
                           KnowMoreItemCard(
-                            text: 'Your Photo should be front facing and your entire face should be visible.',
+                            text:
+                                'Your Photo should be front facing and your entire face should be visible.',
                             icon: Icons.check_circle,
                             iconColor: Colors.green,
-                          ),KnowMoreItemCard(
-                            text: 'Ensure that your Photo is recent and not with a group.',
+                          ),
+                          KnowMoreItemCard(
+                            text:
+                                'Ensure that your Photo is recent and not with a group.',
                             icon: Icons.check_circle,
                             iconColor: Colors.green,
-                          ),KnowMoreItemCard(
-                            text: 'You can upload upto 20 Photos to your Profile.',
+                          ),
+                          KnowMoreItemCard(
+                            text:
+                                'You can upload upto 20 Photos to your Profile.',
                             icon: Icons.check_circle,
                             iconColor: Colors.green,
-                          ),KnowMoreItemCard(
-                            text: 'Each Photo must be less than 15 MB in size and must be in one of the following formats: jpg, gif, png, bmp or tiff.',
+                          ),
+                          KnowMoreItemCard(
+                            text:
+                                'Each Photo must be less than 15 MB in size and must be in one of the following formats: jpg, gif, png, bmp or tiff.',
                             icon: Icons.check_circle,
                             iconColor: Colors.green,
-                          ),KnowMoreItemCard(
-                            text: 'Watermarked, digitally enhanced, morphed Photos or Photos with your personal information will be rejected.',
+                          ),
+                          KnowMoreItemCard(
+                            text:
+                                'Watermarked, digitally enhanced, morphed Photos or Photos with your personal information will be rejected.',
                             icon: Icons.cancel,
                             iconColor: Colors.red,
-                          ),KnowMoreItemCard(
-                            text: 'Irrelevant Photographs will lead to deactivation of your Profile and Membership.',
+                          ),
+                          KnowMoreItemCard(
+                            text:
+                                'Irrelevant Photographs will lead to deactivation of your Profile and Membership.',
                             icon: Icons.cancel,
                             iconColor: Colors.red,
                           ),
@@ -217,7 +231,9 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
     return PrimaryButtons(
       buttonStyle: ButtonsStyle.activePrimaryButton,
       title: 'Continue',
-      onTap: () {},
+      onTap: () {
+          context.push(Paths.hobbiesInterests);
+      },
     );
   }
 }

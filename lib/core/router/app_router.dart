@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/features/onboarding_screen.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/about_you.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/email_phone.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/hobbies_interests.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/profile_is_for.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/your_religion.dart';
 import 'package:flutter_boilerplate/features/settings/presentation/screens/settings_screen.dart';
@@ -112,7 +113,7 @@ GoRouter goRouter(GoRouterRef ref) {
       GoRoute(
         path: Paths.hobbiesInterests,
         name: Routes.hobbiesInterests,
-        builder: (context, state) => const YourReligion(),
+        builder: (context, state) => const HobbiesInterestsScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
