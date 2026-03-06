@@ -243,7 +243,7 @@ class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
               ? ButtonsStyle.activePrimaryButton
               : ButtonsStyle.disableButton,
           title: 'Continue',
-          onTap: otpCode.length == 5 ? () => provider.updateViewState() : () {
+          onTap: otpCode.length != 5 ? () => provider.updateViewState() : () {
             context.push(Paths.photoUpload);
           },
         ),
