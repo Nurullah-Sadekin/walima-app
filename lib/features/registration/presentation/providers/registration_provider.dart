@@ -53,6 +53,22 @@ class RegistrationProvider extends BaseChangeNotifier {
   List<SingleStringModel> incomeRangeList = incomeRangeListInserted;
   List<SingleStringModel> yourWorkList = yourWorkListInserted;
   List<SingleStringModel> youWorkAsList = youWorkAsListInserted;
+  // Hobbies / interests - initialize with sample categories (re-use SingleStringModel)
+  List<SingleStringModel> hobbiesInterestsList = [
+    SingleStringModel(name: 'Writing'),
+    SingleStringModel(name: 'Cooking'),
+    SingleStringModel(name: 'Singing'),
+    SingleStringModel(name: 'Photography'),
+    SingleStringModel(name: 'Playing instruments'),
+    SingleStringModel(name: 'Painting'),
+    SingleStringModel(name: 'DIY crafts'),
+    SingleStringModel(name: 'Dancing'),
+    SingleStringModel(name: 'Acting'),
+    SingleStringModel(name: 'Poetry'),
+    SingleStringModel(name: 'Gardening'),
+    SingleStringModel(name: 'Blogging'),
+  ];
+  static const int hobbiesSelectionMax = 5;
 
 
 
@@ -280,6 +296,17 @@ class RegistrationProvider extends BaseChangeNotifier {
     youWorkAsController.text = value;
     selectedYouWorkAs = value;
     notifyListeners();
+  }
+
+  // HOBBIES: toggle selection of a hobby by index. Allows multiple selections.
+  void toggleHobbySelection(int index) {
+    if (index < 0 || index >= hobbiesInterestsList.length) return;
+    hobbiesInterestsList[index].isSelected = !hobbiesInterestsList[index].isSelected;
+    notifyListeners();
+  }
+
+  int selectedHobbiesCount() {
+    return hobbiesInterestsList.where((h) => h.isSelected).length;
   }
 
   void updateViewState(

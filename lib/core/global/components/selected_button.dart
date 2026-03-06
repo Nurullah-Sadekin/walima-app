@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 
-class SelectedButtons extends StatelessWidget {
-  const SelectedButtons({
+class SelectionCard extends StatelessWidget {
+  const SelectionCard({
     super.key,
     required this.buttonStyle,
     required this.onTap,
@@ -11,25 +11,28 @@ class SelectedButtons extends StatelessWidget {
     this.isSelected ,
   });
 
-  final SelectedButtonsStyle buttonStyle;
+  final SelectionStyle buttonStyle;
   final VoidCallback onTap;
   final String? title;
   final bool? isSelected;
 
   @override
   Widget build(BuildContext context) {
+    final effectiveSelected = isSelected ?? false;
     switch (buttonStyle) {
-
-      case (SelectedButtonsStyle.primeSelectedButton):
-        return primeSelectedButton(onTap, title, isSelected ?? false, context);
-      case SelectedButtonsStyle.secondarySelectedButton:
-        return secondarySelectedButton(onTap, title, isSelected ?? false, context);
-
+      case SelectionStyle.selectedRadio:
+        return selectedRadio(onTap, title, effectiveSelected, context);
+      case SelectionStyle.unSelectedRadio:
+        return unSelectedRadio(onTap, title, effectiveSelected, context);
+      case SelectionStyle.selectedItem:
+        return selectedItem(onTap, title, effectiveSelected, context);
+      case SelectionStyle.unSelectedItem:
+        return unSelectedItem(onTap, title, effectiveSelected, context);
     }
   }
 
 
-  Widget primeSelectedButton(VoidCallback onClick, String? title, bool isSelected, BuildContext context) {
+  Widget selectedRadio(VoidCallback onClick, String? title, bool isSelected, BuildContext context) {
     return GestureDetector(
       onTap: onClick,
       child: Container(
@@ -81,7 +84,7 @@ class SelectedButtons extends StatelessWidget {
     );
   }
 
-  Widget secondarySelectedButton(VoidCallback onClick, String? title, bool isSelected, BuildContext context) {
+  Widget unSelectedRadio(VoidCallback onClick, String? title, bool isSelected, BuildContext context) {
     return GestureDetector(
       onTap: onClick,
       child: Container(
@@ -133,12 +136,59 @@ class SelectedButtons extends StatelessWidget {
     );
   }
 
+  Widget selectedItem(VoidCallback onClick, String? title, bool isSelected, BuildContext context) {
+    return GestureDetector(
+      onTap: onClick,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primaryVariant : Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppColors.primary, width: 1),
+        ),
+        child: Text(
+          title ?? '',
+          style: TextStyle(
+            color: isSelected ? AppColors.primary : AppColors.textPrimaryLight,
+            fontSize: TextSize.font12(context),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
 
+  Widget unSelectedItem(VoidCallback onClick, String? title, bool isSelected, BuildContext context) {
+    return GestureDetector(
+      onTap: onClick,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
+        decoration: BoxDecoration(
+          color: AppColors.disableBackground,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          title ?? '',
+          style: TextStyle(
+            color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
+            fontSize: TextSize.font12(context),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
 
 }
 
-enum SelectedButtonsStyle {
-  primeSelectedButton,
-  secondarySelectedButton,
+enum SelectionStyle {
+  selectedRadio,
+  unSelectedRadio,
+  selectedItem,
+  unSelectedItem,
+}
 
+enum SelectionState {
+  selected,
+  unselected,
 }

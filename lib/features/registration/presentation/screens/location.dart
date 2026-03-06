@@ -116,10 +116,10 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
 
                 return SizedBox(
                   width: itemWidth,
-                  child: SelectedButtons(
+                  child: SelectionCard(
                     buttonStyle: isWithFamily.isSelected
-                        ? SelectedButtonsStyle.primeSelectedButton
-                        : SelectedButtonsStyle.secondarySelectedButton,
+                        ? SelectionStyle.selectedRadio
+                        : SelectionStyle.unSelectedRadio,
                     onTap: () {
                       provider.selectedIsWithFamily(index);
                     },

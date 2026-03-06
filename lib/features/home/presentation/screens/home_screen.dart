@@ -142,15 +142,15 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              SelectedButtons(
-                buttonStyle: SelectedButtonsStyle.primeSelectedButton,
+              SelectionCard(
+                buttonStyle: SelectionStyle.selectedRadio,
                 onTap: () {
                 },
                 isSelected: true,
                 title: 'Prime Selected Button',
               ),
-              SelectedButtons(
-                buttonStyle: SelectedButtonsStyle.secondarySelectedButton,
+              SelectionCard(
+                buttonStyle: SelectionStyle.unSelectedRadio,
                 onTap: () {
                 },
                 isSelected: false,

@@ -110,10 +110,10 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
 
                 return SizedBox(
                   width: itemWidth,
-                  child: SelectedButtons(
+                  child: SelectionCard(
                     buttonStyle: incomePeriod.isSelected
-                        ? SelectedButtonsStyle.primeSelectedButton
-                        : SelectedButtonsStyle.secondarySelectedButton,
+                        ? SelectionStyle.selectedRadio
+                        : SelectionStyle.unSelectedRadio,
                     onTap: () {
                       provider.selectedIncomePeriod(index);
                     },
