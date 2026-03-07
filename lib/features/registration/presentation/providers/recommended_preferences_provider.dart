@@ -1,4 +1,4 @@
-import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
@@ -12,12 +12,12 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   Future<void> getInitialData() async {}
 
   List<SingleStringModel> maritalStatusDataList = maritalStatusListDataInserted;
-  final List<String> selectedMaritalStatuses = [];
+  final List<String> preferableMaritalStatuses = [];
 
 
-  final TextEditingController religionController = TextEditingController();
-  final TextEditingController communityController = TextEditingController();
-  final TextEditingController motherTongueController = TextEditingController();
+  final TextEditingController religionPreferenceController = TextEditingController();
+  final TextEditingController communityPreferenceController = TextEditingController();
+  final TextEditingController motherTonguePreferenceController = TextEditingController();
 
 
   final int ageMinLimit = 18;
@@ -34,9 +34,9 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     final item = maritalStatusDataList[index];
     item.isSelected = !item.isSelected;
     if (item.isSelected) {
-      if (!selectedMaritalStatuses.contains(item.name)) selectedMaritalStatuses.add(item.name);
+      if (!preferableMaritalStatuses.contains(item.name)) preferableMaritalStatuses.add(item.name);
     } else {
-      selectedMaritalStatuses.remove(item.name);
+      preferableMaritalStatuses.remove(item.name);
     }
     notifyListeners();
   }
@@ -69,13 +69,13 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     _controllersListener = () => notifyListeners();
 
     try {
-      religionController.addListener(_controllersListener!);
+      religionPreferenceController.addListener(_controllersListener!);
     } catch (_) {}
     try {
-      communityController.addListener(_controllersListener!);
+      communityPreferenceController.addListener(_controllersListener!);
     } catch (_) {}
     try {
-      motherTongueController.addListener(_controllersListener!);
+      motherTonguePreferenceController.addListener(_controllersListener!);
     } catch (_) {}
 
 
@@ -84,13 +84,13 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   void disposeControllersListener() {
     if (_controllersListener == null) return;
     try {
-      religionController.removeListener(_controllersListener!);
+      religionPreferenceController.removeListener(_controllersListener!);
     } catch (_) {}
     try {
-      communityController.removeListener(_controllersListener!);
+      communityPreferenceController.removeListener(_controllersListener!);
     } catch (_) {}
     try {
-      motherTongueController.removeListener(_controllersListener!);
+      motherTonguePreferenceController.removeListener(_controllersListener!);
     } catch (_) {}
 
     _controllersListener = null;

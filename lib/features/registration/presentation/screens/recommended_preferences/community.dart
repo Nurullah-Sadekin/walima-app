@@ -97,12 +97,12 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
           hintText: 'Select',
           popUpHeader: 'Select Religion',
           items: const ['Islam', 'Hinduism', 'Buddhism', 'Christianity'],
-          controller: provider.religionController,
+          controller: provider.religionPreferenceController,
           onTap: () {
           },
           isSearch: true,
         ),
-        provider.religionController.text.isEmpty
+        provider.religionPreferenceController.text.isEmpty
             ? const SizedBox.shrink()
             : DropDownField(
           headLine: 'Community',
@@ -110,19 +110,19 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
           popUpHeader: 'Select Community',
           headLineInfoIcon: true,
           items: const ['Islam', 'Hinduism', 'Buddhism', 'Christianity'],
-          controller: provider.communityController,
+          controller: provider.communityPreferenceController,
           onTap: () {
           },
           isSearch: true,
         ),
-        provider.religionController.text.isEmpty || provider.communityController.text.isEmpty
+        provider.religionPreferenceController.text.isEmpty || provider.communityPreferenceController.text.isEmpty
             ? const SizedBox.shrink()
             : DropDownField(
           headLine: 'Mother Tongue',
           hintText: 'Select',
           popUpHeader: 'Select Mother Tongue',
           items: const ['Bangla', 'English', 'Dutch', 'Hindi'],
-          controller: provider.motherTongueController,
+          controller: provider.motherTonguePreferenceController,
           onTap: () {},
           isSearch: true,
         ),
@@ -132,16 +132,16 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: provider.religionController.text.isNotEmpty &&
-          provider.communityController.text.isNotEmpty &&
-          provider.motherTongueController.text.isNotEmpty
+      buttonStyle: provider.religionPreferenceController.text.isNotEmpty &&
+          provider.communityPreferenceController.text.isNotEmpty &&
+          provider.motherTonguePreferenceController.text.isNotEmpty
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
-        if (provider.religionController.text.isEmpty ||
-            provider.communityController.text.isEmpty ||
-            provider.motherTongueController.text.isEmpty) {
+        if (provider.religionPreferenceController.text.isEmpty ||
+            provider.communityPreferenceController.text.isEmpty ||
+            provider.motherTonguePreferenceController.text.isEmpty) {
           return;
         }
         context.push(Paths.preferenceLocation);
