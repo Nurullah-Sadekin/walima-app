@@ -63,10 +63,8 @@ class RegistrationProvider extends BaseChangeNotifier {
   List<SingleStringModel> siblingCountList = siblingCountListDataInserted;
 
   static const int hobbiesSelectionMax = 5;
-  // Names of selected hobbies across all lists (keeps a flattened record)
   final List<String> selectedHobbies = [];
 
-  // Track whether each section is selected (for section-level leading radio)
   bool creativeSectionSelected = false;
   bool funSectionSelected = false;
   bool fitnessSectionSelected = false;
@@ -112,29 +110,6 @@ class RegistrationProvider extends BaseChangeNotifier {
     }
     selectedGenderName = genderForList[index].name;
     notifyListeners();
-  }
-
-  String ageText() {
-    final txt = dateOfBirthController.text;
-    if (txt.isEmpty) return '0 Year Age';
-
-    DateTime? dob;
-    try {
-      dob = DateTime.tryParse(txt);
-      dob ??= DateFormat('yyyy-MM-dd').parseLoose(txt);
-    } catch (_) {
-      dob = null;
-    }
-
-    if (dob == null) return '0 Year Age';
-
-    final now = DateTime.now();
-    int years = now.year - dob.year;
-    if (now.month < dob.month || (now.month == dob.month && now.day < dob.day)) {
-      years--;
-    }
-    if (years < 0) years = 0;
-    return '$years Years Age'.replaceFirst('\u007f', '');
   }
 
   void selectedIsWithFamily(int index) {
@@ -205,25 +180,47 @@ class RegistrationProvider extends BaseChangeNotifier {
         }
         return;
       }
-      // allow selection
+
       dataList[index].isSelected = true;
       selectedHobbies.add(dataList[index].name);
     } else {
-      // Deselect
+
       dataList[index].isSelected = false;
-      // remove from flattened selection list
       selectedHobbies.remove(dataList[index].name);
     }
 
     notifyListeners();
   }
 
+  String ageText() {
+    final txt = dateOfBirthController.text;
+    if (txt.isEmpty) return '0 Year Age';
+
+    DateTime? dob;
+    try {
+      dob = DateTime.tryParse(txt);
+      dob ??= DateFormat('yyyy-MM-dd').parseLoose(txt);
+    } catch (_) {
+      dob = null;
+    }
+
+    if (dob == null) return '0 Year Age';
+
+    final now = DateTime.now();
+    int years = now.year - dob.year;
+    if (now.month < dob.month || (now.month == dob.month && now.day < dob.day)) {
+      years--;
+    }
+    if (years < 0) years = 0;
+    return '$years Years Age'.replaceFirst('\u007f', '');
+  }
+
+
   int selectedHobbiesCount() {
     return selectedHobbies.length;
   }
 
   void initControllersListener() {
-    // avoid attaching multiple times
     if (_controllersListener != null) return;
 
     _controllersListener = () => notifyListeners();
