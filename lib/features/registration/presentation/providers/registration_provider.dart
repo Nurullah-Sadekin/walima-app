@@ -3,6 +3,7 @@ import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/is_with_family_status_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/profile_for_model.dart';
+import 'package:intl/intl.dart';
 
 class RegistrationProvider extends BaseChangeNotifier {
   RegistrationScreenStates screenStates = RegistrationScreenStates.defaultLoading;
@@ -111,6 +112,29 @@ class RegistrationProvider extends BaseChangeNotifier {
     }
     selectedGenderName = genderForList[index].name;
     notifyListeners();
+  }
+
+  String ageText() {
+    final txt = dateOfBirthController.text;
+    if (txt.isEmpty) return '0 Year Age';
+
+    DateTime? dob;
+    try {
+      dob = DateTime.tryParse(txt);
+      dob ??= DateFormat('yyyy-MM-dd').parseLoose(txt);
+    } catch (_) {
+      dob = null;
+    }
+
+    if (dob == null) return '0 Year Age';
+
+    final now = DateTime.now();
+    int years = now.year - dob.year;
+    if (now.month < dob.month || (now.month == dob.month && now.day < dob.day)) {
+      years--;
+    }
+    if (years < 0) years = 0;
+    return '$years Years Age'.replaceFirst('\u007f', '');
   }
 
   void selectedIsWithFamily(int index) {

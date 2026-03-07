@@ -12,6 +12,7 @@ import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 class AboutYou extends ConsumerStatefulWidget {
   const AboutYou({super.key});
@@ -40,6 +41,8 @@ class _IsProfileForScreenState extends ConsumerState<AboutYou> {
     provider.disposeControllersListener();
     super.dispose();
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -133,11 +136,11 @@ class _IsProfileForScreenState extends ConsumerState<AboutYou> {
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(color: AppColors.greyLight, width: 1)),
                 child: Text(
-                  '0 Years Age',
+                  provider.ageText(),
                   style: TextStyle(
                     fontSize: TextSize.font14(context),
                     fontWeight: FontWeight.w500,
-                    color: AppColors.grey,
+                    color: provider.dateOfBirthController.text.isNotEmpty ? AppColors.textPrimaryLight : AppColors.grey,
                   ),
                 ))
           ],
