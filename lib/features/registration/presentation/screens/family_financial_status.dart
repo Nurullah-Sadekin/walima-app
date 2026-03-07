@@ -76,7 +76,6 @@ class _ProfessionScreenState
           spacing: 10,
           children: [
             Expanded(child: textField()),
-            const Spacer(),
             bottomAction(),
             const SizedBox(height: 20),
           ],
@@ -142,6 +141,7 @@ class _ProfessionScreenState
           Expanded(
               child: SingleChildScrollView(
             child: Column(
+              spacing: 10,
               children: [
                 CustomExpansionTile(
                   title: 'Elite',
