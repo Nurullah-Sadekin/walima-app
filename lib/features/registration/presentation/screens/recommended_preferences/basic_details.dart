@@ -74,7 +74,7 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
         child: Column(
           spacing: 10,
           children: [
-            Expanded(child: completeMessage()),
+            Expanded(child: view()),
             bottomAction(),
             const SizedBox(height: 20),
           ],
@@ -83,7 +83,7 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
     );
   }
 
-  Widget completeMessage() {
+  Widget view() {
     return Column(
       spacing: 10,
       crossAxisAlignment: CrossAxisAlignment.start,

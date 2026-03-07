@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
+import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -76,7 +77,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
         child: Column(
           spacing: 10,
           children: [
-            completeMessage(),
+            dropdownSelection(),
             const Spacer(),
             bottomAction(),
             const SizedBox(height: 20),
@@ -86,40 +87,63 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
     );
   }
 
-  Widget completeMessage() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        spacing: 10,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            'Partner Preferences',
-            style: TextStyle(
-              fontSize: TextSize.font20(context),
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimaryLight,
-            ),
-          ),
-          Text(
-            'Set your preferences so we can find the right partner for you.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: TextSize.font14(context),
-              fontWeight: FontWeight.w400,
-              color: AppColors.textSecondaryLight,
-            ),
-          ),
-        ],
-      ),
+  Widget dropdownSelection() {
+    return Column(
+      spacing: 10,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        DropDownField(
+          headLine: 'Your Religion',
+          hintText: 'Select',
+          popUpHeader: 'Select Religion',
+          items: const ['Islam', 'Hinduism', 'Buddhism', 'Christianity'],
+          controller: provider.religionController,
+          onTap: () {
+          },
+          isSearch: true,
+        ),
+        provider.religionController.text.isEmpty
+            ? const SizedBox.shrink()
+            : DropDownField(
+          headLine: 'Community',
+          hintText: 'Select',
+          popUpHeader: 'Select Community',
+          headLineInfoIcon: true,
+          items: const ['Islam', 'Hinduism', 'Buddhism', 'Christianity'],
+          controller: provider.communityController,
+          onTap: () {
+          },
+          isSearch: true,
+        ),
+        provider.religionController.text.isEmpty || provider.communityController.text.isEmpty
+            ? const SizedBox.shrink()
+            : DropDownField(
+          headLine: 'Mother Tongue',
+          hintText: 'Select',
+          popUpHeader: 'Select Mother Tongue',
+          items: const ['Bangla', 'English', 'Dutch', 'Hindi'],
+          controller: provider.motherTongueController,
+          onTap: () {},
+          isSearch: true,
+        ),
+      ],
     );
   }
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: ButtonsStyle.activePrimaryButton,
+      buttonStyle: provider.religionController.text.isNotEmpty &&
+          provider.communityController.text.isNotEmpty &&
+          provider.motherTongueController.text.isNotEmpty
+          ? ButtonsStyle.activePrimaryButton
+          : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
+        if (provider.religionController.text.isEmpty ||
+            provider.communityController.text.isEmpty ||
+            provider.motherTongueController.text.isEmpty) {
+          return;
+        }
         context.push(Paths.preferenceLocation);
       },
     );

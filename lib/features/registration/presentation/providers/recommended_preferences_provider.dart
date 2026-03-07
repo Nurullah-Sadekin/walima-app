@@ -16,6 +16,8 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
 
 
   final TextEditingController religionController = TextEditingController();
+  final TextEditingController communityController = TextEditingController();
+  final TextEditingController motherTongueController = TextEditingController();
 
 
   final int ageMinLimit = 18;
@@ -69,6 +71,13 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     try {
       religionController.addListener(_controllersListener!);
     } catch (_) {}
+    try {
+      communityController.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      motherTongueController.addListener(_controllersListener!);
+    } catch (_) {}
+
 
   }
 
@@ -76,6 +85,12 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     if (_controllersListener == null) return;
     try {
       religionController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      communityController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      motherTongueController.removeListener(_controllersListener!);
     } catch (_) {}
 
     _controllersListener = null;
