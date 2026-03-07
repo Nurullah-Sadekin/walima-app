@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/features/onboarding_screen.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/recommended_preferences/partner_preferences.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/about_you.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/email_phone.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/family_details.dart';
@@ -131,6 +132,11 @@ GoRouter goRouter(GoRouterRef ref) {
         path: Paths.profileCreatedStatus,
         name: Routes.profileCreatedStatus,
         builder: (context, state) => const ProfileCreateStatusScreen(),
+      ),
+      GoRoute(
+        path: Paths.partnerPreferences,
+        name: Routes.partnerPreferences,
+        builder: (context, state) => const PartnerPreferencesScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

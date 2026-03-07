@@ -35,4 +35,6 @@ class AppImages {
   static const String verifyNumber = 'assets/svgs/verify_number.svg';
   static const String familyDetails = 'assets/svgs/familyDetails.svg';
   static const String done = 'assets/svgs/done.svg';
+  static const String recommendedPreferences = 'assets/svgs/recommended_preferences.svg';
+
 }
