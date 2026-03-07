@@ -15,6 +15,7 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.isTrailing = false,
     this.trailingText,
     this.onTrailingTap,
+    this.isShowAppbar = true,
   });
   final Color? backgroundColor;
   final double? elevation;
@@ -26,11 +27,12 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool? isTrailing;
   final String? trailingText;
   final VoidCallback? onTrailingTap;
+  final bool isShowAppbar;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: AppBar(
         backgroundColor: backgroundColor ?? Colors.transparent,
         elevation: elevation ?? 0,
@@ -38,7 +40,7 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
         surfaceTintColor: Colors.transparent,
         scrolledUnderElevation: 0.0,
         title: title,
-        leading: Padding(
+        leading: isShowAppbar ? Padding(
           padding: EdgeInsets.all(leadingPadding ?? 12.0),
           child: Material(
             color: Colors.transparent,
@@ -61,7 +63,7 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             ),
           ),
-        ),
+        ) : null,
         centerTitle: true,
         actions: isTrailing == true
             ? [

@@ -5,6 +5,7 @@ import 'package:flutter_boilerplate/features/registration/presentation/screens/e
 import 'package:flutter_boilerplate/features/registration/presentation/screens/family_details.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/family_financial_status.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/hobbies_interests.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/profile_created_status.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/profile_is_for.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/your_religion.dart';
 import 'package:flutter_boilerplate/features/settings/presentation/screens/settings_screen.dart';
@@ -126,6 +127,11 @@ GoRouter goRouter(GoRouterRef ref) {
         path: Paths.financialStatus,
         name: Routes.financialStatus,
         builder: (context, state) => const FamilyFinancialStatusScreen(),
+      ),
+      GoRoute(
+        path: Paths.profileCreatedStatus,
+        name: Routes.profileCreatedStatus,
+        builder: (context, state) => const ProfileCreateStatusScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

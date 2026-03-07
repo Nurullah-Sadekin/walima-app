@@ -14,7 +14,7 @@ class UpperLayer extends StatelessWidget { // Additional children to add below
     this.isTrailing = false,
     this.trailingText,
     this.onTrailingTap,
-
+    this.isShowAppbar,
   });
   final String imagePath;
   final double imageWidth;
@@ -24,6 +24,8 @@ class UpperLayer extends StatelessWidget { // Additional children to add below
   final bool? isTrailing;
   final String? trailingText;
   final VoidCallback? onTrailingTap;
+  final bool? isShowAppbar;
+
 
 
 
@@ -31,11 +33,13 @@ class UpperLayer extends StatelessWidget { // Additional children to add below
   Widget build(BuildContext context) {
     return Column(
       children: [
-         CustomBackAppBar(
-          isTrailing: isTrailing,
-          trailingText: trailingText,
-          onTrailingTap: onTrailingTap,
-        ),
+         isShowAppbar ?? true
+             ? CustomBackAppBar(
+              isTrailing: isTrailing,
+              trailingText: trailingText,
+              onTrailingTap: onTrailingTap,
+              isShowAppbar: isShowAppbar ?? true,
+            ) : const  SizedBox.shrink(),
         Padding(
           padding: EdgeInsets.symmetric(vertical: verticalPadding),
           child: ShowImage(

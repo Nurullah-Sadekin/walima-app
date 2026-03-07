@@ -19,6 +19,7 @@ abstract class Paths {
   static const hobbiesInterests = '/hobbiesInterests';
   static const familyDetails = '/familyDetails';
   static const financialStatus = '/financialStatus';
+  static const profileCreatedStatus = '/profileCreatedStatus';
 
 }
 
@@ -43,4 +44,5 @@ abstract class Routes {
   static const hobbiesInterests = 'hobbiesInterests';
   static const familyDetails = 'familyDetails';
   static const financialStatus = 'financialStatus';
+  static const profileCreatedStatus = 'profileCreatedStatus';
 }
