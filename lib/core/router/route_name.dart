@@ -20,7 +20,16 @@ abstract class Paths {
   static const familyDetails = '/familyDetails';
   static const financialStatus = '/financialStatus';
   static const profileCreatedStatus = '/profileCreatedStatus';
+
+  // Recommended Preferences
   static const partnerPreferences = '/partnerPreferences';
+  static const basicDetails = '/basicDetails';
+  static const community = '/community';
+  static const education = '/education';
+  static const career = '/career';
+  static const otherDetails = '/otherDetails';
+  static const preferenceLocation = '/preferenceLocation';
+
 
 }
 
@@ -46,5 +55,13 @@ abstract class Routes {
   static const familyDetails = 'familyDetails';
   static const financialStatus = 'financialStatus';
   static const profileCreatedStatus = 'profileCreatedStatus';
+
+  // Recommended Preferences
   static const partnerPreferences = 'partnerPreferences';
+  static const basicDetails = 'basicDetails';
+  static const community = 'community';
+  static const education = 'education';
+  static const career = 'career';
+  static const otherDetails = 'otherDetails';
+  static const preferenceLocation = 'preferenceLocation';
 }

@@ -28,6 +28,10 @@ class SelectionCard extends StatelessWidget {
         return selectedItem(onTap, title, effectiveSelected, context);
       case SelectionStyle.unSelectedItem:
         return unSelectedItem(onTap, title, effectiveSelected, context);
+      case SelectionStyle.selectedCheckbox:
+        return selectedCheckbox(onTap, title, effectiveSelected, context);
+      case SelectionStyle.unSelectedCheckbox:
+        return unSelectedCheckbox(onTap, title, effectiveSelected, context);
     }
   }
 
@@ -179,6 +183,88 @@ class SelectionCard extends StatelessWidget {
     );
   }
 
+  Widget selectedCheckbox(VoidCallback onClick, String? title, bool isSelected, BuildContext context) {
+    return GestureDetector(
+      onTap: onClick,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+        decoration: ShapeDecoration(
+          color: Colors.white,
+          shape: RoundedRectangleBorder(
+            side: BorderSide(width: 1, color: isSelected ? AppColors.primary : AppColors.inputBorderColor),
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              height: TextSize.font16(context),
+              width: TextSize.font16(context),
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.primary : Colors.white,
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: isSelected ? AppColors.primary : AppColors.greyLight, width: 1),
+              ),
+              child: isSelected
+                  ? Icon(Icons.check, size: TextSize.font12(context), color: Colors.white)
+                  : null,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              title ?? '',
+              style: TextStyle(
+                color: AppColors.textPrimaryLight,
+                fontSize: TextSize.font14(context),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget unSelectedCheckbox(VoidCallback onClick, String? title, bool isSelected, BuildContext context) {
+    // visually identical to selectedCheckbox but without check mark
+    return GestureDetector(
+      onTap: onClick,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+        decoration: ShapeDecoration(
+          color: Colors.white,
+          shape: RoundedRectangleBorder(
+            side: const BorderSide(width: 1, color: AppColors.inputBorderColor),
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              height: TextSize.font16(context),
+              width: TextSize.font16(context),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: AppColors.greyLight, width: 1),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              title ?? '',
+              style: TextStyle(
+                color: AppColors.textPrimaryLight,
+                fontSize: TextSize.font14(context),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
 }
 
 enum SelectionStyle {
@@ -186,6 +272,8 @@ enum SelectionStyle {
   unSelectedRadio,
   selectedItem,
   unSelectedItem,
+  selectedCheckbox,
+  unSelectedCheckbox,
 }
 
 enum SelectionState {

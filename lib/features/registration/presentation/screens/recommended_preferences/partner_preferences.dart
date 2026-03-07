@@ -45,14 +45,14 @@ class _LocationScreenState extends ConsumerState<PartnerPreferencesScreen> {
   Widget build(BuildContext context) {
     provider = ref.watch(recommendedPreferencesProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading: provider.loaderState == RecommendedPreferencesScreenStates.preferences,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Container(
           decoration: BoxDecoration(
             gradient: AppColors.customBackgroundGradient,
           ),
-          child: provider.screenStates == RegistrationScreenStates.isProfileFor
+          child: provider.screenStates == RecommendedPreferencesScreenStates.preferences
               ? const Loading()
               : Column(
                   children: [
@@ -122,7 +122,7 @@ class _LocationScreenState extends ConsumerState<PartnerPreferencesScreen> {
       buttonStyle: ButtonsStyle.activePrimaryButton,
       title: 'Continue',
       onTap: () {
-        // context.push(Paths.maritalStatus);
+         context.push(Paths.basicDetails);
       },
     );
   }

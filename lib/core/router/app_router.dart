@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/features/onboarding_screen.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/recommended_preferences/career.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/recommended_preferences/other_details.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/recommended_preferences/partner_preferences.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/recommended_preferences/preference_location.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/about_you.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/email_phone.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/family_details.dart';
@@ -22,9 +25,10 @@ import 'package:flutter_boilerplate/features/registration/presentation/screens/r
 import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/profession.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/about_yourself.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/verify_number.dart';
-
+import 'package:flutter_boilerplate/features/registration/presentation/screens/recommended_preferences/basic_details.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/recommended_preferences/community.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/recommended_preferences/education.dart';
 import 'route_name.dart';
-
 part 'app_router.g.dart';
 
 @riverpod
@@ -118,6 +122,7 @@ GoRouter goRouter(GoRouterRef ref) {
         name: Routes.hobbiesInterests,
         builder: (context, state) => const HobbiesInterestsScreen(),
       ),
+
       GoRoute(
         path: Paths.familyDetails,
         name: Routes.familyDetails,
@@ -137,6 +142,36 @@ GoRouter goRouter(GoRouterRef ref) {
         path: Paths.partnerPreferences,
         name: Routes.partnerPreferences,
         builder: (context, state) => const PartnerPreferencesScreen(),
+      ),
+      GoRoute(
+        path: Paths.basicDetails,
+        name: Routes.basicDetails,
+        builder: (context, state) => const BasicDetailsScreen(),
+      ),
+      GoRoute(
+        path: Paths.community,
+        name: Routes.community,
+        builder: (context, state) => const CommunityScreen(),
+      ),
+      GoRoute(
+        path: Paths.preferenceLocation,
+        name: Routes.preferenceLocation,
+        builder: (context, state) => const PreferenceLocationScreen(),
+      ),
+      GoRoute(
+        path: Paths.education,
+        name: Routes.education,
+        builder: (context, state) => const EducationScreen(),
+      ),
+      GoRoute(
+        path: Paths.career,
+        name: Routes.career,
+        builder: (context, state) => const CareerScreen(),
+      ),
+      GoRoute(
+        path: Paths.otherDetails,
+        name: Routes.otherDetails,
+        builder: (context, state) => const OtherDetailsScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
