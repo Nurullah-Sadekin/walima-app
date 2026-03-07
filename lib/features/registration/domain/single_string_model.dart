@@ -152,3 +152,16 @@ List<SingleStringModel> siblingCountListDataInserted = [
   SingleStringModel(name: '4'),
   SingleStringModel(name: '5 or more'),
 ];
+
+List<SingleStringModel> maritalStatusListDataInserted = [
+  SingleStringModel(name: 'Open to All'),
+  SingleStringModel(name: 'Never Married'),
+  SingleStringModel(name: 'Divorced'),
+  SingleStringModel(name: 'Widowed'),
+  SingleStringModel(name: 'Separated'),
+  SingleStringModel(name: 'Married'),
+  SingleStringModel(name: 'Awaiting Divorce'),
+  SingleStringModel(name: 'Annulled'),
+];
+
+
