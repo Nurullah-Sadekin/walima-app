@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
+import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 
 class RecommendedPreferencesProvider extends BaseChangeNotifier {
   RecommendedPreferencesScreenStates screenStates = RecommendedPreferencesScreenStates.defaultLoading;
@@ -8,15 +9,27 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   bool isLoading = false;
   VoidCallback? _controllersListener;
 
+  Future<void> getInitialData() async {}
+
+  String? selectedDietStatus;
 
   final TextEditingController religionController = TextEditingController();
 
-  Future<void> getInitialData() async {
-    // Simulate a delay for fetching data
+
+  List<SingleStringModel> maritalStatusDataList = maritalStatusListDataInserted;
+
+
+  void selectedDiet(int index) {
+    if (index < 0 || index >= maritalStatusDataList.length) return;
+    for (var i = 0; i < maritalStatusDataList.length; i++) {
+      maritalStatusDataList[i].isSelected = i == index;
+    }
+    selectedDietStatus = maritalStatusDataList[index].name;
+
+    notifyListeners();
   }
 
   void initControllersListener() {
-    // avoid attaching multiple times
     if (_controllersListener != null) return;
 
     _controllersListener = () => notifyListeners();
@@ -32,7 +45,6 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     try {
       religionController.removeListener(_controllersListener!);
     } catch (_) {}
-
 
     _controllersListener = null;
 
