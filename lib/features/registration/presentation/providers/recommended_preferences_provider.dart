@@ -12,12 +12,24 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   Future<void> getInitialData() async {}
 
   List<SingleStringModel> maritalStatusDataList = maritalStatusListDataInserted;
+  List<SingleStringModel> countryDataList =  countryListDataInserted;
+  List<SingleStringModel> dietDataList =  dietDataListInserted;
+  List<SingleStringModel> incomeRangeDataList =  incomeRangeListInserted;
+  List<SingleStringModel> professionDataList =  fatherDetailsItemListDataInserted;
+
   final List<String> preferableMaritalStatuses = [];
+  final List<String> preferableCity = [];
+  final List<String> preferableDiet = [];
 
 
   final TextEditingController religionPreferenceController = TextEditingController();
   final TextEditingController communityPreferenceController = TextEditingController();
   final TextEditingController motherTonguePreferenceController = TextEditingController();
+  final TextEditingController countryPreferenceController = TextEditingController();
+  final TextEditingController professionPreferenceController = TextEditingController();
+  final TextEditingController annualIncomePreferenceController = TextEditingController();
+  final TextEditingController profileManagePreferenceController = TextEditingController();
+  final TextEditingController dietPreferenceController = TextEditingController();
 
 
   final int ageMinLimit = 18;
@@ -37,6 +49,29 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
       if (!preferableMaritalStatuses.contains(item.name)) preferableMaritalStatuses.add(item.name);
     } else {
       preferableMaritalStatuses.remove(item.name);
+    }
+    notifyListeners();
+  }
+
+  void toggleCity(int index) {
+    if (index < 0 || index >= countryDataList.length) return;
+    final item = countryDataList[index];
+    item.isSelected = !item.isSelected;
+    if (item.isSelected) {
+      if (!preferableCity.contains(item.name)) preferableCity.add(item.name);
+    } else {
+      preferableCity.remove(item.name);
+    }
+    notifyListeners();
+  }
+  void toggleDiet(int index) {
+    if (index < 0 || index >= dietDataList.length) return;
+    final item = dietDataList[index];
+    item.isSelected = !item.isSelected;
+    if (item.isSelected) {
+      if (!preferableDiet.contains(item.name)) preferableDiet.add(item.name);
+    } else {
+      preferableDiet.remove(item.name);
     }
     notifyListeners();
   }
@@ -77,6 +112,21 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     try {
       motherTonguePreferenceController.addListener(_controllersListener!);
     } catch (_) {}
+    try {
+      countryPreferenceController.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      professionPreferenceController.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      annualIncomePreferenceController.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      profileManagePreferenceController.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      dietPreferenceController.addListener(_controllersListener!);
+    } catch (_) {}
 
 
   }
@@ -91,6 +141,21 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     } catch (_) {}
     try {
       motherTonguePreferenceController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      countryPreferenceController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      professionPreferenceController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      annualIncomePreferenceController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      profileManagePreferenceController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      dietPreferenceController.removeListener(_controllersListener!);
     } catch (_) {}
 
     _controllersListener = null;

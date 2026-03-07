@@ -115,7 +115,7 @@ class _LocationScreenState extends ConsumerState<ProfileCreateStatusScreen> {
       buttonStyle:  ButtonsStyle.activePrimaryButton,
       title: 'Continue',
       onTap: () {
-       // context.push(Paths.maritalStatus);
+       context.push(Paths.partnerPreferences);
       },
     );
   }

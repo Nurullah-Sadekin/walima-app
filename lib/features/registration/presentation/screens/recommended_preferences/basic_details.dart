@@ -59,7 +59,7 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
                   isTrailing: true,
                   trailingText: 'Skip',
                   onTrailingTap: null),
-              Expanded(child: body()),
+              body(),
             ],
           ),
         ),
@@ -74,7 +74,7 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
         child: Column(
           spacing: 10,
           children: [
-            Expanded(child: view()),
+            view(),
             bottomAction(),
             const SizedBox(height: 20),
           ],
@@ -84,93 +84,95 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
   }
 
   Widget view() {
-    return Column(
-      spacing: 10,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Age Range',
-          style: TextStyle(
-            fontSize: TextSize.font14(context),
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        // Age range slider
-        RangeSlider(
-          values: RangeValues(provider.ageStart.toDouble(), provider.ageEnd.toDouble()),
-          min: provider.ageMinLimit.toDouble(),
-          max: provider.ageMaxLimit.toDouble(),
-          divisions: provider.ageMaxLimit - provider.ageMinLimit,
-          labels: RangeLabels('${provider.ageStart}', '${provider.ageEnd}'),
-          onChanged: (values) => provider.setAgeRange(values),
-          activeColor: AppColors.primary,
-          inactiveColor: const Color(0xFFEAEAEA),
-          overlayColor: WidgetStateProperty.resolveWith((states) {
-            return AppColors.primaryVariant;
-          }),
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-        ),
-        Text(
-          'Height Range',
-          style: TextStyle(
-            fontSize: TextSize.font14(context),
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        // Height range slider
-        RangeSlider(
-          values: RangeValues(provider.heightStart.toDouble(), provider.heightEnd.toDouble()),
-          min: provider.heightMinLimit.toDouble(),
-          max: provider.heightMaxLimit.toDouble(),
-          divisions: ((provider.heightMaxLimit - provider.heightMinLimit) ~/ 1) > 0 ? (provider.heightMaxLimit - provider.heightMinLimit) ~/ 1 : null,
-          labels: RangeLabels('${provider.heightStart} cm', '${provider.heightEnd} cm'),
-          activeColor: AppColors.primary,
-          inactiveColor: const Color(0xFFEAEAEA),
-          overlayColor: WidgetStateProperty.resolveWith((states) {
-            return AppColors.primaryVariant;
-          }),
-          onChanged: (values) => provider.setHeightRange(values),
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-        ),
-        Text(
-          'Martial Status',
-          style: TextStyle(
-            fontSize: TextSize.font14(context),
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        Expanded(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                const double spacing = 10.0;
-                return Consumer(builder: (context, ref, _) {
-                  final provider = ref.watch(recommendedPreferencesProvider);
-                  return Wrap(
-                    spacing: spacing,
-                    runSpacing: spacing,
-                    children: List.generate(provider.maritalStatusDataList.length, (index) {
-                      final item = provider.maritalStatusDataList[index];
-
-                      return SelectionCard(
-                        buttonStyle: item.isSelected
-                            ? SelectionStyle.selectedCheckbox
-                            : SelectionStyle.unSelectedCheckbox,
-                        onTap: () {
-                          provider.toggleMaritalStatus(index);
-                        },
-                        isSelected: item.isSelected,
-                        title: item.name,
-                      );
-                    }),
-                  );
-                });
-              },
+    return Expanded(
+      child: Column(
+        spacing: 10,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Age Range',
+            style: TextStyle(
+              fontSize: TextSize.font14(context),
+              fontWeight: FontWeight.w500,
             ),
           ),
-        ),
-      ],
+          // Age range slider
+          RangeSlider(
+            values: RangeValues(provider.ageStart.toDouble(), provider.ageEnd.toDouble()),
+            min: provider.ageMinLimit.toDouble(),
+            max: provider.ageMaxLimit.toDouble(),
+            divisions: provider.ageMaxLimit - provider.ageMinLimit,
+            labels: RangeLabels('${provider.ageStart}', '${provider.ageEnd}'),
+            onChanged: (values) => provider.setAgeRange(values),
+            activeColor: AppColors.primary,
+            inactiveColor: const Color(0xFFEAEAEA),
+            overlayColor: WidgetStateProperty.resolveWith((states) {
+              return AppColors.primaryVariant;
+            }),
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+          ),
+          Text(
+            'Height Range',
+            style: TextStyle(
+              fontSize: TextSize.font14(context),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          // Height range slider
+          RangeSlider(
+            values: RangeValues(provider.heightStart.toDouble(), provider.heightEnd.toDouble()),
+            min: provider.heightMinLimit.toDouble(),
+            max: provider.heightMaxLimit.toDouble(),
+            divisions: ((provider.heightMaxLimit - provider.heightMinLimit) ~/ 1) > 0 ? (provider.heightMaxLimit - provider.heightMinLimit) ~/ 1 : null,
+            labels: RangeLabels('${provider.heightStart} cm', '${provider.heightEnd} cm'),
+            activeColor: AppColors.primary,
+            inactiveColor: const Color(0xFFEAEAEA),
+            overlayColor: WidgetStateProperty.resolveWith((states) {
+              return AppColors.primaryVariant;
+            }),
+            onChanged: (values) => provider.setHeightRange(values),
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+          ),
+          Text(
+            'Martial Status',
+            style: TextStyle(
+              fontSize: TextSize.font14(context),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  const double spacing = 10.0;
+                  return Consumer(builder: (context, ref, _) {
+                    final provider = ref.watch(recommendedPreferencesProvider);
+                    return Wrap(
+                      spacing: spacing,
+                      runSpacing: spacing,
+                      children: List.generate(provider.maritalStatusDataList.length, (index) {
+                        final item = provider.maritalStatusDataList[index];
+
+                        return SelectionCard(
+                          buttonStyle: item.isSelected
+                              ? SelectionStyle.selectedCheckbox
+                              : SelectionStyle.unSelectedCheckbox,
+                          onTap: () {
+                            provider.toggleMaritalStatus(index);
+                          },
+                          isSelected: item.isSelected,
+                          title: item.name,
+                        );
+                      }),
+                    );
+                  });
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

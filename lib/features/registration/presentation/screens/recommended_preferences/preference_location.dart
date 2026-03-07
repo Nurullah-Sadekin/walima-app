@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
+import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
+import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/recommended_preferences_provider.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
@@ -11,8 +12,6 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart' as rn;
-import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart' as regp;
 
 class PreferenceLocationScreen extends ConsumerStatefulWidget {
   const PreferenceLocationScreen({super.key});
@@ -57,10 +56,7 @@ class _BasicDetailsScreenState extends ConsumerState<PreferenceLocationScreen> {
               const UpperLayer(
                   imagePath: AppImages.recommendedPreferences,
                   isShowAppbar: true,
-                  isBackButton: false,
-                  isTrailing: true,
-                  trailingText: 'Skip',
-                  onTrailingTap: null),
+                  isBackButton: true,),
               body(),
             ],
           ),
@@ -76,8 +72,7 @@ class _BasicDetailsScreenState extends ConsumerState<PreferenceLocationScreen> {
         child: Column(
           spacing: 10,
           children: [
-            completeMessage(),
-            const Spacer(),
+            dataField(),
             bottomAction(),
             const SizedBox(height: 20),
           ],
@@ -86,28 +81,58 @@ class _BasicDetailsScreenState extends ConsumerState<PreferenceLocationScreen> {
     );
   }
 
-  Widget completeMessage() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+  Widget dataField() {
+    return Expanded(
       child: Column(
         spacing: 10,
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Partner Preferences',
-            style: TextStyle(
-              fontSize: TextSize.font20(context),
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimaryLight,
-            ),
+          DropDownField(
+            headLine: 'Country Living In Religion',
+            hintText: 'Select',
+            popUpHeader: 'Select Preferable Country Living In',
+            items: provider.countryDataList,
+            controller: provider.countryPreferenceController,
+            onTap: () {
+            },
+            isSearch: true,
           ),
           Text(
-            'Set your preferences so we can find the right partner for you.',
-            textAlign: TextAlign.center,
+            'City',
             style: TextStyle(
               fontSize: TextSize.font14(context),
-              fontWeight: FontWeight.w400,
-              color: AppColors.textSecondaryLight,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  const double spacing = 10.0;
+                  return Consumer(builder: (context, ref, _) {
+                    final provider = ref.watch(recommendedPreferencesProvider);
+                    return Wrap(
+                      spacing: spacing,
+                      runSpacing: spacing,
+                      children: List.generate(provider.countryDataList.length, (index) {
+                        final item = provider.countryDataList[index];
+
+                        return SelectionCard(
+                          buttonStyle: item.isSelected
+                              ? SelectionStyle.selectedCheckbox
+                              : SelectionStyle.unSelectedCheckbox,
+                          onTap: () {
+                            provider.toggleCity(index);
+                          },
+                          isSelected: item.isSelected,
+                          title: item.name,
+                        );
+                      }),
+                    );
+                  });
+                },
+              ),
             ),
           ),
         ],
@@ -120,7 +145,7 @@ class _BasicDetailsScreenState extends ConsumerState<PreferenceLocationScreen> {
       buttonStyle: ButtonsStyle.activePrimaryButton,
       title: 'Continue',
       onTap: () {
-        context.push(Paths.community);
+        context.push(Paths.education);
       },
     );
   }

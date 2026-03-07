@@ -58,10 +58,8 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
               const UpperLayer(
                   imagePath: AppImages.recommendedPreferences,
                   isShowAppbar: true,
-                  isBackButton: false,
-                  isTrailing: true,
-                  trailingText: 'Skip',
-                  onTrailingTap: null),
+                  isBackButton: true,
+              ),
               body(),
             ],
           ),

@@ -163,5 +163,18 @@ List<SingleStringModel> maritalStatusListDataInserted = [
   SingleStringModel(name: 'Awaiting Divorce'),
   SingleStringModel(name: 'Annulled'),
 ];
+List<SingleStringModel> countryListDataInserted = [
+  SingleStringModel(name: 'Bangladesh'),
+  SingleStringModel(name: 'India'),
+  SingleStringModel(name: 'Pakistan'),
+  SingleStringModel(name: 'Nepal'),
+  SingleStringModel(name: 'Sri Lanka'),
+  SingleStringModel(name: 'Afghanistan'),
+  SingleStringModel(name: 'Bhutan'),
+  SingleStringModel(name: 'China'),
+  SingleStringModel(name: 'Italy'),
+  SingleStringModel(name: 'Spain'),
+
+];
 
 

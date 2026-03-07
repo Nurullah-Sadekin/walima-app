@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
+import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -54,10 +55,7 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
               const UpperLayer(
                   imagePath: AppImages.recommendedPreferences,
                   isShowAppbar: true,
-                  isBackButton: false,
-                  isTrailing: true,
-                  trailingText: 'Skip',
-                  onTrailingTap: null),
+                  isBackButton: true,),
               body(),
             ],
           ),
@@ -73,8 +71,7 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
         child: Column(
           spacing: 10,
           children: [
-            completeMessage(),
-            const Spacer(),
+            view(),
             bottomAction(),
             const SizedBox(height: 20),
           ],
@@ -83,28 +80,48 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
     );
   }
 
-  Widget completeMessage() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+  Widget view() {
+    return Expanded(
       child: Column(
         spacing: 10,
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Partner Preferences',
-            style: TextStyle(
-              fontSize: TextSize.font20(context),
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimaryLight,
-            ),
-          ),
-          Text(
-            'Set your preferences so we can find the right partner for you.',
-            textAlign: TextAlign.center,
+            'Education  Qualification',
             style: TextStyle(
               fontSize: TextSize.font14(context),
-              fontWeight: FontWeight.w400,
-              color: AppColors.textSecondaryLight,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  const double spacing = 10.0;
+                  return Consumer(builder: (context, ref, _) {
+                    final provider = ref.watch(recommendedPreferencesProvider);
+                    return Wrap(
+                      spacing: spacing,
+                      runSpacing: spacing,
+                      children: List.generate(provider.countryDataList.length, (index) {
+                        final item = provider.countryDataList[index];
+
+                        return SelectionCard(
+                          buttonStyle: item.isSelected
+                              ? SelectionStyle.selectedCheckbox
+                              : SelectionStyle.unSelectedCheckbox,
+                          onTap: () {
+                            provider.toggleCity(index);
+                          },
+                          isSelected: item.isSelected,
+                          title: item.name,
+                        );
+                      }),
+                    );
+                  });
+                },
+              ),
             ),
           ),
         ],
@@ -117,7 +134,7 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
       buttonStyle: ButtonsStyle.activePrimaryButton,
       title: 'Continue',
       onTap: () {
-        context.push(Paths.preferenceLocation);
+        context.push(Paths.career);
       },
     );
   }

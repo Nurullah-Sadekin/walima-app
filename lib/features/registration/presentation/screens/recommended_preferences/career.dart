@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart' as rn;
+import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
+import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
@@ -11,7 +13,6 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart' as regp;
 
 class CareerScreen extends ConsumerStatefulWidget {
   const CareerScreen({super.key});
@@ -20,41 +21,41 @@ class CareerScreen extends ConsumerStatefulWidget {
 }
 
 class _CareerScreenState extends ConsumerState<CareerScreen> {
-  late RecommendedPreferencesProvider recProvider;
+  late RecommendedPreferencesProvider provider;
 
   @override
   void initState() {
     super.initState();
-    recProvider = ref.read(recommendedPreferencesProvider);
+    provider = ref.read(recommendedPreferencesProvider);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      recProvider.getInitialData();
-      recProvider.initControllersListener();
+      provider.getInitialData();
+      provider.initControllersListener();
     });
   }
 
   @override
   void dispose() {
-    recProvider.disposeControllersListener();
+    provider.disposeControllersListener();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final rec = ref.watch(recommendedPreferencesProvider);
+    final provider = ref.watch(recommendedPreferencesProvider);
     return TransparentLoading(
-      isLoading: rec.loaderState == regp.RegistrationScreenStates.isProfileFor,
+      isLoading: provider.loaderState == RecommendedPreferencesScreenStates.preferences,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Container(
           decoration: BoxDecoration(
             gradient: AppColors.customBackgroundGradient,
           ),
-          child: rec.screenStates == regp.RegistrationScreenStates.isProfileFor
+          child: provider.screenStates == RecommendedPreferencesScreenStates.preferences
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.profession),
-                    Expanded(child: body(rec)),
+                    const UpperLayer(imagePath: AppImages.recommendedPreferences),
+                    Expanded(child: body(provider)),
                   ],
                 ),
         ),
@@ -67,37 +68,76 @@ class _CareerScreenState extends ConsumerState<CareerScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
         spacing: 10,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // PrimaryTextField(
-          //   controller: rec.currentCompanyNameController,
-          //   headLine: 'Current Company',
-          //   hintText: 'Write here',
-          //   errorText: null,
-          //   noPrefix: true,
-          //   onTap: () {},
-          // ),
-          // PrimaryTextField(
-          //   controller: rec.yourWorkController,
-          //   hideHeadline: true,
-          //   hintText: 'Your Work',
-          //   errorText: null,
-          //   noPrefix: true,
-          //   onTap: () {},
-          // ),
+          Text(
+            'Working As',
+            style: TextStyle(
+              fontSize: TextSize.font14(context),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              const double spacing = 10.0;
+              return Consumer(builder: (context, ref, _) {
+                final provider = ref.watch(recommendedPreferencesProvider);
+                return Wrap(
+                  spacing: spacing,
+                  runSpacing: spacing,
+                  children: List.generate(provider.countryDataList.length, (index) {
+                    final item = provider.countryDataList[index];
 
+                    return SelectionCard(
+                      buttonStyle: item.isSelected
+                          ? SelectionStyle.selectedCheckbox
+                          : SelectionStyle.unSelectedCheckbox,
+                      onTap: () {
+                        provider.toggleCity(index);
+                      },
+                      isSelected: item.isSelected,
+                      title: item.name,
+                    );
+                  }),
+                );
+              });
+            },
+          ),
+          DropDownField(
+            headLine: 'Profession',
+            hintText: 'Select',
+            popUpHeader: 'Select Profession',
+            items: provider.professionDataList,
+            controller: provider.professionPreferenceController,
+            onTap: () {
+            },
+            isSearch: true,
+          ),
+          DropDownField(
+            headLine: 'Annual Income',
+            hintText: 'Select',
+            popUpHeader: 'Annual Income',
+            items: provider.incomeRangeDataList,
+            controller: provider.annualIncomePreferenceController,
+            onTap: () {
+            },
+            isSearch: true,
+          ),
           const Spacer(),
-
-          // PrimaryButtons(
-          //   buttonStyle: rec.currentCompanyNameController.text.isNotEmpty ? ButtonsStyle.activePrimaryButton : ButtonsStyle.disableButton,
-          //   title: 'Continue',
-          //   onTap: () {
-          //     if (rec.currentCompanyNameController.text.isEmpty) return;
-          //     context.push(rn.Paths.otherDetails);
-          //   },
-          // ),
+          bottomAction(),
           const SizedBox(height: 20),
         ],
       ),
+    );
+  }
+
+  Widget bottomAction() {
+    return PrimaryButtons(
+      buttonStyle: ButtonsStyle.activePrimaryButton,
+      title: 'Continue',
+      onTap: () {
+        context.push(Paths.otherDetails);
+      },
     );
   }
 }

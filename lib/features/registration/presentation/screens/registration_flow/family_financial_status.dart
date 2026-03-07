@@ -57,7 +57,7 @@ class _ProfessionScreenState
               : Column(
                   children: [
                     const UpperLayer(imagePath: AppImages.familyDetails),
-                    Expanded(child: body()),
+                     body(),
                   ],
                 ),
         ),
@@ -72,7 +72,7 @@ class _ProfessionScreenState
         child: Column(
           spacing: 10,
           children: [
-            Expanded(child: textField()),
+             textField(),
             bottomAction(),
             const SizedBox(height: 20),
           ],
