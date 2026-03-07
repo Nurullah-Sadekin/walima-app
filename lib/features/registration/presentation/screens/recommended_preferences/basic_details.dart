@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
+import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/providers/recommended_preferences_provider.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/providers/recommended_preferences_provider.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart' as rn;
-import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart' as regp;
 
 class BasicDetailsScreen extends ConsumerStatefulWidget {
   const BasicDetailsScreen({super.key});
@@ -61,7 +59,7 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
                   isTrailing: true,
                   trailingText: 'Skip',
                   onTrailingTap: null),
-              body(),
+              Expanded(child: body()),
             ],
           ),
         ),
@@ -76,8 +74,7 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
         child: Column(
           spacing: 10,
           children: [
-            completeMessage(),
-            const Spacer(),
+            Expanded(child: completeMessage()),
             bottomAction(),
             const SizedBox(height: 20),
           ],
@@ -87,31 +84,93 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
   }
 
   Widget completeMessage() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        spacing: 10,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            'Partner Preferences',
-            style: TextStyle(
-              fontSize: TextSize.font20(context),
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimaryLight,
+    return Column(
+      spacing: 10,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Age Range',
+          style: TextStyle(
+            fontSize: TextSize.font14(context),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        // Age range slider
+        RangeSlider(
+          values: RangeValues(provider.ageStart.toDouble(), provider.ageEnd.toDouble()),
+          min: provider.ageMinLimit.toDouble(),
+          max: provider.ageMaxLimit.toDouble(),
+          divisions: provider.ageMaxLimit - provider.ageMinLimit,
+          labels: RangeLabels('${provider.ageStart}', '${provider.ageEnd}'),
+          onChanged: (values) => provider.setAgeRange(values),
+          activeColor: AppColors.primary,
+          inactiveColor: const Color(0xFFEAEAEA),
+          overlayColor: WidgetStateProperty.resolveWith((states) {
+            return AppColors.primaryVariant;
+          }),
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+        ),
+        Text(
+          'Height Range',
+          style: TextStyle(
+            fontSize: TextSize.font14(context),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        // Height range slider
+        RangeSlider(
+          values: RangeValues(provider.heightStart.toDouble(), provider.heightEnd.toDouble()),
+          min: provider.heightMinLimit.toDouble(),
+          max: provider.heightMaxLimit.toDouble(),
+          divisions: ((provider.heightMaxLimit - provider.heightMinLimit) ~/ 1) > 0 ? (provider.heightMaxLimit - provider.heightMinLimit) ~/ 1 : null,
+          labels: RangeLabels('${provider.heightStart} cm', '${provider.heightEnd} cm'),
+          activeColor: AppColors.primary,
+          inactiveColor: const Color(0xFFEAEAEA),
+          overlayColor: WidgetStateProperty.resolveWith((states) {
+            return AppColors.primaryVariant;
+          }),
+          onChanged: (values) => provider.setHeightRange(values),
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+        ),
+        Text(
+          'Martial Status',
+          style: TextStyle(
+            fontSize: TextSize.font14(context),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        Expanded(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                const double spacing = 10.0;
+                return Consumer(builder: (context, ref, _) {
+                  final provider = ref.watch(recommendedPreferencesProvider);
+                  return Wrap(
+                    spacing: spacing,
+                    runSpacing: spacing,
+                    children: List.generate(provider.maritalStatusDataList.length, (index) {
+                      final item = provider.maritalStatusDataList[index];
+
+                      return SelectionCard(
+                        buttonStyle: item.isSelected
+                            ? SelectionStyle.selectedCheckbox
+                            : SelectionStyle.unSelectedCheckbox,
+                        onTap: () {
+                          provider.toggleMaritalStatus(index);
+                        },
+                        isSelected: item.isSelected,
+                        title: item.name,
+                      );
+                    }),
+                  );
+                });
+              },
             ),
           ),
-          Text(
-            'Set your preferences so we can find the right partner for you.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: TextSize.font14(context),
-              fontWeight: FontWeight.w400,
-              color: AppColors.textSecondaryLight,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

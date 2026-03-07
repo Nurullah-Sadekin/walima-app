@@ -11,21 +11,53 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
 
   Future<void> getInitialData() async {}
 
-  String? selectedDietStatus;
+  List<SingleStringModel> maritalStatusDataList = maritalStatusListDataInserted;
+  final List<String> selectedMaritalStatuses = [];
+
 
   final TextEditingController religionController = TextEditingController();
 
 
-  List<SingleStringModel> maritalStatusDataList = maritalStatusListDataInserted;
+  final int ageMinLimit = 18;
+  final int ageMaxLimit = 70;
+  int ageStart = 25;
+  int ageEnd = 35;
+  final int heightMinLimit = 120;
+  final int heightMaxLimit = 220;
+  int heightStart = 160;
+  int heightEnd = 180;
 
-
-  void selectedDiet(int index) {
+  void toggleMaritalStatus(int index) {
     if (index < 0 || index >= maritalStatusDataList.length) return;
-    for (var i = 0; i < maritalStatusDataList.length; i++) {
-      maritalStatusDataList[i].isSelected = i == index;
+    final item = maritalStatusDataList[index];
+    item.isSelected = !item.isSelected;
+    if (item.isSelected) {
+      if (!selectedMaritalStatuses.contains(item.name)) selectedMaritalStatuses.add(item.name);
+    } else {
+      selectedMaritalStatuses.remove(item.name);
     }
-    selectedDietStatus = maritalStatusDataList[index].name;
+    notifyListeners();
+  }
 
+  void setAgeRange(RangeValues values) {
+    ageStart = values.start.round().clamp(ageMinLimit, ageMaxLimit);
+    ageEnd = values.end.round().clamp(ageMinLimit, ageMaxLimit);
+    if (ageStart > ageEnd) {
+      final tmp = ageStart;
+      ageStart = ageEnd;
+      ageEnd = tmp;
+    }
+    notifyListeners();
+  }
+
+  void setHeightRange(RangeValues values) {
+    heightStart = values.start.round().clamp(heightMinLimit, heightMaxLimit);
+    heightEnd = values.end.round().clamp(heightMinLimit, heightMaxLimit);
+    if (heightStart > heightEnd) {
+      final tmp = heightStart;
+      heightStart = heightEnd;
+      heightEnd = tmp;
+    }
     notifyListeners();
   }
 
