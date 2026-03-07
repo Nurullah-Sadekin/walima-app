@@ -72,10 +72,7 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
                   hoverColor: Colors.transparent,
-                  onTap: onTrailingTap ??
-                      () {
-                        Navigator.pop(context);
-                      },
+                  onTap: onTrailingTap,
                   child: Padding(
                     padding: EdgeInsets.all(leadingPadding ?? 12.0),
                     child: Row(
