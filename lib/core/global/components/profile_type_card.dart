@@ -23,7 +23,7 @@ class IsProfileForItemWidget extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primaryVariant : Colors.transparent,
+          color: isSelected ? AppColors.primaryVariant : Colors.white,
           borderRadius: BorderRadius.circular(6),
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.greyLight,

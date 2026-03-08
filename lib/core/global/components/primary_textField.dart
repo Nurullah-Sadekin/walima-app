@@ -211,8 +211,8 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
         prefixIconConstraints: BoxConstraints(
           minHeight: screenHeight * 0.025,
         ),
-        fillColor: widget.fillColor,
-        filled: widget.fillColor != null,
+        fillColor: widget.fillColor ?? Colors.white,
+        filled: true,
       ),
     );
   }

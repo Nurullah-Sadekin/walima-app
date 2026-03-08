@@ -5,24 +5,6 @@ import 'package:flutter_boilerplate/core/global/components/primary_textField.dar
 import 'bottom_sheet.dart'; // Make sure this imports BottomSheetUtils
 
 class DropDownField extends StatefulWidget {
-  final String? hintText;
-  final List items;
-  final bool? enabled;
-  final String popUpHeader;
-  final String? searchBoxHintText;
-  final TextEditingController? controller;
-  final String? headLine;
-  final String? icon;
-  final Widget? suffix;
-  final dynamic errorText;
-  final Function(dynamic)? onConfirm;
-  final VoidCallback? onTap;
-  final bool? noPrefix;
-  final bool? hideHeadline;
-  final Function(String searchKey)? searchItemList;
-  final bool isSearch;
-  final bool? headLineInfoIcon;
-  final String? selectedValue;
 
   const DropDownField({
     super.key,
@@ -45,6 +27,24 @@ class DropDownField extends StatefulWidget {
     this.selectedValue,
     this.headLineInfoIcon = false,
   });
+  final String? hintText;
+  final List items;
+  final bool? enabled;
+  final String popUpHeader;
+  final String? searchBoxHintText;
+  final TextEditingController? controller;
+  final String? headLine;
+  final String? icon;
+  final Widget? suffix;
+  final dynamic errorText;
+  final Function(dynamic)? onConfirm;
+  final VoidCallback? onTap;
+  final bool? noPrefix;
+  final bool? hideHeadline;
+  final Function(String searchKey)? searchItemList;
+  final bool isSearch;
+  final bool? headLineInfoIcon;
+  final String? selectedValue;
 
   @override
   State<DropDownField> createState() => _DropDownFieldState();
@@ -100,6 +100,7 @@ class _DropDownFieldState extends State<DropDownField> {
       ),
       readOnly: true,
       headLine: widget.headLine,
+      fillColor: Colors.white,
     );
   }
 }
