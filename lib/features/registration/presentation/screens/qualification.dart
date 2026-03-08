@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/upper_layer.dart';
@@ -43,10 +44,7 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
       isLoading: provider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: AppColors.customBackgroundGradient,
-          ),
+        body: GradientBackground(
           child: provider.screenStates == RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(

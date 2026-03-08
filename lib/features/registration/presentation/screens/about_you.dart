@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
@@ -48,10 +49,7 @@ class _IsProfileForScreenState extends ConsumerState<AboutYou> {
       isLoading: provider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: AppColors.customBackgroundGradient,
-          ),
+        body: GradientBackground(
           child: provider.screenStates == RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(

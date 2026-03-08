@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_expansion_tile.dart';
+import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/know_more_item.dart';
@@ -47,10 +48,7 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
       child: Scaffold(
         extendBodyBehindAppBar: true,
         backgroundColor: Colors.transparent,
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: AppColors.customBackgroundGradient,
-          ),
+        body: GradientBackground(
           child: provider.screenStates == RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(

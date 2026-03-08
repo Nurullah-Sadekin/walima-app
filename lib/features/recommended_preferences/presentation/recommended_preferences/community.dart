@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
+import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -47,10 +48,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       isLoading: provider.loaderState == RecommendedPreferencesScreenStates.preferences,
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: AppColors.customBackgroundGradient,
-          ),
+        body: GradientBackground(
           child: provider.screenStates == RecommendedPreferencesScreenStates.preferences
               ? const Loading()
               : Column(
