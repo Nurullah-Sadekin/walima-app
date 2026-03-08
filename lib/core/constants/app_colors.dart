@@ -67,7 +67,7 @@ class AppColors {
       Color(0xFFFFFFFF),
       Color(0xFFFAF5FF),
     ],
-    stops: [0.0, 0.5, 1.0],
+    stops: [0.5, 0.67, 1.0],
   );
 
 }
