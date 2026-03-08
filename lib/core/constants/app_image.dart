@@ -25,6 +25,12 @@ class AppImages {
   static const String locationSvgIcon = 'assets/svgIcons/location.svg';
   static const String heightSvgIcon = 'assets/svgIcons/height.svg';
   static const String religionSvgIcon = 'assets/svgIcons/religion.svg';
+  static const String messageSvgIcon = 'assets/svgIcons/message.svg';
+  static const String contactSvgIcon = 'assets/svgIcons/contact.svg';
+  static const String profileSvgIcon = 'assets/svgIcons/profile.svg';
+  static const String matchSvgIcon = 'assets/svgIcons/match.svg';
+
+
 
 
 

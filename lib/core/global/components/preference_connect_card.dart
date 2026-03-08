@@ -1,0 +1,115 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/config/text_responsive.dart';
+import 'package:flutter_boilerplate/core/constants/app_colors.dart';
+import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/global/components/icon_text_row.dart';
+import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+
+class PreferenceConnectCard extends StatelessWidget {
+
+  const PreferenceConnectCard({
+    super.key,
+    required this.isSelected,
+    required this.onTap,
+    required this.imagePath,
+    required this.name,
+    required this.age,
+    required this.height,
+    required this.religion,
+    required this.location,
+  });
+
+  final bool isSelected;
+  final VoidCallback onTap;
+  final String imagePath;
+  final String name;
+  final String age;
+  final String height;
+  final String religion;
+  final String location;
+
+  @override
+  Widget build(BuildContext context) {
+    final double imageSize = MediaQuery.of(context).size.width * 0.3;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppColors.greyLight, width: 1),
+        ),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ShowImage(
+                imagePath: imagePath,
+                width: imageSize,
+                height: imageSize,
+              ),
+              const SizedBox(width: 10),
+
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          name,
+                          style: TextStyle(
+                            fontSize: TextSize.font14(context),
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textPrimaryLight,
+                          ),
+                        ),
+                        Icon(
+                          isSelected
+                              ? Icons.check_box
+                              : Icons.check_box_outline_blank,
+                          color: isSelected
+                              ? AppColors.primary
+                              : AppColors.hintTextColor,
+                          size: TextSize.font18(context),
+                        ),
+                      ],
+                    ),
+
+                    IconTextRow(
+                      imagePath: AppImages.calendarSvgIcon,
+                      text: age,
+                      textColor: AppColors.textSecondaryLight,
+                      imageColor: AppColors.hintTextColor,
+                    ),
+                    IconTextRow(
+                      imagePath: AppImages.heightSvgIcon,
+                      text: height,
+                      textColor: AppColors.textSecondaryLight,
+                      imageColor: AppColors.hintTextColor,
+                    ),
+                    IconTextRow(
+                      imagePath: AppImages.religionSvgIcon,
+                      text: religion,
+                      textColor: AppColors.textSecondaryLight,
+                      imageColor: AppColors.hintTextColor,
+                    ),
+                    IconTextRow(
+                      imagePath: AppImages.locationSvgIcon,
+                      text: location,
+                      textColor: AppColors.textSecondaryLight,
+                      imageColor: AppColors.hintTextColor,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
