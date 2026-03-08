@@ -4,8 +4,6 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/popular_badge.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
-
 import 'icon_text_row.dart';
 
 class PackageCard extends StatelessWidget {
@@ -29,9 +27,9 @@ class PackageCard extends StatelessWidget {
     this.profileIsAvailable = false,
     this.matchIsAvailable = false,
     this.backgroundColor,
-    this.packageStatusText,
-    this.packageStatusBgColor,
-    this.packageStatusIcon,
+    this.packageBadgeText,
+    this.packageBadgeBackgroundColor,
+    this.packageBadgeIcon,
   });
 
   final String packageName;
@@ -55,9 +53,9 @@ class PackageCard extends StatelessWidget {
   final bool? matchIsAvailable;
 
   final Color? backgroundColor;
-  final String? packageStatusText;
-  final Color? packageStatusBgColor;
-  final String? packageStatusIcon;
+  final String? packageBadgeText;
+  final Color? packageBadgeBackgroundColor;
+  final String? packageBadgeIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -169,10 +167,10 @@ class PackageCard extends StatelessWidget {
           left: -10,
           top: 12,
           child: PopularBadge(
-              packageStatusText: 'Recommended',
-              packageStatusBgColor: packageStatusBgColor,
-              packageStatusIcon: AppImages.matchSvgIcon,
-              packageThemeColor: packageThemeColor,
+              badgeText: packageBadgeText,
+              badgeBackgroundColor: packageBadgeBackgroundColor,
+              badgeIcon: packageBadgeIcon,
+              badgeThemeColor: packageThemeColor,
           ),
         ),
       ],

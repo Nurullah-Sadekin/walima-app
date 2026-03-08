@@ -7,16 +7,16 @@ import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 class PopularBadge extends StatelessWidget {
   const PopularBadge({
     super.key,
-    this.packageStatusText,
-    this.packageStatusBgColor,
-    this.packageStatusIcon,
-    this.packageThemeColor,
+    this.badgeText,
+    this.badgeBackgroundColor,
+    this.badgeIcon,
+    this.badgeThemeColor,
   });
 
-  final String? packageStatusText;
-  final Color? packageStatusBgColor;
-  final String? packageStatusIcon;
-  final Color? packageThemeColor;
+  final String? badgeText;
+  final Color? badgeBackgroundColor;
+  final String? badgeIcon;
+  final Color? badgeThemeColor;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class PopularBadge extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           decoration: BoxDecoration(
-            color: packageStatusBgColor ?? AppColors.primaryVariant,
+            color: badgeBackgroundColor ?? AppColors.primaryVariant,
             borderRadius: const BorderRadius.only(
               topRight: Radius.circular(2),
               bottomRight: Radius.circular(2),
@@ -38,18 +38,18 @@ class PopularBadge extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               ShowImage(
-                imagePath: packageStatusIcon ?? AppImages.matchSvgIcon,
+                imagePath: badgeIcon ?? AppImages.matchSvgIcon,
                 height: TextSize.font12(context),
                 width: TextSize.font12(context),
-                color: packageThemeColor ?? AppColors.primary,
+                color: badgeThemeColor ?? AppColors.primary,
               ),
               const SizedBox(width: 4),
               Text(
-                packageStatusText ?? 'Recommended',
+                badgeText ?? 'Recommended',
                 style: TextStyle(
                   fontSize: TextSize.font12(context),
                   fontWeight: FontWeight.w500,
-                  color: packageThemeColor ?? AppColors.textPrimaryLight,
+                  color: badgeThemeColor ?? AppColors.textPrimaryLight,
                 ),
               ),
             ],
@@ -59,7 +59,7 @@ class PopularBadge extends StatelessWidget {
         CustomPaint(
           size: const Size(10, 10),
           painter: TrianglePainter(
-            color: packageThemeColor ?? const Color(0xffD1D5DB),
+            color: badgeThemeColor ?? const Color(0xffD1D5DB),
           ),
         ),
       ],
