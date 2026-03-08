@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
+import 'package:flutter_boilerplate/core/global/components/icon_text_row.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_type_card.dart';
 import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
+import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_boilerplate/generated/l10n/app_localizations.dart';
@@ -17,18 +20,7 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final TextEditingController emailController = TextEditingController();
-    int selectedIndex = 0;
-    final moodList = [
-      {
-        "title": "Myself",
-        "image": AppImages.meIcon,
-      },
-      {
-        "title": "My Son",
-        "image": AppImages.mySonIcon,
-      },
-    ];
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.home),
@@ -50,113 +42,64 @@ class HomeScreen extends ConsumerWidget {
                 onTap: () {},
                 title: 'Active Primary Button',
               ),
-              PrimaryButtons(
-                buttonStyle: ButtonsStyle.disableButton,
-                onTap: () {},
-                title: 'Disable Button',
-              ),
-              PrimaryButtons(
-                buttonStyle: ButtonsStyle.activeSecondaryButton,
-                onTap: () {},
-                title: 'Active Secondary Button',
-              ),
-              PrimaryButtons(
-                buttonStyle: ButtonsStyle.cancelButton,
-                onTap: () {},
-                title: 'Cancel',
-              ),
-
-              PrimaryButtons(
-                  buttonStyle: ButtonsStyle.iconicDynamicButton,
-                  onTap: () {},
-                  title: 'Iconic Dynamic Button',
-                  icon: const Icon(
-                    Icons.arrow_forward,
-                    size: 15,
-                  ),
-                  borderColor: Colors.green,
-                  textColor: AppColors.primary,
-                  iconLeftPosition: false),
-              PrimaryButtons(
-                  buttonStyle: ButtonsStyle.authButton,
-                  onTap: () {},
-                  title: 'Auth Dynamic Button',
-                  icon: const Icon(
-                    Icons.arrow_forward,
-                    size: 15,
-                  ),
-                  borderColor: Colors.green,
-                  textColor: AppColors.primary),
-
-              PrimaryTextField(
-                controller: emailController,
-                hintText: 'Enter your password',
-                noPrefix: true,
-                onChanged: (value) {},
-                errorText: null,
-                onTap: () {},
-                showPassIcon: true,
-                forgotPass: true,
-              ),
-              DropDownField(
-                headLine: 'Select Country',
-                hintText: 'Choose your country',
-                popUpHeader: 'Select Country',
-                headLineInfoIcon: true,
-                items: const ['USA', 'Canada', 'UK', 'Australia'],
-                controller: emailController,
-                onTap: () {},
-                isSearch: true,
-              ),
-              Column(
-                children: List.generate(moodList.length, (index) {
-                  final mood = moodList[index];
-                  return IsProfileForItemWidget(
-                    title: mood['title'] ?? '',
-                    imagePath: mood['image'] ?? '',
-                    isSelected: selectedIndex == index,
-                    onTap: () {
-                      selectedIndex = index;
-                    },
-                  );
-                }),
-              ),
-              Row(
-                spacing: 8,
-                children: [
-                  Expanded(
-                    child: IsProfileForItemWidget(
-                      title: moodList[0]['title'] ?? '', // Access first item's title
-                      imagePath: moodList[0]['image'] ?? '', // Access first item's image
-                      isSelected: selectedIndex == 0, onTap: () {  },
-
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.greyLight, width: 1),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  spacing: 10,
+                  children: [
+                    ShowImage(
+                      imagePath: AppImages.demoProfile,
+                      width: MediaQuery.of(context).size.width * 0.3,
                     ),
-                  ),
-                  Expanded(
-                    child: IsProfileForItemWidget(
-                      title: moodList[1]['title'] ?? '', // Access first item's title
-                      imagePath: moodList[1]['image'] ?? '', // Access first item's image
-                      isSelected: selectedIndex == 1, onTap: () {  },
-
-                    ),
-                  ),
-                ],
-              ),
-              SelectionCard(
-                buttonStyle: SelectionStyle.selectedRadio,
-                onTap: () {
-                },
-                isSelected: true,
-                title: 'Prime Selected Button',
-              ),
-              SelectionCard(
-                buttonStyle: SelectionStyle.unSelectedRadio,
-                onTap: () {
-                },
-                isSelected: false,
-                title: 'Secondary Selected Button',
-              ),
-
+                    Container(
+                      color: Colors.red,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Profile Name',
+                            style: TextStyle(
+                                fontSize: TextSize.font14(context),
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textPrimaryLight),
+                          ),
+                          const IconTextRow(
+                            imagePath: AppImages.calendarSvgIcon,
+                            text: '28 Years',
+                            textColor: AppColors.textSecondaryLight,
+                            imageColor: AppColors.hintTextColor,
+                          ),
+                          const IconTextRow(
+                            imagePath: AppImages.heightSvgIcon,
+                            text: '5 Feet 3Inches',
+                            textColor: AppColors.textSecondaryLight,
+                            imageColor: AppColors.hintTextColor,
+                          ),
+                          const IconTextRow(
+                            imagePath: AppImages.religionSvgIcon,
+                            text: 'Muslim, Sunni',
+                            textColor: AppColors.textSecondaryLight,
+                            imageColor: AppColors.hintTextColor,
+                          ),
+                          const IconTextRow(
+                            imagePath: AppImages.locationSvgIcon,
+                            text: 'Gulshan, Dhaka, BD',
+                            textColor: AppColors.textSecondaryLight,
+                            imageColor: AppColors.hintTextColor,
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              )
             ],
           ),
         ),
