@@ -42,7 +42,7 @@ class OnboardingScreen extends StatelessWidget {
                     children: [
                       PrimaryButtons(
                         buttonStyle: ButtonsStyle.authButton,
-                        svgIconPath: AppImages.email,
+                        svgIconPath: AppImages.emailSvgIcon,
                         svgIconColor: AppColors.primary,
                         textColor: AppColors.primary,
                         bgColor: Colors.white,
@@ -54,7 +54,7 @@ class OnboardingScreen extends StatelessWidget {
                       const SizedBox(height: 16),
                       PrimaryButtons(
                         buttonStyle: ButtonsStyle.authButton,
-                        svgIconPath: AppImages.logout,
+                        svgIconPath: AppImages.logoutSvgIcon,
                         borderColor: Colors.white,
                         bgColor: Colors.black12,
                         onTap: () {

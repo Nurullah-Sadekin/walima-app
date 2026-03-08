@@ -121,7 +121,7 @@ class _IsProfileForScreenState extends ConsumerState<AboutYou> {
                 readOnly: true,
                 noPrefix: true,
                 suffix: ShowImage(
-                  imagePath: AppImages.calendarSvg,
+                  imagePath: AppImages.calendarSvgIcon,
                   width: TextSize.font20(context),
                   height: TextSize.font20(context),
                   color: provider.dateOfBirthController.text.isNotEmpty ? AppColors.textPrimaryLight : AppColors.hintTextColor,

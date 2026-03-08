@@ -48,58 +48,66 @@ class HomeScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: AppColors.greyLight, width: 1),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  spacing: 10,
-                  children: [
-                    ShowImage(
-                      imagePath: AppImages.demoProfile,
-                      width: MediaQuery.of(context).size.width * 0.3,
-                    ),
-                    Container(
-                      color: Colors.red,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Profile Name',
-                            style: TextStyle(
-                                fontSize: TextSize.font14(context),
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.textPrimaryLight),
-                          ),
-                          const IconTextRow(
-                            imagePath: AppImages.calendarSvgIcon,
-                            text: '28 Years',
-                            textColor: AppColors.textSecondaryLight,
-                            imageColor: AppColors.hintTextColor,
-                          ),
-                          const IconTextRow(
-                            imagePath: AppImages.heightSvgIcon,
-                            text: '5 Feet 3Inches',
-                            textColor: AppColors.textSecondaryLight,
-                            imageColor: AppColors.hintTextColor,
-                          ),
-                          const IconTextRow(
-                            imagePath: AppImages.religionSvgIcon,
-                            text: 'Muslim, Sunni',
-                            textColor: AppColors.textSecondaryLight,
-                            imageColor: AppColors.hintTextColor,
-                          ),
-                          const IconTextRow(
-                            imagePath: AppImages.locationSvgIcon,
-                            text: 'Gulshan, Dhaka, BD',
-                            textColor: AppColors.textSecondaryLight,
-                            imageColor: AppColors.hintTextColor,
-                          ),
-                        ],
+                child: IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    spacing: 10,
+                    children: [
+                      ShowImage(
+                        imagePath: AppImages.demoProfile,
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        height: MediaQuery.of(context).size.width * 0.3,
                       ),
-                    )
-                  ],
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Profile Name',
+                                  style: TextStyle(
+                                    fontSize: TextSize.font14(context),
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textPrimaryLight,
+                                  ),
+                                ),
+                                Icon(Icons.check_box_outline_blank, color: AppColors.hintTextColor,size: TextSize.font18(context),)
+                              ],
+                            ),
+                            const IconTextRow(
+                              imagePath: AppImages.calendarSvgIcon,
+                              text: '28 Years',
+                              textColor: AppColors.textSecondaryLight,
+                              imageColor: AppColors.hintTextColor,
+                            ),
+                            const IconTextRow(
+                              imagePath: AppImages.heightSvgIcon,
+                              text: '5 Feet 3Inches',
+                              textColor: AppColors.textSecondaryLight,
+                              imageColor: AppColors.hintTextColor,
+                            ),
+                            const IconTextRow(
+                              imagePath: AppImages.religionSvgIcon,
+                              text: 'Muslim, Sunni',
+                              textColor: AppColors.textSecondaryLight,
+                              imageColor: AppColors.hintTextColor,
+                            ),
+                            const IconTextRow(
+                              imagePath: AppImages.locationSvgIcon,
+                              text: 'Gulshan, Dhaka, BD',
+                              textColor: AppColors.textSecondaryLight,
+                              imageColor: AppColors.hintTextColor,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              )
+              ),
             ],
           ),
         ),

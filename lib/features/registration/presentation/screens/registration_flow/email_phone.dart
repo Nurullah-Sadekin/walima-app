@@ -85,7 +85,7 @@ class _YourRegionState extends ConsumerState<EmailPhone> {
           hintText: 'hello@aliguni.com',
           keyboardType: TextInputType.emailAddress,
           prefixIcon: ShowImage(
-            imagePath: AppImages.email,
+            imagePath: AppImages.emailSvgIcon,
             width: TextSize.font18(context),
             height: TextSize.font18(context),
             color: provider.emailController.text.isNotEmpty ? AppColors.textPrimaryLight : AppColors.hintTextColor,

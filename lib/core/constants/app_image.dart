@@ -5,6 +5,8 @@ class AppImages {
 
   // Image asset paths
   static const String photoGuidelines = 'assets/images/photo_guidelines.png';
+  static const String demoProfile = 'assets/images/demoProfile.png';
+
 
   // Icon asset paths
   static const String femaleIcon = 'assets/icons/female.png';
@@ -17,9 +19,16 @@ class AppImages {
 
 
   // svg icon paths
-  static const String email = 'assets/svgIcons/email.svg';
-  static const String logout = 'assets/svgIcons/logout.svg';
-  static const String calendarSvg = 'assets/svgIcons/calendar.svg';
+  static const String emailSvgIcon = 'assets/svgIcons/email.svg';
+  static const String logoutSvgIcon = 'assets/svgIcons/logout.svg';
+  static const String calendarSvgIcon = 'assets/svgIcons/calendar.svg';
+  static const String locationSvgIcon = 'assets/svgIcons/location.svg';
+  static const String heightSvgIcon = 'assets/svgIcons/height.svg';
+  static const String religionSvgIcon = 'assets/svgIcons/religion.svg';
+
+
+
+
 
   // svg image paths
   static const String isProfileFor = 'assets/svgs/isProfileFor.svg';
