@@ -3,6 +3,7 @@ import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
+import 'package:flutter_boilerplate/core/global/components/popular_badge.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 
 import 'icon_text_row.dart';
@@ -167,40 +168,11 @@ class PackageCard extends StatelessWidget {
         Positioned(
           left: -10,
           top: 12,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration:  BoxDecoration(
-                color: packageStatusBgColor ??  AppColors.primaryVariant,
-                boxShadow: [
-                  BoxShadow(
-                    color:Colors.red,
-                    blurRadius: 4,
-                    offset: Offset(2, 4),
-
-                  ),
-                ],
-                borderRadius: const BorderRadius.only(topRight: Radius.circular(2), bottomRight: Radius.circular(2),),
-
-            ),
-            child: Row(
-              spacing: 4,
-              children: [
-                ShowImage(
-                  imagePath: packageStatusIcon ?? AppImages.matchSvgIcon,
-                  height: TextSize.font12(context),
-                  width: TextSize.font12(context),
-                  color: packageThemeColor ??  AppColors.primary,
-                ),
-                Text(
-                  packageStatusText ?? 'Starter Choice',
-                  style: TextStyle(
-                    fontSize: TextSize.font12(context),
-                    fontWeight: FontWeight.w500,
-                    color: packageThemeColor ??  AppColors.textPrimaryLight,
-                  ),
-                ),
-              ],
-            ),
+          child: PopularBadge(
+              packageStatusText: 'Recommended',
+              packageStatusBgColor: packageStatusBgColor,
+              packageStatusIcon: AppImages.matchSvgIcon,
+              packageThemeColor: packageThemeColor,
           ),
         ),
       ],
