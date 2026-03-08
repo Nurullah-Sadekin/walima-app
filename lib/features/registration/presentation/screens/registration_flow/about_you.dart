@@ -12,7 +12,6 @@ import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 class AboutYou extends ConsumerStatefulWidget {
   const AboutYou({super.key});
@@ -26,7 +25,6 @@ class _IsProfileForScreenState extends ConsumerState<AboutYou> {
   @override
   void initState() {
     super.initState();
-    // cache provider so we don't call ref inside dispose
     provider = ref.read(registrationProvider);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -37,7 +35,6 @@ class _IsProfileForScreenState extends ConsumerState<AboutYou> {
 
   @override
   void dispose() {
-    // use cached provider instead of calling ref.read here
     provider.disposeControllersListener();
     super.dispose();
   }
@@ -75,7 +72,7 @@ class _IsProfileForScreenState extends ConsumerState<AboutYou> {
         child: Column(
           spacing: 10,
           children: [
-            textField(),
+            dataInsertField(),
             const Spacer(),
             bottomAction(),
             const SizedBox(height: 20),
@@ -85,7 +82,7 @@ class _IsProfileForScreenState extends ConsumerState<AboutYou> {
     );
   }
 
-  Widget textField() {
+  Widget dataInsertField() {
     return Column(
       spacing: 10,
       children: [
@@ -158,14 +155,12 @@ class _IsProfileForScreenState extends ConsumerState<AboutYou> {
           : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
-        // block if any field is empty
         if (provider.firstNameController.text.isEmpty ||
             provider.lastNameController.text.isEmpty ||
             provider.dateOfBirthController.text.isEmpty) {
           return;
         }
         context.push(Paths.yourReligion);
-        // Handle continue action
       },
     );
   }

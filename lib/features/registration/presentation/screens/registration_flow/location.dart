@@ -70,7 +70,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
         child: Column(
           spacing: 10,
           children: [
-            textField(),
+            dataInsertField(),
             const Spacer(),
             bottomAction(),
             const SizedBox(height: 20),
@@ -80,7 +80,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
     );
   }
 
-  Widget textField() {
+  Widget dataInsertField() {
     return Column(
       spacing: 20,
       crossAxisAlignment: CrossAxisAlignment.start,

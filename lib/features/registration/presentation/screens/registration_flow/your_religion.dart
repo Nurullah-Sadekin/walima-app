@@ -70,7 +70,7 @@ class _YourRegionState extends ConsumerState<YourReligion> {
         child: Column(
           spacing: 10,
           children: [
-            textField(),
+            dataInsertField(),
             const Spacer(),
             bottomAction(),
             const SizedBox(height: 20),
@@ -80,7 +80,7 @@ class _YourRegionState extends ConsumerState<YourReligion> {
     );
   }
 
-  Widget textField() {
+  Widget dataInsertField() {
     return Column(
       spacing: 20,
       children: [

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/upper_layer.dart';
@@ -68,7 +67,7 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
         child: Column(
           spacing: 10,
           children: [
-            textField(),
+            dataInsertField(),
             const Spacer(),
             bottomAction(),
             const SizedBox(height: 20),
@@ -78,7 +77,7 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
     );
   }
 
-  Widget textField() {
+  Widget dataInsertField() {
     return Column(
       spacing: 20,
       children: [

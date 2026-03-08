@@ -65,7 +65,7 @@ class _YourRegionState extends ConsumerState<EmailPhone> {
         child: Column(
           spacing: 10,
           children: [
-            textField(),
+            dataInsertField(),
             const Spacer(),
             bottomAction(),
             const SizedBox(height: 20),
@@ -75,7 +75,7 @@ class _YourRegionState extends ConsumerState<EmailPhone> {
     );
   }
 
-  Widget textField() {
+  Widget dataInsertField() {
     return Column(
       spacing: 20,
       children: [

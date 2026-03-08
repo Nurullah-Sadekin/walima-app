@@ -70,7 +70,7 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
         child: Column(
           spacing: 10,
           children: [
-            textField(),
+            dataInsertField(),
             const Spacer(),
             bottomAction(),
             const SizedBox(height: 20),
@@ -80,13 +80,10 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
     );
   }
 
-  Widget textField() {
+  Widget dataInsertField() {
     return Column(
       spacing: 20,
       children: [
-
-
-        // Income Yes/No
         Column(
           spacing: 10,
           crossAxisAlignment: CrossAxisAlignment.start,

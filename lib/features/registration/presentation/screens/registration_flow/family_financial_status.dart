@@ -72,7 +72,7 @@ class _ProfessionScreenState
         child: Column(
           spacing: 10,
           children: [
-             textField(),
+            dataInsertField(),
             bottomAction(),
             const SizedBox(height: 20),
           ],
@@ -81,7 +81,7 @@ class _ProfessionScreenState
     );
   }
 
-  Widget textField() {
+  Widget dataInsertField() {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

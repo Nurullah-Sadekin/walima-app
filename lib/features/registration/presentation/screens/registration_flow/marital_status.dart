@@ -70,7 +70,7 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
         child: Column(
           spacing: 10,
           children: [
-            textField(),
+            dataInsertField(),
 
             bottomAction(),
             const SizedBox(height: 20),
@@ -80,7 +80,7 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
     );
   }
 
-  Widget textField() {
+  Widget dataInsertField() {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
