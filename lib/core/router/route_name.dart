@@ -30,6 +30,9 @@ abstract class Paths {
   static const otherDetails = '/otherDetails';
   static const preferenceLocation = '/preferenceLocation';
 
+  // Connect Matches & Purchase
+  static const connectMatches = '/connectMatches';
+
 
 }
 
@@ -64,4 +67,7 @@ abstract class Routes {
   static const career = 'career';
   static const otherDetails = 'otherDetails';
   static const preferenceLocation = 'preferenceLocation';
+
+  // Connect Matches & Purchase
+  static const connectMatches = 'connectMatches';
 }

@@ -1,33 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/features/onboarding_screen.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/recommended_preferences/career.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/recommended_preferences/other_details.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/recommended_preferences/partner_preferences.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/recommended_preferences/preference_location.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/about_you.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/email_phone.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/family_details.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/family_financial_status.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/hobbies_interests.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/photo_upload.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/profile_created_status.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/profile_is_for.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/your_religion.dart';
+import 'package:flutter_boilerplate/features/recommended_preferences/presentation/connect_purchesase_card.dart';
+import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/basic_details.dart';
+import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/career.dart';
+import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/community.dart';
+import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/education.dart';
+import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/other_details.dart';
+import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/partner_preferences.dart';
+import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/preference_location.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/about_you.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/email_phone.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/family_details.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/family_financial_status.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/hobbies_interests.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/photo_upload.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/profile_created_status.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/profile_is_for.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/your_religion.dart';
 import 'package:flutter_boilerplate/features/settings/presentation/screens/settings_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_boilerplate/features/splash_screen.dart';
 import 'package:flutter_boilerplate/features/anchor_point/anchor_point.dart';
 import 'package:flutter_boilerplate/features/login/presentation/login_screen.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/location.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/marital_status.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/qualification.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/profession.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/about_yourself.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/registration_flow/verify_number.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/recommended_preferences/basic_details.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/recommended_preferences/community.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/recommended_preferences/education.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/location.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/marital_status.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/qualification.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/profession.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/about_yourself.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/verify_number.dart';
 import 'route_name.dart';
 part 'app_router.g.dart';
 
@@ -172,6 +173,11 @@ GoRouter goRouter(GoRouterRef ref) {
         path: Paths.otherDetails,
         name: Routes.otherDetails,
         builder: (context, state) => const OtherDetailsScreen(),
+      ),
+      GoRoute(
+        path: Paths.connectMatches,
+        name: Routes.connectMatches,
+        builder: (context, state) => const ConnectMatches(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

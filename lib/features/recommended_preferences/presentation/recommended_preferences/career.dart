@@ -1,0 +1,143 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/config/text_responsive.dart';
+import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
+import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/widgets/upper_layer.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
+import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
+import 'package:flutter_boilerplate/features/recommended_preferences/presentation/providers/recommended_preferences_provider.dart';
+import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
+import 'package:flutter_boilerplate/core/constants/app_colors.dart';
+import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:go_router/go_router.dart';
+
+class CareerScreen extends ConsumerStatefulWidget {
+  const CareerScreen({super.key});
+  @override
+  ConsumerState<CareerScreen> createState() => _CareerScreenState();
+}
+
+class _CareerScreenState extends ConsumerState<CareerScreen> {
+  late RecommendedPreferencesProvider provider;
+
+  @override
+  void initState() {
+    super.initState();
+    provider = ref.read(recommendedPreferencesProvider);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      provider.getInitialData();
+      provider.initControllersListener();
+    });
+  }
+
+  @override
+  void dispose() {
+    provider.disposeControllersListener();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = ref.watch(recommendedPreferencesProvider);
+    return TransparentLoading(
+      isLoading: provider.loaderState == RecommendedPreferencesScreenStates.preferences,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.customBackgroundGradient,
+          ),
+          child: provider.screenStates == RecommendedPreferencesScreenStates.preferences
+              ? const Loading()
+              : Column(
+                  children: [
+                    const UpperLayer(imagePath: AppImages.recommendedPreferences),
+                    Expanded(child: body(provider)),
+                  ],
+                ),
+        ),
+      ),
+    );
+  }
+
+  Widget body(RecommendedPreferencesProvider rec) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Column(
+        spacing: 10,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Working As',
+            style: TextStyle(
+              fontSize: TextSize.font14(context),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              const double spacing = 10.0;
+              return Consumer(builder: (context, ref, _) {
+                final provider = ref.watch(recommendedPreferencesProvider);
+                return Wrap(
+                  spacing: spacing,
+                  runSpacing: spacing,
+                  children: List.generate(provider.countryDataList.length, (index) {
+                    final item = provider.countryDataList[index];
+
+                    return SelectionCard(
+                      buttonStyle: item.isSelected
+                          ? SelectionStyle.selectedCheckbox
+                          : SelectionStyle.unSelectedCheckbox,
+                      onTap: () {
+                        provider.toggleCity(index);
+                      },
+                      isSelected: item.isSelected,
+                      title: item.name,
+                    );
+                  }),
+                );
+              });
+            },
+          ),
+          DropDownField(
+            headLine: 'Profession',
+            hintText: 'Select',
+            popUpHeader: 'Select Profession',
+            items: provider.professionDataList,
+            controller: provider.professionPreferenceController,
+            onTap: () {
+            },
+            isSearch: true,
+          ),
+          DropDownField(
+            headLine: 'Annual Income',
+            hintText: 'Select',
+            popUpHeader: 'Annual Income',
+            items: provider.incomeRangeDataList,
+            controller: provider.annualIncomePreferenceController,
+            onTap: () {
+            },
+            isSearch: true,
+          ),
+          const Spacer(),
+          bottomAction(),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  Widget bottomAction() {
+    return PrimaryButtons(
+      buttonStyle: ButtonsStyle.activePrimaryButton,
+      title: 'Continue',
+      onTap: () {
+        context.push(Paths.otherDetails);
+      },
+    );
+  }
+}

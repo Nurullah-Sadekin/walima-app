@@ -1,5 +1,5 @@
 import 'package:flutter_boilerplate/features/login/presentation/providers/login_provider.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/providers/recommended_preferences_provider.dart';
+import 'package:flutter_boilerplate/features/recommended_preferences/presentation/providers/recommended_preferences_provider.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/providers/recommended_preferences_provider.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/upper_layer.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_boilerplate/features/recommended_preferences/presentation/providers/recommended_preferences_provider.dart';
+import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
+import 'package:flutter_boilerplate/core/constants/app_colors.dart';
+import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:go_router/go_router.dart';
 
-class OtherDetailsScreen extends ConsumerStatefulWidget {
-  const OtherDetailsScreen({super.key});
+class PreferenceLocationScreen extends ConsumerStatefulWidget {
+  const PreferenceLocationScreen({super.key});
   @override
-  ConsumerState<OtherDetailsScreen> createState() => _OtherDetailsScreenState();
+  ConsumerState<PreferenceLocationScreen> createState() => _BasicDetailsScreenState();
 }
 
-class _OtherDetailsScreenState extends ConsumerState<OtherDetailsScreen> {
+class _BasicDetailsScreenState extends ConsumerState<PreferenceLocationScreen> {
   late RecommendedPreferencesProvider provider;
 
   @override
@@ -72,7 +72,7 @@ class _OtherDetailsScreenState extends ConsumerState<OtherDetailsScreen> {
         child: Column(
           spacing: 10,
           children: [
-            completeMessage(),
+            dataField(),
             bottomAction(),
             const SizedBox(height: 20),
           ],
@@ -81,48 +81,24 @@ class _OtherDetailsScreenState extends ConsumerState<OtherDetailsScreen> {
     );
   }
 
-  Widget completeMessage() {
+  Widget dataField() {
     return Expanded(
       child: Column(
         spacing: 10,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Profile Manage by',
-            style: TextStyle(
-              fontSize: TextSize.font14(context),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              const double spacing = 10.0;
-              return Consumer(builder: (context, ref, _) {
-                final provider = ref.watch(recommendedPreferencesProvider);
-                return Wrap(
-                  spacing: spacing,
-                  runSpacing: spacing,
-                  children: List.generate(provider.countryDataList.length, (index) {
-                    final item = provider.countryDataList[index];
-
-                    return SelectionCard(
-                      buttonStyle: item.isSelected
-                          ? SelectionStyle.selectedCheckbox
-                          : SelectionStyle.unSelectedCheckbox,
-                      onTap: () {
-                        provider.toggleCity(index);
-                      },
-                      isSelected: item.isSelected,
-                      title: item.name,
-                    );
-                  }),
-                );
-              });
+          DropDownField(
+            headLine: 'Country Living In Religion',
+            hintText: 'Select',
+            popUpHeader: 'Select Preferable Country Living In',
+            items: provider.countryDataList,
+            controller: provider.countryPreferenceController,
+            onTap: () {
             },
+            isSearch: true,
           ),
-
           Text(
-            'Diet',
+            'City',
             style: TextStyle(
               fontSize: TextSize.font14(context),
               fontWeight: FontWeight.w500,
@@ -139,15 +115,15 @@ class _OtherDetailsScreenState extends ConsumerState<OtherDetailsScreen> {
                     return Wrap(
                       spacing: spacing,
                       runSpacing: spacing,
-                      children: List.generate(provider.dietDataList.length, (index) {
-                        final item = provider.dietDataList[index];
+                      children: List.generate(provider.countryDataList.length, (index) {
+                        final item = provider.countryDataList[index];
 
                         return SelectionCard(
                           buttonStyle: item.isSelected
                               ? SelectionStyle.selectedCheckbox
                               : SelectionStyle.unSelectedCheckbox,
                           onTap: () {
-                            provider.toggleDiet(index);
+                            provider.toggleCity(index);
                           },
                           isSelected: item.isSelected,
                           title: item.name,
@@ -169,7 +145,7 @@ class _OtherDetailsScreenState extends ConsumerState<OtherDetailsScreen> {
       buttonStyle: ButtonsStyle.activePrimaryButton,
       title: 'Continue',
       onTap: () {
-       // context.push(Paths.preferenceLocation);
+        context.push(Paths.education);
       },
     );
   }
