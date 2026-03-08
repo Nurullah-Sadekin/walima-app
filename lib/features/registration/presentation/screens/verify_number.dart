@@ -178,7 +178,7 @@ class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
                     ),
                     decoration: InputDecoration(
                       counterText: '',
-                      fillColor: Colors.transparent,
+                      fillColor: Colors.white,
                       contentPadding: const EdgeInsets.all(0),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
