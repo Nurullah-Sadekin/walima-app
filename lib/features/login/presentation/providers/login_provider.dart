@@ -11,10 +11,10 @@ class LoginProvider extends BaseChangeNotifier {
 
   final TextEditingController mobileNoOrEmailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController otpController = TextEditingController();
   final TextEditingController createPasswordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
-
+  final List<TextEditingController> otpController = List.generate(5, (_) => TextEditingController(),);
+  final List<FocusNode> otpFocusNodesController = List.generate(5, (_) => FocusNode());
   Future<void> getInitialData() async {}
 
   void initControllersListener() {
@@ -27,9 +27,6 @@ class LoginProvider extends BaseChangeNotifier {
     } catch (_) {}
     try {
       passwordController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      otpController.addListener(_controllersListener!);
     } catch (_) {}
     try {
       createPasswordController.addListener(_controllersListener!);
@@ -48,9 +45,6 @@ class LoginProvider extends BaseChangeNotifier {
     } catch (_) {}
     try {
       passwordController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      otpController.removeListener(_controllersListener!);
     } catch (_) {}
     try {
       createPasswordController.removeListener(_controllersListener!);
