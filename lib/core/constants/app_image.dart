@@ -29,6 +29,7 @@ class AppImages {
   static const String contactSvgIcon = 'assets/svgIcons/contact.svg';
   static const String profileSvgIcon = 'assets/svgIcons/profile.svg';
   static const String matchSvgIcon = 'assets/svgIcons/match.svg';
+  static const String premiumSvgIcon = 'assets/svgIcons/premium.svg';
 
 
 

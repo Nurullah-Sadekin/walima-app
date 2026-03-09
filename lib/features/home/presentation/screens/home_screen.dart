@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/global/components/connect_now_card.dart';
 import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
 import 'package:flutter_boilerplate/core/global/components/icon_text_row.dart';
 import 'package:flutter_boilerplate/core/global/components/package_card.dart';
@@ -62,26 +63,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 religion: 'Muslim, Sunni',
                 location: 'Gulshan, Dhaka, BD',
               ),
-              PackageCard(
-                packageName: 'Hermony',
-                duration: '3 Months',
-                packagePrice: '2200',
-                perMonthPrice: '733',
-                buttonText: 'Continue',
-                buttonOnTap: () {},
-                messageText: 'Send unlimited messages',
-                contactCount: 100,
-                profileText: 'Profile highlight',
-                matchText: 'Direct contact from matches',
-                messageIsAvailable: true,
-                contactIsAvailable: true,
-                profileIsAvailable: false,
-                matchIsAvailable: false,
-                backgroundColor: AppColors.transparent,
-                packageThemeColor: Colors.purple,
-                packageBadgeBackgroundColor: Colors.purple.shade50,
-                packageBadgeText: 'Recommended',
+              const ConnectNowCard(
+                imagePath: AppImages.demoProfile,
+                iconPath: AppImages.premiumSvgIcon,
+                isPremiumConnect: true,
+                name: 'Profile Name',
+                age: '28 Years',
+                height: '5 Feet 3 Inches',
+                location: 'Gulshan, Dhaka, BD',
               ),
+
             ],
           ),
         ),
