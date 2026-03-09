@@ -38,7 +38,8 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
   @override
   void dispose() {
     provider.disposeControllersListener();
-    provider.disposeOtpFields();
+    // avoid notifying listeners while widget tree is unmounting
+    provider.disposeOtpFields(notify: false);
     super.dispose();
   }
 

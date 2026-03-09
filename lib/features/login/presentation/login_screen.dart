@@ -226,6 +226,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           buttonStyle: ButtonsStyle.activeSecondaryButton,
           title: 'Login with OTP',
           onTap: () {
+            provider.forgotPassword = false;
+            provider.notifyListeners();
             context.push(Paths.sendOtp);
           },
         ),

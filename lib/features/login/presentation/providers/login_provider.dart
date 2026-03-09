@@ -17,24 +17,29 @@ class LoginProvider extends BaseChangeNotifier {
   final TextEditingController createPasswordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
 
+  // OTP controllers and focus nodes (for multi-digit OTP fields)
   List<TextEditingController> otpControllers = [];
   List<FocusNode> otpFocusNodesController = [];
 
   Future<void> getInitialData() async {}
 
-
   void initOtpFields({int length = 5}) {
+
     disposeOtpFields();
+
     otpControllers = List.generate(length, (_) => TextEditingController());
     otpFocusNodesController = List.generate(length, (_) => FocusNode());
+
     for (final c in otpControllers) {
       try {
         c.addListener(() => notifyListeners());
       } catch (_) {}
     }
+
+    notifyListeners();
   }
 
-  void disposeOtpFields() {
+  void disposeOtpFields({bool notify = true}) {
     if (otpControllers.isNotEmpty) {
       for (final c in otpControllers) {
         try {
@@ -50,6 +55,10 @@ class LoginProvider extends BaseChangeNotifier {
         } catch (_) {}
       }
       otpFocusNodesController = [];
+    }
+
+    if (notify) {
+      notifyListeners();
     }
   }
 
@@ -110,7 +119,6 @@ class LoginProvider extends BaseChangeNotifier {
     if (loadingState != null) loaderState = loadingState;
     notifyListeners();
   }
-
 
 }
 
