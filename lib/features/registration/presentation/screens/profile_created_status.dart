@@ -18,10 +18,10 @@ import 'package:go_router/go_router.dart';
 class ProfileCreateStatusScreen extends ConsumerStatefulWidget {
   const ProfileCreateStatusScreen({super.key});
   @override
-  ConsumerState<ProfileCreateStatusScreen> createState() => _LocationScreenState();
+  ConsumerState<ProfileCreateStatusScreen> createState() => _ProfileCreateStatusScreenState();
 }
 
-class _LocationScreenState extends ConsumerState<ProfileCreateStatusScreen> {
+class _ProfileCreateStatusScreenState extends ConsumerState<ProfileCreateStatusScreen> {
   late RegistrationProvider provider;
 
   @override

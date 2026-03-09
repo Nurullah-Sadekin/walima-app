@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
@@ -15,10 +14,10 @@ import 'package:go_router/go_router.dart';
 class FamilyDetailsScreen extends ConsumerStatefulWidget {
   const FamilyDetailsScreen({super.key});
   @override
-  ConsumerState<FamilyDetailsScreen> createState() => _ProfessionScreenState();
+  ConsumerState<FamilyDetailsScreen> createState() => _FamilyDetailsScreenState();
 }
 
-class _ProfessionScreenState extends ConsumerState<FamilyDetailsScreen> {
+class _FamilyDetailsScreenState extends ConsumerState<FamilyDetailsScreen> {
   late RegistrationProvider provider;
 
   @override

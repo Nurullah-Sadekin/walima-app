@@ -19,11 +19,10 @@ class FamilyFinancialStatusScreen extends ConsumerStatefulWidget {
   const FamilyFinancialStatusScreen({super.key});
   @override
   ConsumerState<FamilyFinancialStatusScreen> createState() =>
-      _ProfessionScreenState();
+      _FamilyFinancialStatusScreenState();
 }
 
-class _ProfessionScreenState
-    extends ConsumerState<FamilyFinancialStatusScreen> {
+class _FamilyFinancialStatusScreenState extends ConsumerState<FamilyFinancialStatusScreen> {
   late RegistrationProvider provider;
 
   @override

@@ -20,10 +20,10 @@ class PartnerPreferencesScreen extends ConsumerStatefulWidget {
   const PartnerPreferencesScreen({super.key});
   @override
   ConsumerState<PartnerPreferencesScreen> createState() =>
-      _LocationScreenState();
+      _PartnerPreferencesScreenState();
 }
 
-class _LocationScreenState extends ConsumerState<PartnerPreferencesScreen> {
+class _PartnerPreferencesScreenState extends ConsumerState<PartnerPreferencesScreen> {
   late RecommendedPreferencesProvider provider;
 
   @override

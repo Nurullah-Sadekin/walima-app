@@ -22,10 +22,10 @@ class ConnectMatches extends ConsumerStatefulWidget {
   const ConnectMatches({super.key});
 
   @override
-  ConsumerState<ConnectMatches> createState() => _HomeScreenState();
+  ConsumerState<ConnectMatches> createState() => _ConnectMatchesState();
 }
 
-class _HomeScreenState extends ConsumerState<ConnectMatches> {
+class _ConnectMatchesState extends ConsumerState<ConnectMatches> {
   bool _isSelected = false;
 
   @override

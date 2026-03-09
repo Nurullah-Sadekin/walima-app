@@ -17,10 +17,10 @@ import 'package:go_router/go_router.dart';
 class PreferenceLocationScreen extends ConsumerStatefulWidget {
   const PreferenceLocationScreen({super.key});
   @override
-  ConsumerState<PreferenceLocationScreen> createState() => _BasicDetailsScreenState();
+  ConsumerState<PreferenceLocationScreen> createState() => _PreferenceLocationScreenState();
 }
 
-class _BasicDetailsScreenState extends ConsumerState<PreferenceLocationScreen> {
+class _PreferenceLocationScreenState extends ConsumerState<PreferenceLocationScreen> {
   late RecommendedPreferencesProvider provider;
 
   @override

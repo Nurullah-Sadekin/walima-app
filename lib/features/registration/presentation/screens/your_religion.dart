@@ -5,7 +5,6 @@ import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
@@ -24,7 +23,6 @@ class _YourRegionState extends ConsumerState<YourReligion> {
   @override
   void initState() {
     super.initState();
-    // cache the provider instance so we don't call `ref` inside dispose
     provider = ref.read(registrationProvider);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -35,7 +33,6 @@ class _YourRegionState extends ConsumerState<YourReligion> {
 
   @override
   void dispose() {
-    // use the cached provider instance rather than calling ref.read here
     provider.disposeControllersListener();
     super.dispose();
   }
@@ -129,7 +126,6 @@ class _YourRegionState extends ConsumerState<YourReligion> {
           : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
-        // block if any field is empty
         if (provider.religionController.text.isEmpty ||
             provider.communityController.text.isEmpty ||
             provider.livingInController.text.isEmpty) {

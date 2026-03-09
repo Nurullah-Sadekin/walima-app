@@ -95,7 +95,7 @@ GoRouter goRouter(GoRouterRef ref) {
       GoRoute(
         path: Paths.aboutYou,
         name: Routes.aboutYou,
-        builder: (context, state) => const AboutYou(),
+        builder: (context, state) => const AboutYouScreen(),
       ),
       GoRoute(
         path: Paths.yourReligion,
@@ -105,7 +105,7 @@ GoRouter goRouter(GoRouterRef ref) {
       GoRoute(
         path: Paths.emailPhone,
         name: Routes.emailPhone,
-        builder: (context, state) => const EmailPhone(),
+        builder: (context, state) => const EmailPhoneScreen(),
       ),
       GoRoute(
         path: Paths.location,

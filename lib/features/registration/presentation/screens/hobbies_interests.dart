@@ -18,10 +18,10 @@ class HobbiesInterestsScreen extends ConsumerStatefulWidget {
   const HobbiesInterestsScreen({super.key});
   @override
   ConsumerState<HobbiesInterestsScreen> createState() =>
-      _PhotoUploadScreenState();
+      _HobbiesInterestsScreenState();
 }
 
-class _PhotoUploadScreenState extends ConsumerState<HobbiesInterestsScreen> {
+class _HobbiesInterestsScreenState extends ConsumerState<HobbiesInterestsScreen> {
   late RegistrationProvider provider;
 
   @override

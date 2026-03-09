@@ -14,13 +14,13 @@ import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:go_router/go_router.dart';
 
-class AboutYou extends ConsumerStatefulWidget {
-  const AboutYou({super.key});
+class AboutYouScreen extends ConsumerStatefulWidget {
+  const AboutYouScreen({super.key});
   @override
-  ConsumerState<AboutYou> createState() => _IsProfileForScreenState();
+  ConsumerState<AboutYouScreen> createState() => _AboutYourScreenState();
 }
 
-class _IsProfileForScreenState extends ConsumerState<AboutYou> {
+class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
   late RegistrationProvider provider;
 
   @override

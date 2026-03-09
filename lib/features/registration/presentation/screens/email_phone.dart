@@ -18,13 +18,13 @@ import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:go_router/go_router.dart';
 
-class EmailPhone extends ConsumerStatefulWidget {
-  const EmailPhone({super.key});
+class EmailPhoneScreen extends ConsumerStatefulWidget {
+  const EmailPhoneScreen({super.key});
   @override
-  ConsumerState<EmailPhone> createState() => _YourRegionState();
+  ConsumerState<EmailPhoneScreen> createState() => _EmailPhoneScreenState();
 }
 
-class _YourRegionState extends ConsumerState<EmailPhone> {
+class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
   late RegistrationProvider provider;
 
   @override
