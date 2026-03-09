@@ -6,14 +6,11 @@ import 'package:flutter_boilerplate/core/global/components/gradient_background.d
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
-import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/login/presentation/providers/login_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -73,6 +70,42 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           children: [
             loginDataField(),
             bottomAction(),
+            const Spacer(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 6,
+              children: [
+                Text(
+                  "Don't have an account?",
+                  style: TextStyle(
+                    color: AppColors.textPrimaryLight,
+                    fontWeight: FontWeight.w400,
+                    fontSize: TextSize.font14(context),
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    //context.push(Paths.signUp);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppColors.greyLight, width: 1,),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      'Sign Up',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w500,
+                        fontSize: TextSize.font16(context),
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+            SizedBox(height: MediaQuery.sizeOf(context).height * 0.03),
           ],
         ),
       ),
