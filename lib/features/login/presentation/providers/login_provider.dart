@@ -8,6 +8,7 @@ class LoginProvider extends BaseChangeNotifier {
   VoidCallback? _controllersListener;
 
   bool keepMeLoggedIn = false;
+  bool forgotPassword = false;
 
   final TextEditingController mobileNoOrEmailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();

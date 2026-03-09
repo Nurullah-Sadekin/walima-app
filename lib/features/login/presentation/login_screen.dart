@@ -183,14 +183,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       )),
                 ],
               ),
-              Text(
-                'Forgot password?',
-                style: TextStyle(
-                  color: AppColors.textSecondaryLight,
-                  fontWeight: FontWeight.w400,
-                  fontSize: TextSize.font12(context),
-                  decoration: TextDecoration.underline,
-                  decorationColor: AppColors.textSecondaryLight,
+              InkWell(
+                onTap: () {
+                  provider.forgotPassword = true;
+                  provider.notifyListeners();
+                  context.push(Paths.sendOtp);
+                },
+                child: Text(
+                  'Forgot password?',
+                  style: TextStyle(
+                    color: AppColors.textSecondaryLight,
+                    fontWeight: FontWeight.w400,
+                    fontSize: TextSize.font12(context),
+                    decoration: TextDecoration.underline,
+                    decorationColor: AppColors.textSecondaryLight,
+                  ),
                 ),
               ),
             ],

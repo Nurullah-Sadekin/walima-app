@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
@@ -52,7 +50,7 @@ class _SendOtpScreenState extends ConsumerState<SendOtpScreen> {
               ? const Loading()
               : Column(
             children: [
-              const UpperLayer(imagePath: AppImages.login),
+               UpperLayer(imagePath: provider.forgotPassword ?  AppImages.forgotPassword : AppImages.login),
               body(),
             ],
           ),
