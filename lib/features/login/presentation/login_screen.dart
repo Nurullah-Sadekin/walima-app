@@ -52,7 +52,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.login),
+                    const UpperLayer(
+                      imagePath: AppImages.login,
+                      onBackPressed: null,
+                      backCancelMood: true,
+                    ),
                     body(),
                   ],
                 ),
@@ -88,9 +92,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     //context.push(Paths.signUp);
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      border: Border.all(color: AppColors.greyLight, width: 1,),
+                      border: Border.all(
+                        color: AppColors.greyLight,
+                        width: 1,
+                      ),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -150,12 +158,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       height: TextSize.font16(context),
                       width: TextSize.font16(context),
                       decoration: BoxDecoration(
-                        color: provider.keepMeLoggedIn ? AppColors.primary : Colors.white,
+                        color: provider.keepMeLoggedIn
+                            ? AppColors.primary
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: provider.keepMeLoggedIn ? AppColors.primary : AppColors.greyLight, width: 1),
+                        border: Border.all(
+                            color: provider.keepMeLoggedIn
+                                ? AppColors.primary
+                                : AppColors.greyLight,
+                            width: 1),
                       ),
                       child: provider.keepMeLoggedIn
-                          ? Icon(Icons.check, size: TextSize.font12(context), color: Colors.white)
+                          ? Icon(Icons.check,
+                              size: TextSize.font12(context),
+                              color: Colors.white)
                           : null,
                     ),
                   ),
@@ -189,21 +205,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       spacing: 10,
       children: [
         PrimaryButtons(
-          buttonStyle:  ButtonsStyle.activePrimaryButton,
+          buttonStyle: ButtonsStyle.activePrimaryButton,
           title: 'Login',
           onTap: () {
             if (provider.mobileNoOrEmailController.text.isEmpty ||
                 provider.passwordController.text.isEmpty) {
               return;
             }
-            context.push(Paths.yourReligion);
+            //context.push(Paths.yourReligion);
           },
         ),
         PrimaryButtons(
           buttonStyle: ButtonsStyle.activeSecondaryButton,
           title: 'Login with OTP',
           onTap: () {
-            context.push(Paths.yourReligion);
+            context.push(Paths.sendOtp);
           },
         ),
       ],

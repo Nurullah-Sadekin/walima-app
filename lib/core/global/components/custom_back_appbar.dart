@@ -16,6 +16,8 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.trailingText,
     this.onTrailingTap,
     this.isBackButton = true,
+    this.backOnTap,
+    this.backCancelMood = false,
   });
   final Color? backgroundColor;
   final double? elevation;
@@ -28,6 +30,8 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? trailingText;
   final VoidCallback? onTrailingTap;
   final bool isBackButton;
+  final VoidCallback? backOnTap;
+  final bool backCancelMood;
 
   @override
   Widget build(BuildContext context) {
@@ -56,8 +60,8 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
                     },
                 borderRadius: BorderRadius.circular(20),
                 child: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  size: iconSize ?? TextSize.font16(context),
+                  backCancelMood ? Icons.clear : Icons.arrow_back_ios_new_rounded,
+                  size: backCancelMood== true ? TextSize.font18(context) : iconSize ??  TextSize.font16(context),
                   color: iconColor ?? AppColors.textSecondaryLight,
                 ),
               ),
