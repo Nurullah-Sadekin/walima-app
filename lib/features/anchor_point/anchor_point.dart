@@ -21,16 +21,10 @@ class AnchorPointScreen extends ConsumerWidget {
       Container(),
       Container(),
     ];
-
-    // WillPopScope is deprecated in newer Flutter versions; PopScope is preferred.
-    // Using WillPopScope here for compatibility; suppress analyzer deprecation warning.
-    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () async {
-        // Show confirmation dialog and only pop if user confirms
         final shouldClose = await DialogUtils.showAppCloseDiaLog(context);
         if (shouldClose) {
-          // Exit the app
           SystemNavigator.pop();
         }
         return false;

@@ -1,3 +1,4 @@
+import 'package:flutter_boilerplate/features/home/presentation/providers/home_provider.dart';
 import 'package:flutter_boilerplate/features/login/presentation/providers/login_provider.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/providers/recommended_preferences_provider.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
@@ -13,5 +14,9 @@ final registrationProvider = ChangeNotifierProvider<RegistrationProvider>((ref) 
 
 final recommendedPreferencesProvider = ChangeNotifierProvider<RecommendedPreferencesProvider>((ref) {
   return RecommendedPreferencesProvider();
+});
+
+final homeProvider = ChangeNotifierProvider<HomeProvider>((ref) {
+  return HomeProvider();
 });
 

@@ -1,20 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/connect_now_card.dart';
-import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
-import 'package:flutter_boilerplate/core/global/components/icon_text_row.dart';
-import 'package:flutter_boilerplate/core/global/components/package_card.dart';
 import 'package:flutter_boilerplate/core/global/components/preference_connect_card.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
-import 'package:flutter_boilerplate/core/global/components/profile_type_card.dart';
-import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_boilerplate/generated/l10n/app_localizations.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -26,11 +17,16 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool _isSelected = false;
-
+  @override
+  void initState() {
+    super.initState();
+    ref.read(homeProvider).getInitialData();
+    // You can fetch initial data here if needed
+  }
+  
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.home),

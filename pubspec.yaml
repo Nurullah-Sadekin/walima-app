@@ -50,8 +50,7 @@ flutter:
      - assets/icons/
      - assets/svgs/
      - assets/svgIcons/
-
-  
+     - assets/nav_icons/
   # fonts:
   #   - family: CustomFont
   #     fonts:

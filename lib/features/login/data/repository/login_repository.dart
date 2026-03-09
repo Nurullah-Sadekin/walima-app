@@ -19,7 +19,7 @@ class LoginRepository {
 
   static Future<LoginResponse> getMe() async {
     try {
-      final response = await DioClient().get(AppUrls.login, isTokenRequired: true);
+      final response = await DioClient().get(AppUrls.getMe, isTokenRequired: true);
       return LoginResponse.fromJson(response.data);
     } catch (e) {
       final errorMessage =  e is DioException ? e.response?.data['message'] ?? e.message : e.toString();
