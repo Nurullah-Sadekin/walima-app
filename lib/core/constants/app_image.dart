@@ -53,8 +53,15 @@ class AppImages {
   static const String otp = 'assets/svgs/otp.svg';
   static const String password = 'assets/svgs/password.svg';
   static const String forgotPassword = 'assets/svgs/forgotPassword.svg';
-
-
-
-
+  
+  static const String home = 'assets/nav_icons/home.svg';
+  static const String matches = 'assets/nav_icons/matches.svg';
+  static const String inbox = 'assets/nav_icons/inbox.svg';
+  static const String chat = 'assets/nav_icons/chat.svg';
+  static const String premium = 'assets/nav_icons/premium.svg';
+  
+  
+  static const String homeProfileBg = 'assets/svgs/home_profile_bg.svg';
+  
+  
 }
