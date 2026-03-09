@@ -4,23 +4,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ShowImage extends StatelessWidget {
-  String? imagePath;
-  String? errorImagePath;
-  double? height;
-  double? width;
-  Color? color;
-  BoxFit? fit;
-  final String placeHolder;
-  Alignment? alignment;
-  VoidCallback? onTap;
-  EdgeInsetsGeometry? margin;
-  BorderRadius? radius;
-  BoxBorder? border;
-  final Widget? placeHolderWidget;
 
   ///a [ShowImage] it can be used for showing any type of images
   /// it will shows the placeholder image if image is not found on network image
-  ShowImage({
+  const ShowImage({super.key,
     this.imagePath,
     this.errorImagePath,
     this.height,
@@ -34,7 +21,22 @@ class ShowImage extends StatelessWidget {
     this.border,
     this.placeHolder = 'packages/sheba_pay_sdk/assets/images/image_not_found.png',
     this.placeHolderWidget,
+    this.isCircle = false,
   });
+  final String? imagePath;
+  final String? errorImagePath;
+  final double? height;
+  final double? width;
+  final Color? color;
+  final BoxFit? fit;
+  final String placeHolder;
+  final Alignment? alignment;
+  final VoidCallback? onTap;
+  final EdgeInsetsGeometry? margin;
+  final BorderRadius? radius;
+  final BoxBorder? border;
+  final Widget? placeHolderWidget;
+  final bool isCircle;
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +63,23 @@ class ShowImage extends StatelessWidget {
 
   ///build the image with border radius
   _buildCircleImage() {
+    // If isCircle is true render a circular image (ignore radius in that case)
+    if (isCircle) {
+      if (border != null) {
+        // If border provided, apply circular BoxDecoration and clip image with ClipOval
+        return Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: border,
+          ),
+          child: ClipOval(child: _buildImageView()),
+        );
+      } else {
+        return ClipOval(child: _buildImageView());
+      }
+    }
+
+    // Default (non-circle) behavior: preserve existing rounded-rect logic
     if (radius != null) {
       return ClipRRect(
         borderRadius: radius ?? BorderRadius.zero,
@@ -98,7 +117,7 @@ class ShowImage extends StatelessWidget {
               height: height,
               width: width,
               fit: fit ?? BoxFit.contain,
-              color: color,
+              colorFilter: color != null ? ColorFilter.mode(color!, BlendMode.srcIn) : null,
             ),
           );
         case ImageType.file:
