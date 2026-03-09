@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/features/login/presentation/screens/otp_verify.dart';
+import 'package:flutter_boilerplate/features/login/presentation/screens/send_otp.dart';
 import 'package:flutter_boilerplate/features/onboarding_screen.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/connect_purchesase_card.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/basic_details.dart';
@@ -52,6 +54,16 @@ GoRouter goRouter(GoRouterRef ref) {
         path: Paths.login,
         name: Routes.login,
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: Paths.sendOtp,
+        name: Routes.sendOtp,
+        builder: (context, state) => const SendOtpScreen(),
+      ),
+      GoRoute(
+        path: Paths.otpVerify,
+        name: Routes.otpVerify,
+        builder: (context, state) => const OtpVerifyScreen(),
       ),
       GoRoute(
         path: Paths.settings,

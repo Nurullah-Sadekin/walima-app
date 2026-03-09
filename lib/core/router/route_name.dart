@@ -1,10 +1,17 @@
 abstract class Paths {
   Paths._();
+
+  // Login Screens
+  static const login = '/login';
+  static const sendOtp = '/sendOtp';
+  static const otpVerify = '/otpVerify';
+
   static const splash = '/';
   static const anchor = '/anchor';
-  static const login = '/login';
   static const settings = '/settings';
   static const onboarding = '/onboarding';
+
+  // Registration Screens
   static const isProfileFor = '/isProfileFor';
   static const aboutYou = '/aboutYou';
   static const yourReligion = '/yourReligion';
@@ -38,11 +45,18 @@ abstract class Paths {
 
 abstract class Routes {
   Routes._();
+
+  // Login Screens
+  static const login = 'login';
+  static const sendOtp = 'sendOtp';
+  static const otpVerify = 'otpVerify';
+
   static const splash = 'splash';
   static const anchor = 'anchor';
-  static const login = 'login';
   static const settings = 'settings';
   static const onboarding = 'onboarding';
+
+  // Registration Screens
   static const isProfileFor = 'isProfileFor';
   static const aboutYou = 'aboutYou';
   static const yourReligion = 'yourReligion';
@@ -70,4 +84,5 @@ abstract class Routes {
 
   // Connect Matches & Purchase
   static const connectMatches = 'connectMatches';
+
 }
