@@ -33,10 +33,6 @@ class AppImages {
 
 
 
-
-
-
-
   // svg image paths
   static const String isProfileFor = 'assets/svgs/isProfileFor.svg';
   static const String aboutYou = 'assets/svgs/about_you.svg';
@@ -52,5 +48,13 @@ class AppImages {
   static const String familyDetails = 'assets/svgs/familyDetails.svg';
   static const String done = 'assets/svgs/done.svg';
   static const String recommendedPreferences = 'assets/svgs/recommended_preferences.svg';
+
+  static const String login = 'assets/svgs/login.svg';
+  static const String otp = 'assets/svgs/otp.svg';
+  static const String password = 'assets/svgs/password.svg';
+  static const String forgotPassword = 'assets/svgs/forgotPassword.svg';
+
+
+
 
 }

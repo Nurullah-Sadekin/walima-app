@@ -28,8 +28,6 @@ class PrimaryTextField extends StatefulWidget {
     this.prefixIcon,
     this.validator,
     this.showPassIcon,
-    this.forgotPass,
-    this.forgotPassOnTap,
     this.datePicker,
     this.noPrefix,
     this.contentPadding,
@@ -53,9 +51,7 @@ class PrimaryTextField extends StatefulWidget {
   final bool? datePicker;
   final TextInputType? keyboardType;
   final bool? obscureText;
-  final VoidCallback? forgotPassOnTap;
   final bool? noPrefix;
-  final bool? forgotPass;
   final void Function(String)? onChanged;
   final String? Function(String? value)? validator;
   final int? minLine;
@@ -85,9 +81,6 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
             ? const SizedBox.shrink()
             : _headLine(),
         _inputField(screenWidth, screenHeight),
-        widget.forgotPass == true
-            ? _forgotPassField(screenHeight)
-            : const SizedBox.shrink(),
       ],
     );
   }
@@ -258,45 +251,6 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
               : AppColors.competeBorderColor,
           size: screenWidth * 0.05,
         ));
-  }
-
-  Widget _forgotPassField(double screenHeight) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(height: screenHeight * 0.01),
-        if (widget.forgotPass != null && true)
-          Row(
-            children: [
-              GestureDetector(
-                onTap: widget.forgotPassOnTap,
-                child: Container(
-                  color: Colors.transparent,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(right: 5, top: 5, bottom: 5),
-                        child: Text(
-                          'Forgot password?',
-                          style: TextStyle(
-                            color: const Color(0xFF818092),
-                            fontSize: TextSize.font14(context),
-                            fontFamily: 'Rubik',
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-      ],
-    );
   }
 
   @override

@@ -7,7 +7,7 @@ class LoginProvider extends BaseChangeNotifier {
   bool isLoading = false;
   VoidCallback? _controllersListener;
 
-  Future<void> getInitialData() async {}
+ final bool keepMeLoggedIn = false;
 
   final TextEditingController mobileNoOrEmailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -15,7 +15,7 @@ class LoginProvider extends BaseChangeNotifier {
   final TextEditingController createPasswordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
 
-
+  Future<void> getInitialData() async {}
 
   void initControllersListener() {
     if (_controllersListener != null) return;
