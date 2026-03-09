@@ -10,13 +10,48 @@ class LoginProvider extends BaseChangeNotifier {
   bool keepMeLoggedIn = false;
   bool forgotPassword = false;
 
+
   final TextEditingController mobileNoOrEmailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController otpController = TextEditingController();
   final TextEditingController createPasswordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
-  final List<TextEditingController> otpController = List.generate(5, (_) => TextEditingController(),);
-  final List<FocusNode> otpFocusNodesController = List.generate(5, (_) => FocusNode());
+
+  List<TextEditingController> otpControllers = [];
+  List<FocusNode> otpFocusNodesController = [];
+
   Future<void> getInitialData() async {}
+
+
+  void initOtpFields({int length = 5}) {
+    disposeOtpFields();
+    otpControllers = List.generate(length, (_) => TextEditingController());
+    otpFocusNodesController = List.generate(length, (_) => FocusNode());
+    for (final c in otpControllers) {
+      try {
+        c.addListener(() => notifyListeners());
+      } catch (_) {}
+    }
+  }
+
+  void disposeOtpFields() {
+    if (otpControllers.isNotEmpty) {
+      for (final c in otpControllers) {
+        try {
+          c.dispose();
+        } catch (_) {}
+      }
+      otpControllers = [];
+    }
+    if (otpFocusNodesController.isNotEmpty) {
+      for (final f in otpFocusNodesController) {
+        try {
+          f.dispose();
+        } catch (_) {}
+      }
+      otpFocusNodesController = [];
+    }
+  }
 
   void initControllersListener() {
     if (_controllersListener != null) return;
@@ -28,6 +63,10 @@ class LoginProvider extends BaseChangeNotifier {
     } catch (_) {}
     try {
       passwordController.addListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      // single otpController listener if needed
+      otpController.addListener(_controllersListener!);
     } catch (_) {}
     try {
       createPasswordController.addListener(_controllersListener!);
@@ -46,6 +85,9 @@ class LoginProvider extends BaseChangeNotifier {
     } catch (_) {}
     try {
       passwordController.removeListener(_controllersListener!);
+    } catch (_) {}
+    try {
+      otpController.removeListener(_controllersListener!);
     } catch (_) {}
     try {
       createPasswordController.removeListener(_controllersListener!);
@@ -68,6 +110,7 @@ class LoginProvider extends BaseChangeNotifier {
     if (loadingState != null) loaderState = loadingState;
     notifyListeners();
   }
+
 
 }
 

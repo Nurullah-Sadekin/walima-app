@@ -23,7 +23,6 @@ class OtpVerifyScreen extends ConsumerStatefulWidget {
 class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
   late LoginProvider provider;
 
-
   @override
   void initState() {
     super.initState();
@@ -32,14 +31,14 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider.getInitialData();
       provider.initControllersListener();
+      provider.initOtpFields(length: 5);
     });
   }
 
   @override
   void dispose() {
     provider.disposeControllersListener();
-    for (final otpControllers in provider.otpController) {otpControllers.dispose();}
-    for (final otpFocusNodes in provider.otpFocusNodesController) {otpFocusNodes.dispose();}
+    provider.disposeOtpFields();
     super.dispose();
   }
 
@@ -112,13 +111,13 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(5, (index) {
+              children: List.generate(provider.otpControllers.length, (index) {
                 return Container(
                   margin: const EdgeInsets.symmetric(horizontal: 6),
                   width: 52,
                   height: 52,
                   child: TextField(
-                    controller: provider.otpController[index],
+                    controller: provider.otpControllers[index],
                     focusNode: provider.otpFocusNodesController[index],
                     textAlign: TextAlign.center,
                     keyboardType: TextInputType.number,
@@ -148,9 +147,9 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
                         final chars = value.split('');
                         for (var i = 0;
                         i < chars.length &&
-                            (index + i) < provider.otpController.length;
+                            (index + i) < provider.otpControllers.length;
                         i++) {
-                          provider.otpController[index + i].text = chars[i];
+                          provider.otpControllers[index + i].text = chars[i];
                         }
                         final next = index + chars.length;
                         if (next >= provider.otpFocusNodesController.length) {
