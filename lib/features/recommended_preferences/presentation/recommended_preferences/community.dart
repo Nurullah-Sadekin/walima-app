@@ -12,7 +12,7 @@ import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/widgets/upper_layer.dart';
+import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart' as rn;
 
