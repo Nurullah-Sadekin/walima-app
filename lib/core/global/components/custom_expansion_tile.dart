@@ -3,7 +3,6 @@ import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 
 class CustomExpansionTile extends StatefulWidget {
-  // Added for alignment
 
   const CustomExpansionTile({
     super.key,
@@ -65,18 +64,15 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
   @override
   void didUpdateWidget(covariant CustomExpansionTile oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // If parent changed the selected prop, sync internal state
     if (oldWidget.selected != widget.selected) {
       _selected = widget.selected;
     }
   }
 
   void _handleSelectToggle() {
-    // Toggle internal selection state so UI updates immediately
     setState(() {
       _selected = !_selected;
     });
-    // notify parent if callback provided
     if (widget.onSelected != null) widget.onSelected!(_selected);
   }
 
