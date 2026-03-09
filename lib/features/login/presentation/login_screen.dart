@@ -110,7 +110,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 children: [
                   InkWell(
                     onTap: () {
-                      provider.keepMeLoggedIn == !provider.keepMeLoggedIn;
+                      provider.keepMeLoggedIn = !provider.keepMeLoggedIn;
+                      provider.notifyListeners();
                     },
                     child: Container(
                       height: TextSize.font16(context),

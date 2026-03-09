@@ -7,7 +7,7 @@ class LoginProvider extends BaseChangeNotifier {
   bool isLoading = false;
   VoidCallback? _controllersListener;
 
- final bool keepMeLoggedIn = false;
+  bool keepMeLoggedIn = false;
 
   final TextEditingController mobileNoOrEmailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -73,6 +73,7 @@ class LoginProvider extends BaseChangeNotifier {
     if (loadingState != null) loaderState = loadingState;
     notifyListeners();
   }
+
 }
 
 enum LoginScreenStates {
