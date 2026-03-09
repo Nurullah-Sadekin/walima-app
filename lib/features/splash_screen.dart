@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/constants/storage_keys.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
@@ -11,7 +12,6 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  static const _tokenKey = 'hasToken'; // Assumption: token is stored under this key
 
   @override
   void initState() {
@@ -22,15 +22,10 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkAuth() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      // prefs.setString(_tokenKey, 'HasToken');
-      // prefs.clear();
-      final token = prefs.getString(_tokenKey);
-
-      // Small delay so splash is visible for a moment
-      await Future.delayed(const Duration(milliseconds: 350));
+      final token = prefs.getString(StorageKeys.accessToken);
+      debugPrint('SplashScreen: AccessToken : $token');
 
       if (token != null && token.isNotEmpty) {
-        // Apply token to Dio client so subsequent requests are authenticated
         try {
           DioClient().setAuthToken(token);
         } catch (_) {}

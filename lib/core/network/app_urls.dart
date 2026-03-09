@@ -12,6 +12,6 @@ class AppUrls{
   static const String setPasswordWithOTP = '$baseUrl/api/v1/auth/set-password-with-otp';
   static const String createPassword = '$baseUrl/api/v1/auth/create-password';
   static const String changePassword = '$baseUrl/api/v1/auth/change-password';
-  static const String refreshToken = '$baseUrl/api/v1/auth/refresh-token';
+  static const String getAccessToken = '$baseUrl/api/v1/auth/refresh-token';
   static const String googleSignin = '$baseUrl/api/v1/auth/google/signin';
 }

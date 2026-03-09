@@ -16,4 +16,14 @@ class LoginRepository {
       return LoginResponse(code: 'FAILED', message: errorMessage);
     }
   }
+
+  static Future<LoginResponse> getMe() async {
+    try {
+      final response = await DioClient().get(AppUrls.login, isTokenRequired: true);
+      return LoginResponse.fromJson(response.data);
+    } catch (e) {
+      final errorMessage =  e is DioException ? e.response?.data['message'] ?? e.message : e.toString();
+      return LoginResponse(code: 'FAILED', message: errorMessage);
+    }
+  }
 }

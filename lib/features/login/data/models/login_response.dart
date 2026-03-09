@@ -11,12 +11,12 @@ class LoginResponse {
   LoginResponse.fromJson(dynamic json) {
     code = json['code'];
     message = json['message'];
-    response = json['response'] != null ? Response.fromJson(json['response']) : null;
+    response = json['response'] != null ? LoginData.fromJson(json['response']) : null;
     traceId = json['traceId'];
   }
   String? code;
   String? message;
-  Response? response;
+  LoginData? response;
   String? traceId;
 
   Map<String, dynamic> toJson() {
@@ -32,15 +32,15 @@ class LoginResponse {
 
 }
 
-Response responseFromJson(String str) => Response.fromJson(json.decode(str));
-String responseToJson(Response data) => json.encode(data.toJson());
-class Response {
-  Response({
+LoginData responseFromJson(String str) => LoginData.fromJson(json.decode(str));
+String responseToJson(LoginData data) => json.encode(data.toJson());
+class LoginData {
+  LoginData({
       this.accessToken, 
       this.refreshToken, 
       this.user,});
 
-  Response.fromJson(dynamic json) {
+  LoginData.fromJson(dynamic json) {
     accessToken = json['accessToken'];
     refreshToken = json['refreshToken'];
     user = json['user'] != null ? User.fromJson(json['user']) : null;

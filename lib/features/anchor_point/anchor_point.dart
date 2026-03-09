@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/home_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,7 +29,11 @@ class AnchorPointScreen extends ConsumerWidget {
       onWillPop: () async {
         // Show confirmation dialog and only pop if user confirms
         final shouldClose = await DialogUtils.showAppCloseDiaLog(context);
-        return shouldClose;
+        if (shouldClose) {
+          // Exit the app
+          SystemNavigator.pop();
+        }
+        return false;
       },
       child: Scaffold(
         body: IndexedStack(index: currentTab, children: screens),

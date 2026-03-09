@@ -1,7 +1,12 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:flutter_boilerplate/core/constants/app_texts.dart';
+import 'package:flutter_boilerplate/core/global/repositorys/global_repository.dart';
+import 'package:flutter_boilerplate/core/network/app_urls.dart';
+import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
 
 /// Singleton Dio client for handling all API calls
 /// Includes status code handling and pretty logger
@@ -42,17 +47,48 @@ class DioClient {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          // Add authentication token if available
-          // final token = await _getAuthToken();
-          // if (token != null) {
-          //   options.headers['Authorization'] = 'Bearer $token';
-          // }
+          final isTokenRequired = options.extra[_isTokenKey] == true;
+
+          if (isTokenRequired) {
+            final accessToken = (_authToken?.isNotEmpty ?? false)
+                ? _authToken!
+                : await PrefsHelper.getAccessToken();
+
+            if (accessToken.isNotEmpty) {
+              options.headers['Authorization'] = 'Bearer $accessToken';
+            } else {
+              options.headers.remove('Authorization');
+            }
+          } else {
+            options.headers.remove('Authorization');
+          }
+
           handler.next(options);
         },
         onResponse: (response, handler) {
           handler.next(response);
         },
-        onError: (error, handler) {
+        onError: (error, handler) async {
+          final statusCode = error.response?.statusCode;
+          final requestPath = error.requestOptions.path;
+          final isRefreshRequest = requestPath == AppUrls.getAccessToken;
+          final isRetried = error.requestOptions.extra[_retryKey] == true;
+          final isTokenRequired = error.requestOptions.extra[_isTokenKey] == true;
+
+          if (statusCode == 403 && isTokenRequired && !isRefreshRequest && !isRetried) {
+            final refreshSuccess = await _refreshAccessTokenWithLock();
+
+            if (refreshSuccess) {
+              try {
+                final response = await _retryRequest(error.requestOptions);
+                handler.resolve(response);
+                return;
+              } catch (_) {
+                // If retry fails, fall back to the original error handling.
+              }
+            }
+          }
+
           handler.next(error);
         },
       ),
@@ -60,8 +96,14 @@ class DioClient {
   }
   // Singleton instance
   static final DioClient _instance = DioClient._internal();
+  static const int _maxRefreshAttempts = 3;
+  static const String _retryKey = 'isRetriedAfterRefresh';
+  static const String _isTokenKey = 'isTokenRequired';
 
   late Dio _dio;
+  Completer<bool>? _refreshCompleter;
+  VoidCallback? _onLogout;
+  String? _authToken;
 
   /// Get Dio instance
   Dio get dio => _dio;
@@ -78,12 +120,119 @@ class DioClient {
 
   /// Set authentication token
   void setAuthToken(String token) {
-    _dio.options.headers['Authorization'] = 'Bearer $token';
+    _authToken = token;
   }
 
   /// Remove authentication token
   void removeAuthToken() {
+    _authToken = null;
     _dio.options.headers.remove('Authorization');
+  }
+
+  /// Optional callback that can navigate to login or show a session-expired UI.
+  void setLogoutHandler(VoidCallback onLogout) {
+    _onLogout = onLogout;
+  }
+
+  Options _optionsWithTokenFlag(Options? options, {required bool isTokenRequired}) {
+    return Options(
+      method: options?.method,
+      sendTimeout: options?.sendTimeout,
+      receiveTimeout: options?.receiveTimeout,
+      extra: {
+        ...?options?.extra,
+        _isTokenKey: isTokenRequired,
+      },
+      headers: options?.headers,
+      responseType: options?.responseType,
+      contentType: options?.contentType,
+      validateStatus: options?.validateStatus,
+      receiveDataWhenStatusError: options?.receiveDataWhenStatusError,
+      followRedirects: options?.followRedirects,
+      maxRedirects: options?.maxRedirects,
+      requestEncoder: options?.requestEncoder,
+      responseDecoder: options?.responseDecoder,
+      listFormat: options?.listFormat,
+    );
+  }
+
+  Future<bool> _refreshAccessTokenWithLock() async {
+    if (_refreshCompleter != null) {
+      return _refreshCompleter!.future;
+    }
+
+    _refreshCompleter = Completer<bool>();
+    try {
+      bool refreshed = false;
+      for (var attempt = 0; attempt < _maxRefreshAttempts; attempt++) {
+        refreshed = await GlobalRepository.refreshAccessToken();
+        if (refreshed) {
+          break;
+        }
+      }
+
+      if (!refreshed) {
+        await _logoutUser();
+      }
+
+      _refreshCompleter!.complete(refreshed);
+      return refreshed;
+    } catch (_) {
+      await _logoutUser();
+      _refreshCompleter!.complete(false);
+      return false;
+    } finally {
+      _refreshCompleter = null;
+    }
+  }
+
+  Future<Response<dynamic>> _retryRequest(RequestOptions requestOptions) async {
+    final accessToken = (_authToken?.isNotEmpty ?? false)
+        ? _authToken!
+        : await PrefsHelper.getAccessToken();
+    final updatedHeaders = Map<String, dynamic>.from(requestOptions.headers);
+    if (accessToken.isNotEmpty) {
+      updatedHeaders['Authorization'] = 'Bearer $accessToken';
+    } else {
+      updatedHeaders.remove('Authorization');
+    }
+
+    final options = Options(
+      method: requestOptions.method,
+      headers: updatedHeaders,
+      responseType: requestOptions.responseType,
+      contentType: requestOptions.contentType,
+      extra: {
+        ...requestOptions.extra,
+        _retryKey: true,
+        _isTokenKey: true,
+      },
+      followRedirects: requestOptions.followRedirects,
+      listFormat: requestOptions.listFormat,
+      maxRedirects: requestOptions.maxRedirects,
+      receiveDataWhenStatusError: requestOptions.receiveDataWhenStatusError,
+      requestEncoder: requestOptions.requestEncoder,
+      responseDecoder: requestOptions.responseDecoder,
+      sendTimeout: requestOptions.sendTimeout,
+      receiveTimeout: requestOptions.receiveTimeout,
+      validateStatus: requestOptions.validateStatus,
+    );
+
+    return _dio.request<dynamic>(
+      requestOptions.path,
+      data: requestOptions.data,
+      queryParameters: requestOptions.queryParameters,
+      options: options,
+      cancelToken: requestOptions.cancelToken,
+      onSendProgress: requestOptions.onSendProgress,
+      onReceiveProgress: requestOptions.onReceiveProgress,
+    );
+  }
+
+  Future<void> _logoutUser() async {
+    await PrefsHelper.clearTokens();
+    removeAuthToken();
+    _onLogout?.call();
   }
 
   /// Handle response based on status code
@@ -211,12 +360,13 @@ class DioClient {
     Map<String, dynamic>? queryParameters,
     Options? options,
     CancelToken? cancelToken,
+    bool isTokenRequired = false,
   }) async {
     try {
       final response = await _dio.get(
         endpoint,
         queryParameters: queryParameters,
-        options: options,
+        options: _optionsWithTokenFlag(options, isTokenRequired: isTokenRequired),
         cancelToken: cancelToken,
       );
       return _handleResponse(response);
@@ -239,13 +389,14 @@ class DioClient {
     CancelToken? cancelToken,
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
+    bool isTokenRequired = false,
   }) async {
     try {
       final response = await _dio.post(
         endpoint,
         data: data,
         queryParameters: queryParameters,
-        options: options,
+        options: _optionsWithTokenFlag(options, isTokenRequired: isTokenRequired),
         cancelToken: cancelToken,
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
@@ -270,13 +421,14 @@ class DioClient {
     CancelToken? cancelToken,
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
+    bool isTokenRequired = false,
   }) async {
     try {
       final response = await _dio.put(
         endpoint,
         data: data,
         queryParameters: queryParameters,
-        options: options,
+        options: _optionsWithTokenFlag(options, isTokenRequired: isTokenRequired),
         cancelToken: cancelToken,
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
@@ -301,13 +453,14 @@ class DioClient {
     CancelToken? cancelToken,
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
+    bool isTokenRequired = false,
   }) async {
     try {
       final response = await _dio.patch(
         endpoint,
         data: data,
         queryParameters: queryParameters,
-        options: options,
+        options: _optionsWithTokenFlag(options, isTokenRequired: isTokenRequired),
         cancelToken: cancelToken,
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
@@ -330,13 +483,14 @@ class DioClient {
     Map<String, dynamic>? queryParameters,
     Options? options,
     CancelToken? cancelToken,
+    bool isTokenRequired = false,
   }) async {
     try {
       final response = await _dio.delete(
         endpoint,
         data: data,
         queryParameters: queryParameters,
-        options: options,
+        options: _optionsWithTokenFlag(options, isTokenRequired: isTokenRequired),
         cancelToken: cancelToken,
       );
       return _handleResponse(response);
@@ -358,6 +512,7 @@ class DioClient {
     Map<String, dynamic>? queryParameters,
     CancelToken? cancelToken,
     Options? options,
+    bool isTokenRequired = false,
   }) async {
     try {
       final response = await _dio.download(
@@ -366,7 +521,7 @@ class DioClient {
         onReceiveProgress: onReceiveProgress,
         queryParameters: queryParameters,
         cancelToken: cancelToken,
-        options: options,
+        options: _optionsWithTokenFlag(options, isTokenRequired: isTokenRequired),
       );
       return _handleResponse(response);
     } on DioException catch (e) {
