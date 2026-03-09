@@ -44,11 +44,11 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
   Widget build(BuildContext context) {
     provider = ref.watch(loginProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == LoginScreenStates.loginSuccess,
+      isLoading: provider.loaderState == LoginScreenStates.transparentLoading,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == LoginScreenStates.loginSuccess
+          child: provider.screenStates == LoginScreenStates.loading
               ? const Loading()
               : Column(
             children: [

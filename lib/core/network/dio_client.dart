@@ -20,7 +20,6 @@ class DioClient {
           'Accept': 'application/json',
         },
         validateStatus: (status) {
-          // Accept all status codes to handle them manually
           return status != null && status < 500;
         },
       ),

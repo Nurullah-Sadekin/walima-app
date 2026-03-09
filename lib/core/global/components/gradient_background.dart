@@ -28,7 +28,7 @@ class GradientBackground extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return  Container(
+    return Container(
         decoration: BoxDecoration(
           gradient: gradientColor ?? AppColors.customBackgroundGradient,
         ),

@@ -1,6 +1,6 @@
 class AppUrls{
   static const String baseUrl = 'https://dev.walima.app';
-  static const String login = '$baseUrl/api/v1/auth/login';
+  static const String login = '$baseUrl/api/v1/auth/signin-with-password';
   static const String getMe = '$baseUrl/api/v1/auth/me';
   static const String register = '$baseUrl/api/v1/auth/register';
   static const String signinWithPassword = '$baseUrl/api/v1/auth/signin-with-password';

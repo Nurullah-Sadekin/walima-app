@@ -9,6 +9,7 @@ import 'package:flutter_boilerplate/core/global/components/primary_textField.dar
 import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/core/utils/validators.dart';
 import 'package:flutter_boilerplate/features/login/presentation/providers/login_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -44,78 +45,82 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     provider = ref.watch(loginProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == LoginScreenStates.loginSuccess,
+      isLoading: provider.loaderState == LoginScreenStates.transparentLoading,
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == LoginScreenStates.loginSuccess
+          child: provider.screenStates == LoginScreenStates.loading
               ? const Loading()
-              : Column(
-                  children: [
-                    const UpperLayer(
-                      imagePath: AppImages.login,
-                      onBackPressed: null,
-                      backCancelMood: true,
+              : SizedBox(
+                  height: MediaQuery.sizeOf(context).height,
+                child: SingleChildScrollView(
+                  child: Column(
+                      children: [
+                        const UpperLayer(
+                          imagePath: AppImages.login,
+                          onBackPressed: null,
+                          backCancelMood: true,
+                        ),
+                        body(),
+                      ],
                     ),
-                    body(),
-                  ],
                 ),
+              ),
         ),
       ),
     );
   }
 
   Widget body() {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: Column(
-          spacing: 10,
-          children: [
-            loginDataField(),
-            bottomAction(),
-            const Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              spacing: 6,
-              children: [
-                Text(
-                  "Don't have an account?",
-                  style: TextStyle(
-                    color: AppColors.textPrimaryLight,
-                    fontWeight: FontWeight.w400,
-                    fontSize: TextSize.font14(context),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Column(
+        spacing: 10,
+        children: [
+          loginDataField(),
+          bottomAction(),
+          SizedBox(height: MediaQuery.sizeOf(context).height * 0.25),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 6,
+            children: [
+              Text(
+                "Don't have an account?",
+                style: TextStyle(
+                  color: AppColors.textPrimaryLight,
+                  fontWeight: FontWeight.w400,
+                  fontSize: TextSize.font14(context),
+                ),
+              ),
+              InkWell(
+                onTap: () {
+                  //context.push(Paths.signUp);
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: AppColors.greyLight,
+                      width: 1,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'Sign Up',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w500,
+                      fontSize: TextSize.font16(context),
+                    ),
                   ),
                 ),
-                InkWell(
-                  onTap: () {
-                    //context.push(Paths.signUp);
-                  },
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: AppColors.greyLight,
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      'Sign Up',
-                      style: TextStyle(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w500,
-                        fontSize: TextSize.font16(context),
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            ),
-            SizedBox(height: MediaQuery.sizeOf(context).height * 0.03),
-          ],
-        ),
+              )
+            ],
+          ),
+          // SizedBox(height: MediaQuery.sizeOf(context).height * 0.03),
+        ],
       ),
     );
   }
@@ -129,7 +134,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           headLine: 'Mobile No. / Email ID',
           hintText: 'Write here',
           noPrefix: true,
-          errorText: null,
+          errorText: provider.mobileOrEmailError,
+          validator: Validators.validateMobileOrEmail,
           onTap: () {},
         ),
         PrimaryTextField(
@@ -137,7 +143,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           headLine: 'Password',
           hintText: 'Write here',
           noPrefix: true,
-          errorText: null,
+          errorText: provider.passwordError,
           showPassIcon: true,
           onTap: () {},
         ),
@@ -180,13 +186,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         color: AppColors.textPrimaryLight,
                         fontWeight: FontWeight.w400,
                         fontSize: TextSize.font12(context),
-                      )),
+                      ),
+                  ),
                 ],
               ),
               InkWell(
                 onTap: () {
                   provider.forgotPassword = true;
-                  provider.notifyListeners();
+                  provider.updateViewState();
                   context.push(Paths.sendOtp);
                 },
                 child: Text(
@@ -214,14 +221,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         PrimaryButtons(
           buttonStyle: ButtonsStyle.activePrimaryButton,
           title: 'Login',
-          onTap: () {
-            if (provider.mobileNoOrEmailController.text.isEmpty ||
-                provider.passwordController.text.isEmpty) {
-              return;
-            }
+          onTap: () async {
+              await provider.login(context);
             //context.push(Paths.yourReligion);
           },
         ),
+        
         PrimaryButtons(
           buttonStyle: ButtonsStyle.activeSecondaryButton,
           title: 'Login with OTP',

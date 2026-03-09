@@ -47,11 +47,11 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
   Widget build(BuildContext context) {
     provider = ref.watch(loginProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == LoginScreenStates.loginSuccess,
+      isLoading: provider.loaderState == LoginScreenStates.loading,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == LoginScreenStates.loginSuccess
+          child: provider.screenStates == LoginScreenStates.transparentLoading
               ? const Loading()
               : Column(
             children: [
