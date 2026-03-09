@@ -95,39 +95,6 @@ class AnchorPointScreen extends ConsumerWidget {
         height: 45,
         color: isActive ? AppColors.primary: const Color(0xFF9CA3AF),
       ),
-      // child: Column(
-      //   mainAxisSize: MainAxisSize.min,
-      //   children: [
-      //     if (isActive)
-      //       Container(
-      //         width: 32,
-      //         height: 3,
-      //         decoration: BoxDecoration(
-      //           color: const Color(0xFF1A8FE3),
-      //           borderRadius: BorderRadius.circular(10),
-      //         ),
-      //       )
-      //     else
-      //       const SizedBox(height: 3),
-      //     const SizedBox(height: 6),
-      //     Icon(
-      //       icon,
-      //       color: isActive ? const Color(0xFF1A8FE3) : const Color(0xFF9CA3AF),
-      //       size: 24,
-      //     ),
-      //     if (isActive && label.isNotEmpty) ...[
-      //       const SizedBox(height: 4),
-      //       Text(
-      //         label,
-      //         style: TextStyle(
-      //           fontSize: 11,
-      //           fontWeight: FontWeight.w600,
-      //           color: const Color(0xFF1A8FE3),
-      //         ),
-      //       ),
-      //     ],
-      //   ],
-      // ),
     );
   }
 }
