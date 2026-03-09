@@ -21,10 +21,8 @@ class VerifyNumberScreen extends ConsumerStatefulWidget {
 
 class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
   late RegistrationProvider provider;
-  final List<TextEditingController> _otpControllers = List.generate(
-    5,
-    (_) => TextEditingController(),
-  );
+
+  final List<TextEditingController> _otpControllers = List.generate(5, (_) => TextEditingController(),);
   final List<FocusNode> _otpFocusNodes = List.generate(5, (_) => FocusNode());
 
   @override
@@ -40,12 +38,8 @@ class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
   @override
   void dispose() {
     provider.disposeControllersListener();
-    for (final c in _otpControllers) {
-      c.dispose();
-    }
-    for (final f in _otpFocusNodes) {
-      f.dispose();
-    }
+    for (final otpControllers in _otpControllers) {otpControllers.dispose();}
+    for (final otpFocusNodes in _otpFocusNodes) {otpFocusNodes.dispose();}
     super.dispose();
   }
 
