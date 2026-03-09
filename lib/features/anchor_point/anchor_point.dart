@@ -93,7 +93,7 @@ class AnchorPointScreen extends ConsumerWidget {
         imagePath: icon,
         width: 45,
         height: 45,
-        color: isActive ? AppColors.primary: const Color(0xFF9CA3AF),
+        color: isActive ? AppColors.primary: AppColors.textSub600,
       ),
     );
   }

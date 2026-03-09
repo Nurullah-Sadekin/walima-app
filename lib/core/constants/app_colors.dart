@@ -57,6 +57,7 @@ class AppColors {
   static const Color competeBorderColor = Color(0xFFFD297B);
   static const Color inputBorderColor = Color(0xFFE6E6E9);
   static const Color inActiveBorderColor = Color(0xFF818092);
+  static const Color textSub600 = Color(0xFF5C5C5C);
 
   // Custom Linear Gradient
   static LinearGradient get customBackgroundGradient => const LinearGradient(
