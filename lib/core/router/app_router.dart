@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/features/login/presentation/screens/new_password.dart';
 import 'package:flutter_boilerplate/features/login/presentation/screens/otp_verify.dart';
+import 'package:flutter_boilerplate/features/login/presentation/screens/reset_pssword_status.dart';
 import 'package:flutter_boilerplate/features/login/presentation/screens/send_otp.dart';
 import 'package:flutter_boilerplate/features/onboarding_screen.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/connect_purchesase_card.dart';
@@ -64,6 +66,16 @@ GoRouter goRouter(GoRouterRef ref) {
         path: Paths.otpVerify,
         name: Routes.otpVerify,
         builder: (context, state) => const OtpVerifyScreen(),
+      ),
+      GoRoute(
+        path: Paths.newPassword,
+        name: Routes.newPassword,
+        builder: (context, state) => const NewPasswordScreen(),
+      ),
+      GoRoute(
+        path: Paths.resetPasswordStatus,
+        name: Routes.resetPasswordStatus,
+        builder: (context, state) => const ResetPasswordStatusScreen(),
       ),
       GoRoute(
         path: Paths.settings,

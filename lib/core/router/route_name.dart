@@ -5,6 +5,9 @@ abstract class Paths {
   static const login = '/login';
   static const sendOtp = '/sendOtp';
   static const otpVerify = '/otpVerify';
+  static const newPassword = '/newPassword';
+  static const resetPasswordStatus = '/resetPasswordStatus';
+
 
   static const splash = '/';
   static const anchor = '/anchor';
@@ -50,6 +53,8 @@ abstract class Routes {
   static const login = 'login';
   static const sendOtp = 'sendOtp';
   static const otpVerify = 'otpVerify';
+  static const newPassword = 'newPassword';
+  static const resetPasswordStatus = 'resetPasswordStatus';
 
   static const splash = 'splash';
   static const anchor = 'anchor';

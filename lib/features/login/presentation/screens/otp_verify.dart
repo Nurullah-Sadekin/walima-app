@@ -189,7 +189,9 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
       buttonStyle:  ButtonsStyle.activePrimaryButton,
       title: 'Done',
       onTap: () {
-        context.push(Paths.yourReligion);
+        if(provider.forgotPassword) {
+          context.push(Paths.newPassword);
+        }
       },
     );
   }

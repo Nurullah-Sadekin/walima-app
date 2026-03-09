@@ -49,11 +49,16 @@ class _SendOtpScreenState extends ConsumerState<SendOtpScreen> {
           child: provider.screenStates == LoginScreenStates.loginSuccess
               ? const Loading()
               : Column(
-            children: [
-               UpperLayer(imagePath: provider.forgotPassword ?  AppImages.forgotPassword : AppImages.login),
-              body(),
-            ],
-          ),
+                  children: [
+                    UpperLayer(
+                        imagePath: provider.forgotPassword
+                            ? AppImages.forgotPassword
+                            : AppImages.login,
+                        backCancelMood: provider.forgotPassword,
+                    ),
+                    body(),
+                  ],
+                ),
         ),
       ),
     );
@@ -92,7 +97,7 @@ class _SendOtpScreenState extends ConsumerState<SendOtpScreen> {
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle:  ButtonsStyle.activePrimaryButton,
+      buttonStyle: ButtonsStyle.activePrimaryButton,
       title: 'Send OTP',
       onTap: () {
         context.push(Paths.otpVerify);
