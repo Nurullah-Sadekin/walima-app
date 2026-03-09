@@ -136,10 +136,8 @@ class DialogUtils {
     required BuildContext context,
     bool hideButton = false,
   }) {
-    final accent =
-    isSuccess ? const Color(0xFF2EE34B) : const Color(0xFFE13B3B);
-    final accentDark =
-    isSuccess ? const Color(0xFF0B4F16) : const Color(0xFF5B1414);
+    final accent = isSuccess ? const Color(0xFF2EE34B) : const Color(0xFFE13B3B);
+    final accentDark = isSuccess ? const Color(0xFF0B4F16) : const Color(0xFF5B1414);
     final icon = isSuccess ? Icons.check : Icons.close;
 
     return Dialog(
@@ -241,17 +239,16 @@ class DialogUtils {
           ),
           hideButton
               ? const SizedBox.shrink()
-              :
-          Positioned(
-            right: 0,
-            top: 0,
-            child: IconButton(
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-              icon: const Icon(Icons.close, color: Colors.white, size: 22),
-              onPressed: onClose,
-            ),
-          ),
+              : Positioned(
+                  right: 0,
+                  top: 0,
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                    icon: const Icon(Icons.close, color: Colors.white, size: 22),
+                    onPressed: onClose,
+                  ),
+                ),
         ],
       ),
     );
@@ -311,8 +308,7 @@ class DialogUtils {
                         color: accent,
                         shape: BoxShape.circle,
                       ),
-                      child:
-                      const Icon(Icons.info, color: Colors.white, size: 26),
+                      child: const Icon(Icons.info, color: Colors.white, size: 26),
                     ),
                   ),
                 ),
@@ -372,4 +368,27 @@ class DialogUtils {
       ),
     );
   }
+  
+  
+ static Future<bool> showAppCloseDiaLog(BuildContext context)async{
+    // Show a confirmation dialog when the user tries to close the app
+    final shouldClose = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Exit App'),
+        content: const Text('Are you sure you want to exit the app?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false), // Don't close
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true), // Close
+            child: const Text('Exit'),
+          ),
+        ],
+      ),
+    );
+    return shouldClose ?? false; // Return false if dialog is dismissed without selection
+ }
 }

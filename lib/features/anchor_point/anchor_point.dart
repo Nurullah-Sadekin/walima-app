@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/home_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,57 +15,67 @@ class AnchorPointScreen extends ConsumerWidget {
 
     final screens = [
       const HomeScreen(),
-      // const CoursesScreen(),
-      // const TestScreen(),
-      // const RankScreen(),
-      // const ProfileScreen(),
+      Container(),
+      Container(),
+      Container(),
+      Container(),
     ];
 
-    return Scaffold(
-      body: IndexedStack(index: currentTab, children: screens),
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Color(0xFFE5E7EB), width: 0.5)),
-        ),
-        child: SafeArea(
-          top: false,
-          child: SizedBox(
-            height: 64,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildNavItem(
-                  icon: Icons.home_rounded,
-                  label: 'Home',
-                  isActive: currentTab == 0,
-                  onTap: () => ref.read(currentTabProvider.notifier).state = 0,
-                ),
-                // _buildNavItem(
-                //   icon: Icons.menu_book_rounded,
-                //   label: 'Courses',
-                //   isActive: currentTab == 1,
-                //   onTap: () => ref.read(currentTabProvider.notifier).state = 1,
-                // ),
-                // _buildNavItem(
-                //   icon: Icons.fact_check_rounded,
-                //   label: 'Test',
-                //   isActive: currentTab == 2,
-                //   onTap: () => ref.read(currentTabProvider.notifier).state = 2,
-                // ),
-                // _buildNavItem(
-                //   icon: Icons.emoji_events_rounded,
-                //   label: 'Rank',
-                //   isActive: currentTab == 3,
-                //   onTap: () => ref.read(currentTabProvider.notifier).state = 3,
-                // ),
-                // _buildNavItem(
-                //   icon: Icons.more_horiz_rounded,
-                //   label: 'More',
-                //   isActive: currentTab == 4,
-                //   onTap: () => ref.read(currentTabProvider.notifier).state = 4,
-                // ),
-              ],
+    // WillPopScope is deprecated in newer Flutter versions; PopScope is preferred.
+    // Using WillPopScope here for compatibility; suppress analyzer deprecation warning.
+    // ignore: deprecated_member_use
+    return WillPopScope(
+      onWillPop: () async {
+        // Show confirmation dialog and only pop if user confirms
+        final shouldClose = await DialogUtils.showAppCloseDiaLog(context);
+        return shouldClose;
+      },
+      child: Scaffold(
+        body: IndexedStack(index: currentTab, children: screens),
+        bottomNavigationBar: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            border: Border(top: BorderSide(color: Color(0xFFE5E7EB), width: 0.5)),
+          ),
+          child: SafeArea(
+            top: false,
+            child: SizedBox(
+              height: 64,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildNavItem(
+                    icon: Icons.home_rounded,
+                    label: 'Home',
+                    isActive: currentTab == 0,
+                    onTap: () => ref.read(currentTabProvider.notifier).state = 0,
+                  ),
+                  _buildNavItem(
+                    icon: Icons.menu_book_rounded,
+                    label: 'Courses',
+                    isActive: currentTab == 1,
+                    onTap: () => ref.read(currentTabProvider.notifier).state = 1,
+                  ),
+                  _buildNavItem(
+                    icon: Icons.fact_check_rounded,
+                    label: 'Test',
+                    isActive: currentTab == 2,
+                    onTap: () => ref.read(currentTabProvider.notifier).state = 2,
+                  ),
+                  _buildNavItem(
+                    icon: Icons.emoji_events_rounded,
+                    label: 'Rank',
+                    isActive: currentTab == 3,
+                    onTap: () => ref.read(currentTabProvider.notifier).state = 3,
+                  ),
+                  _buildNavItem(
+                    icon: Icons.more_horiz_rounded,
+                    label: 'More',
+                    isActive: currentTab == 4,
+                    onTap: () => ref.read(currentTabProvider.notifier).state = 4,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -99,9 +110,7 @@ class AnchorPointScreen extends ConsumerWidget {
           const SizedBox(height: 6),
           Icon(
             icon,
-            color: isActive
-                ? const Color(0xFF1A8FE3)
-                : const Color(0xFF9CA3AF),
+            color: isActive ? const Color(0xFF1A8FE3) : const Color(0xFF9CA3AF),
             size: 24,
           ),
           if (isActive && label.isNotEmpty) ...[
