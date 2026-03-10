@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
+import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_otp_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/registration_repository.dart';
 import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/is_with_family_status_model.dart';
@@ -377,27 +378,48 @@ class RegistrationProvider extends BaseChangeNotifier {
   String phoneAvailabilityErrorMessage = '';
   String emailAvailabilityErrorMessage = '';
 
-  Future<bool> checkEmailAndPhoneAvailability(BuildContext context) async {
-    final emailRes = await RegistrationRepository.checkEmail(emailController.text);
-    final phoneRes = await RegistrationRepository.checkMobile(phoneController.text);
-    if (emailRes.response?.isAvailable == true && phoneRes.response?.isAvailable == true) {
-      phoneAvailabilityErrorMessage = '';
-      emailAvailabilityErrorMessage = '';
-      notifyListeners();
-      return true;
-    } else {
-      if (emailRes.response?.isAvailable != true) {
-        emailAvailabilityErrorMessage = emailRes.message ?? 'Email already exists';
-        // DialogUtils.showErrorDialog(ctx: context, message: emailRes.message ?? 'Email already exists');
+    Future<bool> checkEmailAndPhoneAvailability(BuildContext context) async {
+      final emailRes = await RegistrationRepository.checkEmail(emailController.text);
+      final phoneRes = await RegistrationRepository.checkMobile(phoneController.text);
+      if (emailRes.response?.isAvailable == true && phoneRes.response?.isAvailable == true) {
+        phoneAvailabilityErrorMessage = '';
+        emailAvailabilityErrorMessage = '';
+        notifyListeners();
+        return true;
+      } else {
+        if (emailRes.response?.isAvailable != true) {
+          emailAvailabilityErrorMessage = emailRes.message ?? 'Email already exists';
+          // DialogUtils.showErrorDialog(ctx: context, message: emailRes.message ?? 'Email already exists');
+        }
+        if (phoneRes.response?.isAvailable != true) {
+          phoneAvailabilityErrorMessage = phoneRes.message ?? 'Phone number already exists';
+          // DialogUtils.showErrorDialog(ctx: context, message: phoneRes.message ?? 'Phone number already exists');
+        }
+        notifyListeners();
+        return false;
       }
-      if (phoneRes.response?.isAvailable != true) {
-        phoneAvailabilityErrorMessage = phoneRes.message ?? 'Phone number already exists';
-        // DialogUtils.showErrorDialog(ctx: context, message: phoneRes.message ?? 'Phone number already exists');
-      }
-      notifyListeners();
-      return false;
+    }    
+    Future<bool> signUpViaOtp(BuildContext context) async {
+      final body = SignUpOtpBody(
+        registrationSource: 'referral',
+            identifier: selectedVerificationType == 'email' ? emailController.text : phoneController.text,
+      ) ;
+      final response = await RegistrationRepository.signUpWithOTP(body);
+      // if (emailRes.response?.isAvailable == true && phoneRes.response?.isAvailable == true) {
+      //   phoneAvailabilityErrorMessage = '';
+      //   emailAvailabilityErrorMessage = '';
+      //   notifyListeners();
+      //   return true;
+      // } else {
+      //   if (emailRes.response?.isAvailable != true) {
+      //     emailAvailabilityErrorMessage = emailRes.message ?? 'Email already exists';
+      //   }
+      //   if (phoneRes.response?.isAvailable != true) {
+      //     phoneAvailabilityErrorMessage = phoneRes.message ?? 'Phone number already exists';
+      //   }
+        notifyListeners();
+        return false;
     }
-  }
 }
 
 enum RegistrationScreenStates {

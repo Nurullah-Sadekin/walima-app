@@ -7,6 +7,7 @@ import 'package:flutter_boilerplate/features/registration/data/models/request/si
 import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_request_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/response/email_availability_response.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/response/phone_availability_response.dart';
+import 'package:flutter_boilerplate/features/registration/data/models/response/sign_up_otp_response.dart';
 
 class RegistrationRepository {
   late final DioClient dioClient;
@@ -21,13 +22,13 @@ class RegistrationRepository {
     }
   }
 
-  static Future<LoginResponse> signUpWithOTP(SignUpOtpBody body) async {
+  static Future<SignUpOtpResponse> signUpWithOTP(SignUpOtpBody body) async {
     try {
       final response = await DioClient().post(AppUrls.signUpWithOTP, data: body.toJson());
-      return LoginResponse.fromJson(response.data);
+      return SignUpOtpResponse.fromJson(response.data);
     } catch (e) {
       final errorMessage = e is DioException ? e.response?.data['message'] ?? e.message : e.toString();
-      return LoginResponse(code: 'FAILED', message: errorMessage);
+      return SignUpOtpResponse(code: 'FAILED', message: errorMessage);
     }
   }
 

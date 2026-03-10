@@ -11,8 +11,7 @@ class RegisterBody {
     identifier = json['identifier'];
     password = json['password'];
     confirmPassword = json['confirmPassword'];
-    registrationSource 
-    = json['registrationSource'];
+    registrationSource = json['registrationSource'];
   }
   
   String? identifier;

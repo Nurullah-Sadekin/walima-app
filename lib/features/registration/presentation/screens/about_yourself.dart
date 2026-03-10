@@ -137,9 +137,21 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
       title: 'Continue',
       onTap: () {
         if (provider.aboutYourselfController.text.isNotEmpty && provider.selectedVerificationType.isNotEmpty) {
-          //  provider.sendData().then((_) {
-          //   context.pushNamed(RouteNames.registrationLocation);
+          //transparent loading start
+          final screenNotifier = ref.read(emailPhoneScreenProvider);
+          screenNotifier.updateViewState(
+            loadingState: RegistrationScreenStates.isProfileFor,
+          );
+          provider.signUpViaOtp(context).then((_) {
+            // context.pushNamed(RouteNames.registrationLocation);
+          });
+          // provider.signUpViaOtp().then((_) {
+          //   // context.pushNamed(RouteNames.registrationLocation);
           // });
+          
+          screenNotifier.updateViewState(
+            loadingState: RegistrationScreenStates.loadingComplete,
+          );
         }
       },
     );
