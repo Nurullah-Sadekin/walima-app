@@ -85,11 +85,11 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
       spacing: 10,
       children: [
         PrimaryTextField(
-          controller: provider.confirmPasswordController,
+          controller: provider.createPasswordController,
           headLine: 'Create Password',
           hintText: 'Write here',
           noPrefix: true,
-          errorText: null,
+          errorText: provider.createPasswordError,
           showPassIcon: true,
           onTap: () {},
         ),
@@ -98,7 +98,7 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
           headLine: 'Confirm Password',
           hintText: 'Write here',
           noPrefix: true,
-          errorText: null,
+          errorText: provider.confirmPasswordError,
           showPassIcon: true,
           onTap: () {},
         ),
@@ -111,7 +111,8 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
       buttonStyle: ButtonsStyle.activePrimaryButton,
       title: 'Continue',
       onTap: () {
-        context.push(Paths.resetPasswordStatus);
+        provider.setNewPassword(context);
+        // context.push(Paths.resetPasswordStatus);
       },
     );
   }

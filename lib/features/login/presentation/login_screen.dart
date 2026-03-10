@@ -28,7 +28,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void initState() {
     super.initState();
     provider = ref.read(loginProvider);
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider.getInitialData();
       provider.initControllersListener();
@@ -54,8 +53,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ? const Loading()
               : SizedBox(
                   height: MediaQuery.sizeOf(context).height,
-                child: SingleChildScrollView(
-                  child: Column(
+                  child: SingleChildScrollView(
+                    child: Column(
                       children: [
                         const UpperLayer(
                           imagePath: AppImages.login,
@@ -65,8 +64,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         body(),
                       ],
                     ),
+                  ),
                 ),
-              ),
         ),
       ),
     );
@@ -98,8 +97,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   //context.push(Paths.signUp);
                 },
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: AppColors.greyLight,
@@ -164,29 +162,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       height: TextSize.font16(context),
                       width: TextSize.font16(context),
                       decoration: BoxDecoration(
-                        color: provider.keepMeLoggedIn
-                            ? AppColors.primary
-                            : Colors.white,
+                        color: provider.keepMeLoggedIn ? AppColors.primary : Colors.white,
                         borderRadius: BorderRadius.circular(4),
-                        border: Border.all(
-                            color: provider.keepMeLoggedIn
-                                ? AppColors.primary
-                                : AppColors.greyLight,
-                            width: 1),
+                        border: Border.all(color: provider.keepMeLoggedIn ? AppColors.primary : AppColors.greyLight, width: 1),
                       ),
-                      child: provider.keepMeLoggedIn
-                          ? Icon(Icons.check,
-                              size: TextSize.font12(context),
-                              color: Colors.white)
-                          : null,
+                      child: provider.keepMeLoggedIn ? Icon(Icons.check, size: TextSize.font12(context), color: Colors.white) : null,
                     ),
                   ),
-                  Text('Keep me logged in',
-                      style: TextStyle(
-                        color: AppColors.textPrimaryLight,
-                        fontWeight: FontWeight.w400,
-                        fontSize: TextSize.font12(context),
-                      ),
+                  Text(
+                    'Keep me logged in',
+                    style: TextStyle(
+                      color: AppColors.textPrimaryLight,
+                      fontWeight: FontWeight.w400,
+                      fontSize: TextSize.font12(context),
+                    ),
                   ),
                 ],
               ),
@@ -222,11 +211,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           buttonStyle: ButtonsStyle.activePrimaryButton,
           title: 'Login',
           onTap: () async {
-              await provider.login(context);
+            await provider.login(context);
             //context.push(Paths.yourReligion);
           },
         ),
-        
         PrimaryButtons(
           buttonStyle: ButtonsStyle.activeSecondaryButton,
           title: 'Login with OTP',

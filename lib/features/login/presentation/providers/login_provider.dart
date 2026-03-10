@@ -8,6 +8,7 @@ import 'package:flutter_boilerplate/features/login/data/models/login_response.da
 import 'package:flutter_boilerplate/features/login/data/models/login_with_otp_body.dart';
 import 'package:flutter_boilerplate/features/login/data/models/otp_verify_body.dart';
 import 'package:flutter_boilerplate/features/login/data/models/resend_otp_body.dart';
+import 'package:flutter_boilerplate/features/login/data/models/set_password_body.dart';
 import 'package:flutter_boilerplate/features/login/data/repository/login_repository.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,6 +16,11 @@ import 'package:flutter_boilerplate/core/constants/storage_keys.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
 
 class LoginProvider extends BaseChangeNotifier {
+  static const String _mobileOrEmailRequiredMessage =
+      'Please enter your mobile number or email ID';
+  static const String _passwordRequiredMessage = 'Please enter your password';
+  static const String _otpIncompleteMessage = 'Please enter the complete OTP';
+
   LoginScreenStates screenStates = LoginScreenStates.defaultState;
   LoginScreenStates loaderState = LoginScreenStates.defaultState;
   bool isLoading = false;
@@ -23,15 +29,29 @@ class LoginProvider extends BaseChangeNotifier {
   bool keepMeLoggedIn = false;
   bool forgotPassword = false;
 
-  final TextEditingController mobileNoOrEmailController = TextEditingController();
+  final TextEditingController mobileNoOrEmailController =
+      TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController otpController = TextEditingController();
-  final TextEditingController createPasswordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController createPasswordController =
+      TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   String mobileOrEmailError = '';
   String passwordError = '';
   List<TextEditingController> otpControllers = [];
   List<FocusNode> otpFocusNodesController = [];
+  String createPasswordError = '';
+  String confirmPasswordError = '';
+  String otpCode = '';
+
+  List<TextEditingController> get _managedControllers => [
+        mobileNoOrEmailController,
+        passwordController,
+        otpController,
+        createPasswordController,
+        confirmPasswordController,
+      ];
 
   Future<void> getInitialData() async {
     _clearValidationErrors();
@@ -44,31 +64,23 @@ class LoginProvider extends BaseChangeNotifier {
     otpFocusNodesController = List.generate(length, (_) => FocusNode());
 
     for (final c in otpControllers) {
-      try {
-        c.addListener(() => notifyListeners());
-      } catch (_) {}
+      _addListenerSafely(c, notifyListeners);
     }
 
     notifyListeners();
   }
 
   void disposeOtpFields({bool notify = true}) {
-    if (otpControllers.isNotEmpty) {
-      for (final c in otpControllers) {
-        try {
-          c.dispose();
-        } catch (_) {}
-      }
-      otpControllers = [];
+    for (final c in otpControllers) {
+      _disposeSafely(c);
     }
-    if (otpFocusNodesController.isNotEmpty) {
-      for (final f in otpFocusNodesController) {
-        try {
-          f.dispose();
-        } catch (_) {}
-      }
-      otpFocusNodesController = [];
+
+    for (final f in otpFocusNodesController) {
+      _disposeSafely(f);
     }
+
+    otpControllers = [];
+    otpFocusNodesController = [];
 
     if (notify) {
       notifyListeners();
@@ -80,46 +92,23 @@ class LoginProvider extends BaseChangeNotifier {
 
     _controllersListener = () => notifyListeners();
 
-    try {
-      mobileNoOrEmailController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      passwordController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      // single otpController listener if needed
-      otpController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      createPasswordController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      confirmPasswordController.addListener(_controllersListener!);
-    } catch (_) {}
+    for (final controller in _managedControllers) {
+      _addListenerSafely(controller, _controllersListener!);
+    }
   }
 
   void disposeControllersListener() {
     if (_controllersListener == null) return;
-    try {
-      mobileNoOrEmailController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      passwordController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      otpController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      createPasswordController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      confirmPasswordController.removeListener(_controllersListener!);
-    } catch (_) {}
+
+    for (final controller in _managedControllers) {
+      _removeListenerSafely(controller, _controllersListener!);
+    }
 
     _controllersListener = null;
   }
 
-  void updateViewState({LoginScreenStates? screenStates, LoginScreenStates? loadingState}) {
+  void updateViewState(
+      {LoginScreenStates? screenStates, LoginScreenStates? loadingState}) {
     if (screenStates != null) {
       this.screenStates = screenStates;
       loaderState = LoginScreenStates.defaultState;
@@ -136,88 +125,126 @@ class LoginProvider extends BaseChangeNotifier {
       return;
     }
 
-    updateViewState(loadingState: LoginScreenStates.transparentLoading);
+    _showLoading();
     final response = await _performLoginRequest();
     await _handleLoginResult(context, response);
   }
 
-  Future<void> otpValidateForLogin(BuildContext context) async {
+  Future<void> otpValidate(BuildContext context) async {
     if (otpControllers.any((c) => c.text.isEmpty)) {
       DialogUtils.showErrorDialog(
         ctx: context,
-        message: 'Please enter the complete OTP',
+        message: _otpIncompleteMessage,
       );
       return;
     }
 
     final otp = otpControllers.map((c) => c.text).join();
-    updateViewState(loadingState: LoginScreenStates.transparentLoading);
-    final body = OtVerifyBody(identifier: mobileNoOrEmailController.text, otpCode: otp, purpose: 'signin');
+    _showLoading();
+    final body = OtVerifyBody(
+      identifier: mobileNoOrEmailController.text,
+      otpCode: otp,
+      purpose: _authPurpose,
+    );
     final response = await LoginRepository.verifyOtp(body);
     if (response.code != 'SUCCESS') {
       _handleLoginFailure(context, response.message);
       return;
     }
-    await _handleLoginResult(context, response);
+    if (context.mounted && forgotPassword) {
+      otpCode = otp;
+      createPasswordController.clear();
+      confirmPasswordController.clear();
+      _hideLoading();
+      context.push(Paths.newPassword);
+    } else if (context.mounted && !forgotPassword) {
+      await _handleLoginResult(context, response);
+    }
+  }
+
+  Future<void> setNewPassword(BuildContext context) async {
+    _showLoading();
+    if (validateNewPassword() == false) {
+      _hideLoading();
+      return;
+    }
+    final body = SetPasswordBody(
+        identifier: mobileNoOrEmailController.text,
+        otpCode: otpCode,
+        newPassword: createPasswordController.text,
+        confirmPassword: confirmPasswordController.text);
+    final response = await LoginRepository.setNewPassword(body);
+    _handleLoginResult(context, response);
   }
 
   Future<void> resendOtp(BuildContext context) async {
-    updateViewState(loadingState: LoginScreenStates.transparentLoading);
-    final body = ResendOtpBody(identifier: mobileNoOrEmailController.text, purpose: 'signin');
+    otpCode = '';
+    otpController.clear();
+    for (final c in otpControllers) {
+      c.clear();
+    }
+    _showLoading();
+    final body = ResendOtpBody(
+      identifier: mobileNoOrEmailController.text,
+      purpose: _authPurpose,
+    );
     final response = await LoginRepository.resendOtp(body);
     if (response.code != 'SUCCESS') {
       _handleLoginFailure(context, response.message);
       return;
     }
-    updateViewState(loadingState: LoginScreenStates.defaultState);
-    DialogUtils.showSuccessDialog(context: context, message: response.message, autoClose: true, autoCloseDuration: const Duration(seconds: 2));
-    // await _handleLoginResult(context, response);
+    _hideLoading();
+    await DialogUtils.showSuccessDialog(
+        context: context,
+        message: response.message,
+        autoClose: true,
+        autoCloseDuration: const Duration(seconds: 2));
   }
 
   Future<void> loginWithOtp(BuildContext context) async {
-    updateViewState(loadingState: LoginScreenStates.transparentLoading);
+    _showLoading();
     final body = LoginWithOtpBody(identifier: mobileNoOrEmailController.text);
-    final response = await LoginRepository.loginWithOtp(body);
+    final response =
+        await LoginRepository.loginWithOtp(body, isForgotPass: forgotPassword);
     if (response.code != 'SUCCESS') {
       mobileOrEmailError = '';
       _handleLoginFailure(context, response.message);
       return;
     }
     await _gotoOtpVerificationScreen(context);
-    // await _handleLoginResult(context, response);
   }
 
   Future<void> _gotoOtpVerificationScreen(BuildContext context) async {
-    updateViewState(loadingState: LoginScreenStates.defaultState);
+    _hideLoading();
     if (context.mounted) {
       context.push(Paths.otpVerify);
     }
   }
 
   bool validateOtpInputs() {
-    if (mobileNoOrEmailController.text.isEmpty) {
-      mobileOrEmailError = 'Please enter your mobile number or email ID';
+    if (_hasEmptyMobileOrEmail()) {
+      mobileOrEmailError = _mobileOrEmailRequiredMessage;
       updateViewState();
       return false;
     }
-    if (mobileNoOrEmailController.text.isNotEmpty) {
-      final mobileOrEmailValidation = Validators.validateMobileOrEmail(mobileNoOrEmailController.text);
-      if (mobileOrEmailValidation != null) {
-        mobileOrEmailError = mobileOrEmailValidation;
-        updateViewState();
-        return false;
-      }
+
+    final mobileOrEmailValidation =
+        Validators.validateMobileOrEmail(mobileNoOrEmailController.text);
+    if (mobileOrEmailValidation != null) {
+      mobileOrEmailError = mobileOrEmailValidation;
+      updateViewState();
+      return false;
     }
 
     return true;
   }
 
   void _setRequiredFieldErrors() {
-    if (mobileNoOrEmailController.text.isEmpty) {
-      mobileOrEmailError = 'Please enter your mobile number or email ID';
+    if (_hasEmptyMobileOrEmail()) {
+      mobileOrEmailError = _mobileOrEmailRequiredMessage;
     }
     if (passwordController.text.isEmpty) {
-      passwordError = 'Please enter your password';
+      passwordError = _passwordRequiredMessage;
     }
   }
 
@@ -237,7 +264,8 @@ class LoginProvider extends BaseChangeNotifier {
     return LoginRepository.login(body);
   }
 
-  Future<void> _handleLoginResult(BuildContext context, LoginResponse response) async {
+  Future<void> _handleLoginResult(
+      BuildContext context, LoginResponse response) async {
     if (response.code == 'SUCCESS') {
       await _persistAuthTokens(response);
       _handleLoginSuccess(context);
@@ -261,26 +289,38 @@ class LoginProvider extends BaseChangeNotifier {
     }
   }
 
-  Future<void> _saveAccessToken(SharedPreferences prefs, String accessToken) async {
+  Future<void> _saveAccessToken(
+      SharedPreferences prefs, String accessToken) async {
     await prefs.setString(StorageKeys.accessToken, accessToken);
     try {
       DioClient().setAuthToken(accessToken);
     } catch (_) {}
   }
 
-  Future<void> _saveRefreshToken(SharedPreferences prefs, String refreshToken) async {
+  Future<void> _saveRefreshToken(
+      SharedPreferences prefs, String refreshToken) async {
     await prefs.setString(StorageKeys.refreshToken, refreshToken);
   }
 
   void _handleLoginSuccess(BuildContext context) {
+    clearControllers();
     updateViewState(screenStates: LoginScreenStates.defaultState);
     if (context.mounted) {
       context.push(Paths.anchor);
     }
   }
 
+  void clearControllers() {
+    mobileNoOrEmailController.clear();
+    passwordController.clear();
+    otpController.clear();
+    createPasswordController.clear();
+    confirmPasswordController.clear();
+    otpCode = '';
+  }
+
   void _handleLoginFailure(BuildContext context, String? message) {
-    updateViewState(loadingState: LoginScreenStates.defaultState);
+    _hideLoading();
     if (context.mounted) {
       DialogUtils.showErrorDialog(
         ctx: context,
@@ -305,7 +345,8 @@ class LoginProvider extends BaseChangeNotifier {
   }
 
   bool _validateMobileOrEmail() {
-    final mobileOrEmailValidation = Validators.validateMobileOrEmail(mobileNoOrEmailController.text);
+    final mobileOrEmailValidation =
+        Validators.validateMobileOrEmail(mobileNoOrEmailController.text);
     if (mobileOrEmailValidation != null) {
       mobileOrEmailError = mobileOrEmailValidation;
       updateViewState();
@@ -314,8 +355,13 @@ class LoginProvider extends BaseChangeNotifier {
     return true;
   }
 
+  bool _hasEmptyMobileOrEmail() {
+    return mobileNoOrEmailController.text.isEmpty;
+  }
+
   bool _validatePassword() {
-    final passwordValidation = Validators.validatePassword(passwordController.text);
+    final passwordValidation =
+        Validators.validatePassword(passwordController.text);
     if (passwordValidation != null) {
       passwordError = passwordValidation;
       updateViewState();
@@ -327,6 +373,54 @@ class LoginProvider extends BaseChangeNotifier {
   void _clearValidationErrors() {
     mobileOrEmailError = '';
     passwordError = '';
+  }
+
+  String get _authPurpose => forgotPassword ? 'password_reset' : 'signin';
+
+  void _showLoading() {
+    updateViewState(loadingState: LoginScreenStates.transparentLoading);
+  }
+
+  void _hideLoading() {
+    updateViewState(loadingState: LoginScreenStates.defaultState);
+  }
+
+  void _addListenerSafely(
+      TextEditingController controller, VoidCallback listener) {
+    try {
+      controller.addListener(listener);
+    } catch (_) {}
+  }
+
+  void _removeListenerSafely(
+      TextEditingController controller, VoidCallback listener) {
+    try {
+      controller.removeListener(listener);
+    } catch (_) {}
+  }
+
+  void _disposeSafely(ChangeNotifier notifier) {
+    try {
+      notifier.dispose();
+    } catch (_) {}
+  }
+
+  bool validateNewPassword() {
+    final createPasswordValidation =
+        Validators.validatePassword(createPasswordController.text);
+    if (createPasswordValidation != null) {
+      createPasswordError = createPasswordValidation;
+      updateViewState();
+      return false;
+    }
+    createPasswordError = '';
+    if (createPasswordController.text != confirmPasswordController.text) {
+      confirmPasswordError = 'Confirm password does not match';
+      updateViewState();
+      return false;
+    }
+    confirmPasswordError = '';
+    return true;
   }
 }
 

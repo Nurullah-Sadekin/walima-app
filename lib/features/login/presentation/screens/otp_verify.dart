@@ -182,11 +182,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
       buttonStyle: ButtonsStyle.activePrimaryButton,
       title: 'Done',
       onTap: () {
-        if (provider.forgotPassword) {
-          // context.push(Paths.newPassword);
-        } else {
-          provider.otpValidateForLogin(context);
-        }
+        provider.otpValidate(context);
       },
     );
   }

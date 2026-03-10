@@ -15,13 +15,17 @@ class Validators{
 
     return null; // Return null if the input is valid
   }
-  
+
   static String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your password';
     }
     if (value.length < 6) {
       return 'Password must be at least 6 characters long';
+    }
+    final pattern = RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$');
+    if (!pattern.hasMatch(value)) {
+      return 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character';
     }
     return null; // Return null if the input is valid
   }
