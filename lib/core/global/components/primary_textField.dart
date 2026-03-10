@@ -77,9 +77,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
 
     return Column(
       children: [
-        widget.hideHeadline != null && true
-            ? const SizedBox.shrink()
-            : _headLine(),
+        widget.hideHeadline != null && true ? const SizedBox.shrink() : _headLine(),
         _inputField(screenWidth, screenHeight),
       ],
     );
@@ -91,9 +89,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
       controller: widget.controller ?? _internalController,
       minLines: widget.minLine ?? 1,
       maxLines: widget.maxLine ?? 1,
-      obscureText: widget.showPassIcon != null
-          ? viewPassword
-          : widget.obscureText ?? false,
+      obscureText: widget.showPassIcon != null ? viewPassword : widget.obscureText ?? false,
       keyboardType: widget.keyboardType,
       readOnly: widget.datePicker == true ? true : (widget.readOnly ?? false),
       onTap: () async {
@@ -104,10 +100,9 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
             setState(() {});
           }
           //initial date will be 18 years ago from today
-          DateTime initialDate = DateTime.now().subtract(const Duration(days: 365 * 18));
+          DateTime initialDate = DateTime.now().subtract(const Duration(days: 365 * 19));
           try {
-            final existing =
-                widget.controller?.text ?? _internalController?.text ?? '';
+            final existing = widget.controller?.text ?? _internalController?.text ?? '';
             if (existing.isNotEmpty) {
               try {
                 initialDate = DateTime.parse(existing);
@@ -132,7 +127,6 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
               _internalController!.text = formatted;
             }
             if (widget.onChanged != null) widget.onChanged!(formatted);
-            // rebuild to update visuals if needed
             setState(() {});
           }
 
@@ -141,13 +135,11 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
         }
         if (widget.onTap != null) widget.onTap!();
       },
-      onChanged: (value) =>
-          widget.onChanged != null ? widget.onChanged!(value) : null,
+      onChanged: (value) => widget.onChanged != null ? widget.onChanged!(value) : null,
       validator: widget.validator,
       onTapOutside: (event) {
         FocusManager.instance.primaryFocus?.unfocus();
       },
-      
       style: TextStyle(
         color: widget.textColor ?? AppColors.textPrimaryLight,
         fontSize: TextSize.font14(context),
@@ -155,25 +147,17 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
       ),
       decoration: InputDecoration(
         isDense: true,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        prefix: widget.noPrefix != null && true
-            ? Container(
-                color: Colors.green,
-                child: const Padding(padding: EdgeInsets.only(left: 15)))
-            : null,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        prefix: widget.noPrefix != null && true ? Container(color: Colors.green, child: const Padding(padding: EdgeInsets.only(left: 15))) : null,
         prefixIcon: widget.noPrefix != null && true
             ? const SizedBox()
             : Padding(
-                padding: const EdgeInsets.only(left: 16.0,right: 4),
+                padding: const EdgeInsets.only(left: 16.0, right: 4),
                 child: widget.prefixIcon,
               ),
         border: InputBorderStyle.border(6, borderColor: widget.borderColor),
         focusedBorder: InputBorderStyle.focusedBorder(6),
-        enabledBorder: (widget.controller?.text ??
-                    _internalController?.text ??
-                    '')
-                .isNotEmpty
+        enabledBorder: (widget.controller?.text ?? _internalController?.text ?? '').isNotEmpty
             ? InputBorderStyle.validBorder(6, borderColor: widget.borderColor)
             : InputBorderStyle.border(6),
         focusedErrorBorder: InputBorderStyle.focusedErrorBorder(6),
@@ -197,9 +181,9 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
                 child: _suffixIcon(screenWidth),
               )
             : Padding(
-              padding:  EdgeInsets.only(right: screenWidth * 0.025),
-              child: widget.suffix,
-            ),
+                padding: EdgeInsets.only(right: screenWidth * 0.025),
+                child: widget.suffix,
+              ),
         suffixIconConstraints: BoxConstraints(
           minHeight: screenHeight * 0.025,
         ),
@@ -223,14 +207,10 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
             if (widget.headLine != null)
               Text(
                 widget.headLine!,
-                style: TextStyle(
-                    fontSize: TextSize.font14(context),
-                    fontWeight: FontWeight.w500,
-                    color: const Color(0xFF171717)
-                ),
+                style: TextStyle(fontSize: TextSize.font14(context), fontWeight: FontWeight.w500, color: const Color(0xFF171717)),
               ),
             if (widget.headLineInfoIcon == true && widget.headLine != null)
-              Icon(Icons.info, size: TextSize.font13(context), color:AppColors.disableText),
+              Icon(Icons.info, size: TextSize.font13(context), color: AppColors.disableText),
           ],
         ),
         const SizedBox(height: 6),
@@ -245,12 +225,8 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
           setState(() {});
         },
         child: Icon(
-          viewPassword
-              ? Icons.visibility_off_outlined
-              : Icons.visibility_outlined,
-          color: viewPassword
-              ? AppColors.inputBorderColor
-              : AppColors.competeBorderColor,
+          viewPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+          color: viewPassword ? AppColors.inputBorderColor : AppColors.competeBorderColor,
           size: screenWidth * 0.05,
         ));
   }
