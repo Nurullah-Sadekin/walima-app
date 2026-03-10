@@ -45,6 +45,7 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
     return TransparentLoading(
       isLoading: provider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         body: GradientBackground(
           child: provider.screenStates == RegistrationScreenStates.isProfileFor
@@ -95,8 +96,7 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
             Wrap(
               spacing: 10,
               runSpacing: 10,
-              children:
-              List.generate(provider.incomePeriodDataList.length, (index) {
+              children: List.generate(provider.incomePeriodDataList.length, (index) {
                 final incomePeriod = provider.incomePeriodDataList[index];
 
                 double screenWidth = MediaQuery.of(context).size.width - 40;
@@ -105,9 +105,7 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
                 return SizedBox(
                   width: itemWidth,
                   child: SelectionCard(
-                    buttonStyle: incomePeriod.isSelected
-                        ? SelectionStyle.selectedRadio
-                        : SelectionStyle.unSelectedRadio,
+                    buttonStyle: incomePeriod.isSelected ? SelectionStyle.selectedRadio : SelectionStyle.unSelectedRadio,
                     onTap: () {
                       provider.selectedIncomePeriod(index);
                     },
@@ -158,7 +156,6 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
           noPrefix: true,
           onTap: () {},
         ),
-
       ],
     );
   }
@@ -172,10 +169,12 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
 
     return PrimaryButtons(
       buttonStyle: provider.currentCompanyNameController.text.isNotEmpty &&
-          provider.selectedIncomePeriodStatus != null &&
-          provider.incomeRangeController.text.isNotEmpty &&
-          provider.yourWorkController.text.isNotEmpty &&
-          provider.youWorkAsController.text.isNotEmpty ? ButtonsStyle.activePrimaryButton : ButtonsStyle.disableButton,
+              provider.selectedIncomePeriodStatus != null &&
+              provider.incomeRangeController.text.isNotEmpty &&
+              provider.yourWorkController.text.isNotEmpty &&
+              provider.youWorkAsController.text.isNotEmpty
+          ? ButtonsStyle.activePrimaryButton
+          : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
         if (hasAnyValue) return;

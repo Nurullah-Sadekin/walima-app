@@ -85,8 +85,7 @@ class _YourRegionState extends ConsumerState<YourReligion> {
           popUpHeader: 'Select Religion',
           items: const ['Islam', 'Hinduism', 'Buddhism', 'Christianity'],
           controller: provider.religionController,
-          onTap: () {
-          },
+          onTap: () {},
           isSearch: true,
         ),
         provider.religionController.text.isEmpty
@@ -98,11 +97,11 @@ class _YourRegionState extends ConsumerState<YourReligion> {
                 headLineInfoIcon: true,
                 items: const ['Islam', 'Hinduism', 'Buddhism', 'Christianity'],
                 controller: provider.communityController,
-                onTap: () {
-                },
+                onTap: () {},
                 isSearch: true,
               ),
-        provider.religionController.text.isEmpty || provider.communityController.text.isEmpty
+        provider.religionController.text.isEmpty ||
+                provider.communityController.text.isEmpty
             ? const SizedBox.shrink()
             : DropDownField(
                 headLine: 'Living In',
@@ -131,7 +130,7 @@ class _YourRegionState extends ConsumerState<YourReligion> {
             provider.livingInController.text.isEmpty) {
           return;
         }
-        context.push(Paths.emailPhone);
+        context.push(Paths.location);
       },
     );
   }

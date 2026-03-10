@@ -45,6 +45,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
     return TransparentLoading(
       isLoading: provider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         body: GradientBackground(
           child: provider.screenStates == RegistrationScreenStates.isProfileFor
@@ -150,12 +151,12 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
           : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
-      if (provider.cityController.text.isEmpty ||
-              provider.residencyStatusController.text.isEmpty ||
-              provider.selectedIsWithFamilyStatus == null) {
-            return;
-          }
-         context.push(Paths.maritalStatus);
+        if (provider.cityController.text.isEmpty ||
+            provider.residencyStatusController.text.isEmpty ||
+            provider.selectedIsWithFamilyStatus == null) {
+          return;
+        }
+        context.push(Paths.emailPhone);
       },
     );
   }

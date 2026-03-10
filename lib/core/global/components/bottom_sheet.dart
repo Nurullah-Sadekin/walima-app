@@ -15,9 +15,9 @@ class BottomSheetUtils {
     dynamic tempSelectedValue = selectedValue;
 
     // Calculate dynamic height based on number of items
-    double itemHeight = 56.0; // Approximate height per item
+    double itemHeight = 70.0; // Approximate height per item
     double headerHeight = 60.0; // Height of header section
-    double maxHeight = MediaQuery.of(context).size.height * 0.6; // Max 60% of screen
+    double maxHeight = MediaQuery.of(context).size.height * 0.9; // Max 60% of screen
     double calculatedHeight = (items.length * itemHeight) + headerHeight;
     double bottomSheetHeight = calculatedHeight > maxHeight ? maxHeight : calculatedHeight;
 
@@ -40,26 +40,28 @@ class BottomSheetUtils {
                   topRight: Radius.circular(20),
                 ),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min, // Important: minimizes height
-                children: [
-                  // Header section with drag handle
-                  _buildHeader(context, header),
-
-                  // Items list - no Expanded, use Flexible with fit
-                  Flexible(
-                    child: _buildItemsList(
-                      context,
-                      items,
-                      tempSelectedValue,
-                          (dynamic newValue) {
-                        setState(() {
-                          tempSelectedValue = newValue;
-                        });
-                      },
+              child: SafeArea(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min, // Important: minimizes height
+                  children: [
+                    // Header section with drag handle
+                    _buildHeader(context, header),
+                    // Items list - no Expanded, use Flexible with fit
+                    Flexible(
+                      child: _buildItemsList(
+                        context,
+                        items,
+                        tempSelectedValue,
+                        (dynamic newValue) {
+                          setState(() {
+                            tempSelectedValue = newValue;
+                          });
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 20), // Add some spacing at the bottom
+                  ],
+                ),
               ),
             );
           },
@@ -102,11 +104,11 @@ class BottomSheetUtils {
   }
 
   static Widget _buildItemsList(
-      BuildContext context,
-      List items,
-      dynamic selectedValue,
-      Function(dynamic) onItemSelected,
-      ) {
+    BuildContext context,
+    List items,
+    dynamic selectedValue,
+    Function(dynamic) onItemSelected,
+  ) {
     String _display(dynamic item) {
       try {
         if (item == null) return '';
@@ -149,7 +151,6 @@ class BottomSheetUtils {
       itemCount: items.length,
       separatorBuilder: (context, index) => const Padding(
         padding: EdgeInsets.symmetric(horizontal: 16),
-
       ),
       itemBuilder: (context, index) {
         final item = items[index];
@@ -169,22 +170,22 @@ class BottomSheetUtils {
             },
             trailing: isSelected
                 ? Container(
-              padding: const EdgeInsets.all(2),
-              decoration: const BoxDecoration(
-                color: AppColors.primary,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.check,
-                color: Colors.white,
-                size: TextSize.font12(context),
-              ),
-            )
+                    padding: const EdgeInsets.all(2),
+                    decoration: const BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.check,
+                      color: Colors.white,
+                      size: TextSize.font12(context),
+                    ),
+                  )
                 : Icon(
-              Icons.radio_button_unchecked,
-              color: Colors.grey,
-              size: TextSize.font18(context),
-            ),
+                    Icons.radio_button_unchecked,
+                    color: Colors.grey,
+                    size: TextSize.font18(context),
+                  ),
             title: Text(
               displayText,
               style: TextStyle(

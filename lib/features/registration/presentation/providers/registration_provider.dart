@@ -166,11 +166,10 @@ class RegistrationProvider extends BaseChangeNotifier {
     }
 
     selectedHobbies.clear();
+    updateViewState();
   }
 
   Future<void> getInitialData() async {
-    cleanAllValue();
-    updateViewState();
     // Simulate a delay for fetching data
   }
 
