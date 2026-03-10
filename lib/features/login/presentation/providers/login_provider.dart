@@ -6,6 +6,8 @@ import 'package:flutter_boilerplate/core/utils/validators.dart';
 import 'package:flutter_boilerplate/features/login/data/models/login_body.dart';
 import 'package:flutter_boilerplate/features/login/data/models/login_response.dart';
 import 'package:flutter_boilerplate/features/login/data/models/login_with_otp_body.dart';
+import 'package:flutter_boilerplate/features/login/data/models/otp_verify_body.dart';
+import 'package:flutter_boilerplate/features/login/data/models/resend_otp_body.dart';
 import 'package:flutter_boilerplate/features/login/data/repository/login_repository.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -136,19 +138,60 @@ class LoginProvider extends BaseChangeNotifier {
     final response = await _performLoginRequest();
     await _handleLoginResult(context, response);
   }
+  
+  Future<void> otpValidateForLogin(BuildContext context) async {
+    if (otpControllers.any((c) => c.text.isEmpty)) {
+      DialogUtils.showErrorDialog(
+        ctx: context,
+        message: 'Please enter the complete OTP',
+      );
+      return;
+    }
+
+    final otp = otpControllers.map((c) => c.text).join();
+    updateViewState(loadingState: LoginScreenStates.transparentLoading);
+    final body = OtVerifyBody(identifier: mobileNoOrEmailController.text, otpCode: otp, purpose: 'signin');
+    final response = await LoginRepository.verifyOtp(body);
+    if (response.code != 'SUCCESS') {
+      _handleLoginFailure(context, response.message);
+      return;
+    }
+    await _handleLoginResult(context, response);
+  }
+
+  Future<void> resendOtp(BuildContext context) async {
+    updateViewState(loadingState: LoginScreenStates.transparentLoading);
+    final body = ResendOtpBody(identifier: mobileNoOrEmailController.text, purpose: 'signin');
+    final response = await LoginRepository.resendOtp(body);
+    if (response.code != 'SUCCESS') {
+      _handleLoginFailure(context, response.message);
+      return;
+    }
+    updateViewState(loadingState: LoginScreenStates.defaultState);
+    DialogUtils.showSuccessDialog(context: context, message: response.message,autoClose: true,autoCloseDuration: const Duration(seconds: 2));
+    // await _handleLoginResult(context, response);
+  }
 
   Future<void> loginWithOtp(BuildContext context) async {
     updateViewState(loadingState: LoginScreenStates.transparentLoading);
     final body = LoginWithOtpBody(identifier: mobileNoOrEmailController.text);
     final response = await LoginRepository.loginWithOtp(body);
-    await _handleLoginResult(context, response);
-    
-    // Implement OTP login logic here
-    // if (validateOtpInputs()) {
-    //
-    // }
+    if (response.code != 'SUCCESS') {
+      mobileOrEmailError = '';
+      _handleLoginFailure(context, response.message);
+      return;
+    }
+    await _gotoOtpVerificationScreen(context);
+    // await _handleLoginResult(context, response);
   }
-
+  
+  Future<void> _gotoOtpVerificationScreen(BuildContext context) async {
+    updateViewState(loadingState: LoginScreenStates.defaultState);
+    if (context.mounted) {
+      context.push(Paths.otpVerify);
+    }
+  }
+  
   bool validateOtpInputs() {
     if (mobileNoOrEmailController.text.isEmpty) {
       mobileOrEmailError = 'Please enter your mobile number or email ID';

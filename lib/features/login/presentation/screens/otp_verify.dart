@@ -8,10 +8,8 @@ import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/login/presentation/providers/login_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 class OtpVerifyScreen extends ConsumerStatefulWidget {
   const OtpVerifyScreen({super.key});
@@ -29,16 +27,14 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
     provider = ref.read(loginProvider);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      provider.getInitialData();
       provider.initControllersListener();
-      provider.initOtpFields(length: 5);
+      provider.initOtpFields(length: 6);
     });
   }
 
   @override
   void dispose() {
     provider.disposeControllersListener();
-    // avoid notifying listeners while widget tree is unmounting
     provider.disposeOtpFields(notify: false);
     super.dispose();
   }
@@ -47,18 +43,18 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
   Widget build(BuildContext context) {
     provider = ref.watch(loginProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == LoginScreenStates.loading,
+      isLoading: provider.loaderState == LoginScreenStates.transparentLoading,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == LoginScreenStates.transparentLoading
+          child: provider.screenStates == LoginScreenStates.loading
               ? const Loading()
               : Column(
-            children: [
-              const UpperLayer(imagePath: AppImages.otp),
-              body(),
-            ],
-          ),
+                  children: [
+                    const UpperLayer(imagePath: AppImages.otp),
+                    body(),
+                  ],
+                ),
         ),
       ),
     );
@@ -72,16 +68,18 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
           spacing: 10,
           children: [
             loginDataField(),
+            const SizedBox(height: 10),
             Text(
               'Experiencing issues receiving the code?',
               style: TextStyle(
                   fontSize: TextSize.font14(context),
                   color: AppColors.textSecondaryLight,
-                  fontWeight: FontWeight.w400),
+                  fontWeight: FontWeight.w400,
+              ),
             ),
             InkWell(
               onTap: () {
-                // Handle resend code action
+                provider.resendOtp(context);
               },
               child: Text(
                 'Resend Code',
@@ -91,7 +89,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
                   fontWeight: FontWeight.w500,
                   decoration: TextDecoration.underline,
                   decorationColor: AppColors.textPrimaryLight,
-                  decorationThickness: 2,
+                  decorationThickness: 1,
                 ),
               ),
             ),
@@ -101,7 +99,6 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
       ),
     );
   }
-
 
   Widget loginDataField() {
     return Column(
@@ -115,8 +112,8 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
               children: List.generate(provider.otpControllers.length, (index) {
                 return Container(
                   margin: const EdgeInsets.symmetric(horizontal: 6),
-                  width: 52,
-                  height: 52,
+                  width: 42,
+                  height: 40,
                   child: TextField(
                     controller: provider.otpControllers[index],
                     focusNode: provider.otpFocusNodesController[index],
@@ -138,18 +135,14 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide:
-                        const BorderSide(color: AppColors.greyLight),
+                        borderSide: const BorderSide(color: AppColors.greyLight),
                       ),
                     ),
                     onChanged: (value) {
                       // Handle paste (multiple chars) and normal single char entry
                       if (value.length > 1) {
                         final chars = value.split('');
-                        for (var i = 0;
-                        i < chars.length &&
-                            (index + i) < provider.otpControllers.length;
-                        i++) {
+                        for (var i = 0; i < chars.length && (index + i) < provider.otpControllers.length; i++) {
                           provider.otpControllers[index + i].text = chars[i];
                         }
                         final next = index + chars.length;
@@ -186,11 +179,13 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle:  ButtonsStyle.activePrimaryButton,
+      buttonStyle: ButtonsStyle.activePrimaryButton,
       title: 'Done',
       onTap: () {
-        if(provider.forgotPassword) {
-          context.push(Paths.newPassword);
+        if (provider.forgotPassword) {
+          // context.push(Paths.newPassword);
+        } else {
+          provider.otpValidateForLogin(context);
         }
       },
     );
