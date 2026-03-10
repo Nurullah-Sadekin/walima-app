@@ -3,8 +3,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
+import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
+import 'package:flutter_boilerplate/features/login/data/models/otp_verify_body.dart';
+import 'package:flutter_boilerplate/features/login/data/repository/login_repository.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_otp_body.dart';
+import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_request_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/registration_repository.dart';
 import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/is_with_family_status_model.dart';
@@ -133,6 +137,109 @@ class RegistrationProvider extends BaseChangeNotifier {
     _notifyAndPersist();
   }
 
+  List<TextEditingController> otpControllers = [];
+  List<FocusNode> otpFocusNodesController = [];
+  
+  void initOtpFields({int length = 5}) {
+    disposeOtpFields();
+
+    otpControllers = List.generate(length, (_) => TextEditingController());
+    otpFocusNodesController = List.generate(length, (_) => FocusNode());
+
+    for (final c in otpControllers) {
+      _addListenerSafely(c, notifyListeners);
+    }
+
+    notifyListeners();
+  }
+  void _disposeSafely(ChangeNotifier notifier) {
+    try {
+      notifier.dispose();
+    } catch (_) {}
+  }
+
+  
+  void disposeOtpFields({bool notify = true}) {
+    for (final c in otpControllers) {
+      _disposeSafely(c);
+    }
+
+    for (final f in otpFocusNodesController) {
+      _disposeSafely(f);
+    }
+
+    otpControllers = [];
+    otpFocusNodesController = [];
+
+    if (notify) {
+      notifyListeners();
+    }
+  }
+  static const String _otpIncompleteMessage = 'Please enter the complete OTP';
+  
+/*  Future<bool> otpValidate(BuildContext context) async {
+    if (otpControllers.any((c) => c.text.isEmpty)) {
+      DialogUtils.showErrorDialog(
+        context: context,
+        message: _otpIncompleteMessage,
+      );
+      return false;
+    }
+
+    final otp = otpControllers.map((c) => c.text).join();
+    final body = OtVerifyBody(
+      identifier: selectedVerificationType == 'email' ? emailController.text : phoneController.text,
+      otpCode: otp,
+      purpose: 'signup',
+    );
+    final response = await LoginRepository.verifyOtp(body);
+    if (response.code != 'SUCCESS') {
+      return true;
+    }
+    else {
+      DialogUtils.showErrorDialog(
+        context: context,
+        message: response.message ?? 'OTP verification failed',
+      );
+      return false;
+    }
+  }*/
+  
+  final TextEditingController otpController = TextEditingController();
+  
+  String otpCode = '';
+  
+  Future<bool> resendOtp(BuildContext context) async {
+    otpCode = '';
+    otpController.clear();
+    for (var c in otpControllers) {
+      c.clear();
+    }
+    await signUpViaOtp(context);
+    notifyListeners();
+    return true;
+  }
+
+  void initControllersListener() {
+    if (_controllersListener != null) return;
+
+    _controllersListener = () => notifyListeners();
+
+    for (final controller in _managedControllers) {
+      _addListenerSafely(controller, _controllersListener!);
+    }
+  }
+
+  void disposeControllersListener() {
+    if (_controllersListener == null) return;
+
+    for (final controller in _managedControllers) {
+      _removeListenerSafely(controller, _controllersListener!);
+    }
+
+    _controllersListener = null;
+  }
+  
   void cleanAllValue() {
     _clearSelectedValues();
     _clearAllControllers();
@@ -369,30 +476,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   int selectedHobbiesCount() {
     return selectedHobbies.length;
   }
-
-  void initControllersListener() {
-    if (_controllersListener != null) return;
-
-    _controllersListener = () {
-      notifyListeners();
-      _scheduleDraftPersist();
-    };
-
-    for (final controller in _managedControllers) {
-      _addListenerSafely(controller, _controllersListener!);
-    }
-  }
-
-  void disposeControllersListener() {
-    if (_controllersListener == null) return;
-
-    for (final controller in _managedControllers) {
-      _removeListenerSafely(controller, _controllersListener!);
-    }
-
-    _controllersListener = null;
-  }
-
+  
   void _notifyAndPersist() {
     notifyListeners();
     _scheduleDraftPersist();
@@ -720,14 +804,65 @@ class RegistrationProvider extends BaseChangeNotifier {
     } catch (_) {}
   }
 
-  Future<void> submitRegistration() async {
-    // Simulate a delay for submitting registration data
-    await Future.delayed(const Duration(seconds: 2));
+  Future<bool> submitRegistration(BuildContext context) async {
+    if (otpControllers.any((c) => c.text.isEmpty)) {
+      DialogUtils.showErrorDialog(
+        context: context,
+        message: _otpIncompleteMessage,
+      );
+      return false;
+    }
+
+    final otp = otpControllers.map((c) => c.text).join();
+    final body = SignUpRequestBody(
+      profileManagedBy: 'self',
+      gender: 'male',
+      firstName: 'Nurullah',
+      lastName: 'Ansari',
+      religionName: 'islam',
+      community: 'Ansari',
+      livingIn: 'India',
+      cityName: 'Mumbai',
+      dateOfBirth: '1990-01-01',
+      email: emailController.text,
+      phoneNumber: phoneController.text,
+      residencyStatus: 'citizen',
+      maritalStatus: 'open_to_all',
+      height: 175,
+      diet: 'non_vegetarian',
+      highestLevelOfEducation: 'bachelor',
+      incomeRange: '2-4 LPA',
+      incomeRangeFrequency: 'yearly',
+      workWith: 'private',
+      workingAs: 'software engineer',
+      currentCompany: 'ABC Corp',
+      bio: 'Hello, I am Nurullah.',
+      termsAndConditionsAccepted: true,
+      verificationType: 'phone',
+      otpCode: otp,
+      liveWithFamily: selectedIsWithFamilyStatus?.toLowerCase() == 'yes',
+      displayName: '${firstNameController.text} ${lastNameController.text}',
+      purpose: 'signup',  
+      countryCode: 'IN',
+      locationType: 'permanent',
+    );
+    final response = await RegistrationRepository.signUpCreateUserProfile(body);
+    if (response.code == 'SUCCESS') {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   String phoneAvailabilityErrorMessage = '';
   String emailAvailabilityErrorMessage = '';
-
+  
+  
+  String _getProfileManagedBy() {
+    if (selectedProfileName == null) return 'self';
+    if (selectedProfileName!.toLowerCase() == 'self') return 'self';
+    return 'parent';
+  }
   Future<bool> checkEmailAndPhoneAvailability(BuildContext context) async {
     final emailRes =
         await RegistrationRepository.checkEmail(emailController.text);
@@ -763,21 +898,17 @@ class RegistrationProvider extends BaseChangeNotifier {
           : phoneController.text,
     );
     final response = await RegistrationRepository.signUpWithOTP(body);
-    // if (emailRes.response?.isAvailable == true && phoneRes.response?.isAvailable == true) {
-    //   phoneAvailabilityErrorMessage = '';
-    //   emailAvailabilityErrorMessage = '';
-    //   notifyListeners();
-    //   return true;
-    // } else {
-    //   if (emailRes.response?.isAvailable != true) {
-    //     emailAvailabilityErrorMessage = emailRes.message ?? 'Email already exists';
-    //   }
-    //   if (phoneRes.response?.isAvailable != true) {
-    //     phoneAvailabilityErrorMessage = phoneRes.message ?? 'Phone number already exists';
-    //   }
-    _notifyAndPersist();
-    return response.code == 'SUCCESS';
+    if (response.code == 'SUCCESS') {
+      verificationDone = true;
+      _notifyAndPersist();
+      return true;
+    } else {
+      DialogUtils.showErrorDialog(context: context, message: response.message ?? 'Failed to send OTP');
+      return false;
+    }
+    
   }
+  
 
   @override
   void dispose() {

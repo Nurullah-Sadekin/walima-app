@@ -11,6 +11,7 @@ import 'package:flutter_boilerplate/features/registration/presentation/providers
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
+import 'package:go_router/go_router.dart';
 
 class AboutYourselfScreen extends ConsumerStatefulWidget {
   const AboutYourselfScreen({super.key});
@@ -134,28 +135,30 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,
       title: 'Continue',
-      onTap: () async {
-        if (provider.aboutYourselfController.text.isNotEmpty && provider.selectedVerificationType.isNotEmpty) {
-          //transparent loading start
-          final screenNotifier = ref.read(emailPhoneScreenProvider);
-          screenNotifier.updateViewState(
-            loadingState: RegistrationScreenStates.isProfileFor,
-          );
-          await provider.signUpViaOtp(context).then((_) {
-            screenNotifier.updateViewState(
-              loadingState: RegistrationScreenStates.loadingComplete,
-            );
-            // context.pushNamed(RouteNames.registrationLocation);
-          });
-          // provider.signUpViaOtp().then((_) {
-          //   // context.pushNamed(RouteNames.registrationLocation);
-          // });
-
-          // screenNotifier.updateViewState(
-          //   loadingState: RegistrationScreenStates.loadingComplete,
-          // );
-        }
-      },
+      onTap: _handleContinue,
     );
+  }
+
+  Future<void> _handleContinue() async {
+    final screenProvider = ref.read(aboutYourselfScreenProvider);
+    if (provider.aboutYourselfController.text.isNotEmpty && provider.selectedVerificationType.isNotEmpty) {
+      screenProvider.updateViewState(
+        loadingState: RegistrationScreenStates.isProfileFor,
+      );
+      await provider.signUpViaOtp(context).then((success) {
+        if (success) {
+          screenProvider.updateViewState(
+            screenStates: RegistrationScreenStates.loadingComplete,
+          );
+          if (mounted) {
+            context.pushNamed(Routes.otpVerifyForSignUp);
+          }
+        } else {
+          screenProvider.updateViewState(
+            loadingState: RegistrationScreenStates.loadingComplete,
+          );
+        }
+      });
+    }
   }
 }

@@ -1,39 +1,42 @@
 import 'dart:convert';
+
 SignUpRequestBody signUpRequestBodyFromJson(String str) => SignUpRequestBody.fromJson(json.decode(str));
 String signUpRequestBodyToJson(SignUpRequestBody data) => json.encode(data.toJson());
+
 class SignUpRequestBody {
   SignUpRequestBody({
-      this.profileManagedBy, 
-      this.gender, 
-      this.firstName, 
-      this.lastName, 
-      this.displayName, 
-      this.motherTongue, 
-      this.dateOfBirth, 
-      this.religionName, 
-      this.community, 
-      this.livingIn, 
-      this.cityName, 
-      this.locationType, 
-      this.countryCode, 
-      this.liveWithFamily, 
-      this.residencyStatus, 
-      this.maritalStatus, 
-      this.height, 
-      this.diet, 
-      this.highestLevelOfEducation, 
-      this.incomeRange, 
-      this.incomeRangeFrequency, 
-      this.workWith, 
-      this.workingAs, 
-      this.currentCompany, 
-      this.bio, 
-      this.termsAndConditionsAccepted, 
-      this.verificationType, 
-      this.email, 
-      this.phoneNumber, 
-      this.otpCode, 
-      this.purpose,});
+    this.profileManagedBy,
+    this.gender,
+    this.firstName,
+    this.lastName,
+    this.displayName,
+    this.motherTongue,
+    this.dateOfBirth,
+    this.religionName,
+    this.community,
+    this.livingIn,
+    this.cityName,
+    this.locationType,
+    this.countryCode,
+    this.liveWithFamily,
+    this.residencyStatus,
+    this.maritalStatus,
+    this.height,
+    this.diet,
+    this.highestLevelOfEducation,
+    this.incomeRange,
+    this.incomeRangeFrequency,
+    this.workWith,
+    this.workingAs,
+    this.currentCompany,
+    this.bio,
+    this.termsAndConditionsAccepted,
+    this.verificationType,
+    this.email,
+    this.phoneNumber,
+    this.otpCode,
+    this.purpose,
+  });
 
   SignUpRequestBody.fromJson(dynamic json) {
     profileManagedBy = json['profileManagedBy'];
@@ -135,5 +138,4 @@ class SignUpRequestBody {
     map['purpose'] = purpose;
     return map;
   }
-
 }

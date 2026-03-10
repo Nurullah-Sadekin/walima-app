@@ -36,13 +36,11 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(emailPhoneScreenProvider);
     return TransparentLoading(
-      isLoading:
-          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: screenProvider.screenStates ==
-                  RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates == RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
@@ -85,9 +83,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
             imagePath: AppImages.emailSvgIcon,
             width: TextSize.font18(context),
             height: TextSize.font18(context),
-            color: provider.emailController.text.isNotEmpty
-                ? AppColors.textPrimaryLight
-                : AppColors.hintTextColor,
+            color: provider.emailController.text.isNotEmpty ? AppColors.textPrimaryLight : AppColors.hintTextColor,
           ),
           errorText: provider.emailAvailabilityErrorMessage,
           onTap: () {},
@@ -96,7 +92,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
           controller: provider.phoneController,
           headLine: 'Phone Number',
           keyboardType: TextInputType.phone,
-          hintText: '(555) 000-0000',
+          hintText: '+880168011685',
           errorText: provider.phoneAvailabilityErrorMessage,
           noPrefix: true,
           onTap: () {},
@@ -107,14 +103,12 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: provider.emailController.text.isNotEmpty &&
-              provider.phoneController.text.isNotEmpty
+      buttonStyle: provider.emailController.text.isNotEmpty && provider.phoneController.text.isNotEmpty
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () async {
-        if (provider.emailController.text.isEmpty ||
-            provider.phoneController.text.isEmpty) {
+        if (provider.emailController.text.isEmpty || provider.phoneController.text.isEmpty) {
           return;
         }
 

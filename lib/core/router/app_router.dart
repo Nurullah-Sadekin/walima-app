@@ -20,6 +20,7 @@ import 'package:flutter_boilerplate/features/registration/presentation/screens/h
 import 'package:flutter_boilerplate/features/registration/presentation/screens/photo_upload.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/profile_created_status.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/profile_is_for.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/verify_otp_for_sign_up.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/your_religion.dart';
 import 'package:flutter_boilerplate/features/settings/presentation/screens/settings_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -66,6 +67,12 @@ GoRouter goRouter(GoRouterRef ref) {
         path: Paths.otpVerify,
         name: Routes.otpVerify,
         builder: (context, state) => const OtpVerifyScreen(),
+      ),
+
+      GoRoute(
+        path: Paths.otpVerifyForSignUp,
+        name: Routes.otpVerifyForSignUp,
+        builder: (context, state) => const OtpVerifySignUpScreen(),
       ),
       GoRoute(
         path: Paths.newPassword,

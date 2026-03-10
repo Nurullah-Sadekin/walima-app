@@ -60,6 +60,12 @@ final aboutYourselfScreenProvider =
   return RegistrationScreenStateProvider();
 });
 
+final verifyOtpForSignUp =
+ChangeNotifierProvider<RegistrationScreenStateProvider>((ref) {
+  return RegistrationScreenStateProvider();
+});
+
+
 final verifyNumberScreenProvider =
     ChangeNotifierProvider<RegistrationScreenStateProvider>((ref) {
   return RegistrationScreenStateProvider();

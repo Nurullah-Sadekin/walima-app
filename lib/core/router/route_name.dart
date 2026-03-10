@@ -42,6 +42,7 @@ abstract class Paths {
 
   // Connect Matches & Purchase
   static const connectMatches = '/connectMatches';
+  static const otpVerifyForSignUp = '/otpVerifyForSignUp';
 
 
 }
@@ -89,5 +90,6 @@ abstract class Routes {
 
   // Connect Matches & Purchase
   static const connectMatches = 'connectMatches';
+  static const otpVerifyForSignUp = 'otpVerifyForSignUp';
 
 }
