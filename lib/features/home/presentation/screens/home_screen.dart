@@ -1,153 +1,266 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
+import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/connect_now_card.dart';
-import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
-import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
-import 'package:flutter_boilerplate/core/global/components/icon_text_row.dart';
-import 'package:flutter_boilerplate/core/global/components/package_card.dart';
-import 'package:flutter_boilerplate/core/global/components/preference_connect_card.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
-import 'package:flutter_boilerplate/core/global/components/profile_type_card.dart';
-import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:flutter_boilerplate/generated/l10n/app_localizations.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
 
-class HomeScreen extends ConsumerStatefulWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
-  bool _isSelected = false;
-
+class _HomeScreenState extends State<HomeScreen> {
+  final Key profileImageKey = const ValueKey('home_profile_image');
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-
     return Scaffold(
-      body: GradientBackground(
-        child: Column(
-          children: [
-            AppBar(
-              leading: const Icon(Icons.menu_sharp, color: AppColors.textPrimaryLight),
-              title: Text('My Walima',
-                  style: TextStyle(
-                      color: AppColors.textPrimaryLight,
-                      fontSize: TextSize.font18(context),
-                      fontWeight: FontWeight.w500)
-              ),
-              actions: [
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.notifications_none_rounded, color: AppColors.textPrimaryLight),
-                ),
-              ],
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-            ),
-            body(),
-          ],
-        ),
+      body: Column(
+        children: [
+          _headerSection(context),
+          _bodySection(),
+        ],
       ),
     );
   }
 
-  Widget body() {
+  Widget _headerSection(BuildContext context) {
+    return Stack(
+      children: [
+        const Positioned.fill(
+          child: ShowImage(
+            imagePath: AppImages.homeProfileBg,
+            fit: BoxFit.cover,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Column(
+            children: [
+              _topBar(context),
+              const SizedBox(height: 30),
+              _profileSummary(context),
+              const SizedBox(height: 16),
+              _headerActions(),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _topBar(BuildContext context) {
+    return AppBar(
+      leading: const Icon(Icons.menu_sharp, color: AppColors.textPrimaryLight),
+      title: Text(
+        'My Walima',
+        style: TextStyle(
+          color: AppColors.textPrimaryLight,
+          fontSize: TextSize.font18(context),
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      actions: [
+        IconButton(
+          onPressed: () {},
+          icon: const Icon(Icons.notifications_none_rounded,
+              color: AppColors.textPrimaryLight),
+        ),
+      ],
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+    );
+  }
+
+  Widget _profileSummary(BuildContext context) {
+    return SizedBox(
+      height: 100,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(3.0),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                child: const ShowImage(
+                  imagePath: AppImages.demoProfile,
+                  width: 97,
+                  height: 97,
+                  fit: BoxFit.cover,
+                  radius: BorderRadius.all(Radius.circular(50)),
+                ),
+              ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(4.0),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.white, width: 2),
+                  ),
+                  child: const Icon(
+                    Icons.edit_rounded,
+                    color: AppColors.white,
+                    size: 16,
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 0,
+                left: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(4.0),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.white, width: 2),
+                  ),
+                  child: const Icon(
+                    Icons.check_rounded,
+                    color: AppColors.white,
+                    size: 16,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(width: 12),
+          Expanded(child: _profileDetails(context)),
+        ],
+      ),
+    );
+  }
+
+  Widget _profileDetails(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Tahmina Rahman',
+            style: TextStyle(
+              color: AppColors.textPrimaryLight,
+              fontSize: TextSize.font20(context),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          _memberIdChip(context),
+          _subscriptionRow(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _memberIdChip(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(6.0),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text(
+            'ID : 1234567890',
+            style: TextStyle(
+              color: AppColors.textSecondaryLight,
+              fontSize: TextSize.font12(context),
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          const SizedBox(width: 4),
+          Icon(
+            Icons.copy_rounded,
+            color: AppColors.textSecondaryLight,
+            size: TextSize.font12(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _subscriptionRow(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+          decoration: BoxDecoration(
+            color: AppColors.primary,
+            borderRadius: BorderRadius.circular(4.0),
+          ),
+          child: Text(
+            'Gold',
+            style: TextStyle(
+              color: AppColors.white,
+              fontSize: TextSize.font10(context),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          'Expires: March 2026',
+          style: TextStyle(
+            color: AppColors.textSecondaryLight,
+            fontSize: TextSize.font14(context),
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _headerActions() {
+    return Row(
+      children: [
+        Expanded(
+          child: PrimaryButtons(
+            buttonStyle: ButtonsStyle.activeSecondaryButton,
+            onTap: () {},
+            title: 'Connect Now',
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: PrimaryButtons(
+            buttonStyle: ButtonsStyle.activeSecondaryButton,
+            onTap: () {},
+            title: 'Connect Now',
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _bodySection() {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal:20.0,vertical: 12.0),
-        child: Column(
-          children: [
-            IntrinsicHeight(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 16,
-                children: [
-                  const ShowImage(
-                    imagePath: AppImages.demoProfile,
-                    width: 100,
-                    height: 100,
-                    isCircle: true,
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text('Tahmina Rahman',
-                          style: TextStyle(
-                              color: AppColors.textPrimaryLight,
-                              fontSize: TextSize.font20(context),
-                              fontWeight: FontWeight.w600),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                        decoration: BoxDecoration(
-                          color: AppColors.white,
-                          borderRadius: BorderRadius.circular(6.0),
-                        ),
-                        child: Row(
-                          spacing: 4,
-                          children: [
-                            Text('ID : 1234567890',
-                                style: TextStyle(
-                                    color: AppColors.textSecondaryLight,
-                                    fontSize: TextSize.font12(context),
-                                    fontWeight: FontWeight.w400,),
-                            ),
-                            Icon(Icons.copy_rounded, color: AppColors.textSecondaryLight, size: TextSize.font12(context))
-                          ],
-                        ),
-                      ),
-                      Row(
-                        spacing: 8,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(4.0),
-                            ),
-                            child: Text('Gold',
-                              style: TextStyle(
-                                color: AppColors.white, fontSize: TextSize.font10(context),
-                                fontWeight: FontWeight.w600,),
-                            ),
-                          ),
-                          Text('Expires: March 2026',
-                            style: TextStyle(
-                              color: AppColors.textSecondaryLight,
-                              fontSize: TextSize.font14(context),
-                              fontWeight: FontWeight.w700,),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SingleChildScrollView(
-              child: ConnectNowCard(
-                imagePath: AppImages.demoProfile,
-                iconPath: AppImages.premiumSvgIcon,
-                isPremiumConnect: true,
-                name: 'Profile Name',
-                age: '28 Years',
-                height: '5 Feet 3 Inches',
-                location: 'Gulshan, Dhaka, BD',
-              ),
-            ),
-          ],
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+        child: const SingleChildScrollView(
+          child: ConnectNowCard(
+            imagePath: AppImages.demoProfile,
+            iconPath: AppImages.premiumSvgIcon,
+            isPremiumConnect: true,
+            name: 'Profile Name',
+            age: '28 Years',
+            height: '5 Feet 3 Inches',
+            location: 'Gulshan, Dhaka, BD',
+          ),
         ),
       ),
     );

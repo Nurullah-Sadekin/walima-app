@@ -1,13 +1,15 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shimmer/shimmer.dart';
 
-class ShowImage extends StatelessWidget {
+class ShowImage extends StatefulWidget {
 
   ///a [ShowImage] it can be used for showing any type of images
   /// it will shows the placeholder image if image is not found on network image
-  const ShowImage({super.key,
+  const ShowImage({
+    super.key,
     this.imagePath,
     this.errorImagePath,
     this.height,
@@ -19,9 +21,8 @@ class ShowImage extends StatelessWidget {
     this.radius,
     this.margin,
     this.border,
-    this.placeHolder = 'packages/sheba_pay_sdk/assets/images/image_not_found.png',
+    this.placeHolder = 'assets/pngs/no_image.png',
     this.placeHolderWidget,
-    this.isCircle = false,
   });
   final String? imagePath;
   final String? errorImagePath;
@@ -36,15 +37,19 @@ class ShowImage extends StatelessWidget {
   final BorderRadius? radius;
   final BoxBorder? border;
   final Widget? placeHolderWidget;
-  final bool isCircle;
 
+  @override
+  State<ShowImage> createState() => _ShowImageState();
+}
+
+class _ShowImageState extends State<ShowImage> {
   @override
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
-      child: alignment != null
+      child: widget.alignment != null
           ? Align(
-        alignment: alignment!,
+        alignment: widget.alignment!,
         child: _buildWidget(),
       )
           : _buildWidget(),
@@ -53,36 +58,19 @@ class ShowImage extends StatelessWidget {
 
   Widget _buildWidget() {
     return Padding(
-      padding: margin ?? EdgeInsets.zero,
+      padding: widget.margin ?? EdgeInsets.zero,
       child: InkWell(
-        onTap: onTap,
+        onTap: widget.onTap,
         child: _buildCircleImage(),
       ),
     );
   }
 
   ///build the image with border radius
-  _buildCircleImage() {
-    // If isCircle is true render a circular image (ignore radius in that case)
-    if (isCircle) {
-      if (border != null) {
-        // If border provided, apply circular BoxDecoration and clip image with ClipOval
-        return Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: border,
-          ),
-          child: ClipOval(child: _buildImageView()),
-        );
-      } else {
-        return ClipOval(child: _buildImageView());
-      }
-    }
-
-    // Default (non-circle) behavior: preserve existing rounded-rect logic
-    if (radius != null) {
+  Widget _buildCircleImage() {
+    if (widget.radius != null) {
       return ClipRRect(
-        borderRadius: radius ?? BorderRadius.zero,
+        borderRadius: widget.radius ?? BorderRadius.zero,
         child: _buildImageWithBorder(),
       );
     } else {
@@ -91,12 +79,12 @@ class ShowImage extends StatelessWidget {
   }
 
   ///build the image with border and border radius style
-  _buildImageWithBorder() {
-    if (border != null) {
+  Widget _buildImageWithBorder() {
+    if (widget.border != null) {
       return Container(
         decoration: BoxDecoration(
-          border: border,
-          borderRadius: radius,
+          border: widget.border,
+          borderRadius: widget.radius,
         ),
         child: _buildImageView(),
       );
@@ -106,37 +94,42 @@ class ShowImage extends StatelessWidget {
   }
 
   Widget _buildImageView() {
-    if (imagePath != null) {
-      switch (imagePath!.imageType) {
+    if (widget.imagePath != null) {
+      switch (widget.imagePath!.imageType) {
         case ImageType.svg:
           return SizedBox(
-            height: height,
-            width: width,
+            height: widget.height,
+            width: widget.width,
             child: SvgPicture.asset(
-              imagePath!,
-              height: height,
-              width: width,
-              fit: fit ?? BoxFit.contain,
-              colorFilter: color != null ? ColorFilter.mode(color!, BlendMode.srcIn) : null,
+              widget.imagePath!,
+              height: widget.height,
+              width: widget.width,
+              fit: widget.fit ?? BoxFit.contain,
+              // replaced deprecated 'color' with colorFilter for SvgPicture
+              colorFilter: widget.color != null ? ColorFilter.mode(widget.color!, BlendMode.srcIn) : null,
             ),
           );
         case ImageType.file:
           return Image.file(
-            File(imagePath!),
-            height: height,
-            width: width,
-            fit: fit ?? BoxFit.cover,
-            color: color,
+            File(widget.imagePath!),
+            height: widget.height,
+            width: widget.width,
+            fit: widget.fit ?? BoxFit.cover,
+            // use color + colorBlendMode for tinting (compatible)
+            color: widget.color,
+            colorBlendMode: widget.color != null ? BlendMode.srcIn : BlendMode.srcIn,
           );
         case ImageType.network:
           return ClipRRect(
             borderRadius: const BorderRadius.all(Radius.circular(2.5)),
             child: Image.network(
-              imagePath ?? "",
-              height: height,
-              width: width,
-              fit: fit ?? BoxFit.cover,
-              color: color,
+              widget.imagePath??'',
+              height: widget.height,
+              width: widget.width,
+              fit: widget.fit ?? BoxFit.cover,
+              // use color + colorBlendMode for tinting
+              color: widget.color,
+              colorBlendMode: widget.color != null ? BlendMode.srcIn : BlendMode.srcIn,
               loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
                 if (loadingProgress == null) {
                   return child;
@@ -144,25 +137,26 @@ class ShowImage extends StatelessWidget {
                   return Shimmer.fromColors(
                     baseColor: Colors.grey[300]!,
                     highlightColor: Colors.grey[100]!,
-                    child: Image.asset(
-                      "packages/sheba_pay_sdk/assets/images/profile_placeholder.png",
-                      fit: BoxFit.fill,
-                      height: height,
-                      width: width,
+                    child: Container(
+                      color: AppColors.primary,
+                      height: widget.height,
+                      width: widget.width,
                     ),
                   );
                 }
               },
               errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
                 return Center(
-                  child: errorImagePath != null
+                  child: widget.errorImagePath != null
                       ? Image.asset(
-                          errorImagePath!,
-                          height: height,
-                          width: width,
-                          fit: fit ?? BoxFit.cover,
-                          color: color,
-                        )
+                    widget.errorImagePath!,
+                    height: widget.height,
+                    width: widget.width,
+                    fit: widget.fit ?? BoxFit.cover,
+                    // use color + colorBlendMode for tinting
+                    color: widget.color,
+                    colorBlendMode: widget.color != null ? BlendMode.srcIn : BlendMode.srcIn,
+                  )
                       : const Icon(Icons.production_quantity_limits),
                 );
               },
@@ -171,37 +165,41 @@ class ShowImage extends StatelessWidget {
         case ImageType.png:
         default:
           return Image.asset(
-            imagePath!,
-            height: height,
-            width: width,
-            fit: fit ?? BoxFit.cover,
-            color: color,
+            widget.imagePath!,
+            height: widget.height,
+            width: widget.width,
+            fit: widget.fit ?? BoxFit.cover,
+            // use color + colorBlendMode for tinting
+            color: widget.color,
+            colorBlendMode: widget.color != null ? BlendMode.srcIn : BlendMode.srcIn,
           );
       }
     } else {
-      return placeHolderWidget == null
+      return widget.placeHolderWidget == null
           ? Image.asset(
-              placeHolder,
-              height: height,
-              width: width,
-              fit: fit ?? BoxFit.cover,
-              color: color,
-              errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                return ShowImage(imagePath: placeHolder, fit: BoxFit.contain, height: 16, width: 16);
-              },
-            )
-          : placeHolderWidget!;
+        widget.placeHolder,
+        height: widget.height,
+        width: widget.width,
+        fit: widget.fit ?? BoxFit.cover,
+        // use color + colorBlendMode for tinting
+        color: widget.color,
+        colorBlendMode: widget.color != null ? BlendMode.srcIn : BlendMode.srcIn,
+        errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+          return ShowImage(imagePath: widget.placeHolder, fit: BoxFit.contain, height: 16, width: 16);
+        },
+      )
+          : widget.placeHolderWidget!;
     }
   }
 }
 
 extension ImageTypeExtension on String {
   ImageType get imageType {
-    if (this.startsWith('http') || this.startsWith('https')) {
+    if (startsWith('http') || startsWith('https')) {
       return ImageType.network;
-    } else if (this.endsWith('.svg')) {
+    } else if (endsWith('.svg')) {
       return ImageType.svg;
-    } else if (this.startsWith('file://')) {
+    } else if (startsWith('file://')) {
       return ImageType.file;
     } else {
       return ImageType.png;
