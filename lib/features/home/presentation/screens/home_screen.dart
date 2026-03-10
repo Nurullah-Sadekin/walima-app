@@ -237,13 +237,13 @@ class _HomeScreenState extends State<HomeScreen> {
             svgIconPath: AppImages.premiumSvgIcon,
             iconLeftPosition: false,
             onTap: () async {
-              await DialogUtils.showInfoDialog(
-                  context: context,
+              await DialogUtils.showErrorDialog(
                   message:
                       'Purchase done! Instant alerts for matches and profile views are now enabled.',
                   title: 'Subscription Done',
                   autoClose: true,
-                  autoCloseDuration: const Duration(seconds: 2));
+                  autoCloseDuration: const Duration(seconds: 2),
+                  context: context,);
             },
             title: 'Renew Plan',
           ),

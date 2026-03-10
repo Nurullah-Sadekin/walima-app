@@ -65,7 +65,7 @@ class DialogUtils {
   }
 
   static Future<void> showErrorDialog({
-    required BuildContext ctx,
+    required BuildContext context,
     String title = 'Error',
     String? message,
     String buttonText = 'Try again',
@@ -84,7 +84,7 @@ class DialogUtils {
 
     // Start the dialog and keep its future
     final dialogFuture = showDialog(
-      context: ctx,
+      context: context,
       useRootNavigator: true,
       barrierDismissible: !autoClose,
       builder: (dialogContext) {
