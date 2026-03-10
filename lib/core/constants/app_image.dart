@@ -46,6 +46,10 @@ class AppImages {
   static const String userLoveSvgIcon = 'assets/svgIcons/user_love.svg';
   static const String bubbleChatSvgIcon = 'assets/svgIcons/bubble_chat.svg';
   static const String chatSvgIcon = 'assets/svgIcons/chat.svg';
+  static const String cameraSvgIcon = 'assets/svgIcons/camera.svg';
+  static const String editProfileSvgIcon = 'assets/svgIcons/edit_profile.svg';
+  static const String menuSvgIcon = 'assets/svgIcons/menu.svg';
+  static const String notificationSvgIcon = 'assets/svgIcons/notification.svg';
 
 
 
@@ -69,7 +73,10 @@ class AppImages {
   static const String otp = 'assets/svgs/otp.svg';
   static const String password = 'assets/svgs/password.svg';
   static const String forgotPassword = 'assets/svgs/forgotPassword.svg';
-  
+  static const String verifyContact = 'assets/svgs/verify_contact.svg';
+
+
+  // Navigation icons
   static const String home = 'assets/nav_icons/home.svg';
   static const String matches = 'assets/nav_icons/matches.svg';
   static const String inbox = 'assets/nav_icons/inbox.svg';
