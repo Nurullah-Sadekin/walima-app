@@ -74,6 +74,8 @@ class AppImages {
   static const String password = 'assets/svgs/password.svg';
   static const String forgotPassword = 'assets/svgs/forgotPassword.svg';
   static const String verifyContact = 'assets/svgs/verify_contact.svg';
+  static const String successfulStatus = 'assets/svgs/successful_status.svg';
+  static const String alertStatus = 'assets/svgs/alert_status.svg';
 
 
   // Navigation icons

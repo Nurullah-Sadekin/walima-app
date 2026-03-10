@@ -5,6 +5,7 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/connect_now_card.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
+import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/verification_tile.dart';
@@ -87,7 +88,6 @@ class _HomeScreenState extends State<HomeScreen> {
           height: 20,
           width: 20,
         ),
-
       ],
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -109,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
             topPositionImagePath: AppImages.verifiedBadgeSvgIcon,
             bottomPositionImagePath: AppImages.cameraSvgIcon,
             onBottomPressed: () {
-             // print('Check pressed');
+              // print('Check pressed');
             },
           ),
           const SizedBox(width: 12),
@@ -215,7 +215,16 @@ class _HomeScreenState extends State<HomeScreen> {
             svgIconPath: AppImages.editProfileSvgIcon,
             svgIconColor: AppColors.textSecondaryLight,
             iconLeftPosition: false,
-            onTap: () {},
+            onTap: () async {
+              await DialogUtils.showSuccessDialog(
+                  context: context,
+                  message:
+                      'Purchase done! Instant alerts for matches and profile views are now enabled.',
+                  title: 'Subscription Done',
+                  buttonText: 'Done',
+                  autoClose: true,
+                  autoCloseDuration: const Duration(seconds: 2));
+            },
             title: 'Edit Profile',
           ),
         ),
@@ -227,7 +236,15 @@ class _HomeScreenState extends State<HomeScreen> {
             bgColor: AppColors.primary,
             svgIconPath: AppImages.premiumSvgIcon,
             iconLeftPosition: false,
-            onTap: () {},
+            onTap: () async {
+              await DialogUtils.showInfoDialog(
+                  context: context,
+                  message:
+                      'Purchase done! Instant alerts for matches and profile views are now enabled.',
+                  title: 'Subscription Done',
+                  autoClose: true,
+                  autoCloseDuration: const Duration(seconds: 2));
+            },
             title: 'Renew Plan',
           ),
         ),
@@ -250,7 +267,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _completeProfileStatus() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0,vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -280,14 +297,15 @@ class _HomeScreenState extends State<HomeScreen> {
             statusBackgroundColor: AppColors.primaryVariant,
           ),
           const SizedBox(height: 10),
-           VerificationTile(
+          VerificationTile(
             iconImagePath: AppImages.verifyContact,
             title: 'Verify Phone Number',
             statusText: 'Verified',
             statusColor: AppColors.success,
-            statusBackgroundColor: Colors.green.withOpacity(0.1,),
+            statusBackgroundColor: Colors.green.withOpacity(
+              0.1,
+            ),
           ),
-
         ],
       ),
     );
@@ -295,12 +313,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _premiumMatches() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0,vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-           Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
@@ -326,7 +344,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 10.0, vertical: 10.0),
                 decoration: BoxDecoration(
                   color: AppColors.white,
                   borderRadius: BorderRadius.circular(8.0),
@@ -343,12 +362,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     const SizedBox(width: 4),
-                    Icon(Icons.arrow_forward_ios_rounded,color: AppColors.textSecondaryLight,size: TextSize.font12(context),)
+                    Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      color: AppColors.textSecondaryLight,
+                      size: TextSize.font12(context),
+                    )
                   ],
                 ),
               ),
             ],
-           ),
+          ),
           const SizedBox(height: 12),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),

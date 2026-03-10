@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/config/text_responsive.dart';
+import 'package:flutter_boilerplate/core/constants/app_colors.dart';
+import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
+import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 
 class DialogUtils {
   static Future<void> showSuccessDialog({
@@ -7,9 +12,13 @@ class DialogUtils {
     String? message,
     String buttonText = 'View order',
     bool autoClose = true,
+    String? imagePath,
     Duration autoCloseDuration = const Duration(seconds: 2),
     VoidCallback? onClose,
     VoidCallback? onButtonPressed,
+    String? disableButtonText,
+    bool isDisableButton = false,
+    VoidCallback? onDisableButtonPressed,
   }) async {
     bool dismissed = false;
     void safeClose() {
@@ -24,14 +33,19 @@ class DialogUtils {
     await showDialog(
       context: context,
       barrierDismissible: !autoClose,
-      builder: (context) => statusDialog(
+      builder: (context) => statusDialogs(
         context: context,
         isSuccess: true,
+        imagePath: imagePath,
         title: title,
-        message: message ?? 'Your payment went through.\nYou’ll receive a confirmation shortly.',
-        buttonText: autoClose ? null : buttonText,
+        message: message ?? 'Purchase done! Instant alerts for matches\nand profile views are now enabled.',
+        buttonText: buttonText, // Always show button now
         onButtonPressed: onButtonPressed ?? safeClose,
         onClose: safeClose,
+        showIcon: true,
+       disableButtonText: disableButtonText,
+        isDisableButton: isDisableButton,
+        onDisableButtonPressed: onDisableButtonPressed,
       ),
     );
 
@@ -52,7 +66,11 @@ class DialogUtils {
     Duration autoCloseDuration = const Duration(seconds: 2),
     VoidCallback? onClose,
     bool hideCloseButton = false,
+    String? imagePath,
     VoidCallback? onButtonPressed,
+    String? disableButtonText,
+    bool isDisableButton = false,
+    VoidCallback? onDisableButtonPressed,
   }) async {
     bool dismissed = false;
     void safeClose() {
@@ -68,15 +86,19 @@ class DialogUtils {
     final dialogFuture = showDialog(
       context: ctx,
       barrierDismissible: !autoClose,
-      builder: (context) => statusDialog(
-        isSuccess: false,
-        hideButton: hideCloseButton,
+      builder: (context) => statusDialogs(
         context: context,
+        isSuccess: true,
+        imagePath: imagePath,
         title: title,
-        message: message ?? '',
-        buttonText: autoClose ? null : buttonText,
+        message: message ?? 'Purchase done! Instant alerts for matches\nand profile views are now enabled.',
+        buttonText: buttonText, // Always show button now
         onButtonPressed: onButtonPressed ?? safeClose,
         onClose: safeClose,
+        showIcon: true,
+        disableButtonText: disableButtonText,
+        isDisableButton: isDisableButton,
+        onDisableButtonPressed: onDisableButtonPressed,
       ),
     );
 
@@ -97,24 +119,41 @@ class DialogUtils {
     required BuildContext context,
     required String title,
     String? message,
-    String? buttonText,
+    String? buttonText =' Enable Now',
     bool autoClose = false,
     Duration autoCloseDuration = const Duration(seconds: 2),
     VoidCallback? onClose,
     VoidCallback? onButtonPressed,
+    String? imagePath = AppImages.alertStatus,
+    String? disableButtonText ='Remind Me Later',
+    bool isDisableButton = true,
+    VoidCallback? onDisableButtonPressed,
   }) async {
+    bool dismissed = false;
+    void safeClose() {
+      if (dismissed) return;
+      dismissed = true;
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      if (onClose != null) onClose();
+    }
     await showDialog(
       context: context,
       barrierDismissible: !autoClose,
-      builder: (context) => _infoDialog(
+      builder: (context) => statusDialogs(
+        context: context,
+        isSuccess: true,
+        imagePath: imagePath,
         title: title,
-        message: message ?? '',
-        buttonText: autoClose ? null : buttonText,
-        onClose: () {
-          Navigator.of(context).pop();
-          if (onClose != null) onClose();
-        },
-        onButtonPressed: onButtonPressed,
+        message: message ?? 'Purchase done! Instant alerts for matches\nand profile views are now enabled.',
+        buttonText: buttonText, // Always show button now
+        onButtonPressed: onButtonPressed ?? safeClose,
+        onClose: safeClose,
+        showIcon: true,
+        disableButtonText: disableButtonText,
+        isDisableButton: isDisableButton,
+        onDisableButtonPressed: onDisableButtonPressed,
       ),
     );
     if (onClose != null) onClose();
@@ -126,130 +165,82 @@ class DialogUtils {
     }
   }
 
-  static Widget statusDialog({
+
+  static Widget statusDialogs({
+    required BuildContext context,
     required bool isSuccess,
     required String title,
     required String message,
-    required String? buttonText,
-    required VoidCallback onButtonPressed,
-    required VoidCallback onClose,
-    required BuildContext context,
-    bool hideButton = false,
+    String? buttonText,
+    String? imagePath,
+    VoidCallback? onButtonPressed,
+    VoidCallback? onClose,
+    bool showIcon = true,
+    String? disableButtonText,
+    bool isDisableButton = false,
+    VoidCallback? onDisableButtonPressed,
   }) {
-    final accent = isSuccess ? const Color(0xFF2EE34B) : const Color(0xFFE13B3B);
-    final accentDark = isSuccess ? const Color(0xFF0B4F16) : const Color(0xFF5B1414);
-    final icon = isSuccess ? Icons.check : Icons.close;
-
     return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 32),
-      child: Stack(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: const Color(0xFF151515),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: accent.withOpacity(0.5), width: 1),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black54,
-                  blurRadius: 24,
-                  offset: Offset(0, 16),
-                ),
-              ],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 20,
+          children: [
+            ShowImage(
+              imagePath: imagePath ??AppImages.successfulStatus,
+              width: 80,
+              height: 80,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 110,
-                  height: 110,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        accent.withOpacity(0.9),
-                        accentDark.withOpacity(0.9),
-                        Colors.transparent,
-                      ],
-                      stops: const [0.2, 0.6, 1],
-                    ),
-                  ),
-                  child: Center(
-                    child: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: accent,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(icon, color: Colors.black, size: 26),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    letterSpacing: 0.3,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        message,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
-                          fontSize: 12,
-                          height: 1.4,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                if (buttonText != null) ...[
-                  const SizedBox(height: 18),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: accent.withOpacity(0.6)),
-                        foregroundColor: isSuccess ? accent : Colors.white70,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                      ),
-                      onPressed: onButtonPressed,
-                      child: Text(buttonText),
-                    ),
+            Text(
+              title,
+              maxLines: 1,
+              textHeightBehavior: const TextHeightBehavior(
+                applyHeightToFirstAscent: false,
+                applyHeightToLastDescent: false,
+              ),
+              style: TextStyle(
+                fontSize: TextSize.font20(context),
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimaryLight,
+              ),
+            ),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: TextSize.font14(context),
+                fontWeight: FontWeight.w400,
+                color: AppColors.textSecondaryLight,
+              ),
+            ),
+            if (buttonText != null) ...[
+              PrimaryButtons(
+                buttonStyle: ButtonsStyle.activePrimaryButton,
+                onTap: onButtonPressed ?? () {},
+                title: buttonText,
+              ),
+              if(isDisableButton)
+              Column(
+                children: [
+                  const SizedBox(height: 8),
+                  PrimaryButtons(
+                    buttonStyle: ButtonsStyle.disableButton,
+                    onTap: onDisableButtonPressed ?? () {},
+                    title: disableButtonText,
                   ),
                 ],
-              ],
-            ),
-          ),
-          hideButton
-              ? const SizedBox.shrink()
-              : Positioned(
-                  right: 0,
-                  top: 0,
-                  child: IconButton(
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-                    icon: const Icon(Icons.close, color: Colors.white, size: 22),
-                    onPressed: onClose,
-                  ),
-                ),
-        ],
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -274,7 +265,8 @@ class DialogUtils {
             decoration: BoxDecoration(
               color: const Color(0xFF151515),
               borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: accent.withOpacity(0.45), width: 1),
+              border: Border.all(
+                  color: accent.withAlpha((0.45 * 255).round()), width: 1),
               boxShadow: const [
                 BoxShadow(
                   color: Colors.black54,
@@ -293,8 +285,8 @@ class DialogUtils {
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        accent.withOpacity(0.85),
-                        accentDark.withOpacity(0.9),
+                        accent.withAlpha((0.85 * 255).round()),
+                        accentDark.withAlpha((0.9 * 255).round()),
                         Colors.transparent,
                       ],
                       stops: const [0.2, 0.6, 1],
@@ -308,7 +300,8 @@ class DialogUtils {
                         color: accent,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.info, color: Colors.white, size: 26),
+                      child:
+                          const Icon(Icons.info, color: Colors.white, size: 26),
                     ),
                   ),
                 ),
@@ -328,7 +321,7 @@ class DialogUtils {
                   message,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withAlpha((0.7 * 255).round()),
                     fontSize: 12,
                     height: 1.4,
                   ),
@@ -340,7 +333,8 @@ class DialogUtils {
                     height: 44,
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: accent.withOpacity(0.6)),
+                        side: BorderSide(
+                            color: accent.withAlpha((0.6 * 255).round())),
                         foregroundColor: Colors.white70,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
@@ -368,9 +362,8 @@ class DialogUtils {
       ),
     );
   }
-  
-  
- static Future<bool> showAppCloseDiaLog(BuildContext context)async{
+
+  static Future<bool> showAppCloseDiaLog(BuildContext context) async {
     // Show a confirmation dialog when the user tries to close the app
     final shouldClose = await showDialog<bool>(
       context: context,
@@ -389,6 +382,7 @@ class DialogUtils {
         ],
       ),
     );
-    return shouldClose ?? false; // Return false if dialog is dismissed without selection
- }
+    return shouldClose ??
+        false; // Return false if dialog is dismissed without selection
+  }
 }
