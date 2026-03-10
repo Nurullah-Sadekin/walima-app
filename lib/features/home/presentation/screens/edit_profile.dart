@@ -2,15 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/connect_now_card.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
-import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
-import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
-import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/social_media_icon.dart';
-import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/verification_tile.dart';
+import 'package:flutter_boilerplate/features/home/presentation/widgets/profile_info_card.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -155,6 +149,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Column(
+            spacing: 12,
             children: [
               _aboutMyself(),
               _basicDetails(),
@@ -166,228 +161,38 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Widget _aboutMyself() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: AppColors.greyLight),
-      ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'About Yourself',
-                  style: TextStyle(
-                    color: AppColors.textPrimaryLight,
-                    fontSize: TextSize.font14(context),
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(color: AppColors.greyLight),
-                  ),
-                  child: Row(
-                    spacing: 4,
-                    children: [
-                      ShowImage(
-                        imagePath: AppImages.editWrite,
-                        width: TextSize.font16(context),
-                        height: TextSize.font16(context),
-                        color: AppColors.primary,
-                      ),
-                      Text(
-                        'Edit',
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontSize: TextSize.font14(context),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ),
-          const Divider(height: 1, color: AppColors.greyLight),
-          Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Text(
-                    'I have obtained my Masters in Management. I\'ve been an active student throughout my academic years. I am self-employed and handle my own business.A kind heart and a bright smile would be an apt way to describe me. I am seeking a simple and loving partner who will support me in every phase of life. Thank you for expressing interest in my profile.',
-                    style: TextStyle(
-                      color: AppColors.textSecondaryLight,
-                      fontSize: TextSize.font14(context),
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
+    return ProfileInfoCard(
+      title: 'About Yourself',
+      showEdit: true,
+      onEdit: () {
+      },
+      child: Text(
+        'I have obtained my Masters in Management. I\'ve been an active student throughout my academic years. I am self-employed and handle my own business.A kind heart and a bright smile would be an apt way to describe me. I am seeking a simple and loving partner who will support me in every phase of life. Thank you for expressing interest in my profile.',
+        style: TextStyle(
+          color: AppColors.textSecondaryLight,
+          fontSize: TextSize.font14(context),
+          fontWeight: FontWeight.w400,
+        ),
       ),
     );
   }
 
   Widget _basicDetails() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: AppColors.greyLight),
-      ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Basic Details',
-                  style: TextStyle(
-                    color: AppColors.textPrimaryLight,
-                    fontSize: TextSize.font14(context),
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(color: AppColors.greyLight),
-                  ),
-                  child: Row(
-                    spacing: 4,
-                    children: [
-                      ShowImage(
-                        imagePath: AppImages.editWrite,
-                        width: TextSize.font16(context),
-                        height: TextSize.font16(context),
-                        color: AppColors.primary,
-                      ),
-                      Text(
-                        'Edit',
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontSize: TextSize.font14(context),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ),
-          const Divider(height: 1, color: AppColors.greyLight),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
-            child: Column(
-              spacing: 6,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                   Expanded(
-                     flex: 3,
-                     child: Text(
-                        'Age:',
-                        style: TextStyle(
-                          color: AppColors.textSecondaryLight,
-                          fontSize: TextSize.font12(context),
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                   ),
-                    Expanded(
-                      flex: 4,
-                      child: Text(
-                        '33',
-                        style: TextStyle(
-                          color: AppColors.textPrimaryLight,
-                          fontSize: TextSize.font12(context),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                   Expanded(
-                     flex: 3,
-                     child: Text(
-                        'Date of Birth:',
-                        style: TextStyle(
-                          color: AppColors.textSecondaryLight,
-                          fontSize: TextSize.font12(context),
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                   ),
-                    Expanded(
-                      flex: 4,
-                      child: Text(
-                        '07-Aug-1992',
-                        style: TextStyle(
-                          color: AppColors.textPrimaryLight,
-                          fontSize: TextSize.font12(context),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                   Expanded(
-                     flex: 3,
-                     child: Text(
-                        'Marital Status:',
-                        style: TextStyle(
-                          color: AppColors.textSecondaryLight,
-                          fontSize: TextSize.font12(context),
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                   ),
-                    Expanded(
-                      flex: 4,
-                      child: Text(
-                        'Never Married',
-                        style: TextStyle(
-                          color: AppColors.textPrimaryLight,
-                          fontSize: TextSize.font12(context),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
+    return ProfileInfoCard(
+      title: 'Basic Details',
+      showEdit: true,
+      onEdit: () {},
+      infoList: const [
+        MapEntry('Age', '33'),
+        MapEntry('Date of Birth', '07-Aug-1992'),
+        MapEntry('Marital Status', 'Never Married'),
+        MapEntry('Height', '5\' 3"(167cm) '),
+        MapEntry('Grew up in', 'Bangladesh'),
+        MapEntry('Diet', 'Non-Veg'),
+        MapEntry('Blood Group', 'B Positive (B+)'),
+        MapEntry('Health Information', 'Not Specified'),
+        MapEntry('Disability', 'None'),
+      ],
     );
   }
 }
