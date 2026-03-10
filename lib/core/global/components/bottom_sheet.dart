@@ -45,6 +45,20 @@ class BottomSheetUtils {
                   mainAxisSize: MainAxisSize.min, // Important: minimizes height
                   children: [
                     // Header section with drag handle
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 4,
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.black26,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      ],
+                    ),
                     _buildHeader(context, header),
                     // Items list - no Expanded, use Flexible with fit
                     Flexible(
@@ -77,18 +91,20 @@ class BottomSheetUtils {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Drag handle for better UX
-          Container(
-            width: 40,
-            height: 4,
-            decoration: const BoxDecoration(
-              color: Colors.transparent,
-            ),
-          ),
-          Text(
-            header,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+          // Container(
+          //   width: 40,
+          //   height: 4,
+          //   decoration: const BoxDecoration(
+          //     color: Colors.transparent,
+          //   ),
+          // ),
+          Expanded(
+            child: Text(
+              header,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
           // Close button
