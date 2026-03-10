@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/features/home/presentation/screens/edit_profile.dart';
 import 'package:flutter_boilerplate/features/login/presentation/screens/new_password.dart';
 import 'package:flutter_boilerplate/features/login/presentation/screens/otp_verify.dart';
 import 'package:flutter_boilerplate/features/login/presentation/screens/reset_pssword_status.dart';
@@ -209,6 +210,11 @@ GoRouter goRouter(GoRouterRef ref) {
         path: Paths.connectMatches,
         name: Routes.connectMatches,
         builder: (context, state) => const ConnectMatches(),
+      ),
+      GoRoute(
+        path: Paths.editProfile,
+        name: Routes.editProfile,
+        builder: (context, state) => const EditProfileScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

@@ -6,6 +6,7 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomBackAppBar({
     super.key,
     this.backgroundColor = Colors.transparent,
+    this.backIconBackground,
     this.elevation = 0,
     this.iconColor,
     this.iconSize,
@@ -20,6 +21,7 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.backCancelMood = false,
   });
   final Color? backgroundColor;
+  final Color? backIconBackground;
   final double? elevation;
   final Color? iconColor;
   final double? iconSize;
@@ -44,13 +46,18 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
         surfaceTintColor: Colors.transparent,
         scrolledUnderElevation: 0.0,
         title: title,
+        titleTextStyle: TextStyle(
+          fontSize: TextSize.font18(context),
+          color: AppColors.textPrimaryLight,
+          fontWeight: FontWeight.w500,
+        ),
         leading: isBackButton ? Padding(
           padding: EdgeInsets.all(leadingPadding ?? 12.0),
           child: Material(
             color: Colors.transparent,
             child: Ink(
-              decoration: const BoxDecoration(
-                color: AppColors.white,
+              decoration: BoxDecoration(
+                color: backIconBackground ?? AppColors.white,
                 shape: BoxShape.circle,
               ),
               child: InkWell(

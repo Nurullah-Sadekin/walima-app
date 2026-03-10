@@ -5,11 +5,13 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/connect_now_card.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/social_media_icon.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/verification_tile.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -217,15 +219,8 @@ class _HomeScreenState extends State<HomeScreen> {
             svgIconPath: AppImages.editProfileSvgIcon,
             svgIconColor: AppColors.textSecondaryLight,
             iconLeftPosition: false,
-            onTap: () async {
-              await DialogUtils.showSuccessDialog(
-                  context: context,
-                  message:
-                      'Purchase done! Instant alerts for matches and profile views are now enabled.',
-                  title: 'Subscription Done',
-                  buttonText: 'Done',
-                  autoClose: true,
-                  autoCloseDuration: const Duration(seconds: 2));
+            onTap: ()  {
+              context.push(Paths.editProfile);
             },
             title: 'Edit Profile',
           ),
@@ -238,15 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
             bgColor: AppColors.primary,
             svgIconPath: AppImages.premiumSvgIcon,
             iconLeftPosition: false,
-            onTap: () async {
-              await DialogUtils.showErrorDialog(
-                message:
-                    'Purchase done! Instant alerts for matches and profile views are now enabled.',
-                title: 'Subscription Done',
-                autoClose: true,
-                autoCloseDuration: const Duration(seconds: 2),
-                context: context,
-              );
+            onTap: ()  {
             },
             title: 'Renew Plan',
           ),

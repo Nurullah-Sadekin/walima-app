@@ -45,6 +45,11 @@ abstract class Paths {
   static const otpVerifyForSignUp = '/otpVerifyForSignUp';
 
 
+  // Home Screens
+  static const editProfile = '/editProfile';
+
+
+
 }
 
 abstract class Routes {
@@ -91,5 +96,8 @@ abstract class Routes {
   // Connect Matches & Purchase
   static const connectMatches = 'connectMatches';
   static const otpVerifyForSignUp = 'otpVerifyForSignUp';
+
+  // Home Screens
+  static const editProfile = 'editProfile';
 
 }

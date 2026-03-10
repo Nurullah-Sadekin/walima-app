@@ -33,6 +33,7 @@ class AppImages {
   static const String verifiedBadgeSvgIcon = 'assets/svgIcons/verified_badge.svg';
   static const String editSvgIcon = 'assets/svgIcons/edit.svg';
   static const String logOutSvgIcon = 'assets/svgIcons/Log Out.svg';
+  static const String editWrite = 'assets/svgIcons/editWrite.svg';
 
   // Social media icons
   static const String facebookIcon = 'assets/svgIcons/facebook.svg';
