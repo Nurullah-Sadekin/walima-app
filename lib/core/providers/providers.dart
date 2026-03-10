@@ -1,3 +1,4 @@
+import 'package:flutter_boilerplate/features/drawer/presentation/providers/app_drawer_provider.dart';
 import 'package:flutter_boilerplate/features/home/presentation/providers/home_provider.dart';
 import 'package:flutter_boilerplate/features/login/presentation/providers/login_provider.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/providers/recommended_preferences_provider.dart';
@@ -18,5 +19,9 @@ final recommendedPreferencesProvider = ChangeNotifierProvider<RecommendedPrefere
 
 final homeProvider = ChangeNotifierProvider<HomeProvider>((ref) {
   return HomeProvider();
+});
+
+final drawerProvider = ChangeNotifierProvider<DrawerProvider>((ref) {
+  return DrawerProvider();
 });
 
