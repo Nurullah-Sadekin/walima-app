@@ -42,19 +42,17 @@ class _SendOtpScreenState extends ConsumerState<SendOtpScreen> {
   Widget build(BuildContext context) {
     provider = ref.watch(loginProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == LoginScreenStates.loading,
+      isLoading: provider.loaderState == LoginScreenStates.transparentLoading,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == LoginScreenStates.transparentLoading
+          child: provider.screenStates == LoginScreenStates.loading
               ? const Loading()
               : Column(
                   children: [
                     UpperLayer(
-                        imagePath: provider.forgotPassword
-                            ? AppImages.forgotPassword
-                            : AppImages.login,
-                        backCancelMood: provider.forgotPassword,
+                      imagePath: provider.forgotPassword ? AppImages.forgotPassword : AppImages.login,
+                      backCancelMood: provider.forgotPassword,
                     ),
                     body(),
                   ],
@@ -88,8 +86,8 @@ class _SendOtpScreenState extends ConsumerState<SendOtpScreen> {
           headLine: 'Mobile No. / Email ID',
           hintText: 'Write here',
           noPrefix: true,
-          errorText: null,
-          onTap: () {},
+          errorText: provider.mobileOrEmailError,
+          onTap: null,
         ),
       ],
     );
@@ -100,7 +98,7 @@ class _SendOtpScreenState extends ConsumerState<SendOtpScreen> {
       buttonStyle: ButtonsStyle.activePrimaryButton,
       title: 'Send OTP',
       onTap: () {
-        context.push(Paths.otpVerify);
+        provider.loginWithOtp(context);
       },
     );
   }

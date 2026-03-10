@@ -4,6 +4,8 @@ import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/validators.dart';
 import 'package:flutter_boilerplate/features/login/data/models/login_body.dart';
+import 'package:flutter_boilerplate/features/login/data/models/login_response.dart';
+import 'package:flutter_boilerplate/features/login/data/models/login_with_otp_body.dart';
 import 'package:flutter_boilerplate/features/login/data/repository/login_repository.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,7 +28,6 @@ class LoginProvider extends BaseChangeNotifier {
   final TextEditingController confirmPasswordController = TextEditingController();
   String mobileOrEmailError = '';
   String passwordError = '';
-  // OTP controllers and focus nodes (for multi-digit OTP fields)
   List<TextEditingController> otpControllers = [];
   List<FocusNode> otpFocusNodesController = [];
 
@@ -124,62 +125,163 @@ class LoginProvider extends BaseChangeNotifier {
   }
 
   Future<void> login(BuildContext context) async {
+    _setRequiredFieldErrors();
+    final canSubmit = _validateInputsForSubmit();
+    updateViewState();
+    if (!canSubmit) {
+      return;
+    }
+
+    updateViewState(loadingState: LoginScreenStates.transparentLoading);
+    final response = await _performLoginRequest();
+    await _handleLoginResult(context, response);
+  }
+
+  Future<void> loginWithOtp(BuildContext context) async {
+    updateViewState(loadingState: LoginScreenStates.transparentLoading);
+    final body = LoginWithOtpBody(identifier: mobileNoOrEmailController.text);
+    final response = await LoginRepository.loginWithOtp(body);
+    await _handleLoginResult(context, response);
+    
+    // Implement OTP login logic here
+    // if (validateOtpInputs()) {
+    //
+    // }
+  }
+
+  bool validateOtpInputs() {
+    if (mobileNoOrEmailController.text.isEmpty) {
+      mobileOrEmailError = 'Please enter your mobile number or email ID';
+      updateViewState();
+      return false;
+    }
+    if (mobileNoOrEmailController.text.isNotEmpty) {
+      final mobileOrEmailValidation = Validators.validateMobileOrEmail(mobileNoOrEmailController.text);
+      if (mobileOrEmailValidation != null) {
+        mobileOrEmailError = mobileOrEmailValidation;
+        updateViewState();
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  void _setRequiredFieldErrors() {
     if (mobileNoOrEmailController.text.isEmpty) {
       mobileOrEmailError = 'Please enter your mobile number or email ID';
     }
     if (passwordController.text.isEmpty) {
       passwordError = 'Please enter your password';
     }
-    final canSubmit = validateInputs();
-    updateViewState();
-    if (canSubmit) {
-      updateViewState(loadingState: LoginScreenStates.transparentLoading);
-      final body = LoginBody(
-        identifier: mobileNoOrEmailController.text,
-        password: passwordController.text,
+  }
+
+  bool _validateInputsForSubmit() {
+    return validateInputs();
+  }
+
+  LoginBody _buildLoginBody() {
+    return LoginBody(
+      identifier: mobileNoOrEmailController.text,
+      password: passwordController.text,
+    );
+  }
+
+  Future<LoginResponse> _performLoginRequest() async {
+    final body = _buildLoginBody();
+    return LoginRepository.login(body);
+  }
+
+  Future<void> _handleLoginResult(BuildContext context, LoginResponse response) async {
+    if (response.code == 'SUCCESS') {
+      await _persistAuthTokens(response);
+      _handleLoginSuccess(context);
+      return;
+    }
+
+    _handleLoginFailure(context, response.message);
+  }
+
+  Future<void> _persistAuthTokens(LoginResponse response) async {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = response.response?.accessToken;
+    final refreshToken = response.response?.refreshToken;
+
+    if (accessToken != null && accessToken.isNotEmpty) {
+      await _saveAccessToken(prefs, accessToken);
+    }
+
+    if (refreshToken != null && refreshToken.isNotEmpty) {
+      await _saveRefreshToken(prefs, refreshToken);
+    }
+  }
+
+  Future<void> _saveAccessToken(SharedPreferences prefs, String accessToken) async {
+    await prefs.setString(StorageKeys.accessToken, accessToken);
+    try {
+      DioClient().setAuthToken(accessToken);
+    } catch (_) {}
+  }
+
+  Future<void> _saveRefreshToken(SharedPreferences prefs, String refreshToken) async {
+    await prefs.setString(StorageKeys.refreshToken, refreshToken);
+  }
+
+  void _handleLoginSuccess(BuildContext context) {
+    updateViewState(screenStates: LoginScreenStates.defaultState);
+    if (context.mounted) {
+      context.push(Paths.anchor);
+    }
+  }
+
+  void _handleLoginFailure(BuildContext context, String? message) {
+    updateViewState(loadingState: LoginScreenStates.defaultState);
+    if (context.mounted) {
+      DialogUtils.showErrorDialog(
+        ctx: context,
+        message: message ?? 'Login failed. Please try again.',
       );
-      final response = await LoginRepository.login(body);
-      if (response.code == 'SUCCESS') {
-        final prefs = await SharedPreferences.getInstance();
-        // Save access & refresh tokens for later use
-        final accessToken = response.response?.accessToken;
-        final refreshToken = response.response?.refreshToken;
-        if (accessToken != null && accessToken.isNotEmpty) {
-          await prefs.setString(StorageKeys.accessToken, accessToken);
-          try {
-            DioClient().setAuthToken(accessToken);
-          } catch (_) {}
-        }
-        if (refreshToken != null && refreshToken.isNotEmpty) {
-          await prefs.setString(StorageKeys.refreshToken, refreshToken);
-        }
-        updateViewState(screenStates: LoginScreenStates.defaultState);
-        if (context.mounted) {
-          context.push(Paths.anchor); // Return true to indicate successful login
-        }
-      } else {
-        updateViewState(loadingState: LoginScreenStates.defaultState);
-        if (context.mounted) {
-          DialogUtils.showErrorDialog(ctx: context, message: response.message ?? 'Login failed. Please try again.');
-        }
-      }
     }
   }
 
   bool validateInputs() {
-    if (Validators.validateMobileOrEmail(mobileNoOrEmailController.text) != null) {
-      mobileOrEmailError = Validators.validateMobileOrEmail(mobileNoOrEmailController.text)!;
+    final hasValidMobileOrEmail = _validateMobileOrEmail();
+    if (!hasValidMobileOrEmail) {
+      return false;
+    }
+
+    final hasValidPassword = _validatePassword();
+    if (!hasValidPassword) {
+      return false;
+    }
+
+    _clearValidationErrors();
+    return true;
+  }
+
+  bool _validateMobileOrEmail() {
+    final mobileOrEmailValidation = Validators.validateMobileOrEmail(mobileNoOrEmailController.text);
+    if (mobileOrEmailValidation != null) {
+      mobileOrEmailError = mobileOrEmailValidation;
       updateViewState();
       return false;
     }
-    if (Validators.validatePassword(passwordController.text) != null) {
-      passwordError = Validators.validatePassword(passwordController.text)!;
+    return true;
+  }
+
+  bool _validatePassword() {
+    final passwordValidation = Validators.validatePassword(passwordController.text);
+    if (passwordValidation != null) {
+      passwordError = passwordValidation;
       updateViewState();
       return false;
     }
+    return true;
+  }
+
+  void _clearValidationErrors() {
     mobileOrEmailError = '';
     passwordError = '';
-    return true;
   }
 }
 

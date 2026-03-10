@@ -7,7 +7,7 @@ class Validators{
     // Regular expression for validating email
     final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
     // Regular expression for validating mobile number (10 digits)
-    final mobileRegex = RegExp(r'^\d{10}$');
+    final mobileRegex = RegExp(r'^\d{11}$');
 
     if (!emailRegex.hasMatch(value) && !mobileRegex.hasMatch(value)) {
       return 'Please enter a valid mobile number or email ID';

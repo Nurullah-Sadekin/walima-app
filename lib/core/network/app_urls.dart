@@ -4,7 +4,7 @@ class AppUrls{
   static const String getMe = '$baseUrl/api/v1/auth/me';
   static const String register = '$baseUrl/api/v1/auth/register';
   static const String signinWithPassword = '$baseUrl/api/v1/auth/signin-with-password';
-  static const String signinWithOTP = '$baseUrl/api/v1/auth/signin-with-otp';
+  static const String loginWithOTP = '$baseUrl/api/v1/auth/signin-with-otp';
   static const String signUpWithOTP = '$baseUrl/api/v1/auth/sign-up-with-otp';
   static const String verifyOTP = '$baseUrl/api/v1/auth/verify-otp';
   static const String resendOTP = '$baseUrl/api/v1/auth/resend-otp';
