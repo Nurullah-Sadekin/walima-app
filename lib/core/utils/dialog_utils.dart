@@ -73,7 +73,7 @@ class DialogUtils {
     Duration autoCloseDuration = const Duration(seconds: 2),
     VoidCallback? onClose,
     bool hideCloseButton = false,
-    String? imagePath,
+    String? imagePath = AppImages.errorStatus,
     VoidCallback? onButtonPressed,
     String? disableButtonText,
     bool isDisableButton = false,
