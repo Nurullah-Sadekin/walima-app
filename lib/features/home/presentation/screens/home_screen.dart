@@ -90,6 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ],
       backgroundColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
       elevation: 0,
     );
   }
