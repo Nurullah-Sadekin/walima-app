@@ -46,6 +46,10 @@ class AppImages {
   static const String userLoveSvgIcon = 'assets/svgIcons/user_love.svg';
   static const String bubbleChatSvgIcon = 'assets/svgIcons/bubble_chat.svg';
   static const String chatSvgIcon = 'assets/svgIcons/chat.svg';
+  static const String cameraSvgIcon = 'assets/svgIcons/camera.svg';
+  static const String editProfileSvgIcon = 'assets/svgIcons/edit_profile.svg';
+  static const String menuSvgIcon = 'assets/svgIcons/menu.svg';
+  static const String notificationSvgIcon = 'assets/svgIcons/notification.svg';
 
 
 
