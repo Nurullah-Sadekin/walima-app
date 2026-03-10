@@ -33,7 +33,9 @@ class LoginProvider extends BaseChangeNotifier {
   List<TextEditingController> otpControllers = [];
   List<FocusNode> otpFocusNodesController = [];
 
-  Future<void> getInitialData() async {}
+  Future<void> getInitialData() async {
+    _clearValidationErrors();
+  }
 
   void initOtpFields({int length = 5}) {
     disposeOtpFields();
@@ -138,7 +140,7 @@ class LoginProvider extends BaseChangeNotifier {
     final response = await _performLoginRequest();
     await _handleLoginResult(context, response);
   }
-  
+
   Future<void> otpValidateForLogin(BuildContext context) async {
     if (otpControllers.any((c) => c.text.isEmpty)) {
       DialogUtils.showErrorDialog(
@@ -168,7 +170,7 @@ class LoginProvider extends BaseChangeNotifier {
       return;
     }
     updateViewState(loadingState: LoginScreenStates.defaultState);
-    DialogUtils.showSuccessDialog(context: context, message: response.message,autoClose: true,autoCloseDuration: const Duration(seconds: 2));
+    DialogUtils.showSuccessDialog(context: context, message: response.message, autoClose: true, autoCloseDuration: const Duration(seconds: 2));
     // await _handleLoginResult(context, response);
   }
 
@@ -184,14 +186,14 @@ class LoginProvider extends BaseChangeNotifier {
     await _gotoOtpVerificationScreen(context);
     // await _handleLoginResult(context, response);
   }
-  
+
   Future<void> _gotoOtpVerificationScreen(BuildContext context) async {
     updateViewState(loadingState: LoginScreenStates.defaultState);
     if (context.mounted) {
       context.push(Paths.otpVerify);
     }
   }
-  
+
   bool validateOtpInputs() {
     if (mobileNoOrEmailController.text.isEmpty) {
       mobileOrEmailError = 'Please enter your mobile number or email ID';
