@@ -104,7 +104,6 @@ class ProfileImageCard extends StatelessWidget {
                       width: iconSize,
                       height: iconSize,
                       fit: BoxFit.contain,
-                      color: iconColor,
                     ),
                   ),
                 ),

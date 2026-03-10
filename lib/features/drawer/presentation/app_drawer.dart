@@ -10,6 +10,7 @@ import 'package:flutter_boilerplate/core/router/app_router.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/providers/app_drawer_provider.dart';
+import 'package:flutter_boilerplate/features/drawer/presentation/screens/widgets/profile_action_tile.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -43,7 +44,10 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                 child: Column(
                   children: [
                     _topBar(context),
+                    const SizedBox(height: 16),
                     _profileSummary(context),
+                    const SizedBox(height: 20),
+                    _account(),
                   ],
                 ),
               ),
@@ -144,6 +148,10 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(6.0),
+        border: Border.all(
+          color: AppColors.greyLight,
+          width: 1,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -195,6 +203,62 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
             fontWeight: FontWeight.w700,
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _account() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 10,
+      children: [
+        Text(
+          'ACCOUNT',
+          style: TextStyle(
+            color: AppColors.textSecondaryLight,
+            fontSize: TextSize.font12(context),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+           Row(
+             spacing: 8,
+              children: [
+                Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: const BoxDecoration(
+                      color: AppColors.disableBackground,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const ShowImage(
+                      imagePath: AppImages.profileSvgIcon,
+                      width: 16,
+                      height: 16,
+                      color: AppColors.textSecondaryLight,
+                    ),
+                ),
+                Text(
+                  'View & Edit Your profile',
+                  style: TextStyle(
+                    color: AppColors.textSecondaryLight,
+                    fontSize: TextSize.font14(context),
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+            Icon(Icons.arrow_forward_ios_rounded, size: TextSize.font14(context), color: AppColors.textSecondaryLight),
+          ],
+        ),
+        ProfileActionTile(
+          iconImagePath: AppImages.profileSvgIcon,
+          title: 'View & Edit Your profile',
+          onTap: () {
+          },
+        )
+
       ],
     );
   }
