@@ -5,6 +5,7 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/connect_now_card.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,9 +16,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final Key profileImageKey = const ValueKey('home_profile_image');
+  // Use a scaffold key to reliably open the drawer from anywhere in this State
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: const AppDrawer(),
       body: Column(
         children: [
           _headerSection(context),
@@ -55,7 +60,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _topBar(BuildContext context) {
     return AppBar(
-      leading: const Icon(Icons.menu_sharp, color: AppColors.textPrimaryLight),
+      leading: GestureDetector(
+          child: const Icon(
+              Icons.menu_sharp,
+              color: AppColors.textPrimaryLight,
+          ),
+          onTap: () {
+            // Open the drawer using the scaffold key
+            // _scaffoldKey.currentState?.openDrawer();
+            _openDrawerOverNav();
+          },
+      ),
       title: Text(
         'My Walima',
         style: TextStyle(
@@ -265,4 +280,37 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  void _openDrawerOverNav() {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Drawer',
+      barrierColor: Colors.black54,
+      transitionDuration: const Duration(milliseconds: 250),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        // Full screen container (no SafeArea) so the drawer overlays the status/notification bar
+        return Align(
+          alignment: Alignment.centerLeft,
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height, // full height to cover status bar
+            child: const Material(
+              color: Colors.transparent,
+              child: AppDrawer(),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        final tween = Tween<Offset>(begin: const Offset(-1.0, 0.0), end: Offset.zero)
+            .chain(CurveTween(curve: Curves.easeOut));
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    );
+  }
+
 }
