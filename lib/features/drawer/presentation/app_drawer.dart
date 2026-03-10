@@ -5,6 +5,7 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
+import 'package:flutter_boilerplate/core/global/repositorys/global_repository.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/app_router.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
@@ -41,13 +42,18 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
                 child: Column(
+                  spacing: 16,
                   children: [
                     _topBar(context),
-                    const SizedBox(height: 16),
                     _profileSummary(context),
-                    const SizedBox(height: 20),
                     _account(),
+                    _findYourMatches(),
+                    _optionsAndControls(),
+                    _general(),
+                    _footer(context),
+                    const SizedBox(height: 60),
                   ],
                 ),
               ),
@@ -212,6 +218,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 10,
       children: [
+        const SizedBox(height: 4,),
         Text(
           'ACCOUNT',
           style: TextStyle(
@@ -220,46 +227,169 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
             fontWeight: FontWeight.w500,
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-           Row(
-             spacing: 8,
-              children: [
-                Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(
-                      color: AppColors.disableBackground,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const ShowImage(
-                      imagePath: AppImages.profileSvgIcon,
-                      width: 16,
-                      height: 16,
-                      color: AppColors.textSecondaryLight,
-                    ),
-                ),
-                Text(
-                  'View & Edit Your profile',
-                  style: TextStyle(
-                    color: AppColors.textSecondaryLight,
-                    fontSize: TextSize.font14(context),
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ],
-            ),
-            Icon(Icons.arrow_forward_ios_rounded, size: TextSize.font14(context), color: AppColors.textSecondaryLight),
-          ],
-        ),
         ProfileActionTile(
           iconImagePath: AppImages.profileSvgIcon,
           title: 'View & Edit Your profile',
           onTap: () {
           },
-        )
-
+        ),
+        ProfileActionTile(
+          iconImagePath: AppImages.shareSvgIcon,
+          title: 'Download & Share profile',
+          onTap: () {
+          },
+        ),
       ],
+    );
+  }
+
+  Widget _findYourMatches() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 10,
+      children: [
+        Text(
+          'find your matches'.toUpperCase(),
+          style: TextStyle(
+            color: AppColors.textSecondaryLight,
+            fontSize: TextSize.font12(context),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        ProfileActionTile(
+          iconImagePath: AppImages.userLoveSvgIcon,
+          title: 'Matches',
+          onTap: () {
+          },
+        ),
+        ProfileActionTile(
+          iconImagePath: AppImages.emailSvgIcon,
+          title: 'Inbox',
+          onTap: () {
+          },
+        ),
+        ProfileActionTile(
+          iconImagePath: AppImages.chatSvgIcon,
+          title: 'Chat',
+          onTap: () {
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _optionsAndControls() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 10,
+      children: [
+        Text(
+          'options and controls'.toUpperCase(),
+          style: TextStyle(
+            color: AppColors.textSecondaryLight,
+            fontSize: TextSize.font12(context),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        ProfileActionTile(
+          iconImagePath: AppImages.settingsSvgIcon,
+          title: 'Partner Preferences',
+          onTap: () {
+          },
+        ),
+        ProfileActionTile(
+          iconImagePath: AppImages.filterSvgIcon,
+          title: 'Contacts Filters',
+          onTap: () {
+          },
+        ),
+        ProfileActionTile(
+          iconImagePath: AppImages.accountSettingSvgIcon,
+          title: 'Account Settings',
+          onTap: () {
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _general() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 10,
+      children: [
+        Text(
+          'general'.toUpperCase(),
+          style: TextStyle(
+            color: AppColors.textSecondaryLight,
+            fontSize: TextSize.font12(context),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        ProfileActionTile(
+          iconImagePath: AppImages.customerSupportSvgIcon,
+          title: 'Help & Support',
+          onTap: () {
+          },
+        ),
+        ProfileActionTile(
+          iconImagePath: AppImages.bubbleChatSvgIcon,
+          title: 'Be Safe Online',
+          onTap: () {
+          },
+        ),
+        ProfileActionTile(
+          iconImagePath: AppImages.starSvgIcon,
+          title: 'Rate The App',
+          onTap: () {
+          },
+        ),
+        ProfileActionTile(
+          iconImagePath: AppImages.documentValidationSvgIcon,
+          title: 'Terms & Conditions',
+          onTap: () {
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _footer(BuildContext context)  {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 20.0,horizontal: 12.0),
+      decoration: BoxDecoration(
+        color: AppColors.disableBackground,
+        borderRadius: BorderRadius.circular(8.0),
+        border: Border.all(
+          color: AppColors.greyLight,
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 4,
+        children: [
+          Text(
+            'Copyright© walima.com',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: AppColors.textSecondaryLight,
+              fontSize: TextSize.font12(context),
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          Text(
+            'Version ${GlobalRepository().getAppVersion()}',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: AppColors.textSecondaryLight,
+              fontSize: TextSize.font12(context),
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

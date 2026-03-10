@@ -33,7 +33,18 @@ class AppImages {
   static const String verifiedBadgeSvgIcon = 'assets/svgIcons/verified_badge.svg';
   static const String editSvgIcon = 'assets/svgIcons/edit.svg';
 
-
+  // Newly added svgIcons
+  static const String filterSvgIcon = 'assets/svgIcons/filter.svg';
+  static const String shareSvgIcon = 'assets/svgIcons/share.svg';
+  static const String starSvgIcon = 'assets/svgIcons/star.svg';
+  static const String settingsSvgIcon = 'assets/svgIcons/settings.svg';
+  static const String editUserSvgIcon = 'assets/svgIcons/edit_user.svg';
+  static const String documentValidationSvgIcon = 'assets/svgIcons/document_validation.svg';
+  static const String customerSupportSvgIcon = 'assets/svgIcons/customer_support.svg';
+  static const String accountSettingSvgIcon = 'assets/svgIcons/account_setting.svg';
+  static const String userLoveSvgIcon = 'assets/svgIcons/user_love.svg';
+  static const String bubbleChatSvgIcon = 'assets/svgIcons/bubble_chat.svg';
+  static const String chatSvgIcon = 'assets/svgIcons/chat.svg';
 
 
 
