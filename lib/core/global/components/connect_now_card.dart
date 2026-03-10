@@ -40,90 +40,90 @@ class ConnectNowCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.greyLight, width: 1),
       ),
-      child: IntrinsicHeight(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          spacing: 8,
-          children: [
-            Stack(
-              children: [
-                ShowImage(
-                  imagePath: imagePath,
-                  width: double.infinity,
-                  height: imageSize,
-                  radius: BorderRadius.circular(8),
-                  fit: BoxFit.fitWidth,
-                ),
-                if (isPremiumConnect)
-                Positioned(
-                  top: 10,
-                  left: 10,
-                  child: Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: const BoxDecoration(
-                      color: AppColors.primary,
-                      shape: BoxShape.circle,
-                    ),
-                    child: ShowImage(
-                      imagePath: iconPath ?? AppImages.matchSvgIcon,
-                      width: TextSize.font18(context),
-                      height: TextSize.font18(context),
-                      radius: BorderRadius.circular(8),
-                      fit: BoxFit.fitWidth,
-                      color: AppColors.white,
-                    ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Stack(
+            children: [
+              ShowImage(
+                imagePath: imagePath,
+                width: double.infinity,
+                height: imageSize,
+                radius: BorderRadius.circular(8),
+                fit: BoxFit.fitWidth,
+              ),
+              if (isPremiumConnect)
+              Positioned(
+                top: 10,
+                left: 10,
+                child: Container(
+                  padding: const EdgeInsets.all(5),
+                  decoration: const BoxDecoration(
+                    color: AppColors.primary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: ShowImage(
+                    imagePath: iconPath ?? AppImages.matchSvgIcon,
+                    width: TextSize.font18(context),
+                    height: TextSize.font18(context),
+                    radius: BorderRadius.circular(8),
+                    fit: BoxFit.fitWidth,
+                    color: AppColors.white,
                   ),
                 ),
-              ],
-            ),
-
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              ),
+            ],
+          ),
+          const SizedBox(height: 16,),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name,
+                textHeightBehavior: const TextHeightBehavior(
+                  applyHeightToFirstAscent: false,
+                  applyHeightToLastDescent: false,
+                ),
+                style: TextStyle(
+                  fontSize: TextSize.font20(context),
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimaryLight,
+                ),
+              ),
+              const SizedBox(height: 12,),
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 8,
                 children: [
                   Text(
-                    name,
+                    '$age, $height',
                     style: TextStyle(
-                      fontSize: TextSize.font20(context),
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimaryLight,
+                      fontSize: TextSize.font16(context),
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.textSecondaryLight,
                     ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '$age, $height',
-                        style: TextStyle(
-                          fontSize: TextSize.font16(context),
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.textSecondaryLight,
-                        ),
-                      ),
-                      Text(
-                        location,
-                        style: TextStyle(
-                          fontSize: TextSize.font16(context),
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.textSecondaryLight,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: PrimaryButtons(
-                        buttonStyle: ButtonsStyle.activeSecondaryButton,
-                        onTap: onButtonTap ?? () {},
-                        title: buttonText ?? 'Connect Now'),
+                  Text(
+                    location,
+                    style: TextStyle(
+                      fontSize: TextSize.font16(context),
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.textSecondaryLight,
+                    ),
                   ),
                 ],
               ),
-            ),
-          ],
-        ),
+              const SizedBox(height: 16,),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: PrimaryButtons(
+                    buttonStyle: ButtonsStyle.activeSecondaryButton,
+                    onTap: onButtonTap ?? () {},
+                    title: buttonText ?? 'Connect Now'),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

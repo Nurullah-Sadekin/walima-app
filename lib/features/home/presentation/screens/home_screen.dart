@@ -8,6 +8,7 @@ import 'package:flutter_boilerplate/core/global/components/profile_image_card.da
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
+import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/social_media_icon.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/verification_tile.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -90,6 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ],
       backgroundColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
       elevation: 0,
     );
   }
@@ -237,13 +239,14 @@ class _HomeScreenState extends State<HomeScreen> {
             svgIconPath: AppImages.premiumSvgIcon,
             iconLeftPosition: false,
             onTap: () async {
-              await DialogUtils.showInfoDialog(
-                  context: context,
-                  message:
-                      'Purchase done! Instant alerts for matches and profile views are now enabled.',
-                  title: 'Subscription Done',
-                  autoClose: true,
-                  autoCloseDuration: const Duration(seconds: 2));
+              await DialogUtils.showErrorDialog(
+                message:
+                    'Purchase done! Instant alerts for matches and profile views are now enabled.',
+                title: 'Subscription Done',
+                autoClose: true,
+                autoCloseDuration: const Duration(seconds: 2),
+                context: context,
+              );
             },
             title: 'Renew Plan',
           ),
@@ -259,6 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             _completeProfileStatus(),
             _premiumMatches(),
+            _followUpSection(),
           ],
         ),
       ),
@@ -372,18 +376,91 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-            child: ConnectNowCard(
-              imagePath: AppImages.demoProfile,
-              iconPath: AppImages.premiumSvgIcon,
-              isPremiumConnect: true,
-              name: 'Profile Name',
-              age: '28 Years',
-              height: '5 Feet 3 Inches',
-              location: 'Gulshan, Dhaka, BD',
+          const SizedBox(height: 10),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: List.generate(
+                  10,
+                  (index) => const Padding(
+                        padding: EdgeInsets.only(
+                          right: 10.0,
+                        ),
+                        child: ConnectNowCard(
+                          imagePath: AppImages.demoProfile,
+                          iconPath: AppImages.premiumSvgIcon,
+                          isPremiumConnect: true,
+                          name: 'Profile Name',
+                          age: '28 Years',
+                          height: '5 Feet 3 Inches',
+                          location: 'Gulshan, Dhaka, BD',
+                        ),
+                      )),
             ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _followUpSection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Follow Us on',
+                style: TextStyle(
+                  color: AppColors.textPrimaryLight,
+                  fontSize: TextSize.font18(context),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 6,),
+              Text(
+                'Stay inspired follow us on social media',
+                style: TextStyle(
+                  color: AppColors.textSecondaryLight,
+                  fontSize: TextSize.font14(context),
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              const SizedBox(height: 16,),
+              Row(
+                spacing: 12,
+                children: [
+                  SocialMediaIcon(
+                    imagePath: AppImages.filterSvgIcon,
+                    onTap: () {
+                      // print('Facebook tapped');
+                    },
+                  ),
+                  SocialMediaIcon(
+                    imagePath: AppImages.filterSvgIcon,
+                    onTap: () {
+                      // print('Facebook tapped');
+                    },
+                  ),
+                  SocialMediaIcon(
+                    imagePath: AppImages.filterSvgIcon,
+                    onTap: () {
+                      // print('Facebook tapped');
+                    },
+                  ),
+                  SocialMediaIcon(
+                    imagePath: AppImages.filterSvgIcon,
+                    onTap: () {
+                      // print('Facebook tapped');
+                    },
+                  ),
+                ],
+              )
+            ],
           ),
         ],
       ),

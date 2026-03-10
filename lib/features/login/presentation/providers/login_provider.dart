@@ -128,7 +128,7 @@ class LoginProvider extends BaseChangeNotifier {
   Future<void> otpValidate(BuildContext context) async {
     if (otpControllers.any((c) => c.text.isEmpty)) {
       DialogUtils.showErrorDialog(
-        ctx: context,
+        context: context,
         message: _otpIncompleteMessage,
       );
       return;
@@ -309,7 +309,7 @@ class LoginProvider extends BaseChangeNotifier {
     _hideLoading();
     if (context.mounted) {
       DialogUtils.showErrorDialog(
-        ctx: context,
+        context: context,
         message: message ?? 'Login failed. Please try again.',
       );
     }
