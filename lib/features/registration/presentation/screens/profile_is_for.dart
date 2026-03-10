@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
@@ -34,11 +32,14 @@ class _IsProfileForScreenState extends ConsumerState<IsProfileForScreen> {
   @override
   Widget build(BuildContext context) {
     provider = ref.watch(registrationProvider);
+    final screenProvider = ref.watch(profileIsForScreenProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading:
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         body: GradientBackground(
-          child: provider.screenStates == RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates ==
+                  RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
@@ -58,14 +59,11 @@ class _IsProfileForScreenState extends ConsumerState<IsProfileForScreen> {
         child: Column(
           spacing: 10,
           children: [
-
             isProfileForView(),
-
             provider.selectedProfileName == null
                 ? const SizedBox.shrink()
                 : genderView(),
             const Spacer(),
-
             bottomAction(),
             const SizedBox(height: 20),
           ],
@@ -119,7 +117,6 @@ class _IsProfileForScreenState extends ConsumerState<IsProfileForScreen> {
             fontWeight: FontWeight.w500,
           ),
         ),
-
         Wrap(
           spacing: 10,
           runSpacing: 10,

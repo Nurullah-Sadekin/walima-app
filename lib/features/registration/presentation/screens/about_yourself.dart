@@ -14,7 +14,8 @@ import 'package:go_router/go_router.dart';
 class AboutYourselfScreen extends ConsumerStatefulWidget {
   const AboutYourselfScreen({super.key});
   @override
-  ConsumerState<AboutYourselfScreen> createState() => _AboutYourselfScreenState();
+  ConsumerState<AboutYourselfScreen> createState() =>
+      _AboutYourselfScreenState();
 }
 
 class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
@@ -39,12 +40,15 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
   @override
   Widget build(BuildContext context) {
     provider = ref.watch(registrationProvider);
+    final screenProvider = ref.watch(aboutYourselfScreenProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading:
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates ==
+                  RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [

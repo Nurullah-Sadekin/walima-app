@@ -14,7 +14,8 @@ import 'package:go_router/go_router.dart';
 class QualificationScreen extends ConsumerStatefulWidget {
   const QualificationScreen({super.key});
   @override
-  ConsumerState<QualificationScreen> createState() => _QualificationScreenState();
+  ConsumerState<QualificationScreen> createState() =>
+      _QualificationScreenState();
 }
 
 class _QualificationScreenState extends ConsumerState<QualificationScreen> {
@@ -39,13 +40,16 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
   @override
   Widget build(BuildContext context) {
     provider = ref.watch(registrationProvider);
+    final screenProvider = ref.watch(qualificationScreenProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading:
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates ==
+                  RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
@@ -109,13 +113,16 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: provider.highestQualification.text.isNotEmpty &&  provider.instituteController.text.isNotEmpty && provider.anotherInstituteController.text.isNotEmpty
+      buttonStyle: provider.highestQualification.text.isNotEmpty &&
+              provider.instituteController.text.isNotEmpty &&
+              provider.anotherInstituteController.text.isNotEmpty
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
         if (provider.highestQualification.text.isEmpty ||
-            provider.instituteController.text.isEmpty ||  provider.anotherInstituteController.text.isEmpty) {
+            provider.instituteController.text.isEmpty ||
+            provider.anotherInstituteController.text.isEmpty) {
           return;
         }
         context.push(Paths.profession);

@@ -40,17 +40,18 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
     super.dispose();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     provider = ref.watch(registrationProvider);
+    final screenProvider = ref.watch(aboutYouScreenProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading:
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates ==
+                  RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
@@ -119,7 +120,9 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
                   imagePath: AppImages.calendarSvgIcon,
                   width: TextSize.font20(context),
                   height: TextSize.font20(context),
-                  color: provider.dateOfBirthController.text.isNotEmpty ? AppColors.textPrimaryLight : AppColors.hintTextColor,
+                  color: provider.dateOfBirthController.text.isNotEmpty
+                      ? AppColors.textPrimaryLight
+                      : AppColors.hintTextColor,
                 ),
               ),
             ),
@@ -135,7 +138,9 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
                   style: TextStyle(
                     fontSize: TextSize.font14(context),
                     fontWeight: FontWeight.w500,
-                    color: provider.dateOfBirthController.text.isNotEmpty ? AppColors.textPrimaryLight : AppColors.grey,
+                    color: provider.dateOfBirthController.text.isNotEmpty
+                        ? AppColors.textPrimaryLight
+                        : AppColors.grey,
                   ),
                 ))
           ],

@@ -42,13 +42,16 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
   @override
   Widget build(BuildContext context) {
     provider = ref.watch(registrationProvider);
+    final screenProvider = ref.watch(locationScreenProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading:
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates ==
+                  RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [

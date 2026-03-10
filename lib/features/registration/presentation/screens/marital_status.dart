@@ -17,7 +17,8 @@ import 'package:go_router/go_router.dart';
 class MaritalStatusScreen extends ConsumerStatefulWidget {
   const MaritalStatusScreen({super.key});
   @override
-  ConsumerState<MaritalStatusScreen> createState() => _MaritalStatusScreenState();
+  ConsumerState<MaritalStatusScreen> createState() =>
+      _MaritalStatusScreenState();
 }
 
 class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
@@ -42,13 +43,16 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
   @override
   Widget build(BuildContext context) {
     provider = ref.watch(registrationProvider);
+    final screenProvider = ref.watch(maritalStatusScreenProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading:
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         extendBodyBehindAppBar: true,
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates ==
+                  RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
@@ -69,7 +73,6 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
           spacing: 10,
           children: [
             dataInsertField(),
-
             bottomAction(),
             const SizedBox(height: 20),
           ],
@@ -97,7 +100,14 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
             headLine: 'Height',
             hintText: 'Select',
             popUpHeader: 'Select Height',
-            items: const ['170 cm', '171 cm', '172 cm', '173 cm', '174 cm', '175 cm'],
+            items: const [
+              '170 cm',
+              '171 cm',
+              '172 cm',
+              '173 cm',
+              '174 cm',
+              '175 cm'
+            ],
             controller: provider.heightController,
             onTap: () {},
             isSearch: false,
@@ -113,8 +123,8 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-
-              Icon(Icons.info, size: TextSize.font13(context), color:AppColors.disableText),
+              Icon(Icons.info,
+                  size: TextSize.font13(context), color: AppColors.disableText),
             ],
           ),
           Expanded(
@@ -126,7 +136,8 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
                   return Wrap(
                     spacing: spacing,
                     runSpacing: spacing,
-                    children: List.generate(provider.dietDataList.length, (index) {
+                    children:
+                        List.generate(provider.dietDataList.length, (index) {
                       final dietItems = provider.dietDataList[index];
 
                       return SelectionCard(
@@ -152,7 +163,9 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: provider.maritalStatusController.text.isNotEmpty &&  provider.heightController.text.isNotEmpty && provider.selectedDietStatus != null
+      buttonStyle: provider.maritalStatusController.text.isNotEmpty &&
+              provider.heightController.text.isNotEmpty &&
+              provider.selectedDietStatus != null
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,
       title: 'Continue',
