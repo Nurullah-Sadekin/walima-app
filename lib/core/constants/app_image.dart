@@ -34,6 +34,14 @@ class AppImages {
   static const String editSvgIcon = 'assets/svgIcons/edit.svg';
   static const String logOutSvgIcon = 'assets/svgIcons/Log Out.svg';
 
+  // Social media icons
+  static const String facebookIcon = 'assets/svgIcons/facebook.svg';
+  static const String youtubeIcon = 'assets/svgIcons/youtube.svg';
+  static const String twitterIcon = 'assets/svgIcons/twitter.svg';
+  static const String instagramIcon = 'assets/svgIcons/instagram.svg';
+
+
+
   // Newly added svgIcons
   static const String filterSvgIcon = 'assets/svgIcons/filter.svg';
   static const String shareSvgIcon = 'assets/svgIcons/share.svg';
@@ -74,7 +82,7 @@ class AppImages {
   static const String password = 'assets/svgs/password.svg';
   static const String forgotPassword = 'assets/svgs/forgotPassword.svg';
   static const String verifyContact = 'assets/svgs/verify_contact.svg';
-
+  // Dialog status svgs
   static const String successfulStatus = 'assets/svgs/successful_status.svg';
   static const String alertStatus = 'assets/svgs/alert_status.svg';
   static const String errorStatus = 'assets/svgs/error_status.svg';

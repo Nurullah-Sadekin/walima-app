@@ -435,25 +435,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 spacing: 12,
                 children: [
                   SocialMediaIcon(
-                    imagePath: AppImages.filterSvgIcon,
+                    imagePath: AppImages.instagramIcon,
                     onTap: () {
                       // print('Facebook tapped');
                     },
                   ),
                   SocialMediaIcon(
-                    imagePath: AppImages.filterSvgIcon,
+                    imagePath: AppImages.facebookIcon,
                     onTap: () {
                       // print('Facebook tapped');
                     },
                   ),
                   SocialMediaIcon(
-                    imagePath: AppImages.filterSvgIcon,
+                    imagePath: AppImages.twitterIcon,
                     onTap: () {
                       // print('Facebook tapped');
                     },
                   ),
                   SocialMediaIcon(
-                    imagePath: AppImages.filterSvgIcon,
+                    imagePath: AppImages.youtubeIcon,
                     onTap: () {
                       // print('Facebook tapped');
                     },
