@@ -73,7 +73,10 @@ class AppImages {
   static const String otp = 'assets/svgs/otp.svg';
   static const String password = 'assets/svgs/password.svg';
   static const String forgotPassword = 'assets/svgs/forgotPassword.svg';
-  
+  static const String verifyContact = 'assets/svgs/verify_contact.svg';
+
+
+  // Navigation icons
   static const String home = 'assets/nav_icons/home.svg';
   static const String matches = 'assets/nav_icons/matches.svg';
   static const String inbox = 'assets/nav_icons/inbox.svg';

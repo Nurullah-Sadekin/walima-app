@@ -355,7 +355,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     spacing: 8,
                     children: [
                       const ShowImage(
-                        imagePath: AppImages.verifiedBadgeSvgIcon,
+                        imagePath: AppImages.verifyContact,
                         width: 30,
                         height: 30,
                       ),
