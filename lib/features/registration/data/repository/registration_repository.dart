@@ -38,27 +38,30 @@ class RegistrationRepository {
       return LoginResponse(code: 'FAILED', message: errorMessage);
     }
   }
+
   static Future<LoginResponse> checkEmail(String email) async {
     try {
-      final response = await DioClient().get(AppUrls.checkEmailAvailability);
+      final response = await DioClient().get(AppUrls.checkEmailAvailability, queryParameters: {'email': email});
       return LoginResponse.fromJson(response.data);
     } catch (e) {
       final errorMessage = e is DioException ? e.response?.data['message'] ?? e.message : e.toString();
       return LoginResponse(code: 'FAILED', message: errorMessage);
     }
   }
+
   static Future<LoginResponse> checkUserName(String userName) async {
     try {
-      final response = await DioClient().get(AppUrls.checkUserNameAvailability);
+      final response = await DioClient().get(AppUrls.checkUserNameAvailability, queryParameters: {'keyword': userName});
       return LoginResponse.fromJson(response.data);
     } catch (e) {
       final errorMessage = e is DioException ? e.response?.data['message'] ?? e.message : e.toString();
       return LoginResponse(code: 'FAILED', message: errorMessage);
     }
   }
+
   static Future<LoginResponse> checkMobile(String mobile) async {
     try {
-      final response = await DioClient().get(AppUrls.checkNumberAvailability);
+      final response = await DioClient().get(AppUrls.checkNumberAvailability, queryParameters: {'phoneNumber': mobile});
       return LoginResponse.fromJson(response.data);
     } catch (e) {
       final errorMessage = e is DioException ? e.response?.data['message'] ?? e.message : e.toString();
