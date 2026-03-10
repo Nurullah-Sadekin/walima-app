@@ -135,23 +135,26 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,
       title: 'Continue',
-      onTap: () {
+      onTap: () async {
         if (provider.aboutYourselfController.text.isNotEmpty && provider.selectedVerificationType.isNotEmpty) {
           //transparent loading start
           final screenNotifier = ref.read(emailPhoneScreenProvider);
           screenNotifier.updateViewState(
             loadingState: RegistrationScreenStates.isProfileFor,
           );
-          provider.signUpViaOtp(context).then((_) {
+          await provider.signUpViaOtp(context).then((_) {
+            screenNotifier.updateViewState(
+              loadingState: RegistrationScreenStates.loadingComplete,
+            );
             // context.pushNamed(RouteNames.registrationLocation);
           });
           // provider.signUpViaOtp().then((_) {
           //   // context.pushNamed(RouteNames.registrationLocation);
           // });
-          
-          screenNotifier.updateViewState(
-            loadingState: RegistrationScreenStates.loadingComplete,
-          );
+
+          // screenNotifier.updateViewState(
+          //   loadingState: RegistrationScreenStates.loadingComplete,
+          // );
         }
       },
     );
