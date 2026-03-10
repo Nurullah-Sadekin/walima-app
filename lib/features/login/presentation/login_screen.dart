@@ -56,9 +56,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        const UpperLayer(
+                         UpperLayer(
                           imagePath: AppImages.login,
-                          onBackPressed: null,
+                          onBackPressed: () {
+                            context.pushNamed(Routes.onboarding);
+                          },
                           backCancelMood: true,
                         ),
                         body(),
@@ -94,7 +96,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               InkWell(
                 onTap: () {
-                  //context.push(Paths.signUp);
+                  // context.pop();
+                  context.pushNamed(Routes.onboarding);
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

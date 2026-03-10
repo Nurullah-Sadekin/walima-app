@@ -1,7 +1,3 @@
-import 'dart:convert';
-
-RegisterBody registerBodyFromJson(String str) => RegisterBody.fromJson(json.decode(str));
-String registerBodyToJson(RegisterBody data) => json.encode(data.toJson());
 
 class RegisterBody {
   RegisterBody({
