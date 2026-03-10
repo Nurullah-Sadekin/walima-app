@@ -7,6 +7,7 @@ import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
+import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/verification_tile.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -236,26 +237,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _bodySection() {
     return Expanded(
-      child: Column(
-        children: [
-          _completeProfileStatus(),
-          const Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-              child: SingleChildScrollView(
-                child: ConnectNowCard(
-                  imagePath: AppImages.demoProfile,
-                  iconPath: AppImages.premiumSvgIcon,
-                  isPremiumConnect: true,
-                  name: 'Profile Name',
-                  age: '28 Years',
-                  height: '5 Feet 3 Inches',
-                  location: 'Gulshan, Dhaka, BD',
-                ),
-              ),
-            ),
-          ),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            _completeProfileStatus(),
+            _premiumMatches(),
+          ],
+        ),
       ),
     );
   }
@@ -283,114 +271,95 @@ class _HomeScreenState extends State<HomeScreen> {
               fontWeight: FontWeight.w400,
             ),
           ),
-          GestureDetector(
-            onTap: null,
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-              decoration:  BoxDecoration(
-                color: AppColors.white,
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
-                border: Border.all(color: AppColors.greyLight)
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    spacing: 8,
-                    children: [
-                      const ShowImage(
-                        imagePath: AppImages.verifiedBadgeSvgIcon,
-                        width: 30,
-                        height: 30,
-                      ),
-                      Text(
-                        'Government ID Verify',
-                        style: TextStyle(
-                          color: AppColors.textPrimaryLight,
-                          fontSize: TextSize.font14(context),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryVariant,
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                        child: Text(
-                          'Unverified',
-                          style: TextStyle(
-                            color: AppColors.primary,
-                            fontSize: TextSize.font10(context),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                   Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      size: TextSize.font14(context),
-                      color:  AppColors.hintTextColor,
-                    ),
-                ],
-              ),
-            ),
+          const SizedBox(height: 12),
+          const VerificationTile(
+            iconImagePath: AppImages.verifiedBadgeSvgIcon,
+            title: 'Government ID Verify',
+            statusText: 'Unverified',
+            statusColor: AppColors.primary,
+            statusBackgroundColor: AppColors.primaryVariant,
           ),
-          GestureDetector(
-            onTap: null,
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-              decoration:  BoxDecoration(
-                color: AppColors.white,
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
-                border: Border.all(color: AppColors.greyLight)
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          const SizedBox(height: 10),
+           VerificationTile(
+            iconImagePath: AppImages.verifyContact,
+            title: 'Verify Phone Number',
+            statusText: 'Verified',
+            statusColor: AppColors.success,
+            statusBackgroundColor: Colors.green.withOpacity(0.1,),
+          ),
+
+        ],
+      ),
+    );
+  }
+
+  Widget _premiumMatches() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0,vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 6,
                 children: [
-                  Row(
-                    spacing: 8,
-                    children: [
-                      const ShowImage(
-                        imagePath: AppImages.verifyContact,
-                        width: 30,
-                        height: 30,
-                      ),
-                      Text(
-                        'Government ID Verify',
-                        style: TextStyle(
-                          color: AppColors.textPrimaryLight,
-                          fontSize: TextSize.font14(context),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryVariant,
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                        child: Text(
-                          'Unverified',
-                          style: TextStyle(
-                            color: AppColors.primary,
-                            fontSize: TextSize.font10(context),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                   Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      size: TextSize.font14(context),
-                      color:  AppColors.hintTextColor,
+                  Text(
+                    'Premium Matches',
+                    style: TextStyle(
+                      color: AppColors.textPrimaryLight,
+                      fontSize: TextSize.font18(context),
+                      fontWeight: FontWeight.w500,
                     ),
+                  ),
+                  Text(
+                    '26 Profiles Found',
+                    style: TextStyle(
+                      color: AppColors.textSecondaryLight,
+                      fontSize: TextSize.font14(context),
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
                 ],
               ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(color: AppColors.greyLight),
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      'View All',
+                      style: TextStyle(
+                        color: AppColors.textSecondaryLight,
+                        fontSize: TextSize.font14(context),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(Icons.arrow_forward_ios_rounded,color: AppColors.textSecondaryLight,size: TextSize.font12(context),)
+                  ],
+                ),
+              ),
+            ],
+           ),
+          const SizedBox(height: 12),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+            child: ConnectNowCard(
+              imagePath: AppImages.demoProfile,
+              iconPath: AppImages.premiumSvgIcon,
+              isPremiumConnect: true,
+              name: 'Profile Name',
+              age: '28 Years',
+              height: '5 Feet 3 Inches',
+              location: 'Gulshan, Dhaka, BD',
             ),
           ),
         ],
