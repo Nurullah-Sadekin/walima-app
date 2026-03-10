@@ -8,11 +8,8 @@ import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/features/login/presentation/providers/login_provider.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 class OtpVerifySignUpScreen extends ConsumerStatefulWidget {
   const OtpVerifySignUpScreen({super.key});
