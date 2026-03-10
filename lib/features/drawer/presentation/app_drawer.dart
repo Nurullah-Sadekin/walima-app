@@ -62,12 +62,17 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
           floatingActionButton: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: PrimaryButtons(
-              title: 'Logout',
+              title: 'Log Out',
+              titleSize: TextSize.font14(context),
+              textColor: AppColors.white,
+              bgColor: AppColors.primary,
+              svgIconPath: AppImages.logOutSvgIcon,
+              svgIconColor: AppColors.white,
               onTap: () async {
                  await provider.logout(() {router.go(Paths.login);},
                  );
               },
-              buttonStyle: ButtonsStyle.activePrimaryButton,
+              buttonStyle: ButtonsStyle.iconicDynamicButton,
             ),
           ),
           floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

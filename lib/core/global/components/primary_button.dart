@@ -15,7 +15,6 @@ class PrimaryButtons extends StatelessWidget {
     this.bgColor,
     this.borderColor,
     this.svgIconColor,
-    this.icon,
     this.svgIconPath,
     this.iconLeftPosition = true,
   });
@@ -29,7 +28,6 @@ class PrimaryButtons extends StatelessWidget {
   final Color? bgColor;
   final Color? borderColor;
   final Color? svgIconColor;
-  final Widget? icon;
   final bool? iconLeftPosition;
   final String? svgIconPath;
 
@@ -37,14 +35,14 @@ class PrimaryButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (buttonStyle) {
       case (ButtonsStyle.activePrimaryButton):
-        return activePrimaryButton(onTap, title, icon, context);
+        return activePrimaryButton(onTap, title, context);
 
       case (ButtonsStyle.activeSecondaryButton):
-        return activeSecondaryButton(onTap, title, icon, context);
+        return activeSecondaryButton(onTap, title, context);
 
       case (ButtonsStyle.iconicDynamicButton):
         return iconicDynamicButton(
-            onTap, title, icon, context, bgColor, borderColor, textColor);
+            onTap, title, context, bgColor, borderColor, textColor);
 
       case (ButtonsStyle.cancelButton):
         return cancelButton(title, context, onTap);
@@ -54,12 +52,11 @@ class PrimaryButtons extends StatelessWidget {
 
       case (ButtonsStyle.authButton):
         return authButton(
-            onTap, title, icon, context, bgColor, borderColor, textColor);
+            onTap, title, context, bgColor, borderColor, textColor);
     }
   }
 
-  Widget activePrimaryButton(
-      VoidCallback onClick, String? title, Widget? icon, context) {
+  Widget activePrimaryButton(VoidCallback onClick, String? title, context) {
     return GestureDetector(
       onTap: onClick,
       child: Container(
@@ -88,15 +85,13 @@ class PrimaryButtons extends StatelessWidget {
                 ),
               ),
             ),
-            icon ?? const SizedBox()
           ],
         ),
       ),
     );
   }
 
-  Widget activeSecondaryButton(
-      VoidCallback onClick, String? title, Widget? icon, context) {
+  Widget activeSecondaryButton(VoidCallback onClick, String? title, context) {
     return GestureDetector(
       onTap: onClick,
       child: Container(
@@ -124,7 +119,6 @@ class PrimaryButtons extends StatelessWidget {
                 ),
               ),
             ),
-            icon ?? const SizedBox()
           ],
         ),
       ),
@@ -178,8 +172,8 @@ class PrimaryButtons extends StatelessWidget {
     );
   }
 
-  Widget iconicDynamicButton(VoidCallback onClick, String? title, Widget? icon,
-      context, Color? bgColor, Color? borderColor, Color? textColor) {
+  Widget iconicDynamicButton(VoidCallback onClick, String? title, context,
+      Color? bgColor, Color? borderColor, Color? textColor) {
     return GestureDetector(
       onTap: onClick,
       child: Container(
@@ -195,8 +189,17 @@ class PrimaryButtons extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            if (iconLeftPosition! && icon != null) icon,
-            if (iconLeftPosition! && icon != null) const SizedBox(width: 10),
+            if (iconLeftPosition! && svgIconPath != null)
+              ShowImage(
+                imagePath: svgIconPath,
+                width: 20,
+                height: 20,
+                color: svgIconColor,
+              ),
+            if (iconLeftPosition! && svgIconPath != null)
+              const SizedBox(
+                width: 8,
+              ),
             Text(
               title ?? '',
               textAlign: TextAlign.center,
@@ -206,15 +209,24 @@ class PrimaryButtons extends StatelessWidget {
                 fontWeight: FontWeight.w500,
               ),
             ),
-            if (!iconLeftPosition! && icon != null) const SizedBox(width: 10),
-            if (!iconLeftPosition! && icon != null) icon,
+            if (!iconLeftPosition! && svgIconPath != null)
+              const SizedBox(
+                width: 8,
+              ),
+            if (!iconLeftPosition! && svgIconPath != null)
+              ShowImage(
+                imagePath: svgIconPath,
+                width: 20,
+                height: 20,
+                color: svgIconColor,
+              ),
           ],
         ),
       ),
     );
   }
 
-  Widget authButton(VoidCallback onClick, String? title, Widget? icon, context,
+  Widget authButton(VoidCallback onClick, String? title, context,
       Color? bgColor, Color? borderColor, Color? textColor) {
     return GestureDetector(
       onTap: onClick,
@@ -238,7 +250,7 @@ class PrimaryButtons extends StatelessWidget {
                     height: 20,
                     color: svgIconColor,
                   )
-                : icon ?? const SizedBox(width: 10),
+                : const SizedBox.shrink(),
             const SizedBox(
               width: 10,
             ),

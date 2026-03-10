@@ -32,6 +32,7 @@ class AppImages {
   static const String premiumSvgIcon = 'assets/svgIcons/premium.svg';
   static const String verifiedBadgeSvgIcon = 'assets/svgIcons/verified_badge.svg';
   static const String editSvgIcon = 'assets/svgIcons/edit.svg';
+  static const String logOutSvgIcon = 'assets/svgIcons/Log Out.svg';
 
   // Newly added svgIcons
   static const String filterSvgIcon = 'assets/svgIcons/filter.svg';
