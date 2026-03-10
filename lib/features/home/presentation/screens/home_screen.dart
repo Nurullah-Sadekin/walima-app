@@ -239,12 +239,13 @@ class _HomeScreenState extends State<HomeScreen> {
             iconLeftPosition: false,
             onTap: () async {
               await DialogUtils.showErrorDialog(
-                  message:
-                      'Purchase done! Instant alerts for matches and profile views are now enabled.',
-                  title: 'Subscription Done',
-                  autoClose: true,
-                  autoCloseDuration: const Duration(seconds: 2),
-                  context: context,);
+                message:
+                    'Purchase done! Instant alerts for matches and profile views are now enabled.',
+                title: 'Subscription Done',
+                autoClose: true,
+                autoCloseDuration: const Duration(seconds: 2),
+                context: context,
+              );
             },
             title: 'Renew Plan',
           ),
@@ -374,18 +375,27 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-            child: ConnectNowCard(
-              imagePath: AppImages.demoProfile,
-              iconPath: AppImages.premiumSvgIcon,
-              isPremiumConnect: true,
-              name: 'Profile Name',
-              age: '28 Years',
-              height: '5 Feet 3 Inches',
-              location: 'Gulshan, Dhaka, BD',
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: List.generate(
+                  10,
+                  (index) => const Padding(
+                        padding: EdgeInsets.only(
+                          right: 10.0,
+                        ),
+                        child: ConnectNowCard(
+                          imagePath: AppImages.demoProfile,
+                          iconPath: AppImages.premiumSvgIcon,
+                          isPremiumConnect: true,
+                          name: 'Profile Name',
+                          age: '28 Years',
+                          height: '5 Feet 3 Inches',
+                          location: 'Gulshan, Dhaka, BD',
+                        ),
+                      )),
             ),
-          ),
+          )
         ],
       ),
     );
