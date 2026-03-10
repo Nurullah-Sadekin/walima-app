@@ -107,11 +107,8 @@ class _HomeScreenState extends State<HomeScreen> {
             showBottomIcon: true,
             topPositionImagePath: AppImages.verifiedBadgeSvgIcon,
             bottomPositionImagePath: AppImages.cameraSvgIcon,
-            onTopPressed: () {
-              print('Edit pressed');
-            },
             onBottomPressed: () {
-              print('Check pressed');
+             // print('Check pressed');
             },
           ),
           const SizedBox(width: 12),
@@ -210,17 +207,27 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         Expanded(
           child: PrimaryButtons(
-            buttonStyle: ButtonsStyle.activeSecondaryButton,
+            buttonStyle: ButtonsStyle.iconicDynamicButton,
+            textColor: AppColors.textSecondaryLight,
+            bgColor: AppColors.white,
+            borderColor: AppColors.greyLight,
+            svgIconPath: AppImages.editProfileSvgIcon,
+            svgIconColor: AppColors.textSecondaryLight,
+            iconLeftPosition: false,
             onTap: () {},
-            title: 'Connect Now',
+            title: 'Edit Profile',
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: PrimaryButtons(
-            buttonStyle: ButtonsStyle.activeSecondaryButton,
+            buttonStyle: ButtonsStyle.iconicDynamicButton,
+            textColor: AppColors.white,
+            bgColor: AppColors.primary,
+            svgIconPath: AppImages.premiumSvgIcon,
+            iconLeftPosition: false,
             onTap: () {},
-            title: 'Connect Now',
+            title: 'Renew Plan',
           ),
         ),
       ],
