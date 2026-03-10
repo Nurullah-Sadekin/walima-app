@@ -147,6 +147,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
       onTapOutside: (event) {
         FocusManager.instance.primaryFocus?.unfocus();
       },
+      
       style: TextStyle(
         color: widget.textColor ?? AppColors.textPrimaryLight,
         fontSize: TextSize.font14(context),
@@ -183,7 +184,8 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
           fontWeight: FontWeight.w400,
         ),
         hintText: widget.hintText ?? 'Your Username',
-        errorText: widget.errorText == "" ? null : widget.errorText,
+        errorText: widget.errorText == '' ? null : widget.errorText,
+        errorMaxLines: 2,
         errorStyle: TextStyle(
           color: Colors.red,
           fontSize: TextSize.font12(context),

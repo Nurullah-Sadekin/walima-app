@@ -8,6 +8,7 @@ import 'package:flutter_boilerplate/features/login/data/models/login_response.da
 import 'package:flutter_boilerplate/features/login/data/models/login_with_otp_body.dart';
 import 'package:flutter_boilerplate/features/login/data/models/otp_verify_body.dart';
 import 'package:flutter_boilerplate/features/login/data/models/resend_otp_body.dart';
+import 'package:flutter_boilerplate/features/login/data/models/set_password_body.dart';
 import 'package:flutter_boilerplate/features/login/data/repository/login_repository.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,6 +33,9 @@ class LoginProvider extends BaseChangeNotifier {
   String passwordError = '';
   List<TextEditingController> otpControllers = [];
   List<FocusNode> otpFocusNodesController = [];
+  String createPasswordError = '';
+  String confirmPasswordError = '';
+  String otpCode = '';
 
   Future<void> getInitialData() async {
     _clearValidationErrors();
@@ -141,7 +145,7 @@ class LoginProvider extends BaseChangeNotifier {
     await _handleLoginResult(context, response);
   }
 
-  Future<void> otpValidateForLogin(BuildContext context) async {
+  Future<void> otpValidate(BuildContext context) async {
     if (otpControllers.any((c) => c.text.isEmpty)) {
       DialogUtils.showErrorDialog(
         ctx: context,
@@ -152,39 +156,74 @@ class LoginProvider extends BaseChangeNotifier {
 
     final otp = otpControllers.map((c) => c.text).join();
     updateViewState(loadingState: LoginScreenStates.transparentLoading);
-    final body = OtVerifyBody(identifier: mobileNoOrEmailController.text, otpCode: otp, purpose: 'signin');
+    final body = OtVerifyBody(
+        identifier: mobileNoOrEmailController.text,
+        otpCode: otp,
+        purpose: forgotPassword 
+            ? 'password_reset'
+            : 'signin',
+    );
     final response = await LoginRepository.verifyOtp(body);
     if (response.code != 'SUCCESS') {
       _handleLoginFailure(context, response.message);
       return;
     }
-    await _handleLoginResult(context, response);
+    if (context.mounted && forgotPassword) {
+      otpCode = otp;
+      createPasswordController.clear();
+      confirmPasswordController.clear();
+      updateViewState(loadingState: LoginScreenStates.defaultState);
+      context.push(Paths.newPassword);
+    } 
+    else if (context.mounted && !forgotPassword) {
+      await _handleLoginResult(context, response);
+    }
+  }
+
+  Future<void> setNewPassword(BuildContext context) async {
+    updateViewState(loadingState: LoginScreenStates.transparentLoading);
+    if(validateNewPassword()==false) {
+      updateViewState(loadingState: LoginScreenStates.defaultState);
+      return;
+    }
+    final body = SetPasswordBody(
+        identifier: mobileNoOrEmailController.text,
+        otpCode: otpCode,
+        newPassword: createPasswordController.text,
+        confirmPassword: confirmPasswordController.text);
+    final response = await LoginRepository.setNewPassword(body);
+    _handleLoginResult(context, response);
   }
 
   Future<void> resendOtp(BuildContext context) async {
+    otpCode = '';
+    otpController.clear();
+    for (var c in otpControllers) {
+      c.clear();
+    }
     updateViewState(loadingState: LoginScreenStates.transparentLoading);
-    final body = ResendOtpBody(identifier: mobileNoOrEmailController.text, purpose: 'signin');
+    final body = ResendOtpBody(identifier: mobileNoOrEmailController.text, purpose: forgotPassword
+        ?'password_reset'
+        :'signin',);
     final response = await LoginRepository.resendOtp(body);
     if (response.code != 'SUCCESS') {
       _handleLoginFailure(context, response.message);
       return;
     }
     updateViewState(loadingState: LoginScreenStates.defaultState);
-    DialogUtils.showSuccessDialog(context: context, message: response.message, autoClose: true, autoCloseDuration: const Duration(seconds: 2));
-    // await _handleLoginResult(context, response);
+    await DialogUtils.showSuccessDialog(context: context, message: response.message, autoClose: true, autoCloseDuration: const Duration(seconds: 2));
   }
 
   Future<void> loginWithOtp(BuildContext context) async {
     updateViewState(loadingState: LoginScreenStates.transparentLoading);
     final body = LoginWithOtpBody(identifier: mobileNoOrEmailController.text);
-    final response = await LoginRepository.loginWithOtp(body);
+    final response = await LoginRepository.loginWithOtp(body, isForgotPass: forgotPassword);
     if (response.code != 'SUCCESS') {
       mobileOrEmailError = '';
       _handleLoginFailure(context, response.message);
       return;
     }
     await _gotoOtpVerificationScreen(context);
-    // await _handleLoginResult(context, response);
   }
 
   Future<void> _gotoOtpVerificationScreen(BuildContext context) async {
@@ -273,10 +312,20 @@ class LoginProvider extends BaseChangeNotifier {
   }
 
   void _handleLoginSuccess(BuildContext context) {
+    clearControllers();
     updateViewState(screenStates: LoginScreenStates.defaultState);
     if (context.mounted) {
       context.push(Paths.anchor);
     }
+  }
+  
+  void clearControllers() {
+    mobileNoOrEmailController.clear();
+    passwordController.clear();
+    otpController.clear();
+    createPasswordController.clear();
+    confirmPasswordController.clear();
+    otpCode = '';
   }
 
   void _handleLoginFailure(BuildContext context, String? message) {
@@ -327,6 +376,23 @@ class LoginProvider extends BaseChangeNotifier {
   void _clearValidationErrors() {
     mobileOrEmailError = '';
     passwordError = '';
+  }
+  
+  bool validateNewPassword() {
+    final createPasswordValidation = Validators.validatePassword(createPasswordController.text);
+    if (createPasswordValidation != null) {
+      createPasswordError = createPasswordValidation;
+      updateViewState();
+      return false;
+    }
+    createPasswordError = '';
+    if (createPasswordController.text != confirmPasswordController.text) {
+      confirmPasswordError = 'Confirm password does not match';
+      updateViewState();
+      return false;
+    }
+    confirmPasswordError = '';
+    return true;
   }
 }
 
