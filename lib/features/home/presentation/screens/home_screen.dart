@@ -195,7 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
           style: TextStyle(
             color: AppColors.textSecondaryLight,
             fontSize: TextSize.font14(context),
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w400,
           ),
         ),
       ],
@@ -236,19 +236,164 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _bodySection() {
     return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-        child: const SingleChildScrollView(
-          child: ConnectNowCard(
-            imagePath: AppImages.demoProfile,
-            iconPath: AppImages.premiumSvgIcon,
-            isPremiumConnect: true,
-            name: 'Profile Name',
-            age: '28 Years',
-            height: '5 Feet 3 Inches',
-            location: 'Gulshan, Dhaka, BD',
+      child: Column(
+        children: [
+          _completeProfileStatus(),
+          const Expanded(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+              child: SingleChildScrollView(
+                child: ConnectNowCard(
+                  imagePath: AppImages.demoProfile,
+                  iconPath: AppImages.premiumSvgIcon,
+                  isPremiumConnect: true,
+                  name: 'Profile Name',
+                  age: '28 Years',
+                  height: '5 Feet 3 Inches',
+                  location: 'Gulshan, Dhaka, BD',
+                ),
+              ),
+            ),
           ),
-        ),
+        ],
+      ),
+    );
+  }
+
+  Widget _completeProfileStatus() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0,vertical: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text(
+            'Complete Your Profile',
+            style: TextStyle(
+              color: AppColors.textPrimaryLight,
+              fontSize: TextSize.font18(context),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          Text(
+            'Complete profiles get 2x more matches',
+            style: TextStyle(
+              color: AppColors.textSecondaryLight,
+              fontSize: TextSize.font14(context),
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          GestureDetector(
+            onTap: null,
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+              decoration:  BoxDecoration(
+                color: AppColors.white,
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                border: Border.all(color: AppColors.greyLight)
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    spacing: 8,
+                    children: [
+                      const ShowImage(
+                        imagePath: AppImages.verifiedBadgeSvgIcon,
+                        width: 30,
+                        height: 30,
+                      ),
+                      Text(
+                        'Government ID Verify',
+                        style: TextStyle(
+                          color: AppColors.textPrimaryLight,
+                          fontSize: TextSize.font14(context),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryVariant,
+                          borderRadius: BorderRadius.circular(4.0),
+                        ),
+                        child: Text(
+                          'Unverified',
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontSize: TextSize.font10(context),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                   Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: TextSize.font14(context),
+                      color:  AppColors.hintTextColor,
+                    ),
+                ],
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: null,
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+              decoration:  BoxDecoration(
+                color: AppColors.white,
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                border: Border.all(color: AppColors.greyLight)
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    spacing: 8,
+                    children: [
+                      const ShowImage(
+                        imagePath: AppImages.verifiedBadgeSvgIcon,
+                        width: 30,
+                        height: 30,
+                      ),
+                      Text(
+                        'Government ID Verify',
+                        style: TextStyle(
+                          color: AppColors.textPrimaryLight,
+                          fontSize: TextSize.font14(context),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryVariant,
+                          borderRadius: BorderRadius.circular(4.0),
+                        ),
+                        child: Text(
+                          'Unverified',
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontSize: TextSize.font10(context),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                   Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: TextSize.font14(context),
+                      color:  AppColors.hintTextColor,
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
