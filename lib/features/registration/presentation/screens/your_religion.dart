@@ -133,7 +133,7 @@ class _YourRegionState extends ConsumerState<YourReligion> {
             provider.livingInController.text.isEmpty) {
           return;
         }
-        context.push(Paths.location);
+        context.push(Paths.emailPhone);
       },
     );
   }

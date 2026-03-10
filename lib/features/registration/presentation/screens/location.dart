@@ -159,7 +159,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
             provider.selectedIsWithFamilyStatus == null) {
           return;
         }
-        context.push(Paths.emailPhone);
+        context.push(Paths.maritalStatus);
       },
     );
   }

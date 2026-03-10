@@ -44,13 +44,11 @@ class _ProfileCreateStatusScreenState
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(profileCreatedStatusScreenProvider);
     return TransparentLoading(
-      isLoading:
-          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: screenProvider.screenStates ==
-                  RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates == RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
