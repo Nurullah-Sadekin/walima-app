@@ -53,11 +53,7 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
               ? const Loading()
               : Column(
                   children: [
-                     CustomBackAppBar(
-                      isTrailing: true,
-                      trailingText: 'Add Photos Later',
-                      onTrailingTap: () => context.push(Paths.hobbiesInterests),
-                    ),
+                    const CustomBackAppBar(),
                     body(context),
                   ],
                 ),
@@ -101,7 +97,6 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
                     height: MediaQuery.of(context).size.height * 0.3,
                     fit: BoxFit.fill,
                   ),
-
                   const SizedBox(height: 12),
                 ],
               ),
@@ -116,41 +111,39 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
                 children: [
                   KnowMoreItemCard(
                     text:
-                    'Your Photo should be front facing and your entire face should be visible.',
+                        'Your Photo should be front facing and your entire face should be visible.',
                     icon: Icons.check_circle,
                     iconColor: Colors.green,
                   ),
                   KnowMoreItemCard(
                     text:
-                    'Ensure that your Photo is recent and not with a group.',
+                        'Ensure that your Photo is recent and not with a group.',
+                    icon: Icons.check_circle,
+                    iconColor: Colors.green,
+                  ),
+                  KnowMoreItemCard(
+                    text: 'You can upload upto 20 Photos to your Profile.',
                     icon: Icons.check_circle,
                     iconColor: Colors.green,
                   ),
                   KnowMoreItemCard(
                     text:
-                    'You can upload upto 20 Photos to your Profile.',
+                        'Each Photo must be less than 15 MB in size and must be in one of the following formats: jpg, gif, png, bmp or tiff.',
                     icon: Icons.check_circle,
                     iconColor: Colors.green,
                   ),
                   KnowMoreItemCard(
                     text:
-                    'Each Photo must be less than 15 MB in size and must be in one of the following formats: jpg, gif, png, bmp or tiff.',
-                    icon: Icons.check_circle,
-                    iconColor: Colors.green,
-                  ),
-                  KnowMoreItemCard(
-                    text:
-                    'Watermarked, digitally enhanced, morphed Photos or Photos with your personal information will be rejected.',
+                        'Watermarked, digitally enhanced, morphed Photos or Photos with your personal information will be rejected.',
                     icon: Icons.cancel,
                     iconColor: Colors.red,
                   ),
                   KnowMoreItemCard(
                     text:
-                    'Irrelevant Photographs will lead to deactivation of your Profile and Membership.',
+                        'Irrelevant Photographs will lead to deactivation of your Profile and Membership.',
                     icon: Icons.cancel,
                     iconColor: Colors.red,
                   ),
-
                   const SizedBox(height: 12),
                 ],
               ),
@@ -161,7 +154,7 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
     );
   }
 
-  Widget photoUploadField(){
+  Widget photoUploadField() {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(32.0),
@@ -246,7 +239,7 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
       buttonStyle: ButtonsStyle.activePrimaryButton,
       title: 'Continue',
       onTap: () {
-          context.push(Paths.hobbiesInterests);
+        context.push(Paths.hobbiesInterests);
       },
     );
   }

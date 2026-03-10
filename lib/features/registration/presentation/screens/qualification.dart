@@ -42,6 +42,7 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
     return TransparentLoading(
       isLoading: provider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         body: GradientBackground(
           child: provider.screenStates == RegistrationScreenStates.isProfileFor

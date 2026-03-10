@@ -22,7 +22,10 @@ class VerifyNumberScreen extends ConsumerStatefulWidget {
 class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
   late RegistrationProvider provider;
 
-  final List<TextEditingController> _otpControllers = List.generate(5, (_) => TextEditingController(),);
+  final List<TextEditingController> _otpControllers = List.generate(
+    5,
+    (_) => TextEditingController(),
+  );
   final List<FocusNode> _otpFocusNodes = List.generate(5, (_) => FocusNode());
 
   @override
@@ -38,8 +41,12 @@ class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
   @override
   void dispose() {
     provider.disposeControllersListener();
-    for (final otpControllers in _otpControllers) {otpControllers.dispose();}
-    for (final otpFocusNodes in _otpFocusNodes) {otpFocusNodes.dispose();}
+    for (final otpControllers in _otpControllers) {
+      otpControllers.dispose();
+    }
+    for (final otpFocusNodes in _otpFocusNodes) {
+      otpFocusNodes.dispose();
+    }
     super.dispose();
   }
 
@@ -55,11 +62,8 @@ class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    UpperLayer(
+                    const UpperLayer(
                       imagePath: AppImages.verifyNumber,
-                      isTrailing: true,
-                      trailingText: 'Skip',
-                      onTrailingTap: () => context.push(Paths.photoUpload),
                     ),
                     body(),
                   ],
@@ -235,9 +239,11 @@ class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
               ? ButtonsStyle.activePrimaryButton
               : ButtonsStyle.disableButton,
           title: 'Continue',
-          onTap: otpCode.length != 5 ? () => provider.updateViewState() : () {
-            context.push(Paths.photoUpload);
-          },
+          onTap: otpCode.length != 5
+              ? () => provider.updateViewState()
+              : () {
+                  context.push(Paths.photoUpload);
+                },
         ),
       ],
     );

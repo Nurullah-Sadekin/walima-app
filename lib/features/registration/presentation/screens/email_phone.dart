@@ -1,7 +1,4 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,7 +8,6 @@ import 'package:flutter_boilerplate/features/registration/presentation/providers
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
@@ -86,7 +82,9 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
             imagePath: AppImages.emailSvgIcon,
             width: TextSize.font18(context),
             height: TextSize.font18(context),
-            color: provider.emailController.text.isNotEmpty ? AppColors.textPrimaryLight : AppColors.hintTextColor,
+            color: provider.emailController.text.isNotEmpty
+                ? AppColors.textPrimaryLight
+                : AppColors.hintTextColor,
           ),
           errorText: null,
           onTap: () {},
@@ -112,12 +110,11 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
           : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
-
         if (provider.emailController.text.isEmpty ||
-            provider.phoneController.text.isEmpty ) {
+            provider.phoneController.text.isEmpty) {
           return;
         }
-        context.push(Paths.location);
+        context.push(Paths.maritalStatus);
       },
     );
   }

@@ -6,7 +6,7 @@ import 'package:flutter_boilerplate/features/registration/data/models/request/re
 import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_otp_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_request_body.dart';
 
-class RegistrationRepository{
+class RegistrationRepository {
   late final DioClient dioClient;
 
   static Future<LoginResponse> signUpWithEmail(RegisterBody body) async {
@@ -32,6 +32,36 @@ class RegistrationRepository{
   static Future<LoginResponse> signUpCreateUserProfile(SignUpRequestBody body) async {
     try {
       final response = await DioClient().post(AppUrls.signUpCreateUserProfile, data: body.toJson());
+      return LoginResponse.fromJson(response.data);
+    } catch (e) {
+      final errorMessage = e is DioException ? e.response?.data['message'] ?? e.message : e.toString();
+      return LoginResponse(code: 'FAILED', message: errorMessage);
+    }
+  }
+
+  static Future<LoginResponse> checkEmail(String email) async {
+    try {
+      final response = await DioClient().get(AppUrls.checkEmailAvailability, queryParameters: {'email': email});
+      return LoginResponse.fromJson(response.data);
+    } catch (e) {
+      final errorMessage = e is DioException ? e.response?.data['message'] ?? e.message : e.toString();
+      return LoginResponse(code: 'FAILED', message: errorMessage);
+    }
+  }
+
+  static Future<LoginResponse> checkUserName(String userName) async {
+    try {
+      final response = await DioClient().get(AppUrls.checkUserNameAvailability, queryParameters: {'keyword': userName});
+      return LoginResponse.fromJson(response.data);
+    } catch (e) {
+      final errorMessage = e is DioException ? e.response?.data['message'] ?? e.message : e.toString();
+      return LoginResponse(code: 'FAILED', message: errorMessage);
+    }
+  }
+
+  static Future<LoginResponse> checkMobile(String mobile) async {
+    try {
+      final response = await DioClient().get(AppUrls.checkNumberAvailability, queryParameters: {'phoneNumber': mobile});
       return LoginResponse.fromJson(response.data);
     } catch (e) {
       final errorMessage = e is DioException ? e.response?.data['message'] ?? e.message : e.toString();

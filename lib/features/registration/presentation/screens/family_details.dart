@@ -14,7 +14,8 @@ import 'package:go_router/go_router.dart';
 class FamilyDetailsScreen extends ConsumerStatefulWidget {
   const FamilyDetailsScreen({super.key});
   @override
-  ConsumerState<FamilyDetailsScreen> createState() => _FamilyDetailsScreenState();
+  ConsumerState<FamilyDetailsScreen> createState() =>
+      _FamilyDetailsScreenState();
 }
 
 class _FamilyDetailsScreenState extends ConsumerState<FamilyDetailsScreen> {
@@ -48,11 +49,8 @@ class _FamilyDetailsScreenState extends ConsumerState<FamilyDetailsScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    UpperLayer(
+                    const UpperLayer(
                       imagePath: AppImages.familyDetails,
-                      isTrailing: true,
-                      trailingText: 'Skip',
-                      onTrailingTap: () => context.push(Paths.financialStatus),
                     ),
                     body(),
                   ],
@@ -139,7 +137,7 @@ class _FamilyDetailsScreenState extends ConsumerState<FamilyDetailsScreen> {
       title: 'Continue',
       onTap: () {
         if (hasAnyValue) return;
-         context.push(Paths.financialStatus);
+        context.push(Paths.financialStatus);
         // proceed
       },
     );

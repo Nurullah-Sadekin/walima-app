@@ -21,7 +21,8 @@ class HobbiesInterestsScreen extends ConsumerStatefulWidget {
       _HobbiesInterestsScreenState();
 }
 
-class _HobbiesInterestsScreenState extends ConsumerState<HobbiesInterestsScreen> {
+class _HobbiesInterestsScreenState
+    extends ConsumerState<HobbiesInterestsScreen> {
   late RegistrationProvider provider;
 
   @override
@@ -53,11 +54,7 @@ class _HobbiesInterestsScreenState extends ConsumerState<HobbiesInterestsScreen>
               ? const Loading()
               : Column(
                   children: [
-                     CustomBackAppBar(
-                      isTrailing: true,
-                      trailingText: 'Skip',
-                      onTrailingTap: () => context.push(Paths.familyDetails),
-                    ),
+                    const CustomBackAppBar(),
                     body(),
                   ],
                 ),
@@ -69,7 +66,7 @@ class _HobbiesInterestsScreenState extends ConsumerState<HobbiesInterestsScreen>
   Widget body() {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0,vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
         child: Column(
           children: [
             _bodyScrollable(context),
@@ -98,36 +95,44 @@ class _HobbiesInterestsScreenState extends ConsumerState<HobbiesInterestsScreen>
                 spacing: 10,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   HobbiesInterestsCard(
                     dataList: provider.creativeItemList,
                     title: 'Creative',
                     onItemTap: (index) {
-                      provider.toggleHobbySelection(index, provider.creativeItemList, context: context);
+                      provider.toggleHobbySelection(
+                          index, provider.creativeItemList,
+                          context: context);
                     },
                   ),
                   HobbiesInterestsCard(
                     dataList: provider.funItemList,
                     title: 'Fun',
                     onItemTap: (index) {
-                      provider.toggleHobbySelection(index, provider.funItemList, context: context);
+                      provider.toggleHobbySelection(index, provider.funItemList,
+                          context: context);
                     },
                   ),
                   HobbiesInterestsCard(
                     dataList: provider.fitnessItemList,
                     title: 'Fitness',
                     onItemTap: (index) {
-                      provider.toggleHobbySelection(index, provider.fitnessItemList, context: context);
+                      provider.toggleHobbySelection(
+                          index, provider.fitnessItemList,
+                          context: context);
                     },
                   ),
                   HobbiesInterestsCard(
                     dataList: provider.otherInterestsItemList,
                     title: 'Other Interests',
                     onItemTap: (index) {
-                      provider.toggleHobbySelection(index, provider.otherInterestsItemList, context: context);
+                      provider.toggleHobbySelection(
+                          index, provider.otherInterestsItemList,
+                          context: context);
                     },
                   ),
-                  const SizedBox(height: 20,)
+                  const SizedBox(
+                    height: 20,
+                  )
                 ],
               ),
             ),
@@ -141,7 +146,8 @@ class _HobbiesInterestsScreenState extends ConsumerState<HobbiesInterestsScreen>
     final selected = provider.selectedHobbiesCount();
     return PrimaryButtons(
       buttonStyle: ButtonsStyle.activePrimaryButton,
-      title: 'Save & Continue ($selected/${RegistrationProvider.hobbiesSelectionMax})',
+      title:
+          'Save & Continue ($selected/${RegistrationProvider.hobbiesSelectionMax})',
       onTap: () {
         // show the save selected hobbies dialog
         log('Selected Hobbies: ${provider.selectedHobbies}');

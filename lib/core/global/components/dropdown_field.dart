@@ -72,12 +72,10 @@ class _DropDownFieldState extends State<DropDownField> {
           context: context,
           items: widget.items,
           header: widget.popUpHeader,
-          // prefer controller text (current selection) so the sheet highlights the previously selected item
           selectedValue: (widget.controller != null && (widget.controller!.text).isNotEmpty)
               ? widget.controller!.text
               : widget.selectedValue,
           hintText: widget.hintText,
-
         );
 
         // Update if a value was selected
