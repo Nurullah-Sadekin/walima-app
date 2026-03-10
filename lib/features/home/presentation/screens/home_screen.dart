@@ -8,6 +8,7 @@ import 'package:flutter_boilerplate/core/global/components/profile_image_card.da
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
+import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/social_media_icon.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/verification_tile.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -261,6 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             _completeProfileStatus(),
             _premiumMatches(),
+            _followUpSection(),
           ],
         ),
       ),
@@ -374,7 +376,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -396,6 +398,70 @@ class _HomeScreenState extends State<HomeScreen> {
                       )),
             ),
           )
+        ],
+      ),
+    );
+  }
+
+  Widget _followUpSection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Follow Us on',
+                style: TextStyle(
+                  color: AppColors.textPrimaryLight,
+                  fontSize: TextSize.font18(context),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 6,),
+              Text(
+                'Stay inspired follow us on social media',
+                style: TextStyle(
+                  color: AppColors.textSecondaryLight,
+                  fontSize: TextSize.font14(context),
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              const SizedBox(height: 16,),
+              Row(
+                spacing: 12,
+                children: [
+                  SocialMediaIcon(
+                    imagePath: AppImages.filterSvgIcon,
+                    onTap: () {
+                      // print('Facebook tapped');
+                    },
+                  ),
+                  SocialMediaIcon(
+                    imagePath: AppImages.filterSvgIcon,
+                    onTap: () {
+                      // print('Facebook tapped');
+                    },
+                  ),
+                  SocialMediaIcon(
+                    imagePath: AppImages.filterSvgIcon,
+                    onTap: () {
+                      // print('Facebook tapped');
+                    },
+                  ),
+                  SocialMediaIcon(
+                    imagePath: AppImages.filterSvgIcon,
+                    onTap: () {
+                      // print('Facebook tapped');
+                    },
+                  ),
+                ],
+              )
+            ],
+          ),
         ],
       ),
     );
