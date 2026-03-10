@@ -3,6 +3,7 @@ import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
+import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
 import 'package:flutter_boilerplate/features/home/presentation/widgets/profile_info_card.dart';
 
@@ -27,6 +28,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           _bodySection(),
         ],
       ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: PrimaryButtons(
+          title: 'Preview Profile',
+          titleSize: TextSize.font14(context),
+          textColor: AppColors.white,
+          bgColor: AppColors.primary,
+          svgIconColor: AppColors.white,
+          onTap: ()  {
+
+          },
+          buttonStyle: ButtonsStyle.activePrimaryButton,
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+
     );
   }
 
@@ -153,6 +170,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             children: [
               _aboutMyself(),
               _basicDetails(),
+              _religiousBackground(),
+              _familyDetails(),
+              _educationCareer(),
+              _location(),
             ],
           ),
         ),
@@ -192,6 +213,65 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         MapEntry('Blood Group', 'B Positive (B+)'),
         MapEntry('Health Information', 'Not Specified'),
         MapEntry('Disability', 'None'),
+      ],
+    );
+  }
+  Widget _religiousBackground() {
+    return ProfileInfoCard(
+      title: 'Religious Background',
+      showEdit: true,
+      onEdit: () {},
+      infoList: const [
+        MapEntry('Religion', 'Islam'),
+        MapEntry('Community', 'Sunni'),
+        MapEntry('Sub community', 'Not Specified'),
+        MapEntry('Mother Tongue', 'Bengali'),
+      ],
+    );
+  }
+
+  Widget _familyDetails() {
+    return ProfileInfoCard(
+      title: 'Family Details',
+      showEdit: true,
+      onEdit: () {},
+      infoList: const [
+        MapEntry('Father\'s Details', 'Not Specified'),
+        MapEntry('Father\'s Details', 'Not Specified'),
+        MapEntry('Family Location', 'Dhaka, Bangladesh'),
+        MapEntry('No. of Sisters', '2'),
+        MapEntry('No. of Brothers', '0'),
+        MapEntry('Family Financial Status', 'Elite'),
+      ],
+    );
+  }
+
+  Widget _educationCareer() {
+    return ProfileInfoCard(
+      title: 'Education & Career',
+      showEdit: true,
+      onEdit: () {},
+      infoList: const [
+        MapEntry('Highest Qualification', 'Masters in Management'),
+        MapEntry('College(s) Attended', 'Northern College of Business and Technology'),
+        MapEntry('Annual Income', 'Not Specified'),
+        MapEntry('Working with', 'Full-time'),
+        MapEntry('Working as', 'Software Engineer'),
+        MapEntry('Employer Name', 'Walima'),
+      ],
+    );
+  }
+
+  Widget _location() {
+    return ProfileInfoCard(
+      title: 'Location of Groom',
+      showEdit: true,
+      onEdit: () {},
+      infoList: const [
+        MapEntry('Current Location', 'Dhaka, Bangladesh'),
+        MapEntry('State of Residence', 'Dhaka'),
+        MapEntry('Residency Status', 'Citizen'),
+        MapEntry('ZIP/Pin code', '3700'),
       ],
     );
   }
