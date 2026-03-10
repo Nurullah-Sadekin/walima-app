@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
+import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
+import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_otp_body.dart';
+import 'package:flutter_boilerplate/features/registration/data/repository/registration_repository.dart';
 import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/is_with_family_status_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/profile_for_model.dart';
 import 'package:intl/intl.dart';
 
 class RegistrationProvider extends BaseChangeNotifier {
-  RegistrationScreenStates screenStates = RegistrationScreenStates.defaultLoading;
-  RegistrationScreenStates loaderState = RegistrationScreenStates.defaultLoading;
-  bool isLoading = false;
   VoidCallback? _controllersListener;
 
   String? selectedProfileName;
@@ -61,7 +61,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   List<SingleStringModel> motherDetailsItemList = motherDetailsItemListDataInserted;
   List<SingleStringModel> fatherDetailsItemList = fatherDetailsItemListDataInserted;
   List<SingleStringModel> siblingCountList = siblingCountListDataInserted;
-
+  List<SingleStringModel> verificationList = verificationTypeList;
   static const int hobbiesSelectionMax = 5;
   final List<String> selectedHobbies = [];
 
@@ -69,6 +69,36 @@ class RegistrationProvider extends BaseChangeNotifier {
   bool funSectionSelected = false;
   bool fitnessSectionSelected = false;
   bool otherInterestsSectionSelected = false;
+  
+  String selectedVerificationType = 'email'; // or 'phone'
+
+  List<TextEditingController> get _managedControllers => [
+        firstNameController,
+        lastNameController,
+        dateOfBirthController,
+        religionController,
+        communityController,
+        livingInController,
+        emailController,
+        phoneController,
+        passwordController,
+        cityController,
+        residencyStatusController,
+        maritalStatusController,
+        heightController,
+        highestQualification,
+        instituteController,
+        anotherInstituteController,
+        aboutYourselfController,
+        currentCompanyNameController,
+        incomeRangeController,
+        yourWorkController,
+        youWorkAsController,
+        motherDetailsController,
+        fatherDetailsController,
+        noOfSisterController,
+        noOfBrotherController,
+      ];
 
   void setCreativeSectionSelected(bool v) {
     creativeSectionSelected = v;
@@ -91,6 +121,14 @@ class RegistrationProvider extends BaseChangeNotifier {
   }
 
   void cleanAllValue() {
+    _clearSelectedValues();
+    _clearAllControllers();
+    _resetAllSelections();
+    selectedHobbies.clear();
+    notifyListeners();
+  }
+
+  void _clearSelectedValues() {
     selectedProfileName = null;
     selectedGenderName = null;
     selectedIsWithFamilyStatus = null;
@@ -99,74 +137,38 @@ class RegistrationProvider extends BaseChangeNotifier {
     selectedIncomeRange = null;
     selectedYourWork = null;
     selectedYouWorkAs = null;
+  }
 
-    firstNameController.clear();
-    lastNameController.clear();
-    dateOfBirthController.clear();
-    religionController.clear();
-    communityController.clear();
-    livingInController.clear();
-    emailController.clear();
-    phoneController.clear();
-    passwordController.clear();
-    cityController.clear();
-    residencyStatusController.clear();
-    maritalStatusController.clear();
-    heightController.clear();
-    highestQualification.clear();
-    instituteController.clear();
-    anotherInstituteController.clear();
-    aboutYourselfController.clear();
-    currentCompanyNameController.clear();
-    incomeRangeController.clear();
-    yourWorkController.clear();
-    youWorkAsController.clear();
-    motherDetailsController.clear();
-    fatherDetailsController.clear();
-    noOfSisterController.clear();
-    noOfBrotherController.clear();
+  void _clearAllControllers() {
+    for (final controller in _managedControllers) {
+      controller.clear();
+    }
+  }
 
-    for (var item in profileForList) {
-      item.isSelected = false;
-    }
-    for (var item in genderForList) {
-      item.isSelected = false;
-    }
-    for (var item in isWithFamilyDataList) {
-      item.isSelected = false;
-    }
-    for (var item in dietDataList) {
-      item.isSelected = false;
-    }
-    for (var item in incomePeriodDataList) {
-      item.isSelected = false;
-    }
+  void _resetAllSelections() {
+    _resetSelection(profileForList, (item, selected) => item.isSelected = selected);
+    _resetSelection(genderForList, (item, selected) => item.isSelected = selected);
+    _resetSelection(isWithFamilyDataList, (item, selected) => item.isSelected = selected);
+    _resetSelection(dietDataList, (item, selected) => item.isSelected = selected);
+    _resetSelection(incomePeriodDataList, (item, selected) => item.isSelected = selected);
 
-    for (var item in creativeItemList) {
-      item.isSelected = false;
-    }
-    for (var item in funItemList) {
-      item.isSelected = false;
-    }
-    for (var item in fitnessItemList) {
-      item.isSelected = false;
-    }
-    for (var item in otherInterestsItemList) {
-      item.isSelected = false;
-    }
+    _resetSelection(creativeItemList, (item, selected) => item.isSelected = selected);
+    _resetSelection(funItemList, (item, selected) => item.isSelected = selected);
+    _resetSelection(fitnessItemList, (item, selected) => item.isSelected = selected);
+    _resetSelection(otherInterestsItemList, (item, selected) => item.isSelected = selected);
 
-    for (var item in motherDetailsItemList) {
-      item.isSelected = false;
-    }
-    for (var item in fatherDetailsItemList) {
-      item.isSelected = false;
-    }
-    for (var item in siblingCountList) {
-      item.isSelected = false;
-    }
+    _resetSelection(motherDetailsItemList, (item, selected) => item.isSelected = selected);
+    _resetSelection(fatherDetailsItemList, (item, selected) => item.isSelected = selected);
+    _resetSelection(siblingCountList, (item, selected) => item.isSelected = selected);
+  }
 
-    selectedHobbies.clear();
-    updateViewState();
+  void _resetSelection<T>(
+    List<T> list,
+    void Function(T item, bool selected) applySelection,
+  ) {
+    for (final item in list) {
+      applySelection(item, false);
+    }
   }
 
   Future<void> getInitialData() async {
@@ -174,51 +176,87 @@ class RegistrationProvider extends BaseChangeNotifier {
   }
 
   void selectedProfileFor(int index) {
-    if (index < 0 || index >= profileForList.length) return;
-    for (var i = 0; i < profileForList.length; i++) {
-      profileForList[i].isSelected = i == index;
-    }
+    if (!_isValidIndex(index, profileForList.length)) return;
+    _setSingleSelection(
+      profileForList,
+      index,
+      (item, selected) => item.isSelected = selected,
+    );
     selectedProfileName = profileForList[index].name;
     notifyListeners();
   }
 
   void selectedGender(int index) {
-    if (index < 0 || index >= genderForList.length) return;
-    for (var i = 0; i < genderForList.length; i++) {
-      genderForList[i].isSelected = i == index;
-    }
+    if (!_isValidIndex(index, genderForList.length)) return;
+    _setSingleSelection(
+      genderForList,
+      index,
+      (item, selected) => item.isSelected = selected,
+    );
     selectedGenderName = genderForList[index].name;
     notifyListeners();
   }
 
   void selectedIsWithFamily(int index) {
-    if (index < 0 || index >= isWithFamilyDataList.length) return;
-    for (var i = 0; i < isWithFamilyDataList.length; i++) {
-      isWithFamilyDataList[i].isSelected = i == index;
-    }
+    if (!_isValidIndex(index, isWithFamilyDataList.length)) return;
+    _setSingleSelection(
+      isWithFamilyDataList,
+      index,
+      (item, selected) => item.isSelected = selected,
+    );
     selectedIsWithFamilyStatus = isWithFamilyDataList[index].name;
 
     notifyListeners();
   }
 
   void selectedDiet(int index) {
-    if (index < 0 || index >= dietDataList.length) return;
-    for (var i = 0; i < dietDataList.length; i++) {
-      dietDataList[i].isSelected = i == index;
-    }
+    if (!_isValidIndex(index, dietDataList.length)) return;
+    _setSingleSelection(
+      dietDataList,
+      index,
+      (item, selected) => item.isSelected = selected,
+    );
     selectedDietStatus = dietDataList[index].name;
 
     notifyListeners();
   }
 
   void selectedIncomePeriod(int index) {
-    if (index < 0 || index >= incomePeriodDataList.length) return;
-    for (var i = 0; i < incomePeriodDataList.length; i++) {
-      incomePeriodDataList[i].isSelected = i == index;
-    }
+    if (!_isValidIndex(index, incomePeriodDataList.length)) return;
+    _setSingleSelection(
+      incomePeriodDataList,
+      index,
+      (item, selected) => item.isSelected = selected,
+    );
     selectedIncomePeriodStatus = incomePeriodDataList[index].name;
 
     notifyListeners();
+  }
+
+  
+  void selectedVerificationTypeIndex(int index) {
+    if (!_isValidIndex(index, verificationList.length)) return;
+    _setSingleSelection(
+      verificationList,
+      index,
+      (item, selected) => item.isSelected = selected,
+    );
+    selectedVerificationType = verificationList[index].name;
+
+    notifyListeners();
+  }
+  bool _isValidIndex(int index, int length) {
+    return index >= 0 && index < length;
+  }
+
+  void _setSingleSelection<T>(
+    List<T> list,
+    int selectedIndex,
+    void Function(T item, bool selected) applySelection,
+  ) {
+    for (var i = 0; i < list.length; i++) {
+      applySelection(list[i], i == selectedIndex);
+    }
   }
 
   void selectIncomeRange(String? value) {
@@ -302,175 +340,86 @@ class RegistrationProvider extends BaseChangeNotifier {
 
     _controllersListener = () => notifyListeners();
 
-    try {
-      firstNameController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      lastNameController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      dateOfBirthController.addListener(_controllersListener!);
-    } catch (_) {}
-    // additional controllers used across registration screens
-    try {
-      religionController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      communityController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      livingInController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      emailController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      passwordController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      cityController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      residencyStatusController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      maritalStatusController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      heightController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      highestQualification.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      instituteController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      anotherInstituteController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      phoneController.addListener(_controllersListener!);
-    } catch (_) {}
-    // new dropdown controllers
-    try {
-      incomeRangeController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      yourWorkController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      youWorkAsController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      currentCompanyNameController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      aboutYourselfController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      motherDetailsController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      fatherDetailsController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      noOfSisterController.addListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      noOfBrotherController.addListener(_controllersListener!);
-    } catch (_) {}
+    for (final controller in _managedControllers) {
+      _addListenerSafely(controller, _controllersListener!);
+    }
   }
 
   void disposeControllersListener() {
     if (_controllersListener == null) return;
-    try {
-      firstNameController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      lastNameController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      dateOfBirthController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      religionController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      communityController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      livingInController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      emailController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      passwordController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      cityController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      residencyStatusController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      maritalStatusController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      heightController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      highestQualification.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      instituteController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      anotherInstituteController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      phoneController.removeListener(_controllersListener!);
-    } catch (_) {}
-    // new dropdown controllers
-    try {
-      incomeRangeController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      yourWorkController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      youWorkAsController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      currentCompanyNameController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      aboutYourselfController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      motherDetailsController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      fatherDetailsController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      noOfSisterController.removeListener(_controllersListener!);
-    } catch (_) {}
-    try {
-      noOfBrotherController.removeListener(_controllersListener!);
-    } catch (_) {}
+
+    for (final controller in _managedControllers) {
+      _removeListenerSafely(controller, _controllersListener!);
+    }
 
     _controllersListener = null;
   }
 
-  void updateViewState({RegistrationScreenStates? screenStates, RegistrationScreenStates? loadingState}) {
-    if (screenStates != null) {
-      this.screenStates = screenStates;
-      loaderState = RegistrationScreenStates.defaultLoading;
-    }
-    if (loadingState != null) loaderState = loadingState;
-    notifyListeners();
+  void _addListenerSafely(TextEditingController controller, VoidCallback listener) {
+    try {
+      controller.addListener(listener);
+    } catch (_) {}
   }
+
+  void _removeListenerSafely(
+    TextEditingController controller,
+    VoidCallback listener,
+  ) {
+    try {
+      controller.removeListener(listener);
+    } catch (_) {}
+  }
+
+  Future<void> submitRegistration() async {
+    // Simulate a delay for submitting registration data
+    await Future.delayed(const Duration(seconds: 2));
+  }
+
+  String phoneAvailabilityErrorMessage = '';
+  String emailAvailabilityErrorMessage = '';
+
+    Future<bool> checkEmailAndPhoneAvailability(BuildContext context) async {
+      final emailRes = await RegistrationRepository.checkEmail(emailController.text);
+      final phoneRes = await RegistrationRepository.checkMobile(phoneController.text);
+      if (emailRes.response?.isAvailable == true && phoneRes.response?.isAvailable == true) {
+        phoneAvailabilityErrorMessage = '';
+        emailAvailabilityErrorMessage = '';
+        notifyListeners();
+        return true;
+      } else {
+        if (emailRes.response?.isAvailable != true) {
+          emailAvailabilityErrorMessage = emailRes.message ?? 'Email already exists';
+          // DialogUtils.showErrorDialog(ctx: context, message: emailRes.message ?? 'Email already exists');
+        }
+        if (phoneRes.response?.isAvailable != true) {
+          phoneAvailabilityErrorMessage = phoneRes.message ?? 'Phone number already exists';
+          // DialogUtils.showErrorDialog(ctx: context, message: phoneRes.message ?? 'Phone number already exists');
+        }
+        notifyListeners();
+        return false;
+      }
+    }    
+    Future<bool> signUpViaOtp(BuildContext context) async {
+      final body = SignUpOtpBody(
+        registrationSource: 'referral',
+            identifier: selectedVerificationType == 'email' ? emailController.text : phoneController.text,
+      ) ;
+      final response = await RegistrationRepository.signUpWithOTP(body);
+      // if (emailRes.response?.isAvailable == true && phoneRes.response?.isAvailable == true) {
+      //   phoneAvailabilityErrorMessage = '';
+      //   emailAvailabilityErrorMessage = '';
+      //   notifyListeners();
+      //   return true;
+      // } else {
+      //   if (emailRes.response?.isAvailable != true) {
+      //     emailAvailabilityErrorMessage = emailRes.message ?? 'Email already exists';
+      //   }
+      //   if (phoneRes.response?.isAvailable != true) {
+      //     phoneAvailabilityErrorMessage = phoneRes.message ?? 'Phone number already exists';
+      //   }
+        notifyListeners();
+        return false;
+    }
 }
 
 enum RegistrationScreenStates {

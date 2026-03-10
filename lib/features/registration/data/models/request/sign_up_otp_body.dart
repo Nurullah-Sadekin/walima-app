@@ -1,10 +1,9 @@
-import 'dart:convert';
-SignUpOtpBody signUpOtpBodyFromJson(String str) => SignUpOtpBody.fromJson(json.decode(str));
-String signUpOtpBodyToJson(SignUpOtpBody data) => json.encode(data.toJson());
+
 class SignUpOtpBody {
   SignUpOtpBody({
       this.identifier, 
-      this.registrationSource,});
+      this.registrationSource,
+  });
 
   SignUpOtpBody.fromJson(dynamic json) {
     identifier = json['identifier'];
@@ -19,5 +18,4 @@ class SignUpOtpBody {
     map['registrationSource'] = registrationSource;
     return map;
   }
-
 }

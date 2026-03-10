@@ -42,13 +42,16 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
   @override
   Widget build(BuildContext context) {
     provider = ref.watch(registrationProvider);
+    final screenProvider = ref.watch(professionScreenProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading:
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates ==
+                  RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
@@ -96,7 +99,8 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
             Wrap(
               spacing: 10,
               runSpacing: 10,
-              children: List.generate(provider.incomePeriodDataList.length, (index) {
+              children:
+                  List.generate(provider.incomePeriodDataList.length, (index) {
                 final incomePeriod = provider.incomePeriodDataList[index];
 
                 double screenWidth = MediaQuery.of(context).size.width - 40;
@@ -105,7 +109,9 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
                 return SizedBox(
                   width: itemWidth,
                   child: SelectionCard(
-                    buttonStyle: incomePeriod.isSelected ? SelectionStyle.selectedRadio : SelectionStyle.unSelectedRadio,
+                    buttonStyle: incomePeriod.isSelected
+                        ? SelectionStyle.selectedRadio
+                        : SelectionStyle.unSelectedRadio,
                     onTap: () {
                       provider.selectedIncomePeriod(index);
                     },

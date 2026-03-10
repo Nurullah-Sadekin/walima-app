@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
+import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,12 +41,14 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
   @override
   Widget build(BuildContext context) {
     provider = ref.watch(registrationProvider);
+    final screenProvider = ref.watch(aboutYourselfScreenProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates == RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
@@ -65,6 +69,40 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
           spacing: 10,
           children: [
             dataInsertField(),
+            const SizedBox(height: 20),
+            Column(
+              spacing: 10,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Verification Type',
+                  style: TextStyle(
+                    fontSize: TextSize.font14(context),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  spacing: 10,
+                  children: List.generate(provider.verificationList.length, (index) {
+                    final verificationType = provider.verificationList[index];
+                    double screenWidth = MediaQuery.of(context).size.width - 40;
+                    double itemWidth = (screenWidth - 10) / 3;
+                    return SizedBox(
+                      width: itemWidth,
+                      child: SelectionCard(
+                        buttonStyle: verificationType.isSelected ? SelectionStyle.selectedRadio : SelectionStyle.unSelectedRadio,
+                        onTap: () {
+                          provider.selectedVerificationTypeIndex(index);
+                        },
+                        isSelected: verificationType.isSelected,
+                        title: verificationType.name,
+                      ),
+                    );
+                  }),
+                ),
+              ],
+            ),
             const Spacer(),
             bottomAction(),
             const SizedBox(height: 20),
@@ -93,13 +131,27 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: provider.aboutYourselfController.text.isNotEmpty
+      buttonStyle: provider.aboutYourselfController.text.isNotEmpty && provider.selectedVerificationType.isNotEmpty
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
-        if (provider.aboutYourselfController.text.isNotEmpty) {
-          context.push(Paths.verifyNumber);
+        if (provider.aboutYourselfController.text.isNotEmpty && provider.selectedVerificationType.isNotEmpty) {
+          //transparent loading start
+          final screenNotifier = ref.read(emailPhoneScreenProvider);
+          screenNotifier.updateViewState(
+            loadingState: RegistrationScreenStates.isProfileFor,
+          );
+          provider.signUpViaOtp(context).then((_) {
+            // context.pushNamed(RouteNames.registrationLocation);
+          });
+          // provider.signUpViaOtp().then((_) {
+          //   // context.pushNamed(RouteNames.registrationLocation);
+          // });
+          
+          screenNotifier.updateViewState(
+            loadingState: RegistrationScreenStates.loadingComplete,
+          );
         }
       },
     );

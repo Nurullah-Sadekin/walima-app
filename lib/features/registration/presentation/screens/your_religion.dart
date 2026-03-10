@@ -40,12 +40,15 @@ class _YourRegionState extends ConsumerState<YourReligion> {
   @override
   Widget build(BuildContext context) {
     provider = ref.watch(registrationProvider);
+    final screenProvider = ref.watch(yourReligionScreenProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading:
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates ==
+                  RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
@@ -130,7 +133,7 @@ class _YourRegionState extends ConsumerState<YourReligion> {
             provider.livingInController.text.isEmpty) {
           return;
         }
-        context.push(Paths.location);
+        context.push(Paths.emailPhone);
       },
     );
   }

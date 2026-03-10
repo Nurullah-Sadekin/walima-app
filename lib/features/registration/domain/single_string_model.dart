@@ -177,4 +177,7 @@ List<SingleStringModel> countryListDataInserted = [
 
 ];
 
-
+List<SingleStringModel> verificationTypeList = [
+  SingleStringModel(name: 'Mobile'),
+  SingleStringModel(name: 'Email'),
+];

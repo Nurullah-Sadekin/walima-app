@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
-import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
@@ -18,10 +15,12 @@ import 'package:go_router/go_router.dart';
 class ResetPasswordStatusScreen extends ConsumerStatefulWidget {
   const ResetPasswordStatusScreen({super.key});
   @override
-  ConsumerState<ResetPasswordStatusScreen> createState() => _ResetPasswordStatusScreenState();
+  ConsumerState<ResetPasswordStatusScreen> createState() =>
+      _ResetPasswordStatusScreenState();
 }
 
-class _ResetPasswordStatusScreenState extends ConsumerState<ResetPasswordStatusScreen> {
+class _ResetPasswordStatusScreenState
+    extends ConsumerState<ResetPasswordStatusScreen> {
   late RegistrationProvider provider;
 
   @override
@@ -44,16 +43,14 @@ class _ResetPasswordStatusScreenState extends ConsumerState<ResetPasswordStatusS
   Widget build(BuildContext context) {
     provider = ref.watch(registrationProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading: false,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == RegistrationScreenStates.isProfileFor
-              ? const Loading()
-              : Column(
+          child: Column(
             children: [
               SizedBox(height: MediaQuery.of(context).size.height * 0.1),
-              const UpperLayer(imagePath: AppImages.done,isShowAppbar: false),
+              const UpperLayer(imagePath: AppImages.done, isShowAppbar: false),
               body(),
             ],
           ),
@@ -110,7 +107,7 @@ class _ResetPasswordStatusScreenState extends ConsumerState<ResetPasswordStatusS
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle:  ButtonsStyle.activePrimaryButton,
+      buttonStyle: ButtonsStyle.activePrimaryButton,
       title: 'Continue',
       onTap: () {
         context.push(Paths.partnerPreferences);

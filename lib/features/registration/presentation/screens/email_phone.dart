@@ -34,12 +34,15 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
   @override
   Widget build(BuildContext context) {
     provider = ref.watch(registrationProvider);
+    final screenProvider = ref.watch(emailPhoneScreenProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading:
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates ==
+                  RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
@@ -86,7 +89,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
                 ? AppColors.textPrimaryLight
                 : AppColors.hintTextColor,
           ),
-          errorText: null,
+          errorText: provider.emailAvailabilityErrorMessage,
           onTap: () {},
         ),
         PrimaryTextField(
@@ -94,7 +97,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
           headLine: 'Phone Number',
           keyboardType: TextInputType.phone,
           hintText: '(555) 000-0000',
-          errorText: null,
+          errorText: provider.phoneAvailabilityErrorMessage,
           noPrefix: true,
           onTap: () {},
         ),
@@ -109,12 +112,29 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,
       title: 'Continue',
-      onTap: () {
+      onTap: () async {
         if (provider.emailController.text.isEmpty ||
             provider.phoneController.text.isEmpty) {
           return;
         }
-        context.push(Paths.maritalStatus);
+
+        final screenNotifier = ref.read(emailPhoneScreenProvider);
+        screenNotifier.updateViewState(
+          loadingState: RegistrationScreenStates.isProfileFor,
+        );
+
+        try {
+          final isAvailable = await provider.checkEmailAndPhoneAvailability(context);
+
+          if (isAvailable && mounted) {
+            context.push(Paths.location);
+          }
+        } finally {
+          screenNotifier.updateViewState(
+            loadingState: RegistrationScreenStates.defaultLoading,
+          );
+        }
+        // context.push(Paths.maritalStatus);
       },
     );
   }
