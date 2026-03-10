@@ -3,9 +3,9 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 
-class ProfileCard extends StatelessWidget {
+class ProfileImageCard extends StatelessWidget {
 
-  const ProfileCard({
+  const ProfileImageCard({
     super.key,
     required this.imagePath,
     this.imageSize = 97,

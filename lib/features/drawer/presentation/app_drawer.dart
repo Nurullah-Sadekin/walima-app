@@ -4,7 +4,7 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
-import 'package:flutter_boilerplate/core/global/components/profile_card.dart';
+import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/app_router.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
@@ -93,7 +93,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ProfileCard(
+          ProfileImageCard(
             imagePath: AppImages.demoProfile,
             imageSize: 97,
             iconSize: 20,
