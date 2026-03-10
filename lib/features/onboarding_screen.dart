@@ -14,7 +14,7 @@ class OnboardingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        ShowImage(
+        const ShowImage(
           imagePath: 'assets/svgs/login_bg.svg',
           fit: BoxFit.cover,
           width: double.infinity,
@@ -31,8 +31,8 @@ class OnboardingScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Padding(
-                    padding:  EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.15),
-                    child: ShowImage(
+                    padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.15),
+                    child: const ShowImage(
                       imagePath: 'assets/svgs/walima.svg',
                       width: 270,
                       height: 72,
