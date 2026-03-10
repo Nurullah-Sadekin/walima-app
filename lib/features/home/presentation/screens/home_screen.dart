@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/connect_now_card.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
+import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
 
@@ -60,16 +61,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _topBar(BuildContext context) {
     return AppBar(
-      leading: GestureDetector(
-          child: const Icon(
-              Icons.menu_sharp,
-              color: AppColors.textPrimaryLight,
-          ),
-          onTap: () {
-            // Open the drawer using the scaffold key
-            // _scaffoldKey.currentState?.openDrawer();
-            _openDrawerOverNav();
-          },
+      leadingWidth: 40,
+      leading: IconButton(
+        icon: const ShowImage(
+          imagePath: AppImages.menuSvgIcon,
+          color: AppColors.textPrimaryLight,
+          height: 20,
+          width: 20,
+        ),
+        onPressed: _openDrawerOverNav,
       ),
       title: Text(
         'My Walima',
@@ -79,12 +79,14 @@ class _HomeScreenState extends State<HomeScreen> {
           fontWeight: FontWeight.w500,
         ),
       ),
-      actions: [
-        IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.notifications_none_rounded,
-              color: AppColors.textPrimaryLight),
+      actions: const [
+        ShowImage(
+          imagePath: AppImages.notificationSvgIcon,
+          color: AppColors.textPrimaryLight,
+          height: 20,
+          width: 20,
         ),
+
       ],
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -97,57 +99,20 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Stack(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(3.0),
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: const ShowImage(
-                  imagePath: AppImages.demoProfile,
-                  width: 97,
-                  height: 97,
-                  fit: BoxFit.cover,
-                  radius: BorderRadius.all(Radius.circular(50)),
-                ),
-              ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(4.0),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.white, width: 2),
-                  ),
-                  child: const Icon(
-                    Icons.edit_rounded,
-                    color: AppColors.white,
-                    size: 16,
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 0,
-                left: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(4.0),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.white, width: 2),
-                  ),
-                  child: const Icon(
-                    Icons.check_rounded,
-                    color: AppColors.white,
-                    size: 16,
-                  ),
-                ),
-              ),
-            ],
+          ProfileImageCard(
+            imagePath: AppImages.demoProfile,
+            imageSize: 97,
+            iconSize: 20,
+            showTopIcon: true,
+            showBottomIcon: true,
+            topPositionImagePath: AppImages.verifiedBadgeSvgIcon,
+            bottomPositionImagePath: AppImages.cameraSvgIcon,
+            onTopPressed: () {
+              print('Edit pressed');
+            },
+            onBottomPressed: () {
+              print('Check pressed');
+            },
           ),
           const SizedBox(width: 12),
           Expanded(child: _profileDetails(context)),
@@ -294,7 +259,9 @@ class _HomeScreenState extends State<HomeScreen> {
           alignment: Alignment.centerLeft,
           child: SizedBox(
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height, // full height to cover status bar
+            height: MediaQuery.of(context)
+                .size
+                .height, // full height to cover status bar
             child: const Material(
               color: Colors.transparent,
               child: AppDrawer(),
@@ -303,8 +270,9 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       },
       transitionBuilder: (context, animation, secondaryAnimation, child) {
-        final tween = Tween<Offset>(begin: const Offset(-1.0, 0.0), end: Offset.zero)
-            .chain(CurveTween(curve: Curves.easeOut));
+        final tween =
+            Tween<Offset>(begin: const Offset(-1.0, 0.0), end: Offset.zero)
+                .chain(CurveTween(curve: Curves.easeOut));
         return SlideTransition(
           position: animation.drive(tween),
           child: child,
@@ -312,5 +280,4 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
-
 }
