@@ -49,7 +49,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   List<ProfileForModel> profileForList = profileForListInserted;
   List<GenderProfileForModel> genderForList = genderForListInserted;
   List<IsWithFamilyModel> isWithFamilyDataList = isWithFamilyDataListInserted;
-  List<IsWithFamilyModel> incomePeriodDataList= incomePeriodDataListInserted;
+  List<IsWithFamilyModel> incomePeriodDataList = incomePeriodDataListInserted;
   List<SingleStringModel> dietDataList = dietDataListInserted;
   List<SingleStringModel> incomeRangeList = incomeRangeListInserted;
   List<SingleStringModel> yourWorkList = yourWorkListInserted;
@@ -90,7 +90,87 @@ class RegistrationProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
+  void cleanAllValue() {
+    selectedProfileName = null;
+    selectedGenderName = null;
+    selectedIsWithFamilyStatus = null;
+    selectedDietStatus = null;
+    selectedIncomePeriodStatus = null;
+    selectedIncomeRange = null;
+    selectedYourWork = null;
+    selectedYouWorkAs = null;
+
+    firstNameController.clear();
+    lastNameController.clear();
+    dateOfBirthController.clear();
+    religionController.clear();
+    communityController.clear();
+    livingInController.clear();
+    emailController.clear();
+    phoneController.clear();
+    passwordController.clear();
+    cityController.clear();
+    residencyStatusController.clear();
+    maritalStatusController.clear();
+    heightController.clear();
+    highestQualification.clear();
+    instituteController.clear();
+    anotherInstituteController.clear();
+    aboutYourselfController.clear();
+    currentCompanyNameController.clear();
+    incomeRangeController.clear();
+    yourWorkController.clear();
+    youWorkAsController.clear();
+    motherDetailsController.clear();
+    fatherDetailsController.clear();
+    noOfSisterController.clear();
+    noOfBrotherController.clear();
+
+    for (var item in profileForList) {
+      item.isSelected = false;
+    }
+    for (var item in genderForList) {
+      item.isSelected = false;
+    }
+    for (var item in isWithFamilyDataList) {
+      item.isSelected = false;
+    }
+    for (var item in dietDataList) {
+      item.isSelected = false;
+    }
+    for (var item in incomePeriodDataList) {
+      item.isSelected = false;
+    }
+
+    for (var item in creativeItemList) {
+      item.isSelected = false;
+    }
+    for (var item in funItemList) {
+      item.isSelected = false;
+    }
+    for (var item in fitnessItemList) {
+      item.isSelected = false;
+    }
+    for (var item in otherInterestsItemList) {
+      item.isSelected = false;
+    }
+
+    for (var item in motherDetailsItemList) {
+      item.isSelected = false;
+    }
+    for (var item in fatherDetailsItemList) {
+      item.isSelected = false;
+    }
+    for (var item in siblingCountList) {
+      item.isSelected = false;
+    }
+
+    selectedHobbies.clear();
+  }
+
   Future<void> getInitialData() async {
+    cleanAllValue();
+    updateViewState();
     // Simulate a delay for fetching data
   }
 
@@ -184,7 +264,6 @@ class RegistrationProvider extends BaseChangeNotifier {
       dataList[index].isSelected = true;
       selectedHobbies.add(dataList[index].name);
     } else {
-
       dataList[index].isSelected = false;
       selectedHobbies.remove(dataList[index].name);
     }
@@ -214,7 +293,6 @@ class RegistrationProvider extends BaseChangeNotifier {
     if (years < 0) years = 0;
     return '$years Years Age'.replaceFirst('\u007f', '');
   }
-
 
   int selectedHobbiesCount() {
     return selectedHobbies.length;
@@ -384,12 +462,9 @@ class RegistrationProvider extends BaseChangeNotifier {
     } catch (_) {}
 
     _controllersListener = null;
-
   }
 
-  void updateViewState(
-      {RegistrationScreenStates? screenStates,
-      RegistrationScreenStates? loadingState}) {
+  void updateViewState({RegistrationScreenStates? screenStates, RegistrationScreenStates? loadingState}) {
     if (screenStates != null) {
       this.screenStates = screenStates;
       loaderState = RegistrationScreenStates.defaultLoading;

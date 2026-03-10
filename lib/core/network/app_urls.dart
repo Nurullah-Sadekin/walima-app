@@ -14,4 +14,7 @@ class AppUrls{
   static const String changePassword = '$baseUrl/api/v1/auth/change-password';
   static const String getAccessToken = '$baseUrl/api/v1/auth/refresh-token';
   static const String googleSignin = '$baseUrl/api/v1/auth/google/signin';
+  // static const String createUserProfile = '$baseUrl/api/v1/users/profile';
+  static const String signUpCreateUserProfile = '$baseUrl/api/v1/users/onboarding';
+  
 }

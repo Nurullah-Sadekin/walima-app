@@ -3,7 +3,6 @@ import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 
 class KnowMoreItemCard extends StatelessWidget {
-
   const KnowMoreItemCard({
     super.key,
     required this.text,
@@ -32,7 +31,7 @@ class KnowMoreItemCard extends StatelessWidget {
       spacing: spacing,
       children: [
         Padding(
-          padding:  EdgeInsets.symmetric(vertical: iconPadding ?? 2.0),
+          padding: EdgeInsets.symmetric(vertical: iconPadding ?? 2.0),
           child: Icon(
             icon,
             color: iconColor,
@@ -44,11 +43,12 @@ class KnowMoreItemCard extends StatelessWidget {
             text,
             maxLines: maxLines,
             overflow: TextOverflow.ellipsis,
-            style: textStyle ?? TextStyle(
-              fontSize: TextSize.font12(context),
-              color: AppColors.textSecondaryLight,
-              fontWeight: FontWeight.w400,
-            ),
+            style: textStyle ??
+                TextStyle(
+                  fontSize: TextSize.font12(context),
+                  color: AppColors.textSecondaryLight,
+                  fontWeight: FontWeight.w400,
+                ),
           ),
         ),
       ],
