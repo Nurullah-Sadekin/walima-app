@@ -156,7 +156,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Column(
             children: [
-              _aboutMyself()
+              _aboutMyself(),
+              _basicDetails(),
             ],
           ),
         ),
@@ -236,32 +237,151 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
             ],
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _basicDetails() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(12.0),
+        border: Border.all(color: AppColors.greyLight),
+      ),
+      child: Column(
+        children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-               Expanded(
-                 flex: 3,
-                 child: Text(
-                    'Age:',
-                    style: TextStyle(
-                      color: AppColors.textSecondaryLight,
-                      fontSize: TextSize.font12(context),
-                      fontWeight: FontWeight.w400,
-                    ),
+                Text(
+                  'Basic Details',
+                  style: TextStyle(
+                    color: AppColors.textPrimaryLight,
+                    fontSize: TextSize.font14(context),
+                    fontWeight: FontWeight.w400,
                   ),
-               ),
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    '33',
-                    style: TextStyle(
-                      color: AppColors.textPrimaryLight,
-                      fontSize: TextSize.font12(context),
-                      fontWeight: FontWeight.w500,
-                    ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(8.0),
+                    border: Border.all(color: AppColors.greyLight),
                   ),
+                  child: Row(
+                    spacing: 4,
+                    children: [
+                      ShowImage(
+                        imagePath: AppImages.editWrite,
+                        width: TextSize.font16(context),
+                        height: TextSize.font16(context),
+                        color: AppColors.primary,
+                      ),
+                      Text(
+                        'Edit',
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontSize: TextSize.font14(context),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+          const Divider(height: 1, color: AppColors.greyLight),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
+            child: Column(
+              spacing: 6,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                   Expanded(
+                     flex: 3,
+                     child: Text(
+                        'Age:',
+                        style: TextStyle(
+                          color: AppColors.textSecondaryLight,
+                          fontSize: TextSize.font12(context),
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                   ),
+                    Expanded(
+                      flex: 4,
+                      child: Text(
+                        '33',
+                        style: TextStyle(
+                          color: AppColors.textPrimaryLight,
+                          fontSize: TextSize.font12(context),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                   Expanded(
+                     flex: 3,
+                     child: Text(
+                        'Date of Birth:',
+                        style: TextStyle(
+                          color: AppColors.textSecondaryLight,
+                          fontSize: TextSize.font12(context),
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                   ),
+                    Expanded(
+                      flex: 4,
+                      child: Text(
+                        '07-Aug-1992',
+                        style: TextStyle(
+                          color: AppColors.textPrimaryLight,
+                          fontSize: TextSize.font12(context),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                   Expanded(
+                     flex: 3,
+                     child: Text(
+                        'Marital Status:',
+                        style: TextStyle(
+                          color: AppColors.textSecondaryLight,
+                          fontSize: TextSize.font12(context),
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                   ),
+                    Expanded(
+                      flex: 4,
+                      child: Text(
+                        'Never Married',
+                        style: TextStyle(
+                          color: AppColors.textPrimaryLight,
+                          fontSize: TextSize.font12(context),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
