@@ -30,6 +30,10 @@ class AppImages {
   static const String profileSvgIcon = 'assets/svgIcons/profile.svg';
   static const String matchSvgIcon = 'assets/svgIcons/match.svg';
   static const String premiumSvgIcon = 'assets/svgIcons/premium.svg';
+  static const String verifiedBadgeSvgIcon = 'assets/svgIcons/verified_badge.svg';
+  static const String editSvgIcon = 'assets/svgIcons/edit.svg';
+
+
 
 
 

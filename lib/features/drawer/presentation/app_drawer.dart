@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
+import 'package:flutter_boilerplate/core/global/components/profile_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/app_router.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
@@ -92,57 +93,20 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Stack(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(3.0),
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: const ShowImage(
-                  imagePath: AppImages.demoProfile,
-                  width: 97,
-                  height: 97,
-                  fit: BoxFit.cover,
-                  radius: BorderRadius.all(Radius.circular(50)),
-                ),
-              ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(4.0),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.white, width: 2),
-                  ),
-                  child: const Icon(
-                    Icons.edit_rounded,
-                    color: AppColors.white,
-                    size: 16,
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 0,
-                left: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(4.0),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.white, width: 2),
-                  ),
-                  child: const Icon(
-                    Icons.check_rounded,
-                    color: AppColors.white,
-                    size: 16,
-                  ),
-                ),
-              ),
-            ],
+          ProfileCard(
+            imagePath: AppImages.demoProfile,
+            imageSize: 97,
+            iconSize: 20,
+            showTopIcon: true,
+            showBottomIcon: true,
+            topPositionImagePath: AppImages.verifiedBadgeSvgIcon,
+            bottomPositionImagePath: AppImages.editSvgIcon,
+            onTopPressed: () {
+              print('Edit pressed');
+            },
+            onBottomPressed: () {
+              print('Check pressed');
+            },
           ),
           const SizedBox(width: 12),
           Expanded(child: _profileDetails(context)),
