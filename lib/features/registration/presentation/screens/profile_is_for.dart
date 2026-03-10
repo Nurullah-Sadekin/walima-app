@@ -25,7 +25,6 @@ class _IsProfileForScreenState extends ConsumerState<IsProfileForScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(registrationProvider).getInitialData();
-      ref.read(registrationProvider).cleanAllValue();
     });
   }
 
@@ -34,12 +33,10 @@ class _IsProfileForScreenState extends ConsumerState<IsProfileForScreen> {
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(profileIsForScreenProvider);
     return TransparentLoading(
-      isLoading:
-          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         body: GradientBackground(
-          child: screenProvider.screenStates ==
-                  RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates == RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [

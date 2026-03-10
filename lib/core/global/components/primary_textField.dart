@@ -103,8 +103,8 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
 
             setState(() {});
           }
-
-          DateTime initialDate = DateTime.now();
+          //initial date will be 18 years ago from today
+          DateTime initialDate = DateTime.now().subtract(const Duration(days: 365 * 18));
           try {
             final existing =
                 widget.controller?.text ?? _internalController?.text ?? '';

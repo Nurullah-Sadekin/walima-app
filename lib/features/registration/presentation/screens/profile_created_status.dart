@@ -44,11 +44,13 @@ class _ProfileCreateStatusScreenState
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(profileCreatedStatusScreenProvider);
     return TransparentLoading(
-      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading:
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: screenProvider.screenStates == RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates ==
+                  RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
@@ -113,8 +115,11 @@ class _ProfileCreateStatusScreenState
     return PrimaryButtons(
       buttonStyle: ButtonsStyle.activePrimaryButton,
       title: 'Continue',
-      onTap: () {
-        context.push(Paths.partnerPreferences);
+      onTap: () async {
+        await provider.saveRegistrationProgress(verificationDone: true);
+        if (context.mounted) {
+          context.push(Paths.partnerPreferences);
+        }
       },
     );
   }

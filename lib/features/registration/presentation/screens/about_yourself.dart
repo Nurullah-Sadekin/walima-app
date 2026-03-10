@@ -11,7 +11,6 @@ import 'package:flutter_boilerplate/features/registration/presentation/providers
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
-import 'package:go_router/go_router.dart';
 
 class AboutYourselfScreen extends ConsumerStatefulWidget {
   const AboutYourselfScreen({super.key});

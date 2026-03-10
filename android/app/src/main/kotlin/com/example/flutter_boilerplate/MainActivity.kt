@@ -1,4 +1,4 @@
-package com.example.flutter_boilerplate
+package com.walima.media
 
 import io.flutter.embedding.android.FlutterActivity
 
