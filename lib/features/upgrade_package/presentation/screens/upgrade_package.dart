@@ -52,44 +52,55 @@ class _UpdateToPremiumState extends ConsumerState<UpgradePackageScreen> {
           verticalPadding: 0,
         ),
         const SizedBox(height: 24),
-        Text('Update to Premium',
-            style: TextStyle(
-                fontSize: TextSize.font24(context),
-                fontWeight: FontWeight.w500,
-                color: AppColors.textPrimaryLight),),
+        Text(
+          'Update to Premium',
+          style: TextStyle(
+              fontSize: TextSize.font24(context),
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimaryLight),
+        ),
       ],
     );
   }
 
   Widget _bodySection() {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(20.0),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           spacing: 10,
           children: [
-            PackageCard(
-              packageName: 'Hermony',
-              duration: '3 Months',
-              packagePrice: '2200',
-              perMonthPrice: '733',
-              buttonText: 'Continue',
-              buttonOnTap: () {},
-              messageText: 'Send unlimited messages',
-              contactCount: 100,
-              profileText: 'Profile highlight',
-              matchText: 'Direct contact from matches',
-              messageIsAvailable: true,
-              contactIsAvailable: true,
-              profileIsAvailable: false,
-              matchIsAvailable: false,
-              backgroundColor: AppColors.transparent,
-              packageThemeColor: Colors.purple,
-              packageBadgeBackgroundColor: Colors.purple.shade50,
-              packageBadgeText: 'Recommended',
-            ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: List.generate(6, (index) =>
+                    Padding(
+                          padding: const EdgeInsets.only(right: 16.0,),
+                          child: PackageCard(
+                            packageName: 'Hermony',
+                            duration: '3 Months',
+                            packagePrice: '2200',
+                            perMonthPrice: '733',
+                            buttonText: 'Continue',
+                            buttonOnTap: () {},
+                            messageText: 'Send unlimited messages',
+                            contactCount: 100,
+                            profileText: 'Profile highlight',
+                            matchText: 'Direct contact from matches',
+                            messageIsAvailable: true,
+                            contactIsAvailable: true,
+                            profileIsAvailable: false,
+                            matchIsAvailable: false,
+                            backgroundColor: AppColors.transparent,
+                            packageThemeColor: Colors.purple,
+                            packageBadgeBackgroundColor: Colors.purple.shade50,
+                            packageBadgeText: 'Recommended',
+                          ),
+                        )),
+              ),
+            )
           ],
         ),
       ),
