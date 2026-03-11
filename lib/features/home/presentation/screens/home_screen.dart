@@ -8,6 +8,7 @@ import 'package:flutter_boilerplate/core/global/components/profile_image_card.da
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/social_media_icon.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/verification_tile.dart';
@@ -65,37 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _topBar(BuildContext context) {
-    return AppBar(
-      leadingWidth: 40,
-      leading: IconButton(
-        icon: const ShowImage(
-          imagePath: AppImages.menuSvgIcon,
-          color: AppColors.textPrimaryLight,
-          height: 20,
-          width: 20,
-        ),
-        onPressed: _openDrawerOverNav,
-      ),
-      title: Text(
-        'My Walima',
-        style: TextStyle(
-          color: AppColors.textPrimaryLight,
-          fontSize: TextSize.font18(context),
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      actions: const [
-        ShowImage(
-          imagePath: AppImages.notificationSvgIcon,
-          color: AppColors.textPrimaryLight,
-          height: 20,
-          width: 20,
-        ),
-      ],
-      backgroundColor: Colors.transparent,
-      surfaceTintColor: Colors.transparent,
-      elevation: 0,
-    );
+    return AnchoredAppBar(context: context, title: 'My Walima');
   }
 
   Widget _profileSummary(BuildContext context) {
@@ -544,40 +515,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
-
-  void _openDrawerOverNav() {
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: 'Drawer',
-      barrierColor: Colors.black54,
-      transitionDuration: const Duration(milliseconds: 250),
-      pageBuilder: (context, animation, secondaryAnimation) {
-        // Full screen container (no SafeArea) so the drawer overlays the status/notification bar
-        return Align(
-          alignment: Alignment.centerLeft,
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context)
-                .size
-                .height, // full height to cover status bar
-            child: const Material(
-              color: Colors.transparent,
-              child: AppDrawer(),
-            ),
-          ),
-        );
-      },
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        final tween =
-            Tween<Offset>(begin: const Offset(-1.0, 0.0), end: Offset.zero)
-                .chain(CurveTween(curve: Curves.easeOut));
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
-      },
-    );
-  }
 }
