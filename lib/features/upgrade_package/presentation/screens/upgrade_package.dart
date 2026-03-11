@@ -7,10 +7,7 @@ import 'package:flutter_boilerplate/core/global/components/custom_expansion_tile
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/upgrade_package/presentation/screens/widgets/package_card.dart';
-import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/upgrade_package/presentation/providers/upgrade_package_provider.dart';
@@ -80,7 +77,7 @@ class _UpdateToPremiumState extends ConsumerState<UpgradePackageScreen> {
         ),
         const SizedBox(height: 20),
         Text(
-          'Update to Premium',
+          'Upgrade to Premium',
           style: TextStyle(
               fontSize: TextSize.font24(context),
               fontWeight: FontWeight.w500,
