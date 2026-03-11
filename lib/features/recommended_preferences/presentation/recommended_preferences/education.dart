@@ -99,28 +99,31 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   const double spacing = 10.0;
-                  return Consumer(builder: (context, ref, _) {
-                    final provider = ref.watch(recommendedPreferencesProvider);
-                    return Wrap(
-                      spacing: spacing,
-                      runSpacing: spacing,
-                      children: List.generate(provider.countryDataList.length,
-                          (index) {
-                        final item = provider.countryDataList[index];
+                  return Consumer(
+                    builder: (context, ref, _) {
+                      final provider =
+                          ref.watch(recommendedPreferencesProvider);
+                      return Wrap(
+                        spacing: spacing,
+                        runSpacing: spacing,
+                        children: List.generate(
+                            provider.educationDataList.length, (index) {
+                          final item = provider.educationDataList[index];
 
-                        return SelectionCard(
-                          buttonStyle: item.isSelected
-                              ? SelectionStyle.selectedCheckbox
-                              : SelectionStyle.unSelectedCheckbox,
-                          onTap: () {
-                            provider.toggleCity(index);
-                          },
-                          isSelected: item.isSelected,
-                          title: item.name,
-                        );
-                      }),
-                    );
-                  });
+                          return SelectionCard(
+                            buttonStyle: item.isSelected
+                                ? SelectionStyle.selectedCheckbox
+                                : SelectionStyle.unSelectedCheckbox,
+                            onTap: () {
+                              provider.toggleEducation(index);
+                            },
+                            isSelected: item.isSelected,
+                            title: item.name,
+                          );
+                        }),
+                      );
+                    },
+                  );
                 },
               ),
             ),

@@ -13,6 +13,33 @@ import 'package:flutter_boilerplate/features/registration/domain/repository/loca
 import 'package:flutter_boilerplate/features/registration/domain/repository/religion_data_repository.dart';
 import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 
+const List<String> _educationShortNameOptions = <String>[
+  'SSC/O-Level',
+  'HSC/A-Level',
+  'Cert/Cert I-IV',
+  'Dip/Diploma',
+  'AA/AS',
+  'BA',
+  'BS/BSc',
+  'BBA',
+  'BEd',
+  'BTech/BE',
+  'LLB',
+  'MBBS',
+  'PG',
+  'MA',
+  'MS/MSc',
+  'MBA',
+  'MEd',
+  'MTech/ME',
+  'LLM',
+  'MD/DMD',
+  'PhD/DPhil',
+  'GPA',
+  'CGPA',
+  'STEM',
+];
+
 class RecommendedPreferencesProvider extends BaseChangeNotifier {
   RecommendedPreferencesScreenStates screenStates =
       RecommendedPreferencesScreenStates.defaultLoading;
@@ -225,6 +252,11 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   }
 
   List<SingleStringModel> maritalStatusDataList = maritalStatusListDataInserted;
+  List<SingleStringModel> educationDataList = _educationShortNameOptions
+      .map(
+        (name) => SingleStringModel(name: name),
+      )
+      .toList(growable: false);
   List<SingleStringModel> countryDataList = countryListDataInserted;
   List<SingleStringModel> dietDataList = dietDataListInserted;
   List<SingleStringModel> incomeRangeDataList = incomeRangeListInserted;
@@ -232,6 +264,7 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
       fatherDetailsItemListDataInserted;
 
   final List<String> preferableMaritalStatuses = [];
+  final List<String> preferableEducations = [];
   final List<String> preferableCity = [];
   final List<String> preferableDiet = [];
 
@@ -270,6 +303,20 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
         preferableMaritalStatuses.add(item.name);
     } else {
       preferableMaritalStatuses.remove(item.name);
+    }
+    notifyListeners();
+  }
+
+  void toggleEducation(int index) {
+    if (index < 0 || index >= educationDataList.length) return;
+    final item = educationDataList[index];
+    item.isSelected = !item.isSelected;
+    if (item.isSelected) {
+      if (!preferableEducations.contains(item.name)) {
+        preferableEducations.add(item.name);
+      }
+    } else {
+      preferableEducations.remove(item.name);
     }
     notifyListeners();
   }
@@ -410,6 +457,9 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
         maritalStatusPreference: preferableMaritalStatuses.isNotEmpty
             ? List<String>.from(preferableMaritalStatuses)
             : null,
+        educationPreference: preferableEducations.isNotEmpty
+          ? List<String>.from(preferableEducations)
+          : null,
         dietPreference: preferableDiet.isNotEmpty
             ? List<String>.from(preferableDiet)
             : null,
