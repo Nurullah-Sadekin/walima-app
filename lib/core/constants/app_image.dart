@@ -6,6 +6,7 @@ class AppImages {
   // Image asset paths
   static const String photoGuidelines = 'assets/images/photo_guidelines.png';
   static const String demoProfile = 'assets/images/demoProfile.png';
+  static const String demoProfile2 = 'assets/images/demoProfile2.png';
 
 
   // Icon asset paths

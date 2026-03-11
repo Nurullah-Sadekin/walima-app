@@ -249,6 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             _completeProfileStatus(),
             _premiumMatches(),
+            _recentVisitors(),
             _followUpSection(),
           ],
         ),
@@ -390,6 +391,94 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _recentVisitors() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 6,
+                children: [
+                  Text(
+                    'Recent Visitors',
+                    style: TextStyle(
+                      color: AppColors.textPrimaryLight,
+                      fontSize: TextSize.font18(context),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Text(
+                    '26 Profiles Found',
+                    style: TextStyle(
+                      color: AppColors.textSecondaryLight,
+                      fontSize: TextSize.font14(context),
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 10.0, vertical: 10.0),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(color: AppColors.greyLight),
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      'View All',
+                      style: TextStyle(
+                        color: AppColors.textSecondaryLight,
+                        fontSize: TextSize.font14(context),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      color: AppColors.textSecondaryLight,
+                      size: TextSize.font12(context),
+                    )
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: List.generate(
+                  10,
+                      (index) => const Padding(
+                    padding: EdgeInsets.only(
+                      right: 10.0,
+                    ),
+                    child: ConnectNowCard(
+                      imagePath: AppImages.demoProfile2,
+                      iconPath: AppImages.premiumSvgIcon,
+                      isPremiumConnect: false,
+                      name: 'Profile Name',
+                      age: '28 Years',
+                      height: '5 Feet 3 Inches',
+                      location: 'Gulshan, Dhaka, BD',
+                    ),
+                  )),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   Widget _followUpSection() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
@@ -453,6 +542,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+
 
   void _openDrawerOverNav() {
     showGeneralDialog(
