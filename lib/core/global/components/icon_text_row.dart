@@ -61,6 +61,7 @@ class IconTextRow extends StatelessWidget {
               textAlign: textAlign,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
+              textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false, applyHeightToLastDescent: false),
               style: textStyle ??
                   TextStyle(
                     fontSize: textSize ?? TextSize.font12(context),

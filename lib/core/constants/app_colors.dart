@@ -59,7 +59,6 @@ class AppColors {
   static const Color inActiveBorderColor = Color(0xFF818092);
   static const Color textSub600 = Color(0xFF5C5C5C);
 
-  // Custom Linear Gradient
   static LinearGradient get customBackgroundGradient => const LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -68,7 +67,7 @@ class AppColors {
       Color(0xFFFFFFFF),
       Color(0xFFFAF5FF),
     ],
-    stops: [0.33, 0.67, 1.0],
+    stops: [0.0, 0.5, 1.0],
   );
 
 }

@@ -218,8 +218,8 @@ GoRouter goRouter(GoRouterRef ref) {
         builder: (context, state) => const EditProfileScreen(),
       ),
       GoRoute(
-        path: Paths.upgradePremium,
-        name: Routes.upgradeToPremium,
+        path: Paths.upgradePackage,
+        name: Routes.upgradePackage,
         builder: (context, state) => const UpgradePackageScreen(),
       ),
     ],
