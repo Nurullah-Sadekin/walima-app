@@ -25,6 +25,7 @@ class CustomExpansionTile extends StatefulWidget {
     this.onSelected,
     this.crossAxisAlignment = CrossAxisAlignment.start, // Default to left
     this.mainAxisAlignment = MainAxisAlignment.start, // Default to left
+    this.bottomMargin, // Default bottom margin
   });
   final String title;
   final Widget child;
@@ -46,6 +47,7 @@ class CustomExpansionTile extends StatefulWidget {
   final ValueChanged<bool>? onSelected;
   final CrossAxisAlignment? crossAxisAlignment; // Added for alignment
   final MainAxisAlignment? mainAxisAlignment;
+  final double? bottomMargin;
 
   @override
   State<CustomExpansionTile> createState() => _CustomExpansionTileState();
@@ -176,6 +178,9 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
                 );
               }),
             ),
+            widget.bottomMargin != null
+                ? SizedBox(height: widget.bottomMargin)
+                : const SizedBox.shrink(),
           ],
         ),
       ),

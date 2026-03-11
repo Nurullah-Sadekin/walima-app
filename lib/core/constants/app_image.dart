@@ -60,6 +60,8 @@ class AppImages {
   static const String editProfileSvgIcon = 'assets/svgIcons/edit_profile.svg';
   static const String menuSvgIcon = 'assets/svgIcons/menu.svg';
   static const String notificationSvgIcon = 'assets/svgIcons/notification.svg';
+  static const String callSvgIcon = 'assets/svgIcons/call.svg';
+  static const String whatsappSvgIcon = 'assets/svgIcons/whatsapp.svg';
 
 
 
