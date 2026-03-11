@@ -5,11 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
-import 'package:flutter_boilerplate/features/login/data/models/otp_verify_body.dart';
-import 'package:flutter_boilerplate/features/login/data/repository/login_repository.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_otp_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_request_body.dart';
+import 'package:flutter_boilerplate/features/registration/data/repository/location_data_repository_impl.dart';
+import 'package:flutter_boilerplate/features/registration/data/repository/religion_data_repository_impl.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/registration_repository.dart';
+import 'package:flutter_boilerplate/features/registration/domain/location_data_model.dart';
+import 'package:flutter_boilerplate/features/registration/domain/religion_option_model.dart';
+import 'package:flutter_boilerplate/features/registration/domain/repository/location_data_repository.dart';
+import 'package:flutter_boilerplate/features/registration/domain/repository/religion_data_repository.dart';
 import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/is_with_family_status_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/profile_for_model.dart';
@@ -89,6 +93,26 @@ class RegistrationProvider extends BaseChangeNotifier {
 
   String selectedVerificationType = 'email'; // or 'phone'
 
+  final ReligionDataRepository _religionDataRepository =
+      ReligionDataRepositoryImpl();
+  final LocationDataRepository _locationDataRepository =
+      LocationDataRepositoryImpl();
+
+  List<ReligionOptionModel> religionOptions = <ReligionOptionModel>[];
+  List<String> religionDropdownItems = <String>[];
+  List<String> communityDropdownItems = <String>[];
+  bool isReligionDataLoading = false;
+  String? religionDataError;
+
+  List<CountryLocationModel> countryOptions = <CountryLocationModel>[];
+  List<ResidencyStatusOptionModel> residencyStatusOptions =
+      <ResidencyStatusOptionModel>[];
+  List<String> countryDropdownItems = <String>[];
+  List<String> cityDropdownItems = <String>[];
+  List<String> residencyStatusDropdownItems = <String>[];
+  bool isLocationDataLoading = false;
+  String? locationDataError;
+
   List<TextEditingController> get _managedControllers => [
         firstNameController,
         lastNameController,
@@ -139,7 +163,7 @@ class RegistrationProvider extends BaseChangeNotifier {
 
   List<TextEditingController> otpControllers = [];
   List<FocusNode> otpFocusNodesController = [];
-  
+
   void initOtpFields({int length = 5}) {
     disposeOtpFields();
 
@@ -152,13 +176,13 @@ class RegistrationProvider extends BaseChangeNotifier {
 
     notifyListeners();
   }
+
   void _disposeSafely(ChangeNotifier notifier) {
     try {
       notifier.dispose();
     } catch (_) {}
   }
 
-  
   void disposeOtpFields({bool notify = true}) {
     for (final c in otpControllers) {
       _disposeSafely(c);
@@ -175,8 +199,9 @@ class RegistrationProvider extends BaseChangeNotifier {
       notifyListeners();
     }
   }
+
   static const String _otpIncompleteMessage = 'Please enter the complete OTP';
-  
+
 /*  Future<bool> otpValidate(BuildContext context) async {
     if (otpControllers.any((c) => c.text.isEmpty)) {
       DialogUtils.showErrorDialog(
@@ -204,11 +229,11 @@ class RegistrationProvider extends BaseChangeNotifier {
       return false;
     }
   }*/
-  
+
   final TextEditingController otpController = TextEditingController();
-  
+
   String otpCode = '';
-  
+
   Future<bool> resendOtp(BuildContext context) async {
     otpCode = '';
     otpController.clear();
@@ -239,7 +264,7 @@ class RegistrationProvider extends BaseChangeNotifier {
 
     _controllersListener = null;
   }
-  
+
   void cleanAllValue() {
     _clearSelectedValues();
     _clearAllControllers();
@@ -267,6 +292,8 @@ class RegistrationProvider extends BaseChangeNotifier {
     for (final controller in _managedControllers) {
       controller.clear();
     }
+    communityDropdownItems = <String>[];
+    cityDropdownItems = <String>[];
   }
 
   void _resetAllSelections() {
@@ -310,8 +337,205 @@ class RegistrationProvider extends BaseChangeNotifier {
   Future<void> getInitialData() async {
     if (_isDraftInitialized) return;
     await _restoreRegistrationDraft();
+    await loadReligionData();
+    await loadLocationData();
     _isDraftInitialized = true;
     notifyListeners();
+  }
+
+  Future<void> loadReligionData() async {
+    if (isReligionDataLoading) return;
+
+    if (religionOptions.isNotEmpty) {
+      _syncCommunityOptionsFromSelectedReligion();
+      notifyListeners();
+      return;
+    }
+
+    isReligionDataLoading = true;
+    religionDataError = null;
+    notifyListeners();
+
+    try {
+      religionOptions = await _religionDataRepository.getReligionOptions();
+      religionDropdownItems =
+          religionOptions.map((item) => item.name).toList(growable: false);
+      _syncCommunityOptionsFromSelectedReligion();
+    } catch (e) {
+      religionDataError = e.toString();
+    } finally {
+      isReligionDataLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void onReligionSelected(String? value) {
+    final selectedValue = value?.trim() ?? '';
+    if (selectedValue.isEmpty) return;
+
+    if (religionController.text != selectedValue) {
+      religionController.text = selectedValue;
+      communityController.clear();
+    }
+
+    _syncCommunityOptionsFromSelectedReligion();
+    _notifyAndPersist();
+  }
+
+  void onCommunitySelected(String? value) {
+    final selectedValue = value?.trim() ?? '';
+    if (selectedValue.isEmpty) return;
+
+    communityController.text = selectedValue;
+    _notifyAndPersist();
+  }
+
+  void _syncCommunityOptionsFromSelectedReligion() {
+    final selectedReligion = religionController.text.trim();
+    if (selectedReligion.isEmpty) {
+      communityDropdownItems = <String>[];
+      return;
+    }
+
+    final matchedReligion = _findReligionOption(selectedReligion);
+    if (matchedReligion == null) {
+      communityDropdownItems = <String>[];
+      return;
+    }
+
+    communityDropdownItems = matchedReligion.community.flattenCommunityLabels();
+
+    if (communityDropdownItems.isEmpty) {
+      communityDropdownItems = matchedReligion.community.topLevelLabels();
+    }
+
+    if (communityController.text.isNotEmpty) {
+      final selectedCommunity = communityController.text.trim().toLowerCase();
+      final exists = communityDropdownItems.any(
+        (item) => item.toLowerCase() == selectedCommunity,
+      );
+
+      if (!exists) {
+        communityController.clear();
+      }
+    }
+  }
+
+  ReligionOptionModel? _findReligionOption(String religion) {
+    final normalized = religion.trim().toLowerCase();
+    for (final option in religionOptions) {
+      final byName = option.name.toLowerCase() == normalized;
+      final byValue = option.value.toLowerCase() == normalized;
+      if (byName || byValue) {
+        return option;
+      }
+    }
+    return null;
+  }
+
+  Future<void> loadLocationData() async {
+    if (isLocationDataLoading) return;
+
+    if (countryOptions.isNotEmpty && residencyStatusOptions.isNotEmpty) {
+      _syncCityOptionsFromSelectedCountry();
+      notifyListeners();
+      return;
+    }
+
+    isLocationDataLoading = true;
+    locationDataError = null;
+    notifyListeners();
+
+    try {
+      countryOptions = await _locationDataRepository.getCountries();
+      residencyStatusOptions =
+          await _locationDataRepository.getResidencyStatuses();
+
+      countryDropdownItems =
+          countryOptions.map((item) => item.name).toList(growable: false);
+      residencyStatusDropdownItems = residencyStatusOptions
+          .map((item) => item.name)
+          .toList(growable: false);
+
+      _syncCityOptionsFromSelectedCountry();
+    } catch (e) {
+      locationDataError = e.toString();
+    } finally {
+      isLocationDataLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void onLivingInSelected(String? value) {
+    final selectedValue = value?.trim() ?? '';
+    if (selectedValue.isEmpty) return;
+
+    final previousValue = livingInController.text;
+    livingInController.text = selectedValue;
+
+    if (previousValue.toLowerCase() != selectedValue.toLowerCase()) {
+      cityController.clear();
+    }
+
+    _syncCityOptionsFromSelectedCountry();
+    _notifyAndPersist();
+  }
+
+  void onCitySelected(String? value) {
+    final selectedValue = value?.trim() ?? '';
+    if (selectedValue.isEmpty) return;
+
+    cityController.text = selectedValue;
+    _notifyAndPersist();
+  }
+
+  void onResidencyStatusSelected(String? value) {
+    final selectedValue = value?.trim() ?? '';
+    if (selectedValue.isEmpty) return;
+
+    residencyStatusController.text = selectedValue;
+    _notifyAndPersist();
+  }
+
+  void _syncCityOptionsFromSelectedCountry() {
+    final selectedCountry = livingInController.text.trim();
+    if (selectedCountry.isEmpty) {
+      cityDropdownItems = <String>[];
+      return;
+    }
+
+    if (countryOptions.isEmpty) {
+      return;
+    }
+
+    final matchedCountry = _findCountryOption(selectedCountry);
+    if (matchedCountry == null) {
+      cityDropdownItems = <String>[];
+      return;
+    }
+
+    cityDropdownItems = matchedCountry.cityNames();
+
+    if (cityController.text.isNotEmpty) {
+      final selectedCity = cityController.text.trim().toLowerCase();
+      final exists = cityDropdownItems.any(
+        (item) => item.toLowerCase() == selectedCity,
+      );
+
+      if (!exists) {
+        cityController.clear();
+      }
+    }
+  }
+
+  CountryLocationModel? _findCountryOption(String country) {
+    final normalized = country.trim().toLowerCase();
+    for (final option in countryOptions) {
+      if (option.name.toLowerCase() == normalized) {
+        return option;
+      }
+    }
+    return null;
   }
 
   void selectedProfileFor(int index) {
@@ -476,7 +700,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   int selectedHobbiesCount() {
     return selectedHobbies.length;
   }
-  
+
   void _notifyAndPersist() {
     notifyListeners();
     _scheduleDraftPersist();
@@ -737,6 +961,9 @@ class RegistrationProvider extends BaseChangeNotifier {
         (item) => item.name,
         (item, selected) => item.isSelected = selected,
       );
+
+      _syncCommunityOptionsFromSelectedReligion();
+      _syncCityOptionsFromSelectedCountry();
     } catch (_) {
       // Ignore malformed draft and continue with defaults.
     } finally {
@@ -842,7 +1069,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       otpCode: otp,
       liveWithFamily: selectedIsWithFamilyStatus?.toLowerCase() == 'yes',
       displayName: '${firstNameController.text} ${lastNameController.text}',
-      purpose: 'signup',  
+      purpose: 'signup',
       countryCode: 'IN',
       locationType: 'permanent',
     );
@@ -856,13 +1083,7 @@ class RegistrationProvider extends BaseChangeNotifier {
 
   String phoneAvailabilityErrorMessage = '';
   String emailAvailabilityErrorMessage = '';
-  
-  
-  String _getProfileManagedBy() {
-    if (selectedProfileName == null) return 'self';
-    if (selectedProfileName!.toLowerCase() == 'self') return 'self';
-    return 'parent';
-  }
+
   Future<bool> checkEmailAndPhoneAvailability(BuildContext context) async {
     final emailRes =
         await RegistrationRepository.checkEmail(emailController.text);
@@ -903,12 +1124,11 @@ class RegistrationProvider extends BaseChangeNotifier {
       _notifyAndPersist();
       return true;
     } else {
-      DialogUtils.showErrorDialog(context: context, message: response.message ?? 'Failed to send OTP');
+      DialogUtils.showErrorDialog(
+          context: context, message: response.message ?? 'Failed to send OTP');
       return false;
     }
-    
   }
-  
 
   @override
   void dispose() {

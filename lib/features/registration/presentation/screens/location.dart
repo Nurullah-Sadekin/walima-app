@@ -6,7 +6,6 @@ import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
@@ -30,6 +29,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider.getInitialData();
       provider.initControllersListener();
+      provider.loadLocationData();
     });
   }
 
@@ -45,7 +45,8 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
     final screenProvider = ref.watch(locationScreenProvider);
     return TransparentLoading(
       isLoading:
-          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor ||
+              provider.isLocationDataLoading,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
@@ -86,13 +87,18 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
       spacing: 20,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        PrimaryTextField(
-          controller: provider.cityController,
+        DropDownField(
           headLine: 'City',
-          hintText: 'Write here',
-          errorText: null,
-          noPrefix: true,
-          onTap: () {},
+          hintText: provider.livingInController.text.isEmpty
+              ? 'Select Living In first'
+              : 'Select',
+          popUpHeader: 'Select City',
+          items: provider.cityDropdownItems,
+          controller: provider.cityController,
+          enabled: provider.livingInController.text.isNotEmpty,
+          onTap: provider.loadLocationData,
+          onConfirm: (value) => provider.onCitySelected(value?.toString()),
+          isSearch: true,
         ),
         Column(
           spacing: 10,
@@ -136,9 +142,11 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
           headLine: 'Residency Status',
           hintText: 'Select',
           popUpHeader: 'Select Residency Status',
-          items: const ['Bangladesh', 'India', 'USA', 'UK'],
+          items: provider.residencyStatusDropdownItems,
           controller: provider.residencyStatusController,
-          onTap: () {},
+          onTap: provider.loadLocationData,
+          onConfirm: (value) =>
+              provider.onResidencyStatusSelected(value?.toString()),
           isSearch: true,
         ),
       ],

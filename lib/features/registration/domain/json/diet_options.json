@@ -1,0 +1,8 @@
+[
+  { "name": "Vegetarian", "value": "vegetarian" },
+  { "name": "Non Vegetarian", "value": "non_vegetarian" },
+  { "name": "Halal Only", "value": "halal_only" },
+  { "name": "Vegan", "value": "vegan" },
+  { "name": "Jain Vegetarian", "value": "jain_vegetarian" },
+  { "name": "Occasionally Non Veg", "value": "occasionally_non_veg" }
+]

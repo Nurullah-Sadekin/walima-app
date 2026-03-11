@@ -1,0 +1,8 @@
+[
+  { "name": "Citizen", "value": "citizen" },
+  { "name": "Permanent Resident", "value": "permanent_resident" },
+  { "name": "Work Permit", "value": "work_permit" },
+  { "name": "Student Visa", "value": "student_visa" },
+  { "name": "Temporary Visa", "value": "temporary_visa" },
+  { "name": "Visitor", "value": "visitor" }
+]

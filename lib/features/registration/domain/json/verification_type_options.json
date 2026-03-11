@@ -1,0 +1,5 @@
+[
+  { "name": "Email", "value": "email" },
+  { "name": "Mobile", "value": "phone" },
+  { "name": "Google", "value": "google" }
+]
