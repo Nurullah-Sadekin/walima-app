@@ -3,7 +3,6 @@ import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 
 class CustomExpansionTile extends StatefulWidget {
-
   const CustomExpansionTile({
     super.key,
     required this.title,
@@ -22,6 +21,7 @@ class CustomExpansionTile extends StatefulWidget {
     this.initiallyExpanded = false,
     this.isLeading = false,
     this.selected = false,
+    this.allowDeselect = true,
     this.onSelected,
     this.crossAxisAlignment = CrossAxisAlignment.start, // Default to left
     this.mainAxisAlignment = MainAxisAlignment.start, // Default to left
@@ -42,6 +42,7 @@ class CustomExpansionTile extends StatefulWidget {
   final bool initiallyExpanded;
   final bool isLeading;
   final bool selected;
+  final bool allowDeselect;
   final ValueChanged<bool>? onSelected;
   final CrossAxisAlignment? crossAxisAlignment; // Added for alignment
   final MainAxisAlignment? mainAxisAlignment;
@@ -70,19 +71,28 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
   }
 
   void _handleSelectToggle() {
-    setState(() {
-      _selected = !_selected;
-    });
-    if (widget.onSelected != null) widget.onSelected!(_selected);
+    final nextSelected = widget.allowDeselect ? !_selected : true;
+
+    if (nextSelected != _selected) {
+      setState(() {
+        _selected = nextSelected;
+      });
+    }
+
+    if (widget.onSelected != null) {
+      widget.onSelected!(nextSelected);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       decoration: BoxDecoration(
         color: _isExpanded ? widget.backgroundColor : AppColors.white,
-        border: Border.all(color: (_isExpanded ? widget.borderColor : AppColors.greyLight) ?? AppColors.greyLight, width: 1),
+        border: Border.all(
+            color: (_isExpanded ? widget.borderColor : AppColors.greyLight) ??
+                AppColors.greyLight,
+            width: 1),
         borderRadius: BorderRadius.all(
           Radius.circular(widget.borderRadius ?? 8),
         ),
@@ -94,7 +104,8 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
         child: ExpansionTile(
           initiallyExpanded: widget.initiallyExpanded,
           onExpansionChanged: (v) => setState(() => _isExpanded = v),
-          collapsedIconColor: widget.collapsedIconColor ?? AppColors.hintTextColor,
+          collapsedIconColor:
+              widget.collapsedIconColor ?? AppColors.hintTextColor,
           iconColor: widget.iconColor ?? AppColors.hintTextColor,
           leading: widget.isLeading
               ? GestureDetector(
@@ -108,7 +119,8 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: _selected ? AppColors.primary : AppColors.greyLight,
+                        color:
+                            _selected ? AppColors.primary : AppColors.greyLight,
                         width: _selected ? 3 : 1,
                       ),
                     ),
@@ -144,15 +156,18 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
             Container(
               width: double.infinity,
               color: Colors.white,
-              padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 16.0),
+              padding: widget.padding ??
+                  const EdgeInsets.symmetric(horizontal: 16.0),
               child: Builder(builder: (context) {
                 final maxChildHeight = MediaQuery.of(context).size.height * 0.6;
                 return ConstrainedBox(
                   constraints: BoxConstraints(maxHeight: maxChildHeight),
                   child: SingleChildScrollView(
                     child: Column(
-                      crossAxisAlignment: widget.crossAxisAlignment ?? CrossAxisAlignment.start,
-                      mainAxisAlignment: widget.mainAxisAlignment ?? MainAxisAlignment.start,
+                      crossAxisAlignment:
+                          widget.crossAxisAlignment ?? CrossAxisAlignment.start,
+                      mainAxisAlignment:
+                          widget.mainAxisAlignment ?? MainAxisAlignment.start,
                       children: [
                         widget.child,
                       ],

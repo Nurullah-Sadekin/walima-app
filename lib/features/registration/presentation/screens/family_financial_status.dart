@@ -47,7 +47,8 @@ class _FamilyFinancialStatusScreenState
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(familyFinancialStatusScreenProvider);
     return TransparentLoading(
-      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading:
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
@@ -145,6 +146,16 @@ class _FamilyFinancialStatusScreenState
                   borderColor: AppColors.primary,
                   backgroundColor: AppColors.primaryVariant,
                   isLeading: true,
+                  allowDeselect: false,
+                  selected:
+                      provider.selectedFamilyEconomicCondition?.toLowerCase() ==
+                          'elite',
+                  onSelected: (isSelected) {
+                    provider.onFamilyEconomicConditionSelected(
+                      'Elite',
+                      selected: isSelected,
+                    );
+                  },
                   child: Column(
                     spacing: 8,
                     children: [
@@ -170,6 +181,16 @@ class _FamilyFinancialStatusScreenState
                   borderColor: AppColors.primary,
                   backgroundColor: AppColors.primaryVariant,
                   isLeading: true,
+                  allowDeselect: false,
+                  selected:
+                      provider.selectedFamilyEconomicCondition?.toLowerCase() ==
+                          'high',
+                  onSelected: (isSelected) {
+                    provider.onFamilyEconomicConditionSelected(
+                      'High',
+                      selected: isSelected,
+                    );
+                  },
                   child: Column(
                     spacing: 8,
                     children: [
@@ -195,6 +216,16 @@ class _FamilyFinancialStatusScreenState
                   borderColor: AppColors.primary,
                   backgroundColor: AppColors.primaryVariant,
                   isLeading: true,
+                  allowDeselect: false,
+                  selected:
+                      provider.selectedFamilyEconomicCondition?.toLowerCase() ==
+                          'middle',
+                  onSelected: (isSelected) {
+                    provider.onFamilyEconomicConditionSelected(
+                      'Middle',
+                      selected: isSelected,
+                    );
+                  },
                   child: Column(
                     spacing: 8,
                     children: [
@@ -220,6 +251,16 @@ class _FamilyFinancialStatusScreenState
                   borderColor: AppColors.primary,
                   backgroundColor: AppColors.primaryVariant,
                   isLeading: true,
+                  allowDeselect: false,
+                  selected:
+                      provider.selectedFamilyEconomicCondition?.toLowerCase() ==
+                          'aspiring',
+                  onSelected: (isSelected) {
+                    provider.onFamilyEconomicConditionSelected(
+                      'Aspiring',
+                      selected: isSelected,
+                    );
+                  },
                   child: Column(
                     spacing: 8,
                     children: [
@@ -256,14 +297,16 @@ class _FamilyFinancialStatusScreenState
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,
       title: 'Continue & Submit',
-      onTap: () async{
+      onTap: () async {
         if (hasAnyValue) return;
         final screenProvider = ref.read(familyFinancialStatusScreenProvider);
-        screenProvider.updateViewState(loadingState:  RegistrationScreenStates.isProfileFor);
-        final updated =await provider.updateFamilyEarning(context);
-        screenProvider.updateViewState(loadingState:  RegistrationScreenStates.loadingComplete);
-        if(updated && mounted){
-          if(context.mounted){
+        screenProvider.updateViewState(
+            loadingState: RegistrationScreenStates.isProfileFor);
+        final updated = await provider.updateFamilyEarning(context);
+        screenProvider.updateViewState(
+            loadingState: RegistrationScreenStates.loadingComplete);
+        if (updated && mounted) {
+          if (context.mounted) {
             context.push(Paths.profileCreatedStatus);
           }
         }

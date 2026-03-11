@@ -48,32 +48,69 @@ class UpdateFamilyRequestBody {
   });
 
   Map<String, dynamic> toJson() {
-    return {
-      'familyType': familyType,
-      'familyValues': familyValues,
-      'familyEconomicCondition': familyEconomicCondition,
-      'fatherName': fatherName,
-      'fatherProfession': fatherProfession,
-      'motherName': motherName,
-      'motherProfession': motherProfession,
-      'brothers': brothers,
-      'sisters': sisters,
-      // 'brothersMarried': brothersMarried,
-      // 'sistersMarried': sistersMarried,
-      'brothersDetails': brothersDetails?.map((e) => e.toJson()).toList(),
-      'sistersDetails': sistersDetails?.map((e) => e.toJson()).toList(),
-      'extendedFamilyMembers':
-          extendedFamilyMembers?.map((e) => e.toJson()).toList(),
-      'additionalFamilyMembers':
-          additionalFamilyMembers?.map((e) => e.toJson()).toList(),
-      'familyLocation': familyLocation,
-      'familyIncome': familyIncome,
-      'familyBackground': familyBackground,
-      'ancestralOrigin': ancestralOrigin,
-      'aboutFamily': aboutFamily,
-      'marriageTimeline': marriageTimeline,
-      'childrenPreference': childrenPreference,
-    };
+    final data = <String, dynamic>{};
+
+    void addValue(String key, dynamic value) {
+      if (value == null) {
+        return;
+      }
+      if (value is String && value.trim().isEmpty) {
+        return;
+      }
+      if (value is List && value.isEmpty) {
+        return;
+      }
+      data[key] = value;
+    }
+
+    addValue('familyType', familyType?.trim());
+    addValue('familyValues', familyValues?.trim());
+    addValue('familyEconomicCondition', familyEconomicCondition?.trim());
+    addValue('fatherName', fatherName?.trim());
+    addValue('fatherProfession', fatherProfession?.trim());
+    addValue('motherName', motherName?.trim());
+    addValue('motherProfession', motherProfession?.trim());
+    addValue('brothers', brothers);
+    addValue('sisters', sisters);
+    addValue('brothersMarried', brothersMarried);
+    addValue('sistersMarried', sistersMarried);
+    addValue(
+      'brothersDetails',
+      brothersDetails
+          ?.map((e) => e.toJson())
+          .where((entry) => entry.isNotEmpty)
+          .toList(growable: false),
+    );
+    addValue(
+      'sistersDetails',
+      sistersDetails
+          ?.map((e) => e.toJson())
+          .where((entry) => entry.isNotEmpty)
+          .toList(growable: false),
+    );
+    addValue(
+      'extendedFamilyMembers',
+      extendedFamilyMembers
+          ?.map((e) => e.toJson())
+          .where((entry) => entry.isNotEmpty)
+          .toList(growable: false),
+    );
+    addValue(
+      'additionalFamilyMembers',
+      additionalFamilyMembers
+          ?.map((e) => e.toJson())
+          .where((entry) => entry.isNotEmpty)
+          .toList(growable: false),
+    );
+    addValue('familyLocation', familyLocation?.trim());
+    addValue('familyIncome', familyIncome?.trim());
+    addValue('familyBackground', familyBackground?.trim());
+    addValue('ancestralOrigin', ancestralOrigin?.trim());
+    addValue('aboutFamily', aboutFamily?.trim());
+    addValue('marriageTimeline', marriageTimeline?.trim());
+    addValue('childrenPreference', childrenPreference?.trim());
+
+    return data;
   }
 }
 
@@ -89,11 +126,17 @@ class FamilyMemberDetail {
   });
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'maritalStatus': maritalStatus,
-      'profession': profession,
-    };
+    final data = <String, dynamic>{};
+    if (name != null && name!.trim().isNotEmpty) {
+      data['name'] = name!.trim();
+    }
+    if (maritalStatus != null && maritalStatus!.trim().isNotEmpty) {
+      data['maritalStatus'] = maritalStatus!.trim();
+    }
+    if (profession != null && profession!.trim().isNotEmpty) {
+      data['profession'] = profession!.trim();
+    }
+    return data;
   }
 }
 
@@ -109,11 +152,17 @@ class ExtendedFamilyMember {
   });
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'relation': relation,
-      'profession': profession,
-    };
+    final data = <String, dynamic>{};
+    if (name != null && name!.trim().isNotEmpty) {
+      data['name'] = name!.trim();
+    }
+    if (relation != null && relation!.trim().isNotEmpty) {
+      data['relation'] = relation!.trim();
+    }
+    if (profession != null && profession!.trim().isNotEmpty) {
+      data['profession'] = profession!.trim();
+    }
+    return data;
   }
 }
 
@@ -131,11 +180,19 @@ class AdditionalFamilyMember {
   });
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'relation': relation,
-      'maritalStatus': maritalStatus,
-      'profession': profession,
-    };
+    final data = <String, dynamic>{};
+    if (name != null && name!.trim().isNotEmpty) {
+      data['name'] = name!.trim();
+    }
+    if (relation != null && relation!.trim().isNotEmpty) {
+      data['relation'] = relation!.trim();
+    }
+    if (maritalStatus != null && maritalStatus!.trim().isNotEmpty) {
+      data['maritalStatus'] = maritalStatus!.trim();
+    }
+    if (profession != null && profession!.trim().isNotEmpty) {
+      data['profession'] = profession!.trim();
+    }
+    return data;
   }
 }

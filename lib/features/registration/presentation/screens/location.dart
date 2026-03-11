@@ -27,7 +27,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
     super.initState();
     provider = ref.read(registrationProvider);
     WidgetsBinding.instance.addPostFrameCallback((_) async{
-      provider.loadLocationData();
+      await provider.loadLocationData();
        provider.initControllersListener();
        await provider.getInitialData();
     });
@@ -95,7 +95,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
           items: provider.cityDropdownItems,
           controller: provider.cityController,
           enabled: provider.livingInController.text.isNotEmpty,
-          onTap: provider.loadLocationData,
+          // onTap: provider.loadLocationData,
           onConfirm: (value) => provider.onCitySelected(value?.toString()),
           isSearch: true,
         ),

@@ -114,7 +114,7 @@ class LocationDataRepositoryImpl implements LocationDataRepository {
 
     final cacheKey = normalized.toLowerCase();
     final cached = _cachedCitiesByCountry[cacheKey];
-    if (cached != null) {
+    if (cached != null && cached.isNotEmpty) {
       return cached;
     }
 
@@ -130,7 +130,7 @@ class LocationDataRepositoryImpl implements LocationDataRepository {
           'size': _pageSize,
           'sortBy': 'id',
           'sortOrder': 'ASC',
-          'countries': cacheKey,
+          'countries': normalized,
         },
         isTokenRequired: true,
       );

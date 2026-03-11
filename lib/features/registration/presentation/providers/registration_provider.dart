@@ -44,6 +44,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   String? selectedIncomeRange;
   String? selectedYourWork;
   String? selectedYouWorkAs;
+  String? selectedFamilyEconomicCondition;
 
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
@@ -229,6 +230,16 @@ class RegistrationProvider extends BaseChangeNotifier {
     'no preferences': 'occasionally_non_veg',
   };
 
+  static const Map<String, String> _familyEconomicConditionAliases =
+      <String, String>{
+    'elite': 'elite',
+    'high': 'high',
+    'middle': 'middle_class',
+    'middle class': 'middle_class',
+    'middle_class': 'middle_class',
+    'aspiring': 'aspiring',
+  };
+
   List<TextEditingController> get _managedControllers => [
         firstNameController,
         lastNameController,
@@ -402,6 +413,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     selectedIncomeRange = null;
     selectedYourWork = null;
     selectedYouWorkAs = null;
+    selectedFamilyEconomicCondition = null;
     uploadedProfileMedia = null;
     profileImageUploadErrorMessage = '';
   }
@@ -711,6 +723,30 @@ class RegistrationProvider extends BaseChangeNotifier {
     _notifyAndPersist();
   }
 
+  void onFamilyEconomicConditionSelected(
+    String? value, {
+    bool selected = true,
+  }) {
+    final normalizedValue = value?.trim() ?? '';
+
+    if (!selected || normalizedValue.isEmpty) {
+      if (selectedFamilyEconomicCondition == null) {
+        return;
+      }
+      selectedFamilyEconomicCondition = null;
+      _notifyAndPersist();
+      return;
+    }
+
+    if (selectedFamilyEconomicCondition?.toLowerCase() ==
+        normalizedValue.toLowerCase()) {
+      return;
+    }
+
+    selectedFamilyEconomicCondition = normalizedValue;
+    _notifyAndPersist();
+  }
+
   void selectedDiet(int index) {
     if (!_isValidIndex(index, dietDataList.length)) return;
     _setSingleSelection(
@@ -866,6 +902,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       'selectedIncomeRange': selectedIncomeRange,
       'selectedYourWork': selectedYourWork,
       'selectedYouWorkAs': selectedYouWorkAs,
+      'selectedFamilyEconomicCondition': selectedFamilyEconomicCondition,
       'selectedVerificationType': selectedVerificationType,
       'selectedHobbies': selectedHobbies,
       'creativeSectionSelected': creativeSectionSelected,
@@ -985,6 +1022,8 @@ class RegistrationProvider extends BaseChangeNotifier {
           yourWorkController.text;
       selectedYouWorkAs = _asStringOrNull(decoded['selectedYouWorkAs']) ??
           youWorkAsController.text;
+      selectedFamilyEconomicCondition =
+          _asStringOrNull(decoded['selectedFamilyEconomicCondition']);
       selectedVerificationType =
           _asStringOrNull(decoded['selectedVerificationType']) ??
               selectedVerificationType;
@@ -1241,6 +1280,17 @@ class RegistrationProvider extends BaseChangeNotifier {
       return candidate;
     }
     return 'occasionally_non_veg';
+  }
+
+  String? _resolveFamilyEconomicConditionValue() {
+    final selected = selectedFamilyEconomicCondition?.trim() ?? '';
+    if (selected.isEmpty) {
+      return null;
+    }
+
+    final normalized = selected.toLowerCase();
+    return _familyEconomicConditionAliases[normalized] ??
+        _toSnakeCase(selected);
   }
 
   String _resolveHighestEducationValue() {
@@ -1535,30 +1585,91 @@ class RegistrationProvider extends BaseChangeNotifier {
         .toList();
   }
 
+  String? _toTrimmedOrNull(String value) {
+    final normalized = value.trim();
+    if (normalized.isEmpty) {
+      return null;
+    }
+    return normalized;
+  }
+
+  int? _parseSiblingCount(String value) {
+    final normalized = value.trim();
+    if (normalized.isEmpty) {
+      return null;
+    }
+
+    final matched = RegExp(r'\d+').firstMatch(normalized);
+    if (matched == null) {
+      return null;
+    }
+
+    return int.tryParse(matched.group(0)!);
+  }
+
+  Future<bool> _submitFamilyUpdate(
+    BuildContext context,
+    UpdateFamilyRequestBody body, {
+    required String fallbackMessage,
+  }) async {
+    if (body.toJson().isEmpty) {
+      return true;
+    }
+
+    final response = await _familyRepository.updateFamily(body);
+    if (response.code == 'SUCCESS') {
+      return true;
+    }
+
+    await DialogUtils.showErrorDialog(
+      context: context,
+      message: response.message ?? fallbackMessage,
+    );
+    return false;
+  }
+
   Future<bool> updateFamilyDetails(BuildContext context) async {
     try {
       final body = UpdateFamilyRequestBody(
-        familyType: selectedProfileName?.toLowerCase(),
-        fatherName: fatherDetailsController.text,
-        motherName: motherDetailsController.text,
-        brothers: int.tryParse(noOfBrotherController.text),
-        sisters: int.tryParse(noOfSisterController.text),
-        // Additional fields can be populated as needed from form data
+        fatherProfession: _toTrimmedOrNull(fatherDetailsController.text),
+        motherProfession: _toTrimmedOrNull(motherDetailsController.text),
+        brothers: _parseSiblingCount(noOfBrotherController.text),
+        sisters: _parseSiblingCount(noOfSisterController.text),
       );
 
-      final response = await _familyRepository.updateFamily(body);
-      if(response.code != 'SUCCESS') {
-        DialogUtils.showErrorDialog(context: context,
-            message: response.message ?? 'Failed to update family details');
-      }
-      return response.code == 'SUCCESS';
+      return _submitFamilyUpdate(
+        context,
+        body,
+        fallbackMessage: 'Failed to update family details',
+      );
     } catch (e) {
+      await DialogUtils.showErrorDialog(
+        context: context,
+        message: 'Failed to update family details',
+      );
       return false;
     }
   }
 
   Future<bool> updateFamilyEarning(BuildContext context) async {
-    return true;
+    try {
+      final body = UpdateFamilyRequestBody(
+        // familyEconomicCondition: _resolveFamilyEconomicConditionValue(),
+        familyEconomicCondition: 'middle_class',
+      );
+
+      return _submitFamilyUpdate(
+        context,
+        body,
+        fallbackMessage: 'Failed to update family earning details',
+      );
+    } catch (e) {
+      await DialogUtils.showErrorDialog(
+        context: context,
+        message: 'Failed to update family earning details',
+      );
+      return false;
+    }
   }
 }
 
