@@ -9,6 +9,8 @@ import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/features/upgrade_package/presentation/providers/upgrade_package_provider.dart';
 
 class UpgradePackageScreen extends ConsumerStatefulWidget {
   const UpgradePackageScreen({super.key});
@@ -18,16 +20,21 @@ class UpgradePackageScreen extends ConsumerStatefulWidget {
 }
 
 class _UpdateToPremiumState extends ConsumerState<UpgradePackageScreen> {
-
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final provider = ref.watch(upgradePackageProvider);
+
     return Scaffold(
       body: GradientBackground(
         child: Column(
           children: [
             _headerSection(),
-            _bodySection(),
+            _bodySection(provider),
           ],
         ),
       ),
@@ -45,14 +52,13 @@ class _UpdateToPremiumState extends ConsumerState<UpgradePackageScreen> {
           trailingText: 'Skip',
           onTrailingTap: () {
             context.push(Paths.anchor);
-            // Handle skip action
           },
           spacing: 0,
           imageHeight: 120,
           imageWidth: 145,
           verticalPadding: 0,
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 20),
         Text(
           'Update to Premium',
           style: TextStyle(
@@ -64,84 +70,76 @@ class _UpdateToPremiumState extends ConsumerState<UpgradePackageScreen> {
     );
   }
 
-  Widget _bodySection() {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: SingleChildScrollView(
+  Widget _bodySection(UpgradePackageProvider provider) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          spacing: 10,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const SizedBox(height: 16),
-
-            // Replace horizontal list with CarouselSlider
-            CarouselSlider(
+            CarouselSlider.builder(
+              itemCount: provider.packageItems.length,
+              itemBuilder: (context, index, realIdx) {
+                final item = provider.packageItems[index];
+                return PackageCard(
+                  packageName: item.packageName,
+                  duration: item.duration,
+                  packagePrice: item.packagePrice,
+                  perMonthPrice: item.perMonthPrice,
+                  buttonText: item.buttonText ?? 'Continue',
+                  buttonOnTap: () {},
+                  messageText: 'Send unlimited messages',
+                  contactCount: 100,
+                  profileText: 'Profile highlight',
+                  matchText: 'Direct contact from matches',
+                  messageIsAvailable: item.messageIsAvailable ?? false,
+                  contactIsAvailable: item.contactIsAvailable ?? false,
+                  profileIsAvailable: item.profileIsAvailable ?? false,
+                  matchIsAvailable: item.matchIsAvailable ?? false,
+                  backgroundColor: AppColors.transparent,
+                  packageBadgeText: item.packageBadgeText,
+                );
+              },
               options: CarouselOptions(
                 autoPlay: false,
                 enlargeCenterPage: true,
-                viewportFraction: 1.0,
-                onPageChanged: (index, reason) {
-                 // homeController.changePage(index);
+                scrollDirection: Axis.horizontal,
+                viewportFraction: 0.8,
+                animateToClosest: false,
+                enableInfiniteScroll: false,
+                disableCenter: true,
+                aspectRatio: 0.95,
+                onPageChanged: (index, _) {
+                  ref.read(upgradePackageProvider).changePage(index);
                 },
               ),
-              items: [1,2,3,4,5].map((i) {
-                return Builder(
-                  builder: (BuildContext context) {
-                    return Container(
-                      width: MediaQuery.of(context).size.width,
-                      margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                      decoration: const BoxDecoration(
-                        color: Colors.transparent,
-                      ),
-                      child: PackageCard(
-                        packageName: 'Hermony',
-                        duration: '3 Months',
-                        packagePrice: '2200',
-                        perMonthPrice: '733',
-                        buttonText: 'Continue',
-                        buttonOnTap: () {},
-                        messageText: 'Send unlimited messages',
-                        contactCount: 100,
-                        profileText: 'Profile highlight',
-                        matchText: 'Direct contact from matches',
-                        messageIsAvailable: true,
-                        contactIsAvailable: true,
-                        profileIsAvailable: false,
-                        matchIsAvailable: false,
-                        backgroundColor: AppColors.transparent,
-                        packageThemeColor: Colors.purple,
-                        packageBadgeBackgroundColor: Colors.purple.shade50,
-                        packageBadgeText: 'Recommended',
-                      ),
-                    );
-                  },
-                );
-              }).toList(),
             ),
-    Obx(() {
-    return Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: List.generate(homeController.splashList.length, (index) {
-    return InkWell(
-    onTap: () => homeController.changePage(index),
-    child: Container(
-    width: homeController.selectedPage.value == index ? 15.0 : 10.0,
-    height: 10.0,
-    margin: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 4.0),
-    decoration: BoxDecoration(
-    borderRadius: const BorderRadius.all(Radius.circular(7)),
-    color: homeController.selectedPage.value == index
-    ? AppColor.baseColor
-        : Colors.grey.shade300,
-    ),
-    ),
-    );
-    }),
-    );
+
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(provider.packageItems.length, (index) {
+                final isActive = provider.selectedPage == index;
+                return GestureDetector(
+                  onTap: () => ref.read(upgradePackageProvider).changePage(index),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    width: isActive ? 20 : 10,
+                    height: 10,
+                    margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10 / 2),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10 / 2),
+                      color: isActive ? AppColors.primary : Colors.grey.shade300,
+                    ),
+                  ),
+                );
+              }),
+            ),
           ],
         ),
       ),
     );
+
   }
 }
