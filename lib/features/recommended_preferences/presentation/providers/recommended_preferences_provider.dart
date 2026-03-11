@@ -8,6 +8,7 @@ import 'package:flutter_boilerplate/features/recommended_preferences/data/reposi
 import 'package:flutter_boilerplate/features/registration/data/repository/location_data_repository_impl.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/religion_data_repository_impl.dart';
 import 'package:flutter_boilerplate/features/registration/domain/location_data_model.dart';
+import 'package:flutter_boilerplate/features/registration/domain/profile_for_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/religion_option_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/repository/location_data_repository.dart';
 import 'package:flutter_boilerplate/features/registration/domain/repository/religion_data_repository.dart';
@@ -257,6 +258,11 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
         (name) => SingleStringModel(name: name),
       )
       .toList(growable: false);
+  List<SingleStringModel> profileManageByDataList = profileForListInserted
+      .map(
+        (item) => SingleStringModel(name: item.name),
+      )
+      .toList(growable: false);
   List<SingleStringModel> countryDataList = countryListDataInserted;
   List<SingleStringModel> dietDataList = dietDataListInserted;
   List<SingleStringModel> incomeRangeDataList = incomeRangeListInserted;
@@ -265,6 +271,7 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
 
   final List<String> preferableMaritalStatuses = [];
   final List<String> preferableEducations = [];
+  final List<String> preferableProfileManagedBy = [];
   final List<String> preferableCity = [];
   final List<String> preferableDiet = [];
 
@@ -317,6 +324,20 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
       }
     } else {
       preferableEducations.remove(item.name);
+    }
+    notifyListeners();
+  }
+
+  void toggleProfileManageBy(int index) {
+    if (index < 0 || index >= profileManageByDataList.length) return;
+    final item = profileManageByDataList[index];
+    item.isSelected = !item.isSelected;
+    if (item.isSelected) {
+      if (!preferableProfileManagedBy.contains(item.name)) {
+        preferableProfileManagedBy.add(item.name);
+      }
+    } else {
+      preferableProfileManagedBy.remove(item.name);
     }
     notifyListeners();
   }
@@ -475,8 +496,9 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
             _toListOrNull(professionPreferenceController.text),
         annualIncomePreference:
             _toListOrNull(annualIncomePreferenceController.text),
-        profileManagedByPreference:
-            _toListOrNull(profileManagePreferenceController.text),
+        profileManagedByPreference: preferableProfileManagedBy.isNotEmpty
+          ? List<String>.from(preferableProfileManagedBy)
+          : _toListOrNull(profileManagePreferenceController.text),
       );
 
       if (body.toJson().isEmpty) {
