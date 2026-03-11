@@ -50,7 +50,7 @@ class ConnectNowCard extends StatelessWidget {
                 width: double.infinity,
                 height: imageSize,
                 radius: BorderRadius.circular(8),
-                fit: BoxFit.fitWidth,
+                fit: BoxFit.fill,
               ),
               if (isPremiumConnect)
               Positioned(
