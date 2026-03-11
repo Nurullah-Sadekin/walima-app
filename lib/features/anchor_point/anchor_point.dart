@@ -5,6 +5,7 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/home_screen.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/screens/matches.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Current tab provider
@@ -19,7 +20,7 @@ class AnchorPointScreen extends ConsumerWidget {
 
     final screens = [
       const HomeScreen(),
-      Container(),
+      const MatchesScreen(),
       Container(),
       Container(),
       Container(),
