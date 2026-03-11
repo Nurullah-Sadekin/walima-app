@@ -5,7 +5,7 @@ import 'package:flutter_boilerplate/features/login/presentation/screens/otp_veri
 import 'package:flutter_boilerplate/features/login/presentation/screens/reset_pssword_status.dart';
 import 'package:flutter_boilerplate/features/login/presentation/screens/send_otp.dart';
 import 'package:flutter_boilerplate/features/onboarding_screen.dart';
-import 'package:flutter_boilerplate/features/recommended_preferences/presentation/connect_purchesase_card.dart';
+import 'package:flutter_boilerplate/features/recommended_preferences/presentation/connect_matches.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/basic_details.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/career.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/community.dart';
@@ -13,6 +13,7 @@ import 'package:flutter_boilerplate/features/recommended_preferences/presentatio
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/other_details.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/partner_preferences.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/preference_location.dart';
+import 'package:flutter_boilerplate/features/recommended_preferences/presentation/upgrade_to_premium.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/about_you.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/email_phone.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/family_details.dart';
@@ -215,6 +216,11 @@ GoRouter goRouter(GoRouterRef ref) {
         path: Paths.editProfile,
         name: Routes.editProfile,
         builder: (context, state) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: Paths.upgradePremium,
+        name: Routes.upgradeToPremium,
+        builder: (context, state) => const UpdateToPremium(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

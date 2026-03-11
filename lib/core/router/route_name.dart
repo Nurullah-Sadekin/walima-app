@@ -47,6 +47,7 @@ abstract class Paths {
 
   // Home Screens
   static const editProfile = '/editProfile';
+  static const upgradePremium = '/upgradePremium';
 
 
 
@@ -99,5 +100,6 @@ abstract class Routes {
 
   // Home Screens
   static const editProfile = 'editProfile';
+  static const upgradeToPremium = 'upgradeToPremium';
 
 }
