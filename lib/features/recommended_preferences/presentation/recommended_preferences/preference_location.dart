@@ -16,10 +16,12 @@ import 'package:go_router/go_router.dart';
 class PreferenceLocationScreen extends ConsumerStatefulWidget {
   const PreferenceLocationScreen({super.key});
   @override
-  ConsumerState<PreferenceLocationScreen> createState() => _PreferenceLocationScreenState();
+  ConsumerState<PreferenceLocationScreen> createState() =>
+      _PreferenceLocationScreenState();
 }
 
-class _PreferenceLocationScreenState extends ConsumerState<PreferenceLocationScreen> {
+class _PreferenceLocationScreenState
+    extends ConsumerState<PreferenceLocationScreen> {
   late RecommendedPreferencesProvider provider;
 
   @override
@@ -43,21 +45,24 @@ class _PreferenceLocationScreenState extends ConsumerState<PreferenceLocationScr
   Widget build(BuildContext context) {
     provider = ref.watch(recommendedPreferencesProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == RecommendedPreferencesScreenStates.preferences,
+      isLoading: provider.loaderState ==
+          RecommendedPreferencesScreenStates.preferences,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == RecommendedPreferencesScreenStates.preferences
+          child: provider.screenStates ==
+                  RecommendedPreferencesScreenStates.preferences
               ? const Loading()
               : Column(
-            children: [
-              const UpperLayer(
-                  imagePath: AppImages.recommendedPreferences,
-                  isShowAppbar: true,
-                  isBackButton: true,),
-              body(),
-            ],
-          ),
+                  children: [
+                    const UpperLayer(
+                      imagePath: AppImages.recommendedPreferences,
+                      isShowAppbar: true,
+                      isBackButton: true,
+                    ),
+                    body(),
+                  ],
+                ),
         ),
       ),
     );
@@ -109,7 +114,8 @@ class _PreferenceLocationScreenState extends ConsumerState<PreferenceLocationScr
                   child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
                     child: Consumer(builder: (context, ref, _) {
-                      final provider = ref.watch(recommendedPreferencesProvider);
+                      final provider =
+                          ref.watch(recommendedPreferencesProvider);
                       if (provider.cityDropdownItems.isEmpty) {
                         return const SizedBox.shrink();
                       }
@@ -118,8 +124,8 @@ class _PreferenceLocationScreenState extends ConsumerState<PreferenceLocationScr
                         spacing: spacing,
                         runSpacing: spacing,
                         children: provider.cityDropdownItems.map((cityName) {
-                          final isSelected = provider.preferableCity
-                              .contains(cityName);
+                          final isSelected =
+                              provider.preferableCity.contains(cityName);
                           return SelectionCard(
                             buttonStyle: isSelected
                                 ? SelectionStyle.selectedCheckbox
