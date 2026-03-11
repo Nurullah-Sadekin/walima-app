@@ -662,7 +662,6 @@ class RegistrationProvider extends BaseChangeNotifier {
       cityDropdownItems = <String>[];
       locationDataError = e.toString();
     }
-
     if (cityController.text.isNotEmpty) {
       final selectedCity = cityController.text.trim().toLowerCase();
       final exists = cityDropdownItems.any(
@@ -677,6 +676,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     if (notify) {
       notifyListeners();
     }
+
   }
 
   CountryLocationModel? _findCountryOption(String country) {
