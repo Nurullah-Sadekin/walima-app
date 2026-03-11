@@ -26,10 +26,10 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
   void initState() {
     super.initState();
     provider = ref.read(registrationProvider);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      provider.getInitialData();
-      provider.initControllersListener();
+    WidgetsBinding.instance.addPostFrameCallback((_) async{
       provider.loadLocationData();
+       provider.initControllersListener();
+       await provider.getInitialData();
     });
   }
 
@@ -45,8 +45,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
     final screenProvider = ref.watch(locationScreenProvider);
     return TransparentLoading(
       isLoading:
-          screenProvider.loaderState == RegistrationScreenStates.isProfileFor ||
-              provider.isLocationDataLoading,
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor || provider.isLocationDataLoading,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,

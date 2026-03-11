@@ -20,4 +20,6 @@ class AppUrls{
   static const String checkNumberAvailability = '$baseUrl/api/v1/users/check-phone';
 
   static const String uploadMedia = '$baseUrl/api/v1/media/upload';
+  static const String getAllCountry = '$baseUrl/api/v1/countries';
+  static const String getCityByCountry = '$baseUrl/api/v1/cities';
 }

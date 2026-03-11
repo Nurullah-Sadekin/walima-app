@@ -32,14 +32,16 @@ class _UpdateToPremiumState extends ConsumerState<UpdateToPremium> {
                   // Handle skip action
                 },
               ),
-              Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.all(0),
-                  itemCount: 5,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: PreferenceConnectCard(
+              const SizedBox(height: 60),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 10,
+                    children: [
+                      PreferenceConnectCard(
                         isSelected: _isSelected,
                         onTap: () {
                           setState(() {
@@ -53,11 +55,30 @@ class _UpdateToPremiumState extends ConsumerState<UpdateToPremium> {
                         religion: 'Muslim, Sunni',
                         location: 'Gulshan, Dhaka, BD',
                       ),
-                    );
-                  },
+                      // PackageCard(
+                      //   packageName: 'Hermony',
+                      //   duration: '3 Months',
+                      //   packagePrice: '2200',
+                      //   perMonthPrice: '733',
+                      //   buttonText: 'Continue',
+                      //   buttonOnTap: () {},
+                      //   messageText: 'Send unlimited messages',
+                      //   contactCount: 100,
+                      //   profileText: 'Profile highlight',
+                      //   matchText: 'Direct contact from matches',
+                      //   messageIsAvailable: true,
+                      //   contactIsAvailable: true,
+                      //   profileIsAvailable: false,
+                      //   matchIsAvailable: false,
+                      //   backgroundColor: AppColors.transparent,
+                      //   packageThemeColor: Colors.purple,
+                      //   packageBadgeBackgroundColor: Colors.purple.shade50,
+                      //   packageBadgeText: 'Recommended',
+                      // ),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 60),
             ],
           ),
       ),

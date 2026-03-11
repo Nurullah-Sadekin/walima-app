@@ -59,53 +59,7 @@ class _ConnectMatchesState extends ConsumerState<ConnectMatches> {
           ),
           const SizedBox(
             height: 60,
-          )
-          // Padding(
-          //   padding: const EdgeInsets.all(16.0),
-          //   child: SingleChildScrollView(
-          //     child: Column(
-          //       crossAxisAlignment: CrossAxi sAlignment.center,
-          //       mainAxisAlignment: MainAxisAlignment.center,
-          //       spacing: 10,
-          //       children: [
-          //         PreferenceConnectCard(
-          //           isSelected: _isSelected,
-          //           onTap: () {
-          //             setState(() {
-          //               _isSelected = !_isSelected;
-          //             });
-          //           },
-          //           imagePath: AppImages.demoProfile,
-          //           name: 'Profile Name',
-          //           age: '28 Years',
-          //           height: '5 Feet 3 Inches',
-          //           religion: 'Muslim, Sunni',
-          //           location: 'Gulshan, Dhaka, BD',
-          //         ),
-          //         // PackageCard(
-          //         //   packageName: 'Hermony',
-          //         //   duration: '3 Months',
-          //         //   packagePrice: '2200',
-          //         //   perMonthPrice: '733',
-          //         //   buttonText: 'Continue',
-          //         //   buttonOnTap: () {},
-          //         //   messageText: 'Send unlimited messages',
-          //         //   contactCount: 100,
-          //         //   profileText: 'Profile highlight',
-          //         //   matchText: 'Direct contact from matches',
-          //         //   messageIsAvailable: true,
-          //         //   contactIsAvailable: true,
-          //         //   profileIsAvailable: false,
-          //         //   matchIsAvailable: false,
-          //         //   backgroundColor: AppColors.transparent,
-          //         //   packageThemeColor: Colors.purple,
-          //         //   packageBadgeBackgroundColor: Colors.purple.shade50,
-          //         //   packageBadgeText: 'Recommended',
-          //         // ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
+          ),
         ],
       )),
     );
