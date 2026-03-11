@@ -47,8 +47,7 @@ class _FamilyFinancialStatusScreenState
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(familyFinancialStatusScreenProvider);
     return TransparentLoading(
-      isLoading:
-          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
@@ -257,9 +256,17 @@ class _FamilyFinancialStatusScreenState
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,
       title: 'Continue & Submit',
-      onTap: () {
+      onTap: () async{
         if (hasAnyValue) return;
-        context.push(Paths.profileCreatedStatus);
+        final screenProvider = ref.read(familyFinancialStatusScreenProvider);
+        screenProvider.updateViewState(loadingState:  RegistrationScreenStates.isProfileFor);
+        final updated =await provider.updateFamilyEarning(context);
+        screenProvider.updateViewState(loadingState:  RegistrationScreenStates.loadingComplete);
+        if(updated && mounted){
+          if(context.mounted){
+            context.push(Paths.profileCreatedStatus);
+          }
+        }
         // proceed
       },
     );

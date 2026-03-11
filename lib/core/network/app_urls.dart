@@ -24,4 +24,5 @@ class AppUrls{
   static const String getCityByCountry = '$baseUrl/api/v1/cities';
   static const String getPlans = '$baseUrl/api/v1/plans';
   static const String updateHobbiesInterest = '$baseUrl/api/v1/users/profile/interests';
+  static const String updateFamily = '$baseUrl/api/v1/users/profile/family';
 }

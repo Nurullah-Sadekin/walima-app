@@ -11,9 +11,11 @@ import 'package:flutter_boilerplate/features/registration/data/models/request/si
 import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_request_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/request/upload_media_request_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/request/update_interests_request_body.dart';
+import 'package:flutter_boilerplate/features/registration/data/models/request/update_family_request_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/response/onboarding_response.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/response/upload_media_response.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/interests_repository.dart';
+import 'package:flutter_boilerplate/features/registration/data/repository/family_repository.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/location_data_repository_impl.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/media_repository.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/religion_data_repository_impl.dart';
@@ -108,6 +110,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       LocationDataRepositoryImpl();
   final MediaRepository _mediaRepository = MediaRepository();
   final InterestsRepository _interestsRepository = InterestsRepository();
+  final FamilyRepository _familyRepository = FamilyRepository();
 
   List<ReligionOptionModel> religionOptions = <ReligionOptionModel>[];
   List<String> religionDropdownItems = <String>[];
@@ -1530,6 +1533,32 @@ class RegistrationProvider extends BaseChangeNotifier {
         .where((item) => item.isSelected)
         .map((item) => item.name)
         .toList();
+  }
+
+  Future<bool> updateFamilyDetails(BuildContext context) async {
+    try {
+      final body = UpdateFamilyRequestBody(
+        familyType: selectedProfileName?.toLowerCase(),
+        fatherName: fatherDetailsController.text,
+        motherName: motherDetailsController.text,
+        brothers: int.tryParse(noOfBrotherController.text),
+        sisters: int.tryParse(noOfSisterController.text),
+        // Additional fields can be populated as needed from form data
+      );
+
+      final response = await _familyRepository.updateFamily(body);
+      if(response.code != 'SUCCESS') {
+        DialogUtils.showErrorDialog(context: context,
+            message: response.message ?? 'Failed to update family details');
+      }
+      return response.code == 'SUCCESS';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> updateFamilyEarning(BuildContext context) async {
+    return true;
   }
 }
 
