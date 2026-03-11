@@ -168,7 +168,8 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
 
     try {
       countryOptions = await _locationDataRepository.getCountries();
-      countryDropdownItems = countryOptions.map((item) => item.name).toList(growable: false);
+      countryDropdownItems =
+          countryOptions.map((item) => item.name).toList(growable: false);
       await _syncCityOptionsFromSelectedCountry(notify: false);
     } catch (e) {
       locationDataError = e.toString();
@@ -194,8 +195,7 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _syncCityOptionsFromSelectedCountry(
-      {bool notify = true}) async {
+  Future<void> _syncCityOptionsFromSelectedCountry({bool notify = true}) async {
     final selectedCountry = countryPreferenceController.text.trim();
     if (selectedCountry.isEmpty) {
       cityDropdownItems = <String>[];
@@ -477,8 +477,8 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
             ? List<String>.from(preferableMaritalStatuses)
             : null,
         educationPreference: preferableEducations.isNotEmpty
-          ? List<String>.from(preferableEducations)
-          : null,
+            ? List<String>.from(preferableEducations)
+            : null,
         dietPreference: preferableDiet.isNotEmpty
             ? List<String>.from(preferableDiet)
             : null,
@@ -495,8 +495,8 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
         annualIncomePreference:
             _toListOrNull(annualIncomePreferenceController.text),
         profileManagedByPreference: preferableProfileManagedBy.isNotEmpty
-          ? List<String>.from(preferableProfileManagedBy)
-          : _toListOrNull(profileManagePreferenceController.text),
+            ? List<String>.from(preferableProfileManagedBy)
+            : _toListOrNull(profileManagePreferenceController.text),
       );
 
       if (body.toJson().isEmpty) {
