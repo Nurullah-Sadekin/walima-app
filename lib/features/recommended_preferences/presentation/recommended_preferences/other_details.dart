@@ -166,8 +166,11 @@ class _OtherDetailsScreenState extends ConsumerState<OtherDetailsScreen> {
     return PrimaryButtons(
       buttonStyle: ButtonsStyle.activePrimaryButton,
       title: 'Continue',
-      onTap: () {
-       context.push(Paths.connectMatches);
+      onTap: () async {
+        final success = await provider.updatePreferences(context);
+        if (success && context.mounted) {
+          context.push(Paths.connectMatches);
+        }
       },
     );
   }

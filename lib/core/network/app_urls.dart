@@ -25,4 +25,5 @@ class AppUrls{
   static const String getPlans = '$baseUrl/api/v1/plans';
   static const String updateHobbiesInterest = '$baseUrl/api/v1/users/profile/interests';
   static const String updateFamily = '$baseUrl/api/v1/users/profile/family';
+  static const String updatePreferences = '$baseUrl/api/v1/users/profile/preferences';
 }
