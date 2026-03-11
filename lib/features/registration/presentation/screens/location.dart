@@ -26,10 +26,10 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
   void initState() {
     super.initState();
     provider = ref.read(registrationProvider);
-    WidgetsBinding.instance.addPostFrameCallback((_) async{
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       await provider.loadLocationData();
-       provider.initControllersListener();
-       await provider.getInitialData();
+      provider.initControllersListener();
+      await provider.getInitialData();
     });
   }
 
@@ -45,7 +45,8 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
     final screenProvider = ref.watch(locationScreenProvider);
     return TransparentLoading(
       isLoading:
-          screenProvider.loaderState == RegistrationScreenStates.isProfileFor || provider.isLocationDataLoading,
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor ||
+              provider.isLocationDataLoading,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
@@ -82,6 +83,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
   }
 
   Widget dataInsertField() {
+    List<String> cityItems = provider.cityDropdownItems;
     return Column(
       spacing: 20,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,7 +94,16 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
               ? 'Select Living In first'
               : 'Select',
           popUpHeader: 'Select City',
-          items: provider.cityDropdownItems,
+          items:  [
+            'Barisal',
+            'Chattogram',
+            'Dhaka',
+            'Khulna',
+            'Mymensingh',
+            'Rajshahi',
+            'Rangpur',
+            'Sylhet'
+          ],
           controller: provider.cityController,
           enabled: provider.livingInController.text.isNotEmpty,
           // onTap: provider.loadLocationData,

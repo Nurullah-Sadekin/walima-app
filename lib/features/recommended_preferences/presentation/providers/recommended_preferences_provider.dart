@@ -168,8 +168,7 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
 
     try {
       countryOptions = await _locationDataRepository.getCountries();
-      countryDropdownItems =
-          countryOptions.map((item) => item.name).toList(growable: false);
+      countryDropdownItems = countryOptions.map((item) => item.name).toList(growable: false);
       await _syncCityOptionsFromSelectedCountry(notify: false);
     } catch (e) {
       locationDataError = e.toString();
@@ -230,7 +229,6 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
       );
       locationDataError = null;
     } catch (e) {
-      cityDropdownItems = <String>[];
       locationDataError = e.toString();
     }
 

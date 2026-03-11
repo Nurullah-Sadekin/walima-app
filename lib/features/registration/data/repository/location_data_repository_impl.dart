@@ -9,7 +9,7 @@ import 'package:flutter_boilerplate/features/registration/domain/repository/loca
 class LocationDataRepositoryImpl implements LocationDataRepository {
   static const String _residencyAssetPath =
       'lib/features/registration/domain/json/residency_status_options.json';
-  static const int _pageSize = 100;
+  static const int _pageSize = 1000;
 
   final DioClient _dioClient = DioClient();
   List<CountryLocationModel>? _cachedCountries;
@@ -128,8 +128,8 @@ class LocationDataRepositoryImpl implements LocationDataRepository {
         queryParameters: <String, dynamic>{
           'page': page,
           'size': _pageSize,
-          'sortBy': 'id',
-          'sortOrder': 'ASC',
+          // 'sortBy': 'id',
+          // 'sortOrder': 'ASC',
           'countries': normalized,
         },
         isTokenRequired: true,
