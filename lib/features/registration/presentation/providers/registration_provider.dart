@@ -3,11 +3,17 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
+import 'package:flutter_boilerplate/core/network/dio_client.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_otp_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_request_body.dart';
+import 'package:flutter_boilerplate/features/registration/data/models/request/upload_media_request_body.dart';
+import 'package:flutter_boilerplate/features/registration/data/models/response/onboarding_response.dart';
+import 'package:flutter_boilerplate/features/registration/data/models/response/upload_media_response.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/location_data_repository_impl.dart';
+import 'package:flutter_boilerplate/features/registration/data/repository/media_repository.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/religion_data_repository_impl.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/registration_repository.dart';
 import 'package:flutter_boilerplate/features/registration/domain/location_data_model.dart';
@@ -17,6 +23,7 @@ import 'package:flutter_boilerplate/features/registration/domain/repository/reli
 import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/is_with_family_status_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/profile_for_model.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class RegistrationProvider extends BaseChangeNotifier {
@@ -97,6 +104,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       ReligionDataRepositoryImpl();
   final LocationDataRepository _locationDataRepository =
       LocationDataRepositoryImpl();
+  final MediaRepository _mediaRepository = MediaRepository();
 
   List<ReligionOptionModel> religionOptions = <ReligionOptionModel>[];
   List<String> religionDropdownItems = <String>[];
@@ -112,6 +120,108 @@ class RegistrationProvider extends BaseChangeNotifier {
   List<String> residencyStatusDropdownItems = <String>[];
   bool isLocationDataLoading = false;
   String? locationDataError;
+
+  UploadMediaData? uploadedProfileMedia;
+  String profileImageUploadErrorMessage = '';
+
+  static const Set<String> _allowedReligionValues = <String>{
+    'islam',
+    'hinduism',
+    'christianity',
+    'buddhism',
+    'judaism',
+    'sikhism',
+    'jainism',
+    'others',
+    'no_religion',
+    'spiritual',
+  };
+
+  static const Set<String> _allowedResidencyStatusValues = <String>{
+    'citizen',
+    'permanent_resident',
+    'work_permit',
+    'student_visa',
+    'temporary_visa',
+    'visitor',
+  };
+
+  static const Set<String> _allowedMaritalStatusValues = <String>{
+    'open_to_all',
+    'never_married',
+    'married',
+    'divorced',
+    'widowed',
+    'separated',
+    'awaiting_divorce',
+    'annulled',
+  };
+
+  static const Set<String> _allowedDietValues = <String>{
+    'vegetarian',
+    'non_vegetarian',
+    'halal_only',
+    'vegan',
+    'jain_vegetarian',
+    'occasionally_non_veg',
+  };
+
+  static const Set<String> _allowedEducationValues = <String>{
+    'no_formal_education',
+    'primary',
+    'secondary',
+    'higher_secondary',
+    'diploma',
+    'bachelor',
+    'masters',
+    'phd',
+    'doctorate',
+    'professional_degree',
+    'vocational_training',
+    'certificate',
+    'others',
+  };
+
+  static const Map<String, String> _residencyStatusAliases = <String, String>{
+    'citizen': 'citizen',
+    'permanent resident': 'permanent_resident',
+    'work permit': 'work_permit',
+    'student visa': 'student_visa',
+    'temporary visa': 'temporary_visa',
+    'visitor': 'visitor',
+  };
+
+  static const Map<String, String> _maritalStatusAliases = <String, String>{
+    'open to all': 'open_to_all',
+    'single': 'never_married',
+    'never married': 'never_married',
+    'married': 'married',
+    'divorced': 'divorced',
+    'widowed': 'widowed',
+    'separated': 'separated',
+    'awaiting divorce': 'awaiting_divorce',
+    'annulled': 'annulled',
+  };
+
+  static const Map<String, String> _dietAliases = <String, String>{
+    'vegetarian': 'vegetarian',
+    'non vegetarian': 'non_vegetarian',
+    'halal only': 'halal_only',
+    'vegan': 'vegan',
+    'jain vegetarian': 'jain_vegetarian',
+    'occasionally non veg': 'occasionally_non_veg',
+    'occasionally non-veg': 'occasionally_non_veg',
+    'healthy': 'occasionally_non_veg',
+    'modern balanced diet': 'occasionally_non_veg',
+    'junk food lover': 'occasionally_non_veg',
+    'low carb': 'occasionally_non_veg',
+    'low fat': 'occasionally_non_veg',
+    'low sodium': 'occasionally_non_veg',
+    'low cholesterol': 'occasionally_non_veg',
+    'low sugar': 'occasionally_non_veg',
+    'low salt': 'occasionally_non_veg',
+    'no preferences': 'occasionally_non_veg',
+  };
 
   List<TextEditingController> get _managedControllers => [
         firstNameController,
@@ -286,6 +396,8 @@ class RegistrationProvider extends BaseChangeNotifier {
     selectedIncomeRange = null;
     selectedYourWork = null;
     selectedYouWorkAs = null;
+    uploadedProfileMedia = null;
+    profileImageUploadErrorMessage = '';
   }
 
   void _clearAllControllers() {
@@ -1031,6 +1143,219 @@ class RegistrationProvider extends BaseChangeNotifier {
     } catch (_) {}
   }
 
+  String _toSnakeCase(String value) {
+    final normalized = value.trim().toLowerCase();
+    if (normalized.isEmpty) return '';
+
+    final withUnderscores = normalized.replaceAll(RegExp(r'[^a-z0-9]+'), '_');
+    return withUnderscores
+        .replaceAll(RegExp(r'_+'), '_')
+        .replaceAll(RegExp(r'^_|_$'), '');
+  }
+
+  String _resolveReligionValue() {
+    final selected = religionController.text.trim();
+    if (selected.isEmpty) return '';
+
+    final matchedReligion = _findReligionOption(selected);
+    final candidate =
+        matchedReligion?.value.trim().toLowerCase() ?? _toSnakeCase(selected);
+
+    if (_allowedReligionValues.contains(candidate)) {
+      return candidate;
+    }
+    return 'others';
+  }
+
+  String _resolveResidencyStatusValue() {
+    final selected = residencyStatusController.text.trim();
+    if (selected.isEmpty) return '';
+
+    final normalized = selected.toLowerCase();
+    for (final option in residencyStatusOptions) {
+      final byName = option.name.toLowerCase() == normalized;
+      final byValue = option.value.toLowerCase() == normalized;
+      if (byName || byValue) {
+        final optionValue = option.value.toLowerCase();
+        if (_allowedResidencyStatusValues.contains(optionValue)) {
+          return optionValue;
+        }
+      }
+    }
+
+    final candidate =
+        _residencyStatusAliases[normalized] ?? _toSnakeCase(selected);
+    if (_allowedResidencyStatusValues.contains(candidate)) {
+      return candidate;
+    }
+    return 'visitor';
+  }
+
+  String _resolveMaritalStatusValue() {
+    final selected = maritalStatusController.text.trim();
+    if (selected.isEmpty) return '';
+
+    final normalized = selected.toLowerCase();
+    final candidate =
+        _maritalStatusAliases[normalized] ?? _toSnakeCase(selected);
+    if (_allowedMaritalStatusValues.contains(candidate)) {
+      return candidate;
+    }
+    return 'open_to_all';
+  }
+
+  String _resolveDietValue() {
+    final selected = selectedDietStatus?.trim() ?? '';
+    if (selected.isEmpty) return '';
+
+    final normalized = selected.toLowerCase();
+    final candidate = _dietAliases[normalized] ?? _toSnakeCase(selected);
+    if (_allowedDietValues.contains(candidate)) {
+      return candidate;
+    }
+    return 'occasionally_non_veg';
+  }
+
+  String _resolveHighestEducationValue() {
+    final selected = highestQualification.text.trim();
+    if (selected.isEmpty) return '';
+
+    final normalized = selected.toLowerCase();
+
+    if (normalized.contains('no formal')) {
+      return 'no_formal_education';
+    }
+    if (RegExp(r'\bprimary\b').hasMatch(normalized)) {
+      return 'primary';
+    }
+    if (normalized.contains('higher secondary') ||
+        normalized.contains('high secondary') ||
+        RegExp(r'\bhsc\b').hasMatch(normalized) ||
+        normalized.contains('intermediate')) {
+      return 'higher_secondary';
+    }
+    if (RegExp(r'\bsecondary\b').hasMatch(normalized) ||
+        RegExp(r'\bssc\b').hasMatch(normalized)) {
+      return 'secondary';
+    }
+    if (normalized.contains('diploma')) {
+      return 'diploma';
+    }
+    if (RegExp(
+      r"\b(bachelor|bachelors|bachelor's|bsc|b\.sc|ba|b\.a|bcom|b\.com|btech|b\.tech|be|b\.e)\b",
+    ).hasMatch(normalized)) {
+      return 'bachelor';
+    }
+    if (RegExp(
+      r"\b(master|masters|master's|msc|m\.sc|ma|m\.a|mba|m\.b\.a|mtech|m\.tech|mcom|m\.com|me|m\.e)\b",
+    ).hasMatch(normalized)) {
+      return 'masters';
+    }
+    if (RegExp(r'\b(phd|ph\.d)\b').hasMatch(normalized)) {
+      return 'phd';
+    }
+    if (normalized.contains('doctorate')) {
+      return 'doctorate';
+    }
+    if (normalized.contains('professional') ||
+        normalized.contains('mbbs') ||
+        normalized.contains('llb') ||
+        normalized.contains('pharmd')) {
+      return 'professional_degree';
+    }
+    if (normalized.contains('vocational')) {
+      return 'vocational_training';
+    }
+    if (normalized.contains('certificate')) {
+      return 'certificate';
+    }
+
+    final candidate = _toSnakeCase(selected);
+    if (_allowedEducationValues.contains(candidate)) {
+      return candidate;
+    }
+    return 'others';
+  }
+
+  String _resolveLocationTypeValue(String residencyStatusValue) {
+    if (residencyStatusValue == 'citizen' ||
+        residencyStatusValue == 'permanent_resident') {
+      return 'permanent';
+    }
+    return 'present';
+  }
+
+  String _resolveCountryCodeValue() {
+    final selectedCountry = livingInController.text.trim();
+    if (selectedCountry.isEmpty) return '';
+
+    final matchedCountry = _findCountryOption(selectedCountry);
+    if (matchedCountry != null && matchedCountry.code2.trim().isNotEmpty) {
+      return matchedCountry.code2.trim().toUpperCase();
+    }
+
+    return selectedCountry;
+  }
+
+  Future<void> _persistAuthTokens(OnboardingResponse response) async {
+    final accessToken = response.response?.accessToken?.trim() ?? '';
+    final refreshToken = response.response?.refreshToken?.trim() ?? '';
+
+    if (accessToken.isNotEmpty) {
+      await PrefsHelper.setAccessToken(accessToken);
+      DioClient().setAuthToken(accessToken);
+    }
+
+    if (refreshToken.isNotEmpty) {
+      await PrefsHelper.setRefreshToken(refreshToken);
+    }
+  }
+
+  Future<void> _clearRegistrationDraftCacheOnSuccess() async {
+    _persistDebounce?.cancel();
+    await PrefsHelper.clearRegistrationDraft();
+  }
+
+  Future<bool> uploadProfileImage({
+    required String filePath,
+    String alt = 'Profile photo',
+    String caption = 'My summer photo',
+    String description = 'This is my profile photo',
+    bool isPrimary = true,
+  }) async {
+    final normalizedPath = filePath.trim();
+    if (normalizedPath.isEmpty) {
+      profileImageUploadErrorMessage = 'Please select an image to upload.';
+      notifyListeners();
+      return false;
+    }
+
+    profileImageUploadErrorMessage = '';
+
+    final requestBody = UploadMediaRequestBody(
+      filePath: normalizedPath,
+      alt: alt,
+      caption: caption,
+      description: description,
+      isPrimary: isPrimary,
+    );
+
+    final response = await _mediaRepository.uploadMedia(requestBody);
+    final uploadedData = response.response?.data;
+    final isSuccess = response.code == 'SUCCESS' && uploadedData != null;
+
+    if (!isSuccess) {
+      profileImageUploadErrorMessage =
+          response.message ?? 'Failed to upload profile image.';
+      notifyListeners();
+      return false;
+    }
+
+    uploadedProfileMedia = uploadedData;
+    notifyListeners();
+    return true;
+  }
+
   Future<bool> submitRegistration(BuildContext context) async {
     if (otpControllers.any((c) => c.text.isEmpty)) {
       DialogUtils.showErrorDialog(
@@ -1041,40 +1366,51 @@ class RegistrationProvider extends BaseChangeNotifier {
     }
 
     final otp = otpControllers.map((c) => c.text).join();
+    final religionValue = _resolveReligionValue();
+    final residencyStatusValue = _resolveResidencyStatusValue();
+    final maritalStatusValue = _resolveMaritalStatusValue();
+    final dietValue = _resolveDietValue();
+    final highestEducationValue = _resolveHighestEducationValue();
+    final locationTypeValue = _resolveLocationTypeValue(residencyStatusValue);
+    final countryCodeValue = _resolveCountryCodeValue();
+
     final body = SignUpRequestBody(
       profileManagedBy: 'self',
-      gender: 'male',
-      firstName: 'Nurullah',
-      lastName: 'Ansari',
-      religionName: 'islam',
-      community: 'Ansari',
-      livingIn: 'India',
-      cityName: 'Mumbai',
+      gender: selectedGenderName?.toLowerCase() ?? '',
+      firstName: firstNameController.text,
+      lastName: lastNameController.text,
+      religionName: religionValue,
+      community: communityController.text,
+      livingIn: livingInController.text,
+      cityName: cityController.text,
       dateOfBirth: '1990-01-01',
       email: emailController.text,
       phoneNumber: phoneController.text,
-      residencyStatus: 'citizen',
-      maritalStatus: 'open_to_all',
-      height: 175,
-      diet: 'non_vegetarian',
-      highestLevelOfEducation: 'bachelor',
-      incomeRange: '2-4 LPA',
-      incomeRangeFrequency: 'yearly',
-      workWith: 'private',
-      workingAs: 'software engineer',
-      currentCompany: 'ABC Corp',
-      bio: 'Hello, I am Nurullah.',
+      residencyStatus: residencyStatusValue,
+      maritalStatus: maritalStatusValue,
+      height: num.tryParse(heightController.text),
+      diet: dietValue,
+      highestLevelOfEducation: highestEducationValue,
+      incomeRange: incomeRangeController.text,
+      incomeRangeFrequency: selectedIncomePeriodStatus?.toLowerCase() ?? '',
+      workWith: selectedYourWork?.toLowerCase() ?? '',
+      workingAs: selectedYouWorkAs?.toLowerCase() ?? '',
+      currentCompany: currentCompanyNameController.text,
+      bio: aboutYourselfController.text,
       termsAndConditionsAccepted: true,
-      verificationType: 'phone',
+      verificationType:
+          selectedVerificationType.toLowerCase() == 'email' ? 'email' : 'phone',
       otpCode: otp,
       liveWithFamily: selectedIsWithFamilyStatus?.toLowerCase() == 'yes',
       displayName: '${firstNameController.text} ${lastNameController.text}',
       purpose: 'signup',
-      countryCode: 'IN',
-      locationType: 'permanent',
+      countryCode: countryCodeValue,
+      locationType: locationTypeValue,
     );
     final response = await RegistrationRepository.signUpCreateUserProfile(body);
     if (response.code == 'SUCCESS') {
+      await _persistAuthTokens(response);
+      await _clearRegistrationDraftCacheOnSuccess();
       return true;
     } else {
       return false;
@@ -1124,8 +1460,13 @@ class RegistrationProvider extends BaseChangeNotifier {
       _notifyAndPersist();
       return true;
     } else {
-      DialogUtils.showErrorDialog(
-          context: context, message: response.message ?? 'Failed to send OTP');
+      await DialogUtils.showErrorDialog(
+          context: context,
+          message: response.message ?? 'Failed to send OTP',
+          onButtonPressed: () {
+            context.pushReplacement(Paths.login);
+          },
+          buttonText: 'Go to Login');
       return false;
     }
   }

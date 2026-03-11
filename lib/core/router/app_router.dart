@@ -140,11 +140,11 @@ GoRouter goRouter(GoRouterRef ref) {
         name: Routes.aboutYourself,
         builder: (context, state) => const AboutYourselfScreen(),
       ),
-      GoRoute(
-        path: Paths.verifyNumber,
-        name: Routes.verifyNumber,
-        builder: (context, state) => const VerifyNumberScreen(),
-      ),
+      // GoRoute(
+      //   path: Paths.verifyNumber,
+      //   name: Routes.verifyNumber,
+      //   builder: (context, state) => const VerifyNumberScreen(),
+      // ),
       GoRoute(
         path: Paths.photoUpload,
         name: Routes.photoUpload,

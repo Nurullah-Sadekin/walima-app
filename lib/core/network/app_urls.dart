@@ -18,4 +18,6 @@ class AppUrls{
   static const String checkUserNameAvailability = '$baseUrl/api/v1/users/check-username';
   static const String checkEmailAvailability = '$baseUrl/api/v1/users/check-email';
   static const String checkNumberAvailability = '$baseUrl/api/v1/users/check-phone';
+
+  static const String uploadMedia = '$baseUrl/api/v1/media/upload';
 }
