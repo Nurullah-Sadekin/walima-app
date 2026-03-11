@@ -30,6 +30,7 @@ dependencies:
   json_annotation: ^4.8.1
   shimmer: ^3.0.0
   image_picker: ^1.2.1
+  carousel_slider: ^5.1.2
 
 dev_dependencies:
   flutter_test:
