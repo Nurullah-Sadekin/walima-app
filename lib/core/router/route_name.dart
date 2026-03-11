@@ -49,6 +49,8 @@ abstract class Paths {
   static const editProfile = '/editProfile';
   static const upgradePackage = '/upgradePackage';
 
+  //Matches
+  static const matches = '/matches';
 
 
 }
@@ -101,5 +103,8 @@ abstract class Routes {
   // Home Screens
   static const editProfile = 'editProfile';
   static const upgradePackage = 'upgradePackage';
+
+  //Matches
+  static const matches = 'matches';
 
 }

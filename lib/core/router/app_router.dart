@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/features/login/presentation/screens/new_pass
 import 'package:flutter_boilerplate/features/login/presentation/screens/otp_verify.dart';
 import 'package:flutter_boilerplate/features/login/presentation/screens/reset_pssword_status.dart';
 import 'package:flutter_boilerplate/features/login/presentation/screens/send_otp.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/screens/matches.dart';
 import 'package:flutter_boilerplate/features/onboarding_screen.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/connect_matches.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/basic_details.dart';
@@ -221,6 +222,11 @@ GoRouter goRouter(GoRouterRef ref) {
         path: Paths.upgradePackage,
         name: Routes.upgradePackage,
         builder: (context, state) => const UpgradePackageScreen(),
+      ),
+      GoRoute(
+        path: Paths.matches,
+        name: Routes.matches,
+        builder: (context, state) => const MatchesScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
