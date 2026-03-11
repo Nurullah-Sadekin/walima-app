@@ -4,7 +4,7 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/popular_badge.dart';
-import 'icon_text_row.dart';
+import '../../../../../core/global/components/icon_text_row.dart';
 
 class PackageCard extends StatelessWidget {
 

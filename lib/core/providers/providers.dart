@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/features/login/presentation/providers/login_
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/providers/recommended_preferences_provider.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_screen_state_provider.dart';
+import 'package:flutter_boilerplate/features/upgrade_package/presentation/providers/upgrade_package_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final loginProvider = ChangeNotifierProvider<LoginProvider>((ref) {
@@ -107,4 +108,7 @@ final homeProvider = ChangeNotifierProvider<HomeProvider>((ref) {
 
 final drawerProvider = ChangeNotifierProvider<DrawerProvider>((ref) {
   return DrawerProvider();
+});
+final upgradePackageProvider = ChangeNotifierProvider<UpgradePackageProvider>((ref) {
+  return UpgradePackageProvider();
 });
