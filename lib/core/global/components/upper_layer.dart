@@ -9,7 +9,7 @@ class UpperLayer extends StatelessWidget { // Additional children to add below
     required this.imagePath,
     this.imageWidth = 110,
     this.imageHeight = 110,
-    this.verticalPadding = 16.0,
+    this.verticalPadding = 14.0,
     this.spacing = 10.0,
     this.isTrailing = false,
     this.trailingText,
@@ -18,6 +18,7 @@ class UpperLayer extends StatelessWidget { // Additional children to add below
     this.isBackButton = true,
     this.onBackPressed,
     this.backCancelMood = false,
+    this.backIconBackground = Colors.white,
   });
   final String imagePath;
   final double imageWidth;
@@ -31,7 +32,7 @@ class UpperLayer extends StatelessWidget { // Additional children to add below
   final bool isBackButton;
   final VoidCallback? onBackPressed;
   final bool backCancelMood;
-
+  final Color backIconBackground;
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +46,7 @@ class UpperLayer extends StatelessWidget { // Additional children to add below
               isBackButton: isBackButton,
               onBackPressed: onBackPressed,
               backCancelMood: backCancelMood,
+             backIconBackground: backIconBackground,
             ) : const  SizedBox.shrink(),
         Padding(
           padding: EdgeInsets.symmetric(vertical: verticalPadding),

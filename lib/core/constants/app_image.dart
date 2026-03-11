@@ -78,12 +78,14 @@ class AppImages {
   static const String familyDetails = 'assets/svgs/familyDetails.svg';
   static const String done = 'assets/svgs/done.svg';
   static const String recommendedPreferences = 'assets/svgs/recommended_preferences.svg';
+  static const String upgradePremium = 'assets/svgs/upgrade_premium.svg';
 
   static const String login = 'assets/svgs/login.svg';
   static const String otp = 'assets/svgs/otp.svg';
   static const String password = 'assets/svgs/password.svg';
   static const String forgotPassword = 'assets/svgs/forgotPassword.svg';
   static const String verifyContact = 'assets/svgs/verify_contact.svg';
+
   // Dialog status svgs
   static const String successfulStatus = 'assets/svgs/successful_status.svg';
   static const String alertStatus = 'assets/svgs/alert_status.svg';
