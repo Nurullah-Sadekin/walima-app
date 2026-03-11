@@ -327,15 +327,15 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
               // ),
             ],
           ),
-          if (_selectedImagePath != null)
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _selectedImagePath = null;
-                });
-              },
-              child: const Text('Remove Photo'),
-            ),
+          // if (_selectedImagePath != null)
+          //   TextButton(
+          //     onPressed: () {
+          //       setState(() {
+          //         _selectedImagePath = null;
+          //       });
+          //     },
+          //     child: const Text('Remove Photo'),
+          //   ),
         ],
       ),
     );
