@@ -16,10 +16,10 @@ class UpgradePackageScreen extends ConsumerStatefulWidget {
   const UpgradePackageScreen({super.key});
 
   @override
-  ConsumerState<UpgradePackageScreen> createState() => _UpdateToPremiumState();
+  ConsumerState<UpgradePackageScreen> createState() => _UpgradePackageScreenState();
 }
 
-class _UpdateToPremiumState extends ConsumerState<UpgradePackageScreen> {
+class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
   final UpgradePackageProvider provider = UpgradePackageProvider();
 
   @override
