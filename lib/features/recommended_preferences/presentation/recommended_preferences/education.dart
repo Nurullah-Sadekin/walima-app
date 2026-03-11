@@ -8,7 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/providers/recommended_preferences_provider.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:go_router/go_router.dart';
@@ -42,21 +41,24 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
   Widget build(BuildContext context) {
     provider = ref.watch(recommendedPreferencesProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == RecommendedPreferencesScreenStates.preferences,
+      isLoading: provider.loaderState ==
+          RecommendedPreferencesScreenStates.preferences,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == RecommendedPreferencesScreenStates.preferences
+          child: provider.screenStates ==
+                  RecommendedPreferencesScreenStates.preferences
               ? const Loading()
               : Column(
-            children: [
-              const UpperLayer(
-                  imagePath: AppImages.recommendedPreferences,
-                  isShowAppbar: true,
-                  isBackButton: true,),
-              body(),
-            ],
-          ),
+                  children: [
+                    const UpperLayer(
+                      imagePath: AppImages.recommendedPreferences,
+                      isShowAppbar: true,
+                      isBackButton: true,
+                    ),
+                    body(),
+                  ],
+                ),
         ),
       ),
     );
@@ -102,7 +104,8 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
                     return Wrap(
                       spacing: spacing,
                       runSpacing: spacing,
-                      children: List.generate(provider.countryDataList.length, (index) {
+                      children: List.generate(provider.countryDataList.length,
+                          (index) {
                         final item = provider.countryDataList[index];
 
                         return SelectionCard(
