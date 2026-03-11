@@ -46,8 +46,7 @@ class _HobbiesInterestsScreenState
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(hobbiesInterestsScreenProvider);
     return TransparentLoading(
-      isLoading:
-          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         extendBodyBehindAppBar: true,
         backgroundColor: Colors.transparent,
@@ -149,12 +148,20 @@ class _HobbiesInterestsScreenState
     final selected = provider.selectedHobbiesCount();
     return PrimaryButtons(
       buttonStyle: ButtonsStyle.activePrimaryButton,
-      title:
-          'Save & Continue ($selected/${RegistrationProvider.hobbiesSelectionMax})',
-      onTap: () {
+      title: 'Save & Continue ($selected/${RegistrationProvider.hobbiesSelectionMax})',
+      onTap: () async{
         // show the save selected hobbies dialog
+        final screenProvider = ref.watch(hobbiesInterestsScreenProvider);
+        screenProvider.updateViewState(loadingState:  RegistrationScreenStates.isProfileFor);
         log('Selected Hobbies: ${provider.selectedHobbies}');
-        context.push(Paths.familyDetails);
+         final updated = await provider.updateHobies();
+        screenProvider.updateViewState(loadingState:  RegistrationScreenStates.loadingComplete);
+        if(updated){
+          if(mounted){
+            context.push(Paths.familyDetails);
+          }
+        }
+        // context.push(Paths.familyDetails);
       },
     );
   }

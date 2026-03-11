@@ -10,8 +10,10 @@ import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_otp_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_request_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/request/upload_media_request_body.dart';
+import 'package:flutter_boilerplate/features/registration/data/models/request/update_interests_request_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/response/onboarding_response.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/response/upload_media_response.dart';
+import 'package:flutter_boilerplate/features/registration/data/repository/interests_repository.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/location_data_repository_impl.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/media_repository.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/religion_data_repository_impl.dart';
@@ -105,6 +107,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   final LocationDataRepository _locationDataRepository =
       LocationDataRepositoryImpl();
   final MediaRepository _mediaRepository = MediaRepository();
+  final InterestsRepository _interestsRepository = InterestsRepository();
 
   List<ReligionOptionModel> religionOptions = <ReligionOptionModel>[];
   List<String> religionDropdownItems = <String>[];
@@ -1496,6 +1499,37 @@ class RegistrationProvider extends BaseChangeNotifier {
   void dispose() {
     _persistDebounce?.cancel();
     super.dispose();
+  }
+
+  Future<bool> updateHobies() async {
+    try {
+      final creativePursuits = _getSelectedHobbiesFromList(creativeItemList);
+      final outdoorActivities = _getSelectedHobbiesFromList(funItemList);
+      final fitnessAndSports = _getSelectedHobbiesFromList(fitnessItemList);
+      final mediaAndLearning =
+          _getSelectedHobbiesFromList(otherInterestsItemList);
+
+      final body = UpdateInterestsRequestBody(
+        creativePursuits: creativePursuits,
+        outdoorActivities: outdoorActivities,
+        fitnessAndSports: fitnessAndSports,
+        mediaAndLearning: mediaAndLearning,
+        foodAndCuisine: <String>[],
+        travelAndLeisure: <String>[],
+      );
+
+      final response = await _interestsRepository.updateInterests(body);
+      return response.code == 'SUCCESS';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  List<String> _getSelectedHobbiesFromList(List<SingleStringModel> list) {
+    return list
+        .where((item) => item.isSelected)
+        .map((item) => item.name)
+        .toList();
   }
 }
 

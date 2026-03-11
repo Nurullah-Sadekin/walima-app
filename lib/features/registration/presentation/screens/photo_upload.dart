@@ -5,6 +5,7 @@ import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.da
 import 'package:flutter_boilerplate/core/global/components/custom_expansion_tile.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/know_more_item.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -136,16 +137,18 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
       context.push(Paths.hobbiesInterests);
       return;
     }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          provider.profileImageUploadErrorMessage.isNotEmpty
-              ? provider.profileImageUploadErrorMessage
-              : 'Failed to upload profile image.',
-        ),
-      ),
-    );
+    DialogUtils.showErrorDialog(context: context, message: provider.profileImageUploadErrorMessage.isNotEmpty
+        ? provider.profileImageUploadErrorMessage
+        : 'Failed to upload profile image.');
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(
+    //     content: Text(
+    //       provider.profileImageUploadErrorMessage.isNotEmpty
+    //           ? provider.profileImageUploadErrorMessage
+    //           : 'Failed to upload profile image.',
+    //     ),
+    //   ),
+    // );
   }
 
   Widget body(BuildContext context) {
