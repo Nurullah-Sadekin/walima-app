@@ -255,12 +255,15 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
         spacing: 20,
         children: [
           _selectedImagePath == null
-              ? const ShowImage(
-                  imagePath: AppImages.photoUpload,
-                  radius: BorderRadius.all(Radius.circular(50)),
-                  width: 110,
-                  height: 110,
-                )
+              ? GestureDetector(
+            onTap: () => _pickImage(ImageSource.gallery),
+                child: const ShowImage(
+                    imagePath: AppImages.photoUpload,
+                    radius: BorderRadius.all(Radius.circular(50)),
+                    width: 110,
+                    height: 110,
+                  ),
+              )
               : GestureDetector(
                   onTap: () => _pickImage(ImageSource.gallery),
                   child: ClipRRect(
@@ -315,13 +318,13 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
                   onTap: () => _pickImage(ImageSource.camera),
                 ),
               ),
-              Expanded(
-                child: _photoActionButton(
-                  label: 'Use Gallery',
-                  icon: Icons.photo_library_outlined,
-                  onTap: () => _pickImage(ImageSource.gallery),
-                ),
-              ),
+              // Expanded(
+              //   child: _photoActionButton(
+              //     label: 'Use Gallery',
+              //     icon: Icons.photo_library_outlined,
+              //     onTap: () => _pickImage(ImageSource.gallery),
+              //   ),
+              // ),
             ],
           ),
           if (_selectedImagePath != null)
