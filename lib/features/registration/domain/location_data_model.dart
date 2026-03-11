@@ -26,8 +26,8 @@ class CountryLocationModel {
     }
 
     return CountryLocationModel(
-      code2: (json['code2'] ?? '').toString(),
-      code3: (json['code3'] ?? '').toString(),
+      code2: (json['code2'] ?? json['iso2'] ?? '').toString(),
+      code3: (json['code3'] ?? json['iso3'] ?? '').toString(),
       name: (json['name'] ?? '').toString(),
       capital: (json['capital'] ?? '').toString(),
       region: (json['region'] ?? '').toString(),

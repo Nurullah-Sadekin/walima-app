@@ -53,7 +53,6 @@ flutter:
      - assets/svgIcons/
      - assets/nav_icons/
      - lib/features/registration/domain/json/religion_name_options.json
-     - lib/features/registration/domain/json/country_state.json
      - lib/features/registration/domain/json/residency_status_options.json
   # fonts:
   #   - family: CustomFont

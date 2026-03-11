@@ -549,7 +549,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     if (isLocationDataLoading) return;
 
     if (countryOptions.isNotEmpty && residencyStatusOptions.isNotEmpty) {
-      _syncCityOptionsFromSelectedCountry();
+      await _syncCityOptionsFromSelectedCountry(notify: false);
       notifyListeners();
       return;
     }
@@ -569,7 +569,7 @@ class RegistrationProvider extends BaseChangeNotifier {
           .map((item) => item.name)
           .toList(growable: false);
 
-      _syncCityOptionsFromSelectedCountry();
+      await _syncCityOptionsFromSelectedCountry(notify: false);
     } catch (e) {
       locationDataError = e.toString();
     } finally {
@@ -589,7 +589,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       cityController.clear();
     }
 
-    _syncCityOptionsFromSelectedCountry();
+    unawaited(_syncCityOptionsFromSelectedCountry());
     _notifyAndPersist();
   }
 
@@ -609,24 +609,41 @@ class RegistrationProvider extends BaseChangeNotifier {
     _notifyAndPersist();
   }
 
-  void _syncCityOptionsFromSelectedCountry() {
+  Future<void> _syncCityOptionsFromSelectedCountry({bool notify = true}) async {
     final selectedCountry = livingInController.text.trim();
     if (selectedCountry.isEmpty) {
       cityDropdownItems = <String>[];
+      if (notify) {
+        notifyListeners();
+      }
       return;
     }
 
     if (countryOptions.isEmpty) {
+      if (notify) {
+        notifyListeners();
+      }
       return;
     }
 
     final matchedCountry = _findCountryOption(selectedCountry);
     if (matchedCountry == null) {
       cityDropdownItems = <String>[];
+      if (notify) {
+        notifyListeners();
+      }
       return;
     }
 
-    cityDropdownItems = matchedCountry.cityNames();
+    try {
+      cityDropdownItems = await _locationDataRepository.getCitiesByCountry(
+        country: matchedCountry.name,
+      );
+      locationDataError = null;
+    } catch (e) {
+      cityDropdownItems = <String>[];
+      locationDataError = e.toString();
+    }
 
     if (cityController.text.isNotEmpty) {
       final selectedCity = cityController.text.trim().toLowerCase();
@@ -637,6 +654,10 @@ class RegistrationProvider extends BaseChangeNotifier {
       if (!exists) {
         cityController.clear();
       }
+    }
+
+    if (notify) {
+      notifyListeners();
     }
   }
 
@@ -1075,7 +1096,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       );
 
       _syncCommunityOptionsFromSelectedReligion();
-      _syncCityOptionsFromSelectedCountry();
+      await _syncCityOptionsFromSelectedCountry(notify: false);
     } catch (_) {
       // Ignore malformed draft and continue with defaults.
     } finally {
