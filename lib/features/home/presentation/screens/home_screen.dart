@@ -234,6 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
             svgIconPath: AppImages.premiumSvgIcon,
             iconLeftPosition: false,
             onTap: ()  {
+              context.push(Paths.upgradePremium);
             },
             title: 'Renew Plan',
           ),

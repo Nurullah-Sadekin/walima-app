@@ -13,7 +13,7 @@ import 'package:flutter_boilerplate/features/recommended_preferences/presentatio
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/other_details.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/partner_preferences.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/preference_location.dart';
-import 'package:flutter_boilerplate/features/recommended_preferences/presentation/upgrade_to_premium.dart';
+import 'package:flutter_boilerplate/features/upgrade_package/presentation/screens/upgrade_package.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/about_you.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/email_phone.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/family_details.dart';
@@ -220,7 +220,7 @@ GoRouter goRouter(GoRouterRef ref) {
       GoRoute(
         path: Paths.upgradePremium,
         name: Routes.upgradeToPremium,
-        builder: (context, state) => const UpdateToPremium(),
+        builder: (context, state) => const UpgradePackageScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

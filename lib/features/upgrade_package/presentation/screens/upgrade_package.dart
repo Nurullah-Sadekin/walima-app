@@ -7,14 +7,14 @@ import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class UpdateToPremium extends ConsumerStatefulWidget {
-  const UpdateToPremium({super.key});
+class UpgradePackageScreen extends ConsumerStatefulWidget {
+  const UpgradePackageScreen({super.key});
 
   @override
-  ConsumerState<UpdateToPremium> createState() => _UpdateToPremiumState();
+  ConsumerState<UpgradePackageScreen> createState() => _UpdateToPremiumState();
 }
 
-class _UpdateToPremiumState extends ConsumerState<UpdateToPremium> {
+class _UpdateToPremiumState extends ConsumerState<UpgradePackageScreen> {
   bool _isSelected = false;
 
   @override
