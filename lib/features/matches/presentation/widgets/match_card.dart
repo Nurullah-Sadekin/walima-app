@@ -143,10 +143,10 @@ class MatchCard extends StatelessWidget {
                       borderRadius: const BorderRadius.all(Radius.circular(6)),
                     ),
                     child: Column(
-                      spacing: 4,
+                      spacing: 6,
                       children: [
                         ShowImage(
-                          imagePath: AppImages.premiumSvgIcon,
+                          imagePath: AppImages.photoIcon,
                           width: TextSize.font16(context),
                           height: TextSize.font16(context),
                           radius: BorderRadius.circular(8),
@@ -230,7 +230,7 @@ class MatchCard extends StatelessWidget {
                           bgColor: leftButtonColor ?? const Color(0XFF1FC16B),
                           onTap: onTapLeftButton ?? () {},
                           svgIconColor: AppColors.white,
-                          svgIconPath: leftIconPath ?? '',
+                          svgIconPath: leftIconPath ?? AppImages.favouriteIcon,
                           borderColor: leftButtonBorderColor ?? const Color(0XFF1FC16B),
                           textColor: leftButtonTextColor ?? AppColors.white,
                           title: leftButtonText ?? 'Connect'),

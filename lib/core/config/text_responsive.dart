@@ -25,6 +25,7 @@ class FontSize{
 }
 
 class TextSize {
+  static double font8(BuildContext context) => ResponsiveScale.of(context).fontSize(1.0);
   static double font10(BuildContext context) => ResponsiveScale.of(context).fontSize(1.15);
   static double font12(BuildContext context) => ResponsiveScale.of(context).fontSize(1.37);
   static double font13(BuildContext context) => ResponsiveScale.of(context).fontSize(1.5);
