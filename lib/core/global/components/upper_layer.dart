@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 
-class UpperLayer extends StatelessWidget { // Additional children to add below
+class UpperLayer extends StatelessWidget {
 
   const UpperLayer({
     super.key,
