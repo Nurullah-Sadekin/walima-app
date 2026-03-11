@@ -73,7 +73,7 @@ class _UpdateToPremiumState extends ConsumerState<UpgradePackageScreen> {
   Widget _bodySection(UpgradePackageProvider provider) {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
@@ -98,18 +98,20 @@ class _UpdateToPremiumState extends ConsumerState<UpgradePackageScreen> {
                   profileIsAvailable: item.profileIsAvailable ?? false,
                   matchIsAvailable: item.matchIsAvailable ?? false,
                   backgroundColor: AppColors.transparent,
-                  packageBadgeText: item.packageBadgeText,
+                  packageBadgeText: item.packageBadgeText ?? '',
+                  packageThemeColor: item.packageThemeColor ?? AppColors.transparent,
+                  packageBadgeBackgroundColor: item.packageBadgeBackgroundColor ?? AppColors.transparent,
                 );
               },
               options: CarouselOptions(
                 autoPlay: false,
                 enlargeCenterPage: true,
                 scrollDirection: Axis.horizontal,
-                viewportFraction: 0.8,
+                viewportFraction: 0.75,
                 animateToClosest: false,
                 enableInfiniteScroll: false,
                 disableCenter: true,
-                aspectRatio: 0.95,
+                aspectRatio: 0.94,
                 onPageChanged: (index, _) {
                   ref.read(upgradePackageProvider).changePage(index);
                 },
@@ -125,12 +127,12 @@ class _UpdateToPremiumState extends ConsumerState<UpgradePackageScreen> {
                   onTap: () => ref.read(upgradePackageProvider).changePage(index),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 250),
-                    width: isActive ? 20 : 10,
+                    width: isActive ? 30 : 10,
                     height: 10,
-                    margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10 / 2),
+                    margin: const EdgeInsets.only(right: 4),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10 / 2),
-                      color: isActive ? AppColors.primary : Colors.grey.shade300,
+                      color: isActive ? AppColors.primary : AppColors.primaryShade300,
                     ),
                   ),
                 );
