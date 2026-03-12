@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_expansion_tile.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/know_more_item.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,6 +17,7 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 class PhotoUploadScreen extends ConsumerStatefulWidget {
@@ -93,16 +94,57 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
 
       if (!mounted || pickedFile == null) return;
 
+      final croppedFile = await ImageCropper().cropImage(
+        sourcePath: pickedFile.path,
+        compressFormat: ImageCompressFormat.jpg,
+        compressQuality: 90,
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Crop Image',
+            initAspectRatio: CropAspectRatioPreset.square,
+            lockAspectRatio: false,
+            hideBottomControls: true,
+          ),
+          IOSUiSettings(
+            title: 'Crop Image',
+          ),
+        ],
+      );
+
+      if (!mounted || croppedFile == null) return;
+
+      final croppedPath = croppedFile.path.trim();
+      if (croppedPath.isEmpty) return;
+
       setState(() {
-        _selectedImagePath = pickedFile.path;
+        _selectedImagePath = croppedPath;
       });
-    } catch (_) {
+
       if (!mounted) return;
+      context.push(Paths.cropImage, extra: croppedPath);
+    } on PlatformException catch (e) {
+      if (!mounted) return;
+
+      final code = e.code.toLowerCase();
+      final message = (code.contains('camera') ||
+              code.contains('photo') ||
+              code.contains('permission') ||
+              code.contains('denied'))
+          ? 'Permission denied. Please allow camera/photos access from app settings.'
+          : 'Unable to open image picker/cropper. Please try again.';
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      debugPrint('Image pick/crop failed: $e');
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-            'Unable to pick image. Please check camera and gallery permissions.',
+            'Unable to process image. Please try a different image.',
           ),
         ),
       );
@@ -124,26 +166,7 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
       return;
     }
 
-    final screenProvider = ref.read(photoUploadScreenProvider);
-    screenProvider.updateViewState(
-      loadingState: RegistrationScreenStates.isProfileFor,
-    );
-
-    final isUploaded = await provider.uploadProfileImage(filePath: imagePath);
-
-    if (!mounted) return;
-
-    screenProvider.updateViewState(
-      loadingState: RegistrationScreenStates.loadingComplete,
-    );
-
-    if (isUploaded) {
-      context.push(Paths.hobbiesInterests);
-      return;
-    }
-    DialogUtils.showErrorDialog(context: context, message: provider.profileImageUploadErrorMessage.isNotEmpty
-        ? provider.profileImageUploadErrorMessage
-        : 'Failed to upload profile image.');
+    context.push(Paths.cropImage, extra: imagePath);
   }
 
   Widget body(BuildContext context) {

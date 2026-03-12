@@ -37,7 +37,6 @@ import 'package:flutter_boilerplate/features/registration/presentation/screens/m
 import 'package:flutter_boilerplate/features/registration/presentation/screens/qualification.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/profession.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/about_yourself.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/verify_number.dart';
 import 'route_name.dart';
 part 'app_router.g.dart';
 
@@ -232,7 +231,10 @@ GoRouter goRouter(GoRouterRef ref) {
       GoRoute(
         path: Paths.cropImage,
         name: Routes.cropImage,
-        builder: (context, state) => const CropImageScreen(),
+        builder: (context, state) {
+          final imagePath = state.extra is String ? state.extra as String : null;
+          return CropImageScreen(imagePath: imagePath);
+        },
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
