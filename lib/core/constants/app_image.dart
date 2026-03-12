@@ -37,6 +37,7 @@ class AppImages {
   static const String editWrite = 'assets/svgIcons/editWrite.svg';
   static const String photoIcon = 'assets/svgIcons/photo.svg';
   static const String favouriteIcon = 'assets/svgIcons/favourite.svg';
+  static const String cameraUseIcon = 'assets/svgIcons/camera_use.svg';
 
   // Social media icons
   static const String facebookIcon = 'assets/svgIcons/facebook.svg';
