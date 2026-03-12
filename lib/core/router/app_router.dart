@@ -14,6 +14,7 @@ import 'package:flutter_boilerplate/features/recommended_preferences/presentatio
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/other_details.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/partner_preferences.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/preference_location.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/crop_image.dart';
 import 'package:flutter_boilerplate/features/upgrade_package/presentation/screens/upgrade_package.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/about_you.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/email_phone.dart';
@@ -227,6 +228,11 @@ GoRouter goRouter(GoRouterRef ref) {
         path: Paths.matches,
         name: Routes.matches,
         builder: (context, state) => const MatchesScreen(),
+      ),
+      GoRoute(
+        path: Paths.cropImage,
+        name: Routes.cropImage,
+        builder: (context, state) => const CropImageScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
