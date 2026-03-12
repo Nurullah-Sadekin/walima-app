@@ -18,6 +18,7 @@ class AnchoredAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.iconSize,
     this.leadingWidth,
     this.showNotification = true,
+    this.notificationCount = 0,
   });
   final BuildContext context;
   final String title;
@@ -28,6 +29,7 @@ class AnchoredAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double? iconSize;
   final double? leadingWidth;
   final bool showNotification;
+  final double? notificationCount;
 
   @override
   Widget build(BuildContext context) {
@@ -56,11 +58,36 @@ class AnchoredAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       actions: [
         if (showNotification)
-          ShowImage(
-            imagePath: AppImages.notificationSvgIcon,
-            color: defaultIconColor,
-            height: defaultIconSize,
-            width: defaultIconSize,
+          Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(7),
+                child: ShowImage(
+                  imagePath: AppImages.notificationSvgIcon,
+                  color: defaultIconColor,
+                  height: defaultIconSize,
+                  width: defaultIconSize,
+                ),
+              ),
+              Positioned(
+                left: 12,
+                top: 0,
+                child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5,vertical: 2),
+                  decoration: const BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
+                  child: Text('${notificationCount?.toInt() ?? 0}',
+                    textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false, applyHeightToLastDescent: false),
+                    style: TextStyle(
+                    color: Colors.white,
+                    fontSize: TextSize.font10(context),
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),)
+            ],
           ),
       ],
       backgroundColor: Colors.transparent,

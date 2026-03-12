@@ -41,6 +41,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
   Widget _appbarSection() {
     return AnchoredAppBar(
       title: 'Matches',
+      notificationCount: 26,
       context: context,
     );
   }
