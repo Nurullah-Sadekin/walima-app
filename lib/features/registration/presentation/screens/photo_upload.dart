@@ -52,9 +52,7 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(photoUploadScreenProvider);
     return TransparentLoading(
-      isLoading:
-          screenProvider.loaderState == RegistrationScreenStates.isProfileFor ||
-              _isPickingImage,
+      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor || _isPickingImage,
       child: Scaffold(
         extendBodyBehindAppBar: true,
         backgroundColor: Colors.transparent,

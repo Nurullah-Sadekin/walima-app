@@ -94,7 +94,8 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
         border: Border.all(
             color: (_isExpanded ? widget.borderColor : AppColors.greyLight) ??
                 AppColors.greyLight,
-            width: 1),
+            width: 1,
+        ),
         borderRadius: BorderRadius.all(
           Radius.circular(widget.borderRadius ?? 8),
         ),
@@ -106,8 +107,7 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
         child: ExpansionTile(
           initiallyExpanded: widget.initiallyExpanded,
           onExpansionChanged: (v) => setState(() => _isExpanded = v),
-          collapsedIconColor:
-              widget.collapsedIconColor ?? AppColors.hintTextColor,
+          collapsedIconColor: widget.collapsedIconColor ?? AppColors.hintTextColor,
           iconColor: widget.iconColor ?? AppColors.hintTextColor,
           leading: widget.isLeading
               ? GestureDetector(
