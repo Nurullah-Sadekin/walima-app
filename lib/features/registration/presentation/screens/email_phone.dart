@@ -74,14 +74,16 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
   }
 
   Widget dataInsertField() {
-    selectedCountry = Country.parse(provider.livingInController.text);
+   if(provider.selectedCountryCodeForNumber.isEmpty){
+     selectedCountry = Country.parse(provider.livingInController.text);
+   }
     return Column(
       spacing: 20,
       children: [
         PrimaryTextField(
           controller: provider.emailController,
           headLine: 'Email Address',
-          hintText: 'hello@aliguni.com',
+          hintText: 'hello@faliguni.com',
           keyboardType: TextInputType.emailAddress,
           prefixIcon: ShowImage(
             imagePath: AppImages.emailSvgIcon,
@@ -133,8 +135,8 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
     );
   }
 
-  void _openCountryPicker() {
-    showCountryPicker(
+  Future<void> _openCountryPicker() async{
+     showCountryPicker(
       context: context,
       showPhoneCode: true,
       countryListTheme: CountryListThemeData(
@@ -174,6 +176,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
       ),
       onSelect: (Country country) {
         selectedCountry = country;
+        provider.selectedCountryCodeForNumber = country.countryCode;
         setState(() {});
         // _showCountryError.value = false;
       },

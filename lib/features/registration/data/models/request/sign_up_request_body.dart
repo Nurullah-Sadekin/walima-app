@@ -1,8 +1,3 @@
-import 'dart:convert';
-
-SignUpRequestBody signUpRequestBodyFromJson(String str) => SignUpRequestBody.fromJson(json.decode(str));
-String signUpRequestBodyToJson(SignUpRequestBody data) => json.encode(data.toJson());
-
 class SignUpRequestBody {
   SignUpRequestBody({
     this.profileManagedBy,
@@ -37,40 +32,6 @@ class SignUpRequestBody {
     this.otpCode,
     this.purpose,
   });
-
-  SignUpRequestBody.fromJson(dynamic json) {
-    profileManagedBy = json['profileManagedBy'];
-    gender = json['gender'];
-    firstName = json['firstName'];
-    lastName = json['lastName'];
-    displayName = json['displayName'];
-    motherTongue = json['motherTongue'];
-    dateOfBirth = json['dateOfBirth'];
-    religionName = json['religionName'];
-    community = json['community'];
-    livingIn = json['livingIn'];
-    cityName = json['cityName'];
-    locationType = json['locationType'];
-    countryCode = json['countryCode'];
-    liveWithFamily = json['liveWithFamily'];
-    residencyStatus = json['residencyStatus'];
-    maritalStatus = json['maritalStatus'];
-    height = json['height'];
-    diet = json['diet'];
-    highestLevelOfEducation = json['highestLevelOfEducation'];
-    incomeRange = json['incomeRange'];
-    incomeRangeFrequency = json['incomeRangeFrequency'];
-    workWith = json['workWith'];
-    workingAs = json['workingAs'];
-    currentCompany = json['currentCompany'];
-    bio = json['bio'];
-    termsAndConditionsAccepted = json['termsAndConditionsAccepted'];
-    verificationType = json['verificationType'];
-    email = json['email'];
-    phoneNumber = json['phoneNumber'];
-    otpCode = json['otpCode'];
-    purpose = json['purpose'];
-  }
   String? profileManagedBy;
   String? gender;
   String? firstName;
@@ -134,7 +95,9 @@ class SignUpRequestBody {
     map['verificationType'] = verificationType;
     map['email'] = email;
     map['phoneNumber'] = phoneNumber;
-    map['otpCode'] = otpCode;
+    if (otpCode != null) {
+      map['otpCode'] = otpCode;
+    }
     map['purpose'] = purpose;
     return map;
   }

@@ -51,12 +51,30 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: screenProvider.screenStates ==
-                  RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates == RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.otp),
+                    UpperLayer(
+                      imagePath: AppImages.otp,
+                      trailingText: 'Skip',
+                      isTrailing: true,
+                      onTrailingTap: () async {
+                        final screenProvider = ref.read(verifyOtpForSignUp);
+                        screenProvider.updateViewState(loadingState: RegistrationScreenStates.isProfileFor);
+                        final validate = await provider.submitRegistration(context, skipOtp: true);
+                        if (!validate) {
+                          screenProvider.updateViewState(loadingState: RegistrationScreenStates.loadingComplete);
+                          return;
+                        } else {
+                          screenProvider.updateViewState(screenStates: RegistrationScreenStates.loadingComplete);
+                          if (mounted) {
+                            provider.cleanAllValue();
+                            context.pushReplacement(Paths.photoUpload);
+                          }
+                        }
+                      },
+                    ),
                     body(),
                   ],
                 ),
@@ -72,6 +90,44 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
         child: Column(
           spacing: 10,
           children: [
+            Text(
+              'Verify Number',
+              style: TextStyle(
+                  fontSize: TextSize.font18(context),
+                  color: AppColors.textPrimaryLight,
+                  fontWeight: FontWeight.w500),
+            ),
+            Row(
+              spacing: 8,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'We\'ve sent a code to ${provider.selectedCountryCodeForNumber}${provider.phoneController.text}',
+                  style: TextStyle(
+                      fontSize: TextSize.font14(context),
+                      color: AppColors.textSecondaryLight,
+                      fontWeight: FontWeight.w400),
+                ),
+                InkWell(
+                  onTap: () {},
+                  child: Row(
+                    spacing: 2,
+                    children: [
+                      Icon(Icons.edit_outlined,
+                          size: TextSize.font14(context),
+                          color: AppColors.primary),
+                      Text(
+                        'Edit',
+                        style: TextStyle(
+                            fontSize: TextSize.font14(context),
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
             loginDataField(),
             const SizedBox(height: 10),
             Text(
@@ -85,11 +141,9 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
             InkWell(
               onTap: () async {
                 final screenProvider = ref.read(verifyOtpForSignUp);
-                screenProvider.updateViewState(
-                    loadingState: RegistrationScreenStates.isProfileFor);
+                screenProvider.updateViewState(loadingState: RegistrationScreenStates.isProfileFor);
                 await provider.resendOtp(context);
-                screenProvider.updateViewState(
-                    loadingState: RegistrationScreenStates.loadingComplete);
+                screenProvider.updateViewState(loadingState: RegistrationScreenStates.loadingComplete);
               },
               child: Text(
                 'Resend Code',

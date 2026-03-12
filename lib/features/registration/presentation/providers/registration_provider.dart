@@ -7,6 +7,7 @@ import 'package:flutter_boilerplate/core/network/dio_client.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
+import 'package:flutter_boilerplate/features/login/data/models/resend_otp_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_otp_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_request_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/request/upload_media_request_body.dart';
@@ -378,9 +379,23 @@ class RegistrationProvider extends BaseChangeNotifier {
     for (var c in otpControllers) {
       c.clear();
     }
-    await signUpViaOtp(context);
-    notifyListeners();
-    return true;
+    final body = ResendOtpBody(
+      identifier: selectedVerificationType == 'email'
+          ? emailController.text
+          : phoneController.text,
+      purpose: 'signup',
+    );
+    final response = await RegistrationRepository.resendOtp(body);
+    if(response.code != 'SUCCESS') {
+      DialogUtils.showErrorDialog(
+        context: context,
+        message: response.message ?? 'Failed to resend OTP',
+      );
+      return false;
+    }
+    else{
+      return true;
+    }
   }
 
   void initControllersListener() {
@@ -1431,7 +1446,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     }
     return 'present';
   }
-
+  String selectedCountryCodeForNumber = '';
   String _resolveCountryCodeValue() {
     final selectedCountry = livingInController.text.trim();
     if (selectedCountry.isEmpty) return '';
@@ -1503,7 +1518,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     return true;
   }
 
-  Future<bool> submitRegistration(BuildContext context) async {
+  Future<bool> submitRegistration(BuildContext context,{bool skipOtp = false}) async {
     if (otpControllers.any((c) => c.text.isEmpty)) {
       DialogUtils.showErrorDialog(
         context: context,
@@ -1546,14 +1561,14 @@ class RegistrationProvider extends BaseChangeNotifier {
       bio: aboutYourselfController.text,
       termsAndConditionsAccepted: true,
       verificationType: selectedVerificationType.toLowerCase() == 'email' ? 'email' : 'phone',
-      otpCode: otp,
+      otpCode: skipOtp ? null: otp,
       liveWithFamily: selectedIsWithFamilyStatus?.toLowerCase() == 'yes',
       displayName: '${firstNameController.text} ${lastNameController.text}',
       purpose: 'signup',
       countryCode: countryCodeValue,
       locationType: locationTypeValue,
     );
-    final response = await RegistrationRepository.signUpCreateUserProfile(body);
+    final response = await RegistrationRepository.signUpCreateUserProfile(body, skipOtp: skipOtp);
     if (response.code == 'SUCCESS') {
       await _persistAuthTokens(response);
       await _clearRegistrationDraftCacheOnSuccess();
@@ -1567,21 +1582,19 @@ class RegistrationProvider extends BaseChangeNotifier {
   String emailAvailabilityErrorMessage = '';
   String phoneNumber = '';
   Future<bool> checkEmailAndPhoneAvailability(BuildContext context,String countryCode) async {
-    final emailRes =
-        await RegistrationRepository.checkEmail(emailController.text);
-    final phoneRes =
-        await RegistrationRepository.checkMobile('+$countryCode${phoneController.text}');
+    final emailRes = await RegistrationRepository.checkEmail(emailController.text);
+    final phoneRes = await RegistrationRepository.checkMobile('+$countryCode${phoneController.text}');
     if (emailRes.response?.isAvailable == true &&
         phoneRes.response?.isAvailable == true) {
       phoneAvailabilityErrorMessage = '';
       emailAvailabilityErrorMessage = '';
+      selectedCountryCodeForNumber = countryCode;
       phoneNumber = '+$countryCode${phoneController.text}';
       _notifyAndPersist();
       return true;
     } else {
       if (emailRes.response?.isAvailable != true) {
-        emailAvailabilityErrorMessage =
-            emailRes.message ?? 'Email already exists';
+        emailAvailabilityErrorMessage = emailRes.message ?? 'Email already exists';
         // DialogUtils.showErrorDialog(ctx: context, message: emailRes.message ?? 'Email already exists');
       }
       if (phoneRes.response?.isAvailable != true) {
@@ -1605,6 +1618,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     if (response.code == 'SUCCESS') {
       verificationDone = true;
       _notifyAndPersist();
+      // cleanAllValue();
       return true;
     } else {
       await DialogUtils.showErrorDialog(

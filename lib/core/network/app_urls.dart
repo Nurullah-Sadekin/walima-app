@@ -15,6 +15,7 @@ class AppUrls{
   static const String getAccessToken = '$baseUrl/api/v1/auth/refresh-token';
   static const String googleSignin = '$baseUrl/api/v1/auth/google/signin';
   static const String signUpCreateUserProfile = '$baseUrl/api/v1/users/onboarding';
+  static const String createProfile = '$baseUrl/api/v1/users/profile';
   static const String checkUserNameAvailability = '$baseUrl/api/v1/users/check-username';
   static const String checkEmailAvailability = '$baseUrl/api/v1/users/check-email';
   static const String checkNumberAvailability = '$baseUrl/api/v1/users/check-phone';
