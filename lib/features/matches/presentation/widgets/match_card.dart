@@ -28,6 +28,8 @@ class MatchCard extends StatelessWidget {
     this.leftButtonBorderColor,
     this.rightButtonBorderColor,
     this.activeStatusText,
+    this.photoCount,
+    this.menu,
   });
 
   final String imagePath;
@@ -50,7 +52,8 @@ class MatchCard extends StatelessWidget {
   final Color? leftButtonBorderColor;
   final Color? rightButtonBorderColor;
   final String? activeStatusText;
-
+  final String? photoCount;
+  final bool? menu;
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +89,7 @@ class MatchCard extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     child: ShowImage(
-                      imagePath: leftIconPath ?? AppImages.matchSvgIcon,
+                      imagePath: AppImages.premiumSvgIcon,
                       width: TextSize.font18(context),
                       height: TextSize.font18(context),
                       radius: BorderRadius.circular(8),
@@ -95,14 +98,14 @@ class MatchCard extends StatelessWidget {
                     ),
                   ),
                 ),
-
               if (activeStatusText != null)
                 Positioned(
                   bottom: 10,
                   left: 10,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
-                    decoration:  BoxDecoration(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
+                    decoration: BoxDecoration(
                       color: const Color(0XFF000000).withOpacity(0.5),
                       shape: BoxShape.rectangle,
                       borderRadius: const BorderRadius.all(Radius.circular(4)),
@@ -130,43 +133,71 @@ class MatchCard extends StatelessWidget {
                     ),
                   ),
                 ),
-
-              if (activeStatusText != null)
+              if (photoCount != null)
                 Positioned(
                   top: 10,
                   right: 10,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
-                    decoration:  BoxDecoration(
-                      color: const Color(0XFF000000).withOpacity(0.5),
-                      shape: BoxShape.rectangle,
-                      borderRadius: const BorderRadius.all(Radius.circular(6)),
-                    ),
-                    child: Column(
-                      spacing: 6,
-                      children: [
-                        ShowImage(
-                          imagePath: AppImages.photoIcon,
-                          width: TextSize.font16(context),
-                          height: TextSize.font16(context),
-                          radius: BorderRadius.circular(8),
-                          fit: BoxFit.fitWidth,
-                          color: AppColors.white,
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 6, horizontal: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0XFF000000).withOpacity(0.5),
+                          shape: BoxShape.rectangle,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(6)),
                         ),
-                        Text('1/6',
-                          style: TextStyle(
-                            fontSize: TextSize.font12(context),
-                            fontWeight: FontWeight.w400,
+                        child: Column(
+                          spacing: 6,
+                          children: [
+                            ShowImage(
+                              imagePath: AppImages.photoIcon,
+                              width: TextSize.font16(context),
+                              height: TextSize.font16(context),
+                              radius: BorderRadius.circular(8),
+                              fit: BoxFit.fitWidth,
+                              color: AppColors.white,
+                            ),
+                            Text(
+                              '1/$photoCount',
+                              style: TextStyle(
+                                fontSize: TextSize.font10(context),
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (menu == true)
+                        const SizedBox(
+                          height: 6,
+                        ),
+                      if (menu == true)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 6, horizontal: 6),
+                          decoration: BoxDecoration(
+                            color: const Color(0XFF000000).withOpacity(0.5),
+                            shape: BoxShape.rectangle,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(6)),
+                          ),
+                          child: Icon(
+                            Icons.more_vert,
+                            size: TextSize.font16(context),
                             color: AppColors.white,
                           ),
-                        ),
-                      ],
-                    ),
+                        )
+                    ],
                   ),
                 ),
             ],
           ),
-          const SizedBox(height: 16,),
+          const SizedBox(
+            height: 16,
+          ),
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,7 +226,9 @@ class MatchCard extends StatelessWidget {
                   )
                 ],
               ),
-              const SizedBox(height: 12,),
+              const SizedBox(
+                height: 12,
+              ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -217,7 +250,9 @@ class MatchCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 16,),
+              const SizedBox(
+                height: 16,
+              ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4.0),
                 child: Row(
@@ -243,9 +278,9 @@ class MatchCard extends StatelessWidget {
                           svgIconPath: rightIconPath ?? AppImages.callSvgIcon,
                           title: rightButtonText ?? 'Contact',
                           bgColor: rightButtonColor ?? AppColors.white,
-                          borderColor: rightButtonBorderColor ?? AppColors.primary,
-                          textColor: rightButtonTextColor ?? AppColors.primary
-                      ),
+                          borderColor:
+                              rightButtonBorderColor ?? AppColors.primary,
+                          textColor: rightButtonTextColor ?? AppColors.primary),
                     ),
                   ],
                 ),

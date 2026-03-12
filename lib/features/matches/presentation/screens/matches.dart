@@ -55,7 +55,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
                   (index) => const Padding(padding: EdgeInsets.only(bottom: 10.0,),
                 child: MatchCard(
                   imagePath: AppImages.demoProfile2,
-                  leftIconPath: AppImages.premiumSvgIcon,
+                  leftIconPath: AppImages.favouriteIcon,
                   isPremiumConnect: true,
                   isVerified: true,
                   name: 'Tasnova Ahmed',
@@ -63,6 +63,8 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
                   height: '5\' 3\'" ',
                   location: 'Gulshan, Dhaka, BD',
                   activeStatusText: '1 day ago',
+                  photoCount: '5',
+                  menu: true,
                 ),
               )),
         ),
