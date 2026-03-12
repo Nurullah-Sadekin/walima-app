@@ -2,8 +2,8 @@ import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/features/login/data/repository/login_repository.dart';
 
 class HomeProvider extends BaseChangeNotifier {
-  LoginScreenStates screenStates = LoginScreenStates.defaultState;
-  LoginScreenStates loaderState = LoginScreenStates.defaultState;
+  HomeScreenStates screenStates = HomeScreenStates.defaultState;
+  HomeScreenStates loaderState = HomeScreenStates.defaultState;
 
   Future<void> getInitialData() async {
     final response = await LoginRepository.getMe();
@@ -14,9 +14,19 @@ class HomeProvider extends BaseChangeNotifier {
       // DialogUtils.showErrorDialog(message: response.message);
     }
   }
+
+  void updateViewState(
+      {HomeScreenStates? screenStates, HomeScreenStates? loadingState}) {
+    if (screenStates != null) {
+      this.screenStates = screenStates;
+      loaderState = HomeScreenStates.defaultState;
+    }
+    if (loadingState != null) loaderState = loadingState;
+    notifyListeners();
+  }
 }
 
-enum LoginScreenStates {
+enum HomeScreenStates {
   defaultState,
   loading,
   complete,
