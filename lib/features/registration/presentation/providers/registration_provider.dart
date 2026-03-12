@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
@@ -45,6 +46,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   String? selectedYourWork;
   String? selectedYouWorkAs;
   String? selectedFamilyEconomicCondition;
+
 
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
@@ -1462,7 +1464,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       cityName: cityController.text,
       dateOfBirth: '1990-01-01',
       email: emailController.text,
-      phoneNumber: phoneController.text,
+      phoneNumber: phoneNumber,
       residencyStatus: residencyStatusValue,
       maritalStatus: maritalStatusValue,
       height: num.tryParse(heightController.text),
@@ -1475,8 +1477,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       currentCompany: currentCompanyNameController.text,
       bio: aboutYourselfController.text,
       termsAndConditionsAccepted: true,
-      verificationType:
-          selectedVerificationType.toLowerCase() == 'email' ? 'email' : 'phone',
+      verificationType: selectedVerificationType.toLowerCase() == 'email' ? 'email' : 'phone',
       otpCode: otp,
       liveWithFamily: selectedIsWithFamilyStatus?.toLowerCase() == 'yes',
       displayName: '${firstNameController.text} ${lastNameController.text}',
@@ -1496,16 +1497,17 @@ class RegistrationProvider extends BaseChangeNotifier {
 
   String phoneAvailabilityErrorMessage = '';
   String emailAvailabilityErrorMessage = '';
-
-  Future<bool> checkEmailAndPhoneAvailability(BuildContext context) async {
+  String phoneNumber = '';
+  Future<bool> checkEmailAndPhoneAvailability(BuildContext context,String countryCode) async {
     final emailRes =
         await RegistrationRepository.checkEmail(emailController.text);
     final phoneRes =
-        await RegistrationRepository.checkMobile(phoneController.text);
+        await RegistrationRepository.checkMobile('+$countryCode${phoneController.text}');
     if (emailRes.response?.isAvailable == true &&
         phoneRes.response?.isAvailable == true) {
       phoneAvailabilityErrorMessage = '';
       emailAvailabilityErrorMessage = '';
+      phoneNumber = '+$countryCode${phoneController.text}';
       _notifyAndPersist();
       return true;
     } else {

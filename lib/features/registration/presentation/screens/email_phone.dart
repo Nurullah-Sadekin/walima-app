@@ -1,3 +1,4 @@
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
@@ -22,7 +23,7 @@ class EmailPhoneScreen extends ConsumerStatefulWidget {
 
 class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
   late RegistrationProvider provider;
-
+  Country selectedCountry = Country.parse('BN');
   @override
   void initState() {
     super.initState();
@@ -36,11 +37,13 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(emailPhoneScreenProvider);
     return TransparentLoading(
-      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading:
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: screenProvider.screenStates == RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates ==
+                  RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
@@ -83,42 +86,126 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
             imagePath: AppImages.emailSvgIcon,
             width: TextSize.font18(context),
             height: TextSize.font18(context),
-            color: provider.emailController.text.isNotEmpty ? AppColors.textPrimaryLight : AppColors.hintTextColor,
+            color: provider.emailController.text.isNotEmpty
+                ? AppColors.textPrimaryLight
+                : AppColors.hintTextColor,
           ),
           errorText: provider.emailAvailabilityErrorMessage,
           onTap: () {},
         ),
         PrimaryTextField(
+          prefixIcon: InkWell(
+            onTap: _openCountryPicker,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Row(
+                children: [
+                  if (selectedCountry != null)
+                    Text(
+                      selectedCountry.flagEmoji,
+                      style: const TextStyle(fontSize: 20),
+                    )
+                  else
+                    const Icon(Icons.public,
+                        color: AppColors.primary, size: 18),
+                  const SizedBox(width: 8),
+                  Text(
+                    selectedCountry != null
+                        ? '+${selectedCountry.phoneCode}'
+                        : 'Code',
+                    style: TextStyle(
+                      color: selectedCountry != null
+                          ? AppColors.textPrimaryLight
+                          : AppColors.hintTextColor,
+                      fontSize: TextSize.font14(context),
+                    ),
+                  ),
+                  const Icon(Icons.arrow_drop_down,
+                      color: Colors.grey, size: 20),
+                ],
+              ),
+            ),
+          ),
+          isCountryDropdown: true,
           controller: provider.phoneController,
           headLine: 'Phone Number',
           keyboardType: TextInputType.phone,
-          hintText: '+880168011685',
+          hintText: '168011685',
           errorText: provider.phoneAvailabilityErrorMessage,
-          noPrefix: true,
-          onTap: () {},
+          // noPrefix: true,
+          onTap: () {
+          },
         ),
       ],
     );
   }
 
+  void _openCountryPicker() {
+    showCountryPicker(
+      context: context,
+      showPhoneCode: true,
+      countryListTheme: CountryListThemeData(
+        backgroundColor: const Color(0xFF1A1A1A),
+        textStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 14,
+        ),
+        searchTextStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 14,
+        ),
+        inputDecoration: InputDecoration(
+          hintText: 'Search country',
+          hintStyle: const TextStyle(
+            color: Colors.grey,
+            fontSize: 14,
+          ),
+          filled: true,
+          fillColor: Colors.black,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: Colors.grey.shade800),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: Colors.grey.shade800),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: AppColors.primary),
+          ),
+          prefixIcon: const Icon(Icons.search, color: Colors.grey),
+        ),
+        borderRadius: BorderRadius.circular(12),
+        bottomSheetHeight: 600,
+      ),
+      onSelect: (Country country) {
+        selectedCountry = country;
+        setState(() {});
+        // _showCountryError.value = false;
+      },
+    );
+  }
+
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: provider.emailController.text.isNotEmpty && provider.phoneController.text.isNotEmpty
+      buttonStyle: provider.emailController.text.isNotEmpty &&
+              provider.phoneController.text.isNotEmpty
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () async {
-        if (provider.emailController.text.isEmpty || provider.phoneController.text.isEmpty) {
+        if (provider.emailController.text.isEmpty ||
+            provider.phoneController.text.isEmpty) {
           return;
         }
-
         final screenNotifier = ref.read(emailPhoneScreenProvider);
         screenNotifier.updateViewState(
           loadingState: RegistrationScreenStates.isProfileFor,
         );
 
         try {
-          final isAvailable = await provider.checkEmailAndPhoneAvailability(context);
+          final isAvailable = await provider.checkEmailAndPhoneAvailability(context,selectedCountry.phoneCode);
 
           if (isAvailable && mounted) {
             context.push(Paths.location);

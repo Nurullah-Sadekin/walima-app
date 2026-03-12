@@ -5,12 +5,14 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_expansion_tile.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/upgrade_package/presentation/screens/widgets/package_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/upgrade_package/presentation/providers/upgrade_package_provider.dart';
+import 'package:go_router/go_router.dart';
 
 class UpgradePackageScreen extends ConsumerStatefulWidget {
   const UpgradePackageScreen({super.key});
@@ -45,12 +47,14 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
 
 
   Widget _appbarSection() {
-    return const CustomBackAppBar(
+    return  CustomBackAppBar(
       isBackButton: true,
       backIconBackground: AppColors.transparent,
       isTrailing: true,
       trailingText: 'Skip',
-      onTrailingTap: null,
+      onTrailingTap: (){
+        context.push(Paths.anchor);
+      },
     );
   }
 

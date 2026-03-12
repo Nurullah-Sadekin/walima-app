@@ -35,7 +35,7 @@ class _ConnectMatchesState extends ConsumerState<ConnectMatches> {
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(0),
-              itemCount: 5,
+              itemCount: 1,
               itemBuilder: (context, index) {
                 return Padding(
                   padding: const EdgeInsets.all(16.0),

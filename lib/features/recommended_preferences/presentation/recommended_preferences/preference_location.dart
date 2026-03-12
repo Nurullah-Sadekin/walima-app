@@ -96,9 +96,8 @@ class _PreferenceLocationScreenState
             popUpHeader: 'Select Preferable Country Living In',
             items: provider.countryDropdownItems,
             controller: provider.countryPreferenceController,
-            onTap: provider.loadLocationData,
-            onConfirm: (value) =>
-                provider.onCountryPreferenceSelected(value?.toString()),
+            // onTap: provider.loadLocationData,
+            onConfirm: (value) => provider.onCountryPreferenceSelected(value?.toString()),
             isSearch: true,
           ),
           Text(
@@ -117,7 +116,7 @@ class _PreferenceLocationScreenState
                       final provider =
                           ref.watch(recommendedPreferencesProvider);
                       if (provider.cityDropdownItems.isEmpty) {
-                        return const SizedBox.shrink();
+                        return const Center(child: Text('No cities available for the selected country.'));
                       }
                       const double spacing = 10.0;
                       return Wrap(
