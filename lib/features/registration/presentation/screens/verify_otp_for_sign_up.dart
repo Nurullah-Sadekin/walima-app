@@ -26,8 +26,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
   @override
   void initState() {
     super.initState();
-    provider = ref.read(registrationProvider);
-
+    // provider = ref.watch(registrationProvider);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider.initControllersListener();
       provider.initOtpFields(length: 6);
@@ -51,7 +50,8 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: screenProvider.screenStates == RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates ==
+                  RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
@@ -61,13 +61,20 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                       isTrailing: true,
                       onTrailingTap: () async {
                         final screenProvider = ref.read(verifyOtpForSignUp);
-                        screenProvider.updateViewState(loadingState: RegistrationScreenStates.isProfileFor);
-                        final validate = await provider.submitRegistration(context, skipOtp: true);
+                        screenProvider.updateViewState(
+                            loadingState:
+                                RegistrationScreenStates.isProfileFor);
+                        final validate = await provider
+                            .submitRegistration(context, skipOtp: true);
                         if (!validate) {
-                          screenProvider.updateViewState(loadingState: RegistrationScreenStates.loadingComplete);
+                          screenProvider.updateViewState(
+                              loadingState:
+                                  RegistrationScreenStates.loadingComplete);
                           return;
                         } else {
-                          screenProvider.updateViewState(screenStates: RegistrationScreenStates.loadingComplete);
+                          screenProvider.updateViewState(
+                              screenStates:
+                                  RegistrationScreenStates.loadingComplete);
                           if (mounted) {
                             provider.cleanAllValue();
                             context.pushReplacement(Paths.photoUpload);
@@ -91,7 +98,9 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
           spacing: 10,
           children: [
             Text(
-              'Verify Number',
+              provider.selectedVerificationType == 'email'
+                  ? 'Verify email'
+                  : 'Verify Number',
               style: TextStyle(
                   fontSize: TextSize.font18(context),
                   color: AppColors.textPrimaryLight,
@@ -141,9 +150,11 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
             InkWell(
               onTap: () async {
                 final screenProvider = ref.read(verifyOtpForSignUp);
-                screenProvider.updateViewState(loadingState: RegistrationScreenStates.isProfileFor);
+                screenProvider.updateViewState(
+                    loadingState: RegistrationScreenStates.isProfileFor);
                 await provider.resendOtp(context);
-                screenProvider.updateViewState(loadingState: RegistrationScreenStates.loadingComplete);
+                screenProvider.updateViewState(
+                    loadingState: RegistrationScreenStates.loadingComplete);
               },
               child: Text(
                 'Resend Code',
@@ -210,11 +221,8 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                       // Handle paste (multiple chars) and normal single char entry
                       if (value.length > 1) {
                         final chars = value.split('');
-                        for (var i = 0;
-                            i < chars.length &&
-                                (index + i) < provider.otpControllers.length;
-                            i++) {
-                          provider.otpControllers[index + i].text = chars[i];
+                        for (var i = 0; i < chars.length && (index + i) < provider.otpControllers.length;
+                            i++) {provider.otpControllers[index + i].text = chars[i];
                         }
                         final next = index + chars.length;
                         if (next >= provider.otpFocusNodesController.length) {

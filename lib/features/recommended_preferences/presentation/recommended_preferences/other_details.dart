@@ -65,7 +65,7 @@ class _OtherDetailsScreenState extends ConsumerState<OtherDetailsScreen> {
   Widget body() {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        // padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(
           spacing: 10,
           children: [
@@ -80,99 +80,106 @@ class _OtherDetailsScreenState extends ConsumerState<OtherDetailsScreen> {
 
   Widget selectionField() {
     return Expanded(
-      child: Column(
-        spacing: 10,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Profile Manage by',
-            style: TextStyle(
-              fontSize: TextSize.font14(context),
-              fontWeight: FontWeight.w500,
-              color: AppColors.textPrimaryLight,
-            ),
-          ),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              const double spacing = 10.0;
-              return Consumer(builder: (context, ref, _) {
-                final provider = ref.watch(recommendedPreferencesProvider);
-                return Wrap(
-                  spacing: spacing,
-                  runSpacing: spacing,
-                  children: List.generate(provider.profileManageByDataList.length, (index) {
-                    final item = provider.profileManageByDataList[index];
-
-                    return SelectionCard(
-                      buttonStyle: item.isSelected
-                          ? SelectionStyle.selectedCheckbox
-                          : SelectionStyle.unSelectedCheckbox,
-                      onTap: () {
-                        provider.toggleProfileManageBy(index);
-                      },
-                      isSelected: item.isSelected,
-                      title: item.name.replaceAll('My', ''),
-                    );
-                  }),
-                );
-              });
-            },
-          ),
-
-          Text(
-            'Diet',
-            style: TextStyle(
-              fontSize: TextSize.font14(context),
-              fontWeight: FontWeight.w500,
-              color: AppColors.textPrimaryLight,
-            ),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  const double spacing = 10.0;
-                  return Consumer(builder: (context, ref, _) {
-                    final provider = ref.watch(recommendedPreferencesProvider);
-                    return Wrap(
-                      spacing: spacing,
-                      runSpacing: spacing,
-                      children: List.generate(provider.dietDataList.length, (index) {
-                        final item = provider.dietDataList[index];
-
-                        return SelectionCard(
-                          buttonStyle: item.isSelected
-                              ? SelectionStyle.selectedCheckbox
-                              : SelectionStyle.unSelectedCheckbox,
-                          onTap: () {
-                            provider.toggleDiet(index);
-                          },
-                          isSelected: item.isSelected,
-                          title: item.name,
-                        );
-                      }),
-                    );
-                  });
-                },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          spacing: 10,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Profile Manage by',
+              style: TextStyle(
+                fontSize: TextSize.font14(context),
+                fontWeight: FontWeight.w500,
+                color: AppColors.textPrimaryLight,
               ),
             ),
-          ),
-        ],
+            LayoutBuilder(
+              builder: (context, constraints) {
+                const double spacing = 10.0;
+                return Consumer(builder: (context, ref, _) {
+                  final provider = ref.watch(recommendedPreferencesProvider);
+                  return Wrap(
+                    spacing: spacing,
+                    runSpacing: spacing,
+                    children: List.generate(provider.profileManageByDataList.length, (index) {
+                      final item = provider.profileManageByDataList[index];
+
+                      return SelectionCard(
+                        buttonStyle: item.isSelected
+                            ? SelectionStyle.selectedCheckbox
+                            : SelectionStyle.unSelectedCheckbox,
+                        onTap: () {
+                          provider.toggleProfileManageBy(index);
+                        },
+                        isSelected: item.isSelected,
+                        title: item.name.replaceAll('My', ''),
+                      );
+                    }),
+                  );
+                });
+              },
+            ),
+
+            Text(
+              'Diet',
+              style: TextStyle(
+                fontSize: TextSize.font14(context),
+                fontWeight: FontWeight.w500,
+                color: AppColors.textPrimaryLight,
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    const double spacing = 10.0;
+                    return Consumer(builder: (context, ref, _) {
+                      final provider = ref.watch(recommendedPreferencesProvider);
+                      return Wrap(
+                        spacing: spacing,
+                        runSpacing: spacing,
+                        children: List.generate(provider.dietDataList.length, (index) {
+                          final item = provider.dietDataList[index];
+
+                          return SelectionCard(
+                            buttonStyle: item.isSelected
+                                ? SelectionStyle.selectedCheckbox
+                                : SelectionStyle.unSelectedCheckbox,
+                            onTap: () {
+                              provider.toggleDiet(index);
+                            },
+                            isSelected: item.isSelected,
+                            title: item.name,
+                          );
+                        }),
+                      );
+                    },
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget bottomAction() {
-    return PrimaryButtons(
-      buttonStyle: ButtonsStyle.activePrimaryButton,
-      title: 'Continue',
-      onTap: () async {
-        final success = await provider.updatePreferences(context);
-        if (success && context.mounted) {
-          context.push(Paths.connectMatches);
-        }
-      },
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: PrimaryButtons(
+        buttonStyle: ButtonsStyle.activePrimaryButton,
+        title: 'Continue',
+        onTap: () async {
+          final success = await provider.updatePreferences(context);
+          if (success && context.mounted) {
+            context.push(Paths.connectMatches);
+          }
+        },
+      ),
     );
   }
 }

@@ -142,7 +142,7 @@ class _YourRegionState extends ConsumerState<YourReligion> {
             provider.livingInController.text.isEmpty) {
           return;
         }
-        context.push(Paths.emailPhone);
+        provider.setSelectedCountryCode(context);
       },
     );
   }

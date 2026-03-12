@@ -28,9 +28,9 @@ class _PreferenceLocationScreenState
   void initState() {
     super.initState();
     provider = ref.read(recommendedPreferencesProvider);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       provider.getInitialData();
-      provider.loadLocationData();
+      await provider.loadLocationData();
       provider.initControllersListener();
     });
   }
