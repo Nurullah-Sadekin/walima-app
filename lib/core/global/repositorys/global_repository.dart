@@ -6,8 +6,8 @@ import 'package:flutter_boilerplate/features/login/data/models/login_response.da
 
 class GlobalRepository {
   Future<String> getAppVersion() async {
-    await Future.delayed(Duration(seconds: 1));
-    return "1.0.0";
+    await Future.delayed(const Duration(seconds: 1));
+    return '1.0.0';
   }
 
   static Future<bool> refreshAccessToken() async {
