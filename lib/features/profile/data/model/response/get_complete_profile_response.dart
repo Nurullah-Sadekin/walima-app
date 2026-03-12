@@ -11,12 +11,12 @@ class GetCompleteProfileResponse {
     code = json['code'];
     message = json['message'];
     response =
-        json['response'] != null ? Response.fromJson(json['response']) : null;
+        json['response'] != null ? CompleteProfile.fromJson(json['response']) : null;
     traceId = json['traceId'];
   }
   String? code;
   String? message;
-  Response? response;
+  CompleteProfile? response;
   String? traceId;
 
   Map<String, dynamic> toJson() {
@@ -31,8 +31,8 @@ class GetCompleteProfileResponse {
   }
 }
 
-class Response {
-  Response({
+class CompleteProfile {
+  CompleteProfile({
     this.user,
     this.profile,
     this.profileCompletion,
@@ -50,7 +50,7 @@ class Response {
     this.interest,
   });
 
-  Response.fromJson(dynamic json) {
+  CompleteProfile.fromJson(dynamic json) {
     user = json['user'] != null ? User.fromJson(json['user']) : null;
     profile =
         json['profile'] != null ? Profile.fromJson(json['profile']) : null;
@@ -236,7 +236,6 @@ class Interest {
     return map;
   }
 }
-
 
 class Contacts {
   Contacts({
@@ -485,7 +484,6 @@ class Preferences {
     return map;
   }
 }
-
 
 class Lifestyle {
   Lifestyle({
@@ -1074,7 +1072,6 @@ class Statistics {
     return map;
   }
 }
-
 
 class ProfileCompletion {
   ProfileCompletion({
