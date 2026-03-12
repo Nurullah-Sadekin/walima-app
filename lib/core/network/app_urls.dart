@@ -2,8 +2,6 @@ class AppUrls{
   static const String domain = 'https://dev.walima.app/';
   static const String apiVersion = 'api/v1';
   static const String baseUrl = '$domain$apiVersion';
-  
-  
   static const String login = '$baseUrl/auth/signin-with-password';
   static const String getMe = '$baseUrl/auth/me';
   static const String register = '$baseUrl/auth/register';
@@ -19,11 +17,9 @@ class AppUrls{
   static const String getAccessToken = '$baseUrl/auth/refresh-token';
   static const String googleSignin = '$baseUrl/auth/google/signin';
   static const String signUpCreateUserProfile = '$baseUrl/users/onboarding';
-  // static const String createProfile = '$baseUrl/users/profile';
   static const String checkUserNameAvailability = '$baseUrl/users/check-username';
   static const String checkEmailAvailability = '$baseUrl/users/check-email';
   static const String checkNumberAvailability = '$baseUrl/users/check-phone';
-
   static const String uploadMedia = '$baseUrl/media/upload';
   static const String getAllCountry = '$baseUrl/countries';
   static const String getCityByCountry = '$baseUrl/cities';
