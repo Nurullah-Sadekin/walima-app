@@ -145,7 +145,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
       context: context,
       showPhoneCode: true,
       countryListTheme: CountryListThemeData(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: Colors.white,
         textStyle: const TextStyle(
           color: Colors.white,
           fontSize: 14,
