@@ -146,15 +146,6 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
     DialogUtils.showErrorDialog(context: context, message: provider.profileImageUploadErrorMessage.isNotEmpty
         ? provider.profileImageUploadErrorMessage
         : 'Failed to upload profile image.');
-    // ScaffoldMessenger.of(context).showSnackBar(
-    //   SnackBar(
-    //     content: Text(
-    //       provider.profileImageUploadErrorMessage.isNotEmpty
-    //           ? provider.profileImageUploadErrorMessage
-    //           : 'Failed to upload profile image.',
-    //     ),
-    //   ),
-    // );
   }
 
   Widget body(BuildContext context) {
