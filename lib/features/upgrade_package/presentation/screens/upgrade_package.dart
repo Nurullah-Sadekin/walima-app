@@ -22,17 +22,18 @@ class UpgradePackageScreen extends ConsumerStatefulWidget {
 }
 
 class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
-  final UpgradePackageProvider provider = UpgradePackageProvider();
-
+  late UpgradePackageProvider provider;
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(registrationProvider).getInitialData();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final provider = ref.watch(upgradePackageProvider);
-
+    provider = ref.watch(upgradePackageProvider);
     return Scaffold(
       body: GradientBackground(
         child: Column(
@@ -58,7 +59,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
     );
   }
 
-  Widget _body(){
+  Widget _body() {
     return Expanded(
       child: SingleChildScrollView(
         child: Column(

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
@@ -240,6 +239,16 @@ class RegistrationProvider extends BaseChangeNotifier {
     'middle class': 'middle_class',
     'middle_class': 'middle_class',
     'aspiring': 'aspiring',
+  };
+
+  static const Set<String> _maleLockedProfileNames = <String>{
+    'my son',
+    'my brother',
+  };
+
+  static const Set<String> _femaleLockedProfileNames = <String>{
+    'my daughter',
+    'my sister',
   };
 
   List<TextEditingController> get _managedControllers => [
@@ -693,17 +702,38 @@ class RegistrationProvider extends BaseChangeNotifier {
 
   void selectedProfileFor(int index) {
     if (!_isValidIndex(index, profileForList.length)) return;
+    final previousProfile = selectedProfileName?.trim().toLowerCase();
+
     _setSingleSelection(
       profileForList,
       index,
       (item, selected) => item.isSelected = selected,
     );
     selectedProfileName = profileForList[index].name;
+
+    final currentProfile = selectedProfileName?.trim().toLowerCase();
+    final hasProfileChanged = previousProfile != currentProfile;
+
+    final lockedGender = _lockedGenderForProfile(selectedProfileName);
+    if (lockedGender != null) {
+      _setGenderByName(lockedGender);
+    } else if (hasProfileChanged) {
+      _clearSelectedGender();
+    }
+
     _notifyAndPersist();
   }
 
   void selectedGender(int index) {
     if (!_isValidIndex(index, genderForList.length)) return;
+
+    final lockedGender = _lockedGenderForProfile(selectedProfileName);
+    if (lockedGender != null) {
+      _setGenderByName(lockedGender);
+      _notifyAndPersist();
+      return;
+    }
+
     _setSingleSelection(
       genderForList,
       index,
@@ -1054,6 +1084,7 @@ class RegistrationProvider extends BaseChangeNotifier {
         (item) => item.name,
         (item, selected) => item.isSelected = selected,
       );
+      _ensureLockedGenderConsistency();
       _applySingleSelectionByName(
         isWithFamilyDataList,
         selectedIsWithFamilyStatus,
@@ -1167,6 +1198,43 @@ class RegistrationProvider extends BaseChangeNotifier {
       return value.whereType<String>().toList();
     }
     return <String>[];
+  }
+
+  String? _lockedGenderForProfile(String? profileName) {
+    final normalized = profileName?.trim().toLowerCase() ?? '';
+    if (_maleLockedProfileNames.contains(normalized)) {
+      return 'Male';
+    }
+    if (_femaleLockedProfileNames.contains(normalized)) {
+      return 'Female';
+    }
+    return null;
+  }
+
+  void _setGenderByName(String genderName) {
+    _applySingleSelectionByName(
+      genderForList,
+      genderName,
+      (item) => item.name,
+      (item, selected) => item.isSelected = selected,
+    );
+    selectedGenderName = genderName;
+  }
+
+  void _clearSelectedGender() {
+    _resetSelection(
+      genderForList,
+      (item, selected) => item.isSelected = selected,
+    );
+    selectedGenderName = null;
+  }
+
+  void _ensureLockedGenderConsistency() {
+    final lockedGender = _lockedGenderForProfile(selectedProfileName);
+    if (lockedGender == null) {
+      return;
+    }
+    _setGenderByName(lockedGender);
   }
 
   void _applySingleSelectionByName<T>(
@@ -1656,8 +1724,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   Future<bool> updateFamilyEarning(BuildContext context) async {
     try {
       final body = UpdateFamilyRequestBody(
-        // familyEconomicCondition: _resolveFamilyEconomicConditionValue(),
-        familyEconomicCondition: 'middle_class',
+        familyEconomicCondition: _resolveFamilyEconomicConditionValue(),
       );
 
       return _submitFamilyUpdate(
