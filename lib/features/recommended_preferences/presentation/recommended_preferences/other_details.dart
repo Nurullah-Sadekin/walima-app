@@ -69,7 +69,7 @@ class _OtherDetailsScreenState extends ConsumerState<OtherDetailsScreen> {
         child: Column(
           spacing: 10,
           children: [
-            completeMessage(),
+            selectionField(),
             bottomAction(),
             const SizedBox(height: 20),
           ],
@@ -78,7 +78,7 @@ class _OtherDetailsScreenState extends ConsumerState<OtherDetailsScreen> {
     );
   }
 
-  Widget completeMessage() {
+  Widget selectionField() {
     return Expanded(
       child: Column(
         spacing: 10,
