@@ -34,6 +34,7 @@ class PrimaryTextField extends StatefulWidget {
     this.contentPadding,
     this.enabled,
     this.hideHeadline,
+    this.length
   });
 
   final TextEditingController? controller;
@@ -63,6 +64,7 @@ class PrimaryTextField extends StatefulWidget {
   final Widget? prefixIcon;
   final bool? showPassIcon;
   final bool? headLineInfoIcon;
+  final int? length;
 
   @override
   State<PrimaryTextField> createState() => _PrimaryTextFieldState();
@@ -97,7 +99,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
           ? viewPassword
           : widget.obscureText ?? false,
       keyboardType: widget.keyboardType,
-      maxLength: widget.isCountryDropdown ? 10 : null,
+      maxLength: widget.length,
       readOnly: widget.datePicker == true ? true : (widget.readOnly ?? false),
       onTap: () async {
         if (widget.datePicker == true) {

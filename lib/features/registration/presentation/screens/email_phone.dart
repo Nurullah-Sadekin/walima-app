@@ -132,6 +132,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
           headLine: 'Phone Number',
           keyboardType: TextInputType.phone,
           hintText: '168011685',
+          length: 10,
           errorText: provider.phoneAvailabilityErrorMessage,
           onTap: null,
           maxLine: 1,
