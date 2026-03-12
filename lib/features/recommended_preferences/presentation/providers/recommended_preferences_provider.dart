@@ -264,13 +264,13 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   List<SingleStringModel> countryDataList = countryListDataInserted;
   List<SingleStringModel> dietDataList = dietDataListInserted;
   List<SingleStringModel> incomeRangeDataList = incomeRangeListInserted;
-  List<SingleStringModel> professionDataList =
-      fatherDetailsItemListDataInserted;
+  List<SingleStringModel> professionDataList = fatherDetailsItemListDataInserted;
 
   final List<String> preferableMaritalStatuses = [];
   final List<String> preferableEducations = [];
   final List<String> preferableProfileManagedBy = [];
   final List<String> preferableCity = [];
+  final List<String> preferableWorkingAs = [];
   final List<String> preferableDiet = [];
 
   final TextEditingController religionPreferenceController =
@@ -336,6 +336,18 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
       }
     } else {
       preferableProfileManagedBy.remove(item.name);
+    }
+    notifyListeners();
+  }
+
+  void toggleProfession(int index) {
+    if (index < 0 || index >= professionDataList.length) return;
+    final item = professionDataList[index];
+    item.isSelected = !item.isSelected;
+    if (item.isSelected) {
+      if (!preferableWorkingAs.contains(item.name)) preferableWorkingAs.add(item.name);
+    } else {
+      preferableWorkingAs.remove(item.name);
     }
     notifyListeners();
   }
