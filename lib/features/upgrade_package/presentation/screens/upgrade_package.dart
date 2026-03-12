@@ -289,11 +289,10 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
                     ],
                   ),
                 ],
-              )
+              ),
             ],
           ),
         )
-
       ],
     );
   }

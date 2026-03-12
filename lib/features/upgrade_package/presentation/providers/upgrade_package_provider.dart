@@ -19,6 +19,23 @@ class UpgradePackageProvider extends BaseChangeNotifier {
   };
 
   final List<UpgradePackageItem> packageItems = packageItemsDataInserted;
+  UpgradePackageScreenStates screenStates = UpgradePackageScreenStates.defaultLoading;
+  UpgradePackageScreenStates loaderState = UpgradePackageScreenStates.defaultLoading;
+
+  void updateViewState({
+    UpgradePackageScreenStates? screenStates,
+    UpgradePackageScreenStates? loadingState,
+  }) {
+    if (screenStates != null) {
+      this.screenStates = screenStates;
+      loaderState = UpgradePackageScreenStates.defaultLoading;
+    }
+    if (loadingState != null) {
+      loaderState = loadingState;
+    }
+    notifyListeners();
+  }
+
 }
 
 
