@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
+import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
@@ -79,6 +80,7 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
                   style: TextStyle(
                     fontSize: TextSize.font14(context),
                     fontWeight: FontWeight.w500,
+                    color: AppColors.textPrimaryLight,
                   ),
                 ),
                 Row(
