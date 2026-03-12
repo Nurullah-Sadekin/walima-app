@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_boilerplate/core/network/app_urls.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/features/profile/data/model/get_complete_profile_response.dart';
+import 'package:flutter_boilerplate/features/profile/data/model/response/get_complete_profile_response.dart';
 
 class ProfileRepository {
   static Future<GetCompleteProfileResponse> getCompleteProfile() async {
