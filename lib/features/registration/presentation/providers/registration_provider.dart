@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
@@ -444,6 +445,15 @@ class RegistrationProvider extends BaseChangeNotifier {
     profileImageUploadErrorMessage = '';
   }
 
+  Country selectedCountry = Country.worldWide;
+  void setSelectedCountryCode(BuildContext context) async {
+    if (livingInController.text.isNotEmpty) {
+      try {
+        selectedCountry = Country.parse(livingInController.text);
+        context.push(Paths.emailPhone);
+      } catch (_) {}
+    }
+  }
   void _clearAllControllers() {
     for (final controller in _managedControllers) {
       controller.clear();
@@ -1596,11 +1606,13 @@ class RegistrationProvider extends BaseChangeNotifier {
       if (emailRes.response?.isAvailable != true) {
         emailAvailabilityErrorMessage = emailRes.message ?? 'Email already exists';
         // DialogUtils.showErrorDialog(ctx: context, message: emailRes.message ?? 'Email already exists');
+      notifyListeners();
       }
       if (phoneRes.response?.isAvailable != true) {
         phoneAvailabilityErrorMessage =
             phoneRes.message ?? 'Phone number already exists';
         // DialogUtils.showErrorDialog(ctx: context, message: phoneRes.message ?? 'Phone number already exists');
+
       }
       _notifyAndPersist();
       return false;

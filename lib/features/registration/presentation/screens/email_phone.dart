@@ -22,8 +22,6 @@ class EmailPhoneScreen extends ConsumerStatefulWidget {
 }
 
 class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
-  late RegistrationProvider provider;
-  late Country selectedCountry;
   @override
   void initState() {
     super.initState();
@@ -34,7 +32,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
 
   @override
   Widget build(BuildContext context) {
-    provider = ref.watch(registrationProvider);
+    final provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(emailPhoneScreenProvider);
     return TransparentLoading(
       isLoading:
@@ -43,7 +41,8 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
         backgroundColor: Colors.transparent,
         body: GradientBackground(
           child: screenProvider.screenStates ==
-                  RegistrationScreenStates.isProfileFor
+                      RegistrationScreenStates.isProfileFor ||
+                  provider.selectedCountry == null
               ? const Loading()
               : Column(
                   children: [
@@ -74,9 +73,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
   }
 
   Widget dataInsertField() {
-   if(provider.selectedCountryCodeForNumber.isEmpty){
-     selectedCountry = Country.parse(provider.livingInController.text);
-   }
+    final provider = ref.watch(registrationProvider);
     return Column(
       spacing: 20,
       children: [
@@ -104,12 +101,12 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
               child: Row(
                 children: [
                   Text(
-                    selectedCountry.flagEmoji,
+                    provider.selectedCountry.flagEmoji,
                     style: const TextStyle(fontSize: 20),
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '+${selectedCountry.phoneCode}',
+                    '+${provider.selectedCountry!.phoneCode}',
                     style: TextStyle(
                       color: AppColors.textPrimaryLight,
                       fontSize: TextSize.font14(context),
@@ -135,8 +132,9 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
     );
   }
 
-  Future<void> _openCountryPicker() async{
-     showCountryPicker(
+  Future<void> _openCountryPicker() async {
+    final provider = ref.read(registrationProvider);
+    showCountryPicker(
       context: context,
       showPhoneCode: true,
       countryListTheme: CountryListThemeData(
@@ -175,7 +173,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
         bottomSheetHeight: 600,
       ),
       onSelect: (Country country) {
-        selectedCountry = country;
+        provider.selectedCountry = country;
         provider.selectedCountryCodeForNumber = country.countryCode;
         setState(() {});
         // _showCountryError.value = false;
@@ -184,6 +182,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
   }
 
   Widget bottomAction() {
+    final provider = ref.watch(registrationProvider);
     return PrimaryButtons(
       buttonStyle: provider.emailController.text.isNotEmpty &&
               provider.phoneController.text.isNotEmpty
@@ -203,7 +202,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
         try {
           final isAvailable = await provider.checkEmailAndPhoneAvailability(
             context,
-            selectedCountry.phoneCode,
+            provider.selectedCountry.phoneCode,
           );
 
           if (isAvailable && mounted) {
