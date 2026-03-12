@@ -94,7 +94,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
               ? 'Select Living In first'
               : 'Select',
           popUpHeader: 'Select City',
-          items:  [
+          items: [
             'Barisal',
             'Chattogram',
             'Dhaka',
@@ -154,9 +154,8 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
           popUpHeader: 'Select Residency Status',
           items: provider.residencyStatusDropdownItems,
           controller: provider.residencyStatusController,
-          onTap: provider.loadLocationData,
-          onConfirm: (value) =>
-              provider.onResidencyStatusSelected(value?.toString()),
+          // onTap: provider.loadLocationData,
+          onConfirm: (value) => provider.onResidencyStatusSelected(value?.toString()),
           isSearch: true,
         ),
       ],
