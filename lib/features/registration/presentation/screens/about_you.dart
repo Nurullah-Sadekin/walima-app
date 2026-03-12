@@ -48,6 +48,7 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
       isLoading:
           screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         body: GradientBackground(
           child: screenProvider.screenStates ==

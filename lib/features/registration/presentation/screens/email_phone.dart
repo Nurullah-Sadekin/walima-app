@@ -23,7 +23,7 @@ class EmailPhoneScreen extends ConsumerStatefulWidget {
 
 class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
   late RegistrationProvider provider;
-  Country selectedCountry = Country.parse('BN');
+  late Country selectedCountry;
   @override
   void initState() {
     super.initState();
@@ -74,6 +74,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
   }
 
   Widget dataInsertField() {
+    selectedCountry = Country.parse(provider.livingInController.text);
     return Column(
       spacing: 20,
       children: [
@@ -132,9 +133,8 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
           keyboardType: TextInputType.phone,
           hintText: '168011685',
           errorText: provider.phoneAvailabilityErrorMessage,
-          // noPrefix: true,
-          onTap: () {
-          },
+          onTap: null,
+          maxLine: 1,
         ),
       ],
     );
@@ -147,11 +147,11 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
       countryListTheme: CountryListThemeData(
         backgroundColor: Colors.white,
         textStyle: const TextStyle(
-          color: Colors.white,
+          color: Colors.black,
           fontSize: 14,
         ),
         searchTextStyle: const TextStyle(
-          color: Colors.white,
+          color: Colors.black,
           fontSize: 14,
         ),
         inputDecoration: InputDecoration(
@@ -161,7 +161,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
             fontSize: 14,
           ),
           filled: true,
-          fillColor: Colors.black,
+          fillColor: Colors.white,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
             borderSide: BorderSide(color: Colors.grey.shade800),
@@ -205,7 +205,10 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
         );
 
         try {
-          final isAvailable = await provider.checkEmailAndPhoneAvailability(context,selectedCountry.phoneCode);
+          final isAvailable = await provider.checkEmailAndPhoneAvailability(
+            context,
+            selectedCountry.phoneCode,
+          );
 
           if (isAvailable && mounted) {
             context.push(Paths.location);

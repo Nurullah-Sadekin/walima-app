@@ -97,6 +97,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
           ? viewPassword
           : widget.obscureText ?? false,
       keyboardType: widget.keyboardType,
+      maxLength: widget.isCountryDropdown ? 10 : null,
       readOnly: widget.datePicker == true ? true : (widget.readOnly ?? false),
       onTap: () async {
         if (widget.datePicker == true) {
@@ -156,9 +157,8 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
       ),
       decoration: InputDecoration(
         isDense: true,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        // prefix: widget.noPrefix != null && true ? Container(color: Colors.green, child: const Padding(padding: EdgeInsets.only(left: 15))) : null,
+        counterText: '',
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         prefix: _getPrefix(),
         prefixIcon: _getPrefixIcon(),
         border: InputBorderStyle.border(6, borderColor: widget.borderColor),
