@@ -52,10 +52,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
         child: Column(
           children: List.generate(
               10,
-                  (index) => const Padding(
-                padding: EdgeInsets.only(
-                  right: 10.0,
-                ),
+                  (index) => const Padding(padding: EdgeInsets.only(bottom: 10.0,),
                 child: MatchCard(
                   imagePath: AppImages.demoProfile2,
                   leftIconPath: AppImages.premiumSvgIcon,
