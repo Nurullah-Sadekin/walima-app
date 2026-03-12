@@ -66,39 +66,39 @@ class _CareerScreenState extends ConsumerState<CareerScreen> {
         spacing: 10,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Text(
-          //   'Working As',
-          //   style: TextStyle(
-          //     fontSize: TextSize.font14(context),
-          //     fontWeight: FontWeight.w500,
-          //   ),
-          // ),
-          // LayoutBuilder(
-          //   builder: (context, constraints) {
-          //     const double spacing = 10.0;
-          //     return Consumer(builder: (context, ref, _) {
-          //       final provider = ref.watch(recommendedPreferencesProvider);
-          //       return Wrap(
-          //         spacing: spacing,
-          //         runSpacing: spacing,
-          //         children: List.generate(provider.countryDataList.length, (index) {
-          //           final item = provider.countryDataList[index];
-          //
-          //           return SelectionCard(
-          //             buttonStyle: item.isSelected
-          //                 ? SelectionStyle.selectedCheckbox
-          //                 : SelectionStyle.unSelectedCheckbox,
-          //             onTap: () {
-          //               provider.toggleCity(index);
-          //             },
-          //             isSelected: item.isSelected,
-          //             title: item.name,
-          //           );
-          //         }),
-          //       );
-          //     });
-          //   },
-          // ),
+          Text(
+            'Working As',
+            style: TextStyle(
+              fontSize: TextSize.font14(context),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              const double spacing = 10.0;
+              return Consumer(builder: (context, ref, _) {
+                final provider = ref.watch(recommendedPreferencesProvider);
+                return Wrap(
+                  spacing: spacing,
+                  runSpacing: spacing,
+                  children: List.generate(provider.professionDataList.length, (index) {
+                    final item = provider.professionDataList[index];
+
+                    return SelectionCard(
+                      buttonStyle: item.isSelected
+                          ? SelectionStyle.selectedCheckbox
+                          : SelectionStyle.unSelectedCheckbox,
+                      onTap: () {
+                        provider.toggleProfession(index);
+                      },
+                      isSelected: item.isSelected,
+                      title: item.name,
+                    );
+                  }),
+                );
+              });
+            },
+          ),
           DropDownField(
             headLine: 'Profession',
             hintText: 'Select',
