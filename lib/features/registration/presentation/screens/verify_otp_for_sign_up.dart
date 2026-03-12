@@ -132,6 +132,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                     style: TextStyle(
                       fontSize: TextSize.font18(context),
                       fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimaryLight,
                     ),
                     decoration: InputDecoration(
                       counterText: '',
