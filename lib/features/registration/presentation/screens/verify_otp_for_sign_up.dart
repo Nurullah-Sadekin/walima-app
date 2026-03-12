@@ -154,7 +154,8 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                     loadingState: RegistrationScreenStates.isProfileFor);
                 await provider.resendOtp(context);
                 screenProvider.updateViewState(
-                    loadingState: RegistrationScreenStates.loadingComplete);
+                    loadingState: RegistrationScreenStates.loadingComplete,
+                );
               },
               child: Text(
                 'Resend Code',
