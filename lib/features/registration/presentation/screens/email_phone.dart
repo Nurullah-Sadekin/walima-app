@@ -101,23 +101,15 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               child: Row(
                 children: [
-                  if (selectedCountry != null)
-                    Text(
-                      selectedCountry.flagEmoji,
-                      style: const TextStyle(fontSize: 20),
-                    )
-                  else
-                    const Icon(Icons.public,
-                        color: AppColors.primary, size: 18),
+                  Text(
+                    selectedCountry.flagEmoji,
+                    style: const TextStyle(fontSize: 20),
+                  ),
                   const SizedBox(width: 8),
                   Text(
-                    selectedCountry != null
-                        ? '+${selectedCountry.phoneCode}'
-                        : 'Code',
+                    '+${selectedCountry.phoneCode}',
                     style: TextStyle(
-                      color: selectedCountry != null
-                          ? AppColors.textPrimaryLight
-                          : AppColors.hintTextColor,
+                      color: AppColors.textPrimaryLight,
                       fontSize: TextSize.font14(context),
                     ),
                   ),
