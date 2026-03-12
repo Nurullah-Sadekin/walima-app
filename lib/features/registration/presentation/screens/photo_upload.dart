@@ -64,7 +64,13 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const CustomBackAppBar(),
+                     CustomBackAppBar(
+                      trailingText: 'Add Photos Later',
+                      isTrailing: true,
+                      onTrailingTap: (){
+                       context.push(Paths.hobbiesInterests);
+                      },
+                    ),
                     body(context),
                   ],
                 ),
@@ -311,24 +317,10 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
               ),
             ],
           ),
-          Row(
-            spacing: 10,
-            children: [
-              Expanded(
-                child: _photoActionButton(
-                  label: 'Use Camera',
-                  icon: Icons.camera_alt_outlined,
-                  onTap: () => _pickImage(ImageSource.camera),
-                ),
-              ),
-              // Expanded(
-              //   child: _photoActionButton(
-              //     label: 'Use Gallery',
-              //     icon: Icons.photo_library_outlined,
-              //     onTap: () => _pickImage(ImageSource.gallery),
-              //   ),
-              // ),
-            ],
+          _photoActionButton(
+            label: 'Use Camera',
+            icon: Icons.camera_alt_outlined,
+            onTap: () => _pickImage(ImageSource.camera),
           ),
           // if (_selectedImagePath != null)
           //   TextButton(
@@ -362,12 +354,13 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: TextSize.font18(context),
-              color: AppColors.primary,
+             ShowImage(
+              imagePath: AppImages.cameraUseIcon,
+              width: TextSize.font20(context),
+              height: TextSize.font20(context),
             ),
             const SizedBox(width: 6),
             Flexible(

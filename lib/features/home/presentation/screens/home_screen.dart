@@ -12,6 +12,7 @@ import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/social_media_icon.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/verification_tile.dart';
+import 'package:flutter_boilerplate/features/home/presentation/widgets/connect_card.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -346,14 +347,18 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: EdgeInsets.only(
                           right: 10.0,
                         ),
-                        child: ConnectNowCard(
-                          imagePath: AppImages.demoProfile,
-                          iconPath: AppImages.premiumSvgIcon,
-                          isPremiumConnect: true,
-                          name: 'Profile Name',
-                          age: '28 Years',
-                          height: '5 Feet 3 Inches',
+                        child: ConnectCard(
+                          imagePath: AppImages.demoProfile2,
+                          leftIconPath: AppImages.favouriteIcon,
+                          isPremiumConnect: false,
+                          isVerified: true,
+                          name: 'Afia Sultana',
+                          age: '28 Yr',
+                          height: '5\' 3\'" ',
+                          religion: 'Muslim',
+                          profession: 'Software Engineer',
                           location: 'Gulshan, Dhaka, BD',
+                          activeStatusText: 'Online',
                         ),
                       )),
             ),
@@ -435,12 +440,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       right: 10.0,
                     ),
                     child: ConnectNowCard(
-                      imagePath: AppImages.demoProfile2,
+                      imagePath: AppImages.demoProfile,
                       iconPath: AppImages.premiumSvgIcon,
                       isPremiumConnect: false,
-                      name: 'Profile Name',
-                      age: '28 Years',
-                      height: '5 Feet 3 Inches',
+                      name: 'Tasnim Akter',
+                      age: '28 Yr',
+                      height: '5\' 3\'" ',
                       location: 'Gulshan, Dhaka, BD',
                     ),
                   )),

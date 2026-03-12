@@ -31,10 +31,10 @@ class ConnectNowCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double imageSize = MediaQuery.of(context).size.height * 0.275;
+    final double imageSize = MediaQuery.of(context).size.height * 0.3;
 
     return Container(
-      width: MediaQuery.of(context).size.width * 0.7,
+      width: MediaQuery.of(context).size.width * 0.75,
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
