@@ -384,14 +384,22 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
               fontWeight: FontWeight.w400,
             ),
           ),
-          Text(
-            'Version ${GlobalRepository().getAppVersion()}',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AppColors.textSecondaryLight,
-              fontSize: TextSize.font12(context),
-              fontWeight: FontWeight.w400,
-            ),
+          FutureBuilder<String>(
+            future: GlobalRepository().getAppVersion(),
+            builder: (context, snapshot) {
+              final versionLabel = snapshot.connectionState == ConnectionState.done && snapshot.hasData
+                  ? 'Version ${snapshot.data}'
+                  : 'Version';
+              return Text(
+                versionLabel,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: AppColors.textSecondaryLight,
+                  fontSize: TextSize.font12(context),
+                  fontWeight: FontWeight.w400,
+                ),
+              );
+            },
           ),
         ],
       ),
