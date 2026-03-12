@@ -30,6 +30,7 @@ abstract class Paths {
   static const familyDetails = '/familyDetails';
   static const financialStatus = '/financialStatus';
   static const profileCreatedStatus = '/profileCreatedStatus';
+  static const cropImage = '/cropImage';
 
   // Recommended Preferences
   static const partnerPreferences = '/partnerPreferences';
@@ -86,6 +87,7 @@ abstract class Routes {
   static const familyDetails = 'familyDetails';
   static const financialStatus = 'financialStatus';
   static const profileCreatedStatus = 'profileCreatedStatus';
+  static const cropImage = 'cropImage';
 
   // Recommended Preferences
   static const partnerPreferences = 'partnerPreferences';
