@@ -148,7 +148,7 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
             child: Text(
               widget.title,
               style: TextStyle(
-                fontSize: TextSize.font14(context),
+                fontSize: TextSize.font16(context),
                 fontWeight: FontWeight.w500,
                 color: AppColors.textPrimaryLight,
               ),
