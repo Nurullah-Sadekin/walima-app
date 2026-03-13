@@ -2,18 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
+import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 
 class EmptyStateWidget extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final String buttonText;
-  final VoidCallback? onTap;
-  final bool showButton;
-  final double? horizontalPadding;
-  final double? spacing;
 
   const EmptyStateWidget({
-    Key? key,
+    super.key,
     required this.title,
     required this.subtitle,
     required this.buttonText,
@@ -21,7 +15,20 @@ class EmptyStateWidget extends StatelessWidget {
     this.showButton = true,
     this.horizontalPadding,
     this.spacing,
-  }) : super(key: key);
+    this.imagePath,
+    this.imageSize,
+    this.imageColor,
+  });
+  final String title;
+  final String subtitle;
+  final String buttonText;
+  final VoidCallback? onTap;
+  final bool showButton;
+  final double? horizontalPadding;
+  final double? spacing;
+  final String? imagePath;
+  final double? imageSize;
+  final Color? imageColor;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +39,15 @@ class EmptyStateWidget extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (imagePath != null) ...[
+            ShowImage(
+              imagePath: imagePath!,
+              width: imageSize ?? 80,
+              height: imageSize ?? 80,
+              color: imageColor ?? AppColors.textSecondaryLight,
+            ),
+            SizedBox(height: spacing ?? 16),
+          ],
           Text(
             title,
             textAlign: TextAlign.center,

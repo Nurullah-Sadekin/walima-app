@@ -147,6 +147,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
           ),
           EmptyStateWidget(
             title: 'No Matches Yet!',
+            imagePath: AppImages.viewOnAccept,
             subtitle:
                 'We do not have new matches at this point. Checkout my matches to find profiles matching your preference',
             buttonText: 'My Matches',
