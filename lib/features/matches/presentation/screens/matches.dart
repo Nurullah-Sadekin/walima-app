@@ -3,8 +3,9 @@ import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/provider/matcher_provider.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/into_tile.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/setting_switcher_title.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/match_card.dart';
@@ -18,13 +19,21 @@ class MatchesScreen extends ConsumerStatefulWidget {
 }
 
 class _MatchesScreenState extends ConsumerState<MatchesScreen> {
+  late MatchesProvider provider;
+
   @override
   void initState() {
     super.initState();
+    provider = ref.read(matchesProvider);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    provider = ref.watch(matchesProvider);
     return Scaffold(
       body: GradientBackground(
         child: Padding(
@@ -102,8 +111,11 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
           SettingsSwitchTile(
             title: 'Notifications',
             subtitle: 'Receive push notifications',
-            value: true,
-            onChanged: (newValue) {},
+            value: provider.switcherValue ?? false,
+            onChanged: (newValue) {
+              provider.switcherValue = newValue;
+              provider.updateViewState();
+            },
           ),
           const MatchCard(
             imagePath: AppImages.demoProfile2,
