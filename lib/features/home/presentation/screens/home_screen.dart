@@ -11,7 +11,7 @@ import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/social_media_icon.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/verification_tile.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/match_card.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -359,7 +359,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                         child: SizedBox(
                           width: 300,
-                          child: MatchCard(
+                          child: ProfileComprehensiveCard(
                             imagePath: AppImages.demoProfile2,
                             leftIconPath: AppImages.favouriteIcon,
                             imageHeight: 250,
@@ -459,7 +459,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                         child: SizedBox(
                           width: 300,
-                          child: MatchCard(
+                          child: ProfileComprehensiveCard(
                             imagePath: AppImages.demoProfile,
                             imageHeight: 250,
                             isPremiumConnect: true,

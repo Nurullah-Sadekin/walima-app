@@ -14,7 +14,7 @@ import 'package:flutter_boilerplate/features/matches/presentation/widgets/empty_
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/info_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/into_tile.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/setting_switcher_title.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/match_card.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -152,7 +152,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             description: 'Some profiles may not match all your preferences, but you might find meaningful connections.',
           ),
           SelectionCard(buttonStyle: SelectionStyle.selectedCheckbox, onTap: (){}, title: 'Open to All',isExpand: true,),
-          const MatchCard(
+          const ProfileComprehensiveCard(
             imagePath: AppImages.demoProfile,
             leftIconPath: AppImages.favouriteIcon,
             isPremiumConnect: false,

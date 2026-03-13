@@ -7,8 +7,8 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 
-class MatchCard extends StatelessWidget {
-  const MatchCard({
+class ProfileComprehensiveCard extends StatelessWidget {
+  const ProfileComprehensiveCard({
     super.key,
     required this.imagePath,
     this.imageHeight,
