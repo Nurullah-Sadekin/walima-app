@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/connect_now_card.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
@@ -12,7 +11,7 @@ import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/social_media_icon.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/verification_tile.dart';
-import 'package:flutter_boilerplate/features/home/presentation/widgets/connect_card.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/match_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -358,18 +357,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         padding: EdgeInsets.only(
                           right: 10.0,
                         ),
-                        child: ConnectCard(
-                          imagePath: AppImages.demoProfile2,
-                          leftIconPath: AppImages.favouriteIcon,
-                          isPremiumConnect: false,
-                          isVerified: true,
-                          name: 'Afia Sultana',
-                          age: '28 Yr',
-                          height: '5\' 3\'" ',
-                          religion: 'Muslim',
-                          profession: 'Software Engineer',
-                          location: 'Gulshan, Dhaka, BD',
-                          activeStatusText: 'Online',
+                        child: SizedBox(
+                          width: 300,
+                          child: MatchCard(
+                            imagePath: AppImages.demoProfile2,
+                            leftIconPath: AppImages.favouriteIcon,
+                            imageHeight: 250,
+                            isPremiumConnect: true,
+                            isVerified: true,
+                            name: 'Afia Sultana',
+                            age: '28 Yr',
+                            height: '5\' 3\'" ',
+                            religion: 'Muslim',
+                            profession: 'Software Engineer',
+                            location: 'Gulshan, Dhaka, BD',
+                            activeStatusText: 'Online',
+                            isSingleButton: true,
+                          ),
                         ),
                       )),
             ),
@@ -453,14 +457,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         padding: EdgeInsets.only(
                           right: 10.0,
                         ),
-                        child: ConnectNowCard(
-                          imagePath: AppImages.demoProfile,
-                          iconPath: AppImages.premiumSvgIcon,
-                          isPremiumConnect: false,
-                          name: 'Tasnim Akter',
-                          age: '28 Yr',
-                          height: '5\' 3\'" ',
-                          location: 'Gulshan, Dhaka, BD',
+                        child: SizedBox(
+                          width: 300,
+                          child: MatchCard(
+                            imagePath: AppImages.demoProfile,
+                            imageHeight: 250,
+                            isPremiumConnect: true,
+                            name: 'Tasnim Akter',
+                            age: '28 Yr',
+                            height: '5\' 3\'" ',
+                            location: 'Gulshan, Dhaka, BD',
+                            viewOnAccept: true,
+                          ),
                         ),
                       )),
             ),
