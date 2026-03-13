@@ -12,6 +12,7 @@ import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/providers/app_drawer_provider.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/screens/widgets/profile_action_tile.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -36,7 +37,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
     return Drawer(
       width: MediaQuery.of(context).size.width,
       child: TransparentLoading(
-        isLoading: provider.loaderState == DrawerScreenStates.transparentLoading,
+        isLoading:
+            provider.loaderState == DrawerScreenStates.transparentLoading,
         child: Scaffold(
           body: SafeArea(
             child: Padding(
@@ -59,9 +61,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
               ),
             ),
           ),
-          floatingActionButton: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: PrimaryButtons(
+          floatingActionButton: BottomBorderedWidget(
+            widget: PrimaryButtons(
               title: 'Log Out',
               titleSize: TextSize.font14(context),
               textColor: AppColors.white,
@@ -69,13 +70,17 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
               svgIconPath: AppImages.logOutSvgIcon,
               svgIconColor: AppColors.white,
               onTap: () async {
-                 await provider.logout(() {router.go(Paths.login);},
-                 );
+                await provider.logout(
+                  () {
+                    router.go(Paths.login);
+                  },
+                );
               },
               buttonStyle: ButtonsStyle.iconicDynamicButton,
             ),
           ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
         ),
       ),
     );
@@ -87,7 +92,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
       children: [
         IconButton(
           onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.close_rounded, color: AppColors.textPrimaryLight),
+          icon: const Icon(Icons.close_rounded,
+              color: AppColors.textPrimaryLight),
         ),
         Text(
           'Profile',
@@ -223,7 +229,9 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 10,
       children: [
-        const SizedBox(height: 4,),
+        const SizedBox(
+          height: 4,
+        ),
         Text(
           'ACCOUNT',
           style: TextStyle(
@@ -235,14 +243,12 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         ProfileActionTile(
           iconImagePath: AppImages.profileSvgIcon,
           title: 'View & Edit Your profile',
-          onTap: () {
-          },
+          onTap: () {},
         ),
         ProfileActionTile(
           iconImagePath: AppImages.shareSvgIcon,
           title: 'Download & Share profile',
-          onTap: () {
-          },
+          onTap: () {},
         ),
       ],
     );
@@ -264,20 +270,17 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         ProfileActionTile(
           iconImagePath: AppImages.userLoveSvgIcon,
           title: 'Matches',
-          onTap: () {
-          },
+          onTap: () {},
         ),
         ProfileActionTile(
           iconImagePath: AppImages.emailSvgIcon,
           title: 'Inbox',
-          onTap: () {
-          },
+          onTap: () {},
         ),
         ProfileActionTile(
           iconImagePath: AppImages.chatSvgIcon,
           title: 'Chat',
-          onTap: () {
-          },
+          onTap: () {},
         ),
       ],
     );
@@ -299,20 +302,17 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         ProfileActionTile(
           iconImagePath: AppImages.settingsSvgIcon,
           title: 'Partner Preferences',
-          onTap: () {
-          },
+          onTap: () {},
         ),
         ProfileActionTile(
           iconImagePath: AppImages.filterSvgIcon,
           title: 'Contacts Filters',
-          onTap: () {
-          },
+          onTap: () {},
         ),
         ProfileActionTile(
           iconImagePath: AppImages.accountSettingSvgIcon,
           title: 'Account Settings',
-          onTap: () {
-          },
+          onTap: () {},
         ),
       ],
     );
@@ -334,35 +334,31 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         ProfileActionTile(
           iconImagePath: AppImages.customerSupportSvgIcon,
           title: 'Help & Support',
-          onTap: () {
-          },
+          onTap: () {},
         ),
         ProfileActionTile(
           iconImagePath: AppImages.bubbleChatSvgIcon,
           title: 'Be Safe Online',
-          onTap: () {
-          },
+          onTap: () {},
         ),
         ProfileActionTile(
           iconImagePath: AppImages.starSvgIcon,
           title: 'Rate The App',
-          onTap: () {
-          },
+          onTap: () {},
         ),
         ProfileActionTile(
           iconImagePath: AppImages.documentValidationSvgIcon,
           title: 'Terms & Conditions',
-          onTap: () {
-          },
+          onTap: () {},
         ),
       ],
     );
   }
 
-  Widget _footer(BuildContext context)  {
+  Widget _footer(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 20.0,horizontal: 12.0),
+      padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 12.0),
       decoration: BoxDecoration(
         color: AppColors.disableBackground,
         borderRadius: BorderRadius.circular(8.0),
@@ -387,9 +383,11 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
           FutureBuilder<String>(
             future: GlobalRepository().getAppVersion(),
             builder: (context, snapshot) {
-              final versionLabel = snapshot.connectionState == ConnectionState.done && snapshot.hasData
-                  ? 'Version ${snapshot.data}'
-                  : 'Version';
+              final versionLabel =
+                  snapshot.connectionState == ConnectionState.done &&
+                          snapshot.hasData
+                      ? 'Version ${snapshot.data}'
+                      : 'Version';
               return Text(
                 versionLabel,
                 textAlign: TextAlign.center,
