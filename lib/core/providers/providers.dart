@@ -2,6 +2,7 @@ import 'package:flutter_boilerplate/features/drawer/presentation/providers/app_d
 import 'package:flutter_boilerplate/features/home/presentation/providers/home_provider.dart';
 import 'package:flutter_boilerplate/features/login/presentation/providers/login_provider.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/provider/matcher_provider.dart';
+import 'package:flutter_boilerplate/features/profile/presentation/providers/profile_provider.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/providers/recommended_preferences_provider.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_screen_state_provider.dart';
@@ -115,4 +116,7 @@ final upgradePackageProvider = ChangeNotifierProvider<UpgradePackageProvider>((r
 });
 final matchesProvider = ChangeNotifierProvider<MatchesProvider>((ref) {
   return MatchesProvider();
+});
+final profileProvider = ChangeNotifierProvider<ProfileProvider>((ref) {
+  return ProfileProvider();
 });
