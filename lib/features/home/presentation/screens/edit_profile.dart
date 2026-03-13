@@ -6,6 +6,7 @@ import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.da
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
 import 'package:flutter_boilerplate/features/home/presentation/widgets/profile_info_card.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -21,16 +22,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      body: Column(
-        children: [
-          _topBar(context),
-          _headerSection(context),
-          _bodySection(),
-        ],
+      body: SafeArea(
+        child: Column(
+          children: [
+            _topBar(context),
+            _headerSection(context),
+            _bodySection(),
+          ],
+        ),
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: PrimaryButtons(
+      floatingActionButton: BottomBorderedWidget(
+        widget: PrimaryButtons(
           title: 'Preview Profile',
           titleSize: TextSize.font14(context),
           textColor: AppColors.white,
@@ -42,7 +44,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           buttonStyle: ButtonsStyle.activePrimaryButton,
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
     );
   }
