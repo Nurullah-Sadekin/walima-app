@@ -153,7 +153,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
           ),
           SelectionCard(buttonStyle: SelectionStyle.selectedCheckbox, onTap: (){}, title: 'Open to All',isExpand: true,),
           const MatchCard(
-            imagePath: AppImages.demoProfile2,
+            imagePath: AppImages.demoProfile,
             leftIconPath: AppImages.favouriteIcon,
             isPremiumConnect: true,
             isVerified: true,
@@ -162,8 +162,8 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             height: '5\' 3\'" ',
             location: 'Gulshan, Dhaka, BD',
             activeStatusText: '1 day ago',
-            photoCount: '5',
             menu: true,
+            photoRequest: true,
           ),
         ]),
       ),

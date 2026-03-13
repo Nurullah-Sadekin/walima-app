@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
@@ -30,6 +32,8 @@ class MatchCard extends StatelessWidget {
     this.activeStatusText,
     this.photoCount,
     this.menu,
+    this.viewOnAccept = false,
+    this.photoRequest = false,
   });
 
   final String imagePath;
@@ -54,6 +58,8 @@ class MatchCard extends StatelessWidget {
   final String? activeStatusText;
   final String? photoCount;
   final bool? menu;
+  final bool viewOnAccept;
+  final bool photoRequest;
 
   @override
   Widget build(BuildContext context) {
@@ -78,6 +84,78 @@ class MatchCard extends StatelessWidget {
                 radius: BorderRadius.circular(8),
                 fit: BoxFit.fill,
               ),
+              if (viewOnAccept)
+                Positioned.fill(
+                  child: ClipRRect(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.disable,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          spacing: 4,
+                          children: [
+                            ShowImage(
+                              imagePath: AppImages.viewOnAccept,
+                              width: TextSize.font48(context),
+                              height: TextSize.font48(context),
+                              radius: BorderRadius.circular(8),
+                              fit: BoxFit.fitWidth,
+                              color: AppColors.white,
+                            ),
+                            Text('View on Accept',
+                                style: TextStyle(
+                                  fontSize: TextSize.font14(context),
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.white,
+                                ))
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              if (photoRequest)
+                Positioned.fill(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 4,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 16),
+                        decoration: const BoxDecoration(
+                          color: AppColors.primaryVariant,
+                          shape: BoxShape.rectangle,
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(8)),
+                        ),
+                        child: Row(
+                          spacing: 8,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ShowImage(
+                              imagePath: AppImages.photoIcon,
+                              width: TextSize.font16(context),
+                              height: TextSize.font16(context),
+                              fit: BoxFit.fill,
+                              color: AppColors.primary,
+                            ),
+                            Text('Photo Request',
+                                style: TextStyle(
+                                  fontSize: TextSize.font14(context),
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.primary,
+                                ))
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               if (isPremiumConnect)
                 Positioned(
                   top: 10,
@@ -133,12 +211,13 @@ class MatchCard extends StatelessWidget {
                     ),
                   ),
                 ),
-              if (photoCount != null)
+              if (photoCount != null || menu == true)
                 Positioned(
                   top: 10,
                   right: 10,
                   child: Column(
                     children: [
+                      if (photoCount != null)
                       Container(
                         padding: const EdgeInsets.symmetric(
                             vertical: 6, horizontal: 6),
@@ -170,7 +249,7 @@ class MatchCard extends StatelessWidget {
                           ],
                         ),
                       ),
-                      if (menu == true)
+                      if (menu == true && photoCount != null)
                         const SizedBox(
                           height: 6,
                         ),
@@ -266,7 +345,8 @@ class MatchCard extends StatelessWidget {
                           onTap: onTapLeftButton ?? () {},
                           svgIconColor: AppColors.white,
                           svgIconPath: leftIconPath ?? AppImages.favouriteIcon,
-                          borderColor: leftButtonBorderColor ?? const Color(0XFF1FC16B),
+                          borderColor:
+                              leftButtonBorderColor ?? const Color(0XFF1FC16B),
                           textColor: leftButtonTextColor ?? AppColors.white,
                           title: leftButtonText ?? 'Connect'),
                     ),

@@ -99,6 +99,9 @@ class AppImages {
   static const String errorStatus = 'assets/svgs/error_status.svg';
 
 
+  static const String viewOnAccept = 'assets/svgs/view_on_accept.svg';
+
+
   // Navigation icons
   static const String home = 'assets/nav_icons/home.svg';
   static const String matches = 'assets/nav_icons/matches.svg';
