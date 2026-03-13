@@ -10,6 +10,7 @@ class PrimaryButtons extends StatelessWidget {
     required this.onTap,
     this.title,
     this.titleSize,
+    this.iconSize,
     this.context,
     this.textColor,
     this.bgColor,
@@ -24,6 +25,7 @@ class PrimaryButtons extends StatelessWidget {
   final VoidCallback onTap;
   final String? title;
   final double? titleSize;
+  final double? iconSize;
   final BuildContext? context;
   final Color? textColor;
   final Color? bgColor;
@@ -192,8 +194,8 @@ class PrimaryButtons extends StatelessWidget {
             if (iconLeftPosition! && svgIconPath != null)
               ShowImage(
                 imagePath: svgIconPath,
-                width: 20,
-                height: 20,
+                width: iconSize ?? 20,
+                height: iconSize ?? 20,
                 color: svgIconColor,
               ),
             if (iconLeftPosition! && svgIconPath != null)
