@@ -229,113 +229,119 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
       AppImages.demoProfile2,
     ];
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final height = MediaQuery.of(context).size.height * 0.65; // responsive height based on width
-        return CarouselSlider.builder(
-          itemCount: images.length,
-          itemBuilder: (context, index, realIndex) {
-            final img = images[index];
-            return ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Stack(
-                children: [
-                  ShowImage(
-                    imagePath: img,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: height,
-                  ),
-                  Positioned.fill(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.disable,
-                            borderRadius: BorderRadius.circular(10),
+    return Stack(
+      children: [
+
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final height = MediaQuery.of(context).size.height * 0.65; // responsive height based on width
+            return CarouselSlider.builder(
+              itemCount: images.length,
+              itemBuilder: (context, index, realIndex) {
+                final img = images[index];
+                return ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Stack(
+                    children: [
+                      ShowImage(
+                        imagePath: img,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: height,
+                      ),
+                      Positioned.fill(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: AppColors.disable,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 10,
-                    left: 10,
-                    child: Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 5, horizontal: 8),
-                          decoration: const BoxDecoration(
-                            color: AppColors.disableDark,
-                            shape: BoxShape.rectangle,
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(16)),
-                          ),
-                          child: Row(
-                            spacing: 4,
-                            children: [
-                              ShowImage(
-                                imagePath: AppImages.photoIcon,
-                                width: TextSize.font14(context),
-                                height: TextSize.font14(context),
-                                radius: BorderRadius.circular(8),
-                                fit: BoxFit.fitWidth,
-                                color: AppColors.white,
+                      Positioned(
+                        top: 10,
+                        left: 10,
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 8),
+                              decoration: const BoxDecoration(
+                                color: AppColors.disableDark,
+                                shape: BoxShape.rectangle,
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(16)),
                               ),
-                              Text(
-                                '${index+1}/${images.length}',
-                                style: TextStyle(
-                                  fontSize: TextSize.font12(context),
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.white,
-                                ),
+                              child: Row(
+                                spacing: 4,
+                                children: [
+                                  ShowImage(
+                                    imagePath: AppImages.photoIcon,
+                                    width: TextSize.font14(context),
+                                    height: TextSize.font14(context),
+                                    radius: BorderRadius.circular(8),
+                                    fit: BoxFit.fitWidth,
+                                    color: AppColors.white,
+                                  ),
+                                  Text(
+                                    '${index+1}/${images.length}',
+                                    style: TextStyle(
+                                      fontSize: TextSize.font12(context),
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.white,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
 
-                  Positioned(
-                    bottom: 10,
-                    left: 0,
-                    right: 0,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(images.length, (index) {
-                        final isActive = _currentImageIndex == index;
-                        final dotWidth = isActive ? 20.0 : 10.0;
-                        const dotHeight = 10.0;
-                        return AnimatedContainer(
-                          duration: const Duration(milliseconds: 250),
-                          width: dotWidth,
-                          height: dotHeight,
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(dotHeight / 2),
-                            color: isActive ? AppColors.primary : AppColors.disable,
-                          ),
-                        );
-                      }),
-                    ),
+                    ],
                   ),
-                ],
+                );
+              },
+              options: CarouselOptions(
+                autoPlay: false,
+                enlargeCenterPage: true,
+                viewportFraction: 1,
+                height: height,
+                onPageChanged: (index, reason) => setState(() => _currentImageIndex = index),
               ),
             );
           },
-          options: CarouselOptions(
-            autoPlay: false,
-            enlargeCenterPage: true,
-            viewportFraction: 1,
-            height: height,
-            onPageChanged: (index, reason) => setState(() => _currentImageIndex = index),
+        ),
+
+        Positioned(
+          bottom: 10,
+          left: 0,
+          right: 0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(images.length, (index) {
+              final isActive = _currentImageIndex == index;
+              final dotWidth = isActive ? 20.0 : 10.0;
+              const dotHeight = 10.0;
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                width: dotWidth,
+                height: dotHeight,
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(dotHeight / 2),
+                  color: isActive ? AppColors.primary : AppColors.disable,
+                ),
+              );
+            }),
           ),
-        );
-      },
+        ),
+      ],
     );
   }
 }
