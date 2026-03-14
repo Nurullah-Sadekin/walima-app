@@ -8,7 +8,6 @@ import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 class AcceptedCard extends StatelessWidget {
   const AcceptedCard({
     super.key,
-    required this.onTap,
     required this.imagePath,
     required this.name,
     required this.age,
@@ -20,10 +19,9 @@ class AcceptedCard extends StatelessWidget {
     this.onTapWalimaChat,
     this.onTapPhoneCall,
     this.onTapWhatsapp,
-      this.isVerified = false,
+    this.isVerified = false,
   });
 
-  final VoidCallback onTap;
   final String imagePath;
   final String name;
   final String age;
@@ -117,12 +115,15 @@ class AcceptedCard extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Icon(
-                                Icons.more_vert,
-                                color: AppColors.textSecondaryLight,
-                                size: TextSize.font16(context),
+                            InkWell(
+                              onTap: onMenuTap,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: Icon(
+                                  Icons.more_vert,
+                                  color: AppColors.textSecondaryLight,
+                                  size: TextSize.font16(context),
+                                ),
                               ),
                             ),
                           ],

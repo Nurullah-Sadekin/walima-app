@@ -104,8 +104,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
               ],
             ),
           ),
-          AcceptedCard(
-            onTap: () {},
+          const AcceptedCard(
             imagePath: AppImages.demoProfile,
             name: 'Tasnova Ahmed',
             age: '28 Yr',
