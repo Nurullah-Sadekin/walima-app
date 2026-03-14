@@ -71,35 +71,29 @@ class AcceptedCard extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Flexible(
+                            Expanded(
                               child: Row(
                                 children: [
                                   Flexible(
-                                    child: Row(
-                                      children: [
-                                        Flexible(
-                                          child: Text(
-                                            name,
-                                            overflow: TextOverflow.ellipsis,
-                                            maxLines: 1,
-                                            style: TextStyle(
-                                              fontSize: TextSize.font16(context),
-                                              fontWeight: FontWeight.w500,
-                                              color: AppColors.textPrimaryLight,
-                                            ),
-                                          ),
-                                        ),
-                                        if (isVerified) ...[
-                                          const SizedBox(width: 4),
-                                          ShowImage(
-                                            imagePath: AppImages.verifiedBadgeSvgIcon,
-                                            width: TextSize.font14(context),
-                                            height: TextSize.font14(context),
-                                          )
-                                        ],
-                                      ],
+                                    child: Text(
+                                      name,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      style: TextStyle(
+                                        fontSize: TextSize.font16(context),
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.textPrimaryLight,
+                                      ),
                                     ),
                                   ),
+                                  if (isVerified) ...[
+                                    const SizedBox(width: 4),
+                                    ShowImage(
+                                      imagePath: AppImages.verifiedBadgeSvgIcon,
+                                      width: TextSize.font14(context),
+                                      height: TextSize.font14(context),
+                                    )
+                                  ],
                                   SizedBox(
                                     height: TextSize.font12(context),
                                     child: const Padding(
@@ -110,16 +104,14 @@ class AcceptedCard extends StatelessWidget {
                                       ),
                                     ),
                                   ),
-                                  Flexible(
-                                    child: Text(
-                                      day??'',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontSize: TextSize.font10(context),
-                                        fontWeight: FontWeight.w400,
-                                        color: AppColors.textSecondaryLight,
-                                      ),
+                                  Text(
+                                    day??'',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: TextSize.font10(context),
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.textSecondaryLight,
                                     ),
                                   ),
                                 ],
