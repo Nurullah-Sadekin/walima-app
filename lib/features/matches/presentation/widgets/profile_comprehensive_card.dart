@@ -159,8 +159,7 @@ class ProfileComprehensiveCard extends StatelessWidget {
                         decoration: const BoxDecoration(
                           color: AppColors.primaryVariant,
                           shape: BoxShape.rectangle,
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(8)),
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
                         ),
                         child: Row(
                           spacing: 8,
@@ -247,37 +246,36 @@ class ProfileComprehensiveCard extends StatelessWidget {
                   child: Column(
                     children: [
                       if (photoCount != null)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 6, horizontal: 6),
-                        decoration: const BoxDecoration(
-                          color: AppColors.disableDark,
-                          shape: BoxShape.rectangle,
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(6)),
-                        ),
-                        child: Column(
-                          spacing: 6,
-                          children: [
-                            ShowImage(
-                              imagePath: AppImages.photoIcon,
-                              width: TextSize.font16(context),
-                              height: TextSize.font16(context),
-                              radius: BorderRadius.circular(8),
-                              fit: BoxFit.fitWidth,
-                              color: AppColors.white,
-                            ),
-                            Text(
-                              '1/$photoCount',
-                              style: TextStyle(
-                                fontSize: TextSize.font10(context),
-                                fontWeight: FontWeight.w400,
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 6, horizontal: 6),
+                          decoration: const BoxDecoration(
+                            color: AppColors.disableDark,
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.all(Radius.circular(6)),
+                          ),
+                          child: Column(
+                            spacing: 6,
+                            children: [
+                              ShowImage(
+                                imagePath: AppImages.photoIcon,
+                                width: TextSize.font16(context),
+                                height: TextSize.font16(context),
+                                radius: BorderRadius.circular(8),
+                                fit: BoxFit.fitWidth,
                                 color: AppColors.white,
                               ),
-                            ),
-                          ],
+                              Text(
+                                '1/$photoCount',
+                                style: TextStyle(
+                                  fontSize: TextSize.font10(context),
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.white,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
                       if (menu == true && photoCount != null)
                         const SizedBox(
                           height: 6,
@@ -285,12 +283,13 @@ class ProfileComprehensiveCard extends StatelessWidget {
                       if (menu == true)
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 6, horizontal: 6,),
+                            vertical: 6,
+                            horizontal: 6,
+                          ),
                           decoration: const BoxDecoration(
                             color: AppColors.disableDark,
                             shape: BoxShape.rectangle,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(6)),
+                            borderRadius: BorderRadius.all(Radius.circular(6)),
                           ),
                           child: Icon(
                             Icons.more_vert,
@@ -313,16 +312,20 @@ class ProfileComprehensiveCard extends StatelessWidget {
               Row(
                 spacing: 8,
                 children: [
-                  Text(
-                    name,
-                    textHeightBehavior: const TextHeightBehavior(
-                      applyHeightToFirstAscent: false,
-                      applyHeightToLastDescent: false,
-                    ),
-                    style: TextStyle(
-                      fontSize: TextSize.font20(context),
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimaryLight,
+                  Flexible(
+                    child: Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textHeightBehavior: const TextHeightBehavior(
+                        applyHeightToFirstAscent: false,
+                        applyHeightToLastDescent: false,
+                      ),
+                      style: TextStyle(
+                        fontSize: TextSize.font20(context),
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimaryLight,
+                      ),
                     ),
                   ),
                   ShowImage(
@@ -349,52 +352,58 @@ class ProfileComprehensiveCard extends StatelessWidget {
                     ),
                   ),
                   if (religion != null || maritalStatus != null)
-                  Row(
-                    spacing: 4,
-                    children: [
-                      Text(
-                        religion ?? '',
-                        style: TextStyle(
-                          fontSize: TextSize.font16(context),
-                          fontWeight: FontWeight.w400,
+                    Row(
+                      spacing: 4,
+                      children: [
+                        Text(
+                          religion ?? '',
+                          style: TextStyle(
+                            fontSize: TextSize.font16(context),
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.textSecondaryLight,
+                          ),
+                        ),
+                        const Icon(
+                          Icons.circle,
+                          size: 4,
                           color: AppColors.textSecondaryLight,
                         ),
+                        Text(
+                          maritalStatus ?? 'Never Married',
+                          style: TextStyle(
+                            fontSize: TextSize.font16(context),
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.textSecondaryLight,
+                          ),
+                        ),
+                      ],
+                    ),
+                  if (profession != null && location.isNotEmpty)
+                    const SizedBox(
+                      height: 12,
+                    ),
+                  if (profession != null)
+                    Text(
+                      profession ?? '',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: TextSize.font16(context),
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textPrimaryLight,
                       ),
-                      const Icon(
-                        Icons.circle,
-                        size: 4,
+                    ),
+                  if (location.isNotEmpty)
+                    Text(
+                      location,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: TextSize.font16(context),
+                        fontWeight: FontWeight.w400,
                         color: AppColors.textSecondaryLight,
                       ),
-                      Text(
-                        maritalStatus ?? 'Never Married',
-                        style: TextStyle(
-                          fontSize: TextSize.font16(context),
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.textSecondaryLight,
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (profession != null && location.isNotEmpty)
-                  const SizedBox(height: 12,),
-                  if (profession != null)
-                  Text(
-                    profession ?? '',
-                    style: TextStyle(
-                      fontSize: TextSize.font16(context),
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.textPrimaryLight,
                     ),
-                  ),
-                  if (location.isNotEmpty)
-                  Text(
-                  location,
-                  style: TextStyle(
-                    fontSize: TextSize.font16(context),
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.textSecondaryLight,
-                  ),
-                ),
                 ],
               ),
               const SizedBox(
@@ -409,41 +418,44 @@ class ProfileComprehensiveCard extends StatelessWidget {
                     borderColor: singleButtonBorderColor ?? AppColors.primary,
                     textColor: singleButtonTextColor ?? AppColors.primary,
                     title: singleButtonText ?? 'Connect Now'),
-
               if (!isSingleButton)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4.0),
-                child: Row(
-                  spacing: 16,
-                  children: [
-                    Expanded(
-                      child: PrimaryButtons(
-                          buttonStyle: ButtonsStyle.iconicDynamicButton,
-                          iconLeftPosition: true,
-                          bgColor: leftButtonColor ?? const Color(0XFF1FC16B),
-                          onTap: onTapLeftButton ?? () {},
-                          svgIconColor: leftButtonIconColor ?? AppColors.white,
-                          svgIconPath: leftIconPath ?? AppImages.favouriteIcon,
-                          borderColor:
-                              leftButtonBorderColor ?? const Color(0XFF1FC16B),
-                          textColor: leftButtonTextColor ?? AppColors.white,
-                          title: leftButtonText ?? 'Connect'),
-                    ),
-                    Expanded(
-                      child: PrimaryButtons(
-                          buttonStyle: ButtonsStyle.iconicDynamicButton,
-                          onTap: onTapRightButton ?? () {},
-                          svgIconColor: rightButtonIconColor ?? AppColors.primary,
-                          svgIconPath: rightIconPath ?? AppImages.callSvgIcon,
-                          title: rightButtonText ?? 'Contact',
-                          bgColor: rightButtonColor ?? AppColors.white,
-                          borderColor:
-                              rightButtonBorderColor ?? AppColors.primary,
-                          textColor: rightButtonTextColor ?? AppColors.primary),
-                    ),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Row(
+                    spacing: 16,
+                    children: [
+                      Expanded(
+                        child: PrimaryButtons(
+                            buttonStyle: ButtonsStyle.iconicDynamicButton,
+                            iconLeftPosition: true,
+                            bgColor: leftButtonColor ?? const Color(0XFF1FC16B),
+                            onTap: onTapLeftButton ?? () {},
+                            svgIconColor:
+                                leftButtonIconColor ?? AppColors.white,
+                            svgIconPath:
+                                leftIconPath ?? AppImages.favouriteIcon,
+                            borderColor: leftButtonBorderColor ??
+                                const Color(0XFF1FC16B),
+                            textColor: leftButtonTextColor ?? AppColors.white,
+                            title: leftButtonText ?? 'Connect'),
+                      ),
+                      Expanded(
+                        child: PrimaryButtons(
+                            buttonStyle: ButtonsStyle.iconicDynamicButton,
+                            onTap: onTapRightButton ?? () {},
+                            svgIconColor:
+                                rightButtonIconColor ?? AppColors.primary,
+                            svgIconPath: rightIconPath ?? AppImages.callSvgIcon,
+                            title: rightButtonText ?? 'Contact',
+                            bgColor: rightButtonColor ?? AppColors.white,
+                            borderColor:
+                                rightButtonBorderColor ?? AppColors.primary,
+                            textColor:
+                                rightButtonTextColor ?? AppColors.primary),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
             ],
           ),
         ],
