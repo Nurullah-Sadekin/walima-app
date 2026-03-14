@@ -44,7 +44,7 @@ class EmptyStateWidget extends StatelessWidget {
               imagePath: imagePath!,
               width: imageSize ?? 80,
               height: imageSize ?? 80,
-              color: imageColor ?? AppColors.textSecondaryLight,
+              color: imageColor ?? AppColors.hintTextColor,
             ),
             SizedBox(height: spacing ?? 16),
           ],
