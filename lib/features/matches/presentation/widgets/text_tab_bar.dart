@@ -41,9 +41,9 @@ class _TextTabBarState extends State<TextTabBar>
     return TabBar(
       indicatorColor: AppColors.primary,
       onTap: widget.onTabChange,
-      dividerColor: AppColors.greyLight,
+      dividerColor: AppColors.hintTextColor,
       isScrollable: widget.isScrollable ?? true,
-      tabAlignment: widget.tabAlignment,
+      tabAlignment: widget.tabAlignment ?? TabAlignment.fill,
       indicatorPadding: const EdgeInsets.all(0),
       padding: widget.padding?? EdgeInsets.zero,
       indicator: const BoxDecoration(
@@ -55,7 +55,7 @@ class _TextTabBarState extends State<TextTabBar>
         ),
       ),
       labelColor: AppColors.primary,
-      unselectedLabelColor: AppColors.textPrimaryLight,
+      unselectedLabelColor: AppColors.textSecondaryLight,
       labelStyle: TextStyle(
         fontSize: TextSize.font16(context),
         fontWeight: FontWeight.w500,

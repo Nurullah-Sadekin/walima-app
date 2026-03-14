@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/provider/matcher_provider.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/accepted_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/text_tab_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -15,7 +17,7 @@ class InboxScreen extends ConsumerStatefulWidget {
 
 class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProviderStateMixin {
   TabController? _tabController;
-  final _tabs = const ['Accepted by Her', 'Accepted by Her'];
+  final _tabs = const ['Accepted by Her', 'Accepted by Me'];
 
   MatchesProvider provider = MatchesProvider();
 
@@ -58,7 +60,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProv
       children: [
         TextTabBar(
             isScrollable: false,
-            tabAlignment: TabAlignment.center,
+            tabAlignment: TabAlignment.fill,
             controller: _tabController,
             onTabChange: (index) {
               //provider?.updateTab(index: index);
@@ -88,9 +90,19 @@ class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProv
   }
 
   Widget _acceptedByHer() {
-    return Container(
-      color: Colors.red,
-      child: const Center(child: Text('Accepted by Her')),
+    return  Column(
+      children: [
+        AcceptedCard(
+          onTap: () {},
+          imagePath: AppImages.demoProfile2,
+          name: 'Tasnova Ahmed',
+          age: '28 Yr',
+          height: '5\' 3\'" ',
+          day: 'Today',
+          location: 'Gulshan, Dhaka, BD',
+          isVerified: true,
+        ),
+      ],
     );
   }
 
