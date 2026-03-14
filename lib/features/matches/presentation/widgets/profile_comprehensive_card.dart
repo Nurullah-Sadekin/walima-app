@@ -48,6 +48,7 @@ class ProfileComprehensiveCard extends StatelessWidget {
     this.singleButtonBorderColor,
     this.singleButtonIconColor,
     this.singleButtonText = 'Connect Now',
+    this.onMenuTap,
   });
 
   final String imagePath;
@@ -55,6 +56,7 @@ class ProfileComprehensiveCard extends StatelessWidget {
   final double? imageWidth;
   final String? leftIconPath;
   final String? rightIconPath;
+
   final String name;
   final String age;
   final String height;
@@ -64,10 +66,9 @@ class ProfileComprehensiveCard extends StatelessWidget {
   final String? leftButtonText;
   final String? rightButtonText;
   final String location;
+
   final VoidCallback? onTapLeftButton;
   final VoidCallback? onTapRightButton;
-  final bool isPremiumConnect;
-  final bool isVerified;
   final Color? leftButtonColor;
   final Color? rightButtonColor;
   final Color? leftButtonTextColor;
@@ -76,12 +77,18 @@ class ProfileComprehensiveCard extends StatelessWidget {
   final Color? rightButtonTextColor;
   final Color? leftButtonBorderColor;
   final Color? rightButtonBorderColor;
+
   final String? activeStatusText;
   final String? photoCount;
+  final bool isPremiumConnect;
+  final bool isVerified;
   final bool? menu;
   final bool viewOnAccept;
   final bool photoRequest;
   final bool isSingleButton;
+
+  final VoidCallback? onMenuTap;
+
   final VoidCallback? onTapSingleButton;
   final Color? singleButtonColor;
   final Color? singleButtonTextColor;
@@ -281,20 +288,23 @@ class ProfileComprehensiveCard extends StatelessWidget {
                           height: 6,
                         ),
                       if (menu == true)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 6,
-                            horizontal: 6,
-                          ),
-                          decoration: const BoxDecoration(
-                            color: AppColors.disableDark,
-                            shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.all(Radius.circular(6)),
-                          ),
-                          child: Icon(
-                            Icons.more_vert,
-                            size: TextSize.font16(context),
-                            color: AppColors.white,
+                        InkWell(
+                          onTap: onMenuTap ?? () {},
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 6,
+                              horizontal: 6,
+                            ),
+                            decoration: const BoxDecoration(
+                              color: AppColors.disableDark,
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.all(Radius.circular(6)),
+                            ),
+                            child: Icon(
+                              Icons.more_vert,
+                              size: TextSize.font16(context),
+                              color: AppColors.white,
+                            ),
                           ),
                         )
                     ],
