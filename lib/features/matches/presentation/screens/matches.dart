@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
@@ -7,8 +6,10 @@ import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/provider/matcher_provider.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/accepted_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/count_down_timer.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/empty_state.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/filter_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/image_carousel.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/info_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/into_tile.dart';
@@ -29,7 +30,7 @@ class MatchesScreen extends ConsumerStatefulWidget {
 }
 
 class _MatchesScreenState extends ConsumerState<MatchesScreen> {
-  late MatchesProvider provider;
+   MatchesProvider provider = MatchesProvider();
 
   @override
   void initState() {
@@ -68,13 +69,13 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(spacing: 10, children: [
+
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               spacing: 10,
               children: [
-                // Example 1: Basic usage (like your original code)
                 TabBarWidget(
                   text: 'Search',
                   isSelected: true,
@@ -87,7 +88,6 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
                   text: 'New',
                   onTap: () {},
                 ),
-
                 TabBarWidget(
                   text: 'Daily',
                   count: 28,
@@ -103,6 +103,26 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
                 ),
               ],
             ),
+          ),
+          AcceptedCard(
+            onTap: () {},
+            imagePath: AppImages.demoProfile,
+            name: 'Tasnova Ahmed',
+            age: '28 Yr',
+            height: '5\' 3\'" ',
+            day: 'Today',
+            location: 'Gulshan, Dhaka, BD',
+            isVerified: true,
+          ),
+
+          FilterWidget(
+            title: 'Sort by',
+            iconPath: AppImages.sortIcon,
+            items: provider.sortByDataList.map((item) =>
+                FilterItem(name: item.name, isSelected: item.isSelected),).toList(),
+            onItemTap: (index) {
+              provider.sortBy(index);
+            },
           ),
           InfoTile(
             title: 'Country Living in',
@@ -123,7 +143,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
           SettingsSwitchTile(
             title: 'More Matches',
             value: provider.switcherValue ?? false,
-            trailingImage: AppImages.cameraUseIcon,
+            trailingImage: AppImages.cardView,
             showTrailingImage: true,
             onChanged: (newValue) {
               provider.switcherValue = newValue;
@@ -159,14 +179,15 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             title: 'Open to All',
             isExpand: true,
           ),
+
           RemindCard(
-            onTap: () {
-            },
+            onTap: () {},
             imagePath: AppImages.demoProfile,
             name: 'Tasnova Ahmed',
             age: '28 Yr',
             height: '5\' 3\'" ',
             location: 'Gulshan, Dhaka, BD',
+            isVerified: true,
           ),
           const MessageBubble(
             message:
@@ -221,5 +242,4 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
       ),
     );
   }
-
 }
