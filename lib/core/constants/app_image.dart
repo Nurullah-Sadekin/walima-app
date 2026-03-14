@@ -68,6 +68,7 @@ class AppImages {
   static const String callSvgIcon = 'assets/svgIcons/call.svg';
   static const String whatsappSvgIcon = 'assets/svgIcons/whatsapp.svg';
   static const String safetySvgIcon = 'assets/svgIcons/safety.svg';
+  static const String searchSvgIcon = 'assets/svgIcons/search.svg';
 
 
 
