@@ -18,6 +18,8 @@ class MatchesProvider extends BaseChangeNotifier {
   MatchesProviderScreenStates screenStates = MatchesProviderScreenStates.defaultLoading;
   MatchesProviderScreenStates loaderState = MatchesProviderScreenStates.defaultLoading;
 
+  bool? switcherValue = false;
+
 
   void updateViewState(
       {MatchesProviderScreenStates? screenStates,

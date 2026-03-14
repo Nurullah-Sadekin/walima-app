@@ -38,6 +38,8 @@ class AppImages {
   static const String photoIcon = 'assets/svgIcons/photo.svg';
   static const String favouriteIcon = 'assets/svgIcons/favourite.svg';
   static const String cameraUseIcon = 'assets/svgIcons/camera_use.svg';
+  static const String unselectedCheckbox = 'assets/svgIcons/unselectedCheckbox.svg';
+  static const String selectedCheckbox = 'assets/svgIcons/selectedCheckbox.svg';
 
   // Social media icons
   static const String facebookIcon = 'assets/svgIcons/facebook.svg';
@@ -65,6 +67,7 @@ class AppImages {
   static const String notificationSvgIcon = 'assets/svgIcons/notification.svg';
   static const String callSvgIcon = 'assets/svgIcons/call.svg';
   static const String whatsappSvgIcon = 'assets/svgIcons/whatsapp.svg';
+  static const String safetySvgIcon = 'assets/svgIcons/safety.svg';
 
 
 
@@ -95,6 +98,9 @@ class AppImages {
   static const String successfulStatus = 'assets/svgs/successful_status.svg';
   static const String alertStatus = 'assets/svgs/alert_status.svg';
   static const String errorStatus = 'assets/svgs/error_status.svg';
+
+
+  static const String viewOnAccept = 'assets/svgs/view_on_accept.svg';
 
 
   // Navigation icons

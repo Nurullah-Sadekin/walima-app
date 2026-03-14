@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
@@ -5,15 +7,20 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 
-class MatchCard extends StatelessWidget {
-  const MatchCard({
+class ProfileComprehensiveCard extends StatelessWidget {
+  const ProfileComprehensiveCard({
     super.key,
     required this.imagePath,
+    this.imageHeight,
+    this.imageWidth,
     this.leftIconPath,
     this.rightIconPath,
     required this.name,
     required this.age,
     required this.height,
+    this.maritalStatus,
+    this.profession,
+    this.religion,
     this.leftButtonText = 'Connect',
     this.rightButtonText = 'Contact',
     required this.location,
@@ -24,20 +31,36 @@ class MatchCard extends StatelessWidget {
     this.leftButtonColor,
     this.rightButtonColor,
     this.leftButtonTextColor,
+    this.leftButtonIconColor,
+    this.rightButtonIconColor,
     this.rightButtonTextColor,
     this.leftButtonBorderColor,
     this.rightButtonBorderColor,
     this.activeStatusText,
     this.photoCount,
     this.menu,
+    this.viewOnAccept = false,
+    this.photoRequest = false,
+    this.isSingleButton = false,
+    this.onTapSingleButton,
+    this.singleButtonColor,
+    this.singleButtonTextColor,
+    this.singleButtonBorderColor,
+    this.singleButtonIconColor,
+    this.singleButtonText = 'Connect Now',
   });
 
   final String imagePath;
+  final double? imageHeight;
+  final double? imageWidth;
   final String? leftIconPath;
   final String? rightIconPath;
   final String name;
   final String age;
   final String height;
+  final String? maritalStatus;
+  final String? profession;
+  final String? religion;
   final String? leftButtonText;
   final String? rightButtonText;
   final String location;
@@ -48,12 +71,23 @@ class MatchCard extends StatelessWidget {
   final Color? leftButtonColor;
   final Color? rightButtonColor;
   final Color? leftButtonTextColor;
+  final Color? leftButtonIconColor;
+  final Color? rightButtonIconColor;
   final Color? rightButtonTextColor;
   final Color? leftButtonBorderColor;
   final Color? rightButtonBorderColor;
   final String? activeStatusText;
   final String? photoCount;
   final bool? menu;
+  final bool viewOnAccept;
+  final bool photoRequest;
+  final bool isSingleButton;
+  final VoidCallback? onTapSingleButton;
+  final Color? singleButtonColor;
+  final Color? singleButtonTextColor;
+  final Color? singleButtonBorderColor;
+  final Color? singleButtonIconColor;
+  final String? singleButtonText;
 
   @override
   Widget build(BuildContext context) {
@@ -73,11 +107,84 @@ class MatchCard extends StatelessWidget {
             children: [
               ShowImage(
                 imagePath: imagePath,
-                width: double.infinity,
-                height: imageSize,
+                width: imageWidth ?? double.infinity,
+                height: imageHeight ?? imageSize,
                 radius: BorderRadius.circular(8),
                 fit: BoxFit.fill,
               ),
+              if (viewOnAccept)
+                Positioned.fill(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.disable,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          spacing: 4,
+                          children: [
+                            ShowImage(
+                              imagePath: AppImages.viewOnAccept,
+                              width: TextSize.font48(context),
+                              height: TextSize.font48(context),
+                              radius: BorderRadius.circular(8),
+                              fit: BoxFit.fitWidth,
+                              color: AppColors.white,
+                            ),
+                            Text('View on Accept',
+                                style: TextStyle(
+                                  fontSize: TextSize.font14(context),
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.white,
+                                ))
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              if (photoRequest)
+                Positioned.fill(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 4,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 16),
+                        decoration: const BoxDecoration(
+                          color: AppColors.primaryVariant,
+                          shape: BoxShape.rectangle,
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(8)),
+                        ),
+                        child: Row(
+                          spacing: 8,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ShowImage(
+                              imagePath: AppImages.photoIcon,
+                              width: TextSize.font16(context),
+                              height: TextSize.font16(context),
+                              fit: BoxFit.fill,
+                              color: AppColors.primary,
+                            ),
+                            Text('Photo Request',
+                                style: TextStyle(
+                                  fontSize: TextSize.font14(context),
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.primary,
+                                ))
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               if (isPremiumConnect)
                 Positioned(
                   top: 10,
@@ -105,10 +212,10 @@ class MatchCard extends StatelessWidget {
                   child: Container(
                     padding:
                         const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
-                    decoration: BoxDecoration(
-                      color: const Color(0XFF000000).withOpacity(0.5),
+                    decoration: const BoxDecoration(
+                      color: AppColors.disableDark,
                       shape: BoxShape.rectangle,
-                      borderRadius: const BorderRadius.all(Radius.circular(4)),
+                      borderRadius: BorderRadius.all(Radius.circular(4)),
                     ),
                     child: Row(
                       spacing: 4,
@@ -133,20 +240,21 @@ class MatchCard extends StatelessWidget {
                     ),
                   ),
                 ),
-              if (photoCount != null)
+              if (photoCount != null || menu == true)
                 Positioned(
                   top: 10,
                   right: 10,
                   child: Column(
                     children: [
+                      if (photoCount != null)
                       Container(
                         padding: const EdgeInsets.symmetric(
                             vertical: 6, horizontal: 6),
-                        decoration: BoxDecoration(
-                          color: const Color(0XFF000000).withOpacity(0.5),
+                        decoration: const BoxDecoration(
+                          color: AppColors.disableDark,
                           shape: BoxShape.rectangle,
                           borderRadius:
-                              const BorderRadius.all(Radius.circular(6)),
+                              BorderRadius.all(Radius.circular(6)),
                         ),
                         child: Column(
                           spacing: 6,
@@ -170,19 +278,19 @@ class MatchCard extends StatelessWidget {
                           ],
                         ),
                       ),
-                      if (menu == true)
+                      if (menu == true && photoCount != null)
                         const SizedBox(
                           height: 6,
                         ),
                       if (menu == true)
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 6, horizontal: 6),
-                          decoration: BoxDecoration(
-                            color: const Color(0XFF000000).withOpacity(0.5),
+                              vertical: 6, horizontal: 6,),
+                          decoration: const BoxDecoration(
+                            color: AppColors.disableDark,
                             shape: BoxShape.rectangle,
                             borderRadius:
-                                const BorderRadius.all(Radius.circular(6)),
+                                BorderRadius.all(Radius.circular(6)),
                           ),
                           child: Icon(
                             Icons.more_vert,
@@ -240,19 +348,69 @@ class MatchCard extends StatelessWidget {
                       color: AppColors.textSecondaryLight,
                     ),
                   ),
+                  if (religion != null || maritalStatus != null)
+                  Row(
+                    spacing: 4,
+                    children: [
+                      Text(
+                        religion ?? '',
+                        style: TextStyle(
+                          fontSize: TextSize.font16(context),
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.textSecondaryLight,
+                        ),
+                      ),
+                      const Icon(
+                        Icons.circle,
+                        size: 4,
+                        color: AppColors.textSecondaryLight,
+                      ),
+                      Text(
+                        maritalStatus ?? 'Never Married',
+                        style: TextStyle(
+                          fontSize: TextSize.font16(context),
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.textSecondaryLight,
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (profession != null && location.isNotEmpty)
+                  const SizedBox(height: 12,),
+                  if (profession != null)
                   Text(
-                    location,
+                    profession ?? '',
                     style: TextStyle(
                       fontSize: TextSize.font16(context),
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.textSecondaryLight,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textPrimaryLight,
                     ),
                   ),
+                  if (location.isNotEmpty)
+                  Text(
+                  location,
+                  style: TextStyle(
+                    fontSize: TextSize.font16(context),
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
                 ],
               ),
               const SizedBox(
                 height: 16,
               ),
+              if (isSingleButton)
+                PrimaryButtons(
+                    buttonStyle: ButtonsStyle.iconicDynamicButton,
+                    iconLeftPosition: true,
+                    bgColor: singleButtonColor ?? AppColors.white,
+                    onTap: onTapSingleButton ?? () {},
+                    borderColor: singleButtonBorderColor ?? AppColors.primary,
+                    textColor: singleButtonTextColor ?? AppColors.primary,
+                    title: singleButtonText ?? 'Connect Now'),
+
+              if (!isSingleButton)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4.0),
                 child: Row(
@@ -264,9 +422,10 @@ class MatchCard extends StatelessWidget {
                           iconLeftPosition: true,
                           bgColor: leftButtonColor ?? const Color(0XFF1FC16B),
                           onTap: onTapLeftButton ?? () {},
-                          svgIconColor: AppColors.white,
+                          svgIconColor: leftButtonIconColor ?? AppColors.white,
                           svgIconPath: leftIconPath ?? AppImages.favouriteIcon,
-                          borderColor: leftButtonBorderColor ?? const Color(0XFF1FC16B),
+                          borderColor:
+                              leftButtonBorderColor ?? const Color(0XFF1FC16B),
                           textColor: leftButtonTextColor ?? AppColors.white,
                           title: leftButtonText ?? 'Connect'),
                     ),
@@ -274,7 +433,7 @@ class MatchCard extends StatelessWidget {
                       child: PrimaryButtons(
                           buttonStyle: ButtonsStyle.iconicDynamicButton,
                           onTap: onTapRightButton ?? () {},
-                          svgIconColor: AppColors.primary,
+                          svgIconColor: rightButtonIconColor ?? AppColors.primary,
                           svgIconPath: rightIconPath ?? AppImages.callSvgIcon,
                           title: rightButtonText ?? 'Contact',
                           bgColor: rightButtonColor ?? AppColors.white,

@@ -10,6 +10,7 @@ class PrimaryButtons extends StatelessWidget {
     required this.onTap,
     this.title,
     this.titleSize,
+    this.iconSize,
     this.context,
     this.textColor,
     this.bgColor,
@@ -17,12 +18,14 @@ class PrimaryButtons extends StatelessWidget {
     this.svgIconColor,
     this.svgIconPath,
     this.iconLeftPosition = true,
+    this.isExpand = true,
   });
 
   final ButtonsStyle buttonStyle;
   final VoidCallback onTap;
   final String? title;
   final double? titleSize;
+  final double? iconSize;
   final BuildContext? context;
   final Color? textColor;
   final Color? bgColor;
@@ -30,12 +33,13 @@ class PrimaryButtons extends StatelessWidget {
   final Color? svgIconColor;
   final bool? iconLeftPosition;
   final String? svgIconPath;
+  final bool isExpand;
 
   @override
   Widget build(BuildContext context) {
     switch (buttonStyle) {
       case (ButtonsStyle.activePrimaryButton):
-        return activePrimaryButton(onTap, title, context);
+        return activePrimaryButton(onTap, title,isExpand, context);
 
       case (ButtonsStyle.activeSecondaryButton):
         return activeSecondaryButton(onTap, title, context);
@@ -56,12 +60,12 @@ class PrimaryButtons extends StatelessWidget {
     }
   }
 
-  Widget activePrimaryButton(VoidCallback onClick, String? title, context) {
+  Widget activePrimaryButton(VoidCallback onClick, String? title, bool isExpand, context) {
     return GestureDetector(
       onTap: onClick,
       child: Container(
         padding: const EdgeInsets.symmetric(
-          vertical: 10,
+          vertical: 10,horizontal: 16
         ),
         decoration: ShapeDecoration(
           color: AppColors.primary,
@@ -70,19 +74,17 @@ class PrimaryButtons extends StatelessWidget {
           ),
         ),
         child: Row(
-          mainAxisSize: MainAxisSize.max,
+          mainAxisSize: isExpand ? MainAxisSize.max : MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Expanded(
-              child: Text(
-                title ?? '',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: TextSize.font14(context),
-                  fontWeight: FontWeight.w500,
-                ),
+            Text(
+              title ?? '',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: TextSize.font14(context),
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
@@ -192,8 +194,8 @@ class PrimaryButtons extends StatelessWidget {
             if (iconLeftPosition! && svgIconPath != null)
               ShowImage(
                 imagePath: svgIconPath,
-                width: 20,
-                height: 20,
+                width: iconSize ?? 20,
+                height: iconSize ?? 20,
                 color: svgIconColor,
               ),
             if (iconLeftPosition! && svgIconPath != null)

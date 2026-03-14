@@ -22,6 +22,8 @@ class AppColors {
   static const Color backgroundDark = Color(0xFF121212);
   static const Color surfaceLight = Color(0xFFF5F5F5);
   static const Color surfaceDark = Color(0xFF1E1E1E);
+  static const Color disable = Color(0x80151515);
+  static const Color disableDark = Color(0x80000000);
 
   // Text Colors
   static const Color textPrimaryLight = Color(0xFF171717);
@@ -60,6 +62,9 @@ class AppColors {
   static const Color inputBorderColor = Color(0xFFE6E6E9);
   static const Color inActiveBorderColor = Color(0xFF818092);
   static const Color textSub600 = Color(0xFF5C5C5C);
+
+
+  static const Color greenButtonColor = Color(0XFF1FC16B);
 
   static LinearGradient get customBackgroundGradient => const LinearGradient(
     begin: Alignment.topLeft,

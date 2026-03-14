@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/connect_now_card.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
@@ -12,7 +11,7 @@ import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/social_media_icon.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/verification_tile.dart';
-import 'package:flutter_boilerplate/features/home/presentation/widgets/connect_card.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -285,13 +284,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _premiumMatches() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
@@ -345,8 +344,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          SingleChildScrollView(
+        ),
+        const SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.only(left: 20.0),
+          child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: List.generate(
@@ -355,35 +357,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         padding: EdgeInsets.only(
                           right: 10.0,
                         ),
-                        child: ConnectCard(
-                          imagePath: AppImages.demoProfile2,
-                          leftIconPath: AppImages.favouriteIcon,
-                          isPremiumConnect: false,
-                          isVerified: true,
-                          name: 'Afia Sultana',
-                          age: '28 Yr',
-                          height: '5\' 3\'" ',
-                          religion: 'Muslim',
-                          profession: 'Software Engineer',
-                          location: 'Gulshan, Dhaka, BD',
-                          activeStatusText: 'Online',
+                        child: SizedBox(
+                          width: 300,
+                          child: ProfileComprehensiveCard(
+                            imagePath: AppImages.demoProfile2,
+                            leftIconPath: AppImages.favouriteIcon,
+                            imageHeight: 250,
+                            isPremiumConnect: true,
+                            isVerified: true,
+                            name: 'Afia Sultana',
+                            age: '28 Yr',
+                            height: '5\' 3\'" ',
+                            religion: 'Muslim',
+                            profession: 'Software Engineer',
+                            location: 'Gulshan, Dhaka, BD',
+                            activeStatusText: 'Online',
+                            isSingleButton: true,
+                          ),
                         ),
                       )),
             ),
-          )
-        ],
-      ),
+          ),
+        )
+      ],
     );
   }
 
   Widget _recentVisitors() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
@@ -437,8 +444,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          SingleChildScrollView(
+        ),
+        const SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.only(left: 20.0),
+          child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: List.generate(
@@ -447,20 +457,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         padding: EdgeInsets.only(
                           right: 10.0,
                         ),
-                        child: ConnectNowCard(
-                          imagePath: AppImages.demoProfile,
-                          iconPath: AppImages.premiumSvgIcon,
-                          isPremiumConnect: false,
-                          name: 'Tasnim Akter',
-                          age: '28 Yr',
-                          height: '5\' 3\'" ',
-                          location: 'Gulshan, Dhaka, BD',
+                        child: SizedBox(
+                          width: 300,
+                          child: ProfileComprehensiveCard(
+                            imagePath: AppImages.demoProfile,
+                            imageHeight: 250,
+                            isPremiumConnect: true,
+                            name: 'Tasnim Akter',
+                            age: '28 Yr',
+                            height: '5\' 3\'" ',
+                            location: 'Gulshan, Dhaka, BD',
+                            viewOnAccept: true,
+                          ),
                         ),
                       )),
             ),
-          )
-        ],
-      ),
+          ),
+        )
+      ],
     );
   }
 

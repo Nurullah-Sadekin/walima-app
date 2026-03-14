@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
+import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 
 class SelectionCard extends StatelessWidget {
   const SelectionCard({
@@ -9,12 +11,14 @@ class SelectionCard extends StatelessWidget {
     required this.onTap,
     required this.title,
     this.isSelected ,
+    this.isExpand = false,
   });
 
   final SelectionStyle buttonStyle;
   final VoidCallback onTap;
   final String? title;
   final bool? isSelected;
+  final bool isExpand;
 
   @override
   Widget build(BuildContext context) {
@@ -29,9 +33,9 @@ class SelectionCard extends StatelessWidget {
       case SelectionStyle.unSelectedItem:
         return unSelectedItem(onTap, title, effectiveSelected, context);
       case SelectionStyle.selectedCheckbox:
-        return selectedCheckbox(onTap, title, effectiveSelected, context);
+        return selectedCheckbox(onTap, title, isExpand, effectiveSelected, context);
       case SelectionStyle.unSelectedCheckbox:
-        return unSelectedCheckbox(onTap, title, effectiveSelected, context);
+        return unSelectedCheckbox(onTap, title, isExpand, effectiveSelected, context);
     }
   }
 
@@ -183,7 +187,7 @@ class SelectionCard extends StatelessWidget {
     );
   }
 
-  Widget selectedCheckbox(VoidCallback onClick, String? title, bool isSelected, BuildContext context) {
+  Widget selectedCheckbox(VoidCallback onClick, String? title, bool isExpand, bool isSelected, BuildContext context) {
     return GestureDetector(
       onTap: onClick,
       child: Container(
@@ -196,19 +200,12 @@ class SelectionCard extends StatelessWidget {
           ),
         ),
         child: Row(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: isExpand ? MainAxisSize.max :MainAxisSize.min,
           children: [
-            Container(
-              height: TextSize.font16(context),
-              width: TextSize.font16(context),
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary : Colors.white,
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: isSelected ? AppColors.primary : AppColors.greyLight, width: 1),
-              ),
-              child: isSelected
-                  ? Icon(Icons.check, size: TextSize.font12(context), color: Colors.white)
-                  : null,
+            ShowImage(
+              imagePath: AppImages.selectedCheckbox,
+              width: TextSize.font20(context),
+              height: TextSize.font20(context),
             ),
             const SizedBox(width: 8),
             Text(
@@ -225,7 +222,7 @@ class SelectionCard extends StatelessWidget {
     );
   }
 
-  Widget unSelectedCheckbox(VoidCallback onClick, String? title, bool isSelected, BuildContext context) {
+  Widget unSelectedCheckbox(VoidCallback onClick, String? title, bool isExpand, bool isSelected, BuildContext context) {
     // visually identical to selectedCheckbox but without check mark
     return GestureDetector(
       onTap: onClick,
@@ -239,16 +236,12 @@ class SelectionCard extends StatelessWidget {
           ),
         ),
         child: Row(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: isExpand ? MainAxisSize.max : MainAxisSize.min,
           children: [
-            Container(
-              height: TextSize.font16(context),
-              width: TextSize.font16(context),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: AppColors.greyLight, width: 1),
-              ),
+            ShowImage(
+              imagePath: AppImages.unselectedCheckbox,
+              width: TextSize.font20(context),
+              height: TextSize.font20(context),
             ),
             const SizedBox(width: 8),
             Text(
