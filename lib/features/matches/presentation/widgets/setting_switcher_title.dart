@@ -11,19 +11,22 @@ class SettingsSwitchTile extends StatelessWidget { // Control switch size
     this.subtitle,
     required this.value,
     required this.onChanged,
-    this.showSubtitle = true,
     this.showTrailingImage = false,
     this.trailingImage,
     this.switchScale = 0.6,
+    this.trailingImageSize,
+    this.trailingImageColor,
   });
   final String title;
-  final String? subtitle; // Optional subtitle
+  final String? subtitle;
   final bool value;
   final ValueChanged<bool> onChanged;
-  final bool showSubtitle; // Control subtitle visibility
-  final bool showTrailingImage; // Control trailing image visibility
-  final String? trailingImage; // Custom trailing image
+  final bool showTrailingImage;
+  final String? trailingImage;
   final double switchScale;
+  final double? trailingImageSize;
+  final Color? trailingImageColor;
+
 
   @override
   Widget build(BuildContext context) {
@@ -37,9 +40,11 @@ class SettingsSwitchTile extends StatelessWidget { // Control switch size
               if (showTrailingImage)
                 ShowImage(
                   imagePath: trailingImage,
-                  width: 24,
-                  height: 24,
+                  width: trailingImageSize ?? TextSize.font20(context),
+                  height: trailingImageSize ?? TextSize.font20(context),
+                  color: trailingImageColor ?? AppColors.textPrimaryLight,
                 ),
+              if (showTrailingImage) const SizedBox(width: 8), // Spacing between image and text
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 4,
@@ -56,7 +61,7 @@ class SettingsSwitchTile extends StatelessWidget { // Control switch size
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  if (showSubtitle && subtitle != null)
+                  if (subtitle != null)
                     Text(
                       subtitle!,
                       textHeightBehavior: const TextHeightBehavior(
