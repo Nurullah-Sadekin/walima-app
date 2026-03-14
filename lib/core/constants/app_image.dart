@@ -72,6 +72,7 @@ class AppImages {
   static const String sortIcon = 'assets/svgIcons/sort.svg';
   static const String selectedRadio = 'assets/svgIcons/selectedRadio.svg';
   static const String unSelectedRadio = 'assets/svgIcons/unSelectedRadio.svg';
+  static const String cardView = 'assets/svgIcons/card_view.svg';
 
 
 
