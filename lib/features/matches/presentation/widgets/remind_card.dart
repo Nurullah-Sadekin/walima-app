@@ -14,6 +14,7 @@ class RemindCard extends StatelessWidget {
     required this.age,
     required this.height,
     required this.location,
+    this.isVerified = false,
   });
 
   final VoidCallback onTap;
@@ -22,6 +23,7 @@ class RemindCard extends StatelessWidget {
   final String age;
   final String height;
   final String location;
+  final bool isVerified;
 
   @override
   Widget build(BuildContext context) {
@@ -54,13 +56,29 @@ class RemindCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        Text(
-                          name,
-                          style: TextStyle(
-                            fontSize: TextSize.font16(context),
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textPrimaryLight,
-                          ),
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: TextSize.font16(context),
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.textPrimaryLight,
+                                ),
+                              ),
+                            ),
+                            if (isVerified) ...[
+                              const SizedBox(width: 4),
+                              ShowImage(
+                                imagePath: AppImages.verifiedBadgeSvgIcon,
+                                width: TextSize.font14(context),
+                                height: TextSize.font14(context),
+                              )
+                            ],
+                          ],
                         ),
                         const SizedBox(height: 6),
                         Text(
