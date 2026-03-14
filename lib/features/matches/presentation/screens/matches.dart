@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
@@ -7,12 +5,11 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/provider/matcher_provider.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/count_down_timer.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/empty_state.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/image_carousel.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/info_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/into_tile.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/message_bubble.dart';
@@ -21,6 +18,7 @@ import 'package:flutter_boilerplate/features/matches/presentation/widgets/remind
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/safety_first_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/setting_switcher_title.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/tab_bar_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MatchesScreen extends ConsumerStatefulWidget {
@@ -32,7 +30,6 @@ class MatchesScreen extends ConsumerStatefulWidget {
 
 class _MatchesScreenState extends ConsumerState<MatchesScreen> {
   late MatchesProvider provider;
-  int _currentImageIndex = 0;
 
   @override
   void initState() {
@@ -71,44 +68,41 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(spacing: 10, children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            spacing: 10,
-            children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: AppColors.greyLight, width: 1),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              spacing: 10,
+              children: [
+                // Example 1: Basic usage (like your original code)
+                TabBarWidget(
+                  text: 'Search',
+                  isSelected: true,
+                  prefixImagePath: AppImages.searchSvgIcon,
+                  onTap: () {
+                    // Handle tap
+                  },
                 ),
-                child: Text(
-                  'Search',
-                  style: TextStyle(
-                    color: AppColors.textSecondaryLight,
-                    fontSize: TextSize.font14(context),
-                    fontWeight: FontWeight.w500,
-                  ),
+                TabBarWidget(
+                  text: 'New',
+                  onTap: () {},
                 ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(6),
+
+                TabBarWidget(
+                  text: 'Daily',
+                  count: 28,
+                  onTap: () {},
                 ),
-                child: Text(
-                  'New',
-                  style: TextStyle(
-                    color: AppColors.white,
-                    fontSize: TextSize.font14(context),
-                    fontWeight: FontWeight.w500,
-                  ),
+                TabBarWidget(
+                  text: 'My Matches',
+                  isSelected: false,
+                  selectedBackgroundColor: AppColors.primary,
+                  selectedTextColor: AppColors.white,
+                  selectedBorderColor: AppColors.primary,
+                  onTap: () {},
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           InfoTile(
             title: 'Country Living in',
@@ -129,6 +123,8 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
           SettingsSwitchTile(
             title: 'More Matches',
             value: provider.switcherValue ?? false,
+            trailingImage: AppImages.cameraUseIcon,
+            showTrailingImage: true,
             onChanged: (newValue) {
               provider.switcherValue = newValue;
               provider.updateViewState();
@@ -179,8 +175,16 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             showSenderName: true,
           ),
           const SafetyTipCard(),
-          // Image carousel: horizontal scrollable images with dots indicator
-          _imageCarousel(),
+          const ImageCarousel(
+            images: [
+              CarouselImage(imagePath: AppImages.demoProfile, isBlur: false),
+              CarouselImage(imagePath: AppImages.demoProfile2, isBlur: true),
+              CarouselImage(imagePath: AppImages.demoProfile, isBlur: true),
+              CarouselImage(imagePath: AppImages.demoProfile2, isBlur: true),
+              CarouselImage(imagePath: AppImages.demoProfile, isBlur: true),
+              CarouselImage(imagePath: AppImages.demoProfile2, isBlur: true),
+            ],
+          ),
           const ProfileComprehensiveCard(
             imagePath: AppImages.demoProfile,
             leftIconPath: AppImages.favouriteIcon,
@@ -218,130 +222,4 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
     );
   }
 
-  Widget _imageCarousel() {
-    // Replace or extend this list with the images you want to show
-    final images = [
-      AppImages.demoProfile,
-      AppImages.demoProfile2,
-      AppImages.demoProfile,
-      AppImages.demoProfile2,
-      AppImages.demoProfile,
-      AppImages.demoProfile2,
-    ];
-
-    return Stack(
-      children: [
-
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final height = MediaQuery.of(context).size.height * 0.65; // responsive height based on width
-            return CarouselSlider.builder(
-              itemCount: images.length,
-              itemBuilder: (context, index, realIndex) {
-                final img = images[index];
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Stack(
-                    children: [
-                      ShowImage(
-                        imagePath: img,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: height,
-                      ),
-                      Positioned.fill(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: AppColors.disable,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 10,
-                        left: 10,
-                        child: Column(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 5, horizontal: 8),
-                              decoration: const BoxDecoration(
-                                color: AppColors.disableDark,
-                                shape: BoxShape.rectangle,
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(16)),
-                              ),
-                              child: Row(
-                                spacing: 4,
-                                children: [
-                                  ShowImage(
-                                    imagePath: AppImages.photoIcon,
-                                    width: TextSize.font14(context),
-                                    height: TextSize.font14(context),
-                                    radius: BorderRadius.circular(8),
-                                    fit: BoxFit.fitWidth,
-                                    color: AppColors.white,
-                                  ),
-                                  Text(
-                                    '${index+1}/${images.length}',
-                                    style: TextStyle(
-                                      fontSize: TextSize.font12(context),
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                    ],
-                  ),
-                );
-              },
-              options: CarouselOptions(
-                autoPlay: false,
-                enlargeCenterPage: true,
-                viewportFraction: 1,
-                height: height,
-                onPageChanged: (index, reason) => setState(() => _currentImageIndex = index),
-              ),
-            );
-          },
-        ),
-
-        Positioned(
-          bottom: 10,
-          left: 0,
-          right: 0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(images.length, (index) {
-              final isActive = _currentImageIndex == index;
-              final dotWidth = isActive ? 20.0 : 10.0;
-              const dotHeight = 10.0;
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                width: dotWidth,
-                height: dotHeight,
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(dotHeight / 2),
-                  color: isActive ? AppColors.primary : AppColors.disable,
-                ),
-              );
-            }),
-          ),
-        ),
-      ],
-    );
-  }
 }
