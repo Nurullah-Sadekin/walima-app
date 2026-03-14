@@ -7,6 +7,8 @@ class AppColors {
 
   // Primary Colors
   static const Color primary = Color(0xFFFD297B);
+  static const Color primaryShade300 = Color(0xFFFFCAE3);
+  static const Color primaryShade200 = Color(0xFFFEE5F0);
   static const Color primaryVariant = Color(0xFFFEF1F7);
   static const Color secondary = Color(0xFF03DAC6);
   static const Color secondaryVariant = Color(0xFF018786);
@@ -59,7 +61,6 @@ class AppColors {
   static const Color inActiveBorderColor = Color(0xFF818092);
   static const Color textSub600 = Color(0xFF5C5C5C);
 
-  // Custom Linear Gradient
   static LinearGradient get customBackgroundGradient => const LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -68,7 +69,7 @@ class AppColors {
       Color(0xFFFFFFFF),
       Color(0xFFFAF5FF),
     ],
-    stops: [0.33, 0.67, 1.0],
+    stops: [0.0, 0.5, 1.0],
   );
 
 }

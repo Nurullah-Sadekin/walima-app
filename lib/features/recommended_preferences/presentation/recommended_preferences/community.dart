@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart' as regp;
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/providers/recommended_preferences_provider.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart' as rn;
 
 class CommunityScreen extends ConsumerStatefulWidget {
   const CommunityScreen({super.key});
@@ -89,32 +84,34 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         DropDownField(
-          headLine: 'Your Religion',
+          headLine: 'Partner Religion',
           hintText: 'Select',
           popUpHeader: 'Select Religion',
-          items: const ['Islam', 'Hinduism', 'Buddhism', 'Christianity'],
+          items: provider.religionDropdownItems,
           controller: provider.religionPreferenceController,
-          onTap: () {
-          },
+          onTap: provider.loadReligionData,
+          onConfirm: (value) =>
+              provider.onReligionPreferenceSelected(value?.toString()),
           isSearch: true,
         ),
         provider.religionPreferenceController.text.isEmpty
             ? const SizedBox.shrink()
             : DropDownField(
-          headLine: 'Community',
+          headLine: 'Partner Community',
           hintText: 'Select',
           popUpHeader: 'Select Community',
           headLineInfoIcon: true,
-          items: const ['Islam', 'Hinduism', 'Buddhism', 'Christianity'],
+          items: provider.communityDropdownItems,
           controller: provider.communityPreferenceController,
-          onTap: () {
-          },
+          onTap: () {},
+          onConfirm: (value) =>
+              provider.onCommunityPreferenceSelected(value?.toString()),
           isSearch: true,
         ),
         provider.religionPreferenceController.text.isEmpty || provider.communityPreferenceController.text.isEmpty
             ? const SizedBox.shrink()
             : DropDownField(
-          headLine: 'Mother Tongue',
+          headLine: 'Partner Mother Tongue',
           hintText: 'Select',
           popUpHeader: 'Select Mother Tongue',
           items: const ['Bangla', 'English', 'Dutch', 'Hindi'],

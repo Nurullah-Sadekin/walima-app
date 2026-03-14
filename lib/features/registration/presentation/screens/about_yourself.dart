@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
+import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
@@ -16,7 +17,8 @@ import 'package:go_router/go_router.dart';
 class AboutYourselfScreen extends ConsumerStatefulWidget {
   const AboutYourselfScreen({super.key});
   @override
-  ConsumerState<AboutYourselfScreen> createState() => _AboutYourselfScreenState();
+  ConsumerState<AboutYourselfScreen> createState() =>
+      _AboutYourselfScreenState();
 }
 
 class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
@@ -43,12 +45,14 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(aboutYourselfScreenProvider);
     return TransparentLoading(
-      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading:
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: screenProvider.screenStates == RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates ==
+                  RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
@@ -79,19 +83,23 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
                   style: TextStyle(
                     fontSize: TextSize.font14(context),
                     fontWeight: FontWeight.w500,
+                    color: AppColors.textPrimaryLight,
                   ),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   spacing: 10,
-                  children: List.generate(provider.verificationList.length, (index) {
+                  children:
+                      List.generate(provider.verificationList.length, (index) {
                     final verificationType = provider.verificationList[index];
                     double screenWidth = MediaQuery.of(context).size.width - 40;
                     double itemWidth = (screenWidth - 10) / 3;
                     return SizedBox(
                       width: itemWidth,
                       child: SelectionCard(
-                        buttonStyle: verificationType.isSelected ? SelectionStyle.selectedRadio : SelectionStyle.unSelectedRadio,
+                        buttonStyle: verificationType.isSelected
+                            ? SelectionStyle.selectedRadio
+                            : SelectionStyle.unSelectedRadio,
                         onTap: () {
                           provider.selectedVerificationTypeIndex(index);
                         },
@@ -131,7 +139,8 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: provider.aboutYourselfController.text.isNotEmpty && provider.selectedVerificationType.isNotEmpty
+      buttonStyle: provider.aboutYourselfController.text.isNotEmpty &&
+              provider.selectedVerificationType.isNotEmpty
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,
       title: 'Continue',
@@ -141,22 +150,19 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
 
   Future<void> _handleContinue() async {
     final screenProvider = ref.read(aboutYourselfScreenProvider);
-    if (provider.aboutYourselfController.text.isNotEmpty && provider.selectedVerificationType.isNotEmpty) {
+    if (provider.aboutYourselfController.text.isNotEmpty &&
+        provider.selectedVerificationType.isNotEmpty) {
       screenProvider.updateViewState(
         loadingState: RegistrationScreenStates.isProfileFor,
       );
       await provider.signUpViaOtp(context).then((success) {
         if (success) {
-          screenProvider.updateViewState(
-            screenStates: RegistrationScreenStates.loadingComplete,
-          );
+          screenProvider.updateViewState(screenStates: RegistrationScreenStates.loadingComplete);
           if (mounted) {
-            context.pushNamed(Routes.otpVerifyForSignUp);
+            context.pushReplacementNamed(Routes.otpVerifyForSignUp);
           }
         } else {
-          screenProvider.updateViewState(
-            loadingState: RegistrationScreenStates.loadingComplete,
-          );
+          screenProvider.updateViewState(loadingState: RegistrationScreenStates.loadingComplete);
         }
       });
     }

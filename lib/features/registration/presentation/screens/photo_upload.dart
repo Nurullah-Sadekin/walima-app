@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_expansion_tile.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
@@ -14,6 +17,8 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 
 class PhotoUploadScreen extends ConsumerStatefulWidget {
   const PhotoUploadScreen({super.key});
@@ -23,6 +28,9 @@ class PhotoUploadScreen extends ConsumerStatefulWidget {
 
 class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
   late RegistrationProvider provider;
+  final ImagePicker _imagePicker = ImagePicker();
+  String? _selectedImagePath;
+  bool _isPickingImage = false;
 
   @override
   void initState() {
@@ -45,8 +53,7 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(photoUploadScreenProvider);
     return TransparentLoading(
-      isLoading:
-          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor || _isPickingImage,
       child: Scaffold(
         extendBodyBehindAppBar: true,
         backgroundColor: Colors.transparent,
@@ -56,13 +63,110 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const CustomBackAppBar(),
+                     CustomBackAppBar(
+                      trailingText: 'Add Photos Later',
+                      isTrailing: true,
+                      onTrailingTap: (){
+                       context.push(Paths.hobbiesInterests);
+                      },
+                    ),
                     body(context),
                   ],
                 ),
         ),
       ),
     );
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    if (_isPickingImage) return;
+
+    setState(() {
+      _isPickingImage = true;
+    });
+
+    try {
+      final pickedFile = await _imagePicker.pickImage(
+        source: source,
+        imageQuality: 85,
+        maxWidth: 1800,
+      );
+
+      if (!mounted || pickedFile == null) return;
+
+      final croppedFile = await ImageCropper().cropImage(
+        sourcePath: pickedFile.path,
+        compressFormat: ImageCompressFormat.jpg,
+        compressQuality: 90,
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Crop Image',
+            initAspectRatio: CropAspectRatioPreset.square,
+            lockAspectRatio: false,
+            hideBottomControls: true,
+          ),
+          IOSUiSettings(
+            title: 'Crop Image',
+          ),
+        ],
+      );
+
+      if (!mounted || croppedFile == null) return;
+
+      final croppedPath = croppedFile.path.trim();
+      if (croppedPath.isEmpty) return;
+
+      setState(() {
+        _selectedImagePath = croppedPath;
+      });
+
+      if (!mounted) return;
+      context.push(Paths.cropImage, extra: croppedPath);
+    } on PlatformException catch (e) {
+      if (!mounted) return;
+
+      final code = e.code.toLowerCase();
+      final message = (code.contains('camera') ||
+              code.contains('photo') ||
+              code.contains('permission') ||
+              code.contains('denied'))
+          ? 'Permission denied. Please allow camera/photos access from app settings.'
+          : 'Unable to open image picker/cropper. Please try again.';
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      debugPrint('Image pick/crop failed: $e');
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Unable to process image. Please try a different image.',
+          ),
+        ),
+      );
+    } finally {
+      if (!mounted) return;
+
+      setState(() {
+        _isPickingImage = false;
+      });
+    }
+  }
+
+  Future<void> _handleContinue() async {
+    final imagePath = _selectedImagePath?.trim() ?? '';
+    if (imagePath.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a profile image first.')),
+      );
+      return;
+    }
+
+    context.push(Paths.cropImage, extra: imagePath);
   }
 
   Widget body(BuildContext context) {
@@ -147,7 +251,7 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
                     icon: Icons.cancel,
                     iconColor: Colors.red,
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                 ],
               ),
             ),
@@ -171,13 +275,31 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
       child: Column(
         spacing: 20,
         children: [
-          ShowImage(
-            imagePath: AppImages.photoUpload,
-            width: 110,
-            height: 110,
-          ),
+          _selectedImagePath == null
+              ? GestureDetector(
+            onTap: () => _pickImage(ImageSource.gallery),
+                child: const ShowImage(
+                    imagePath: AppImages.photoUpload,
+                    radius: BorderRadius.all(Radius.circular(50)),
+                    width: 110,
+                    height: 110,
+                  ),
+              )
+              : GestureDetector(
+                  onTap: () => _pickImage(ImageSource.gallery),
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(50)),
+                    child: Image.file(
+                      File(_selectedImagePath!),
+                      width: 110,
+                      height: 110,
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+                ),
           Center(
-            child: Text('Upload Image',
+            child: Text(
+                _selectedImagePath == null ? 'Upload Image' : 'Image Selected',
                 style: TextStyle(
                     fontSize: TextSize.font14(context),
                     fontWeight: FontWeight.w400,
@@ -207,43 +329,76 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
               ),
             ],
           ),
-          Container(
-            padding: const EdgeInsets.all(10.0),
-            decoration: const BoxDecoration(
-              color: AppColors.primaryVariant,
-              borderRadius: BorderRadius.all(
-                Radius.circular(6),
-              ),
+          _photoActionButton(
+            label: 'Use Camera',
+            icon: Icons.camera_alt_outlined,
+            onTap: () => _pickImage(ImageSource.camera),
+          ),
+          // if (_selectedImagePath != null)
+          //   TextButton(
+          //     onPressed: () {
+          //       setState(() {
+          //         _selectedImagePath = null;
+          //       });
+          //     },
+          //     child: const Text('Remove Photo'),
+          //   ),
+        ],
+      ),
+    );
+  }
+
+  Widget _photoActionButton({
+    required String label,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      borderRadius: const BorderRadius.all(Radius.circular(6)),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(10.0),
+        decoration: const BoxDecoration(
+          color: AppColors.primaryVariant,
+          borderRadius: BorderRadius.all(
+            Radius.circular(6),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+             ShowImage(
+              imagePath: AppImages.cameraUseIcon,
+              width: TextSize.font20(context),
+              height: TextSize.font20(context),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.camera_alt_outlined,
-                  size: TextSize.font18(context),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                label,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: TextSize.font14(context),
+                  fontWeight: FontWeight.w500,
                   color: AppColors.primary,
                 ),
-                const SizedBox(width: 6),
-                Text('Use Camera',
-                    style: TextStyle(
-                        fontSize: TextSize.font14(context),
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.primary)),
-              ],
+              ),
             ),
-          )
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: ButtonsStyle.activePrimaryButton,
+      buttonStyle: (_selectedImagePath?.trim().isNotEmpty ?? false)
+          ? ButtonsStyle.activePrimaryButton
+          : ButtonsStyle.disableButton,
       title: 'Continue',
-      onTap: () {
-        context.push(Paths.hobbiesInterests);
-      },
+      onTap: _handleContinue,
     );
   }
 }

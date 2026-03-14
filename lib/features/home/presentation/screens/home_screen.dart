@@ -5,25 +5,35 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/connect_now_card.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
+import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/social_media_icon.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/verification_tile.dart';
+import 'package:flutter_boilerplate/features/home/presentation/widgets/connect_card.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   final Key profileImageKey = const ValueKey('home_profile_image');
-  // Use a scaffold key to reliably open the drawer from anywhere in this State
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(profileProvider).getProfile();
+      });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,37 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _topBar(BuildContext context) {
-    return AppBar(
-      leadingWidth: 40,
-      leading: IconButton(
-        icon: const ShowImage(
-          imagePath: AppImages.menuSvgIcon,
-          color: AppColors.textPrimaryLight,
-          height: 20,
-          width: 20,
-        ),
-        onPressed: _openDrawerOverNav,
-      ),
-      title: Text(
-        'My Walima',
-        style: TextStyle(
-          color: AppColors.textPrimaryLight,
-          fontSize: TextSize.font18(context),
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      actions: const [
-        ShowImage(
-          imagePath: AppImages.notificationSvgIcon,
-          color: AppColors.textPrimaryLight,
-          height: 20,
-          width: 20,
-        ),
-      ],
-      backgroundColor: Colors.transparent,
-      surfaceTintColor: Colors.transparent,
-      elevation: 0,
-    );
+    return AnchoredAppBar(context: context, title: 'My Walima');
   }
 
   Widget _profileSummary(BuildContext context) {
@@ -219,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
             svgIconPath: AppImages.editProfileSvgIcon,
             svgIconColor: AppColors.textSecondaryLight,
             iconLeftPosition: false,
-            onTap: ()  {
+            onTap: () {
               context.push(Paths.editProfile);
             },
             title: 'Edit Profile',
@@ -233,7 +213,8 @@ class _HomeScreenState extends State<HomeScreen> {
             bgColor: AppColors.primary,
             svgIconPath: AppImages.premiumSvgIcon,
             iconLeftPosition: false,
-            onTap: ()  {
+            onTap: () {
+              context.push(Paths.upgradePackage);
             },
             title: 'Renew Plan',
           ),
@@ -249,6 +230,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             _completeProfileStatus(),
             _premiumMatches(),
+            _recentVisitors(),
             _followUpSection(),
           ],
         ),
@@ -373,13 +355,105 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: EdgeInsets.only(
                           right: 10.0,
                         ),
+                        child: ConnectCard(
+                          imagePath: AppImages.demoProfile2,
+                          leftIconPath: AppImages.favouriteIcon,
+                          isPremiumConnect: false,
+                          isVerified: true,
+                          name: 'Afia Sultana',
+                          age: '28 Yr',
+                          height: '5\' 3\'" ',
+                          religion: 'Muslim',
+                          profession: 'Software Engineer',
+                          location: 'Gulshan, Dhaka, BD',
+                          activeStatusText: 'Online',
+                        ),
+                      )),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _recentVisitors() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 6,
+                children: [
+                  Text(
+                    'Recent Visitors',
+                    style: TextStyle(
+                      color: AppColors.textPrimaryLight,
+                      fontSize: TextSize.font18(context),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Text(
+                    '26 Profiles Found',
+                    style: TextStyle(
+                      color: AppColors.textSecondaryLight,
+                      fontSize: TextSize.font14(context),
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 10.0, vertical: 10.0),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(color: AppColors.greyLight),
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      'View All',
+                      style: TextStyle(
+                        color: AppColors.textSecondaryLight,
+                        fontSize: TextSize.font14(context),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      color: AppColors.textSecondaryLight,
+                      size: TextSize.font12(context),
+                    )
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: List.generate(
+                  10,
+                  (index) => const Padding(
+                        padding: EdgeInsets.only(
+                          right: 10.0,
+                        ),
                         child: ConnectNowCard(
                           imagePath: AppImages.demoProfile,
                           iconPath: AppImages.premiumSvgIcon,
-                          isPremiumConnect: true,
-                          name: 'Profile Name',
-                          age: '28 Years',
-                          height: '5 Feet 3 Inches',
+                          isPremiumConnect: false,
+                          name: 'Tasnim Akter',
+                          age: '28 Yr',
+                          height: '5\' 3\'" ',
                           location: 'Gulshan, Dhaka, BD',
                         ),
                       )),
@@ -408,7 +482,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 6,),
+              const SizedBox(
+                height: 6,
+              ),
               Text(
                 'Stay inspired follow us on social media',
                 style: TextStyle(
@@ -417,7 +493,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontWeight: FontWeight.w400,
                 ),
               ),
-              const SizedBox(height: 16,),
+              const SizedBox(
+                height: 16,
+              ),
               Row(
                 spacing: 12,
                 children: [
@@ -451,41 +529,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  void _openDrawerOverNav() {
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: 'Drawer',
-      barrierColor: Colors.black54,
-      transitionDuration: const Duration(milliseconds: 250),
-      pageBuilder: (context, animation, secondaryAnimation) {
-        // Full screen container (no SafeArea) so the drawer overlays the status/notification bar
-        return Align(
-          alignment: Alignment.centerLeft,
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context)
-                .size
-                .height, // full height to cover status bar
-            child: const Material(
-              color: Colors.transparent,
-              child: AppDrawer(),
-            ),
-          ),
-        );
-      },
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        final tween =
-            Tween<Offset>(begin: const Offset(-1.0, 0.0), end: Offset.zero)
-                .chain(CurveTween(curve: Curves.easeOut));
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
-      },
     );
   }
 }

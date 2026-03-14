@@ -8,8 +8,10 @@ import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class OtpVerifySignUpScreen extends ConsumerStatefulWidget {
   const OtpVerifySignUpScreen({super.key});
@@ -24,8 +26,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
   @override
   void initState() {
     super.initState();
-    provider = ref.read(registrationProvider);
-
+    // provider = ref.watch(registrationProvider);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider.initControllersListener();
       provider.initOtpFields(length: 6);
@@ -44,15 +45,43 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(verifyOtpForSignUp);
     return TransparentLoading(
-      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading:
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: screenProvider.screenStates == RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates ==
+                  RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.otp),
+                    UpperLayer(
+                      imagePath: AppImages.otp,
+                      trailingText: 'Skip',
+                      isTrailing: true,
+                      onTrailingTap: () async {
+                        final screenProvider = ref.read(verifyOtpForSignUp);
+                        screenProvider.updateViewState(
+                            loadingState:
+                                RegistrationScreenStates.isProfileFor);
+                        final validate = await provider
+                            .submitRegistration(context, skipOtp: true);
+                        if (!validate) {
+                          screenProvider.updateViewState(
+                              loadingState:
+                                  RegistrationScreenStates.loadingComplete);
+                          return;
+                        } else {
+                          screenProvider.updateViewState(
+                              screenStates:
+                                  RegistrationScreenStates.loadingComplete);
+                          if (mounted) {
+                            provider.cleanAllValue();
+                            context.pushReplacement(Paths.photoUpload);
+                          }
+                        }
+                      },
+                    ),
                     body(),
                   ],
                 ),
@@ -68,6 +97,46 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
         child: Column(
           spacing: 10,
           children: [
+            Text(
+              provider.selectedVerificationType == 'email'
+                  ? 'Verify email'
+                  : 'Verify Number',
+              style: TextStyle(
+                  fontSize: TextSize.font18(context),
+                  color: AppColors.textPrimaryLight,
+                  fontWeight: FontWeight.w500),
+            ),
+            Row(
+              spacing: 8,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'We\'ve sent a code to ${provider.selectedCountryCodeForNumber}${provider.phoneController.text}',
+                  style: TextStyle(
+                      fontSize: TextSize.font14(context),
+                      color: AppColors.textSecondaryLight,
+                      fontWeight: FontWeight.w400),
+                ),
+                InkWell(
+                  onTap: () {},
+                  child: Row(
+                    spacing: 2,
+                    children: [
+                      Icon(Icons.edit_outlined,
+                          size: TextSize.font14(context),
+                          color: AppColors.primary),
+                      Text(
+                        'Edit',
+                        style: TextStyle(
+                            fontSize: TextSize.font14(context),
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
             loginDataField(),
             const SizedBox(height: 10),
             Text(
@@ -81,9 +150,12 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
             InkWell(
               onTap: () async {
                 final screenProvider = ref.read(verifyOtpForSignUp);
-                screenProvider.updateViewState(loadingState: RegistrationScreenStates.isProfileFor);
+                screenProvider.updateViewState(
+                    loadingState: RegistrationScreenStates.isProfileFor);
                 await provider.resendOtp(context);
-                screenProvider.updateViewState(loadingState: RegistrationScreenStates.loadingComplete);
+                screenProvider.updateViewState(
+                    loadingState: RegistrationScreenStates.loadingComplete,
+                );
               },
               child: Text(
                 'Resend Code',
@@ -130,6 +202,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                     style: TextStyle(
                       fontSize: TextSize.font18(context),
                       fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimaryLight,
                     ),
                     decoration: InputDecoration(
                       counterText: '',
@@ -141,15 +214,16 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: AppColors.greyLight),
+                        borderSide:
+                            const BorderSide(color: AppColors.greyLight),
                       ),
                     ),
                     onChanged: (value) {
                       // Handle paste (multiple chars) and normal single char entry
                       if (value.length > 1) {
                         final chars = value.split('');
-                        for (var i = 0; i < chars.length && (index + i) < provider.otpControllers.length; i++) {
-                          provider.otpControllers[index + i].text = chars[i];
+                        for (var i = 0; i < chars.length && (index + i) < provider.otpControllers.length;
+                            i++) {provider.otpControllers[index + i].text = chars[i];
                         }
                         final next = index + chars.length;
                         if (next >= provider.otpFocusNodesController.length) {
@@ -163,13 +237,16 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                       }
 
                       if (value.isNotEmpty) {
-                        if (index + 1 < provider.otpFocusNodesController.length) {
-                          provider.otpFocusNodesController[index + 1].requestFocus();
+                        if (index + 1 <
+                            provider.otpFocusNodesController.length) {
+                          provider.otpFocusNodesController[index + 1]
+                              .requestFocus();
                         } else {
                           provider.otpFocusNodesController[index].unfocus();
                         }
                       } else if (index - 1 >= 0) {
-                        provider.otpFocusNodesController[index - 1].requestFocus();
+                        provider.otpFocusNodesController[index - 1]
+                            .requestFocus();
                       }
                       setState(() {});
                     },
@@ -189,13 +266,20 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
       title: 'Done',
       onTap: () async {
         final screenProvider = ref.read(verifyOtpForSignUp);
-        screenProvider.updateViewState(loadingState: RegistrationScreenStates.isProfileFor);
+        screenProvider.updateViewState(
+            loadingState: RegistrationScreenStates.isProfileFor);
         final validate = await provider.submitRegistration(context);
         if (!validate) {
-          screenProvider.updateViewState(loadingState: RegistrationScreenStates.loadingComplete);
+          screenProvider.updateViewState(
+              loadingState: RegistrationScreenStates.loadingComplete);
           return;
         } else {
-          screenProvider.updateViewState(screenStates: RegistrationScreenStates.loadingComplete);
+          screenProvider.updateViewState(
+              screenStates: RegistrationScreenStates.loadingComplete);
+          if (mounted) {
+            provider.cleanAllValue();
+            context.pushReplacement(Paths.photoUpload);
+          }
         }
       },
     );

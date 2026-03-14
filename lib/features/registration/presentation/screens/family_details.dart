@@ -138,9 +138,15 @@ class _FamilyDetailsScreenState extends ConsumerState<FamilyDetailsScreen> {
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,
       title: 'Continue',
-      onTap: () {
+      onTap: () async{
         if (hasAnyValue) return;
-        context.push(Paths.financialStatus);
+        final screenProvider = ref.read(familyDetailsScreenProvider);
+        screenProvider.updateViewState(loadingState: RegistrationScreenStates.isProfileFor);
+         final updated = await provider.updateFamilyDetails(context);
+        screenProvider.updateViewState(screenStates: RegistrationScreenStates.loadingComplete);
+        if(updated && mounted){
+          context.push(Paths.financialStatus);
+        }
         // proceed
       },
     );

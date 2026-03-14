@@ -4,8 +4,9 @@ import 'package:flutter_boilerplate/features/login/presentation/screens/new_pass
 import 'package:flutter_boilerplate/features/login/presentation/screens/otp_verify.dart';
 import 'package:flutter_boilerplate/features/login/presentation/screens/reset_pssword_status.dart';
 import 'package:flutter_boilerplate/features/login/presentation/screens/send_otp.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/screens/matches.dart';
 import 'package:flutter_boilerplate/features/onboarding_screen.dart';
-import 'package:flutter_boilerplate/features/recommended_preferences/presentation/connect_purchesase_card.dart';
+import 'package:flutter_boilerplate/features/recommended_preferences/presentation/connect_matches.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/basic_details.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/career.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/community.dart';
@@ -13,6 +14,8 @@ import 'package:flutter_boilerplate/features/recommended_preferences/presentatio
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/other_details.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/partner_preferences.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/preference_location.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/crop_image.dart';
+import 'package:flutter_boilerplate/features/upgrade_package/presentation/screens/upgrade_package.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/about_you.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/email_phone.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/family_details.dart';
@@ -34,7 +37,6 @@ import 'package:flutter_boilerplate/features/registration/presentation/screens/m
 import 'package:flutter_boilerplate/features/registration/presentation/screens/qualification.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/profession.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/about_yourself.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/verify_number.dart';
 import 'route_name.dart';
 part 'app_router.g.dart';
 
@@ -140,11 +142,11 @@ GoRouter goRouter(GoRouterRef ref) {
         name: Routes.aboutYourself,
         builder: (context, state) => const AboutYourselfScreen(),
       ),
-      GoRoute(
-        path: Paths.verifyNumber,
-        name: Routes.verifyNumber,
-        builder: (context, state) => const VerifyNumberScreen(),
-      ),
+      // GoRoute(
+      //   path: Paths.verifyNumber,
+      //   name: Routes.verifyNumber,
+      //   builder: (context, state) => const VerifyNumberScreen(),
+      // ),
       GoRoute(
         path: Paths.photoUpload,
         name: Routes.photoUpload,
@@ -215,6 +217,24 @@ GoRouter goRouter(GoRouterRef ref) {
         path: Paths.editProfile,
         name: Routes.editProfile,
         builder: (context, state) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: Paths.upgradePackage,
+        name: Routes.upgradePackage,
+        builder: (context, state) => const UpgradePackageScreen(),
+      ),
+      GoRoute(
+        path: Paths.matches,
+        name: Routes.matches,
+        builder: (context, state) => const MatchesScreen(),
+      ),
+      GoRoute(
+        path: Paths.cropImage,
+        name: Routes.cropImage,
+        builder: (context, state) {
+          final imagePath = state.extra is String ? state.extra as String : null;
+          return CropImageScreen(imagePath: imagePath);
+        },
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

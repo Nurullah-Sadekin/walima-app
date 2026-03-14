@@ -6,11 +6,9 @@ import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/providers/recommended_preferences_provider.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:go_router/go_router.dart';
@@ -83,15 +81,15 @@ class _CareerScreenState extends ConsumerState<CareerScreen> {
                 return Wrap(
                   spacing: spacing,
                   runSpacing: spacing,
-                  children: List.generate(provider.countryDataList.length, (index) {
-                    final item = provider.countryDataList[index];
+                  children: List.generate(provider.professionDataList.length, (index) {
+                    final item = provider.professionDataList[index];
 
                     return SelectionCard(
                       buttonStyle: item.isSelected
                           ? SelectionStyle.selectedCheckbox
                           : SelectionStyle.unSelectedCheckbox,
                       onTap: () {
-                        provider.toggleCity(index);
+                        provider.toggleProfession(index);
                       },
                       isSelected: item.isSelected,
                       title: item.name,

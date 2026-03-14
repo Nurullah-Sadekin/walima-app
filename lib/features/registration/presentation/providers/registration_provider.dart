@@ -1,18 +1,35 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
+import 'package:flutter_boilerplate/core/network/dio_client.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
-import 'package:flutter_boilerplate/features/login/data/models/otp_verify_body.dart';
-import 'package:flutter_boilerplate/features/login/data/repository/login_repository.dart';
+import 'package:flutter_boilerplate/features/login/data/models/resend_otp_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_otp_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_request_body.dart';
+import 'package:flutter_boilerplate/features/registration/data/models/request/upload_media_request_body.dart';
+import 'package:flutter_boilerplate/features/registration/data/models/request/update_interests_request_body.dart';
+import 'package:flutter_boilerplate/features/registration/data/models/request/update_family_request_body.dart';
+import 'package:flutter_boilerplate/features/registration/data/models/response/onboarding_response.dart';
+import 'package:flutter_boilerplate/features/registration/data/models/response/upload_media_response.dart';
+import 'package:flutter_boilerplate/features/registration/data/repository/interests_repository.dart';
+import 'package:flutter_boilerplate/features/registration/data/repository/family_repository.dart';
+import 'package:flutter_boilerplate/features/registration/data/repository/location_data_repository_impl.dart';
+import 'package:flutter_boilerplate/features/registration/data/repository/media_repository.dart';
+import 'package:flutter_boilerplate/features/registration/data/repository/religion_data_repository_impl.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/registration_repository.dart';
+import 'package:flutter_boilerplate/features/registration/domain/location_data_model.dart';
+import 'package:flutter_boilerplate/features/registration/domain/religion_option_model.dart';
+import 'package:flutter_boilerplate/features/registration/domain/repository/location_data_repository.dart';
+import 'package:flutter_boilerplate/features/registration/domain/repository/religion_data_repository.dart';
 import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/is_with_family_status_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/profile_for_model.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class RegistrationProvider extends BaseChangeNotifier {
@@ -29,6 +46,8 @@ class RegistrationProvider extends BaseChangeNotifier {
   String? selectedIncomeRange;
   String? selectedYourWork;
   String? selectedYouWorkAs;
+  String? selectedFamilyEconomicCondition;
+
 
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
@@ -89,6 +108,151 @@ class RegistrationProvider extends BaseChangeNotifier {
 
   String selectedVerificationType = 'email'; // or 'phone'
 
+  final ReligionDataRepository _religionDataRepository =
+      ReligionDataRepositoryImpl();
+  final LocationDataRepository _locationDataRepository =
+      LocationDataRepositoryImpl();
+  final MediaRepository _mediaRepository = MediaRepository();
+  final InterestsRepository _interestsRepository = InterestsRepository();
+  final FamilyRepository _familyRepository = FamilyRepository();
+
+  List<ReligionOptionModel> religionOptions = <ReligionOptionModel>[];
+  List<String> religionDropdownItems = <String>[];
+  List<String> communityDropdownItems = <String>[];
+  bool isReligionDataLoading = false;
+  String? religionDataError;
+
+  List<CountryLocationModel> countryOptions = <CountryLocationModel>[];
+  List<ResidencyStatusOptionModel> residencyStatusOptions =
+      <ResidencyStatusOptionModel>[];
+  List<String> countryDropdownItems = <String>[];
+  List<String> cityDropdownItems = <String>[];
+  List<String> residencyStatusDropdownItems = <String>[];
+  bool isLocationDataLoading = false;
+  String? locationDataError;
+
+  UploadMediaData? uploadedProfileMedia;
+  String profileImageUploadErrorMessage = '';
+
+  static const Set<String> _allowedReligionValues = <String>{
+    'islam',
+    'hinduism',
+    'christianity',
+    'buddhism',
+    'judaism',
+    'sikhism',
+    'jainism',
+    'others',
+    'no_religion',
+    'spiritual',
+  };
+
+  static const Set<String> _allowedResidencyStatusValues = <String>{
+    'citizen',
+    'permanent_resident',
+    'work_permit',
+    'student_visa',
+    'temporary_visa',
+    'visitor',
+  };
+
+  static const Set<String> _allowedMaritalStatusValues = <String>{
+    'open_to_all',
+    'never_married',
+    'married',
+    'divorced',
+    'widowed',
+    'separated',
+    'awaiting_divorce',
+    'annulled',
+  };
+
+  static const Set<String> _allowedDietValues = <String>{
+    'vegetarian',
+    'non_vegetarian',
+    'halal_only',
+    'vegan',
+    'jain_vegetarian',
+    'occasionally_non_veg',
+  };
+
+  static const Set<String> _allowedEducationValues = <String>{
+    'no_formal_education',
+    'primary',
+    'secondary',
+    'higher_secondary',
+    'diploma',
+    'bachelor',
+    'masters',
+    'phd',
+    'doctorate',
+    'professional_degree',
+    'vocational_training',
+    'certificate',
+    'others',
+  };
+
+  static const Map<String, String> _residencyStatusAliases = <String, String>{
+    'citizen': 'citizen',
+    'permanent resident': 'permanent_resident',
+    'work permit': 'work_permit',
+    'student visa': 'student_visa',
+    'temporary visa': 'temporary_visa',
+    'visitor': 'visitor',
+  };
+
+  static const Map<String, String> _maritalStatusAliases = <String, String>{
+    'open to all': 'open_to_all',
+    'single': 'never_married',
+    'never married': 'never_married',
+    'married': 'married',
+    'divorced': 'divorced',
+    'widowed': 'widowed',
+    'separated': 'separated',
+    'awaiting divorce': 'awaiting_divorce',
+    'annulled': 'annulled',
+  };
+
+  static const Map<String, String> _dietAliases = <String, String>{
+    'vegetarian': 'vegetarian',
+    'non vegetarian': 'non_vegetarian',
+    'halal only': 'halal_only',
+    'vegan': 'vegan',
+    'jain vegetarian': 'jain_vegetarian',
+    'occasionally non veg': 'occasionally_non_veg',
+    'occasionally non-veg': 'occasionally_non_veg',
+    'healthy': 'occasionally_non_veg',
+    'modern balanced diet': 'occasionally_non_veg',
+    'junk food lover': 'occasionally_non_veg',
+    'low carb': 'occasionally_non_veg',
+    'low fat': 'occasionally_non_veg',
+    'low sodium': 'occasionally_non_veg',
+    'low cholesterol': 'occasionally_non_veg',
+    'low sugar': 'occasionally_non_veg',
+    'low salt': 'occasionally_non_veg',
+    'no preferences': 'occasionally_non_veg',
+  };
+
+  static const Map<String, String> _familyEconomicConditionAliases =
+      <String, String>{
+    'elite': 'elite',
+    'high': 'high',
+    'middle': 'middle_class',
+    'middle class': 'middle_class',
+    'middle_class': 'middle_class',
+    'aspiring': 'aspiring',
+  };
+
+  static const Set<String> _maleLockedProfileNames = <String>{
+    'my son',
+    'my brother',
+  };
+
+  static const Set<String> _femaleLockedProfileNames = <String>{
+    'my daughter',
+    'my sister',
+  };
+
   List<TextEditingController> get _managedControllers => [
         firstNameController,
         lastNameController,
@@ -139,7 +303,7 @@ class RegistrationProvider extends BaseChangeNotifier {
 
   List<TextEditingController> otpControllers = [];
   List<FocusNode> otpFocusNodesController = [];
-  
+
   void initOtpFields({int length = 5}) {
     disposeOtpFields();
 
@@ -152,13 +316,13 @@ class RegistrationProvider extends BaseChangeNotifier {
 
     notifyListeners();
   }
+
   void _disposeSafely(ChangeNotifier notifier) {
     try {
       notifier.dispose();
     } catch (_) {}
   }
 
-  
   void disposeOtpFields({bool notify = true}) {
     for (final c in otpControllers) {
       _disposeSafely(c);
@@ -175,8 +339,9 @@ class RegistrationProvider extends BaseChangeNotifier {
       notifyListeners();
     }
   }
+
   static const String _otpIncompleteMessage = 'Please enter the complete OTP';
-  
+
 /*  Future<bool> otpValidate(BuildContext context) async {
     if (otpControllers.any((c) => c.text.isEmpty)) {
       DialogUtils.showErrorDialog(
@@ -204,20 +369,34 @@ class RegistrationProvider extends BaseChangeNotifier {
       return false;
     }
   }*/
-  
+
   final TextEditingController otpController = TextEditingController();
-  
+
   String otpCode = '';
-  
+
   Future<bool> resendOtp(BuildContext context) async {
     otpCode = '';
     otpController.clear();
     for (var c in otpControllers) {
       c.clear();
     }
-    await signUpViaOtp(context);
-    notifyListeners();
-    return true;
+    final body = ResendOtpBody(
+      identifier: selectedVerificationType == 'email'
+          ? emailController.text
+          : phoneController.text,
+      purpose: 'signup',
+    );
+    final response = await RegistrationRepository.resendOtp(body);
+    if(response.code != 'SUCCESS') {
+      DialogUtils.showErrorDialog(
+        context: context,
+        message: response.message ?? 'Failed to resend OTP',
+      );
+      return false;
+    }
+    else{
+      return true;
+    }
   }
 
   void initControllersListener() {
@@ -239,7 +418,7 @@ class RegistrationProvider extends BaseChangeNotifier {
 
     _controllersListener = null;
   }
-  
+
   void cleanAllValue() {
     _clearSelectedValues();
     _clearAllControllers();
@@ -261,12 +440,26 @@ class RegistrationProvider extends BaseChangeNotifier {
     selectedIncomeRange = null;
     selectedYourWork = null;
     selectedYouWorkAs = null;
+    selectedFamilyEconomicCondition = null;
+    uploadedProfileMedia = null;
+    profileImageUploadErrorMessage = '';
   }
 
+  Country selectedCountry = Country.worldWide;
+  void setSelectedCountryCode(BuildContext context) async {
+    if (livingInController.text.isNotEmpty) {
+      try {
+        selectedCountry = Country.parse(livingInController.text);
+        context.push(Paths.emailPhone);
+      } catch (_) {}
+    }
+  }
   void _clearAllControllers() {
     for (final controller in _managedControllers) {
       controller.clear();
     }
+    communityDropdownItems = <String>[];
+    cityDropdownItems = <String>[];
   }
 
   void _resetAllSelections() {
@@ -310,23 +503,262 @@ class RegistrationProvider extends BaseChangeNotifier {
   Future<void> getInitialData() async {
     if (_isDraftInitialized) return;
     await _restoreRegistrationDraft();
+    await loadReligionData();
+    await loadLocationData();
     _isDraftInitialized = true;
     notifyListeners();
   }
 
+  Future<void> loadReligionData() async {
+    if (isReligionDataLoading) return;
+
+    if (religionOptions.isNotEmpty) {
+      _syncCommunityOptionsFromSelectedReligion();
+      notifyListeners();
+      return;
+    }
+
+    isReligionDataLoading = true;
+    religionDataError = null;
+    notifyListeners();
+
+    try {
+      religionOptions = await _religionDataRepository.getReligionOptions();
+      religionDropdownItems =
+          religionOptions.map((item) => item.name).toList(growable: false);
+      _syncCommunityOptionsFromSelectedReligion();
+    } catch (e) {
+      religionDataError = e.toString();
+    } finally {
+      isReligionDataLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void onReligionSelected(String? value) {
+    final selectedValue = value?.trim() ?? '';
+    if (selectedValue.isEmpty) return;
+
+    if (religionController.text != selectedValue) {
+      religionController.text = selectedValue;
+      communityController.clear();
+    }
+
+    _syncCommunityOptionsFromSelectedReligion();
+    _notifyAndPersist();
+  }
+
+  void onCommunitySelected(String? value) {
+    final selectedValue = value?.trim() ?? '';
+    if (selectedValue.isEmpty) return;
+
+    communityController.text = selectedValue;
+    _notifyAndPersist();
+  }
+
+  void _syncCommunityOptionsFromSelectedReligion() {
+    final selectedReligion = religionController.text.trim();
+    if (selectedReligion.isEmpty) {
+      communityDropdownItems = <String>[];
+      return;
+    }
+
+    final matchedReligion = _findReligionOption(selectedReligion);
+    if (matchedReligion == null) {
+      communityDropdownItems = <String>[];
+      return;
+    }
+
+    communityDropdownItems = matchedReligion.community.flattenCommunityLabels();
+
+    if (communityDropdownItems.isEmpty) {
+      communityDropdownItems = matchedReligion.community.topLevelLabels();
+    }
+
+    if (communityController.text.isNotEmpty) {
+      final selectedCommunity = communityController.text.trim().toLowerCase();
+      final exists = communityDropdownItems.any(
+        (item) => item.toLowerCase() == selectedCommunity,
+      );
+
+      if (!exists) {
+        communityController.clear();
+      }
+    }
+  }
+
+  ReligionOptionModel? _findReligionOption(String religion) {
+    final normalized = religion.trim().toLowerCase();
+    for (final option in religionOptions) {
+      final byName = option.name.toLowerCase() == normalized;
+      final byValue = option.value.toLowerCase() == normalized;
+      if (byName || byValue) {
+        return option;
+      }
+    }
+    return null;
+  }
+
+  Future<void> loadLocationData() async {
+    if (isLocationDataLoading) return;
+
+    if (countryOptions.isNotEmpty && residencyStatusOptions.isNotEmpty) {
+      await _syncCityOptionsFromSelectedCountry(notify: false);
+      notifyListeners();
+      return;
+    }
+
+    isLocationDataLoading = true;
+    locationDataError = null;
+    notifyListeners();
+
+    try {
+      countryOptions = await _locationDataRepository.getCountries();
+      residencyStatusOptions =
+          await _locationDataRepository.getResidencyStatuses();
+
+      countryDropdownItems =
+          countryOptions.map((item) => item.name).toList(growable: false);
+      residencyStatusDropdownItems = residencyStatusOptions
+          .map((item) => item.name)
+          .toList(growable: false);
+
+      await _syncCityOptionsFromSelectedCountry(notify: false);
+    } catch (e) {
+      locationDataError = e.toString();
+    } finally {
+      isLocationDataLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void onLivingInSelected(String? value) {
+    final selectedValue = value?.trim() ?? '';
+    if (selectedValue.isEmpty) return;
+
+    final previousValue = livingInController.text;
+    livingInController.text = selectedValue;
+
+    if (previousValue.toLowerCase() != selectedValue.toLowerCase()) {
+      cityController.clear();
+    }
+
+    unawaited(_syncCityOptionsFromSelectedCountry());
+    _notifyAndPersist();
+  }
+
+  void onCitySelected(String? value) {
+    final selectedValue = value?.trim() ?? '';
+    if (selectedValue.isEmpty) return;
+
+    cityController.text = selectedValue;
+    _notifyAndPersist();
+  }
+
+  void onResidencyStatusSelected(String? value) {
+    final selectedValue = value?.trim() ?? '';
+    if (selectedValue.isEmpty) return;
+
+    residencyStatusController.text = selectedValue;
+    _notifyAndPersist();
+  }
+
+  Future<void> _syncCityOptionsFromSelectedCountry({bool notify = true}) async {
+    final selectedCountry = livingInController.text.trim();
+    if (selectedCountry.isEmpty) {
+      cityDropdownItems = <String>[];
+      if (notify) {
+        notifyListeners();
+      }
+      return;
+    }
+
+    if (countryOptions.isEmpty) {
+      if (notify) {
+        notifyListeners();
+      }
+      return;
+    }
+
+    final matchedCountry = _findCountryOption(selectedCountry);
+    if (matchedCountry == null) {
+      cityDropdownItems = <String>[];
+      if (notify) {
+        notifyListeners();
+      }
+      return;
+    }
+
+    try {
+      cityDropdownItems = await _locationDataRepository.getCitiesByCountry(
+        country: matchedCountry.name,
+      );
+      locationDataError = null;
+    } catch (e) {
+      cityDropdownItems = <String>[];
+      locationDataError = e.toString();
+    }
+    if (cityController.text.isNotEmpty) {
+      final selectedCity = cityController.text.trim().toLowerCase();
+      final exists = cityDropdownItems.any(
+        (item) => item.toLowerCase() == selectedCity,
+      );
+
+      if (!exists) {
+        cityController.clear();
+      }
+    }
+
+    if (notify) {
+      notifyListeners();
+    }
+
+  }
+
+  CountryLocationModel? _findCountryOption(String country) {
+    final normalized = country.trim().toLowerCase();
+    for (final option in countryOptions) {
+      if (option.name.toLowerCase() == normalized) {
+        return option;
+      }
+    }
+    return null;
+  }
+
   void selectedProfileFor(int index) {
     if (!_isValidIndex(index, profileForList.length)) return;
+    final previousProfile = selectedProfileName?.trim().toLowerCase();
+
     _setSingleSelection(
       profileForList,
       index,
       (item, selected) => item.isSelected = selected,
     );
     selectedProfileName = profileForList[index].name;
+
+    final currentProfile = selectedProfileName?.trim().toLowerCase();
+    final hasProfileChanged = previousProfile != currentProfile;
+
+    final lockedGender = _lockedGenderForProfile(selectedProfileName);
+    if (lockedGender != null) {
+      _setGenderByName(lockedGender);
+    } else if (hasProfileChanged) {
+      _clearSelectedGender();
+    }
+
     _notifyAndPersist();
   }
 
   void selectedGender(int index) {
     if (!_isValidIndex(index, genderForList.length)) return;
+
+    final lockedGender = _lockedGenderForProfile(selectedProfileName);
+    if (lockedGender != null) {
+      _setGenderByName(lockedGender);
+      _notifyAndPersist();
+      return;
+    }
+
     _setSingleSelection(
       genderForList,
       index,
@@ -345,6 +777,30 @@ class RegistrationProvider extends BaseChangeNotifier {
     );
     selectedIsWithFamilyStatus = isWithFamilyDataList[index].name;
 
+    _notifyAndPersist();
+  }
+
+  void onFamilyEconomicConditionSelected(
+    String? value, {
+    bool selected = true,
+  }) {
+    final normalizedValue = value?.trim() ?? '';
+
+    if (!selected || normalizedValue.isEmpty) {
+      if (selectedFamilyEconomicCondition == null) {
+        return;
+      }
+      selectedFamilyEconomicCondition = null;
+      _notifyAndPersist();
+      return;
+    }
+
+    if (selectedFamilyEconomicCondition?.toLowerCase() ==
+        normalizedValue.toLowerCase()) {
+      return;
+    }
+
+    selectedFamilyEconomicCondition = normalizedValue;
     _notifyAndPersist();
   }
 
@@ -476,7 +932,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   int selectedHobbiesCount() {
     return selectedHobbies.length;
   }
-  
+
   void _notifyAndPersist() {
     notifyListeners();
     _scheduleDraftPersist();
@@ -503,6 +959,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       'selectedIncomeRange': selectedIncomeRange,
       'selectedYourWork': selectedYourWork,
       'selectedYouWorkAs': selectedYouWorkAs,
+      'selectedFamilyEconomicCondition': selectedFamilyEconomicCondition,
       'selectedVerificationType': selectedVerificationType,
       'selectedHobbies': selectedHobbies,
       'creativeSectionSelected': creativeSectionSelected,
@@ -622,6 +1079,8 @@ class RegistrationProvider extends BaseChangeNotifier {
           yourWorkController.text;
       selectedYouWorkAs = _asStringOrNull(decoded['selectedYouWorkAs']) ??
           youWorkAsController.text;
+      selectedFamilyEconomicCondition =
+          _asStringOrNull(decoded['selectedFamilyEconomicCondition']);
       selectedVerificationType =
           _asStringOrNull(decoded['selectedVerificationType']) ??
               selectedVerificationType;
@@ -650,6 +1109,7 @@ class RegistrationProvider extends BaseChangeNotifier {
         (item) => item.name,
         (item, selected) => item.isSelected = selected,
       );
+      _ensureLockedGenderConsistency();
       _applySingleSelectionByName(
         isWithFamilyDataList,
         selectedIsWithFamilyStatus,
@@ -737,6 +1197,9 @@ class RegistrationProvider extends BaseChangeNotifier {
         (item) => item.name,
         (item, selected) => item.isSelected = selected,
       );
+
+      _syncCommunityOptionsFromSelectedReligion();
+      await _syncCityOptionsFromSelectedCountry(notify: false);
     } catch (_) {
       // Ignore malformed draft and continue with defaults.
     } finally {
@@ -760,6 +1223,43 @@ class RegistrationProvider extends BaseChangeNotifier {
       return value.whereType<String>().toList();
     }
     return <String>[];
+  }
+
+  String? _lockedGenderForProfile(String? profileName) {
+    final normalized = profileName?.trim().toLowerCase() ?? '';
+    if (_maleLockedProfileNames.contains(normalized)) {
+      return 'Male';
+    }
+    if (_femaleLockedProfileNames.contains(normalized)) {
+      return 'Female';
+    }
+    return null;
+  }
+
+  void _setGenderByName(String genderName) {
+    _applySingleSelectionByName(
+      genderForList,
+      genderName,
+      (item) => item.name,
+      (item, selected) => item.isSelected = selected,
+    );
+    selectedGenderName = genderName;
+  }
+
+  void _clearSelectedGender() {
+    _resetSelection(
+      genderForList,
+      (item, selected) => item.isSelected = selected,
+    );
+    selectedGenderName = null;
+  }
+
+  void _ensureLockedGenderConsistency() {
+    final lockedGender = _lockedGenderForProfile(selectedProfileName);
+    if (lockedGender == null) {
+      return;
+    }
+    _setGenderByName(lockedGender);
   }
 
   void _applySingleSelectionByName<T>(
@@ -804,7 +1304,231 @@ class RegistrationProvider extends BaseChangeNotifier {
     } catch (_) {}
   }
 
-  Future<bool> submitRegistration(BuildContext context) async {
+  String _toSnakeCase(String value) {
+    final normalized = value.trim().toLowerCase();
+    if (normalized.isEmpty) return '';
+
+    final withUnderscores = normalized.replaceAll(RegExp(r'[^a-z0-9]+'), '_');
+    return withUnderscores
+        .replaceAll(RegExp(r'_+'), '_')
+        .replaceAll(RegExp(r'^_|_$'), '');
+  }
+
+  String _resolveReligionValue() {
+    final selected = religionController.text.trim();
+    if (selected.isEmpty) return '';
+
+    final matchedReligion = _findReligionOption(selected);
+    final candidate =
+        matchedReligion?.value.trim().toLowerCase() ?? _toSnakeCase(selected);
+
+    if (_allowedReligionValues.contains(candidate)) {
+      return candidate;
+    }
+    return 'others';
+  }
+
+  String _resolveResidencyStatusValue() {
+    final selected = residencyStatusController.text.trim();
+    if (selected.isEmpty) return '';
+
+    final normalized = selected.toLowerCase();
+    for (final option in residencyStatusOptions) {
+      final byName = option.name.toLowerCase() == normalized;
+      final byValue = option.value.toLowerCase() == normalized;
+      if (byName || byValue) {
+        final optionValue = option.value.toLowerCase();
+        if (_allowedResidencyStatusValues.contains(optionValue)) {
+          return optionValue;
+        }
+      }
+    }
+
+    final candidate =
+        _residencyStatusAliases[normalized] ?? _toSnakeCase(selected);
+    if (_allowedResidencyStatusValues.contains(candidate)) {
+      return candidate;
+    }
+    return 'visitor';
+  }
+
+  String _resolveMaritalStatusValue() {
+    final selected = maritalStatusController.text.trim();
+    if (selected.isEmpty) return '';
+
+    final normalized = selected.toLowerCase();
+    final candidate =
+        _maritalStatusAliases[normalized] ?? _toSnakeCase(selected);
+    if (_allowedMaritalStatusValues.contains(candidate)) {
+      return candidate;
+    }
+    return 'open_to_all';
+  }
+
+  String _resolveDietValue() {
+    final selected = selectedDietStatus?.trim() ?? '';
+    if (selected.isEmpty) return '';
+
+    final normalized = selected.toLowerCase();
+    final candidate = _dietAliases[normalized] ?? _toSnakeCase(selected);
+    if (_allowedDietValues.contains(candidate)) {
+      return candidate;
+    }
+    return 'occasionally_non_veg';
+  }
+
+  String? _resolveFamilyEconomicConditionValue() {
+    final selected = selectedFamilyEconomicCondition?.trim() ?? '';
+    if (selected.isEmpty) {
+      return null;
+    }
+
+    final normalized = selected.toLowerCase();
+    return _familyEconomicConditionAliases[normalized] ??
+        _toSnakeCase(selected);
+  }
+
+  String _resolveHighestEducationValue() {
+    final selected = highestQualification.text.trim();
+    if (selected.isEmpty) return '';
+
+    final normalized = selected.toLowerCase();
+
+    if (normalized.contains('no formal')) {
+      return 'no_formal_education';
+    }
+    if (RegExp(r'\bprimary\b').hasMatch(normalized)) {
+      return 'primary';
+    }
+    if (normalized.contains('higher secondary') ||
+        normalized.contains('high secondary') ||
+        RegExp(r'\bhsc\b').hasMatch(normalized) ||
+        normalized.contains('intermediate')) {
+      return 'higher_secondary';
+    }
+    if (RegExp(r'\bsecondary\b').hasMatch(normalized) ||
+        RegExp(r'\bssc\b').hasMatch(normalized)) {
+      return 'secondary';
+    }
+    if (normalized.contains('diploma')) {
+      return 'diploma';
+    }
+    if (RegExp(
+      r"\b(bachelor|bachelors|bachelor's|bsc|b\.sc|ba|b\.a|bcom|b\.com|btech|b\.tech|be|b\.e)\b",
+    ).hasMatch(normalized)) {
+      return 'bachelor';
+    }
+    if (RegExp(
+      r"\b(master|masters|master's|msc|m\.sc|ma|m\.a|mba|m\.b\.a|mtech|m\.tech|mcom|m\.com|me|m\.e)\b",
+    ).hasMatch(normalized)) {
+      return 'masters';
+    }
+    if (RegExp(r'\b(phd|ph\.d)\b').hasMatch(normalized)) {
+      return 'phd';
+    }
+    if (normalized.contains('doctorate')) {
+      return 'doctorate';
+    }
+    if (normalized.contains('professional') ||
+        normalized.contains('mbbs') ||
+        normalized.contains('llb') ||
+        normalized.contains('pharmd')) {
+      return 'professional_degree';
+    }
+    if (normalized.contains('vocational')) {
+      return 'vocational_training';
+    }
+    if (normalized.contains('certificate')) {
+      return 'certificate';
+    }
+
+    final candidate = _toSnakeCase(selected);
+    if (_allowedEducationValues.contains(candidate)) {
+      return candidate;
+    }
+    return 'others';
+  }
+
+  String _resolveLocationTypeValue(String residencyStatusValue) {
+    if (residencyStatusValue == 'citizen' ||
+        residencyStatusValue == 'permanent_resident') {
+      return 'permanent';
+    }
+    return 'present';
+  }
+  String selectedCountryCodeForNumber = '';
+  String _resolveCountryCodeValue() {
+    final selectedCountry = livingInController.text.trim();
+    if (selectedCountry.isEmpty) return '';
+
+    final matchedCountry = _findCountryOption(selectedCountry);
+    if (matchedCountry != null && matchedCountry.code2.trim().isNotEmpty) {
+      return matchedCountry.code2.trim().toUpperCase();
+    }
+
+    return selectedCountry;
+  }
+
+  Future<void> _persistAuthTokens(OnboardingResponse response) async {
+    final accessToken = response.response?.accessToken?.trim() ?? '';
+    final refreshToken = response.response?.refreshToken?.trim() ?? '';
+
+    if (accessToken.isNotEmpty) {
+      await PrefsHelper.setAccessToken(accessToken);
+      DioClient().setAuthToken(accessToken);
+    }
+
+    if (refreshToken.isNotEmpty) {
+      await PrefsHelper.setRefreshToken(refreshToken);
+    }
+  }
+
+  Future<void> _clearRegistrationDraftCacheOnSuccess() async {
+    _persistDebounce?.cancel();
+    await PrefsHelper.clearRegistrationDraft();
+  }
+
+  Future<bool> uploadProfileImage({
+    required String filePath,
+    String alt = 'Profile photo',
+    String caption = 'My summer photo',
+    String description = 'This is my profile photo',
+    bool isPrimary = true,
+  }) async {
+    final normalizedPath = filePath.trim();
+    if (normalizedPath.isEmpty) {
+      profileImageUploadErrorMessage = 'Please select an image to upload.';
+      notifyListeners();
+      return false;
+    }
+
+    profileImageUploadErrorMessage = '';
+
+    final requestBody = UploadMediaRequestBody(
+      filePath: normalizedPath,
+      alt: alt,
+      caption: caption,
+      description: description,
+      isPrimary: isPrimary,
+    );
+
+    final response = await _mediaRepository.uploadMedia(requestBody);
+    final uploadedData = response.response?.data;
+    final isSuccess = response.code == 'SUCCESS' && uploadedData != null;
+
+    if (!isSuccess) {
+      profileImageUploadErrorMessage =
+          response.message ?? 'Failed to upload profile image.';
+      notifyListeners();
+      return false;
+    }
+
+    uploadedProfileMedia = uploadedData;
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> submitRegistration(BuildContext context,{bool skipOtp = false}) async {
     if (otpControllers.any((c) => c.text.isEmpty)) {
       DialogUtils.showErrorDialog(
         context: context,
@@ -814,40 +1538,50 @@ class RegistrationProvider extends BaseChangeNotifier {
     }
 
     final otp = otpControllers.map((c) => c.text).join();
+    final religionValue = _resolveReligionValue();
+    final residencyStatusValue = _resolveResidencyStatusValue();
+    final maritalStatusValue = _resolveMaritalStatusValue();
+    final dietValue = _resolveDietValue();
+    final highestEducationValue = _resolveHighestEducationValue();
+    final locationTypeValue = _resolveLocationTypeValue(residencyStatusValue);
+    final countryCodeValue = _resolveCountryCodeValue();
+
     final body = SignUpRequestBody(
       profileManagedBy: 'self',
-      gender: 'male',
-      firstName: 'Nurullah',
-      lastName: 'Ansari',
-      religionName: 'islam',
-      community: 'Ansari',
-      livingIn: 'India',
-      cityName: 'Mumbai',
+      gender: selectedGenderName?.toLowerCase() ?? '',
+      firstName: firstNameController.text,
+      lastName: lastNameController.text,
+      religionName: religionValue,
+      community: communityController.text,
+      livingIn: livingInController.text,
+      cityName: cityController.text,
       dateOfBirth: '1990-01-01',
       email: emailController.text,
-      phoneNumber: phoneController.text,
-      residencyStatus: 'citizen',
-      maritalStatus: 'open_to_all',
-      height: 175,
-      diet: 'non_vegetarian',
-      highestLevelOfEducation: 'bachelor',
-      incomeRange: '2-4 LPA',
-      incomeRangeFrequency: 'yearly',
-      workWith: 'private',
-      workingAs: 'software engineer',
-      currentCompany: 'ABC Corp',
-      bio: 'Hello, I am Nurullah.',
+      phoneNumber: phoneNumber,
+      residencyStatus: residencyStatusValue,
+      maritalStatus: maritalStatusValue,
+      height: num.tryParse(heightController.text),
+      diet: dietValue,
+      highestLevelOfEducation: highestEducationValue,
+      incomeRange: incomeRangeController.text,
+      incomeRangeFrequency: selectedIncomePeriodStatus?.toLowerCase() ?? '',
+      workWith: selectedYourWork?.toLowerCase() ?? '',
+      workingAs: selectedYouWorkAs?.toLowerCase() ?? '',
+      currentCompany: currentCompanyNameController.text,
+      bio: aboutYourselfController.text,
       termsAndConditionsAccepted: true,
-      verificationType: 'phone',
-      otpCode: otp,
+      verificationType: selectedVerificationType.toLowerCase() == 'email' ? 'email' : 'phone',
+      otpCode: skipOtp ? null: otp,
       liveWithFamily: selectedIsWithFamilyStatus?.toLowerCase() == 'yes',
       displayName: '${firstNameController.text} ${lastNameController.text}',
-      purpose: 'signup',  
-      countryCode: 'IN',
-      locationType: 'permanent',
+      purpose: 'signup',
+      countryCode: countryCodeValue,
+      locationType: locationTypeValue,
     );
-    final response = await RegistrationRepository.signUpCreateUserProfile(body);
+    final response = await RegistrationRepository.signUpCreateUserProfile(body, skipOtp: skipOtp);
     if (response.code == 'SUCCESS') {
+      await _persistAuthTokens(response);
+      await _clearRegistrationDraftCacheOnSuccess();
       return true;
     } else {
       return false;
@@ -856,34 +1590,29 @@ class RegistrationProvider extends BaseChangeNotifier {
 
   String phoneAvailabilityErrorMessage = '';
   String emailAvailabilityErrorMessage = '';
-  
-  
-  String _getProfileManagedBy() {
-    if (selectedProfileName == null) return 'self';
-    if (selectedProfileName!.toLowerCase() == 'self') return 'self';
-    return 'parent';
-  }
-  Future<bool> checkEmailAndPhoneAvailability(BuildContext context) async {
-    final emailRes =
-        await RegistrationRepository.checkEmail(emailController.text);
-    final phoneRes =
-        await RegistrationRepository.checkMobile(phoneController.text);
+  String phoneNumber = '';
+  Future<bool> checkEmailAndPhoneAvailability(BuildContext context,String countryCode) async {
+    final emailRes = await RegistrationRepository.checkEmail(emailController.text);
+    final phoneRes = await RegistrationRepository.checkMobile('+$countryCode${phoneController.text}');
     if (emailRes.response?.isAvailable == true &&
         phoneRes.response?.isAvailable == true) {
       phoneAvailabilityErrorMessage = '';
       emailAvailabilityErrorMessage = '';
+      selectedCountryCodeForNumber = countryCode;
+      phoneNumber = '+$countryCode${phoneController.text}';
       _notifyAndPersist();
       return true;
     } else {
       if (emailRes.response?.isAvailable != true) {
-        emailAvailabilityErrorMessage =
-            emailRes.message ?? 'Email already exists';
+        emailAvailabilityErrorMessage = emailRes.message ?? 'Email already exists';
         // DialogUtils.showErrorDialog(ctx: context, message: emailRes.message ?? 'Email already exists');
+      notifyListeners();
       }
       if (phoneRes.response?.isAvailable != true) {
         phoneAvailabilityErrorMessage =
             phoneRes.message ?? 'Phone number already exists';
         // DialogUtils.showErrorDialog(ctx: context, message: phoneRes.message ?? 'Phone number already exists');
+
       }
       _notifyAndPersist();
       return false;
@@ -901,19 +1630,141 @@ class RegistrationProvider extends BaseChangeNotifier {
     if (response.code == 'SUCCESS') {
       verificationDone = true;
       _notifyAndPersist();
+      // cleanAllValue();
       return true;
     } else {
-      DialogUtils.showErrorDialog(context: context, message: response.message ?? 'Failed to send OTP');
+      await DialogUtils.showErrorDialog(
+          context: context,
+          message: response.message ?? 'Failed to send OTP',
+          onButtonPressed: () {
+            context.pushReplacement(Paths.login);
+          },
+          buttonText: 'Go to Login');
       return false;
     }
-    
   }
-  
 
   @override
   void dispose() {
     _persistDebounce?.cancel();
     super.dispose();
+  }
+
+  Future<bool> updateHobies() async {
+    try {
+      final creativePursuits = _getSelectedHobbiesFromList(creativeItemList);
+      final outdoorActivities = _getSelectedHobbiesFromList(funItemList);
+      final fitnessAndSports = _getSelectedHobbiesFromList(fitnessItemList);
+      final mediaAndLearning =
+          _getSelectedHobbiesFromList(otherInterestsItemList);
+
+      final body = UpdateInterestsRequestBody(
+        creativePursuits: creativePursuits,
+        outdoorActivities: outdoorActivities,
+        fitnessAndSports: fitnessAndSports,
+        mediaAndLearning: mediaAndLearning,
+        foodAndCuisine: <String>[],
+        travelAndLeisure: <String>[],
+      );
+
+      final response = await _interestsRepository.updateInterests(body);
+      return response.code == 'SUCCESS';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  List<String> _getSelectedHobbiesFromList(List<SingleStringModel> list) {
+    return list
+        .where((item) => item.isSelected)
+        .map((item) => item.name)
+        .toList();
+  }
+
+  String? _toTrimmedOrNull(String value) {
+    final normalized = value.trim();
+    if (normalized.isEmpty) {
+      return null;
+    }
+    return normalized;
+  }
+
+  int? _parseSiblingCount(String value) {
+    final normalized = value.trim();
+    if (normalized.isEmpty) {
+      return null;
+    }
+
+    final matched = RegExp(r'\d+').firstMatch(normalized);
+    if (matched == null) {
+      return null;
+    }
+
+    return int.tryParse(matched.group(0)!);
+  }
+
+  Future<bool> _submitFamilyUpdate(
+    BuildContext context,
+    UpdateFamilyRequestBody body, {
+    required String fallbackMessage,
+  }) async {
+    if (body.toJson().isEmpty) {
+      return true;
+    }
+
+    final response = await _familyRepository.updateFamily(body);
+    if (response.code == 'SUCCESS') {
+      return true;
+    }
+
+    await DialogUtils.showErrorDialog(
+      context: context,
+      message: response.message ?? fallbackMessage,
+    );
+    return false;
+  }
+
+  Future<bool> updateFamilyDetails(BuildContext context) async {
+    try {
+      final body = UpdateFamilyRequestBody(
+        fatherProfession: _toTrimmedOrNull(fatherDetailsController.text),
+        motherProfession: _toTrimmedOrNull(motherDetailsController.text),
+        brothers: _parseSiblingCount(noOfBrotherController.text),
+        sisters: _parseSiblingCount(noOfSisterController.text),
+      );
+
+      return _submitFamilyUpdate(
+        context,
+        body,
+        fallbackMessage: 'Failed to update family details',
+      );
+    } catch (e) {
+      await DialogUtils.showErrorDialog(
+        context: context,
+        message: 'Failed to update family details',
+      );
+      return false;
+    }
+  }
+
+  Future<bool> updateFamilyEarning(BuildContext context) async {
+    try {
+      final body = UpdateFamilyRequestBody(
+        familyEconomicCondition: _resolveFamilyEconomicConditionValue(),
+      );
+
+      return _submitFamilyUpdate(
+        context,
+        body,
+        fallbackMessage: 'Failed to update family earning details',
+      );
+    } catch (e) {
+      await DialogUtils.showErrorDialog(
+        context: context,
+        message: 'Failed to update family earning details',
+      );
+      return false;
+    }
   }
 }
 

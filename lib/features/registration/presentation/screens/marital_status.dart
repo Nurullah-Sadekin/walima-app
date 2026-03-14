@@ -139,7 +139,6 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
                     children:
                         List.generate(provider.dietDataList.length, (index) {
                       final dietItems = provider.dietDataList[index];
-
                       return SelectionCard(
                         buttonStyle: dietItems.isSelected
                             ? SelectionStyle.selectedRadio

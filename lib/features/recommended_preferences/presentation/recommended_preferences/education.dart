@@ -8,7 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/providers/recommended_preferences_provider.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:go_router/go_router.dart';
@@ -42,21 +41,24 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
   Widget build(BuildContext context) {
     provider = ref.watch(recommendedPreferencesProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == RecommendedPreferencesScreenStates.preferences,
+      isLoading: provider.loaderState ==
+          RecommendedPreferencesScreenStates.preferences,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == RecommendedPreferencesScreenStates.preferences
+          child: provider.screenStates ==
+                  RecommendedPreferencesScreenStates.preferences
               ? const Loading()
               : Column(
-            children: [
-              const UpperLayer(
-                  imagePath: AppImages.recommendedPreferences,
-                  isShowAppbar: true,
-                  isBackButton: true,),
-              body(),
-            ],
-          ),
+                  children: [
+                    const UpperLayer(
+                      imagePath: AppImages.recommendedPreferences,
+                      isShowAppbar: true,
+                      isBackButton: true,
+                    ),
+                    body(),
+                  ],
+                ),
         ),
       ),
     );
@@ -97,27 +99,31 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   const double spacing = 10.0;
-                  return Consumer(builder: (context, ref, _) {
-                    final provider = ref.watch(recommendedPreferencesProvider);
-                    return Wrap(
-                      spacing: spacing,
-                      runSpacing: spacing,
-                      children: List.generate(provider.countryDataList.length, (index) {
-                        final item = provider.countryDataList[index];
+                  return Consumer(
+                    builder: (context, ref, _) {
+                      final provider =
+                          ref.watch(recommendedPreferencesProvider);
+                      return Wrap(
+                        spacing: spacing,
+                        runSpacing: spacing,
+                        children: List.generate(
+                            provider.educationDataList.length, (index) {
+                          final item = provider.educationDataList[index];
 
-                        return SelectionCard(
-                          buttonStyle: item.isSelected
-                              ? SelectionStyle.selectedCheckbox
-                              : SelectionStyle.unSelectedCheckbox,
-                          onTap: () {
-                            provider.toggleCity(index);
-                          },
-                          isSelected: item.isSelected,
-                          title: item.name,
-                        );
-                      }),
-                    );
-                  });
+                          return SelectionCard(
+                            buttonStyle: item.isSelected
+                                ? SelectionStyle.selectedCheckbox
+                                : SelectionStyle.unSelectedCheckbox,
+                            onTap: () {
+                              provider.toggleEducation(index);
+                            },
+                            isSelected: item.isSelected,
+                            title: item.name,
+                          );
+                        }),
+                      );
+                    },
+                  );
                 },
               ),
             ),

@@ -37,7 +37,7 @@ class MyApp extends ConsumerWidget {
 
       // Theme
       theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+      darkTheme: AppTheme.lightTheme,
       themeMode: themeMode,
 
       // Routing

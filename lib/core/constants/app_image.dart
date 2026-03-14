@@ -6,6 +6,7 @@ class AppImages {
   // Image asset paths
   static const String photoGuidelines = 'assets/images/photo_guidelines.png';
   static const String demoProfile = 'assets/images/demoProfile.png';
+  static const String demoProfile2 = 'assets/images/demoProfile2.png';
 
 
   // Icon asset paths
@@ -34,6 +35,9 @@ class AppImages {
   static const String editSvgIcon = 'assets/svgIcons/edit.svg';
   static const String logOutSvgIcon = 'assets/svgIcons/Log Out.svg';
   static const String editWrite = 'assets/svgIcons/editWrite.svg';
+  static const String photoIcon = 'assets/svgIcons/photo.svg';
+  static const String favouriteIcon = 'assets/svgIcons/favourite.svg';
+  static const String cameraUseIcon = 'assets/svgIcons/camera_use.svg';
 
   // Social media icons
   static const String facebookIcon = 'assets/svgIcons/facebook.svg';
@@ -59,6 +63,8 @@ class AppImages {
   static const String editProfileSvgIcon = 'assets/svgIcons/edit_profile.svg';
   static const String menuSvgIcon = 'assets/svgIcons/menu.svg';
   static const String notificationSvgIcon = 'assets/svgIcons/notification.svg';
+  static const String callSvgIcon = 'assets/svgIcons/call.svg';
+  static const String whatsappSvgIcon = 'assets/svgIcons/whatsapp.svg';
 
 
 
@@ -77,12 +83,14 @@ class AppImages {
   static const String familyDetails = 'assets/svgs/familyDetails.svg';
   static const String done = 'assets/svgs/done.svg';
   static const String recommendedPreferences = 'assets/svgs/recommended_preferences.svg';
+  static const String upgradePremium = 'assets/svgs/upgrade_premium.svg';
 
   static const String login = 'assets/svgs/login.svg';
   static const String otp = 'assets/svgs/otp.svg';
   static const String password = 'assets/svgs/password.svg';
   static const String forgotPassword = 'assets/svgs/forgotPassword.svg';
   static const String verifyContact = 'assets/svgs/verify_contact.svg';
+
   // Dialog status svgs
   static const String successfulStatus = 'assets/svgs/successful_status.svg';
   static const String alertStatus = 'assets/svgs/alert_status.svg';

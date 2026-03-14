@@ -28,6 +28,8 @@ class _YourRegionState extends ConsumerState<YourReligion> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider.getInitialData();
       provider.initControllersListener();
+      provider.loadReligionData();
+      provider.loadLocationData();
     });
   }
 
@@ -43,7 +45,9 @@ class _YourRegionState extends ConsumerState<YourReligion> {
     final screenProvider = ref.watch(yourReligionScreenProvider);
     return TransparentLoading(
       isLoading:
-          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor ||
+              provider.isReligionDataLoading ||
+              provider.isLocationDataLoading,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
@@ -86,9 +90,10 @@ class _YourRegionState extends ConsumerState<YourReligion> {
           headLine: 'Your Religion',
           hintText: 'Select',
           popUpHeader: 'Select Religion',
-          items: const ['Islam', 'Hinduism', 'Buddhism', 'Christianity'],
+          items: provider.religionDropdownItems,
           controller: provider.religionController,
-          onTap: () {},
+          onTap: provider.loadReligionData,
+          onConfirm: (value) => provider.onReligionSelected(value?.toString()),
           isSearch: true,
         ),
         provider.religionController.text.isEmpty
@@ -98,9 +103,11 @@ class _YourRegionState extends ConsumerState<YourReligion> {
                 hintText: 'Select',
                 popUpHeader: 'Select Community',
                 headLineInfoIcon: true,
-                items: const ['Islam', 'Hinduism', 'Buddhism', 'Christianity'],
+                items: provider.communityDropdownItems,
                 controller: provider.communityController,
                 onTap: () {},
+                onConfirm: (value) =>
+                    provider.onCommunitySelected(value?.toString()),
                 isSearch: true,
               ),
         provider.religionController.text.isEmpty ||
@@ -110,9 +117,11 @@ class _YourRegionState extends ConsumerState<YourReligion> {
                 headLine: 'Living In',
                 hintText: 'Select',
                 popUpHeader: 'Select Living In',
-                items: const ['Islam', 'Hinduism', 'Buddhism', 'Christianity'],
+                items: provider.countryDropdownItems,
                 controller: provider.livingInController,
-                onTap: () {},
+                onTap: provider.loadLocationData,
+                onConfirm: (value) =>
+                    provider.onLivingInSelected(value?.toString()),
                 isSearch: true,
               ),
       ],
@@ -133,7 +142,7 @@ class _YourRegionState extends ConsumerState<YourReligion> {
             provider.livingInController.text.isEmpty) {
           return;
         }
-        context.push(Paths.emailPhone);
+        provider.setSelectedCountryCode(context);
       },
     );
   }

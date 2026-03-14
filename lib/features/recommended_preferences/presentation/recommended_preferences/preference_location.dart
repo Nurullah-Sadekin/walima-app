@@ -8,7 +8,6 @@ import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/providers/recommended_preferences_provider.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
@@ -17,18 +16,21 @@ import 'package:go_router/go_router.dart';
 class PreferenceLocationScreen extends ConsumerStatefulWidget {
   const PreferenceLocationScreen({super.key});
   @override
-  ConsumerState<PreferenceLocationScreen> createState() => _PreferenceLocationScreenState();
+  ConsumerState<PreferenceLocationScreen> createState() =>
+      _PreferenceLocationScreenState();
 }
 
-class _PreferenceLocationScreenState extends ConsumerState<PreferenceLocationScreen> {
+class _PreferenceLocationScreenState
+    extends ConsumerState<PreferenceLocationScreen> {
   late RecommendedPreferencesProvider provider;
 
   @override
   void initState() {
     super.initState();
     provider = ref.read(recommendedPreferencesProvider);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       provider.getInitialData();
+      await provider.loadLocationData();
       provider.initControllersListener();
     });
   }
@@ -43,21 +45,24 @@ class _PreferenceLocationScreenState extends ConsumerState<PreferenceLocationScr
   Widget build(BuildContext context) {
     provider = ref.watch(recommendedPreferencesProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == RecommendedPreferencesScreenStates.preferences,
+      isLoading: provider.loaderState ==
+          RecommendedPreferencesScreenStates.preferences,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == RecommendedPreferencesScreenStates.preferences
+          child: provider.screenStates ==
+                  RecommendedPreferencesScreenStates.preferences
               ? const Loading()
               : Column(
-            children: [
-              const UpperLayer(
-                  imagePath: AppImages.recommendedPreferences,
-                  isShowAppbar: true,
-                  isBackButton: true,),
-              body(),
-            ],
-          ),
+                  children: [
+                    const UpperLayer(
+                      imagePath: AppImages.recommendedPreferences,
+                      isShowAppbar: true,
+                      isBackButton: true,
+                    ),
+                    body(),
+                  ],
+                ),
         ),
       ),
     );
@@ -86,13 +91,13 @@ class _PreferenceLocationScreenState extends ConsumerState<PreferenceLocationScr
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           DropDownField(
-            headLine: 'Country Living In Religion',
+            headLine: 'Country Living In',
             hintText: 'Select',
             popUpHeader: 'Select Preferable Country Living In',
-            items: provider.countryDataList,
+            items: provider.countryDropdownItems,
             controller: provider.countryPreferenceController,
-            onTap: () {
-            },
+            // onTap: provider.loadLocationData,
+            onConfirm: (value) => provider.onCountryPreferenceSelected(value?.toString()),
             isSearch: true,
           ),
           Text(
@@ -102,37 +107,39 @@ class _PreferenceLocationScreenState extends ConsumerState<PreferenceLocationScr
               fontWeight: FontWeight.w500,
             ),
           ),
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  const double spacing = 10.0;
-                  return Consumer(builder: (context, ref, _) {
-                    final provider = ref.watch(recommendedPreferencesProvider);
-                    return Wrap(
-                      spacing: spacing,
-                      runSpacing: spacing,
-                      children: List.generate(provider.countryDataList.length, (index) {
-                        final item = provider.countryDataList[index];
-
-                        return SelectionCard(
-                          buttonStyle: item.isSelected
-                              ? SelectionStyle.selectedCheckbox
-                              : SelectionStyle.unSelectedCheckbox,
-                          onTap: () {
-                            provider.toggleCity(index);
-                          },
-                          isSelected: item.isSelected,
-                          title: item.name,
-                        );
-                      }),
-                    );
-                  });
-                },
-              ),
-            ),
-          ),
+          provider.countryPreferenceController.text.isEmpty
+              ? const SizedBox.shrink()
+              : Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Consumer(builder: (context, ref, _) {
+                      final provider =
+                          ref.watch(recommendedPreferencesProvider);
+                      if (provider.cityDropdownItems.isEmpty) {
+                        return const Center(child: Text('No cities available for the selected country.'));
+                      }
+                      const double spacing = 10.0;
+                      return Wrap(
+                        spacing: spacing,
+                        runSpacing: spacing,
+                        children: provider.cityDropdownItems.map((cityName) {
+                          final isSelected =
+                              provider.preferableCity.contains(cityName);
+                          return SelectionCard(
+                            buttonStyle: isSelected
+                                ? SelectionStyle.selectedCheckbox
+                                : SelectionStyle.unSelectedCheckbox,
+                            onTap: () {
+                              provider.togglePreferableCity(cityName);
+                            },
+                            isSelected: isSelected,
+                            title: cityName,
+                          );
+                        }).toList(),
+                      );
+                    }),
+                  ),
+                ),
         ],
       ),
     );

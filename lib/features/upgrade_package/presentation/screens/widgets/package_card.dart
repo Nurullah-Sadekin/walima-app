@@ -4,7 +4,7 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/popular_badge.dart';
-import 'icon_text_row.dart';
+import '../../../../../core/global/components/icon_text_row.dart';
 
 class PackageCard extends StatelessWidget {
 
@@ -63,8 +63,8 @@ class PackageCard extends StatelessWidget {
       clipBehavior: Clip.none,
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-          width: MediaQuery.of(context).size.width * 0.65,
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          width: MediaQuery.of(context).size.width * 0.75,
           decoration: BoxDecoration(
             color: backgroundColor,
             borderRadius: BorderRadius.circular(8),
@@ -72,15 +72,16 @@ class PackageCard extends StatelessWidget {
           ),
           child: Column(
             children: [
-
-              const SizedBox(height: 25),
+              const SizedBox(height: 60),
               Column(
+                spacing: 8,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         '$packageName / ',
+                        textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false, applyHeightToLastDescent: false),
                         style: TextStyle(
                           fontSize: TextSize.font18(context),
                           fontWeight: FontWeight.w600,
@@ -89,6 +90,7 @@ class PackageCard extends StatelessWidget {
                       ),
                       Text(
                         duration ?? '3 Months',
+                        textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false, applyHeightToLastDescent: false),
                         style: TextStyle(
                           fontSize: TextSize.font16(context),
                           fontWeight: FontWeight.w500,
@@ -99,6 +101,7 @@ class PackageCard extends StatelessWidget {
                   ),
                   Text(
                     packagePrice,
+                    textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false, applyHeightToLastDescent: false),
                     style: TextStyle(
                       fontSize: TextSize.font36(context),
                       fontWeight: FontWeight.w700,
@@ -107,6 +110,7 @@ class PackageCard extends StatelessWidget {
                   ),
                   Text(
                     '( $perMonthPrice / month )',
+                    textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false, applyHeightToLastDescent: false),
                     style: TextStyle(
                       fontSize: TextSize.font16(context),
                       fontWeight: FontWeight.w500,
@@ -115,14 +119,15 @@ class PackageCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               PrimaryButtons(
                 buttonStyle: ButtonsStyle.activePrimaryButton,
                 onTap: buttonOnTap,
                 title: buttonText,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               Column(
+                spacing: 20,
                 children: [
                   IconTextRow(
                     imagePath: AppImages.messageSvgIcon,
@@ -131,8 +136,6 @@ class PackageCard extends StatelessWidget {
                     imageColor: AppColors.hintTextColor,
                     availableOption: messageIsAvailable,
                   ),
-                  const SizedBox(height: 16),
-
                   IconTextRow(
                     imagePath: AppImages.contactSvgIcon,
                     text: contactText ?? 'View uo to $contactCount contact numbers',
@@ -140,8 +143,6 @@ class PackageCard extends StatelessWidget {
                     imageColor: AppColors.hintTextColor,
                     availableOption: contactIsAvailable,
                   ),
-                  const SizedBox(height: 16),
-
                   IconTextRow(
                     imagePath: AppImages.profileSvgIcon,
                     text: profileText ?? 'Profile highlight',
@@ -149,8 +150,6 @@ class PackageCard extends StatelessWidget {
                     imageColor: AppColors.hintTextColor,
                     availableOption: profileIsAvailable,
                   ),
-                  const SizedBox(height: 16),
-
                   IconTextRow(
                     imagePath: AppImages.matchSvgIcon,
                     text: matchText ?? 'Direct contact from matches',
@@ -160,12 +159,14 @@ class PackageCard extends StatelessWidget {
                   ),
                 ],
               ),
+
+              const SizedBox(height: 20),
             ],
           ),
         ),
         Positioned(
           left: -10,
-          top: 12,
+          top: 22,
           child: PopularBadge(
               badgeText: packageBadgeText,
               badgeBackgroundColor: packageBadgeBackgroundColor,
