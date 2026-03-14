@@ -15,15 +15,45 @@ import 'package:flutter_boilerplate/features/registration/domain/repository/reli
 import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 
 class MatchesProvider extends BaseChangeNotifier {
-  MatchesProviderScreenStates screenStates = MatchesProviderScreenStates.defaultLoading;
-  MatchesProviderScreenStates loaderState = MatchesProviderScreenStates.defaultLoading;
+  MatchesProviderScreenStates screenStates =
+      MatchesProviderScreenStates.defaultLoading;
+  MatchesProviderScreenStates loaderState =
+      MatchesProviderScreenStates.defaultLoading;
 
   bool? switcherValue = false;
 
+  String? selectedIsWithFamilyStatus;
+  List<SingleStringModel> sortByDataList = sortByListDataInserted;
+
+  bool _isValidIndex(int index, int length) {
+    return index >= 0 && index < length;
+  }
+
+  void _setSingleSelection<T>(
+    List<T> list,
+    int selectedIndex,
+    void Function(T item, bool selected) applySelection,
+  ) {
+    for (var i = 0; i < list.length; i++) {
+      applySelection(list[i], i == selectedIndex);
+    }
+  }
+
+  void sortBy(int index) {
+    if (!_isValidIndex(index, sortByDataList.length)) return;
+    _setSingleSelection(
+      sortByDataList,
+      index,
+      (item, selected) => item.isSelected = selected,
+    );
+    selectedIsWithFamilyStatus = sortByDataList[index].name;
+
+    notifyListeners();
+  }
 
   void updateViewState(
       {MatchesProviderScreenStates? screenStates,
-        MatchesProviderScreenStates? loadingState}) {
+      MatchesProviderScreenStates? loadingState}) {
     if (screenStates != null) {
       this.screenStates = screenStates;
       loaderState = MatchesProviderScreenStates.defaultLoading;
@@ -31,7 +61,6 @@ class MatchesProvider extends BaseChangeNotifier {
     if (loadingState != null) loaderState = loadingState;
     notifyListeners();
   }
-
 }
 
 enum MatchesProviderScreenStates {
