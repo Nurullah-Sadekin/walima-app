@@ -8,7 +8,6 @@ class SingleStringModel {
   final String name;
   bool isSelected;
 
-  // Optional: Add a copyWith method for easy updating
   SingleStringModel copyWith({
     String? name,
     bool? isSelected,
@@ -180,4 +179,20 @@ List<SingleStringModel> countryListDataInserted = [
 List<SingleStringModel> verificationTypeList = [
   SingleStringModel(name: 'Mobile'),
   SingleStringModel(name: 'Email'),
+];
+
+List<SingleStringModel> sortByListDataInserted = [
+  SingleStringModel(name: 'Most Relevant'),
+  SingleStringModel(name: 'Newest First'),
+  SingleStringModel(name: 'Oldest First'),
+];
+
+List<SingleStringModel> filterListDataInserted = [
+  SingleStringModel(name: 'All Requests'),
+  SingleStringModel(name: 'Super Contacts'),
+  SingleStringModel(name: 'Premium Members'),
+  SingleStringModel(name: 'Member Online Now'),
+  SingleStringModel(name: 'Phone Verified Members'),
+  SingleStringModel(name: 'Members with Photo'),
+  SingleStringModel(name: 'Filtered Out Members'),
 ];
