@@ -289,16 +289,20 @@ class NewMatchesCard extends StatelessWidget {
               Row(
                 spacing: 8,
                 children: [
-                  Text(
-                    name,
-                    textHeightBehavior: const TextHeightBehavior(
-                      applyHeightToFirstAscent: false,
-                      applyHeightToLastDescent: false,
-                    ),
-                    style: TextStyle(
-                      fontSize: TextSize.font20(context),
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimaryLight,
+                  Flexible(
+                    child: Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textHeightBehavior: const TextHeightBehavior(
+                        applyHeightToFirstAscent: false,
+                        applyHeightToLastDescent: false,
+                      ),
+                      style: TextStyle(
+                        fontSize: TextSize.font20(context),
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimaryLight,
+                      ),
                     ),
                   ),
                   ShowImage(
