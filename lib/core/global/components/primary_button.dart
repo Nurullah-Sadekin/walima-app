@@ -19,6 +19,8 @@ class PrimaryButtons extends StatelessWidget {
     this.svgIconPath,
     this.iconLeftPosition = true,
     this.isExpand = true,
+    this.verticalPadding,
+    this.horizontalPadding,
   });
 
   final ButtonsStyle buttonStyle;
@@ -34,35 +36,35 @@ class PrimaryButtons extends StatelessWidget {
   final bool? iconLeftPosition;
   final String? svgIconPath;
   final bool isExpand;
+  final double? verticalPadding;
+  final double? horizontalPadding;
 
   @override
   Widget build(BuildContext context) {
     switch (buttonStyle) {
       case (ButtonsStyle.activePrimaryButton):
-        return activePrimaryButton(onTap, title,isExpand, context);
+        return activePrimaryButton(context);
 
       case (ButtonsStyle.activeSecondaryButton):
-        return activeSecondaryButton(onTap, title, context);
+        return activeSecondaryButton(context);
 
       case (ButtonsStyle.iconicDynamicButton):
-        return iconicDynamicButton(
-            onTap, title, context, bgColor, borderColor, textColor);
+        return iconicDynamicButton(context);
 
       case (ButtonsStyle.cancelButton):
-        return cancelButton(title, context, onTap);
+        return cancelButton(context);
 
       case (ButtonsStyle.disableButton):
-        return disableButton(title, context, onTap);
+        return disableButton(context);
 
       case (ButtonsStyle.authButton):
-        return authButton(
-            onTap, title, context, bgColor, borderColor, textColor);
+        return authButton(context);
     }
   }
 
-  Widget activePrimaryButton(VoidCallback onClick, String? title, bool isExpand, context) {
+  Widget activePrimaryButton(context) {
     return GestureDetector(
-      onTap: onClick,
+      onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(
           vertical: 10,horizontal: 16
@@ -93,9 +95,9 @@ class PrimaryButtons extends StatelessWidget {
     );
   }
 
-  Widget activeSecondaryButton(VoidCallback onClick, String? title, context) {
+  Widget activeSecondaryButton(context) {
     return GestureDetector(
-      onTap: onClick,
+      onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: ShapeDecoration(
@@ -127,8 +129,7 @@ class PrimaryButtons extends StatelessWidget {
     );
   }
 
-  Widget disableButton(
-      String? title, BuildContext context, VoidCallback onTap) {
+  Widget disableButton(context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -150,7 +151,7 @@ class PrimaryButtons extends StatelessWidget {
     );
   }
 
-  Widget cancelButton(String? title, BuildContext context, VoidCallback onTap) {
+  Widget cancelButton(context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -174,10 +175,9 @@ class PrimaryButtons extends StatelessWidget {
     );
   }
 
-  Widget iconicDynamicButton(VoidCallback onClick, String? title, context,
-      Color? bgColor, Color? borderColor, Color? textColor) {
+  Widget iconicDynamicButton(context) {
     return GestureDetector(
-      onTap: onClick,
+      onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
@@ -228,10 +228,9 @@ class PrimaryButtons extends StatelessWidget {
     );
   }
 
-  Widget authButton(VoidCallback onClick, String? title, context,
-      Color? bgColor, Color? borderColor, Color? textColor) {
+  Widget authButton(context) {
     return GestureDetector(
-      onTap: onClick,
+      onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
         decoration: BoxDecoration(
