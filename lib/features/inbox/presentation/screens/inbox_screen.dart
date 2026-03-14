@@ -93,7 +93,9 @@ class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProv
     return  Column(
       children: [
         AcceptedCard(
-          onTap: () {},
+          onTap: () {
+
+          },
           imagePath: AppImages.demoProfile2,
           name: 'Tasnova Ahmed',
           age: '28 Yr',
