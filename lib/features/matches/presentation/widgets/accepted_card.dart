@@ -20,6 +20,7 @@ class AcceptedCard extends StatelessWidget {
     this.onTapWalimaChat,
     this.onTapPhoneCall,
     this.onTapWhatsapp,
+      this.isVerified = false,
   });
 
   final VoidCallback onTap;
@@ -34,6 +35,7 @@ class AcceptedCard extends StatelessWidget {
   final VoidCallback? onTapWalimaChat;
   final VoidCallback? onTapPhoneCall;
   final VoidCallback? onTapWhatsapp;
+  final bool isVerified;
 
   @override
   Widget build(BuildContext context) {
@@ -73,14 +75,29 @@ class AcceptedCard extends StatelessWidget {
                               child: Row(
                                 children: [
                                   Flexible(
-                                    child: Text(
-                                      name,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontSize: TextSize.font16(context),
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.textPrimaryLight,
-                                      ),
+                                    child: Row(
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            name,
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                            style: TextStyle(
+                                              fontSize: TextSize.font16(context),
+                                              fontWeight: FontWeight.w500,
+                                              color: AppColors.textPrimaryLight,
+                                            ),
+                                          ),
+                                        ),
+                                        if (isVerified) ...[
+                                          const SizedBox(width: 4),
+                                          ShowImage(
+                                            imagePath: AppImages.verifiedBadgeSvgIcon,
+                                            width: TextSize.font14(context),
+                                            height: TextSize.font14(context),
+                                          )
+                                        ],
+                                      ],
                                     ),
                                   ),
                                   SizedBox(
@@ -93,12 +110,16 @@ class AcceptedCard extends StatelessWidget {
                                       ),
                                     ),
                                   ),
-                                  Text(
-                                    day??'',
-                                    style: TextStyle(
-                                      fontSize: TextSize.font10(context),
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColors.textSecondaryLight,
+                                  Flexible(
+                                    child: Text(
+                                      day??'',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: TextSize.font10(context),
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.textSecondaryLight,
+                                      ),
                                     ),
                                   ),
                                 ],
