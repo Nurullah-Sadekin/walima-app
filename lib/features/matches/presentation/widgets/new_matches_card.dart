@@ -447,7 +447,7 @@ class NewMatchesCard extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   ShowImage(
-                                    imagePath: AppImages.bubbleChatSvgIcon,
+                                    imagePath: AppImages.chatIcon,
                                     width: TextSize.font16(context),
                                     height: TextSize.font16(context),
                                     radius: BorderRadius.circular(8),
