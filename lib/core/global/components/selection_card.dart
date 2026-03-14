@@ -12,6 +12,8 @@ class SelectionCard extends StatelessWidget {
     required this.title,
     this.isSelected ,
     this.isExpand = false,
+    this.noBorder = false,
+    this.radiaBackgroundColor ,
   });
 
   final SelectionStyle buttonStyle;
@@ -19,36 +21,38 @@ class SelectionCard extends StatelessWidget {
   final String? title;
   final bool? isSelected;
   final bool isExpand;
+  final bool noBorder;
+  final Color? radiaBackgroundColor;
 
   @override
   Widget build(BuildContext context) {
     final effectiveSelected = isSelected ?? false;
     switch (buttonStyle) {
       case SelectionStyle.selectedRadio:
-        return selectedRadio(onTap, title, effectiveSelected, context);
+        return selectedRadio(effectiveSelected, context);
       case SelectionStyle.unSelectedRadio:
-        return unSelectedRadio(onTap, title, effectiveSelected, context);
+        return unSelectedRadio( effectiveSelected, context);
       case SelectionStyle.selectedItem:
-        return selectedItem(onTap, title, effectiveSelected, context);
+        return selectedItem( effectiveSelected, context);
       case SelectionStyle.unSelectedItem:
-        return unSelectedItem(onTap, title, effectiveSelected, context);
+        return unSelectedItem(effectiveSelected, context);
       case SelectionStyle.selectedCheckbox:
-        return selectedCheckbox(onTap, title, isExpand, effectiveSelected, context);
+        return selectedCheckbox(effectiveSelected, context);
       case SelectionStyle.unSelectedCheckbox:
-        return unSelectedCheckbox(onTap, title, isExpand, effectiveSelected, context);
+        return unSelectedCheckbox(effectiveSelected, context);
     }
   }
 
 
-  Widget selectedRadio(VoidCallback onClick, String? title, bool isSelected, BuildContext context) {
+  Widget selectedRadio( bool isSelected, BuildContext context) {
     return GestureDetector(
-      onTap: onClick,
+      onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12,horizontal: 12),
+        padding:  EdgeInsets.symmetric(vertical: noBorder ? 0 : 12,horizontal: noBorder ? 0 : 12),
         decoration: ShapeDecoration(
-          color: Colors.white,
+          color: radiaBackgroundColor ?? Colors.white,
           shape: RoundedRectangleBorder(
-            side: const BorderSide(width: 1, color: AppColors.inputBorderColor),
+            side: noBorder ? BorderSide.none : const BorderSide(width: 1, color: AppColors.inputBorderColor),
             borderRadius: BorderRadius.circular(6),
           ),
         ),
@@ -58,24 +62,10 @@ class SelectionCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           spacing: 6,
           children: [
-            Container(
-              height: TextSize.font16(context),
-              width: TextSize.font16(context),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isSelected ? AppColors.primary : AppColors.greyLight,
-                  width: isSelected ? 3 : 1,
-                ),
-              ),
-              child: isSelected
-                  ? const Center(
-                child: CircleAvatar(
-                  radius: 6,
-                  backgroundColor: Colors.white,
-                ),
-              )
-                  : null,
+            ShowImage(
+              imagePath: AppImages.selectedRadio,
+              width: TextSize.font20(context),
+              height: TextSize.font20(context),
             ),
             Text(
               title ?? '',
@@ -92,15 +82,15 @@ class SelectionCard extends StatelessWidget {
     );
   }
 
-  Widget unSelectedRadio(VoidCallback onClick, String? title, bool isSelected, BuildContext context) {
+  Widget unSelectedRadio( bool isSelected, BuildContext context) {
     return GestureDetector(
-      onTap: onClick,
+      onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12,horizontal: 12),
+        padding:  EdgeInsets.symmetric(vertical: noBorder ? 0 : 12,horizontal: noBorder ? 0 : 12),
         decoration: ShapeDecoration(
-          color: Colors.white,
+          color: radiaBackgroundColor ?? Colors.white,
           shape: RoundedRectangleBorder(
-            side: const BorderSide(width: 1, color: AppColors.inputBorderColor),
+            side: noBorder ? BorderSide.none : const BorderSide(width: 1, color: AppColors.inputBorderColor),
             borderRadius: BorderRadius.circular(6),
           ),
         ),
@@ -110,24 +100,10 @@ class SelectionCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           spacing: 6,
           children: [
-            Container(
-              height: TextSize.font16(context),
-              width: TextSize.font16(context),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isSelected ? AppColors.primary : AppColors.greyLight,
-                  width: isSelected ? 3 : 1,
-                ),
-              ),
-              child: isSelected
-                  ? const Center(
-                child: CircleAvatar(
-                  radius: 6,
-                  backgroundColor: Colors.white,
-                ),
-              )
-                  : null,
+            ShowImage(
+              imagePath: AppImages.unSelectedRadio,
+              width: TextSize.font20(context),
+              height: TextSize.font20(context),
             ),
             Text(
               title ?? '',
@@ -144,9 +120,9 @@ class SelectionCard extends StatelessWidget {
     );
   }
 
-  Widget selectedItem(VoidCallback onClick, String? title, bool isSelected, BuildContext context) {
+  Widget selectedItem( bool isSelected, BuildContext context) {
     return GestureDetector(
-      onTap: onClick,
+      onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
         decoration: BoxDecoration(
@@ -166,9 +142,9 @@ class SelectionCard extends StatelessWidget {
     );
   }
 
-  Widget unSelectedItem(VoidCallback onClick, String? title, bool isSelected, BuildContext context) {
+  Widget unSelectedItem(bool isSelected, BuildContext context) {
     return GestureDetector(
-      onTap: onClick,
+      onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
         decoration: BoxDecoration(
@@ -187,9 +163,9 @@ class SelectionCard extends StatelessWidget {
     );
   }
 
-  Widget selectedCheckbox(VoidCallback onClick, String? title, bool isExpand, bool isSelected, BuildContext context) {
+  Widget selectedCheckbox( bool isSelected, BuildContext context) {
     return GestureDetector(
-      onTap: onClick,
+      onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
         decoration: ShapeDecoration(
@@ -222,10 +198,9 @@ class SelectionCard extends StatelessWidget {
     );
   }
 
-  Widget unSelectedCheckbox(VoidCallback onClick, String? title, bool isExpand, bool isSelected, BuildContext context) {
-    // visually identical to selectedCheckbox but without check mark
+  Widget unSelectedCheckbox(bool isSelected, BuildContext context) {
     return GestureDetector(
-      onTap: onClick,
+      onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
         decoration: ShapeDecoration(
