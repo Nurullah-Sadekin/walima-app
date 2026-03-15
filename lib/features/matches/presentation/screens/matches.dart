@@ -8,6 +8,7 @@ import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/provider/matcher_provider.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/count_down_timer.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/empty_state.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/filter_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
@@ -24,7 +25,14 @@ class MatchesScreen extends ConsumerStatefulWidget {
 
 class _MatchesScreenState extends ConsumerState<MatchesScreen> {
   MatchesProvider provider = MatchesProvider();
-  final tabs = ['Search', 'New', 'Daily', 'My Matches','Near Me', 'More Matches'];
+  final tabs = [
+    'Search',
+    'New',
+    'Daily',
+    'My Matches',
+    'Near Me',
+    'More Matches'
+  ];
 
   @override
   void initState() {
@@ -163,7 +171,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
           return _dailyTabContent();
         case 3:
           return _myMatchesContent();
-          case 4:
+        case 4:
           return _nearMeContent();
         case 5:
           return _moreMatchesContent();
@@ -177,7 +185,8 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
       child: Column(
-        children: List.generate(10,
+        children: List.generate(
+          10,
           (index) => const Padding(
             padding: EdgeInsets.only(
               bottom: 10.0,
@@ -224,7 +233,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
         EmptyStateWidget(
           title: 'No Matches Yet!',
           subtitle:
-          'We do not have new matches at this point. Checkout my matches to find profiles matching your preference',
+              'We do not have new matches at this point. Checkout my matches to find profiles matching your preference',
           buttonText: 'My Matches',
           onTap: null,
         ),
@@ -234,21 +243,56 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
 
   Widget _dailyTabContent() {
     return const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        SizedBox(height: 8),
-        Text('Daily tab content'),
+        SizedBox(height: 50),
+        CountdownTimer(
+          initialHours: 8,
+          initialMinutes: 24,
+          initialSeconds: 48,
+        ),
+        SizedBox(height: 30),
+        EmptyStateWidget(
+            title: 'Sorry!',
+            subtitle:
+                'No today’s matches found. Please try again till then, search for your partner.',
+            buttonText: 'Search Now')
       ],
     );
   }
 
   Widget _myMatchesContent() {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(height: 8),
-        Text('My Matches content'),
-      ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: Column(
+        children: List.generate(
+          10,
+              (index) => const Padding(
+            padding: EdgeInsets.only(
+              bottom: 10.0,
+            ),
+            child: ProfileComprehensiveCard(
+              imagePath: AppImages.demoProfile,
+              leftIconPath: AppImages.favouriteIcon,
+              isPremiumConnect: true,
+              isVerified: true,
+              name: 'Tasnova Ahmed',
+              age: '28 Yr',
+              height: '5\' 3\'" ',
+              location: 'Gulshan, Dhaka, BD',
+              activeStatusText: '1 day ago',
+              menu: true,
+              photoRequest: false,
+              onTapLeftButton: null,
+              onTapRightButton: null,
+              photoCount: '1',
+              profession: 'Software Engineer',
+              maritalStatus: 'Never Married',
+              religion: 'Islam',
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -272,7 +316,9 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
     );
   }
 
-  Future<void> _filter(BuildContext context,) async {
+  Future<void> _filter(
+    BuildContext context,
+  ) async {
     await showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -302,8 +348,12 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
               FilterWidget(
                 title: 'Filter',
                 iconPath: AppImages.filterSvgIcon,
-                items: provider.sortByDataList.map((item) =>
-                    FilterItem(name: item.name, isSelected: item.isSelected),).toList(),
+                items: provider.sortByDataList
+                    .map(
+                      (item) => FilterItem(
+                          name: item.name, isSelected: item.isSelected),
+                    )
+                    .toList(),
                 onItemTap: (index) {
                   provider.sortBy(index);
                 },
@@ -314,5 +364,4 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
       },
     );
   }
-
 }
