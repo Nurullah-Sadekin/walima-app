@@ -7,7 +7,6 @@ import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/provider/matcher_provider.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/accepted_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/tab_bar_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -153,24 +152,36 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
   }
 
   Widget _searchTabContent() {
-    return const ProfileComprehensiveCard(
-      imagePath: AppImages.demoProfile,
-      leftIconPath: AppImages.favouriteIcon,
-      isPremiumConnect: false,
-      isVerified: true,
-      name: 'Tasnova Ahmed',
-      age: '28 Yr',
-      height: '5\' 3\'" ',
-      location: 'Gulshan, Dhaka, BD',
-      activeStatusText: '1 day ago',
-      menu: true,
-      photoRequest: true,
-      onTapLeftButton: null,
-      onTapRightButton: null,
-      photoCount: '1',
-      profession: 'Software Engineer',
-      maritalStatus: 'Never Married',
-      religion: 'Islam',
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: Column(
+        children: List.generate(10,
+          (index) => const Padding(
+            padding: EdgeInsets.only(
+              bottom: 10.0,
+            ),
+            child: ProfileComprehensiveCard(
+              imagePath: AppImages.demoProfile,
+              leftIconPath: AppImages.favouriteIcon,
+              isPremiumConnect: false,
+              isVerified: true,
+              name: 'Tasnova Ahmed',
+              age: '28 Yr',
+              height: '5\' 3\'" ',
+              location: 'Gulshan, Dhaka, BD',
+              activeStatusText: '1 day ago',
+              menu: true,
+              photoRequest: true,
+              onTapLeftButton: null,
+              onTapRightButton: null,
+              photoCount: '1',
+              profession: 'Software Engineer',
+              maritalStatus: 'Never Married',
+              religion: 'Islam',
+            ),
+          ),
+        ),
+      ),
     );
   }
 
