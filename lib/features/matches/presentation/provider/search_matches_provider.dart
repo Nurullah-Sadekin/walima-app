@@ -37,6 +37,17 @@ class SearchMatchesProvider extends BaseChangeNotifier {
 
     final TextEditingController ageFromController = TextEditingController();
     final TextEditingController ageToController = TextEditingController();
+    final TextEditingController heightFromController = TextEditingController();
+    final TextEditingController heightToController = TextEditingController();
+    final TextEditingController maritalStatusController = TextEditingController();
+    final TextEditingController religionController = TextEditingController();
+    final TextEditingController communityController = TextEditingController();
+    final TextEditingController motherTongueController = TextEditingController();
+    final TextEditingController countryLivingController = TextEditingController();
+    final TextEditingController stateLivingController = TextEditingController();
+    final TextEditingController grewUpController = TextEditingController();
+    final TextEditingController residencyStatusController = TextEditingController();
+    final TextEditingController photoSettingController = TextEditingController();
 
 
     List<SingleStringModel> ageRangeDropdownItems = ageListDataInserted;

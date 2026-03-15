@@ -91,80 +91,202 @@ class _SearchMatchesScreenState extends ConsumerState<SearchMatchesScreen> {
         spacing: 10,
         children: [
           personalizeYourSearch(),
+          const SizedBox(height: 65),
         ],
       ),
     );
   }
 
   Widget personalizeYourSearch() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.greyLight),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          headLineText('Personalize Your Search', fontSize: TextSize.font16(context)),
-          SizedBox(height: TextSize.font16(context)),
-          headLineText('Age'),
-          Row(
-            spacing: 12,
-            children: [
-              Expanded(
-                child: DropDownField(
-                  hintText: 'From',
-                  popUpHeader: 'Age From',
-                  items: provider.ageRangeDropdownItems,
-                  controller: provider.ageFromController,
-                //  onConfirm: (value) => provider.onResidencyStatusSelected(value?.toString()),
-                  isSearch: true,
-                ),
-              ),
-              Expanded(
-                child: DropDownField(
-                  hintText: 'To',
-                  popUpHeader: 'Age To',
-                  items: provider.ageRangeDropdownItems,
-                  controller: provider.ageToController,
-                 // onConfirm: (value) => provider.onResidencyStatusSelected(value?.toString()),
-                  isSearch: true,
-                ),
-              ),
-            ],
+    return Expanded(
+      child: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: AppColors.greyLight),
           ),
-          SizedBox(height: TextSize.font12(context)),
-          Column(
-            spacing: 10,
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              headLineText('Personalize Your Search', fontSize: TextSize.font16(context)),
+              SizedBox(height: TextSize.font16(context)),
+              headLineText('Age'),
+              Row(
+                spacing: 12,
+                children: [
+                  Expanded(
+                    child: DropDownField(
+                      hintText: 'From',
+                      popUpHeader: 'Age From',
+                      items: provider.ageRangeDropdownItems,
+                      controller: provider.ageFromController,
+                    //  onConfirm: (value) => provider.onResidencyStatusSelected(value?.toString()),
+                      isSearch: true,
+                    ),
+                  ),
+                  Expanded(
+                    child: DropDownField(
+                      hintText: 'To',
+                      popUpHeader: 'Age To',
+                      items: provider.ageRangeDropdownItems,
+                      controller: provider.ageToController,
+                     // onConfirm: (value) => provider.onResidencyStatusSelected(value?.toString()),
+                      isSearch: true,
+                    ),
+                  ),
+                ],
+              ),
 
-              headLineText('Have Children'),
-              // Wrap(
-              //   spacing: 10,
-              //   runSpacing: 10,
-              //   children:
-              //   List.generate(provider.isWithFamilyDataList.length, (index) {
-              //     final isWithFamily = provider.isWithFamilyDataList[index];
-              //
-              //     return SelectionCard(
-              //       buttonStyle: isWithFamily.isSelected
-              //           ? SelectionStyle.selectedRadio
-              //           : SelectionStyle.unSelectedRadio,
-              //       onTap: () {
-              //         provider.selectedIsWithFamily(index);
-              //       },
-              //       isSelected: isWithFamily.isSelected,
-              //       title: isWithFamily.name,
-              //       isExpand: false,
-              //     );
-              //   }),
-              // ),
+              SizedBox(height: TextSize.font12(context)),
+              headLineText('Height'),
+              Row(
+                spacing: 12,
+                children: [
+                  Expanded(
+                    child: DropDownField(
+                      hintText: 'From',
+                      popUpHeader: 'Height From',
+                      items: provider.ageRangeDropdownItems,
+                      controller: provider.heightFromController,
+                      isSearch: true,
+                    ),
+                  ),
+                  Expanded(
+                    child: DropDownField(
+                      hintText: 'To',
+                      popUpHeader: 'Height To',
+                      items: provider.ageRangeDropdownItems,
+                      controller: provider.heightToController,
+                      isSearch: true,
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: TextSize.font12(context)),
+              headLineText('Marital Status'),
+              DropDownField(
+                hintText: 'Select',
+                popUpHeader: 'Marital Status',
+                items: provider.ageRangeDropdownItems,
+                controller: provider.maritalStatusController,
+                isSearch: true,
+              ),
+
+              SizedBox(height: TextSize.font12(context)),
+              headLineText('Your Religion'),
+              DropDownField(
+                hintText: 'Select',
+                popUpHeader: 'Your Religion',
+                items: provider.ageRangeDropdownItems,
+                controller: provider.religionController,
+                isSearch: true,
+              ),
+
+              SizedBox(height: TextSize.font12(context)),
+              headLineText('Community'),
+              DropDownField(
+                hintText: 'Select',
+                popUpHeader: 'Community',
+                items: provider.ageRangeDropdownItems,
+                controller: provider.communityController,
+                isSearch: true,
+              ),
+
+              SizedBox(height: TextSize.font12(context)),
+              headLineText('Mother Tongue'),
+              DropDownField(
+                hintText: 'Select',
+                popUpHeader: 'Mother Tongue',
+                items: provider.ageRangeDropdownItems,
+                controller: provider.motherTongueController,
+                isSearch: true,
+              ),
+
+              SizedBox(height: TextSize.font12(context)),
+              headLineText('Country Living In'),
+              DropDownField(
+                hintText: 'Select',
+                popUpHeader: 'Country Living In',
+                items: provider.ageRangeDropdownItems,
+                controller: provider.countryLivingController,
+                isSearch: true,
+              ),
+
+              SizedBox(height: TextSize.font12(context)),
+              headLineText('State Living In'),
+              DropDownField(
+                hintText: 'Select',
+                popUpHeader: 'State Living In',
+                items: provider.ageRangeDropdownItems,
+                controller: provider.stateLivingController,
+                isSearch: true,
+              ),
+
+              SizedBox(height: TextSize.font12(context)),
+              headLineText('Country Grew Up In'),
+              DropDownField(
+                hintText: 'Select',
+                popUpHeader: 'Country Grew Up In',
+                items: provider.ageRangeDropdownItems,
+                controller: provider.grewUpController,
+                isSearch: true,
+              ),
+
+              SizedBox(height: TextSize.font12(context)),
+              headLineText('Residency Status'),
+              DropDownField(
+                hintText: 'Select',
+                popUpHeader: 'Residency Status',
+                items: provider.ageRangeDropdownItems,
+                controller: provider.residencyStatusController,
+                isSearch: true,
+              ),
+
+              SizedBox(height: TextSize.font12(context)),
+              headLineText('Photo Setting'),
+              DropDownField(
+                hintText: 'Select',
+                popUpHeader: 'Photo Setting',
+                items: provider.ageRangeDropdownItems,
+                controller: provider.photoSettingController,
+                isSearch: true,
+              ),
+
+              SizedBox(height: TextSize.font12(context)),
+              Column(
+                spacing: 10,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+
+                  headLineText('Have Children'),
+                  // Wrap(
+                  //   spacing: 10,
+                  //   runSpacing: 10,
+                  //   children:
+                  //   List.generate(provider.isWithFamilyDataList.length, (index) {
+                  //     final isWithFamily = provider.isWithFamilyDataList[index];
+                  //
+                  //     return SelectionCard(
+                  //       buttonStyle: isWithFamily.isSelected
+                  //           ? SelectionStyle.selectedRadio
+                  //           : SelectionStyle.unSelectedRadio,
+                  //       onTap: () {
+                  //         provider.selectedIsWithFamily(index);
+                  //       },
+                  //       isSelected: isWithFamily.isSelected,
+                  //       title: isWithFamily.name,
+                  //       isExpand: false,
+                  //     );
+                  //   }),
+                  // ),
+                ],
+              ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
