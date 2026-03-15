@@ -175,6 +175,30 @@ class _SearchMatchesScreenState extends ConsumerState<SearchMatchesScreen> {
                 isSearch: true,
               ),
 
+
+              SizedBox(height: TextSize.font12(context)),
+              headLineText('Have Children'),
+              SizedBox(height: TextSize.font10(context)),
+              Wrap(
+                spacing: 20,
+                runSpacing: 10,
+                children: List.generate(provider.haveChildren.length, (index) {
+                  final haveChildren = provider.haveChildren[index];
+
+                  return SelectionCard(
+                    buttonStyle: haveChildren.isSelected
+                        ? SelectionStyle.selectedRadio
+                        : SelectionStyle.unSelectedRadio,
+                    onTap: () {
+                      provider.selectedHaveChildren(index);
+                    },
+                    isSelected: haveChildren.isSelected,
+                    title: haveChildren.name,
+                    isExpand: false,
+                  );
+                }),
+              ),
+
               SizedBox(height: TextSize.font12(context)),
               headLineText('Your Religion'),
               DropDownField(
@@ -256,34 +280,7 @@ class _SearchMatchesScreenState extends ConsumerState<SearchMatchesScreen> {
               ),
 
               SizedBox(height: TextSize.font12(context)),
-              Column(
-                spacing: 10,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
 
-                  headLineText('Have Children'),
-                  // Wrap(
-                  //   spacing: 10,
-                  //   runSpacing: 10,
-                  //   children:
-                  //   List.generate(provider.isWithFamilyDataList.length, (index) {
-                  //     final isWithFamily = provider.isWithFamilyDataList[index];
-                  //
-                  //     return SelectionCard(
-                  //       buttonStyle: isWithFamily.isSelected
-                  //           ? SelectionStyle.selectedRadio
-                  //           : SelectionStyle.unSelectedRadio,
-                  //       onTap: () {
-                  //         provider.selectedIsWithFamily(index);
-                  //       },
-                  //       isSelected: isWithFamily.isSelected,
-                  //       title: isWithFamily.name,
-                  //       isExpand: false,
-                  //     );
-                  //   }),
-                  // ),
-                ],
-              ),
             ],
           ),
         ),

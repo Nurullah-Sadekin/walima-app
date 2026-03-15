@@ -109,7 +109,7 @@ class SelectionCard extends StatelessWidget {
               title ?? '',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: AppColors.textPrimaryLight,
+                color: AppColors.textSecondaryLight,
                 fontSize: TextSize.font14(context),
                 fontWeight: FontWeight.w500,
               ),

@@ -216,3 +216,10 @@ List<SingleStringModel> ageListDataInserted = [
   SingleStringModel(name: '29'),
   SingleStringModel(name: '30'),
 ];
+
+
+List<SingleStringModel> haveChildrenDataListInserted = [
+  SingleStringModel(name: 'No',),
+  SingleStringModel(name: 'Yes'),
+  SingleStringModel(name: 'Okay, If we\'re not staying together',),
+];

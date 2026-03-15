@@ -51,7 +51,35 @@ class SearchMatchesProvider extends BaseChangeNotifier {
 
 
     List<SingleStringModel> ageRangeDropdownItems = ageListDataInserted;
-}
+    List<SingleStringModel> haveChildren = haveChildrenDataListInserted;
+
+    String? selectedHaveChildrenStatus;
+
+    bool _isValidIndex(int index, int length) {
+      return index >= 0 && index < length;
+    }
+
+    void _setSingleSelection<T>(
+      List<T> list,
+      int selectedIndex,
+      void Function(T item, bool selected) applySelection,
+    ) {
+      for (var i = 0; i < list.length; i++) {
+        applySelection(list[i], i == selectedIndex);
+      }
+    }
+
+    void selectedHaveChildren(int index) {
+      if (!_isValidIndex(index, haveChildren.length)) return;
+      _setSingleSelection(
+        haveChildren,
+        index,
+        (item, selected) => item.isSelected = selected,
+      );
+      selectedHaveChildrenStatus = haveChildren[index].name;
+      notifyListeners();
+    }
+ }
 
 enum SearchMatchesScreenStates {
   defaultLoading,
