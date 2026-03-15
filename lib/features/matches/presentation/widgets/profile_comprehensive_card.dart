@@ -16,14 +16,14 @@ class ProfileComprehensiveCard extends StatelessWidget {
     this.leftIconPath,
     this.rightIconPath,
     required this.name,
-    required this.age,
-    required this.height,
+    this.age,
+    this.height,
+    this.location,
     this.maritalStatus,
     this.profession,
     this.religion,
     this.leftButtonText = 'Connect',
     this.rightButtonText = 'Contact',
-    required this.location,
     this.onTapLeftButton,
     this.onTapRightButton,
     this.isPremiumConnect = false,
@@ -49,6 +49,7 @@ class ProfileComprehensiveCard extends StatelessWidget {
     this.singleButtonIconColor,
     this.singleButtonText = 'Connect Now',
     this.onMenuTap,
+    this.noButton = false,
   });
 
   final String imagePath;
@@ -58,14 +59,14 @@ class ProfileComprehensiveCard extends StatelessWidget {
   final String? rightIconPath;
 
   final String name;
-  final String age;
-  final String height;
+  final String? age;
+  final String? height;
   final String? maritalStatus;
   final String? profession;
   final String? religion;
   final String? leftButtonText;
   final String? rightButtonText;
-  final String location;
+  final String? location;
 
   final VoidCallback? onTapLeftButton;
   final VoidCallback? onTapRightButton;
@@ -95,6 +96,9 @@ class ProfileComprehensiveCard extends StatelessWidget {
   final Color? singleButtonBorderColor;
   final Color? singleButtonIconColor;
   final String? singleButtonText;
+
+  final bool noButton;
+
 
   @override
   Widget build(BuildContext context) {
@@ -347,12 +351,14 @@ class ProfileComprehensiveCard extends StatelessWidget {
                   )
                 ],
               ),
-              const SizedBox(
-                height: 12,
-              ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (age != null && height != null)
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  if (age != null && height != null)
                   Text(
                     '$age, $height',
                     style: TextStyle(
@@ -388,7 +394,7 @@ class ProfileComprehensiveCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                  if (profession != null && location.isNotEmpty)
+                  if (profession != null && location!.isNotEmpty)
                     const SizedBox(
                       height: 12,
                     ),
@@ -403,9 +409,9 @@ class ProfileComprehensiveCard extends StatelessWidget {
                         color: AppColors.textPrimaryLight,
                       ),
                     ),
-                  if (location.isNotEmpty)
+                  if (location != null && location!.isNotEmpty)
                     Text(
-                      location,
+                      location!,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -416,10 +422,8 @@ class ProfileComprehensiveCard extends StatelessWidget {
                     ),
                 ],
               ),
-              const SizedBox(
-                height: 16,
-              ),
-              if (isSingleButton)
+              if (noButton == true) const SizedBox() else const SizedBox(height: 16,),
+              if (isSingleButton && noButton == false)
                 PrimaryButtons(
                     buttonStyle: ButtonsStyle.iconicDynamicButton,
                     iconLeftPosition: true,
@@ -428,7 +432,7 @@ class ProfileComprehensiveCard extends StatelessWidget {
                     borderColor: singleButtonBorderColor ?? AppColors.primary,
                     textColor: singleButtonTextColor ?? AppColors.primary,
                     title: singleButtonText ?? 'Connect Now'),
-              if (!isSingleButton)
+              if (! isSingleButton && noButton == false)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4.0),
                   child: Row(
