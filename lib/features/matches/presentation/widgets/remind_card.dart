@@ -15,6 +15,23 @@ class RemindCard extends StatelessWidget {
     required this.height,
     required this.location,
     this.isVerified = false,
+    this.singleButton = true,
+    this.leftButtonTitle = 'Reject',
+    this.leftButtonOnTap,
+    this.leftButtonBackgroundColor = AppColors.white,
+    this.leftButtonBorderColor = AppColors.greyLight,
+    this.leftButtonTextColor = AppColors.textPrimaryLight,
+    this.leftButtonSvgIconPath = AppImages.cancelSvgIcon,
+    this.leftButtonSvgIconColor = AppColors.textPrimaryLight,
+    this.leftButtonIconSize = 16,
+    this.rightButtonTitle = 'Approve',
+    this.rightButtonOnTap,
+    this.rightButtonBorderColor = AppColors.greenButtonColor,
+    this.rightButtonBackgroundColor = AppColors.greenButtonColor,
+    this.rightButtonTextColor = AppColors.white,
+    this.rightButtonSvgIconPath = AppImages.favouriteIcon,
+    this.rightButtonSvgIconColor = AppColors.white,
+    this.rightButtonIconSize = 16,
   });
 
   final VoidCallback onTap;
@@ -24,6 +41,26 @@ class RemindCard extends StatelessWidget {
   final String height;
   final String location;
   final bool isVerified;
+
+  final bool singleButton;
+
+  final String leftButtonTitle;
+  final VoidCallback? leftButtonOnTap;
+  final Color leftButtonBackgroundColor;
+  final Color leftButtonBorderColor;
+  final Color leftButtonTextColor;
+  final String leftButtonSvgIconPath;
+  final Color leftButtonSvgIconColor;
+  final double leftButtonIconSize;
+
+  final VoidCallback? rightButtonOnTap;
+  final String rightButtonTitle;
+  final Color rightButtonBackgroundColor;
+  final Color rightButtonBorderColor;
+  final Color rightButtonTextColor;
+  final String rightButtonSvgIconPath;
+  final Color rightButtonSvgIconColor;
+  final double rightButtonIconSize;
 
   @override
   Widget build(BuildContext context) {
@@ -113,16 +150,50 @@ class RemindCard extends StatelessWidget {
               height: 0,
             ),
           ),
-          PrimaryButtons(
-            buttonStyle: ButtonsStyle.iconicDynamicButton,
-            onTap: onTap,
-            title: 'Remind',
-            borderColor: AppColors.primary,
-            textColor: AppColors.primary,
-            svgIconPath: AppImages.notificationSvgIcon,
-            svgIconColor: AppColors.primary,
-            iconSize: 16,
-          )
+          if (singleButton)
+            PrimaryButtons(
+              buttonStyle: ButtonsStyle.iconicDynamicButton,
+              onTap: onTap,
+              title: 'Remind',
+              borderColor: AppColors.primary,
+              textColor: AppColors.primary,
+              svgIconPath: AppImages.notificationSvgIcon,
+              svgIconColor: AppColors.primary,
+              iconSize: 16,
+            ),
+          if (!singleButton) ...[
+            Row(
+              children: [
+                Expanded(
+                  child: PrimaryButtons(
+                    buttonStyle: ButtonsStyle.iconicDynamicButton,
+                    onTap: leftButtonOnTap ?? () {},
+                    title: leftButtonTitle,
+                    borderColor: leftButtonBorderColor,
+                    textColor: leftButtonTextColor,
+                    bgColor: leftButtonBackgroundColor,
+                    svgIconPath: leftButtonSvgIconPath,
+                    svgIconColor: leftButtonSvgIconColor,
+                    iconSize: leftButtonIconSize,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: PrimaryButtons(
+                    buttonStyle: ButtonsStyle.iconicDynamicButton,
+                    onTap: rightButtonOnTap ?? () {},
+                    title: rightButtonTitle,
+                    borderColor: rightButtonBorderColor,
+                    textColor: rightButtonTextColor,
+                    bgColor: rightButtonBackgroundColor,
+                    svgIconPath: rightButtonSvgIconPath,
+                    svgIconColor: rightButtonSvgIconColor,
+                    iconSize: rightButtonIconSize,
+                  ),
+                ),
+              ],
+            )
+          ]
         ],
       ),
     );

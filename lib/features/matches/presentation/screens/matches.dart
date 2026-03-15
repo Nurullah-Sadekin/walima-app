@@ -188,6 +188,16 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             location: 'Gulshan, Dhaka, BD',
             isVerified: true,
           ),
+          RemindCard(
+            onTap: () {},
+            imagePath: AppImages.demoProfile,
+            name: 'Tasnova Ahmed',
+            age: '28 Yr',
+            height: '5\' 3\'" ',
+            location: 'Gulshan, Dhaka, BD',
+            isVerified: true,
+            singleButton: false,
+          ),
           const MessageBubble(
             message:
                 'Hello, I have liked your profile and believe it to be a good Match. If you like my profile too, kindly accept this Invitation. Please feel free to contact me to take this conversation ahead. Warm Regards, Mehedi Hasan',

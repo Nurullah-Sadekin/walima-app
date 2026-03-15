@@ -74,6 +74,7 @@ class AppImages {
   static const String unSelectedRadio = 'assets/svgIcons/unSelectedRadio.svg';
   static const String cardView = 'assets/svgIcons/card_view.svg';
   static const String chatIcon = 'assets/svgIcons/chat_icon.svg';
+  static const String cancelSvgIcon = 'assets/svgIcons/cancel.svg';
 
 
 

@@ -145,7 +145,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProv
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimaryLight),
                         ),
                         const SizedBox(height: 4),
-                        Text(
+                        const Text(
                           'Gulshan, Dhaka, BD',
                           style: TextStyle(fontSize: 13, color: AppColors.textSecondaryLight),
                         ),
