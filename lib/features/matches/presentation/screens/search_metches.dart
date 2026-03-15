@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
+import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/provider/search_matches_provider.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
@@ -17,7 +19,8 @@ import 'package:go_router/go_router.dart';
 class SearchMatchesScreen extends ConsumerStatefulWidget {
   const SearchMatchesScreen({super.key});
   @override
-  ConsumerState<SearchMatchesScreen> createState() => _SearchMatchesScreenState();
+  ConsumerState<SearchMatchesScreen> createState() =>
+      _SearchMatchesScreenState();
 }
 
 class _SearchMatchesScreenState extends ConsumerState<SearchMatchesScreen> {
@@ -27,8 +30,7 @@ class _SearchMatchesScreenState extends ConsumerState<SearchMatchesScreen> {
   void initState() {
     super.initState();
     provider = ref.read(searchMatchesProvider);
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) async {});
   }
 
   @override
@@ -40,38 +42,62 @@ class _SearchMatchesScreenState extends ConsumerState<SearchMatchesScreen> {
   @override
   Widget build(BuildContext context) {
     provider = ref.watch(searchMatchesProvider);
-    return  Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.transparent,
-        body: GradientBackground(
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Column(
             children: [
-              const UpperLayer(imagePath: AppImages.location),
-              body(),
+              _appbar(),
+              _body(),
             ],
           ),
         ),
+      ),
+      floatingActionButton: BottomBorderedWidget(
+        widget: bottomAction(),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
-  Widget body() {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: Column(
-          spacing: 10,
-          children: [
-            dataInsertField(),
-            const Spacer(),
-            bottomAction(),
-            const SizedBox(height: 20),
-          ],
+  Widget _appbar() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(Icons.arrow_back_ios,
+              size: TextSize.font16(context),
+              color: AppColors.textSecondaryLight),
         ),
+        Text(
+          'Search Box',
+          style: TextStyle(
+            fontSize: TextSize.font16(context),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _body() {
+    return Expanded(
+      child: Column(
+        spacing: 10,
+        children: [
+          personalizeYourSearch(),
+        ],
       ),
     );
   }
 
-  Widget dataInsertField() {
+  Widget personalizeYourSearch() {
     return Column(
       spacing: 20,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,7 +107,7 @@ class _SearchMatchesScreenState extends ConsumerState<SearchMatchesScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'You Live with Your Family',
+              'Have Children',
               style: TextStyle(
                 fontSize: TextSize.font14(context),
                 fontWeight: FontWeight.w500,
@@ -91,24 +117,19 @@ class _SearchMatchesScreenState extends ConsumerState<SearchMatchesScreen> {
               spacing: 10,
               runSpacing: 10,
               children:
-              List.generate(provider.isWithFamilyDataList.length, (index) {
+                  List.generate(provider.isWithFamilyDataList.length, (index) {
                 final isWithFamily = provider.isWithFamilyDataList[index];
 
-                double screenWidth = MediaQuery.of(context).size.width - 40;
-                double itemWidth = (screenWidth - 10) / 2;
-
-                return SizedBox(
-                  width: itemWidth,
-                  child: SelectionCard(
-                    buttonStyle: isWithFamily.isSelected
-                        ? SelectionStyle.selectedRadio
-                        : SelectionStyle.unSelectedRadio,
-                    onTap: () {
-                      provider.selectedIsWithFamily(index);
-                    },
-                    isSelected: isWithFamily.isSelected,
-                    title: isWithFamily.name,
-                  ),
+                return SelectionCard(
+                  buttonStyle: isWithFamily.isSelected
+                      ? SelectionStyle.selectedRadio
+                      : SelectionStyle.unSelectedRadio,
+                  onTap: () {
+                    provider.selectedIsWithFamily(index);
+                  },
+                  isSelected: isWithFamily.isSelected,
+                  title: isWithFamily.name,
+                  isExpand: false,
                 );
               }),
             ),
@@ -121,7 +142,8 @@ class _SearchMatchesScreenState extends ConsumerState<SearchMatchesScreen> {
           items: provider.residencyStatusDropdownItems,
           controller: provider.residencyStatusController,
           // onTap: provider.loadLocationData,
-          onConfirm: (value) => provider.onResidencyStatusSelected(value?.toString()),
+          onConfirm: (value) =>
+              provider.onResidencyStatusSelected(value?.toString()),
           isSearch: true,
         ),
       ],
@@ -133,7 +155,7 @@ class _SearchMatchesScreenState extends ConsumerState<SearchMatchesScreen> {
       buttonStyle: ButtonsStyle.activePrimaryButton,
       title: 'Search Now',
       onTap: () {
-   Navigator.pop(context);
+        Navigator.pop(context);
       },
     );
   }
