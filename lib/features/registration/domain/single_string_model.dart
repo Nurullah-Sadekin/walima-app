@@ -20,24 +20,9 @@ class SingleStringModel {
 }
 
 List<SingleStringModel> dietDataListInserted = [
-  SingleStringModel(name: 'Healthy'),
-  SingleStringModel(name: 'Modern Balanced Diet'),
-  SingleStringModel(name: 'Vegetarian'),
-  SingleStringModel(name: 'Vegan'),
-  SingleStringModel(name: 'Junk Food Lover'),
-  SingleStringModel(name: 'Low Carb'),
-  SingleStringModel(name: 'Low Fat'),
-  SingleStringModel(name: 'Low Sodium'),
-  SingleStringModel(name: 'Low Cholesterol'),
-  SingleStringModel(name: 'Low Sugar'),
-  SingleStringModel(name: 'Low Salt'),
-  SingleStringModel(name: 'No Preferences'),
-  SingleStringModel(name: 'Low Fat'),
-  SingleStringModel(name: 'Low Sodium'),
-  SingleStringModel(name: 'Low Cholesterol'),
-  SingleStringModel(name: 'Low Sugar'),
-  SingleStringModel(name: 'Low Salt'),
-  SingleStringModel(name: 'No Preferences'),
+  SingleStringModel(name: 'Veg'),
+  SingleStringModel(name: 'Non-Veg'),
+  SingleStringModel(name: 'Jain'),
 ];
 
 List<SingleStringModel> incomeRangeListInserted = [

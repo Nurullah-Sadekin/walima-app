@@ -34,7 +34,9 @@ import 'package:intl/intl.dart';
 
 class SearchMatchesProvider extends BaseChangeNotifier {
     SearchMatchesScreenStates screenStates = SearchMatchesScreenStates.defaultLoading;
+    SearchMatchesScreenStates loaderState = SearchMatchesScreenStates.defaultLoading;
 
+    final TextEditingController profileIdController = TextEditingController();
     final TextEditingController ageFromController = TextEditingController();
     final TextEditingController ageToController = TextEditingController();
     final TextEditingController heightFromController = TextEditingController();
@@ -49,11 +51,24 @@ class SearchMatchesProvider extends BaseChangeNotifier {
     final TextEditingController residencyStatusController = TextEditingController();
     final TextEditingController photoSettingController = TextEditingController();
 
+    // Additional controllers for dropdown selections
+    final TextEditingController qualificationController = TextEditingController();
+    final TextEditingController educationAreaController = TextEditingController();
+    final TextEditingController workingWithController = TextEditingController();
+    final TextEditingController professionAreaController = TextEditingController();
+    final TextEditingController profileManageByController = TextEditingController();
+
 
     List<SingleStringModel> ageRangeDropdownItems = ageListDataInserted;
     List<SingleStringModel> haveChildren = haveChildrenDataListInserted;
+    List<SingleStringModel> annualIncomeRange = incomeRangeListInserted;
+    List<SingleStringModel> dietData = dietDataListInserted;
 
     String? selectedHaveChildrenStatus;
+    String? selectedAnnualIncomeRangeStatus;
+    String? selectedDietStatus;
+    bool? filteredProfiles = false;
+    bool? viewedProfile = false;
 
     bool _isValidIndex(int index, int length) {
       return index >= 0 && index < length;
@@ -77,6 +92,39 @@ class SearchMatchesProvider extends BaseChangeNotifier {
         (item, selected) => item.isSelected = selected,
       );
       selectedHaveChildrenStatus = haveChildren[index].name;
+      notifyListeners();
+    }
+
+    void selectedAnnualIncome(int index) {
+      if (!_isValidIndex(index, annualIncomeRange.length)) return;
+      _setSingleSelection(
+        annualIncomeRange,
+        index,
+        (item, selected) => item.isSelected = selected,
+      );
+      selectedAnnualIncomeRangeStatus = annualIncomeRange[index].name;
+      notifyListeners();
+    }
+
+    void selectedDiet(int index) {
+      if (!_isValidIndex(index, dietData.length)) return;
+      _setSingleSelection(
+        dietData,
+        index,
+        (item, selected) => item.isSelected = selected,
+      );
+      selectedDietStatus = dietData[index].name;
+      notifyListeners();
+    }
+
+
+    void updateViewState({SearchMatchesScreenStates? screenStates,
+      SearchMatchesScreenStates? loadingState}) {
+      if (screenStates != null) {
+        this.screenStates = screenStates;
+        loaderState = SearchMatchesScreenStates.defaultLoading;
+      }
+      if (loadingState != null) loaderState = loadingState;
       notifyListeners();
     }
  }
