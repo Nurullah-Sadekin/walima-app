@@ -52,6 +52,7 @@ abstract class Paths {
 
   //Matches
   static const matches = '/matches';
+  static const searchMatches = '/searchMatches';
 
 
 }
@@ -108,5 +109,6 @@ abstract class Routes {
 
   //Matches
   static const matches = 'matches';
+  static const searchMatches = 'searchMatches';
 
 }

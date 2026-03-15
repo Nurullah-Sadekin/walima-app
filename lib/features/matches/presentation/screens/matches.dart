@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/provider/matcher_provider.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_boilerplate/features/matches/presentation/widgets/filter
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/tab_bar_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class MatchesScreen extends ConsumerStatefulWidget {
   const MatchesScreen({super.key});
@@ -110,7 +112,10 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             text: tabs[0],
             isSelected: provider.selectedTabIndex == 0,
             prefixImagePath: AppImages.searchSvgIcon,
-            onTap: () => provider.setSelectedTab(0),
+            onTap: () {
+              provider.setSelectedTab(0);
+              context.push(Paths.searchMatches);
+            },
           ),
           TabBarWidget(
             text: tabs[1],

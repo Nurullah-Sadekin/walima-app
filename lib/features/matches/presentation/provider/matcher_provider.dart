@@ -75,5 +75,4 @@ class MatchesProvider extends BaseChangeNotifier {
 enum MatchesProviderScreenStates {
   defaultLoading,
   loadingComplete,
-  preferences,
 }

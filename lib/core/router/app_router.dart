@@ -5,6 +5,7 @@ import 'package:flutter_boilerplate/features/login/presentation/screens/otp_veri
 import 'package:flutter_boilerplate/features/login/presentation/screens/reset_pssword_status.dart';
 import 'package:flutter_boilerplate/features/login/presentation/screens/send_otp.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/screens/matches.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/screens/search_metches.dart';
 import 'package:flutter_boilerplate/features/onboarding_screen.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/connect_matches.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/basic_details.dart';
@@ -227,6 +228,11 @@ GoRouter goRouter(GoRouterRef ref) {
         path: Paths.matches,
         name: Routes.matches,
         builder: (context, state) => const MatchesScreen(),
+      ),
+      GoRoute(
+        path: Paths.searchMatches,
+        name: Routes.searchMatches,
+        builder: (context, state) => const SearchMatchesScreen(),
       ),
       GoRoute(
         path: Paths.cropImage,
