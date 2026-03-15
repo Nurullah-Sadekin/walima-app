@@ -25,6 +25,17 @@ class MatchesProvider extends BaseChangeNotifier {
   String? selectedIsWithFamilyStatus;
   List<SingleStringModel> sortByDataList = sortByListDataInserted;
 
+  // Selected tab index for horizontal tabs in Matches screen
+  int selectedTabIndex = 0;
+
+  /// Update selected tab index and notify listeners
+  void setSelectedTab(int index) {
+    if (index == selectedTabIndex) return;
+    if (index < 0) return;
+    selectedTabIndex = index;
+    notifyListeners();
+  }
+
   bool _isValidIndex(int index, int length) {
     return index >= 0 && index < length;
   }
