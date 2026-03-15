@@ -121,6 +121,7 @@ List<SingleStringModel> otherInterestsItemListDataInserted = [
   SingleStringModel(name: 'Home decor'),
   SingleStringModel(name: 'Investments'),
 ];
+
 List<SingleStringModel> motherDetailsItemListDataInserted = [
   SingleStringModel(name: 'Housewife'),
   SingleStringModel(name: 'Working'),
@@ -133,6 +134,7 @@ List<SingleStringModel> motherDetailsItemListDataInserted = [
 
 
 ];
+
 List<SingleStringModel> fatherDetailsItemListDataInserted = [
   SingleStringModel(name: 'Engineer'),
   SingleStringModel(name: 'Doctor'),
@@ -143,6 +145,7 @@ List<SingleStringModel> fatherDetailsItemListDataInserted = [
   SingleStringModel(name: 'Other'),
 
 ];
+
 List<SingleStringModel> siblingCountListDataInserted = [
   SingleStringModel(name: '0'),
   SingleStringModel(name: '1'),
@@ -162,6 +165,7 @@ List<SingleStringModel> maritalStatusListDataInserted = [
   SingleStringModel(name: 'Awaiting Divorce'),
   SingleStringModel(name: 'Annulled'),
 ];
+
 List<SingleStringModel> countryListDataInserted = [
   SingleStringModel(name: 'Bangladesh'),
   SingleStringModel(name: 'India'),
@@ -195,4 +199,20 @@ List<SingleStringModel> filterListDataInserted = [
   SingleStringModel(name: 'Phone Verified Members'),
   SingleStringModel(name: 'Members with Photo'),
   SingleStringModel(name: 'Filtered Out Members'),
+];
+
+List<SingleStringModel> ageListDataInserted = [
+  SingleStringModel(name: '18'),
+  SingleStringModel(name: '19'),
+  SingleStringModel(name: '20'),
+  SingleStringModel(name: '21'),
+  SingleStringModel(name: '22'),
+  SingleStringModel(name: '23'),
+  SingleStringModel(name: '24'),
+  SingleStringModel(name: '25'),
+  SingleStringModel(name: '26'),
+  SingleStringModel(name: '27'),
+  SingleStringModel(name: '28'),
+  SingleStringModel(name: '29'),
+  SingleStringModel(name: '30'),
 ];

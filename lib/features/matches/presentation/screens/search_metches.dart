@@ -35,7 +35,6 @@ class _SearchMatchesScreenState extends ConsumerState<SearchMatchesScreen> {
 
   @override
   void dispose() {
-    provider.disposeControllersListener();
     super.dispose();
   }
 
@@ -98,55 +97,85 @@ class _SearchMatchesScreenState extends ConsumerState<SearchMatchesScreen> {
   }
 
   Widget personalizeYourSearch() {
-    return Column(
-      spacing: 20,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Column(
-          spacing: 10,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Have Children',
-              style: TextStyle(
-                fontSize: TextSize.font14(context),
-                fontWeight: FontWeight.w500,
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.greyLight),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          headLineText('Personalize Your Search', fontSize: TextSize.font16(context)),
+          SizedBox(height: TextSize.font16(context)),
+          headLineText('Age'),
+          Row(
+            spacing: 12,
+            children: [
+              Expanded(
+                child: DropDownField(
+                  hintText: 'From',
+                  popUpHeader: 'Age From',
+                  items: provider.ageRangeDropdownItems,
+                  controller: provider.ageFromController,
+                //  onConfirm: (value) => provider.onResidencyStatusSelected(value?.toString()),
+                  isSearch: true,
+                ),
               ),
-            ),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children:
-                  List.generate(provider.isWithFamilyDataList.length, (index) {
-                final isWithFamily = provider.isWithFamilyDataList[index];
+              Expanded(
+                child: DropDownField(
+                  hintText: 'To',
+                  popUpHeader: 'Age To',
+                  items: provider.ageRangeDropdownItems,
+                  controller: provider.ageToController,
+                 // onConfirm: (value) => provider.onResidencyStatusSelected(value?.toString()),
+                  isSearch: true,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: TextSize.font12(context)),
+          Column(
+            spacing: 10,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
 
-                return SelectionCard(
-                  buttonStyle: isWithFamily.isSelected
-                      ? SelectionStyle.selectedRadio
-                      : SelectionStyle.unSelectedRadio,
-                  onTap: () {
-                    provider.selectedIsWithFamily(index);
-                  },
-                  isSelected: isWithFamily.isSelected,
-                  title: isWithFamily.name,
-                  isExpand: false,
-                );
-              }),
-            ),
-          ],
-        ),
-        DropDownField(
-          headLine: 'Residency Status',
-          hintText: 'Select',
-          popUpHeader: 'Select Residency Status',
-          items: provider.residencyStatusDropdownItems,
-          controller: provider.residencyStatusController,
-          // onTap: provider.loadLocationData,
-          onConfirm: (value) =>
-              provider.onResidencyStatusSelected(value?.toString()),
-          isSearch: true,
-        ),
-      ],
+              headLineText('Have Children'),
+              // Wrap(
+              //   spacing: 10,
+              //   runSpacing: 10,
+              //   children:
+              //   List.generate(provider.isWithFamilyDataList.length, (index) {
+              //     final isWithFamily = provider.isWithFamilyDataList[index];
+              //
+              //     return SelectionCard(
+              //       buttonStyle: isWithFamily.isSelected
+              //           ? SelectionStyle.selectedRadio
+              //           : SelectionStyle.unSelectedRadio,
+              //       onTap: () {
+              //         provider.selectedIsWithFamily(index);
+              //       },
+              //       isSelected: isWithFamily.isSelected,
+              //       title: isWithFamily.name,
+              //       isExpand: false,
+              //     );
+              //   }),
+              // ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget headLineText(String text,{double? fontSize}) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: fontSize ?? TextSize.font14(context),
+        fontWeight: FontWeight.w500,
+      ),
     );
   }
 
