@@ -22,7 +22,7 @@ class MatchesScreen extends ConsumerStatefulWidget {
 
 class _MatchesScreenState extends ConsumerState<MatchesScreen> {
   MatchesProvider provider = MatchesProvider();
-  final tabs = ['Search', 'New', 'Daily', 'My Matches'];
+  final tabs = ['Search', 'New', 'Daily', 'My Matches','Near Me', 'More Matches'];
 
   @override
   void initState() {
@@ -131,6 +131,17 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             selectedBorderColor: AppColors.primary,
             onTap: () => provider.setSelectedTab(3),
           ),
+          TabBarWidget(
+            text: tabs[4],
+            isSelected: provider.selectedTabIndex == 4,
+            selectedBackgroundColor: AppColors.primary,
+            onTap: () => provider.setSelectedTab(4),
+          ),
+          TabBarWidget(
+            text: tabs[5],
+            isSelected: provider.selectedTabIndex == 5,
+            onTap: () => provider.setSelectedTab(5),
+          ),
         ],
       ),
     );
@@ -147,6 +158,10 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
           return _dailyTabContent();
         case 3:
           return _myMatchesContent();
+          case 4:
+          return _nearMeContent();
+        case 5:
+          return _moreMatchesContent();
         default:
           return _searchTabContent();
       }
@@ -228,6 +243,26 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
       children: [
         SizedBox(height: 8),
         Text('My Matches content'),
+      ],
+    );
+  }
+
+  Widget _nearMeContent() {
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 8),
+        Text('Near Me content'),
+      ],
+    );
+  }
+
+  Widget _moreMatchesContent() {
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 8),
+        Text('More Matches content'),
       ],
     );
   }
