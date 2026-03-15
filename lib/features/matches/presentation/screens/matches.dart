@@ -7,6 +7,8 @@ import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/provider/matcher_provider.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/empty_state.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/filter_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/tab_bar_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -66,7 +68,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
       children: [
         InkWell(
           onTap: () {
-            // Handle filter tap
+            _filter(context);
           },
           child: Container(
             padding: const EdgeInsets.all(8),
@@ -187,18 +189,33 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
 
   Widget _newTabContent() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
-        SizedBox(height: 8),
-        Text('New tab content'),
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        _newTabEmptyView(),
+      ],
+    );
+  }
+
+  Widget _newTabEmptyView() {
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        SizedBox(height: 50),
+        EmptyStateWidget(
+          title: 'No Matches Yet!',
+          subtitle:
+          'We do not have new matches at this point. Checkout my matches to find profiles matching your preference',
+          buttonText: 'My Matches',
+          onTap: null,
+        ),
       ],
     );
   }
 
   Widget _dailyTabContent() {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
+      children: [
         SizedBox(height: 8),
         Text('Daily tab content'),
       ],
@@ -206,12 +223,56 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
   }
 
   Widget _myMatchesContent() {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
+      children: [
         SizedBox(height: 8),
         Text('My Matches content'),
       ],
     );
   }
+
+  Future<void> _filter(BuildContext context,) async {
+    await showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+      ),
+      builder: (sheetCtx) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 20,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  InkWell(
+                    onTap: () => Navigator.of(sheetCtx).pop(),
+                    child: ShowImage(
+                      imagePath: AppImages.cancelSvgIcon,
+                      height: TextSize.font24(sheetCtx),
+                      width: TextSize.font24(sheetCtx),
+                    ),
+                  ),
+                ],
+              ),
+              FilterWidget(
+                title: 'Filter',
+                iconPath: AppImages.filterSvgIcon,
+                items: provider.sortByDataList.map((item) =>
+                    FilterItem(name: item.name, isSelected: item.isSelected),).toList(),
+                onItemTap: (index) {
+                  provider.sortBy(index);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
 }

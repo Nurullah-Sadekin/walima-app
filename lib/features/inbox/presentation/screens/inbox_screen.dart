@@ -344,4 +344,5 @@ class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProv
       },
     );
   }
+
 }
