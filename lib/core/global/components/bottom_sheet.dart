@@ -84,6 +84,58 @@ class BottomSheetUtils {
     );
   }
 
+
+  static Future<dynamic> open({required BuildContext context,required Widget child,bool? fullHeight}) async {
+    double maxHeight = MediaQuery.of(context).size.height * 0.9; // Max 60% of screen
+    return showModalBottomSheet(
+      context: context,
+      isScrollControlled: fullHeight ?? false,
+      backgroundColor: Colors.transparent,
+      useSafeArea: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Container(
+              // height: maxHeight, // Dynamic height based on content
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min, // Important: minimizes height
+                children: [
+                  // Header section with drag handle
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 4,
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.black26,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Expanded(child: child),
+                  const SizedBox(height: 20), // Add some spacing at the bottom
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   static Widget _buildHeader(BuildContext context, String header) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

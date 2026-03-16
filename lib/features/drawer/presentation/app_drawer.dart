@@ -125,7 +125,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
             onTopPressed: () {
               print('Edit pressed');
             },
-            onBottomPressed: () {
+            onEdit: () {
               print('Check pressed');
             },
           ),

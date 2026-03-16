@@ -16,7 +16,7 @@ class ProfileImageCard extends StatelessWidget {
     this.iconColor = AppColors.primary,
     this.borderColor = AppColors.white,
     this.onTopPressed,
-    this.onBottomPressed,
+    this.onEdit,
     this.showTopIcon = true,
     this.showBottomIcon = true,
     this.bottomPositionImagePath,
@@ -33,7 +33,7 @@ class ProfileImageCard extends StatelessWidget {
   final Color iconColor;
   final Color borderColor;
   final VoidCallback? onTopPressed;
-  final VoidCallback? onBottomPressed;
+  final VoidCallback? onEdit;
   final bool showTopIcon;
   final bool showBottomIcon;
   final String? bottomPositionImagePath;
@@ -51,18 +51,21 @@ class ProfileImageCard extends StatelessWidget {
             clipBehavior: Clip.none,
             children: [
 
-              Container(
-                padding: const EdgeInsets.all(3.0),
-                decoration: BoxDecoration(
-                  color: backgroundColor,
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: ShowImage(
-                  imagePath: imagePath,
-                  width: imageSize,
-                  height: imageSize,
-                  fit: imageFit,
-                  radius: const BorderRadius.all(Radius.circular(50)),
+              GestureDetector(
+                onTap: onTopPressed,
+                child: Container(
+                  padding: const EdgeInsets.all(3.0),
+                  decoration: BoxDecoration(
+                    color: backgroundColor,
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: ShowImage(
+                    imagePath: imagePath,
+                    width: imageSize,
+                    height: imageSize,
+                    fit: imageFit,
+                    radius: const BorderRadius.all(Radius.circular(50)),
+                  ),
                 ),
               ),
 
@@ -71,7 +74,7 @@ class ProfileImageCard extends StatelessWidget {
                   bottom: 0,
                   right: 0,
                   child: GestureDetector(
-                    onTap: onTopPressed,
+                    onTap: onEdit,
                     child: Container(
                       padding: EdgeInsets.all(iconSize * 0.25),
                       decoration: BoxDecoration(
@@ -98,14 +101,11 @@ class ProfileImageCard extends StatelessWidget {
                 Positioned(
                   top: 6,
                   left: 6,
-                  child: GestureDetector(
-                    onTap: onBottomPressed,
-                    child: ShowImage(
-                      imagePath: topPositionImagePath ?? AppImages.verifiedBadgeSvgIcon,
-                      width: iconSize,
-                      height: iconSize,
-                      fit: BoxFit.contain,
-                    ),
+                  child: ShowImage(
+                    imagePath: topPositionImagePath ?? AppImages.verifiedBadgeSvgIcon,
+                    width: iconSize,
+                    height: iconSize,
+                    fit: BoxFit.contain,
                   ),
                 ),
             ],

@@ -41,7 +41,7 @@ class AppUrls{
   static const String getLifestyleProfile = '$baseUrl/users/profile/lifestyle'; //GET
   static const String getProfilePreferences = '$baseUrl/users/profile/preferences'; //GET
   static const String getProfileContacts = '$baseUrl/users/profile/contacts'; //GET
-  static const String getProfilePhotos = '$baseUrl/users/profile/photos'; //GET
+  static const String getProfilePhotos = '$baseUrl/users/profile/photos'; //GET  // need to put after image upload
   static const String getProfilePhotoById = '$baseUrl/users/profile/photo/{photoId}'; //GET
   static const String getProfileInterests = '$baseUrl/users/profile/interests'; //GET
   static const String createProfile = '$baseUrl/users/profile'; //POST

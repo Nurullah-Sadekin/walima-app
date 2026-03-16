@@ -12,7 +12,7 @@ import 'package:flutter_boilerplate/core/providers/locale_provider.dart';
 void main() {
   runApp(
     const ProviderScope(
-      child: MyApp(),
+      child: SafeArea(bottom: true, top: false, left: false, right: false, child: MyApp()),
     ),
   );
 }

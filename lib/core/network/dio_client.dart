@@ -50,9 +50,7 @@ class DioClient {
           final isTokenRequired = options.extra[_isTokenKey] == true;
 
           if (isTokenRequired) {
-            final accessToken = (_authToken?.isNotEmpty ?? false)
-                ? _authToken!
-                : await PrefsHelper.getAccessToken();
+            final accessToken = (_authToken?.isNotEmpty ?? false) ? _authToken! : await PrefsHelper.getAccessToken();
 
             if (accessToken.isNotEmpty) {
               options.headers['Authorization'] = 'Bearer $accessToken';
@@ -75,7 +73,7 @@ class DioClient {
           final isRetried = error.requestOptions.extra[_retryKey] == true;
           final isTokenRequired = error.requestOptions.extra[_isTokenKey] == true;
 
-          if (statusCode == 403 && isTokenRequired && !isRefreshRequest && !isRetried) {
+          if ((statusCode == 403 || statusCode == 401) && isTokenRequired && !isRefreshRequest && !isRetried) {
             final refreshSuccess = await _refreshAccessTokenWithLock();
 
             if (refreshSuccess) {
@@ -187,9 +185,7 @@ class DioClient {
   }
 
   Future<Response<dynamic>> _retryRequest(RequestOptions requestOptions) async {
-    final accessToken = (_authToken?.isNotEmpty ?? false)
-        ? _authToken!
-        : await PrefsHelper.getAccessToken();
+    final accessToken = (_authToken?.isNotEmpty ?? false) ? _authToken! : await PrefsHelper.getAccessToken();
     final updatedHeaders = Map<String, dynamic>.from(requestOptions.headers);
     if (accessToken.isNotEmpty) {
       updatedHeaders['Authorization'] = 'Bearer $accessToken';
@@ -537,7 +533,6 @@ class DioClient {
 
 /// API Response wrapper class
 class ApiResponse<T> {
-
   ApiResponse({
     required this.isSuccess,
     required this.message,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
+import 'package:flutter_boilerplate/features/home/presentation/screens/edit_profile.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/social_media_icon.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/verification_tile.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
@@ -91,8 +93,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             showBottomIcon: true,
             topPositionImagePath: AppImages.verifiedBadgeSvgIcon,
             bottomPositionImagePath: AppImages.cameraSvgIcon,
-            onBottomPressed: () {
-              // print('Check pressed');
+            onEdit: () async {
+             final data = await BottomSheetUtils.open(
+                context: context,
+                fullHeight: true,
+                child: const EditProfileScreen(), 
+              );
+              print(data);
             },
           ),
           const SizedBox(width: 12),

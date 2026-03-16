@@ -7,6 +7,7 @@ import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
 import 'package:flutter_boilerplate/features/home/presentation/widgets/profile_info_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
+import 'package:go_router/go_router.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -39,7 +40,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           bgColor: AppColors.primary,
           svgIconColor: AppColors.white,
           onTap: ()  {
-
+              context.pop(
+                {'preview': true}
+              );
           },
           buttonStyle: ButtonsStyle.activePrimaryButton,
         ),
@@ -86,7 +89,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             showBottomIcon: true,
             topPositionImagePath: AppImages.verifiedBadgeSvgIcon,
             bottomPositionImagePath: AppImages.cameraSvgIcon,
-            onBottomPressed: () {
+            onEdit: () {
               // print('Check pressed');
             },
           ),
