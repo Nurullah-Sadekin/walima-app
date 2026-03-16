@@ -86,7 +86,6 @@ class BottomSheetUtils {
 
 
   static Future<dynamic> open({required BuildContext context,required Widget child,bool? fullHeight}) async {
-    double maxHeight = MediaQuery.of(context).size.height * 0.9; // Max 60% of screen
     return showModalBottomSheet(
       context: context,
       isScrollControlled: fullHeight ?? false,
@@ -125,7 +124,10 @@ class BottomSheetUtils {
                       ),
                     ],
                   ),
-                  Expanded(child: child),
+                  // Wrap the child so any `Navigator.pop(context, data)` from inside the child's
+                  // subtree will be forwarded as the modal bottom sheet result.
+                  // ignore: deprecated_member_use
+                  Expanded(child: _wrapChildForReturn(context, child)),
                   const SizedBox(height: 20), // Add some spacing at the bottom
                 ],
               ),
@@ -133,6 +135,34 @@ class BottomSheetUtils {
           },
         );
       },
+    );
+  }
+
+  /// Wraps the provided child in a nested [Navigator] which intercepts any
+  /// pop from the child's navigator (via [onPopPage]) and forwards the
+  /// popped `result` to the modal bottom sheet by calling
+  /// `Navigator.of(modalContext).pop(result)`. This makes
+  /// `Navigator.pop(childContext, data)` behave as if it returned `data`
+  /// from the `showModalBottomSheet` Future.
+  static Widget _wrapChildForReturn(BuildContext modalContext, Widget child) {
+    return Navigator(
+      onPopPage: (Route<dynamic> route, dynamic result) {
+        final bool didPop = route.didPop(result);
+        if (didPop) {
+          // Forward the result to the modal bottom sheet. Use a microtask
+          // to avoid calling pop synchronously while the nested route is
+          // finishing its own pop handling.
+          Future.microtask(() {
+            if (Navigator.of(modalContext).canPop()) {
+              Navigator.of(modalContext).pop(result);
+            }
+          });
+        }
+        return didPop;
+      },
+      pages: [
+        MaterialPage(child: child),
+      ],
     );
   }
 
