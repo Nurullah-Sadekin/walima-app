@@ -128,11 +128,11 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
               contactIsAvailable:  false,
               profileIsAvailable:  false,
               matchIsAvailable:  false,
+              features: item.features ,
               backgroundColor: AppColors.transparent,
-              packageBadgeText:  '',
-              packageThemeColor:  AppColors.primary,
-              packageBadgeBackgroundColor:  AppColors.primary,
-
+              packageBadgeText: item.tag,
+              packageThemeColor: const Color(0xFF7D52F4),
+              packageBadgeBackgroundColor: const Color (0xFFEFEBFF),
             );
           },
           options: CarouselOptions(

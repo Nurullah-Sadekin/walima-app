@@ -5,6 +5,7 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/icon_text_row.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/popular_badge.dart';
+import 'package:flutter_boilerplate/features/plans/data/models/get_plans_response.dart';
 
 class PackageCard extends StatelessWidget {
 
@@ -30,6 +31,7 @@ class PackageCard extends StatelessWidget {
     this.packageBadgeText,
     this.packageBadgeBackgroundColor,
     this.packageBadgeIcon,
+    this.features,
   });
 
   final String packageName;
@@ -56,6 +58,7 @@ class PackageCard extends StatelessWidget {
   final String? packageBadgeText;
   final Color? packageBadgeBackgroundColor;
   final String? packageBadgeIcon;
+  final List<Features>? features;
 
   @override
   Widget build(BuildContext context) {

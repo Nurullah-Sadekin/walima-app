@@ -19,7 +19,7 @@ class PlansProvider extends BaseChangeNotifier {
         'Our support team is here to assist with account, payment, or profile-related questions. You can contact us anytime through chat, email, or phone support.',
   };
 
-  // final List<UpgradePackageItem> packageItems = packageItemsDataInserted;
+  final List<UpgradePackageItem> packageItems = packageItemsDataInserted;
   UpgradePackageScreenStates screenStates = UpgradePackageScreenStates.complete;
   UpgradePackageScreenStates loaderState = UpgradePackageScreenStates.complete;
 
