@@ -7,11 +7,11 @@ import 'package:flutter_boilerplate/core/global/components/custom_expansion_tile
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
-import 'package:flutter_boilerplate/features/upgrade_package/presentation/screens/widgets/package_card.dart';
+import 'package:flutter_boilerplate/features/plans//presentation/screens/widgets/package_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/features/upgrade_package/presentation/providers/upgrade_package_provider.dart';
+import 'package:flutter_boilerplate/features/plans/presentation/providers/plans_provider.dart';
 import 'package:go_router/go_router.dart';
 
 class UpgradePackageScreen extends ConsumerStatefulWidget {
@@ -22,18 +22,18 @@ class UpgradePackageScreen extends ConsumerStatefulWidget {
 }
 
 class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
-  late UpgradePackageProvider provider;
+  late PlansProvider provider;
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(registrationProvider).getInitialData();
+      // ref.read(registrationProvider).getInitialData();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    provider = ref.watch(upgradePackageProvider);
+    provider = ref.watch(plansProvider);
     return Scaffold(
       body: GradientBackground(
         child: Column(
@@ -146,7 +146,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
             disableCenter: true,
             aspectRatio: 0.94,
             onPageChanged: (index, _) {
-              ref.read(upgradePackageProvider).changePage(index);
+              ref.read(plansProvider).changePage(index);
             },
           ),
         ),
@@ -156,7 +156,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
           children: List.generate(provider.packageItems.length, (index) {
             final isActive = provider.selectedPage == index;
             return GestureDetector(
-              onTap: () => ref.read(upgradePackageProvider).changePage(index),
+              onTap: () => ref.read(plansProvider).changePage(index),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
                 width: isActive ? 30 : 10,

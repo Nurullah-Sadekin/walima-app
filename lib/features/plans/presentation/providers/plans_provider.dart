@@ -1,7 +1,7 @@
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/features/upgrade_package/domain/upgrade_package_model.dart';
+import 'package:flutter_boilerplate/features/plans/domain/upgrade_package_model.dart';
 
-class UpgradePackageProvider extends BaseChangeNotifier {
+class PlansProvider extends BaseChangeNotifier {
 
   // current selected page index for carousel
   int selectedPage = 0;
@@ -25,7 +25,6 @@ class UpgradePackageProvider extends BaseChangeNotifier {
   Future<void> fetchUpgradePackages() async {
     updateViewState(loadingState: UpgradePackageScreenStates.loading);
     // Simulate a network call to fetch upgrade packages
-    await Future.delayed(const Duration(seconds: 2));
     // After fetching, update the state to loadingComplete
     updateViewState(screenStates: UpgradePackageScreenStates.complete);
   }

@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
@@ -126,7 +128,6 @@ class BottomSheetUtils {
                   ),
                   // Wrap the child so any `Navigator.pop(context, data)` from inside the child's
                   // subtree will be forwarded as the modal bottom sheet result.
-                  // ignore: deprecated_member_use
                   Expanded(child: _wrapChildForReturn(context, child)),
                   const SizedBox(height: 20), // Add some spacing at the bottom
                 ],
@@ -146,6 +147,7 @@ class BottomSheetUtils {
   /// from the `showModalBottomSheet` Future.
   static Widget _wrapChildForReturn(BuildContext modalContext, Widget child) {
     return Navigator(
+      // ignore: deprecated_member_use
       onPopPage: (Route<dynamic> route, dynamic result) {
         final bool didPop = route.didPop(result);
         if (didPop) {

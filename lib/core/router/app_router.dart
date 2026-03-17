@@ -16,7 +16,7 @@ import 'package:flutter_boilerplate/features/recommended_preferences/presentatio
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/partner_preferences.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/preference_location.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/crop_image.dart';
-import 'package:flutter_boilerplate/features/upgrade_package/presentation/screens/upgrade_package.dart';
+import 'package:flutter_boilerplate/features/plans/presentation/screens/plans_screen.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/about_you.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/email_phone.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/family_details.dart';

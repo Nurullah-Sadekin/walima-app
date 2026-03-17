@@ -94,12 +94,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             topPositionImagePath: AppImages.verifiedBadgeSvgIcon,
             bottomPositionImagePath: AppImages.cameraSvgIcon,
             onEdit: () async {
-             final data = await BottomSheetUtils.open(
+              await BottomSheetUtils.open(
                 context: context,
                 fullHeight: true,
                 child: const EditProfileScreen(), 
               );
-              print(data);
             },
           ),
           const SizedBox(width: 12),
