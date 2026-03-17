@@ -8,7 +8,7 @@ class ProfileAvatarWithName extends StatelessWidget {
   const ProfileAvatarWithName({
     super.key,
     required this.imagePath,
-    required this.name,
+    this.name,
     this.avatarSize = 56,
     this.indicatorSize = 14,
     this.spacing = 2,
@@ -18,7 +18,7 @@ class ProfileAvatarWithName extends StatelessWidget {
     this.onTap,
   });
   final String imagePath;
-  final String name;
+  final String? name;
   final double avatarSize;
   final double indicatorSize;
   final double spacing;
@@ -35,8 +35,11 @@ class ProfileAvatarWithName extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _buildAvatarStack(context),
-          SizedBox(height: spacing),
-          _buildNameText(context),
+          if (name?.isNotEmpty == true)...[
+            SizedBox(height: spacing),
+            _buildNameText(context),
+          ],
+
         ],
       ),
     );
@@ -73,7 +76,7 @@ class ProfileAvatarWithName extends StatelessWidget {
 
   Widget _buildNameText(BuildContext context) {
     return Text(
-      name,
+      name ?? '',
       textHeightBehavior: const TextHeightBehavior(
         applyHeightToFirstAscent: false,
         applyHeightToLastDescent: false,

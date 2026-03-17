@@ -7,6 +7,7 @@ import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/provider/chat_provider.dart';
+import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/chat_list_item.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/profile_avatar_with_name.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/count_down_timer.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/empty_state.dart';
@@ -58,14 +59,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   Widget _body() {
     return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisAlignment: MainAxisAlignment.start,
-        spacing: 10,
-        children: [
-          _topProfileView(),
-          _headerSection(),
-          _tabBarViewSection(),
-        ],
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        _topProfileView(),
+        const SizedBox(height: 16),
+        _headerSection(),
+        const SizedBox(height: 20),
+        _tabBarViewSection(),
+      ],
     );
   }
 
@@ -124,8 +126,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     return const Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        SizedBox(height: 8),
-        Text('All content'),
+        ChatListItem(
+          name: 'Sumaiya Akter',
+          isVerified: true,
+          lastMessage: 'Hey! How are you doing?',
+          timeAgo: '2:30 PM',
+        ),
       ],
     );
   }
@@ -137,15 +143,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: List.generate(
             10,
-                (index) => const Padding(
-              padding: EdgeInsets.only(
-                right: 10.0,
-              ),
-              child: ProfileAvatarWithName(
-                name: 'John Doe',
-                imagePath: AppImages.demoProfile,
-              ),
-            )),
+            (index) => const Padding(
+                  padding: EdgeInsets.only(
+                    right: 16.0,
+                  ),
+                  child: ProfileAvatarWithName(
+                    name: 'Sumaiya',
+                    imagePath: AppImages.demoProfile,
+                  ),
+                )),
       ),
     );
   }
