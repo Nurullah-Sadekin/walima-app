@@ -77,7 +77,7 @@ class PackageCard extends StatelessWidget {
                 spacing: 8,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
                         '$packageName / ',

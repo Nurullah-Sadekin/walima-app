@@ -1,46 +1,31 @@
-import 'dart:convert';
-GetPlansResponse getPlansResponseFromJson(String str) => GetPlansResponse.fromJson(json.decode(str));
-String getPlansResponseToJson(GetPlansResponse data) => json.encode(data.toJson());
+
 class GetPlansResponse {
   GetPlansResponse({
       this.code, 
       this.message, 
-      this.response, 
-      this.traceId,});
+      this.packages, 
+      this.traceId,
+  });
 
   GetPlansResponse.fromJson(dynamic json) {
     code = json['code'];
     message = json['message'];
     if (json['response'] != null) {
-      response = [];
+      packages = [];
       json['response'].forEach((v) {
-        response?.add(Response.fromJson(v));
+        packages?.add(Plans.fromJson(v));
       });
     }
     traceId = json['traceId'];
   }
   String? code;
   String? message;
-  List<Response>? response;
+  List<Plans>? packages;
   String? traceId;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['code'] = code;
-    map['message'] = message;
-    if (response != null) {
-      map['response'] = response?.map((v) => v.toJson()).toList();
-    }
-    map['traceId'] = traceId;
-    return map;
-  }
-
 }
 
-Response responseFromJson(String str) => Response.fromJson(json.decode(str));
-String responseToJson(Response data) => json.encode(data.toJson());
-class Response {
-  Response({
+class Plans {
+  Plans({
       this.id, 
       this.name, 
       this.slug, 
@@ -55,7 +40,7 @@ class Response {
       this.countryPlans, 
       this.features,});
 
-  Response.fromJson(dynamic json) {
+  Plans.fromJson(dynamic json) {
     id = json['id'];
     name = json['name'];
     slug = json['slug'];
@@ -125,8 +110,6 @@ class Response {
 
 }
 
-Features featuresFromJson(String str) => Features.fromJson(json.decode(str));
-String featuresToJson(Features data) => json.encode(data.toJson());
 class Features {
   Features({
       this.id, 
@@ -188,8 +171,6 @@ class Features {
 
 }
 
-Pricings pricingsFromJson(String str) => Pricings.fromJson(json.decode(str));
-String pricingsToJson(Pricings data) => json.encode(data.toJson());
 class Pricings {
   Pricings({
       this.id, 
