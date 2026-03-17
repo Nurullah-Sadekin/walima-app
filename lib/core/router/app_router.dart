@@ -38,6 +38,7 @@ import 'package:flutter_boilerplate/features/registration/presentation/screens/m
 import 'package:flutter_boilerplate/features/registration/presentation/screens/qualification.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/profession.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/about_yourself.dart';
+import '../../features/chat/presentation/screens/one_to_one_chat_screen.dart';
 import 'route_name.dart';
 part 'app_router.g.dart';
 
@@ -240,6 +241,15 @@ GoRouter goRouter(GoRouterRef ref) {
         builder: (context, state) {
           final imagePath = state.extra is String ? state.extra as String : null;
           return CropImageScreen(imagePath: imagePath);
+        },
+      ),
+
+      GoRoute(
+        path: Paths.chatScreen,
+        name: Routes.chatScreen,
+        builder: (context, state) {
+          // final imagePath = state.extra is String ? state.extra as String : null;
+          return ChatScreen();
         },
       ),
     ],

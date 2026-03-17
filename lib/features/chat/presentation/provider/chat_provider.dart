@@ -1,22 +1,9 @@
-import 'dart:async';
-
-import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
-import 'package:flutter_boilerplate/features/recommended_preferences/data/models/request/update_preferences_request_body.dart';
-import 'package:flutter_boilerplate/features/recommended_preferences/data/repository/preferences_repository.dart';
-import 'package:flutter_boilerplate/features/registration/data/repository/location_data_repository_impl.dart';
-import 'package:flutter_boilerplate/features/registration/data/repository/religion_data_repository_impl.dart';
-import 'package:flutter_boilerplate/features/registration/domain/location_data_model.dart';
-import 'package:flutter_boilerplate/features/registration/domain/profile_for_model.dart';
-import 'package:flutter_boilerplate/features/registration/domain/religion_option_model.dart';
-import 'package:flutter_boilerplate/features/registration/domain/repository/location_data_repository.dart';
-import 'package:flutter_boilerplate/features/registration/domain/repository/religion_data_repository.dart';
-import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
+import 'package:flutter_boilerplate/features/chat/data/repository/chat_repository.dart';
 
 class ChatProvider extends BaseChangeNotifier {
-  ChatProviderScreenStates screenStates = ChatProviderScreenStates.defaultLoading;
-  ChatProviderScreenStates loaderState = ChatProviderScreenStates.defaultLoading;
+  ChatScreenState screenStates = ChatScreenState.complete;
+  ChatScreenState loaderState = ChatScreenState.complete;
 
 
   int selectedTabIndex = 0;
@@ -29,19 +16,26 @@ class ChatProvider extends BaseChangeNotifier {
   }
 
 
+  Future<void> getInitialData() async {
+    updateViewState(loadingState: ChatScreenState.loading);
+    await ChatRepository.getConnectableUserList();
+    await ChatRepository.getConversation();
+    updateViewState(screenStates: ChatScreenState.complete);
+  }
+
   void updateViewState(
-      {ChatProviderScreenStates? screenStates,
-        ChatProviderScreenStates? loadingState}) {
+      {ChatScreenState? screenStates,
+        ChatScreenState? loadingState}) {
     if (screenStates != null) {
       this.screenStates = screenStates;
-      loaderState = ChatProviderScreenStates.defaultLoading;
+      loaderState = ChatScreenState.complete;
     }
     if (loadingState != null) loaderState = loadingState;
     notifyListeners();
   }
 }
 
-enum ChatProviderScreenStates {
-  defaultLoading,
-  loadingComplete,
+enum ChatScreenState {
+  loading,
+  complete,
 }

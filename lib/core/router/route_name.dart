@@ -53,6 +53,7 @@ abstract class Paths {
   //Matches
   static const matches = '/matches';
   static const searchMatches = '/searchMatches';
+  static const chatScreen = '/chatScreen';
 
 
 }
@@ -110,5 +111,7 @@ abstract class Routes {
   //Matches
   static const matches = 'matches';
   static const searchMatches = 'searchMatches';
+  static const chatHome = 'chatHome';
+  static const chatScreen = 'chatScreen';
 
 }
