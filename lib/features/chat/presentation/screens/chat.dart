@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
+import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/provider/matcher_provider.dart';
+import 'package:flutter_boilerplate/features/chat/presentation/provider/chat_provider.dart';
+import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/profile_avatar_with_name.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/count_down_timer.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/empty_state.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/tab_bar_widget.dart';
@@ -17,18 +21,18 @@ class ChatScreen extends ConsumerStatefulWidget {
 }
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
-  MatchesProvider provider = MatchesProvider();
+  ChatProvider provider = ChatProvider();
   final tabs = ['All', 'Unread', 'Calls'];
 
   @override
   void initState() {
     super.initState();
-    provider = ref.read(matchesProvider);
+    provider = ref.read(chatProvider);
   }
 
   @override
   Widget build(BuildContext context) {
-    provider = ref.watch(matchesProvider);
+    provider = ref.watch(chatProvider);
     return Scaffold(
       body: GradientBackground(
         child: Padding(
@@ -54,12 +58,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   Widget _body() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: 10,
         children: [
-      _headerSection(),
-      Expanded(child: _tabBarViewSection()),
-    ]);
+          _headerSection(),
+          Expanded(child: _tabBarViewSection()),
+        ]);
   }
 
   Widget _headerSection() {
@@ -71,7 +75,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       scrollDirection: Axis.horizontal,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 8,
         children: [
           TabBarWidget(
@@ -91,7 +95,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             selectedBackgroundColor: AppColors.primary,
             onTap: () => provider.setSelectedTab(2),
           ),
-
         ],
       ),
     );
@@ -115,18 +118,25 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   Widget _allTabContent() {
-    return const Column(
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        EmptyStateWidget(
-            title: 'Sorry!',
-            subtitle:
-            'No today’s matches found. Please try again till then, search for your partner.',
-            buttonText: 'Search Now')
+
+        const ProfileAvatarWithName(
+          imagePath: AppImages.demoProfile,
+          name: 'Ayesha',
+        ),
+        ProfileAvatarWithName(
+          imagePath: AppImages.demoProfile,
+          name: 'Ayesha',
+          indicatorColor: AppColors.errorBorderColor,
+          onTap: () {
+            // Handle tap
+          },
+        )
       ],
     );
   }
-
 
   Widget unreadTabContent() {
     return const Column(
@@ -150,7 +160,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   Widget callsTabContent() {
     return const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         SizedBox(height: 8),
         Text('Near Me content'),
