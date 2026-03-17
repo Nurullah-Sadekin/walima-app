@@ -1,3 +1,4 @@
+import 'package:flutter_boilerplate/features/chat/presentation/provider/chat_provider.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/providers/app_drawer_provider.dart';
 import 'package:flutter_boilerplate/features/home/presentation/providers/home_provider.dart';
 import 'package:flutter_boilerplate/features/login/presentation/providers/login_provider.dart';
@@ -124,4 +125,8 @@ final profileProvider = ChangeNotifierProvider<ProfileProvider>((ref) {
 
 final searchMatchesProvider = ChangeNotifierProvider<SearchMatchesProvider>((ref) {
   return SearchMatchesProvider();
+});
+
+final chatProvider = ChangeNotifierProvider<ChatProvider>((ref) {
+  return ChatProvider();
 });

@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:flutter_boilerplate/features/chat/presentation/screens/chat.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/home_screen.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/screens/inbox_screen.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/screens/matches.dart';
@@ -23,7 +24,7 @@ class AnchorPointScreen extends ConsumerWidget {
       const HomeScreen(),
       const MatchesScreen(),
       const InboxScreen(),
-      Container(),
+      const ChatScreen(),
       Container(),
     ];
     return WillPopScope(
