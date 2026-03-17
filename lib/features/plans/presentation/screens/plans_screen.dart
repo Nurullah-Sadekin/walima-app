@@ -5,6 +5,7 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_expansion_tile.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
+import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/plans//presentation/screens/widgets/package_card.dart';
@@ -18,7 +19,8 @@ class UpgradePackageScreen extends ConsumerStatefulWidget {
   const UpgradePackageScreen({super.key});
 
   @override
-  ConsumerState<UpgradePackageScreen> createState() => _UpgradePackageScreenState();
+  ConsumerState<UpgradePackageScreen> createState() =>
+      _UpgradePackageScreenState();
 }
 
 class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
@@ -34,26 +36,27 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
   @override
   Widget build(BuildContext context) {
     provider = ref.watch(plansProvider);
-    return Scaffold(
-      body: GradientBackground(
-        child: Column(
-          children: [
-            _appbarSection(),
-            _body(),
-          ],
-        ),
-      ),
-    );
+    return  Scaffold(
+            body: GradientBackground(
+              child: Column(
+                children: [
+                  _appbarSection(),
+                  provider.loaderState == UpgradePackageScreenStates.loading
+                      ? const Center(child: Loading())
+                      : _body(),
+                ],
+              ),
+            ),
+          );
   }
 
-
   Widget _appbarSection() {
-    return  CustomBackAppBar(
+    return CustomBackAppBar(
       isBackButton: true,
       backIconBackground: AppColors.transparent,
       isTrailing: true,
       trailingText: 'Skip',
-      onTrailingTap: (){
+      onTrailingTap: () {
         context.push(Paths.anchor);
       },
     );
@@ -76,7 +79,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
     return Column(
       children: [
         const ShowImage(
-          imagePath:  AppImages.upgradePremium,
+          imagePath: AppImages.upgradePremium,
           width: 140,
           height: 110,
         ),
@@ -115,24 +118,29 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
             final item = provider.packages[index];
             return PackageCard(
               packageName: item.name ?? '',
-              duration:  '',
-              packagePrice: (item.pricings != null && item.pricings!.isNotEmpty ? item.pricings!.first.price ?? 0 : 0).toString(),
-              perMonthPrice:item.pricings != null && item.pricings!.isNotEmpty ? item.pricings!.first.billingCycle ?? '' : '',
-              buttonText:  'Continue',
+              duration: '',
+              packagePrice: (item.pricings != null && item.pricings!.isNotEmpty
+                      ? item.pricings!.first.price ?? 0
+                      : 0)
+                  .toString(),
+              perMonthPrice: item.pricings != null && item.pricings!.isNotEmpty
+                  ? item.pricings!.first.billingCycle ?? ''
+                  : '',
+              buttonText: 'Continue',
               buttonOnTap: () {},
               messageText: 'Send unlimited messages',
               contactCount: 100,
               profileText: 'Profile highlight',
               matchText: 'Direct contact from matches',
-              messageIsAvailable:   false,
-              contactIsAvailable:  false,
-              profileIsAvailable:  false,
-              matchIsAvailable:  false,
-              features: item.features ,
+              messageIsAvailable: false,
+              contactIsAvailable: false,
+              profileIsAvailable: false,
+              matchIsAvailable: false,
+              features: item.features,
               backgroundColor: AppColors.transparent,
               packageBadgeText: item.tag,
               packageThemeColor: const Color(0xFF7D52F4),
-              packageBadgeBackgroundColor: const Color (0xFFEFEBFF),
+              packageBadgeBackgroundColor: const Color(0xFFEFEBFF),
             );
           },
           options: CarouselOptions(
@@ -175,11 +183,12 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
   }
 
   Widget _haveQuestionSection() {
-    return  Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         const SizedBox(height: 40),
-        Text('You Have Questions?',
+        Text(
+          'You Have Questions?',
           style: TextStyle(
             fontSize: TextSize.font18(context),
             fontWeight: FontWeight.w700,
@@ -191,13 +200,14 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
           spacing: 10,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: provider.haveQuestion.entries.map((entry) {
-            return  CustomExpansionTile(
+            return CustomExpansionTile(
               title: entry.key,
               backgroundColor: AppColors.transparent,
               titleBackgroundColor: AppColors.transparent,
               bottomMargin: 16,
               borderColor: AppColors.primary,
-              child: Text(entry.value,
+              child: Text(
+                entry.value,
                 style: TextStyle(
                   fontSize: TextSize.font12(context),
                   fontWeight: FontWeight.w400,
@@ -219,7 +229,8 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Still Need Help?',
+              Text(
+                'Still Need Help?',
                 style: TextStyle(
                   fontSize: TextSize.font18(context),
                   fontWeight: FontWeight.w500,
@@ -227,7 +238,8 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
                 ),
               ),
               const SizedBox(height: 6),
-              Text('We are right here to help you. Give us a call anything between  10am-7pm',
+              Text(
+                'We are right here to help you. Give us a call anything between  10am-7pm',
                 style: TextStyle(
                   fontSize: TextSize.font14(context),
                   fontWeight: FontWeight.w400,
@@ -253,7 +265,8 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
                         ),
                       ),
                       const SizedBox(width: 6),
-                      Text('01715-7277279',
+                      Text(
+                        '01715-7277279',
                         style: TextStyle(
                           fontSize: TextSize.font14(context),
                           fontWeight: FontWeight.w500,
@@ -279,7 +292,8 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
                         ),
                       ),
                       const SizedBox(width: 6),
-                      Text('01715-7277279',
+                      Text(
+                        '01715-7277279',
                         style: TextStyle(
                           fontSize: TextSize.font14(context),
                           fontWeight: FontWeight.w500,
@@ -296,5 +310,4 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
       ],
     );
   }
-
 }
