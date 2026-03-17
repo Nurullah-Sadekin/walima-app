@@ -166,7 +166,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         SizedBox(height: 8),
-        Text('Near Me content'),
+        Text('No Calls content'),
       ],
     );
   }
