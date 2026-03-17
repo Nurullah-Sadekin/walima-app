@@ -8,9 +8,10 @@ import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/provider/chat_provider.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/chat_list_item.dart';
+import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/dismissible_safety_card.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/profile_avatar_with_name.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/count_down_timer.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/empty_state.dart';
+import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/safety_First_bottom_sheet.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/safety_first_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/tab_bar_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -157,23 +158,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   Widget unreadTabContent() {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SizedBox(height: 50),
-        CountdownTimer(
-          initialHours: 8,
-          initialMinutes: 24,
-          initialSeconds: 48,
-        ),
-        SizedBox(height: 30),
-        EmptyStateWidget(
-            title: 'Sorry!',
-            subtitle:
-                'No today’s matches found. Please try again till then, search for your partner.',
-            buttonText: 'Search Now')
-      ],
-    );
+    return const SafetyFirst();
   }
 
   Widget callsTabContent() {
@@ -181,7 +166,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         SizedBox(height: 8),
-        Text('Near Me content'),
+        Text('No Calls content'),
       ],
     );
   }
