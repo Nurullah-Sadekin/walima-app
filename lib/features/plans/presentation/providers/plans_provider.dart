@@ -32,9 +32,13 @@ class PlansProvider extends BaseChangeNotifier {
     updateViewState(loadingState: UpgradePackageScreenStates.loading);
     final response = await PlanRepository.getAllPlans();
     if (response.packages != null) {
-      packages = response.packages!;
+      //have to remove the free plan from the list of packages
+      final plansAfterRemoveFree = response.packages!
+          .where((plan) => plan.name?.toLowerCase() != 'free')
+          .toList();
+      packages = plansAfterRemoveFree;
     }
-    updateViewState(screenStates: UpgradePackageScreenStates.complete);
+    updateViewState(loadingState: UpgradePackageScreenStates.complete);
   }
 
   void updateViewState({
