@@ -59,11 +59,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Widget _body() {
     return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.start,
         spacing: 10,
         children: [
+          _topProfileView(),
           _headerSection(),
-          Expanded(child: _tabBarViewSection()),
-        ]);
+          _tabBarViewSection(),
+        ],
+    );
   }
 
   Widget _headerSection() {
@@ -118,23 +121,32 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   Widget _allTabContent() {
-    return Row(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-
-        const ProfileAvatarWithName(
-          imagePath: AppImages.demoProfile,
-          name: 'Ayesha',
-        ),
-        ProfileAvatarWithName(
-          imagePath: AppImages.demoProfile,
-          name: 'Ayesha',
-          indicatorColor: AppColors.errorBorderColor,
-          onTap: () {
-            // Handle tap
-          },
-        )
+        SizedBox(height: 8),
+        Text('All content'),
       ],
+    );
+  }
+
+  Widget _topProfileView() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: List.generate(
+            10,
+                (index) => const Padding(
+              padding: EdgeInsets.only(
+                right: 10.0,
+              ),
+              child: ProfileAvatarWithName(
+                name: 'John Doe',
+                imagePath: AppImages.demoProfile,
+              ),
+            )),
+      ),
     );
   }
 
