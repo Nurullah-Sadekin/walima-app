@@ -76,6 +76,13 @@ class AppImages {
   static const String chatIcon = 'assets/svgIcons/chat_icon.svg';
   static const String cancelSvgIcon = 'assets/svgIcons/cancel.svg';
 
+  static const String arrowRightSvgIcon = 'assets/svgIcons/arrow_left.svg';
+  static const String alertSvgIcon = 'assets/svgIcons/alert.svg';
+  static const String flagSvgIcon = 'assets/svgIcons/flag.svg';
+  static const String lockPasswordSvgIcon = 'assets/svgIcons/lock_password.svg';
+
+
+
 
 
   // svg image paths
