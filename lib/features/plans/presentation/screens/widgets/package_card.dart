@@ -72,7 +72,7 @@ class PackageCard extends StatelessWidget {
           ),
           child: Column(
             children: [
-              const SizedBox(height: 60),
+              const SizedBox(height: 50),
               Column(
                 spacing: 8,
                 children: [
@@ -119,48 +119,51 @@ class PackageCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               PrimaryButtons(
                 buttonStyle: ButtonsStyle.activePrimaryButton,
                 onTap: buttonOnTap,
                 title: buttonText,
               ),
-              const SizedBox(height: 24),
-              Column(
-                spacing: 20,
-                children: [
-                  IconTextRow(
-                    imagePath: AppImages.messageSvgIcon,
-                    text: messageText ?? 'Send unlimited messages',
-                    textColor: AppColors.textSecondaryLight,
-                    imageColor: AppColors.hintTextColor,
-                    availableOption: messageIsAvailable,
-                  ),
-                  IconTextRow(
-                    imagePath: AppImages.contactSvgIcon,
-                    text: contactText ?? 'View uo to $contactCount contact numbers',
-                    textColor: AppColors.textSecondaryLight,
-                    imageColor: AppColors.hintTextColor,
-                    availableOption: contactIsAvailable,
-                  ),
-                  IconTextRow(
-                    imagePath: AppImages.profileSvgIcon,
-                    text: profileText ?? 'Profile highlight',
-                    textColor: AppColors.textSecondaryLight,
-                    imageColor: AppColors.hintTextColor,
-                    availableOption: profileIsAvailable,
-                  ),
-                  IconTextRow(
-                    imagePath: AppImages.matchSvgIcon,
-                    text: matchText ?? 'Direct contact from matches',
-                    textColor: AppColors.textSecondaryLight,
-                    imageColor: AppColors.hintTextColor,
-                    availableOption: matchIsAvailable,
-                  ),
-                ],
+              // const SizedBox(height: 24),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    IconTextRow(
+                      imagePath: AppImages.messageSvgIcon,
+                      text: messageText ?? 'Send unlimited messages',
+                      textColor: AppColors.textSecondaryLight,
+                      imageColor: AppColors.hintTextColor,
+                      availableOption: messageIsAvailable,
+                    ),
+                    IconTextRow(
+                      imagePath: AppImages.contactSvgIcon,
+                      text: contactText ?? 'View uo to $contactCount contact numbers',
+                      textColor: AppColors.textSecondaryLight,
+                      imageColor: AppColors.hintTextColor,
+                      availableOption: contactIsAvailable,
+                    ),
+                    IconTextRow(
+                      imagePath: AppImages.profileSvgIcon,
+                      text: profileText ?? 'Profile highlight',
+                      textColor: AppColors.textSecondaryLight,
+                      imageColor: AppColors.hintTextColor,
+                      availableOption: profileIsAvailable,
+                    ),
+                    IconTextRow(
+                      imagePath: AppImages.matchSvgIcon,
+                      text: matchText ?? 'Direct contact from matches',
+                      textColor: AppColors.textSecondaryLight,
+                      imageColor: AppColors.hintTextColor,
+                      availableOption: matchIsAvailable,
+                    ),
+                  ],
+                ),
               ),
 
-              const SizedBox(height: 20),
+              // const SizedBox(height: 20),
             ],
           ),
         ),

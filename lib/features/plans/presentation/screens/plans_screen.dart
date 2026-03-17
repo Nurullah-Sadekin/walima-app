@@ -77,8 +77,8 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
       children: [
         const ShowImage(
           imagePath:  AppImages.upgradePremium,
-          width: 145,
-          height: 120,
+          width: 140,
+          height: 110,
         ),
         const SizedBox(height: 20),
         Text(
@@ -94,7 +94,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
 
   Widget _bodySection() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -130,10 +130,8 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
               matchIsAvailable: item.matchIsAvailable ?? false,
               backgroundColor: AppColors.transparent,
               packageBadgeText: item.packageBadgeText ?? '',
-              packageThemeColor:
-                  item.packageThemeColor ?? AppColors.transparent,
-              packageBadgeBackgroundColor:
-                  item.packageBadgeBackgroundColor ?? AppColors.transparent,
+              packageThemeColor: item.packageThemeColor ?? AppColors.transparent,
+              packageBadgeBackgroundColor: item.packageBadgeBackgroundColor ?? AppColors.transparent,
             );
           },
           options: CarouselOptions(
