@@ -5,6 +5,7 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/icon_text_row.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/popular_badge.dart';
+import 'package:flutter_boilerplate/features/plans/data/models/get_plans_response.dart';
 
 class PackageCard extends StatelessWidget {
 
@@ -30,6 +31,7 @@ class PackageCard extends StatelessWidget {
     this.packageBadgeText,
     this.packageBadgeBackgroundColor,
     this.packageBadgeIcon,
+    this.features,
   });
 
   final String packageName;
@@ -56,6 +58,7 @@ class PackageCard extends StatelessWidget {
   final String? packageBadgeText;
   final Color? packageBadgeBackgroundColor;
   final String? packageBadgeIcon;
+  final List<Features>? features;
 
   @override
   Widget build(BuildContext context) {
@@ -72,12 +75,12 @@ class PackageCard extends StatelessWidget {
           ),
           child: Column(
             children: [
-              const SizedBox(height: 60),
+              const SizedBox(height: 50),
               Column(
                 spacing: 8,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
                         '$packageName / ',
@@ -119,48 +122,51 @@ class PackageCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               PrimaryButtons(
                 buttonStyle: ButtonsStyle.activePrimaryButton,
                 onTap: buttonOnTap,
                 title: buttonText,
               ),
-              const SizedBox(height: 24),
-              Column(
-                spacing: 20,
-                children: [
-                  IconTextRow(
-                    imagePath: AppImages.messageSvgIcon,
-                    text: messageText ?? 'Send unlimited messages',
-                    textColor: AppColors.textSecondaryLight,
-                    imageColor: AppColors.hintTextColor,
-                    availableOption: messageIsAvailable,
-                  ),
-                  IconTextRow(
-                    imagePath: AppImages.contactSvgIcon,
-                    text: contactText ?? 'View uo to $contactCount contact numbers',
-                    textColor: AppColors.textSecondaryLight,
-                    imageColor: AppColors.hintTextColor,
-                    availableOption: contactIsAvailable,
-                  ),
-                  IconTextRow(
-                    imagePath: AppImages.profileSvgIcon,
-                    text: profileText ?? 'Profile highlight',
-                    textColor: AppColors.textSecondaryLight,
-                    imageColor: AppColors.hintTextColor,
-                    availableOption: profileIsAvailable,
-                  ),
-                  IconTextRow(
-                    imagePath: AppImages.matchSvgIcon,
-                    text: matchText ?? 'Direct contact from matches',
-                    textColor: AppColors.textSecondaryLight,
-                    imageColor: AppColors.hintTextColor,
-                    availableOption: matchIsAvailable,
-                  ),
-                ],
+              // const SizedBox(height: 24),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    IconTextRow(
+                      imagePath: AppImages.messageSvgIcon,
+                      text: messageText ?? 'Send unlimited messages',
+                      textColor: AppColors.textSecondaryLight,
+                      imageColor: AppColors.hintTextColor,
+                      availableOption: messageIsAvailable,
+                    ),
+                    IconTextRow(
+                      imagePath: AppImages.contactSvgIcon,
+                      text: contactText ?? 'View uo to $contactCount contact numbers',
+                      textColor: AppColors.textSecondaryLight,
+                      imageColor: AppColors.hintTextColor,
+                      availableOption: contactIsAvailable,
+                    ),
+                    IconTextRow(
+                      imagePath: AppImages.profileSvgIcon,
+                      text: profileText ?? 'Profile highlight',
+                      textColor: AppColors.textSecondaryLight,
+                      imageColor: AppColors.hintTextColor,
+                      availableOption: profileIsAvailable,
+                    ),
+                    IconTextRow(
+                      imagePath: AppImages.matchSvgIcon,
+                      text: matchText ?? 'Direct contact from matches',
+                      textColor: AppColors.textSecondaryLight,
+                      imageColor: AppColors.hintTextColor,
+                      availableOption: matchIsAvailable,
+                    ),
+                  ],
+                ),
               ),
 
-              const SizedBox(height: 20),
+              // const SizedBox(height: 20),
             ],
           ),
         ),

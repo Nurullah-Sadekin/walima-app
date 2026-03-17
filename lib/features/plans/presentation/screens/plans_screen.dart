@@ -27,7 +27,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // ref.read(registrationProvider).getInitialData();
+      ref.read(plansProvider).fetchUpgradePackages();
     });
   }
 
@@ -77,8 +77,8 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
       children: [
         const ShowImage(
           imagePath:  AppImages.upgradePremium,
-          width: 145,
-          height: 120,
+          width: 140,
+          height: 110,
         ),
         const SizedBox(height: 20),
         Text(
@@ -94,7 +94,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
 
   Widget _bodySection() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -110,30 +110,29 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
     return Column(
       children: [
         CarouselSlider.builder(
-          itemCount: provider.packageItems.length,
+          itemCount: provider.packages.length,
           itemBuilder: (context, index, realIdx) {
-            final item = provider.packageItems[index];
+            final item = provider.packages[index];
             return PackageCard(
-              packageName: item.packageName,
-              duration: item.duration,
-              packagePrice: item.packagePrice,
-              perMonthPrice: item.perMonthPrice,
-              buttonText: item.buttonText ?? 'Continue',
+              packageName: item.name ?? '',
+              duration:  '',
+              packagePrice: (item.pricings != null && item.pricings!.isNotEmpty ? item.pricings!.first.price ?? 0 : 0).toString(),
+              perMonthPrice:item.pricings != null && item.pricings!.isNotEmpty ? item.pricings!.first.billingCycle ?? '' : '',
+              buttonText:  'Continue',
               buttonOnTap: () {},
               messageText: 'Send unlimited messages',
               contactCount: 100,
               profileText: 'Profile highlight',
               matchText: 'Direct contact from matches',
-              messageIsAvailable: item.messageIsAvailable ?? false,
-              contactIsAvailable: item.contactIsAvailable ?? false,
-              profileIsAvailable: item.profileIsAvailable ?? false,
-              matchIsAvailable: item.matchIsAvailable ?? false,
+              messageIsAvailable:   false,
+              contactIsAvailable:  false,
+              profileIsAvailable:  false,
+              matchIsAvailable:  false,
+              features: item.features ,
               backgroundColor: AppColors.transparent,
-              packageBadgeText: item.packageBadgeText ?? '',
-              packageThemeColor:
-                  item.packageThemeColor ?? AppColors.transparent,
-              packageBadgeBackgroundColor:
-                  item.packageBadgeBackgroundColor ?? AppColors.transparent,
+              packageBadgeText: item.tag,
+              packageThemeColor: const Color(0xFF7D52F4),
+              packageBadgeBackgroundColor: const Color (0xFFEFEBFF),
             );
           },
           options: CarouselOptions(
@@ -153,7 +152,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
         const SizedBox(height: 20),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(provider.packageItems.length, (index) {
+          children: List.generate(provider.packages.length, (index) {
             final isActive = provider.selectedPage == index;
             return GestureDetector(
               onTap: () => ref.read(plansProvider).changePage(index),
