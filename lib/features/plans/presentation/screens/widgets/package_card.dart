@@ -12,53 +12,16 @@ class PackageCard extends StatelessWidget {
   const PackageCard({
     super.key,
     required this.packageName,
-    this.packageThemeColor,
-    this.duration,
-    required this.packagePrice,
-    required this.perMonthPrice,
-    this.buttonText,
     required this.buttonOnTap,
-    this.messageText,
-    this.contactText,
-    this.contactCount = 0,
-    this.profileText,
-    this.matchText,
-    this.messageIsAvailable = false,
-    this.contactIsAvailable = false,
-    this.profileIsAvailable = false,
-    this.matchIsAvailable = false,
-    this.backgroundColor,
-    this.packageBadgeText,
-    this.packageBadgeBackgroundColor,
-    this.packageBadgeIcon,
-    this.features,
+    required this.plan
+
   });
 
   final String packageName;
-  final Color? packageThemeColor;
-  final String? duration;
-  final String packagePrice;
-  final String perMonthPrice;
-
-  final String? buttonText;
   final VoidCallback buttonOnTap;
+  final Plans plan;
 
-  final String? messageText;
-  final String? contactText;
-  final int? contactCount;
-  final String? profileText;
-  final String? matchText;
 
-  final bool? messageIsAvailable;
-  final bool? contactIsAvailable;
-  final bool? profileIsAvailable;
-  final bool? matchIsAvailable;
-
-  final Color? backgroundColor;
-  final String? packageBadgeText;
-  final Color? packageBadgeBackgroundColor;
-  final String? packageBadgeIcon;
-  final List<Features>? features;
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +32,7 @@ class PackageCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24),
           width: MediaQuery.of(context).size.width * 0.75,
           decoration: BoxDecoration(
-            color: backgroundColor,
+            color: Colors.transparent,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: AppColors.primary, width: 1),
           ),
@@ -80,30 +43,35 @@ class PackageCard extends StatelessWidget {
                 spacing: 8,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        '$packageName / ',
+                        '${plan.name} / ',
                         textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false, applyHeightToLastDescent: false),
                         style: TextStyle(
                           fontSize: TextSize.font18(context),
                           fontWeight: FontWeight.w600,
-                          color: packageThemeColor ?? AppColors.textPrimaryLight,
+                          color: AppColors.textPrimaryLight,
                         ),
                       ),
-                      Text(
-                        duration ?? '3 Months',
-                        textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false, applyHeightToLastDescent: false),
-                        style: TextStyle(
-                          fontSize: TextSize.font16(context),
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textPrimaryLight,
+                      Flexible(
+                        child: Text(
+                          (plan.description ?? '').length > 7
+                              ? (plan.description ?? '').substring(0, 8)
+                              : (plan.description ?? ''),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: TextSize.font16(context),
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textSecondaryLight,
+                          ),
                         ),
                       ),
                     ],
                   ),
                   Text(
-                    packagePrice,
+                    plan.pricings?.first.price.toString() ?? '',
                     textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false, applyHeightToLastDescent: false),
                     style: TextStyle(
                       fontSize: TextSize.font36(context),
@@ -112,7 +80,7 @@ class PackageCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '( $perMonthPrice / month )',
+                    '( ${plan.pricings?.first.actualPerMonthPrice.toString() } / month )',
                     textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false, applyHeightToLastDescent: false),
                     style: TextStyle(
                       fontSize: TextSize.font16(context),
@@ -126,47 +94,28 @@ class PackageCard extends StatelessWidget {
               PrimaryButtons(
                 buttonStyle: ButtonsStyle.activePrimaryButton,
                 onTap: buttonOnTap,
-                title: buttonText,
+                title: 'Continue',
               ),
-              // const SizedBox(height: 24),
+              const SizedBox(height: 20),
               Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    IconTextRow(
-                      imagePath: AppImages.messageSvgIcon,
-                      text: messageText ?? 'Send unlimited messages',
-                      textColor: AppColors.textSecondaryLight,
-                      imageColor: AppColors.hintTextColor,
-                      availableOption: messageIsAvailable,
-                    ),
-                    IconTextRow(
-                      imagePath: AppImages.contactSvgIcon,
-                      text: contactText ?? 'View uo to $contactCount contact numbers',
-                      textColor: AppColors.textSecondaryLight,
-                      imageColor: AppColors.hintTextColor,
-                      availableOption: contactIsAvailable,
-                    ),
-                    IconTextRow(
-                      imagePath: AppImages.profileSvgIcon,
-                      text: profileText ?? 'Profile highlight',
-                      textColor: AppColors.textSecondaryLight,
-                      imageColor: AppColors.hintTextColor,
-                      availableOption: profileIsAvailable,
-                    ),
-                    IconTextRow(
-                      imagePath: AppImages.matchSvgIcon,
-                      text: matchText ?? 'Direct contact from matches',
-                      textColor: AppColors.textSecondaryLight,
-                      imageColor: AppColors.hintTextColor,
-                      availableOption: matchIsAvailable,
-                    ),
-                  ],
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: plan.features?.map((feature) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: IconTextRow(
+                        imagePath: AppImages.flagSvgIcon,
+                        text: feature.name ?? 'Feature',
+                        textColor: AppColors.textSecondaryLight,
+                        imageColor: AppColors.hintTextColor,
+                        availableOption: feature.included ?? false,
+                      ),
+                    )).toList() ?? [],
+                  ),
                 ),
-              ),
-
-              // const SizedBox(height: 20),
+              )
             ],
           ),
         ),
@@ -174,10 +123,10 @@ class PackageCard extends StatelessWidget {
           left: -10,
           top: 22,
           child: PopularBadge(
-              badgeText: packageBadgeText,
-              badgeBackgroundColor: packageBadgeBackgroundColor,
-              badgeIcon: packageBadgeIcon,
-              badgeThemeColor: packageThemeColor,
+              badgeText: plan.tag ?? 'Premium',
+              badgeBackgroundColor: AppColors.primaryVariant,
+              badgeIcon: AppImages.flagSvgIcon,
+              badgeThemeColor: AppColors.primary,
           ),
         ),
       ],
