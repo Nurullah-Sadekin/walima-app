@@ -27,7 +27,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    ref.read(chatProvider).getInitialData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(chatProvider).getInitialData();
+    });
   }
 
   Future<void> _onRefresh() async {
