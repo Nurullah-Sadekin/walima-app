@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/global/components/bottom_sheet_widget/contacts_viewed.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
@@ -110,6 +111,9 @@ class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProv
       child: Column(
         spacing: 10,
         children: [
+          ContactsViewed(
+            profileImage: AppImages.demoProfile,
+          ),
           AcceptedCard(
             onMenuTap: () {
                _showAcceptedMenu(context,
