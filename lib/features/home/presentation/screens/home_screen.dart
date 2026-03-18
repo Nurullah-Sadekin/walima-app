@@ -1,22 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
-import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
-import 'package:flutter_boilerplate/features/home/presentation/screens/edit_profile.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/complete_profile_section.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/profile_summery_section.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/social_media_icon.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -28,15 +23,33 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final Key profileImageKey = const ValueKey('home_profile_image');
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _showProfileSummary = true;
 
   @override
   void initState() {
     super.initState();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(profileProvider).getProfile();
-        ref.read(profileProvider).getDashboard();
-      });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(profileProvider).getProfile();
+      ref.read(profileProvider).getDashboard();
+    });
   }
+
+  bool _onBodyUserScroll(UserScrollNotification notification) {
+    if (notification.depth != 0 || notification.metrics.axis != Axis.vertical) {
+      return false;
+    }
+
+    if (notification.direction == ScrollDirection.reverse &&
+        _showProfileSummary) {
+      setState(() => _showProfileSummary = false);
+    } else if (notification.direction == ScrollDirection.forward &&
+        !_showProfileSummary) {
+      setState(() => _showProfileSummary = true);
+    }
+
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,8 +78,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Column(
             children: [
               _topBar(context),
-              // const SizedBox(height: 30),
-              ProfileSummerySection(),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 220),
+                switchInCurve: Curves.easeOut,
+                switchOutCurve: Curves.easeIn,
+                transitionBuilder: (child, animation) {
+                  return SizeTransition(
+                    sizeFactor: animation,
+                    axisAlignment: -1,
+                    child: FadeTransition(opacity: animation, child: child),
+                  );
+                },
+                child: _showProfileSummary
+                    ? const ProfileSummerySection(
+                        key: ValueKey('profile-summary-visible'),
+                      )
+                    : const SizedBox(
+                        key: ValueKey('profile-summary-hidden'),
+                      ),
+              ),
             ],
           ),
         ),
@@ -80,14 +110,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _bodySection() {
     return Expanded(
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            const CompleteProfileSection(),
-            _premiumMatches(),
-            _recentVisitors(),
-            _followUpSection(),
-          ],
+      child: NotificationListener<UserScrollNotification>(
+        onNotification: _onBodyUserScroll,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const CompleteProfileSection(),
+              _premiumMatches(),
+              _recentVisitors(),
+              _followUpSection(),
+            ],
+          ),
         ),
       ),
     );
@@ -127,7 +160,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 10.0, vertical: 10.0),
+                  horizontal: 10.0,
+                  vertical: 10.0,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.white,
                   borderRadius: BorderRadius.circular(8.0),
@@ -148,7 +183,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       Icons.arrow_forward_ios_rounded,
                       color: AppColors.textSecondaryLight,
                       size: TextSize.font12(context),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -162,33 +197,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: List.generate(
-                  10,
-                  (index) => const Padding(
-                        padding: EdgeInsets.only(
-                          right: 10.0,
-                        ),
-                        child: SizedBox(
-                          width: 300,
-                          child: ProfileComprehensiveCard(
-                            imagePath: AppImages.demoProfile2,
-                            leftIconPath: AppImages.favouriteIcon,
-                            imageHeight: 250,
-                            isPremiumConnect: true,
-                            isVerified: true,
-                            name: 'Afia Sultana',
-                            age: '28 Yr',
-                            height: '5\' 3\'" ',
-                            religion: 'Muslim',
-                            profession: 'Software Engineer',
-                            location: 'Gulshan, Dhaka, BD',
-                            activeStatusText: 'Online',
-                            isSingleButton: true,
-                          ),
-                        ),
-                      )),
+                10,
+                (index) => const Padding(
+                  padding: EdgeInsets.only(
+                    right: 10.0,
+                  ),
+                  child: SizedBox(
+                    width: 300,
+                    child: ProfileComprehensiveCard(
+                      imagePath: AppImages.demoProfile2,
+                      leftIconPath: AppImages.favouriteIcon,
+                      imageHeight: 250,
+                      isPremiumConnect: true,
+                      isVerified: true,
+                      name: 'Afia Sultana',
+                      age: '28 Yr',
+                      height: '5\' 3\'" ',
+                      religion: 'Muslim',
+                      profession: 'Software Engineer',
+                      location: 'Gulshan, Dhaka, BD',
+                      activeStatusText: 'Online',
+                      isSingleButton: true,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
-        )
+        ),
       ],
     );
   }
@@ -227,7 +263,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 10.0, vertical: 10.0),
+                  horizontal: 10.0,
+                  vertical: 10.0,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.white,
                   borderRadius: BorderRadius.circular(8.0),
@@ -248,7 +286,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       Icons.arrow_forward_ios_rounded,
                       color: AppColors.textSecondaryLight,
                       size: TextSize.font12(context),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -262,28 +300,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: List.generate(
-                  10,
-                  (index) => const Padding(
-                        padding: EdgeInsets.only(
-                          right: 10.0,
-                        ),
-                        child: SizedBox(
-                          width: 300,
-                          child: ProfileComprehensiveCard(
-                            imagePath: AppImages.demoProfile,
-                            imageHeight: 250,
-                            isPremiumConnect: true,
-                            name: 'Tasnim Akter',
-                            age: '28 Yr',
-                            height: '5\' 3\'" ',
-                            location: 'Gulshan, Dhaka, BD',
-                            viewOnAccept: true,
-                          ),
-                        ),
-                      )),
+                10,
+                (index) => const Padding(
+                  padding: EdgeInsets.only(
+                    right: 10.0,
+                  ),
+                  child: SizedBox(
+                    width: 300,
+                    child: ProfileComprehensiveCard(
+                      imagePath: AppImages.demoProfile,
+                      imageHeight: 250,
+                      isPremiumConnect: true,
+                      name: 'Tasnim Akter',
+                      age: '28 Yr',
+                      height: '5\' 3\'" ',
+                      location: 'Gulshan, Dhaka, BD',
+                      viewOnAccept: true,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
-        )
+        ),
       ],
     );
   }
@@ -348,7 +387,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     },
                   ),
                 ],
-              )
+              ),
             ],
           ),
         ],
