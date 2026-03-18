@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
+import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/provider/chat_provider.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/chat_list_item.dart';
@@ -10,6 +12,7 @@ import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/p
 import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/safety_First_bottom_sheet.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/tab_bar_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key});
@@ -19,18 +22,21 @@ class ChatScreen extends ConsumerStatefulWidget {
 }
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
-  ChatProvider provider = ChatProvider();
   final tabs = ['All', 'Unread', 'Calls'];
 
   @override
   void initState() {
     super.initState();
-    provider = ref.read(chatProvider);
+    ref.read(chatProvider).getInitialData();
+  }
+
+  Future<void> _onRefresh() async {
+    await ref.read(chatProvider).getInitialData();
   }
 
   @override
   Widget build(BuildContext context) {
-    provider = ref.watch(chatProvider);
+    final provider = ref.watch(chatProvider);
     return Scaffold(
       body: GradientBackground(
         child: Padding(
@@ -38,7 +44,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           child: Column(
             children: [
               _appbarSection(),
-              Expanded(child: _body()),
+              if (provider.loaderState == ChatScreenState.loading)
+                const Expanded(child: Loading())
+              else
+                Expanded(child: _body()),
             ],
           ),
         ),
@@ -55,24 +64,29 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   Widget _body() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        _topProfileView(),
-        const SizedBox(height: 16),
-        _headerSection(),
-        const SizedBox(height: 20),
-        _tabBarViewSection(),
-      ],
+    return RefreshIndicator(
+      onRefresh: _onRefresh,
+      color: AppColors.primary,
+      child: ListView(
+        padding: EdgeInsets.zero,
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          _connectableUser(),
+          const SizedBox(height: 16),
+          _filterBar(),
+          const SizedBox(height: 20),
+          _conversationList(),
+        ],
+      ),
     );
   }
 
-  Widget _headerSection() {
+  Widget _filterBar() {
     return _customTabBar();
   }
 
   Widget _customTabBar() {
+    final provider = ref.watch(chatProvider);
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -102,7 +116,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     );
   }
 
-  Widget _tabBarViewSection() {
+  Widget _conversationList() {
+    final provider = ref.watch(chatProvider);
     return Builder(
       builder: (context) {
         switch (provider.selectedTabIndex) {
@@ -120,7 +135,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   Widget _allTabContent() {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         ChatListItem(
@@ -128,27 +143,36 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           isVerified: true,
           lastMessage: 'Hey! How are you doing?',
           timeAgo: '2:30 PM',
+          onTap: () {
+            context.pushNamed(Routes.chatScreen);
+          },
         ),
       ],
     );
   }
 
-  Widget _topProfileView() {
+  Widget _connectableUser() {
+    final provider = ref.watch(chatProvider);
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: List.generate(
-            10,
-            (index) => const Padding(
-                  padding: EdgeInsets.only(
-                    right: 16.0,
-                  ),
-                  child: ProfileAvatarWithName(
-                    name: 'Sumaiya',
-                    imagePath: AppImages.demoProfile,
-                  ),
-                )),
+          provider.connectableUsers?.length ?? 0,
+          (index) {
+            final user = provider.connectableUsers![index];
+           return  Padding(
+             padding: const EdgeInsets.only(
+               right: 16.0,
+             ),
+             child: ProfileAvatarWithName(
+               name: user.displayName,
+               imagePath: user.profilePictureUrl ?? AppImages.demoProfile2,
+               indicatorColor: user.isOnline == true ? AppColors.greenButtonColor : AppColors.grey.withOpacity(0.5),
+             ),
+           );
+          },
+        ),
       ),
     );
   }

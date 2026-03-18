@@ -1,24 +1,15 @@
-import 'dart:async';
+import 'dart:math';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
-import 'package:flutter_boilerplate/features/recommended_preferences/data/models/request/update_preferences_request_body.dart';
-import 'package:flutter_boilerplate/features/recommended_preferences/data/repository/preferences_repository.dart';
-import 'package:flutter_boilerplate/features/registration/data/repository/location_data_repository_impl.dart';
-import 'package:flutter_boilerplate/features/registration/data/repository/religion_data_repository_impl.dart';
-import 'package:flutter_boilerplate/features/registration/domain/location_data_model.dart';
-import 'package:flutter_boilerplate/features/registration/domain/profile_for_model.dart';
-import 'package:flutter_boilerplate/features/registration/domain/religion_option_model.dart';
-import 'package:flutter_boilerplate/features/registration/domain/repository/location_data_repository.dart';
-import 'package:flutter_boilerplate/features/registration/domain/repository/religion_data_repository.dart';
-import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
+import 'package:flutter_boilerplate/features/chat/data/model/response/connectable_user_response.dart';
+import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_list.dart';
+import 'package:flutter_boilerplate/features/chat/data/repository/chat_repository.dart';
 
 class ChatProvider extends BaseChangeNotifier {
-  ChatProviderScreenStates screenStates = ChatProviderScreenStates.defaultLoading;
-  ChatProviderScreenStates loaderState = ChatProviderScreenStates.defaultLoading;
-
-
+  ChatScreenState screenStates = ChatScreenState.complete;
+  ChatScreenState loaderState = ChatScreenState.complete;
+  List<Users>? connectableUsers;
+  List<Conversations>? conversations;
   int selectedTabIndex = 0;
 
   void setSelectedTab(int index) {
@@ -29,19 +20,49 @@ class ChatProvider extends BaseChangeNotifier {
   }
 
 
+  Future<void> getInitialData() async {
+    updateViewState(loadingState: ChatScreenState.loading);
+    await getConnectableUserList();
+    await getConversation();
+    updateViewState(screenStates: ChatScreenState.complete);
+  }
+
+  Future<void> getConnectableUserList() async {
+    final data = await ChatRepository.getConnectableUserList();
+     if(data.response?.users != null){
+      connectableUsers = data.response!.users;
+     }
+     else{
+      connectableUsers = [];
+     }
+     updateViewState();
+  }
+  Future<void> getConversation() async {
+    final data = await ChatRepository.getConversation();
+      if(data.response?.conversations != null){
+        conversations = data.response!.conversations;
+      }
+      else{
+        conversations = [];
+      }
+      updateViewState();
+  }
+
+
   void updateViewState(
-      {ChatProviderScreenStates? screenStates,
-        ChatProviderScreenStates? loadingState}) {
+      {ChatScreenState? screenStates,
+        ChatScreenState? loadingState}) {
     if (screenStates != null) {
       this.screenStates = screenStates;
-      loaderState = ChatProviderScreenStates.defaultLoading;
+      loaderState = ChatScreenState.complete;
     }
     if (loadingState != null) loaderState = loadingState;
     notifyListeners();
   }
+
 }
 
-enum ChatProviderScreenStates {
-  defaultLoading,
-  loadingComplete,
+enum ChatScreenState {
+  loading,
+  complete,
 }
