@@ -1,11 +1,15 @@
+import 'dart:math';
+
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
+import 'package:flutter_boilerplate/features/chat/data/model/response/connectable_user_response.dart';
+import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_list.dart';
 import 'package:flutter_boilerplate/features/chat/data/repository/chat_repository.dart';
 
 class ChatProvider extends BaseChangeNotifier {
   ChatScreenState screenStates = ChatScreenState.complete;
   ChatScreenState loaderState = ChatScreenState.complete;
-
-
+  List<Users>? connectableUsers;
+  List<Conversations>? conversations;
   int selectedTabIndex = 0;
 
   void setSelectedTab(int index) {
@@ -18,10 +22,32 @@ class ChatProvider extends BaseChangeNotifier {
 
   Future<void> getInitialData() async {
     updateViewState(loadingState: ChatScreenState.loading);
-    await ChatRepository.getConnectableUserList();
-    await ChatRepository.getConversation();
+    await getConnectableUserList();
+    await getConversation();
     updateViewState(screenStates: ChatScreenState.complete);
   }
+
+  Future<void> getConnectableUserList() async {
+    final data = await ChatRepository.getConnectableUserList();
+     if(data.response?.users != null){
+      connectableUsers = data.response!.users;
+     }
+     else{
+      connectableUsers = [];
+     }
+     updateViewState();
+  }
+  Future<void> getConversation() async {
+    final data = await ChatRepository.getConversation();
+      if(data.response?.conversations != null){
+        conversations = data.response!.conversations;
+      }
+      else{
+        conversations = [];
+      }
+      updateViewState();
+  }
+
 
   void updateViewState(
       {ChatScreenState? screenStates,
@@ -33,6 +59,7 @@ class ChatProvider extends BaseChangeNotifier {
     if (loadingState != null) loaderState = loadingState;
     notifyListeners();
   }
+
 }
 
 enum ChatScreenState {

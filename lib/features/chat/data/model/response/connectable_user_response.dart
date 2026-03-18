@@ -1,6 +1,4 @@
-import 'dart:convert';
-ConnectableUserResponse connectableUserResponseFromJson(String str) => ConnectableUserResponse.fromJson(json.decode(str));
-String connectableUserResponseToJson(ConnectableUserResponse data) => json.encode(data.toJson());
+
 class ConnectableUserResponse {
   ConnectableUserResponse({
       this.code, 
@@ -18,27 +16,14 @@ class ConnectableUserResponse {
   String? message;
   Response? response;
   String? traceId;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['code'] = code;
-    map['message'] = message;
-    if (response != null) {
-      map['response'] = response?.toJson();
-    }
-    map['traceId'] = traceId;
-    return map;
-  }
-
 }
 
-Response responseFromJson(String str) => Response.fromJson(json.decode(str));
-String responseToJson(Response data) => json.encode(data.toJson());
 class Response {
   Response({
       this.users, 
       this.total, 
-      this.onlineCount,});
+      this.onlineCount,
+  });
 
   Response.fromJson(dynamic json) {
     if (json['users'] != null) {
@@ -53,21 +38,7 @@ class Response {
   List<Users>? users;
   int? total;
   int? onlineCount;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    if (users != null) {
-      map['users'] = users?.map((v) => v.toJson()).toList();
-    }
-    map['total'] = total;
-    map['onlineCount'] = onlineCount;
-    return map;
-  }
-
 }
-
-Users usersFromJson(String str) => Users.fromJson(json.decode(str));
-String usersToJson(Users data) => json.encode(data.toJson());
 class Users {
   Users({
       this.id, 

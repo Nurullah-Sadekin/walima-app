@@ -62,7 +62,6 @@ class OnboardingScreen extends StatelessWidget {
                         },
                         title: 'Sign Up with OTP',
                       ),
-
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 20.0),
                         child: Row(

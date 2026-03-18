@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
+import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
@@ -22,15 +23,20 @@ class ChatScreen extends ConsumerStatefulWidget {
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final tabs = ['All', 'Unread', 'Calls'];
+
   @override
   void initState() {
     super.initState();
-     ref.read(chatProvider).getInitialData();
+    ref.read(chatProvider).getInitialData();
+  }
+
+  Future<void> _onRefresh() async {
+    await ref.read(chatProvider).getInitialData();
   }
 
   @override
   Widget build(BuildContext context) {
-   final provider = ref.watch(chatProvider);
+    final provider = ref.watch(chatProvider);
     return Scaffold(
       body: GradientBackground(
         child: Padding(
@@ -38,9 +44,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           child: Column(
             children: [
               _appbarSection(),
-              provider.loaderState == ChatScreenState.loading
-                  ? const Center(child: CircularProgressIndicator())
-                  : Expanded(child: _body()),
+              if (provider.loaderState == ChatScreenState.loading)
+                const Expanded(child: Loading())
+              else
+                Expanded(child: _body()),
             ],
           ),
         ),
@@ -57,20 +64,24 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   Widget _body() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        _connectableUser(),
-        const SizedBox(height: 16),
-        _onlineUserList(),
-        const SizedBox(height: 20),
-        _conversationList(),
-      ],
-    ); 
+    return RefreshIndicator(
+      onRefresh: _onRefresh,
+      color: AppColors.primary,
+      child: ListView(
+        padding: EdgeInsets.zero,
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          _connectableUser(),
+          const SizedBox(height: 16),
+          _filterBar(),
+          const SizedBox(height: 20),
+          _conversationList(),
+        ],
+      ),
+    );
   }
 
-  Widget _onlineUserList() {
+  Widget _filterBar() {
     return _customTabBar();
   }
 
@@ -132,7 +143,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           isVerified: true,
           lastMessage: 'Hey! How are you doing?',
           timeAgo: '2:30 PM',
-          onTap: (){
+          onTap: () {
             context.pushNamed(Routes.chatScreen);
           },
         ),
@@ -141,21 +152,27 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   Widget _connectableUser() {
+    final provider = ref.watch(chatProvider);
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: List.generate(
-            10,
-            (index) => const Padding(
-                  padding: EdgeInsets.only(
-                    right: 16.0,
-                  ),
-                  child: ProfileAvatarWithName(
-                    name: 'Sumaiya',
-                    imagePath: AppImages.demoProfile,
-                  ),
-                )),
+          provider.connectableUsers?.length ?? 0,
+          (index) {
+            final user = provider.connectableUsers![index];
+           return  Padding(
+             padding: const EdgeInsets.only(
+               right: 16.0,
+             ),
+             child: ProfileAvatarWithName(
+               name: user.displayName,
+               imagePath: user.profilePictureUrl ?? AppImages.demoProfile2,
+               indicatorColor: user.isOnline == true ? AppColors.greenButtonColor : AppColors.grey.withOpacity(0.5),
+             ),
+           );
+          },
+        ),
       ),
     );
   }
