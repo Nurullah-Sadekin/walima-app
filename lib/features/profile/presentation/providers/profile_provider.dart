@@ -1,5 +1,6 @@
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
+import 'package:flutter_boilerplate/features/profile/data/model/response/dashboard_response.dart';
 import 'package:flutter_boilerplate/features/profile/data/model/response/get_complete_profile_response.dart';
 import 'package:flutter_boilerplate/features/profile/data/repository/profile_repository.dart';
 
@@ -7,14 +8,24 @@ class ProfileProvider extends BaseChangeNotifier {
   ProfileScreenStates screenStates = ProfileScreenStates.defaultState;
   ProfileScreenStates loaderState = ProfileScreenStates.defaultState;
   CompleteProfile? profile;
-
+  DashboardData? dashboard;
   Future<void> getProfile() async {
-    final response = await ProfileRepository.getCompleteProfile();
-    if (response.code == 'SUCCESS') {
-      profile = response.response;
+    final data = await ProfileRepository.getCompleteProfile();
+    if (data.code == 'SUCCESS') {
+      profile = data.response;
       updateViewState();
     } else {
-      // DialogUtils.showErrorDialog(context:message: response.message);
+      profile = null;
+
+    }
+  }
+  Future<void> getDashboard() async {
+    final data = await ProfileRepository.getDashboard();
+    if (data.code == 'SUCCESS') {
+      dashboard = data.response;
+      updateViewState();
+    } else {
+      dashboard = null;
     }
   }
 

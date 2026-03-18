@@ -11,8 +11,9 @@ import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/edit_profile.dart';
+import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/complete_profile_section.dart';
+import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/profile_summery_section.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/social_media_icon.dart';
-import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/verification_tile.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -33,6 +34,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.initState();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(profileProvider).getProfile();
+        ref.read(profileProvider).getDashboard();
       });
   }
   @override
@@ -63,11 +65,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Column(
             children: [
               _topBar(context),
-              const SizedBox(height: 30),
-              _profileSummary(context),
-              const SizedBox(height: 16),
-              _headerActions(),
-              const SizedBox(height: 20),
+              // const SizedBox(height: 30),
+              ProfileSummerySection(),
             ],
           ),
         ),
@@ -79,212 +78,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return AnchoredAppBar(context: context, title: 'My Walima');
   }
 
-  Widget _profileSummary(BuildContext context) {
-    return SizedBox(
-      height: 100,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ProfileImageCard(
-            imagePath: AppImages.demoProfile,
-            imageSize: 97,
-            iconSize: 20,
-            showTopIcon: true,
-            showBottomIcon: true,
-            topPositionImagePath: AppImages.verifiedBadgeSvgIcon,
-            bottomPositionImagePath: AppImages.cameraSvgIcon,
-            onEdit: () async {
-              await BottomSheetUtils.open(
-                context: context,
-                fullHeight: true,
-                child: const EditProfileScreen(), 
-              );
-            },
-          ),
-          const SizedBox(width: 12),
-          Expanded(child: _profileDetails(context)),
-        ],
-      ),
-    );
-  }
-
-  Widget _profileDetails(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Tahmina Rahman',
-            style: TextStyle(
-              color: AppColors.textPrimaryLight,
-              fontSize: TextSize.font20(context),
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          _memberIdChip(context),
-          _subscriptionRow(context),
-        ],
-      ),
-    );
-  }
-
-  Widget _memberIdChip(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(6.0),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text(
-            'ID : 1234567890',
-            style: TextStyle(
-              color: AppColors.textSecondaryLight,
-              fontSize: TextSize.font12(context),
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          const SizedBox(width: 4),
-          Icon(
-            Icons.copy_rounded,
-            color: AppColors.textSecondaryLight,
-            size: TextSize.font12(context),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _subscriptionRow(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
-          decoration: BoxDecoration(
-            color: AppColors.primary,
-            borderRadius: BorderRadius.circular(4.0),
-          ),
-          child: Text(
-            'Gold',
-            style: TextStyle(
-              color: AppColors.white,
-              fontSize: TextSize.font10(context),
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          'Expires: March 2026',
-          style: TextStyle(
-            color: AppColors.textSecondaryLight,
-            fontSize: TextSize.font14(context),
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _headerActions() {
-    return Row(
-      children: [
-        Expanded(
-          child: PrimaryButtons(
-            buttonStyle: ButtonsStyle.iconicDynamicButton,
-            textColor: AppColors.textSecondaryLight,
-            bgColor: AppColors.white,
-            borderColor: AppColors.greyLight,
-            svgIconPath: AppImages.editProfileSvgIcon,
-            svgIconColor: AppColors.textSecondaryLight,
-            iconLeftPosition: false,
-            onTap: () {
-              context.push(Paths.editProfile);
-            },
-            title: 'Edit Profile',
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: PrimaryButtons(
-            buttonStyle: ButtonsStyle.iconicDynamicButton,
-            textColor: AppColors.white,
-            bgColor: AppColors.primary,
-            svgIconPath: AppImages.premiumSvgIcon,
-            iconLeftPosition: false,
-            onTap: () {
-              context.push(Paths.upgradePackage);
-            },
-            title: 'Renew Plan',
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _bodySection() {
     return Expanded(
       child: SingleChildScrollView(
         child: Column(
           children: [
-            _completeProfileStatus(),
+            const CompleteProfileSection(),
             _premiumMatches(),
             _recentVisitors(),
             _followUpSection(),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _completeProfileStatus() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text(
-            'Complete Your Profile',
-            style: TextStyle(
-              color: AppColors.textPrimaryLight,
-              fontSize: TextSize.font18(context),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          Text(
-            'Complete profiles get 2x more matches',
-            style: TextStyle(
-              color: AppColors.textSecondaryLight,
-              fontSize: TextSize.font14(context),
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          const SizedBox(height: 12),
-          const VerificationTile(
-            iconImagePath: AppImages.verifiedBadgeSvgIcon,
-            title: 'Government ID Verify',
-            statusText: 'Unverified',
-            statusColor: AppColors.primary,
-            statusBackgroundColor: AppColors.primaryVariant,
-          ),
-          const SizedBox(height: 10),
-          VerificationTile(
-            iconImagePath: AppImages.verifyContact,
-            title: 'Verify Phone Number',
-            statusText: 'Verified',
-            statusColor: AppColors.success,
-            statusBackgroundColor: Colors.green.withOpacity(
-              0.1,
-            ),
-          ),
-        ],
       ),
     );
   }

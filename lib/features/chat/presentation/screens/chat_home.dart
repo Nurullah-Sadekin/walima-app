@@ -6,13 +6,14 @@ import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
+import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_list.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/provider/chat_provider.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/chat_list_item.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/profile_avatar_with_name.dart';
-import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/safety_First_bottom_sheet.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/tab_bar_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key});
@@ -89,68 +90,135 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   Widget _customTabBar() {
     final provider = ref.watch(chatProvider);
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 8,
-        children: [
-          TabBarWidget(
-            text: tabs[0],
-            isSelected: provider.selectedTabIndex == 0,
-            onTap: () => provider.setSelectedTab(0),
-          ),
-          TabBarWidget(
-            text: tabs[1],
-            count: 28,
-            isSelected: provider.selectedTabIndex == 1,
-            onTap: () => provider.setSelectedTab(1),
-          ),
-          TabBarWidget(
-            text: tabs[2],
-            isSelected: provider.selectedTabIndex == 2,
-            selectedBackgroundColor: AppColors.primary,
-            onTap: () => provider.setSelectedTab(2),
-          ),
-        ],
-      ),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      spacing: 8,
+      children: [
+        TabBarWidget(
+          text: tabs[0],
+          isSelected: provider.selectedTabIndex == 0,
+          onTap: () => provider.setSelectedTab(0),
+        ),
+        TabBarWidget(
+          text: tabs[1],
+          count: provider.unreadCount.toDouble(),
+          isSelected: provider.selectedTabIndex == 1,
+          onTap: () => provider.setSelectedTab(1),
+        ),
+        TabBarWidget(
+          text: tabs[2],
+          isSelected: provider.selectedTabIndex == 2,
+          selectedBackgroundColor: AppColors.primary,
+          onTap: () => provider.setSelectedTab(2),
+        ),
+      ],
     );
   }
 
   Widget _conversationList() {
     final provider = ref.watch(chatProvider);
-    return Builder(
-      builder: (context) {
-        switch (provider.selectedTabIndex) {
-          case 0:
-            return _allTabContent();
-          case 1:
-            return unreadTabContent();
-          case 2:
-            return callsTabContent();
-          default:
-            return _allTabContent();
-        }
-      },
+    switch (provider.selectedTabIndex) {
+      case 0:
+        return _allTabContent(provider);
+      case 1:
+        return unreadTabContent(provider);
+      case 2:
+        return callsTabContent(provider);
+      default:
+        return _allTabContent(provider);
+    }
+  }
+
+  Widget _allTabContent(ChatProvider provider) {
+    return _conversationContent(
+      provider: provider,
+      conversations: provider.allConversations,
+      emptyMessage: 'No conversations yet',
     );
   }
 
-  Widget _allTabContent() {
+  Widget _conversationContent({
+    required ChatProvider provider,
+    required List<Conversations> conversations,
+    required String emptyMessage,
+  }) {
+    if (conversations.isEmpty) {
+      return _emptyConversationState(emptyMessage);
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        ChatListItem(
-          name: 'Sumaiya Akter',
-          isVerified: true,
-          lastMessage: 'Hey! How are you doing?',
-          timeAgo: '2:30 PM',
-          onTap: () {
-            context.pushNamed(Routes.chatScreen);
-          },
-        ),
-      ],
+      children: List.generate(conversations.length, (index) {
+        final conversation = conversations[index];
+        final participant = provider.getConversationCounterpart(conversation);
+        final userName = participant?.displayName?.trim();
+        final displayName =
+            (userName?.isNotEmpty ?? false) ? userName! : 'Unknown User';
+        final lastMessage = conversation.lastMessage?.trim();
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: ChatListItem(
+            name: displayName,
+            imagePath: participant?.profilePictureUrl ?? AppImages.demoProfile2,
+            isVerified: participant?.profilePhoto?.isVerified ?? false,
+            lastMessage: (lastMessage?.isNotEmpty ?? false)
+                ? lastMessage!
+                : 'No message',
+            timeAgo: _formatConversationTime(conversation.lastMessageAt),
+            onTap: () {
+              context.pushNamed(Routes.chatScreen);
+            },
+          ),
+        );
+      }),
     );
+  }
+
+  Widget _emptyConversationState(String message) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 24),
+      child: Center(
+        child: Text(
+          message,
+          style: const TextStyle(
+            color: AppColors.textSecondaryLight,
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatConversationTime(String? dateTime) {
+    if (dateTime == null || dateTime.isEmpty) return '--';
+
+    final parsedDateTime = DateTime.tryParse(dateTime)?.toLocal();
+    if (parsedDateTime == null) return '--';
+
+    final now = DateTime.now();
+    final startOfToday = DateTime(now.year, now.month, now.day);
+    final startOfMessageDay = DateTime(
+      parsedDateTime.year,
+      parsedDateTime.month,
+      parsedDateTime.day,
+    );
+    final dayDifference = startOfToday.difference(startOfMessageDay).inDays;
+
+    if (dayDifference == 0) {
+      return DateFormat('h:mm a').format(parsedDateTime);
+    }
+
+    if (dayDifference == 1) {
+      return 'Yesterday';
+    }
+
+    if (dayDifference < 7) {
+      return DateFormat('EEE').format(parsedDateTime);
+    }
+
+    return DateFormat('d MMM').format(parsedDateTime);
   }
 
   Widget _connectableUser() {
@@ -163,33 +231,37 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           provider.connectableUsers?.length ?? 0,
           (index) {
             final user = provider.connectableUsers![index];
-           return  Padding(
-             padding: const EdgeInsets.only(
-               right: 16.0,
-             ),
-             child: ProfileAvatarWithName(
-               name: user.displayName,
-               imagePath: user.profilePictureUrl ?? AppImages.demoProfile2,
-               indicatorColor: user.isOnline == true ? AppColors.greenButtonColor : AppColors.grey.withOpacity(0.5),
-             ),
-           );
+            return Padding(
+              padding: const EdgeInsets.only(
+                right: 16.0,
+              ),
+              child: ProfileAvatarWithName(
+                name: user.displayName,
+                imagePath: user.profilePictureUrl ?? AppImages.demoProfile2,
+                indicatorColor: user.isOnline == true
+                    ? AppColors.greenButtonColor
+                    : AppColors.grey.withValues(alpha: 0.5),
+              ),
+            );
           },
         ),
       ),
     );
   }
 
-  Widget unreadTabContent() {
-    return const SafetyFirst();
+  Widget unreadTabContent(ChatProvider provider) {
+    return _conversationContent(
+      provider: provider,
+      conversations: provider.unreadConversations,
+      emptyMessage: 'No unread conversations',
+    );
   }
 
-  Widget callsTabContent() {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SizedBox(height: 8),
-        Text('No Calls content'),
-      ],
+  Widget callsTabContent(ChatProvider provider) {
+    return _conversationContent(
+      provider: provider,
+      conversations: provider.callConversations,
+      emptyMessage: 'No calls content',
     );
   }
 }
