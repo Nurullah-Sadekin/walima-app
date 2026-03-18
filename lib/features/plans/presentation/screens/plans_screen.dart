@@ -118,29 +118,9 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
             final item = provider.packages[index];
             return PackageCard(
               packageName: item.name ?? '',
-              duration: '',
-              packagePrice: (item.pricings != null && item.pricings!.isNotEmpty
-                      ? item.pricings!.first.price ?? 0
-                      : 0)
-                  .toString(),
-              perMonthPrice: item.pricings != null && item.pricings!.isNotEmpty
-                  ? item.pricings!.first.billingCycle ?? ''
-                  : '',
-              buttonText: 'Continue',
+
               buttonOnTap: () {},
-              messageText: 'Send unlimited messages',
-              contactCount: 100,
-              profileText: 'Profile highlight',
-              matchText: 'Direct contact from matches',
-              messageIsAvailable: false,
-              contactIsAvailable: false,
-              profileIsAvailable: false,
-              matchIsAvailable: false,
-              features: item.features,
-              backgroundColor: AppColors.transparent,
-              packageBadgeText: item.tag,
-              packageThemeColor: const Color(0xFF7D52F4),
-              packageBadgeBackgroundColor: const Color(0xFFEFEBFF),
+              plan: item,
             );
           },
           options: CarouselOptions(
