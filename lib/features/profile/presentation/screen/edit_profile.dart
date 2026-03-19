@@ -6,9 +6,11 @@ import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.da
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/home/presentation/widgets/profile_info_card.dart';
 import 'package:flutter_boilerplate/features/profile/data/model/response/get_complete_profile_response.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
+import 'package:flutter_boilerplate/features/profile/presentation/screen/profile_edit_section.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -35,23 +37,24 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             _topBar(context),
             _headerSection(context, profile),
             _bodySection(profile),
+            // SizedBox(height: 50,)
           ],
         ),
       ),
-      floatingActionButton: BottomBorderedWidget(
-        widget: PrimaryButtons(
-          title: 'Preview Profile',
-          titleSize: TextSize.font14(context),
-          textColor: AppColors.white,
-          bgColor: AppColors.primary,
-          svgIconColor: AppColors.white,
-          onTap: () {
-            context.pop({'preview': true});
-          },
-          buttonStyle: ButtonsStyle.activePrimaryButton,
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // floatingActionButton: BottomBorderedWidget(
+      //   widget: PrimaryButtons(
+      //     title: 'Preview Profile',
+      //     titleSize: TextSize.font14(context),
+      //     textColor: AppColors.white,
+      //     bgColor: AppColors.primary,
+      //     svgIconColor: AppColors.white,
+      //     onTap: () {
+      //       context.pop({'preview': true});
+      //     },
+      //     buttonStyle: ButtonsStyle.activePrimaryButton,
+      //   ),
+      // ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
@@ -182,6 +185,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               _familyDetails(profile),
               _educationCareer(profile),
               _location(profile),
+              _hobbiesInterests(profile),
+              _partnerPreferencesHeader(),
+              _partnerPreferenceBasic(profile),
+              _partnerPreferenceLocation(profile),
+              _partnerPreferenceEducationCareer(profile),
+              _partnerPreferenceOther(profile),
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -193,7 +203,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return ProfileInfoCard(
       title: 'About Yourself',
       showEdit: true,
-      onEdit: () {},
+      onEdit: () => _openSectionEditor(ProfileEditSection.aboutYourself),
       child: Text(
         _valueOrDefault(profile?.profile?.bio),
         style: TextStyle(
@@ -212,7 +222,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return ProfileInfoCard(
       title: 'Basic Details',
       showEdit: true,
-      onEdit: () {},
+      onEdit: () => _openSectionEditor(ProfileEditSection.basicDetails),
       infoList: [
         MapEntry('Age', _valueOrDefault(profile?.profile?.age)),
         MapEntry('Date of Birth', _formatDate(profile?.profile?.dateOfBirth)),
@@ -244,7 +254,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return ProfileInfoCard(
       title: 'Religious Background',
       showEdit: true,
-      onEdit: () {},
+      onEdit: () => _openSectionEditor(ProfileEditSection.religiousBackground),
       infoList: [
         MapEntry(
           'Religion',
@@ -269,7 +279,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return ProfileInfoCard(
       title: 'Family Details',
       showEdit: true,
-      onEdit: () {},
+      onEdit: () => _openSectionEditor(ProfileEditSection.familyDetails),
       infoList: [
         MapEntry(
           'Father\'s Details',
@@ -307,7 +317,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return ProfileInfoCard(
       title: 'Education & Career',
       showEdit: true,
-      onEdit: () {},
+      onEdit: () => _openSectionEditor(ProfileEditSection.educationCareer),
       infoList: [
         MapEntry(
           'Highest Qualification',
@@ -336,7 +346,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return ProfileInfoCard(
       title: 'Location of Groom',
       showEdit: true,
-      onEdit: () {},
+      onEdit: () => _openSectionEditor(ProfileEditSection.location),
       infoList: [
         MapEntry(
           'Current Location',
@@ -352,6 +362,175 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         ),
         MapEntry('ZIP/Pin code', _valueOrDefault(location?.zipCode)),
       ],
+    );
+  }
+
+  Widget _hobbiesInterests(CompleteProfile? profile) {
+    final interest = profile?.interest;
+
+    return ProfileInfoCard(
+      title: 'Hobbies & Interests',
+      showEdit: true,
+      onEdit: () => _openSectionEditor(ProfileEditSection.hobbiesInterests),
+      infoList: [
+        MapEntry(
+          'Creative',
+          _valueOrDefault(_joinList(interest?.creativePursuits)),
+        ),
+        MapEntry(
+          'Fun',
+          _valueOrDefault(_joinList(interest?.outdoorActivities)),
+        ),
+        MapEntry(
+          'Fitness',
+          _valueOrDefault(_joinList(interest?.fitnessAndSports)),
+        ),
+        MapEntry(
+          'Other',
+          _valueOrDefault(
+            _joinList([
+              ...?interest?.mediaAndLearning,
+              ...?interest?.foodAndCuisine,
+              ...?interest?.travelAndLeisure,
+            ]),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _partnerPreferencesHeader() {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 4, bottom: 2),
+        child: Text(
+          'Partner Preferences',
+          style: TextStyle(
+            color: AppColors.textPrimaryLight,
+            fontSize: TextSize.font16(context),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _partnerPreferenceBasic(CompleteProfile? profile) {
+    final preference = profile?.preferences;
+
+    return ProfileInfoCard(
+      title: 'Basic Info',
+      showEdit: true,
+      onEdit: () => _openSectionEditor(ProfileEditSection.preferenceBasicInfo),
+      infoList: [
+        MapEntry(
+          'Age Range',
+          _composeRange(preference?.ageMin, preference?.ageMax),
+        ),
+        MapEntry(
+          'Height Range',
+          _composeRange(
+            preference?.heightMin,
+            preference?.heightMax,
+            suffix: ' cm',
+          ),
+        ),
+        MapEntry(
+          'Religion',
+          _valueOrDefault(_joinList(preference?.religionPreference)),
+        ),
+        MapEntry(
+          'Community',
+          _valueOrDefault(_joinList(preference?.communityPreference)),
+        ),
+        MapEntry(
+          'Mother Tongue',
+          _valueOrDefault(_joinList(preference?.motherTonguePreference)),
+        ),
+      ],
+    );
+  }
+
+  Widget _partnerPreferenceLocation(CompleteProfile? profile) {
+    final preference = profile?.preferences;
+
+    return ProfileInfoCard(
+      title: 'Location Details',
+      showEdit: true,
+      onEdit: () =>
+          _openSectionEditor(ProfileEditSection.preferenceLocationDetails),
+      infoList: [
+        MapEntry(
+          'Countries',
+          _valueOrDefault(_joinList(preference?.preferredCountries)),
+        ),
+        MapEntry(
+          'States',
+          _valueOrDefault(_joinList(preference?.preferredStates)),
+        ),
+        MapEntry(
+          'Cities',
+          _valueOrDefault(_joinList(preference?.preferredCities)),
+        ),
+      ],
+    );
+  }
+
+  Widget _partnerPreferenceEducationCareer(CompleteProfile? profile) {
+    final preference = profile?.preferences;
+
+    return ProfileInfoCard(
+      title: 'Education & Career',
+      showEdit: true,
+      onEdit: () =>
+          _openSectionEditor(ProfileEditSection.preferenceEducationCareer),
+      infoList: [
+        MapEntry(
+          'Education',
+          _valueOrDefault(_joinList(preference?.educationPreference)),
+        ),
+        MapEntry(
+          'Profession',
+          _valueOrDefault(_joinList(preference?.professionPreference)),
+        ),
+        MapEntry(
+          'Working As',
+          _valueOrDefault(_joinList(preference?.workingAsPreference)),
+        ),
+        MapEntry(
+          'Annual Income',
+          _valueOrDefault(_joinList(preference?.annualIncomePreference)),
+        ),
+      ],
+    );
+  }
+
+  Widget _partnerPreferenceOther(CompleteProfile? profile) {
+    final preference = profile?.preferences;
+
+    return ProfileInfoCard(
+      title: 'Other Details',
+      showEdit: true,
+      onEdit: () =>
+          _openSectionEditor(ProfileEditSection.preferenceOtherDetails),
+      infoList: [
+        MapEntry(
+          'Profile Managed By',
+          _valueOrDefault(_joinList(preference?.profileManagedByPreference)),
+        ),
+        MapEntry(
+          'Diet',
+          _valueOrDefault(_joinList(preference?.dietPreference)),
+        ),
+      ],
+    );
+  }
+
+  void _openSectionEditor(ProfileEditSection section) {
+    context.pushNamed(
+      Routes.profileSectionEdit,
+      extra: section.key,
     );
   }
 
@@ -442,6 +621,43 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (cityText.isEmpty) return countryText;
     if (countryText.isEmpty) return cityText;
     return '$cityText, $countryText';
+  }
+
+  String _joinList(List<String>? values) {
+    if (values == null || values.isEmpty) {
+      return '';
+    }
+
+    final normalized = values
+        .map((item) => item.trim())
+        .where((item) => item.isNotEmpty)
+        .toList(growable: false);
+
+    if (normalized.isEmpty) {
+      return '';
+    }
+
+    return normalized.join(', ');
+  }
+
+  String _composeRange(
+    dynamic minValue,
+    dynamic maxValue, {
+    String suffix = '',
+  }) {
+    final minText = _trimmed(minValue);
+    final maxText = _trimmed(maxValue);
+
+    if (minText.isEmpty && maxText.isEmpty) {
+      return 'Not Specified';
+    }
+    if (minText.isEmpty) {
+      return '$maxText$suffix';
+    }
+    if (maxText.isEmpty) {
+      return '$minText$suffix';
+    }
+    return '$minText$suffix - $maxText$suffix';
   }
 
   String _combineNames(dynamic first, dynamic second) {

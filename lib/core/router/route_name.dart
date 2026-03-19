@@ -46,6 +46,7 @@ abstract class Paths {
 
   // Home Screens
   static const editProfile = '/editProfile';
+  static const profileSectionEdit = '/profileSectionEdit';
   static const upgradePackage = '/upgradePackage';
   static const paymentWebView = '/paymentWebView';
 
@@ -103,6 +104,7 @@ abstract class Routes {
 
   // Home Screens
   static const editProfile = 'editProfile';
+  static const profileSectionEdit = 'profileSectionEdit';
   static const upgradePackage = 'upgradePackage';
   static const paymentWebView = 'paymentWebView';
 
