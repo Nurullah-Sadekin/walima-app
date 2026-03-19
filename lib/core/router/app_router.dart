@@ -256,6 +256,7 @@ GoRouter goRouter(Ref ref) {
           final extra = state.extra;
           String redirectUrl = '';
           String? transactionId;
+          String? tranId;
 
           if (extra is String) {
             redirectUrl = extra;
@@ -263,6 +264,7 @@ GoRouter goRouter(Ref ref) {
             final map = Map<String, dynamic>.from(extra);
             final rawUrl = map['redirectUrl'];
             final rawTransactionId = map['transactionId'];
+            final rawTranId = map['tranId'];
 
             if (rawUrl is String) {
               redirectUrl = rawUrl;
@@ -271,11 +273,15 @@ GoRouter goRouter(Ref ref) {
                 rawTransactionId.trim().isNotEmpty) {
               transactionId = rawTransactionId.trim();
             }
+            if (rawTranId is String && rawTranId.trim().isNotEmpty) {
+              tranId = rawTranId.trim();
+            }
           }
 
           return PaymentWebViewScreen(
             redirectUrl: redirectUrl,
             transactionId: transactionId,
+            tranId: tranId,
           );
         },
       ),

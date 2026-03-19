@@ -211,6 +211,8 @@ class AppUrls {
       '$baseUrl/payments/initiate-upgrade'; //POST
   static const String paymentsSslCommerzWebhook =
       '$baseUrl/payments/webhook/sslcommerz'; //POST
+  static const String paymentsSslCommerzCallback =
+      '$baseUrl/payments/callback/sslcommerz'; //GET
   static const String paymentsSubscription =
       '$baseUrl/payments/subscription'; //GET
 

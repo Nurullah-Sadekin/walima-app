@@ -97,6 +97,55 @@ class PlanRepository {
     }
   }
 
+  static Future<bool> confirmSslCommerzCallback({
+    required String transactionId,
+    required String valId,
+    required String tranId,
+    String status = 'success',
+    String tranType = 'success',
+  }) async {
+    try {
+      final response = await DioClient().get(
+        AppUrls.paymentsSslCommerzCallback,
+        queryParameters: <String, dynamic>{
+          'transactionId': transactionId,
+          'val_id': valId,
+          'tran_id': tranId,
+          'status': status,
+          'tran_type': tranType,
+        },
+        isTokenRequired: true,
+      );
+
+      final data = response.data;
+      if (data is Map<String, dynamic>) {
+        final code = (data['code'] as String?)?.trim().toUpperCase();
+        if (code != null && code.isNotEmpty && code != 'SUCCESS') {
+          return false;
+        }
+
+        final directReceived = data['received'];
+        if (directReceived is bool) {
+          return directReceived;
+        }
+
+        final nestedResponse = data['response'];
+        if (nestedResponse is Map<String, dynamic>) {
+          final nestedReceived = nestedResponse['received'];
+          if (nestedReceived is bool) {
+            return nestedReceived;
+          }
+        }
+
+        return true;
+      }
+
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
   static Future<bool> notifySslCommerzWebhook({
     required String transactionId,
     required String status,

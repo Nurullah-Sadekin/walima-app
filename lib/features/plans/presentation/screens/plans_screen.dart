@@ -159,6 +159,9 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
                       );
                       if (!context.mounted || redirectUrl == null) return;
 
+                      final appTransactionId = plansState
+                          .latestPaymentSession?.transactionId
+                          ?.trim();
                       final gatewayTransactionId = plansState
                           .latestPaymentSession?.rawResponse?.transactionId
                           ?.trim();
@@ -167,7 +170,8 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
                         Routes.paymentWebView,
                         extra: <String, dynamic>{
                           'redirectUrl': redirectUrl,
-                          'transactionId': gatewayTransactionId,
+                          'transactionId': appTransactionId,
+                          'tranId': gatewayTransactionId,
                         },
                       );
                     },

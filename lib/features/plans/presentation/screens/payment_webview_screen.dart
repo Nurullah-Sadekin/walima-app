@@ -14,11 +14,13 @@ class PaymentWebViewScreen extends ConsumerStatefulWidget {
   const PaymentWebViewScreen({
     required this.redirectUrl,
     this.transactionId,
+    this.tranId,
     super.key,
   });
 
   final String redirectUrl;
   final String? transactionId;
+  final String? tranId;
 
   @override
   ConsumerState<PaymentWebViewScreen> createState() =>
@@ -30,7 +32,8 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
   bool _isPageLoading = true;
   bool _isCompletingFlow = false;
   bool _isErrorHandled = false;
-  bool _isWebhookInProgress = false;
+  bool _isCallbackInProgress = false;
+  bool _isFinalizingPayment = false;
   Uri? _initialUri;
 
   @override
@@ -77,37 +80,51 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
     final currentUri = Uri.tryParse(currentUrl);
     if (currentUri == null) return;
 
-    final isWalimaDomain = currentUri.host.toLowerCase().contains('walima.app');
-    final hasTerminalMarker = _hasTerminalMarker(currentUrl);
-    final hasSuccessMarker = _hasSuccessMarker(currentUrl);
-
-    if (!isWalimaDomain || !hasTerminalMarker) {
-      return;
-    }
-
-    if (hasSuccessMarker) {
+    if (_matchesSslCommerzCompletionPattern(currentUri)) {
       unawaited(_confirmPaymentSuccess(currentUri));
       return;
     }
 
-    _completeFlowAndGoHome();
-  }
+    final isWalimaDomain = currentUri.host.toLowerCase().contains('walima.app');
+    if (!isWalimaDomain) return;
 
-  bool _hasSuccessMarker(String url) {
-    final normalized = url.toLowerCase();
-    return normalized.contains('success') ||
-        normalized.contains('complete') ||
-        normalized.contains('completed');
+    if (_hasFailureMarker(currentUrl)) {
+      _completeFlowAndGoHome();
+    }
   }
 
   Future<void> _confirmPaymentSuccess(Uri currentUri) async {
-    if (_isCompletingFlow || _isWebhookInProgress) return;
-    _isWebhookInProgress = true;
+    if (_isCompletingFlow || _isCallbackInProgress) return;
+    _isCallbackInProgress = true;
+    if (mounted) {
+      setState(() {
+        _isFinalizingPayment = true;
+      });
+    }
 
-    final transactionId = _resolveTransactionId(currentUri);
-    final isReceived = await PlanRepository.notifySslCommerzWebhook(
-      transactionId: transactionId,
+    final callbackTransactionId = _resolveCallbackTransactionId(currentUri);
+    final callbackValId = _resolveValId(currentUri);
+    final callbackTranId = _resolveCallbackTranId(currentUri);
+
+    if (callbackTransactionId.isEmpty ||
+        callbackValId.isEmpty ||
+        callbackTranId.isEmpty) {
+      await DialogUtils.showErrorDialog(
+        context: context,
+        message:
+            'Payment verification information is incomplete. Please try again.',
+      );
+      if (!mounted) return;
+      _completeFlowAndGoHome();
+      return;
+    }
+
+    final isReceived = await PlanRepository.confirmSslCommerzCallback(
+      transactionId: callbackTransactionId,
+      valId: callbackValId,
+      tranId: callbackTranId,
       status: 'success',
+      tranType: 'success',
     );
 
     if (!mounted) return;
@@ -127,40 +144,88 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
     _completeFlowAndGoHome();
   }
 
-  String _resolveTransactionId(Uri currentUri) {
-    final candidates = <String?>[
-      widget.transactionId,
-      currentUri.queryParameters['tran_id'],
-      currentUri.queryParameters['tranId'],
-      currentUri.queryParameters['transaction_id'],
-      currentUri.queryParameters['transactionId'],
-      _initialUri?.queryParameters['tran_id'],
-      _initialUri?.queryParameters['tranId'],
-      _initialUri?.queryParameters['transaction_id'],
-      _initialUri?.queryParameters['transactionId'],
-    ];
+  bool _matchesSslCommerzCompletionPattern(Uri uri) {
+    final host = uri.host.toLowerCase();
+    if (!host.contains('walima.app')) return false;
 
-    for (final candidate in candidates) {
-      final normalized = candidate?.trim();
-      if (normalized != null && normalized.isNotEmpty) {
-        return normalized;
+    final path = uri.path.toLowerCase();
+    final gateway = _pickQueryParam(uri, const ['gateway']).toLowerCase();
+    final valId = _resolveValId(uri);
+    final transactionId =
+        _pickQueryParam(uri, const ['transactionId', 'transaction_id']);
+
+    return path.contains('/payment/success') &&
+        gateway == 'sslcommerz' &&
+        valId.isNotEmpty &&
+        transactionId.isNotEmpty;
+  }
+
+  bool _hasFailureMarker(String url) {
+    final normalized = url.toLowerCase();
+    return normalized.contains('fail') ||
+        normalized.contains('failed') ||
+        normalized.contains('cancel') ||
+        normalized.contains('cancelled');
+  }
+
+  String _resolveCallbackTransactionId(Uri currentUri) {
+    final fromWidget = widget.transactionId?.trim() ?? '';
+    if (fromWidget.isNotEmpty) return fromWidget;
+
+    final fromInitial = _pickQueryParam(
+      _initialUri,
+      const ['paymentTransactionId', 'transactionId', 'transaction_id'],
+    );
+    if (fromInitial.isNotEmpty) return fromInitial;
+
+    final fromCurrent = _pickQueryParam(
+      currentUri,
+      const ['paymentTransactionId', 'transactionId', 'transaction_id'],
+    );
+    if (fromCurrent.isNotEmpty) return fromCurrent;
+
+    return '';
+  }
+
+  String _resolveCallbackTranId(Uri currentUri) {
+    final fromWidget = widget.tranId?.trim() ?? '';
+    if (fromWidget.isNotEmpty) return fromWidget;
+
+    final fromCurrent =
+        _pickQueryParam(currentUri, const ['tran_id', 'tranId']);
+    if (fromCurrent.isNotEmpty) return fromCurrent;
+
+    final fromCurrentTransaction =
+        _pickQueryParam(currentUri, const ['transactionId', 'transaction_id']);
+    if (fromCurrentTransaction.isNotEmpty) return fromCurrentTransaction;
+
+    final fromInitial = _pickQueryParam(
+      _initialUri,
+      const ['tran_id', 'tranId', 'transactionId', 'transaction_id'],
+    );
+    if (fromInitial.isNotEmpty) return fromInitial;
+
+    return '';
+  }
+
+  String _resolveValId(Uri currentUri) {
+    final fromCurrent = _pickQueryParam(currentUri, const ['val_id', 'valId']);
+    if (fromCurrent.isNotEmpty) return fromCurrent;
+
+    return _pickQueryParam(_initialUri, const ['val_id', 'valId']);
+  }
+
+  String _pickQueryParam(Uri? uri, List<String> keys) {
+    if (uri == null) return '';
+
+    for (final key in keys) {
+      final value = uri.queryParameters[key]?.trim();
+      if (value != null && value.isNotEmpty) {
+        return value;
       }
     }
 
-    // Fallback keeps webhook payload aligned with backend contract in case txn id is missing from redirect URL.
-    return '4545f';
-  }
-
-  bool _hasTerminalMarker(String url) {
-    final normalized = url.toLowerCase();
-    return normalized.contains('success') ||
-        normalized.contains('fail') ||
-        normalized.contains('failed') ||
-        normalized.contains('cancel') ||
-        normalized.contains('cancelled') ||
-        normalized.contains('complete') ||
-        normalized.contains('completed') ||
-        normalized.contains('payment-status');
+    return '';
   }
 
   Future<void> _handleWebViewError() async {
@@ -229,7 +294,7 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
                       _handleWebViewError();
                     },
                   ),
-                  if (_isPageLoading)
+                  if (_isPageLoading || _isFinalizingPayment)
                     Container(
                       height: double.infinity,
                       width: double.infinity,
