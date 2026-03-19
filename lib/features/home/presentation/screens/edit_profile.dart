@@ -5,6 +5,7 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
+import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/profile_summery_section.dart';
 import 'package:flutter_boilerplate/features/home/presentation/widgets/profile_info_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:go_router/go_router.dart';
@@ -27,7 +28,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         child: Column(
           children: [
             _topBar(context),
-            _headerSection(context),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.0),
+              child: ProfileSummerySection(
+                key: ValueKey('profile-summary-visible'),
+              ),
+            ),
             _bodySection(),
           ],
         ),
