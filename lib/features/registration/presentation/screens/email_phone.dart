@@ -1,4 +1,5 @@
 import 'package:country_picker/country_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
@@ -16,13 +17,16 @@ import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:go_router/go_router.dart';
 
 class EmailPhoneScreen extends ConsumerStatefulWidget {
-   const EmailPhoneScreen({super.key, this.fromScreen});
+  const EmailPhoneScreen({super.key, this.fromScreen});
   final String? fromScreen;
   @override
   ConsumerState<EmailPhoneScreen> createState() => _EmailPhoneScreenState();
 }
 
 class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
+  static const String _otpEditFlowSource = 'otpScreen';
+  static const String _debugOtpFlowSource = 'debugOtpSignup';
+
   @override
   void initState() {
     super.initState();
@@ -33,16 +37,15 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(emailPhoneScreenProvider);
     return TransparentLoading(
-      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading:
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
           child: screenProvider.screenStates ==
-                      RegistrationScreenStates.isProfileFor ||
-                  provider.selectedCountry == null
+                  RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
@@ -106,7 +109,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '+${provider.selectedCountry!.phoneCode}',
+                    '+${provider.selectedCountry.phoneCode}',
                     style: TextStyle(
                       color: AppColors.textPrimaryLight,
                       fontSize: TextSize.font14(context),
@@ -206,14 +209,26 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
           );
 
           if (isAvailable && mounted) {
-            if(widget.fromScreen != null && widget.fromScreen == 'otpScreen'){
-              await provider.signUpViaOtp(context);
-              if(isAvailable && mounted){
+            if (widget.fromScreen == _otpEditFlowSource) {
+              final otpSent = await provider.signUpViaOtp(context);
+              if (otpSent && mounted) {
                 context.pop();
-                // context.push(Paths.otpVerifyForSignUp);
               }
               return;
             }
+
+            if (kDebugMode && widget.fromScreen == _debugOtpFlowSource) {
+              final otpSent = await provider.signUpViaOtp(context);
+              if (otpSent && mounted) {
+                context.pushNamed(
+                  Routes.otpVerifyForSignUp,
+                  queryParameters: const {'fromScreen': _debugOtpFlowSource},
+                  extra: _debugOtpFlowSource,
+                );
+              }
+              return;
+            }
+
             context.push(Paths.location);
           }
         } finally {

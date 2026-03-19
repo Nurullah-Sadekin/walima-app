@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:country_picker/country_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
@@ -47,7 +48,6 @@ class RegistrationProvider extends BaseChangeNotifier {
   String? selectedYourWork;
   String? selectedYouWorkAs;
   String? selectedFamilyEconomicCondition;
-
 
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
@@ -387,14 +387,13 @@ class RegistrationProvider extends BaseChangeNotifier {
       purpose: 'signup',
     );
     final response = await RegistrationRepository.resendOtp(body);
-    if(response.code != 'SUCCESS') {
+    if (response.code != 'SUCCESS') {
       DialogUtils.showErrorDialog(
         context: context,
         message: response.message ?? 'Failed to resend OTP',
       );
       return false;
-    }
-    else{
+    } else {
       return true;
     }
   }
@@ -454,6 +453,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       } catch (_) {}
     }
   }
+
   void _clearAllControllers() {
     for (final controller in _managedControllers) {
       controller.clear();
@@ -712,7 +712,6 @@ class RegistrationProvider extends BaseChangeNotifier {
     if (notify) {
       notifyListeners();
     }
-
   }
 
   CountryLocationModel? _findCountryOption(String country) {
@@ -1455,6 +1454,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     }
     return 'present';
   }
+
   String selectedCountryCodeForNumber = '';
   String _resolveCountryCodeValue() {
     final selectedCountry = livingInController.text.trim();
@@ -1527,8 +1527,12 @@ class RegistrationProvider extends BaseChangeNotifier {
     return true;
   }
 
-  Future<bool> submitRegistration(BuildContext context,{bool skipOtp = false}) async {
-    if (otpControllers.any((c) => c.text.isEmpty)) {
+  Future<bool> submitRegistration(
+    BuildContext context, {
+    bool skipOtp = false,
+    bool useDebugTemplate = false,
+  }) async {
+    if (!skipOtp && otpControllers.any((c) => c.text.isEmpty)) {
       DialogUtils.showErrorDialog(
         context: context,
         message: _otpIncompleteMessage,
@@ -1537,6 +1541,28 @@ class RegistrationProvider extends BaseChangeNotifier {
     }
 
     final otp = otpControllers.map((c) => c.text).join();
+    final shouldUseDebugTemplate = kDebugMode && useDebugTemplate;
+    final body = shouldUseDebugTemplate
+        ? _buildDebugSignUpRequestBody(skipOtp: skipOtp, otp: otp)
+        : _buildDefaultSignUpRequestBody(skipOtp: skipOtp, otp: otp);
+
+    final response = await RegistrationRepository.signUpCreateUserProfile(
+      body,
+      skipOtp: skipOtp,
+    );
+    if (response.code == 'SUCCESS') {
+      await _persistAuthTokens(response);
+      await _clearRegistrationDraftCacheOnSuccess();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  SignUpRequestBody _buildDefaultSignUpRequestBody({
+    required bool skipOtp,
+    required String otp,
+  }) {
     final religionValue = _resolveReligionValue();
     final residencyStatusValue = _resolveResidencyStatusValue();
     final maritalStatusValue = _resolveMaritalStatusValue();
@@ -1545,7 +1571,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     final locationTypeValue = _resolveLocationTypeValue(residencyStatusValue);
     final countryCodeValue = _resolveCountryCodeValue();
 
-    final body = SignUpRequestBody(
+    return SignUpRequestBody(
       profileManagedBy: 'self',
       gender: selectedGenderName?.toLowerCase() ?? '',
       firstName: firstNameController.text,
@@ -1556,7 +1582,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       cityName: cityController.text,
       dateOfBirth: '1990-01-01',
       email: emailController.text,
-      phoneNumber: phoneNumber,
+      phoneNumber: _resolveSubmissionPhoneNumber(),
       residencyStatus: residencyStatusValue,
       maritalStatus: maritalStatusValue,
       height: num.tryParse(heightController.text),
@@ -1569,30 +1595,154 @@ class RegistrationProvider extends BaseChangeNotifier {
       currentCompany: currentCompanyNameController.text,
       bio: aboutYourselfController.text,
       termsAndConditionsAccepted: true,
-      verificationType: selectedVerificationType.toLowerCase() == 'email' ? 'email' : 'phone',
-      otpCode: skipOtp ? null: otp,
+      verificationType: _resolveVerificationTypeValue(),
+      otpCode: skipOtp ? null : otp,
       liveWithFamily: selectedIsWithFamilyStatus?.toLowerCase() == 'yes',
       displayName: '${firstNameController.text} ${lastNameController.text}',
       purpose: 'signup',
       countryCode: countryCodeValue,
       locationType: locationTypeValue,
     );
-    final response = await RegistrationRepository.signUpCreateUserProfile(body, skipOtp: skipOtp);
-    if (response.code == 'SUCCESS') {
-      await _persistAuthTokens(response);
-      await _clearRegistrationDraftCacheOnSuccess();
-      return true;
-    } else {
-      return false;
+  }
+
+  SignUpRequestBody _buildDebugSignUpRequestBody({
+    required bool skipOtp,
+    required String otp,
+  }) {
+    final fallbackCountryName =
+        selectedCountry.name.toLowerCase() == 'world wide'
+            ? 'Bangladesh'
+            : selectedCountry.name;
+
+    final firstName = _valueOrDefault(firstNameController.text, 'Debug');
+    final lastName = _valueOrDefault(lastNameController.text, 'User');
+    final religionValue =
+        _resolveReligionValue().isNotEmpty ? _resolveReligionValue() : 'islam';
+    final residencyStatusValue = _resolveResidencyStatusValue().isNotEmpty
+        ? _resolveResidencyStatusValue()
+        : 'citizen';
+    final maritalStatusValue = _resolveMaritalStatusValue().isNotEmpty
+        ? _resolveMaritalStatusValue()
+        : 'never_married';
+    final dietValue =
+        _resolveDietValue().isNotEmpty ? _resolveDietValue() : 'non_vegetarian';
+    final highestEducationValue = _resolveHighestEducationValue().isNotEmpty
+        ? _resolveHighestEducationValue()
+        : 'bachelor';
+
+    final verificationType = _resolveVerificationTypeValue();
+    final dynamicPhone = _resolveSubmissionPhoneNumber();
+    final resolvedPhoneNumber =
+        dynamicPhone.isNotEmpty ? dynamicPhone : '+8801700000000';
+    final locationTypeValue = _resolveLocationTypeValue(residencyStatusValue);
+
+    return SignUpRequestBody(
+      profileManagedBy: 'self',
+      gender: _valueOrDefault(selectedGenderName ?? '', 'male').toLowerCase(),
+      firstName: firstName,
+      lastName: lastName,
+      religionName: religionValue,
+      community: _valueOrDefault(communityController.text, 'sunni'),
+      livingIn: _valueOrDefault(livingInController.text, fallbackCountryName),
+      cityName: _valueOrDefault(cityController.text, 'Dhaka'),
+      dateOfBirth: '1990-01-01',
+      email: _valueOrDefault(emailController.text, 'debug@example.com'),
+      phoneNumber: resolvedPhoneNumber,
+      residencyStatus: residencyStatusValue,
+      maritalStatus: maritalStatusValue,
+      height: num.tryParse(heightController.text) ?? 170,
+      diet: dietValue,
+      highestLevelOfEducation: highestEducationValue,
+      incomeRange: _valueOrDefault(incomeRangeController.text, '50000-100000'),
+      incomeRangeFrequency:
+          _valueOrDefault(selectedIncomePeriodStatus ?? '', 'monthly')
+              .toLowerCase(),
+      workWith:
+          _valueOrDefault(selectedYourWork ?? '', 'private').toLowerCase(),
+      workingAs: _valueOrDefault(selectedYouWorkAs ?? '', 'software_engineer')
+          .toLowerCase(),
+      currentCompany:
+          _valueOrDefault(currentCompanyNameController.text, 'Walima QA'),
+      bio: _valueOrDefault(
+        aboutYourselfController.text,
+        'Debug OTP registration flow',
+      ),
+      termsAndConditionsAccepted: true,
+      verificationType: verificationType,
+      otpCode: skipOtp ? null : otp,
+      liveWithFamily: selectedIsWithFamilyStatus?.toLowerCase() == 'yes',
+      displayName: '$firstName $lastName',
+      purpose: 'signup',
+      countryCode: _resolveCountryCodeForSubmission(),
+      locationType: locationTypeValue,
+    );
+  }
+
+  String _valueOrDefault(String value, String fallback) {
+    final normalized = value.trim();
+    if (normalized.isNotEmpty) {
+      return normalized;
     }
+    return fallback;
+  }
+
+  String _resolveVerificationTypeValue() {
+    return selectedVerificationType.toLowerCase() == 'email'
+        ? 'email'
+        : 'phone';
+  }
+
+  String _resolveSubmissionPhoneNumber() {
+    final cachedPhoneNumber = phoneNumber.trim();
+    if (cachedPhoneNumber.isNotEmpty) {
+      return cachedPhoneNumber;
+    }
+
+    final localNumber = phoneController.text.trim();
+    if (localNumber.isEmpty) {
+      return '';
+    }
+
+    final dialCode = selectedCountry.phoneCode.trim();
+    if (dialCode.isNotEmpty) {
+      return '+$dialCode$localNumber';
+    }
+
+    final selectedCode = selectedCountryCodeForNumber.trim();
+    if (selectedCode.isNotEmpty && RegExp(r'^\d+$').hasMatch(selectedCode)) {
+      return '+$selectedCode$localNumber';
+    }
+
+    if (localNumber.startsWith('+')) {
+      return localNumber;
+    }
+
+    return '+$localNumber';
+  }
+
+  String _resolveCountryCodeForSubmission() {
+    final resolvedCountryCode = _resolveCountryCodeValue().trim();
+    if (resolvedCountryCode.isNotEmpty) {
+      return resolvedCountryCode;
+    }
+
+    final selectedCountryCode = selectedCountry.countryCode.trim();
+    if (selectedCountryCode.isNotEmpty) {
+      return selectedCountryCode;
+    }
+
+    return 'BD';
   }
 
   String phoneAvailabilityErrorMessage = '';
   String emailAvailabilityErrorMessage = '';
   String phoneNumber = '';
-  Future<bool> checkEmailAndPhoneAvailability(BuildContext context,String countryCode) async {
-    final emailRes = await RegistrationRepository.checkEmail(emailController.text);
-    final phoneRes = await RegistrationRepository.checkMobile('+$countryCode${phoneController.text}');
+  Future<bool> checkEmailAndPhoneAvailability(
+      BuildContext context, String countryCode) async {
+    final emailRes =
+        await RegistrationRepository.checkEmail(emailController.text);
+    final phoneRes = await RegistrationRepository.checkMobile(
+        '+$countryCode${phoneController.text}');
     if (emailRes.response?.isAvailable == true &&
         phoneRes.response?.isAvailable == true) {
       phoneAvailabilityErrorMessage = '';
@@ -1603,15 +1753,15 @@ class RegistrationProvider extends BaseChangeNotifier {
       return true;
     } else {
       if (emailRes.response?.isAvailable != true) {
-        emailAvailabilityErrorMessage = emailRes.message ?? 'Email already exists';
+        emailAvailabilityErrorMessage =
+            emailRes.message ?? 'Email already exists';
         // DialogUtils.showErrorDialog(ctx: context, message: emailRes.message ?? 'Email already exists');
-      notifyListeners();
+        notifyListeners();
       }
       if (phoneRes.response?.isAvailable != true) {
         phoneAvailabilityErrorMessage =
             phoneRes.message ?? 'Phone number already exists';
         // DialogUtils.showErrorDialog(ctx: context, message: phoneRes.message ?? 'Phone number already exists');
-
       }
       _notifyAndPersist();
       return false;

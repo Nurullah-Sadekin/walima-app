@@ -79,7 +79,16 @@ GoRouter goRouter(Ref ref) {
       GoRoute(
         path: Paths.otpVerifyForSignUp,
         name: Routes.otpVerifyForSignUp,
-        builder: (context, state) => const OtpVerifySignUpScreen(),
+        builder: (context, state) {
+          final fromScreenFromQuery =
+              state.uri.queryParameters['fromScreen']?.trim();
+          final fromScreenFromExtra =
+              state.extra is String ? (state.extra as String).trim() : null;
+          final fromScreen = fromScreenFromQuery?.isNotEmpty == true
+              ? fromScreenFromQuery
+              : fromScreenFromExtra;
+          return OtpVerifySignUpScreen(fromScreen: fromScreen);
+        },
       ),
       GoRoute(
         path: Paths.newPassword,

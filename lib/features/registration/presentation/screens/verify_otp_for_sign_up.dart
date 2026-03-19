@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
@@ -14,7 +15,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class OtpVerifySignUpScreen extends ConsumerStatefulWidget {
-  const OtpVerifySignUpScreen({super.key});
+  const OtpVerifySignUpScreen({super.key, this.fromScreen});
+
+  static const String debugOtpFlowSource = 'debugOtpSignup';
+  final String? fromScreen;
 
   @override
   ConsumerState<OtpVerifySignUpScreen> createState() => _OtpVerifyScreenState();
@@ -22,6 +26,11 @@ class OtpVerifySignUpScreen extends ConsumerStatefulWidget {
 
 class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
   late RegistrationProvider provider;
+
+  bool get _isDebugOtpFlow {
+    return kDebugMode &&
+        widget.fromScreen?.trim() == OtpVerifySignUpScreen.debugOtpFlowSource;
+  }
 
   @override
   void initState() {
@@ -64,8 +73,11 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                         screenProvider.updateViewState(
                             loadingState:
                                 RegistrationScreenStates.isProfileFor);
-                        final validate = await provider
-                            .submitRegistration(context, skipOtp: true);
+                        final validate = await provider.submitRegistration(
+                          context,
+                          skipOtp: true,
+                          useDebugTemplate: _isDebugOtpFlow,
+                        );
                         if (!validate) {
                           screenProvider.updateViewState(
                               loadingState:
@@ -76,8 +88,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                               screenStates:
                                   RegistrationScreenStates.loadingComplete);
                           if (mounted) {
-                            provider.cleanAllValue();
-                            context.pushReplacement(Paths.photoUpload);
+                            _navigateAfterRegistrationSuccess();
                           }
                         }
                       },
@@ -287,7 +298,10 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
         final screenProvider = ref.read(verifyOtpForSignUp);
         screenProvider.updateViewState(
             loadingState: RegistrationScreenStates.isProfileFor);
-        final validate = await provider.submitRegistration(context);
+        final validate = await provider.submitRegistration(
+          context,
+          useDebugTemplate: _isDebugOtpFlow,
+        );
         if (!validate) {
           screenProvider.updateViewState(
               loadingState: RegistrationScreenStates.loadingComplete);
@@ -296,11 +310,17 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
           screenProvider.updateViewState(
               screenStates: RegistrationScreenStates.loadingComplete);
           if (mounted) {
-            provider.cleanAllValue();
-            context.pushReplacement(Paths.photoUpload);
+            _navigateAfterRegistrationSuccess();
           }
         }
       },
     );
+  }
+
+  void _navigateAfterRegistrationSuccess() {
+    provider.cleanAllValue();
+    final destination =
+        _isDebugOtpFlow ? Paths.connectMatches : Paths.photoUpload;
+    context.pushReplacement(destination);
   }
 }
