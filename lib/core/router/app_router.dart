@@ -309,8 +309,8 @@ GoRouter goRouter(Ref ref) {
         path: Paths.chatScreen,
         name: Routes.chatScreen,
         builder: (context, state) {
-          // final imagePath = state.extra is String ? state.extra as String : null;
-          return const ChatScreen();
+          final extra = state.extra is Map<String, dynamic> ? state.extra as Map<String, dynamic> : null;
+          return ChatScreen(extra: extra);
         },
       ),
     ],

@@ -167,7 +167,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 : 'No message',
             timeAgo: _formatConversationTime(conversation.lastMessageAt),
             onTap: () {
-              context.pushNamed(Routes.chatScreen);
+              final payload = {
+                'conversationId': conversation.id,
+                'participant': {
+                  'userId': participant?.userId,
+                  'displayName': displayName,
+                  'profilePictureUrl': participant?.profilePictureUrl,
+                  'isOnline': participant?.isOnline,
+                }
+              };
+              context.pushNamed(Routes.chatScreen, extra: payload);
             },
           ),
         );
