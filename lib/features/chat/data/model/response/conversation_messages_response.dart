@@ -11,11 +11,12 @@ class ConversationMessagesResponse {
     if (json == null) return;
     connection = json['connection'] != null ? Connection.fromJson(json['connection']) : null;
     otherParticipant = json['otherParticipant'] != null ? OtherParticipant.fromJson(json['otherParticipant']) : null;
-    if (json['data'] != null) {
+    final items = json['data'] ?? json['messages'];
+    if (items != null) {
       data = [];
-      json['data'].forEach((v) {
+      for (final v in items) {
         data?.add(Message.fromJson(v));
-      });
+      }
     } else {
       data = [];
     }
