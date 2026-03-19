@@ -7,7 +7,7 @@ import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/features/home/presentation/screens/edit_profile.dart';
+import 'package:flutter_boilerplate/features/profile/presentation/screen/edit_profile.dart';
 import 'package:flutter_boilerplate/features/profile/data/model/response/dashboard_response.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -39,7 +39,8 @@ class ProfileSummerySection extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ProfileImageCard(
-                imagePath: profile?.profilePicture?.url ?? AppImages.demoProfile,
+                imagePath:
+                    profile?.profilePicture?.url ?? AppImages.demoProfile,
                 imageSize: 97,
                 iconSize: 20,
                 showTopIcon: profile?.isVerified ?? false,
@@ -75,12 +76,12 @@ class ProfileSummerySection extends ConsumerWidget {
   }
 
   Widget _profileDetails(
-      BuildContext context, {
-        required String displayName,
-        required String memberId,
-        required String planName,
-        required String expiryText,
-      }) {
+    BuildContext context, {
+    required String displayName,
+    required String memberId,
+    required String planName,
+    required String expiryText,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Column(
@@ -139,10 +140,10 @@ class ProfileSummerySection extends ConsumerWidget {
   }
 
   Widget _subscriptionRow(
-      BuildContext context, {
-        required String planName,
-        required String expiryText,
-      }) {
+    BuildContext context, {
+    required String planName,
+    required String expiryText,
+  }) {
     return Row(
       children: [
         Container(
@@ -200,7 +201,8 @@ class ProfileSummerySection extends ConsumerWidget {
             svgIconPath: AppImages.premiumSvgIcon,
             iconLeftPosition: false,
             onTap: () {
-              context.pushNamed(Routes.upgradePackage,
+              context.pushNamed(
+                Routes.upgradePackage,
                 extra: Routes.anchor,
               );
             },

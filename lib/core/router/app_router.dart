@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/features/home/presentation/screens/edit_profile.dart';
+import 'package:flutter_boilerplate/features/profile/presentation/screen/edit_profile.dart';
 import 'package:flutter_boilerplate/features/login/presentation/screens/new_password.dart';
 import 'package:flutter_boilerplate/features/login/presentation/screens/otp_verify.dart';
 import 'package:flutter_boilerplate/features/login/presentation/screens/reset_pssword_status.dart';
