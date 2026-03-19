@@ -152,15 +152,23 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
               buttonOnTap: isButtonDisabled
                   ? () {}
                   : () async {
-                      final redirectUrl =
-                          await ref.read(plansProvider).startPlanPurchase(
-                                context: context,
-                                selectedPlan: item,
-                              );
+                      final plansState = ref.read(plansProvider);
+                      final redirectUrl = await plansState.startPlanPurchase(
+                        context: context,
+                        selectedPlan: item,
+                      );
                       if (!context.mounted || redirectUrl == null) return;
+
+                      final gatewayTransactionId = plansState
+                          .latestPaymentSession?.rawResponse?.transactionId
+                          ?.trim();
+
                       await context.pushNamed(
                         Routes.paymentWebView,
-                        extra: redirectUrl,
+                        extra: <String, dynamic>{
+                          'redirectUrl': redirectUrl,
+                          'transactionId': gatewayTransactionId,
+                        },
                       );
                     },
               plan: item,

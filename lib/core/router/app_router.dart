@@ -253,9 +253,30 @@ GoRouter goRouter(Ref ref) {
         path: Paths.paymentWebView,
         name: Routes.paymentWebView,
         builder: (context, state) {
-          final redirectUrl =
-              state.extra is String ? state.extra as String : '';
-          return PaymentWebViewScreen(redirectUrl: redirectUrl);
+          final extra = state.extra;
+          String redirectUrl = '';
+          String? transactionId;
+
+          if (extra is String) {
+            redirectUrl = extra;
+          } else if (extra is Map) {
+            final map = Map<String, dynamic>.from(extra);
+            final rawUrl = map['redirectUrl'];
+            final rawTransactionId = map['transactionId'];
+
+            if (rawUrl is String) {
+              redirectUrl = rawUrl;
+            }
+            if (rawTransactionId is String &&
+                rawTransactionId.trim().isNotEmpty) {
+              transactionId = rawTransactionId.trim();
+            }
+          }
+
+          return PaymentWebViewScreen(
+            redirectUrl: redirectUrl,
+            transactionId: transactionId,
+          );
         },
       ),
       GoRoute(

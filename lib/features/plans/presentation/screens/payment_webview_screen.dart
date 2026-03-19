@@ -13,10 +13,12 @@ import 'package:go_router/go_router.dart';
 class PaymentWebViewScreen extends ConsumerStatefulWidget {
   const PaymentWebViewScreen({
     required this.redirectUrl,
+    this.transactionId,
     super.key,
   });
 
   final String redirectUrl;
+  final String? transactionId;
 
   @override
   ConsumerState<PaymentWebViewScreen> createState() =>
@@ -127,6 +129,7 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
 
   String _resolveTransactionId(Uri currentUri) {
     final candidates = <String?>[
+      widget.transactionId,
       currentUri.queryParameters['tran_id'],
       currentUri.queryParameters['tranId'],
       currentUri.queryParameters['transaction_id'],
@@ -227,10 +230,10 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
                     },
                   ),
                   if (_isPageLoading)
-                     Container(
-                       height: double.infinity,
-                       width: double.infinity,
-                       color: Colors.white,
+                    Container(
+                      height: double.infinity,
+                      width: double.infinity,
+                      color: Colors.white,
                       child: const Center(
                         child: Loading(),
                       ),

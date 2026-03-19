@@ -63,7 +63,11 @@ class PlanRepository {
     try {
       final response = await DioClient().post(
         AppUrls.paymentsInitiateUpgrade,
-        data: body.toJson(),
+        data: <String, dynamic>{
+          'gateway': body.gateway,
+          'targetPlanId': body.planId,
+          'billingCycle': body.billingCycle,
+        },
         isTokenRequired: true,
       );
       return InitiatePaymentResponse.fromJson(response.data);
