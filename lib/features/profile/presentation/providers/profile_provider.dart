@@ -9,6 +9,7 @@ class ProfileProvider extends BaseChangeNotifier {
   ProfileScreenStates loaderState = ProfileScreenStates.defaultState;
   CompleteProfile? profile;
   DashboardData? dashboard;
+
   Future<void> getProfile() async {
     final data = await ProfileRepository.getCompleteProfile();
     if (data.code == 'SUCCESS') {

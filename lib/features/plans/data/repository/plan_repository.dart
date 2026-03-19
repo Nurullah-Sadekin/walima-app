@@ -57,6 +57,24 @@ class PlanRepository {
     }
   }
 
+  static Future<InitiatePaymentResponse> initiateUpgradePayment(
+    InitiatePaymentRequestBody body,
+  ) async {
+    try {
+      final response = await DioClient().post(
+        AppUrls.paymentsInitiateUpgrade,
+        data: body.toJson(),
+        isTokenRequired: true,
+      );
+      return InitiatePaymentResponse.fromJson(response.data);
+    } catch (e) {
+      final errorMessage = e is DioException
+          ? e.response?.data['message'] ?? e.message
+          : e.toString();
+      return InitiatePaymentResponse(code: 'FAILED', message: errorMessage);
+    }
+  }
+
   static Future<GetCurrentSubscriptionResponse> getCurrentSubscription() async {
     try {
       final response = await DioClient().get(
@@ -72,6 +90,36 @@ class PlanRepository {
         code: 'FAILED',
         message: errorMessage,
       );
+    }
+  }
+
+  static Future<bool> notifySslCommerzWebhook({
+    required String transactionId,
+    required String status,
+  }) async {
+    try {
+      final response = await DioClient().post(
+        AppUrls.paymentsSslCommerzWebhook,
+        data: <String, dynamic>{
+          'tran_id': transactionId,
+          'status': status,
+        },
+        isTokenRequired: true,
+      );
+
+      final data = response.data;
+      if (data is Map<String, dynamic>) {
+        final nestedResponse = data['response'];
+        final receivedValue = data['received'] ??
+            (nestedResponse is Map<String, dynamic>
+                ? nestedResponse['received']
+                : null);
+        return receivedValue == true;
+      }
+
+      return false;
+    } catch (_) {
+      return false;
     }
   }
 }

@@ -119,7 +119,9 @@ class PlansProvider extends BaseChangeNotifier {
       );
     }
 
-    if (hasCurrentSubscription) {
+    final hasExistingPlan = hasCurrentSubscription;
+
+    if (hasExistingPlan) {
       final quoteData = await _fetchAndValidateQuote(
         context: context,
         purchaseInput: purchaseInput,
@@ -134,6 +136,7 @@ class PlansProvider extends BaseChangeNotifier {
     final paymentData = await _initiatePaymentSession(
       context: context,
       purchaseInput: purchaseInput,
+      isUpgrade: hasExistingPlan,
     );
     if (paymentData == null) return null;
 
@@ -206,14 +209,17 @@ class PlansProvider extends BaseChangeNotifier {
   Future<InitiatePaymentData?> _initiatePaymentSession({
     required BuildContext context,
     required _PurchaseInput purchaseInput,
+    required bool isUpgrade,
   }) async {
-    final initiateResponse = await PlanRepository.initiatePayment(
-      InitiatePaymentRequestBody(
-        gateway: 'sslcommerz',
-        planId: purchaseInput.targetPlanId,
-        billingCycle: purchaseInput.billingCycle,
-      ),
+    final requestBody = InitiatePaymentRequestBody(
+      gateway: 'sslcommerz',
+      planId: purchaseInput.targetPlanId,
+      billingCycle: purchaseInput.billingCycle,
     );
+
+    final initiateResponse = isUpgrade
+        ? await PlanRepository.initiateUpgradePayment(requestBody)
+        : await PlanRepository.initiatePayment(requestBody);
 
     if (!context.mounted) {
       updateViewState(screenStates: UpgradePackageScreenStates.complete);
@@ -223,7 +229,10 @@ class PlansProvider extends BaseChangeNotifier {
     if (initiateResponse.code != 'SUCCESS') {
       await _handlePurchaseError(
         context,
-        initiateResponse.message ?? 'Failed to initiate payment.',
+        initiateResponse.message ??
+            (isUpgrade
+                ? 'Failed to initiate upgrade payment.'
+                : 'Failed to initiate payment.'),
       );
       return null;
     }

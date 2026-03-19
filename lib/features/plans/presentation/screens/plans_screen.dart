@@ -32,7 +32,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(plansProvider).fetchUpgradePackages();
-      ref.read(plansProvider).fetchCurrentSubscription();
+      ref.read(profileProvider).getDashboard();
     });
   }
 
@@ -124,12 +124,12 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
   }
 
   Widget _carouselSliderSection() {
-    final activePlanId = provider.currentPlanId;
-    final activePlanRanking = provider.currentPlanRanking ??
-        _resolveCurrentPlanRanking(
-          activePlanId: activePlanId,
-          plans: provider.packages,
-        );
+    final activePlanId =
+        _resolveCurrentPlanIdFromDashboard() ?? provider.currentPlanId;
+    final activePlanRanking = _resolveCurrentPlanRanking(
+      activePlanId: activePlanId,
+      plans: provider.packages,
+    );
 
     return Column(
       children: [
@@ -218,6 +218,23 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
       if (planId == activePlanId) {
         return plan.ranking;
       }
+    }
+
+    return null;
+  }
+
+  String? _resolveCurrentPlanIdFromDashboard() {
+    final dashboard = ref.watch(profileProvider).dashboard;
+    final membership = dashboard?.profile?.membership;
+
+    final directPlanId = membership?.planId?.trim();
+    if (directPlanId?.isNotEmpty == true) {
+      return directPlanId;
+    }
+
+    final nestedPlanId = membership?.plan?.id?.trim();
+    if (nestedPlanId?.isNotEmpty == true) {
+      return nestedPlanId;
     }
 
     return null;

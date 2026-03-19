@@ -207,6 +207,10 @@ class AppUrls {
   static const String paymentsUpgradeQuote =
       '$baseUrl/payments/upgrade-quote'; //POST
   static const String paymentsInitiate = '$baseUrl/payments/initiate'; //POST
+  static const String paymentsInitiateUpgrade =
+      '$baseUrl/payments/initiate-upgrade'; //POST
+  static const String paymentsSslCommerzWebhook =
+      '$baseUrl/payments/webhook/sslcommerz'; //POST
   static const String paymentsSubscription =
       '$baseUrl/payments/subscription'; //GET
 

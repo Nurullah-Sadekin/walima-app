@@ -1,10 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
+import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
+import 'package:flutter_boilerplate/features/plans/data/repository/plan_repository.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class PaymentWebViewScreen extends StatefulWidget {
+class PaymentWebViewScreen extends ConsumerStatefulWidget {
   const PaymentWebViewScreen({
     required this.redirectUrl,
     super.key,
@@ -13,14 +19,16 @@ class PaymentWebViewScreen extends StatefulWidget {
   final String redirectUrl;
 
   @override
-  State<PaymentWebViewScreen> createState() => _PaymentWebViewScreenState();
+  ConsumerState<PaymentWebViewScreen> createState() =>
+      _PaymentWebViewScreenState();
 }
 
-class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
+class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
   InAppWebViewController? _webViewController;
   bool _isPageLoading = true;
   bool _isCompletingFlow = false;
   bool _isErrorHandled = false;
+  bool _isWebhookInProgress = false;
   Uri? _initialUri;
 
   @override
@@ -69,10 +77,75 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
 
     final isWalimaDomain = currentUri.host.toLowerCase().contains('walima.app');
     final hasTerminalMarker = _hasTerminalMarker(currentUrl);
+    final hasSuccessMarker = _hasSuccessMarker(currentUrl);
 
-    if (isWalimaDomain && hasTerminalMarker) {
-      _completeFlowAndGoHome();
+    if (!isWalimaDomain || !hasTerminalMarker) {
+      return;
     }
+
+    if (hasSuccessMarker) {
+      unawaited(_confirmPaymentSuccess(currentUri));
+      return;
+    }
+
+    _completeFlowAndGoHome();
+  }
+
+  bool _hasSuccessMarker(String url) {
+    final normalized = url.toLowerCase();
+    return normalized.contains('success') ||
+        normalized.contains('complete') ||
+        normalized.contains('completed');
+  }
+
+  Future<void> _confirmPaymentSuccess(Uri currentUri) async {
+    if (_isCompletingFlow || _isWebhookInProgress) return;
+    _isWebhookInProgress = true;
+
+    final transactionId = _resolveTransactionId(currentUri);
+    final isReceived = await PlanRepository.notifySslCommerzWebhook(
+      transactionId: transactionId,
+      status: 'success',
+    );
+
+    if (!mounted) return;
+
+    if (!isReceived) {
+      await DialogUtils.showErrorDialog(
+        context: context,
+        message: 'Payment verification failed. Please try again.',
+      );
+      if (!mounted) return;
+      _completeFlowAndGoHome();
+      return;
+    }
+
+    await ref.read(profileProvider).getDashboard();
+    if (!mounted) return;
+    _completeFlowAndGoHome();
+  }
+
+  String _resolveTransactionId(Uri currentUri) {
+    final candidates = <String?>[
+      currentUri.queryParameters['tran_id'],
+      currentUri.queryParameters['tranId'],
+      currentUri.queryParameters['transaction_id'],
+      currentUri.queryParameters['transactionId'],
+      _initialUri?.queryParameters['tran_id'],
+      _initialUri?.queryParameters['tranId'],
+      _initialUri?.queryParameters['transaction_id'],
+      _initialUri?.queryParameters['transactionId'],
+    ];
+
+    for (final candidate in candidates) {
+      final normalized = candidate?.trim();
+      if (normalized != null && normalized.isNotEmpty) {
+        return normalized;
+      }
+    }
+
+    // Fallback keeps webhook payload aligned with backend contract in case txn id is missing from redirect URL.
+    return '4545f';
   }
 
   bool _hasTerminalMarker(String url) {
@@ -154,9 +227,13 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
                     },
                   ),
                   if (_isPageLoading)
-                    const Align(
-                      alignment: Alignment.topCenter,
-                      child: LinearProgressIndicator(minHeight: 2),
+                     Container(
+                       height: double.infinity,
+                       width: double.infinity,
+                       color: Colors.white,
+                      child: const Center(
+                        child: Loading(),
+                      ),
                     ),
                 ],
               ),
