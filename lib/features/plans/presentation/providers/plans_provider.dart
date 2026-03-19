@@ -1,5 +1,11 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/features/plans/data/models/get_plans_response.dart';
+import 'package:flutter_boilerplate/features/plans/data/models/initiate_payment_request.dart';
+import 'package:flutter_boilerplate/features/plans/data/models/initiate_payment_response.dart';
+import 'package:flutter_boilerplate/features/plans/data/models/upgrade_quote_request.dart';
+import 'package:flutter_boilerplate/features/plans/data/models/upgrade_quote_response.dart';
 import 'package:flutter_boilerplate/features/plans/data/repository/plan_repository.dart';
 import 'package:flutter_boilerplate/features/plans/domain/upgrade_package_model.dart';
 
@@ -7,6 +13,8 @@ class PlansProvider extends BaseChangeNotifier {
   // current selected page index for carousel
   int selectedPage = 0;
   List<Plans> packages = [];
+  UpgradeQuoteData? latestUpgradeQuote;
+  InitiatePaymentData? latestPaymentSession;
 
   final Map<String, String> haveQuestion = {
     'What are the benefits of upgrading?':
@@ -41,6 +49,155 @@ class PlansProvider extends BaseChangeNotifier {
     updateViewState(loadingState: UpgradePackageScreenStates.complete);
   }
 
+  Future<String?> startPlanPurchase({
+    required BuildContext context,
+    required Plans selectedPlan,
+  }) async {
+    updateViewState(screenStates: UpgradePackageScreenStates.transparent);
+
+    final purchaseInput = _resolvePurchaseInput(selectedPlan);
+    if (purchaseInput == null) {
+      return _handlePurchaseError(
+        context,
+        'Selected package is invalid. Please try another package.',
+      );
+    }
+
+    final quoteData = await _fetchAndValidateQuote(
+      context: context,
+      purchaseInput: purchaseInput,
+    );
+    if (quoteData == null) return null;
+    if (!context.mounted) {
+      updateViewState(screenStates: UpgradePackageScreenStates.complete);
+      return null;
+    }
+
+    final paymentData = await _initiatePaymentSession(
+      context: context,
+      purchaseInput: purchaseInput,
+    );
+    if (paymentData == null) return null;
+
+    latestPaymentSession = paymentData;
+    updateViewState(screenStates: UpgradePackageScreenStates.complete);
+    return paymentData.redirectUrl?.trim();
+  }
+
+  _PurchaseInput? _resolvePurchaseInput(Plans selectedPlan) {
+    final targetPlanId = selectedPlan.id?.trim() ?? '';
+    if (targetPlanId.isEmpty) return null;
+
+    final billingCycle = selectedPlan.pricings?.firstOrNull?.billingCycle
+            ?.trim()
+            .toLowerCase() ??
+        'monthly';
+
+    return _PurchaseInput(
+      targetPlanId: targetPlanId,
+      billingCycle: billingCycle,
+    );
+  }
+
+  Future<UpgradeQuoteData?> _fetchAndValidateQuote({
+    required BuildContext context,
+    required _PurchaseInput purchaseInput,
+  }) async {
+    final quoteResponse = await PlanRepository.getUpgradeQuote(
+      UpgradeQuoteRequestBody(
+        targetPlanId: purchaseInput.targetPlanId,
+        billingCycle: purchaseInput.billingCycle,
+      ),
+    );
+
+    if (!context.mounted) {
+      updateViewState(screenStates: UpgradePackageScreenStates.complete);
+      return null;
+    }
+
+    if (quoteResponse.code != 'SUCCESS') {
+      await _handlePurchaseError(
+        context,
+        quoteResponse.message ?? 'Unable to calculate upgrade quote.',
+      );
+      return null;
+    }
+
+    final quoteData = quoteResponse.response?.data;
+    if (quoteData == null) {
+      await _handlePurchaseError(
+        context,
+        'Upgrade quote is unavailable right now. Please try again.',
+      );
+      return null;
+    }
+
+    latestUpgradeQuote = quoteData;
+
+    if (quoteData.canMove != true) {
+      await _handlePurchaseError(
+        context,
+        quoteData.reason ?? 'Only higher-rank paid plan upgrade is allowed.',
+      );
+      return null;
+    }
+
+    return quoteData;
+  }
+
+  Future<InitiatePaymentData?> _initiatePaymentSession({
+    required BuildContext context,
+    required _PurchaseInput purchaseInput,
+  }) async {
+    final initiateResponse = await PlanRepository.initiatePayment(
+      InitiatePaymentRequestBody(
+        gateway: 'sslcommerz',
+        planId: purchaseInput.targetPlanId,
+        billingCycle: purchaseInput.billingCycle,
+      ),
+    );
+
+    if (!context.mounted) {
+      updateViewState(screenStates: UpgradePackageScreenStates.complete);
+      return null;
+    }
+
+    if (initiateResponse.code != 'SUCCESS') {
+      await _handlePurchaseError(
+        context,
+        initiateResponse.message ?? 'Failed to initiate payment.',
+      );
+      return null;
+    }
+
+    final paymentData = initiateResponse.response?.data;
+    final redirectUrl = paymentData?.redirectUrl?.trim() ?? '';
+    if (paymentData == null || redirectUrl.isEmpty) {
+      await _handlePurchaseError(
+        context,
+        'Payment redirect URL is missing. Please try again.',
+      );
+      return null;
+    }
+
+    return paymentData;
+  }
+
+  Future<String?> _handlePurchaseError(
+    BuildContext context,
+    String message,
+  ) async {
+    updateViewState(screenStates: UpgradePackageScreenStates.complete);
+    if (context.mounted) {
+      await DialogUtils.showErrorDialog(
+        context: context,
+        message: message,
+      );
+    }
+    return null;
+  }
+
+
   void updateViewState({
     UpgradePackageScreenStates? screenStates,
     UpgradePackageScreenStates? loadingState,
@@ -56,8 +213,22 @@ class PlansProvider extends BaseChangeNotifier {
   }
 }
 
+class _PurchaseInput {
+  _PurchaseInput({
+    required this.targetPlanId,
+    required this.billingCycle,
+  });
+
+  final String targetPlanId;
+  final String billingCycle;
+}
+
 enum UpgradePackageScreenStates {
   transparent,
   complete,
   loading,
+}
+
+extension _ListSafeAccess<T> on List<T> {
+  T? get firstOrNull => isEmpty ? null : first;
 }

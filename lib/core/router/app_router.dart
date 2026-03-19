@@ -17,6 +17,7 @@ import 'package:flutter_boilerplate/features/recommended_preferences/presentatio
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/preference_location.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/crop_image.dart';
 import 'package:flutter_boilerplate/features/plans/presentation/screens/plans_screen.dart';
+import 'package:flutter_boilerplate/features/plans/presentation/screens/payment_webview_screen.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/about_you.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/email_phone.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/family_details.dart';
@@ -28,6 +29,7 @@ import 'package:flutter_boilerplate/features/registration/presentation/screens/p
 import 'package:flutter_boilerplate/features/registration/presentation/screens/verify_otp_for_sign_up.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/your_religion.dart';
 import 'package:flutter_boilerplate/features/settings/presentation/screens/settings_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_boilerplate/features/splash_screen.dart';
@@ -43,7 +45,7 @@ import 'route_name.dart';
 part 'app_router.g.dart';
 
 @riverpod
-GoRouter goRouter(GoRouterRef ref) {
+GoRouter goRouter(Ref ref) {
   return GoRouter(
     initialLocation: Paths.splash,
     debugLogDiagnostics: true,
@@ -223,7 +225,20 @@ GoRouter goRouter(GoRouterRef ref) {
       GoRoute(
         path: Paths.upgradePackage,
         name: Routes.upgradePackage,
-        builder: (context, state) => const UpgradePackageScreen(),
+        builder: (context, state) {
+          final fromScreen =
+          state.extra is String? state.extra as String : null;
+          return UpgradePackageScreen(fromScreen: fromScreen);
+          },
+      ),
+      GoRoute(
+        path: Paths.paymentWebView,
+        name: Routes.paymentWebView,
+        builder: (context, state) {
+          final redirectUrl =
+              state.extra is String ? state.extra as String : '';
+          return PaymentWebViewScreen(redirectUrl: redirectUrl);
+        },
       ),
       GoRoute(
         path: Paths.matches,
@@ -239,7 +254,8 @@ GoRouter goRouter(GoRouterRef ref) {
         path: Paths.cropImage,
         name: Routes.cropImage,
         builder: (context, state) {
-          final imagePath = state.extra is String ? state.extra as String : null;
+          final imagePath =
+              state.extra is String ? state.extra as String : null;
           return CropImageScreen(imagePath: imagePath);
         },
       ),
@@ -249,7 +265,7 @@ GoRouter goRouter(GoRouterRef ref) {
         name: Routes.chatScreen,
         builder: (context, state) {
           // final imagePath = state.extra is String ? state.extra as String : null;
-          return ChatScreen();
+          return const ChatScreen();
         },
       ),
     ],

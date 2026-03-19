@@ -8,7 +8,6 @@ abstract class Paths {
   static const newPassword = '/newPassword';
   static const resetPasswordStatus = '/resetPasswordStatus';
 
-
   static const splash = '/';
   static const anchor = '/anchor';
   static const settings = '/settings';
@@ -45,17 +44,15 @@ abstract class Paths {
   static const connectMatches = '/connectMatches';
   static const otpVerifyForSignUp = '/otpVerifyForSignUp';
 
-
   // Home Screens
   static const editProfile = '/editProfile';
   static const upgradePackage = '/upgradePackage';
+  static const paymentWebView = '/paymentWebView';
 
   //Matches
   static const matches = '/matches';
   static const searchMatches = '/searchMatches';
   static const chatScreen = '/chatScreen';
-
-
 }
 
 abstract class Routes {
@@ -107,11 +104,11 @@ abstract class Routes {
   // Home Screens
   static const editProfile = 'editProfile';
   static const upgradePackage = 'upgradePackage';
+  static const paymentWebView = 'paymentWebView';
 
   //Matches
   static const matches = 'matches';
   static const searchMatches = 'searchMatches';
   static const chatHome = 'chatHome';
   static const chatScreen = 'chatScreen';
-
 }

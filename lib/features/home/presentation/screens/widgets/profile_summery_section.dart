@@ -200,9 +200,11 @@ class ProfileSummerySection extends ConsumerWidget {
             svgIconPath: AppImages.premiumSvgIcon,
             iconLeftPosition: false,
             onTap: () {
-              context.pushNamed(Routes.upgradePackage);
+              context.pushNamed(Routes.upgradePackage,
+                extra: Routes.anchor,
+              );
             },
-            title: 'Renew Plan',
+            title: 'Upgrade Plan',
           ),
         ),
       ],

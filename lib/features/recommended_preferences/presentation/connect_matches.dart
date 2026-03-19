@@ -28,7 +28,10 @@ class _ConnectMatchesState extends ConsumerState<ConnectMatches> {
             isTrailing: true,
             trailingText: 'Skip',
             onTrailingTap: () {
-              context.push(Paths.upgradePackage);
+              context.push(
+                Paths.upgradePackage,
+                extra: Routes.connectMatches,
+              );
               // Handle skip action
             },
           ),

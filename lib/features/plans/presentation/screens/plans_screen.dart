@@ -8,7 +8,8 @@ import 'package:flutter_boilerplate/core/global/components/gradient_background.d
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
-import 'package:flutter_boilerplate/features/plans//presentation/screens/widgets/package_card.dart';
+import 'package:flutter_boilerplate/features/plans/data/models/get_plans_response.dart';
+import 'package:flutter_boilerplate/features/plans/presentation/screens/widgets/package_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
@@ -16,7 +17,8 @@ import 'package:flutter_boilerplate/features/plans/presentation/providers/plans_
 import 'package:go_router/go_router.dart';
 
 class UpgradePackageScreen extends ConsumerStatefulWidget {
-  const UpgradePackageScreen({super.key});
+  const UpgradePackageScreen({super.key, required this.fromScreen});
+  final String? fromScreen;
 
   @override
   ConsumerState<UpgradePackageScreen> createState() =>
@@ -30,33 +32,44 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(plansProvider).fetchUpgradePackages();
+      ref.read(profileProvider).getDashboard();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     provider = ref.watch(plansProvider);
-    return  Scaffold(
-            body: GradientBackground(
-              child: Column(
-                children: [
-                  _appbarSection(),
-                  provider.loaderState == UpgradePackageScreenStates.loading
-                      ? const Center(child: Loading())
-                      : _body(),
-                ],
-              ),
-            ),
-          );
+    return TransparentLoading(
+      isLoading:
+          provider.screenStates == UpgradePackageScreenStates.transparent,
+      child: Scaffold(
+        body: GradientBackground(
+          child: Column(
+            children: [
+              _appbarSection(),
+              provider.loaderState == UpgradePackageScreenStates.loading
+                  ? const Expanded(child: Center(child: Loading()))
+                  : _body(),
+              // if(provider.screenStates == UpgradePackageScreenStates.transparent)
+              //   TransparentLoading(child: child, isLoading: isLoading)
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _appbarSection() {
     return CustomBackAppBar(
       isBackButton: true,
       backIconBackground: AppColors.transparent,
-      isTrailing: true,
+      isTrailing: widget.fromScreen != Routes.anchor,
       trailingText: 'Skip',
       onTrailingTap: () {
+        if (widget.fromScreen == Routes.anchor) {
+          context.push(Paths.connectMatches);
+          return;
+        }
         context.push(Paths.anchor);
       },
     );
@@ -87,9 +100,10 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
         Text(
           'Upgrade to Premium',
           style: TextStyle(
-              fontSize: TextSize.font24(context),
-              fontWeight: FontWeight.w500,
-              color: AppColors.textPrimaryLight),
+            fontSize: TextSize.font24(context),
+            fontWeight: FontWeight.w500,
+            color: AppColors.textPrimaryLight,
+          ),
         ),
       ],
     );
@@ -110,17 +124,53 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
   }
 
   Widget _carouselSliderSection() {
+    final activePlanId = ref
+        .watch(profileProvider)
+        .dashboard
+        ?.profile
+        ?.membership
+        ?.planId
+        ?.trim();
+    final activePlanRanking = _resolveCurrentPlanRanking(
+      activePlanId: activePlanId,
+      plans: provider.packages,
+    );
+
     return Column(
       children: [
         CarouselSlider.builder(
           itemCount: provider.packages.length,
           itemBuilder: (context, index, realIdx) {
             final item = provider.packages[index];
+            final isCurrentPlan = _isCurrentPlan(
+              item: item,
+              activePlanId: activePlanId,
+            );
+            final isButtonDisabled = _isPlanActionDisabled(
+              item: item,
+              activePlanId: activePlanId,
+              activePlanRanking: activePlanRanking,
+            );
+
             return PackageCard(
               packageName: item.name ?? '',
-
-              buttonOnTap: () {},
+              buttonOnTap: isButtonDisabled
+                  ? () {}
+                  : () async {
+                      final redirectUrl =
+                          await ref.read(plansProvider).startPlanPurchase(
+                                context: context,
+                                selectedPlan: item,
+                              );
+                      if (!context.mounted || redirectUrl == null) return;
+                      await context.pushNamed(
+                        Routes.paymentWebView,
+                        extra: redirectUrl,
+                      );
+                    },
               plan: item,
+              isButtonDisabled: isButtonDisabled,
+              buttonTitle: isCurrentPlan ? 'Current Plan' : 'Continue',
             );
           },
           options: CarouselOptions(
@@ -160,6 +210,44 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
         ),
       ],
     );
+  }
+
+  int? _resolveCurrentPlanRanking({
+    required String? activePlanId,
+    required List<Plans> plans,
+  }) {
+    if (activePlanId == null || activePlanId.isEmpty) return null;
+
+    for (final plan in plans) {
+      final planId = (plan.id ?? '').trim();
+      if (planId == activePlanId) {
+        return plan.ranking;
+      }
+    }
+
+    return null;
+  }
+
+  bool _isCurrentPlan({
+    required Plans item,
+    required String? activePlanId,
+  }) {
+    if (activePlanId == null || activePlanId.isEmpty) return false;
+    return (item.id ?? '').trim() == activePlanId;
+  }
+
+  bool _isPlanActionDisabled({
+    required Plans item,
+    required String? activePlanId,
+    required int? activePlanRanking,
+  }) {
+    if (_isCurrentPlan(item: item, activePlanId: activePlanId)) return true;
+    if (activePlanRanking == null) return false;
+
+    final itemRanking = item.ranking;
+    if (itemRanking == null) return false;
+
+    return itemRanking <= activePlanRanking;
   }
 
   Widget _haveQuestionSection() {
@@ -286,7 +374,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
               ),
             ],
           ),
-        )
+        ),
       ],
     );
   }
