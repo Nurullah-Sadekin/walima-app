@@ -98,7 +98,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
           spacing: 10,
           children: [
             Text(
-              provider.selectedVerificationType == 'email'
+              provider.selectedVerificationType.toLowerCase() == 'email'
                   ? 'Verify email'
                   : 'Verify Number',
               style: TextStyle(
@@ -110,15 +110,31 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
               spacing: 8,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  'We\'ve sent a code to ${provider.selectedCountryCodeForNumber}${provider.phoneController.text}',
-                  style: TextStyle(
+                if (provider.selectedVerificationType.toLowerCase() == 'email')
+                  Text(
+                    'We\'ve sent a code to ${provider.emailController.text}',
+                    style: TextStyle(
                       fontSize: TextSize.font14(context),
                       color: AppColors.textSecondaryLight,
-                      fontWeight: FontWeight.w400),
-                ),
+                      fontWeight: FontWeight.w400,
+                    ),
+                  )
+                else
+                  Text(
+                    'We\'ve sent a code to ${provider.selectedCountryCodeForNumber}${provider.phoneController.text}',
+                    style: TextStyle(
+                        fontSize: TextSize.font14(context),
+                        color: AppColors.textSecondaryLight,
+                        fontWeight: FontWeight.w400),
+                  ),
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    context.pushNamed(
+                      Routes.emailPhone,
+                      queryParameters: const {'fromScreen': 'otpScreen'},
+                      extra: 'otpScreen',
+                    );
+                  },
                   child: Row(
                     spacing: 2,
                     children: [
@@ -154,7 +170,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                     loadingState: RegistrationScreenStates.isProfileFor);
                 await provider.resendOtp(context);
                 screenProvider.updateViewState(
-                    loadingState: RegistrationScreenStates.loadingComplete,
+                  loadingState: RegistrationScreenStates.loadingComplete,
                 );
               },
               child: Text(
@@ -222,8 +238,11 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                       // Handle paste (multiple chars) and normal single char entry
                       if (value.length > 1) {
                         final chars = value.split('');
-                        for (var i = 0; i < chars.length && (index + i) < provider.otpControllers.length;
-                            i++) {provider.otpControllers[index + i].text = chars[i];
+                        for (var i = 0;
+                            i < chars.length &&
+                                (index + i) < provider.otpControllers.length;
+                            i++) {
+                          provider.otpControllers[index + i].text = chars[i];
                         }
                         final next = index + chars.length;
                         if (next >= provider.otpFocusNodesController.length) {

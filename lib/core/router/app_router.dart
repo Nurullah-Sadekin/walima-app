@@ -119,7 +119,16 @@ GoRouter goRouter(Ref ref) {
       GoRoute(
         path: Paths.emailPhone,
         name: Routes.emailPhone,
-        builder: (context, state) => const EmailPhoneScreen(),
+        builder: (context, state) {
+          final fromScreenFromQuery =
+              state.uri.queryParameters['fromScreen']?.trim();
+          final fromScreenFromExtra =
+              state.extra is String ? (state.extra as String).trim() : null;
+          final fromScreen = fromScreenFromQuery?.isNotEmpty == true
+              ? fromScreenFromQuery
+              : fromScreenFromExtra;
+          return EmailPhoneScreen(fromScreen: fromScreen);
+        },
       ),
       GoRoute(
         path: Paths.location,
@@ -227,9 +236,9 @@ GoRouter goRouter(Ref ref) {
         name: Routes.upgradePackage,
         builder: (context, state) {
           final fromScreen =
-          state.extra is String? state.extra as String : null;
+              state.extra is String ? state.extra as String : null;
           return UpgradePackageScreen(fromScreen: fromScreen);
-          },
+        },
       ),
       GoRoute(
         path: Paths.paymentWebView,

@@ -32,7 +32,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(plansProvider).fetchUpgradePackages();
-      ref.read(profileProvider).getDashboard();
+      ref.read(plansProvider).fetchCurrentSubscription();
     });
   }
 
@@ -124,17 +124,12 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
   }
 
   Widget _carouselSliderSection() {
-    final activePlanId = ref
-        .watch(profileProvider)
-        .dashboard
-        ?.profile
-        ?.membership
-        ?.planId
-        ?.trim();
-    final activePlanRanking = _resolveCurrentPlanRanking(
-      activePlanId: activePlanId,
-      plans: provider.packages,
-    );
+    final activePlanId = provider.currentPlanId;
+    final activePlanRanking = provider.currentPlanRanking ??
+        _resolveCurrentPlanRanking(
+          activePlanId: activePlanId,
+          plans: provider.packages,
+        );
 
     return Column(
       children: [

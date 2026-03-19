@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
+import 'package:flutter_boilerplate/features/plans/data/models/get_current_subscription_response.dart';
 import 'package:flutter_boilerplate/features/plans/data/models/get_plans_response.dart';
 import 'package:flutter_boilerplate/features/plans/data/models/initiate_payment_request.dart';
 import 'package:flutter_boilerplate/features/plans/data/models/initiate_payment_response.dart';
@@ -15,6 +16,27 @@ class PlansProvider extends BaseChangeNotifier {
   List<Plans> packages = [];
   UpgradeQuoteData? latestUpgradeQuote;
   InitiatePaymentData? latestPaymentSession;
+  CurrentSubscriptionData? currentSubscription;
+  bool _subscriptionResolved = false;
+  bool _subscriptionFetchSucceeded = true;
+
+  String? get currentPlanId {
+    final planId = currentSubscription?.planId?.trim();
+    if (planId?.isNotEmpty == true) return planId;
+
+    final nestedPlanId = currentSubscription?.plan?.id?.trim();
+    if (nestedPlanId?.isNotEmpty == true) return nestedPlanId;
+
+    return null;
+  }
+
+  int? get currentPlanRanking => currentSubscription?.plan?.ranking;
+
+  bool get hasCurrentSubscription => currentPlanId?.isNotEmpty == true;
+
+  bool get hasResolvedCurrentSubscription => _subscriptionResolved;
+
+  bool get hasSubscriptionFetchSucceeded => _subscriptionFetchSucceeded;
 
   final Map<String, String> haveQuestion = {
     'What are the benefits of upgrading?':
@@ -49,11 +71,45 @@ class PlansProvider extends BaseChangeNotifier {
     updateViewState(loadingState: UpgradePackageScreenStates.complete);
   }
 
+  Future<void> fetchCurrentSubscription({bool forceRefresh = false}) async {
+    if (_subscriptionResolved && !forceRefresh) return;
+
+    final response = await PlanRepository.getCurrentSubscription();
+    _subscriptionResolved = true;
+    _subscriptionFetchSucceeded = response.code == 'SUCCESS';
+
+    if (response.code == 'SUCCESS') {
+      currentSubscription = response.response?.data;
+    } else {
+      currentSubscription = null;
+    }
+
+    notifyListeners();
+  }
+
   Future<String?> startPlanPurchase({
     required BuildContext context,
     required Plans selectedPlan,
   }) async {
     updateViewState(screenStates: UpgradePackageScreenStates.transparent);
+
+    if (!hasResolvedCurrentSubscription || !hasSubscriptionFetchSucceeded) {
+      await fetchCurrentSubscription(
+        forceRefresh: true,
+      );
+    }
+
+    if (!context.mounted) {
+      updateViewState(screenStates: UpgradePackageScreenStates.complete);
+      return null;
+    }
+
+    if (!hasSubscriptionFetchSucceeded) {
+      return _handlePurchaseError(
+        context,
+        'Unable to verify current plan. Please try again.',
+      );
+    }
 
     final purchaseInput = _resolvePurchaseInput(selectedPlan);
     if (purchaseInput == null) {
@@ -63,14 +119,16 @@ class PlansProvider extends BaseChangeNotifier {
       );
     }
 
-    final quoteData = await _fetchAndValidateQuote(
-      context: context,
-      purchaseInput: purchaseInput,
-    );
-    if (quoteData == null) return null;
-    if (!context.mounted) {
-      updateViewState(screenStates: UpgradePackageScreenStates.complete);
-      return null;
+    if (hasCurrentSubscription) {
+      final quoteData = await _fetchAndValidateQuote(
+        context: context,
+        purchaseInput: purchaseInput,
+      );
+      if (quoteData == null) return null;
+      if (!context.mounted) {
+        updateViewState(screenStates: UpgradePackageScreenStates.complete);
+        return null;
+      }
     }
 
     final paymentData = await _initiatePaymentSession(
@@ -196,7 +254,6 @@ class PlansProvider extends BaseChangeNotifier {
     }
     return null;
   }
-
 
   void updateViewState({
     UpgradePackageScreenStates? screenStates,

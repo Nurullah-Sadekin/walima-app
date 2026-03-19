@@ -836,7 +836,6 @@ class RegistrationProvider extends BaseChangeNotifier {
       (item, selected) => item.isSelected = selected,
     );
     selectedVerificationType = verificationList[index].name;
-
     _notifyAndPersist();
   }
 
@@ -960,7 +959,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       'selectedYourWork': selectedYourWork,
       'selectedYouWorkAs': selectedYouWorkAs,
       'selectedFamilyEconomicCondition': selectedFamilyEconomicCondition,
-      'selectedVerificationType': selectedVerificationType,
+      'selectedVerificationType': selectedVerificationType.toLowerCase(),
       'selectedHobbies': selectedHobbies,
       'creativeSectionSelected': creativeSectionSelected,
       'funSectionSelected': funSectionSelected,

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_boilerplate/core/network/app_urls.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
+import 'package:flutter_boilerplate/features/plans/data/models/get_current_subscription_response.dart';
 import 'package:flutter_boilerplate/features/plans/data/models/get_plans_response.dart';
 import 'package:flutter_boilerplate/features/plans/data/models/initiate_payment_request.dart';
 import 'package:flutter_boilerplate/features/plans/data/models/initiate_payment_response.dart';
@@ -53,6 +54,24 @@ class PlanRepository {
           ? e.response?.data['message'] ?? e.message
           : e.toString();
       return InitiatePaymentResponse(code: 'FAILED', message: errorMessage);
+    }
+  }
+
+  static Future<GetCurrentSubscriptionResponse> getCurrentSubscription() async {
+    try {
+      final response = await DioClient().get(
+        AppUrls.paymentsSubscription,
+        isTokenRequired: true,
+      );
+      return GetCurrentSubscriptionResponse.fromJson(response.data);
+    } catch (e) {
+      final errorMessage = e is DioException
+          ? e.response?.data['message'] ?? e.message
+          : e.toString();
+      return GetCurrentSubscriptionResponse(
+        code: 'FAILED',
+        message: errorMessage,
+      );
     }
   }
 }

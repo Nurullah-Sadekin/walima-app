@@ -16,7 +16,8 @@ import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:go_router/go_router.dart';
 
 class EmailPhoneScreen extends ConsumerStatefulWidget {
-  const EmailPhoneScreen({super.key});
+   const EmailPhoneScreen({super.key, this.fromScreen});
+  final String? fromScreen;
   @override
   ConsumerState<EmailPhoneScreen> createState() => _EmailPhoneScreenState();
 }
@@ -35,8 +36,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
     final provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(emailPhoneScreenProvider);
     return TransparentLoading(
-      isLoading:
-          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
@@ -206,6 +206,14 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
           );
 
           if (isAvailable && mounted) {
+            if(widget.fromScreen != null && widget.fromScreen == 'otpScreen'){
+              await provider.signUpViaOtp(context);
+              if(isAvailable && mounted){
+                context.pop();
+                // context.push(Paths.otpVerifyForSignUp);
+              }
+              return;
+            }
             context.push(Paths.location);
           }
         } finally {

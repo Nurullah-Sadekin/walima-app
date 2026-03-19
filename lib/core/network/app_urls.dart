@@ -207,6 +207,8 @@ class AppUrls {
   static const String paymentsUpgradeQuote =
       '$baseUrl/payments/upgrade-quote'; //POST
   static const String paymentsInitiate = '$baseUrl/payments/initiate'; //POST
+  static const String paymentsSubscription =
+      '$baseUrl/payments/subscription'; //GET
 
   // --- Activities & Interactions ---
   static const String getProfileVisitors = '$baseUrl/activities/visitors'; //GET
