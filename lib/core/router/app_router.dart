@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/features/home/presentation/screens/edit_profile.dart';
+import 'package:flutter_boilerplate/features/profile/presentation/screen/edit_profile.dart';
+import 'package:flutter_boilerplate/features/profile/presentation/screen/profile_edit_section.dart';
+import 'package:flutter_boilerplate/features/profile/presentation/screen/profile_section_edit_screen.dart';
 import 'package:flutter_boilerplate/features/login/presentation/screens/new_password.dart';
 import 'package:flutter_boilerplate/features/login/presentation/screens/otp_verify.dart';
 import 'package:flutter_boilerplate/features/login/presentation/screens/reset_pssword_status.dart';
@@ -241,6 +243,27 @@ GoRouter goRouter(Ref ref) {
         builder: (context, state) => const EditProfileScreen(),
       ),
       GoRoute(
+        path: Paths.profileSectionEdit,
+        name: Routes.profileSectionEdit,
+        builder: (context, state) {
+          final extra = state.extra;
+          String? sectionKey;
+
+          if (extra is String) {
+            sectionKey = extra;
+          } else if (extra is Map) {
+            final map = Map<String, dynamic>.from(extra);
+            final rawSection = map['section'];
+            if (rawSection is String) {
+              sectionKey = rawSection;
+            }
+          }
+
+          final section = ProfileEditSectionX.fromKey(sectionKey);
+          return ProfileSectionEditScreen(section: section);
+        },
+      ),
+      GoRoute(
         path: Paths.upgradePackage,
         name: Routes.upgradePackage,
         builder: (context, state) {
@@ -309,8 +332,8 @@ GoRouter goRouter(Ref ref) {
         path: Paths.chatScreen,
         name: Routes.chatScreen,
         builder: (context, state) {
-          // final imagePath = state.extra is String ? state.extra as String : null;
-          return const ChatScreen();
+          final extra = state.extra is Map<String, dynamic> ? state.extra as Map<String, dynamic> : null;
+          return ChatScreen(extra: extra);
         },
       ),
     ],

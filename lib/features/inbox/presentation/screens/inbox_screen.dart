@@ -55,7 +55,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProv
           child: Column(
             children: [
               _appbarSection(),
-              Expanded(child: _body()),
+              // Expanded(child: _body()),
             ],
           ),
         ),
@@ -111,7 +111,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProv
       child: Column(
         spacing: 10,
         children: [
-          ContactsViewed(
+          const ContactsViewed(
             profileImage: AppImages.demoProfile,
           ),
           AcceptedCard(
