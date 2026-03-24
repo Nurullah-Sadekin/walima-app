@@ -71,7 +71,15 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
       children: [
         InkWell(
           onTap: () {
-            _filter(context);
+            if (provider.selectedTabIndex == 0) {
+              // Search tab
+              context.push(Paths.searchFilter);
+            } else if (provider.selectedTabIndex == 1) {
+              // New tab
+              context.push(Paths.newFilter);
+            } else {
+              _filter(context);
+            }
           },
           child: Container(
             padding: const EdgeInsets.all(8),
@@ -113,10 +121,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             text: tabs[0],
             isSelected: provider.selectedTabIndex == 0,
             prefixImagePath: AppImages.searchSvgIcon,
-            onTap: () {
-              provider.setSelectedTab(0);
-              context.push(Paths.searchFilter);
-            },
+            onTap: () => provider.setSelectedTab(0),
           ),
           TabBarWidget(
             text: tabs[1],
