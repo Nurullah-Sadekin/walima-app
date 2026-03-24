@@ -8,7 +8,7 @@ import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/provider/search_matches_provider.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/provider/search_filter_provider.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/setting_switcher_title.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,20 +19,19 @@ import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:go_router/go_router.dart';
 
-class SearchMatchesScreen extends ConsumerStatefulWidget {
-  const SearchMatchesScreen({super.key});
+class SearchFilterScreen extends ConsumerStatefulWidget {
+  const SearchFilterScreen({super.key});
   @override
-  ConsumerState<SearchMatchesScreen> createState() =>
-      _SearchMatchesScreenState();
+  ConsumerState<SearchFilterScreen> createState() => _SearchFilterScreenState();
 }
 
-class _SearchMatchesScreenState extends ConsumerState<SearchMatchesScreen> {
-  late SearchMatchesProvider provider;
+class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
+  late SearchFilterProvider provider;
 
   @override
   void initState() {
     super.initState();
-    provider = ref.read(searchMatchesProvider);
+    provider = ref.read(searchFilterProvider);
     WidgetsBinding.instance.addPostFrameCallback((_) async {});
   }
 
@@ -43,7 +42,7 @@ class _SearchMatchesScreenState extends ConsumerState<SearchMatchesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    provider = ref.watch(searchMatchesProvider);
+    provider = ref.watch(searchFilterProvider);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,

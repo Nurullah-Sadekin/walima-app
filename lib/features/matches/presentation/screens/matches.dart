@@ -115,7 +115,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             prefixImagePath: AppImages.searchSvgIcon,
             onTap: () {
               provider.setSelectedTab(0);
-              context.push(Paths.searchMatches);
+              context.push(Paths.searchFilter);
             },
           ),
           TabBarWidget(

@@ -32,9 +32,9 @@ import 'package:flutter_boilerplate/features/registration/domain/profile_for_mod
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-class SearchMatchesProvider extends BaseChangeNotifier {
-    SearchMatchesScreenStates screenStates = SearchMatchesScreenStates.defaultLoading;
-    SearchMatchesScreenStates loaderState = SearchMatchesScreenStates.defaultLoading;
+class SearchFilterProvider extends BaseChangeNotifier {
+    SearchFilterScreenStates screenStates = SearchFilterScreenStates.defaultLoading;
+    SearchFilterScreenStates loaderState = SearchFilterScreenStates.defaultLoading;
 
     final TextEditingController profileIdController = TextEditingController();
     final TextEditingController ageFromController = TextEditingController();
@@ -118,18 +118,18 @@ class SearchMatchesProvider extends BaseChangeNotifier {
     }
 
 
-    void updateViewState({SearchMatchesScreenStates? screenStates,
-      SearchMatchesScreenStates? loadingState}) {
+    void updateViewState({SearchFilterScreenStates? screenStates,
+      SearchFilterScreenStates? loadingState}) {
       if (screenStates != null) {
         this.screenStates = screenStates;
-        loaderState = SearchMatchesScreenStates.defaultLoading;
+        loaderState = SearchFilterScreenStates.defaultLoading;
       }
       if (loadingState != null) loaderState = loadingState;
       notifyListeners();
     }
  }
 
-enum SearchMatchesScreenStates {
+enum SearchFilterScreenStates {
   defaultLoading,
   loadingComplete,
   isProfileFor,
