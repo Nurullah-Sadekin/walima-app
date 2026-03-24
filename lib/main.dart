@@ -8,12 +8,15 @@ import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/theme/app_theme.dart';
 import 'package:flutter_boilerplate/core/providers/theme_provider.dart';
 import 'package:flutter_boilerplate/core/providers/locale_provider.dart';
+import 'package:flutter_boilerplate/core/connectivity/connectivity_keys.dart';
+import 'package:flutter_boilerplate/core/connectivity/connectivity_monitor.dart';
 
 void main() {
   runApp(
     const ProviderScope(
       child: SafeArea(
-          bottom: true, top: false, left: false, right: false, child: MyApp()),
+          bottom: true, top: false, left: false, right: false, child: MyApp(),
+      ),
     ),
   );
 }
@@ -32,9 +35,12 @@ class MyApp extends ConsumerWidget {
     final themeMode = ref.watch(themeNotifierProvider);
     final locale = ref.watch(localeNotifierProvider);
 
-    return MaterialApp.router(
+    return ConnectivityMonitor(
+      child: MaterialApp.router(
       title: 'Walima',
       debugShowCheckedModeBanner: false,
+
+      scaffoldMessengerKey: rootScaffoldMessengerKey,
 
       // Theme
       theme: AppTheme.lightTheme,
@@ -56,6 +62,7 @@ class MyApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
+    ),
     );
   }
 }
