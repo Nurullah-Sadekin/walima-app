@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/screens/filters/new_filter.dart';
 import 'package:flutter_boilerplate/features/profile/presentation/screen/edit_profile.dart';
 import 'package:flutter_boilerplate/features/profile/presentation/screen/profile_edit_section.dart';
 import 'package:flutter_boilerplate/features/profile/presentation/screen/profile_section_edit_screen.dart';
@@ -317,6 +318,11 @@ GoRouter goRouter(Ref ref) {
         path: Paths.searchFilter,
         name: Routes.searchFilter,
         builder: (context, state) => const SearchFilterScreen(),
+      ),
+      GoRoute(
+        path: Paths.newFilter,
+        name: Routes.newFilter,
+        builder: (context, state) => const NewFilterScreen(),
       ),
       GoRoute(
         path: Paths.cropImage,
