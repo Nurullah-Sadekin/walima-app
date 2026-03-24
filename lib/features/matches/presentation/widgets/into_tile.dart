@@ -90,6 +90,8 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
               children: [
                 Text(
                   value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: valueStyle ??
                       TextStyle(
                         color: AppColors.textPrimaryLight,
