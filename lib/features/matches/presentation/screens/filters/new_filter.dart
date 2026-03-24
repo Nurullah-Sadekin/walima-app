@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/provider/search_filter_provider.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/provider/new_filter_provider.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/into_tile.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
+import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 
 class NewFilterScreen extends ConsumerStatefulWidget {
   const NewFilterScreen({super.key});
@@ -16,29 +17,11 @@ class NewFilterScreen extends ConsumerStatefulWidget {
   ConsumerState<NewFilterScreen> createState() => _NewFilterScreenState();
 }
 
+enum FilterStep { refine, countryLivingIn, community }
+
 class _NewFilterScreenState extends ConsumerState<NewFilterScreen> {
   late SearchFilterProvider provider;
   FilterStep _step = FilterStep.refine;
-
-  // local selections (kept simple and safe so we don't depend on provider API)
-  String? _selectedCountry;
-  String? _selectedCommunity;
-
-  // sample lists - replace with provider data if available
-  final List<String> _countries = [
-    'Bangladesh',
-    'India',
-    'Pakistan',
-    'United Kingdom',
-    'United States'
-  ];
-
-  final List<String> _communities = [
-    'Community A',
-    'Community B',
-    'Community C',
-    'Community D'
-  ];
 
   @override
   void initState() {
@@ -55,6 +38,7 @@ class _NewFilterScreenState extends ConsumerState<NewFilterScreen> {
   @override
   Widget build(BuildContext context) {
     provider = ref.watch(searchFilterProvider);
+    final newFilter = ref.watch(newFilterProvider);
 
     // Dynamic title based on step
     String appBarTitle;
@@ -85,7 +69,6 @@ class _NewFilterScreenState extends ConsumerState<NewFilterScreen> {
         appBar: CustomBackAppBar(
           title: Text(appBarTitle),
           backgroundColor: Colors.transparent,
-          // If CustomBackAppBar supports onBack, use it; otherwise it will pop.
           onBackPressed: () {
             if (_step != FilterStep.refine) {
               setState(() => _step = FilterStep.refine);
@@ -99,45 +82,38 @@ class _NewFilterScreenState extends ConsumerState<NewFilterScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Column(
               children: [
-                Expanded(child: _body()),
+                Expanded(child: _body(newFilter)),
               ],
             ),
           ),
         ),
         floatingActionButton: BottomBorderedWidget(
-          widget: bottomAction(),
+          widget: bottomAction(newFilter),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
   }
 
-  Widget _body() {
+  Widget _body(NewFilterProvider newFilter) {
     switch (_step) {
       case FilterStep.countryLivingIn:
-        return _countryBody();
+        return _countryBody(newFilter);
       case FilterStep.community:
-        return _communityBody();
+        return _communityBody(newFilter);
       case FilterStep.refine:
-        return _refineBody();
+        return _refineBody(newFilter);
     }
   }
 
-  Widget _refineBody() {
+  Widget _refineBody(NewFilterProvider newFilter) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 12),
-        const Column(
-          spacing: 10,
-          children: [
-            // We will build the tiles with tappable behavior below (can't use const for that)
-          ],
-        ),
-        // Build the interactive tiles (not const)
         InfoTile(
           title: 'Country Living In',
-          value: _selectedCountry ?? 'Not selected',
+          value: newFilter.selectedCountries.isEmpty ? 'Not selected' : newFilter.selectedCountries.join(', '),
           onTap: () => setState(() => _step = FilterStep.countryLivingIn),
           trailingImagePath: AppImages.editWrite,
           leadingImagePath: AppImages.locationSvgIcon,
@@ -145,151 +121,85 @@ class _NewFilterScreenState extends ConsumerState<NewFilterScreen> {
         const SizedBox(height: 8),
         InfoTile(
           title: 'Community',
-          value: _selectedCommunity ?? 'Not selected',
+          value: newFilter.selectedCommunities.isEmpty ? 'Not selected' : newFilter.selectedCommunities.join(', '),
           onTap: () => setState(() => _step = FilterStep.community),
           trailingImagePath: AppImages.editWrite,
           leadingImagePath: AppImages.profileSvgIcon,
         ),
         const SizedBox(height: 12),
-        // You can add more overview tiles here if required
       ],
     );
   }
 
-  Widget _countryBody() {
+  Widget _countryBody(NewFilterProvider newFilter) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 6),
-        Text(
-          'Country Living In',
-          style: TextStyle(fontSize: TextSize.font16(context), fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 12),
-        _buildDropdown(
-          hint: 'Select country',
-          value: _selectedCountry,
-          items: _countries,
-          onChanged: (v) => setState(() => _selectedCountry = v),
-        ),
-        const SizedBox(height: 12),
-        // show a quick list as alternative selection
+
         Expanded(
-          child: ListView.separated(
-            padding: EdgeInsets.zero,
-            itemCount: _countries.length,
-            separatorBuilder: (_, __) => const Divider(height: 1),
-            itemBuilder: (context, index) {
-              final country = _countries[index];
-              final selected = country == _selectedCountry;
-              return ListTile(
-                title: Text(country),
-                trailing: selected ? Icon(Icons.check, color: AppColors.primary) : null,
-                onTap: () => setState(() => _selectedCountry = country),
-              );
-            },
+          child: SingleChildScrollView(
+            child: Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: List.generate(newFilter.countries.length, (index) {
+                final item = newFilter.countries[index];
+                return SelectionCard(
+                  buttonStyle: item.isSelected ? SelectionStyle.selectedCheckbox : SelectionStyle.unSelectedCheckbox,
+                  onTap: () => ref.read(newFilterProvider).toggleCountry(index),
+                  isSelected: item.isSelected,
+                  title: item.name,
+                  isExpand: true,
+                );
+              }),
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _communityBody() {
+  Widget _communityBody(NewFilterProvider newFilter) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 6),
-        Text(
-          'Community',
-          style: TextStyle(fontSize: TextSize.font16(context), fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 12),
-        _buildDropdown(
-          hint: 'Select community',
-          value: _selectedCommunity,
-          items: _communities,
-          onChanged: (v) => setState(() => _selectedCommunity = v),
-        ),
-        const SizedBox(height: 12),
         Expanded(
-          child: ListView.separated(
-            padding: EdgeInsets.zero,
-            itemCount: _communities.length,
-            separatorBuilder: (_, __) => const Divider(height: 1),
-            itemBuilder: (context, index) {
-              final community = _communities[index];
-              final selected = community == _selectedCommunity;
-              return ListTile(
-                title: Text(community),
-                trailing: selected ? Icon(Icons.check, color: AppColors.primary) : null,
-                onTap: () => setState(() => _selectedCommunity = community),
-              );
-            },
+          child: SingleChildScrollView(
+            child: Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: List.generate(newFilter.communities.length, (index) {
+                final item = newFilter.communities[index];
+                return SelectionCard(
+                  buttonStyle: item.isSelected ? SelectionStyle.selectedCheckbox : SelectionStyle.unSelectedCheckbox,
+                  onTap: () => ref.read(newFilterProvider).toggleCommunity(index),
+                  isSelected: item.isSelected,
+                  title: item.name,
+                  isExpand: true,
+                );
+              }),
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget headLineText(String text, {double? fontSize}) {
-    return Text(
-      text,
-      style: TextStyle(
-        fontSize: fontSize ?? TextSize.font14(context),
-        fontWeight: FontWeight.w500,
-      ),
-    );
-  }
-
-  Widget bottomAction() {
-
+  Widget bottomAction(NewFilterProvider newFilter) {
     final isRefine = _step == FilterStep.refine;
     return PrimaryButtons(
       buttonStyle: ButtonsStyle.activePrimaryButton,
       title: isRefine ? 'Show Matches' : 'Apply',
       onTap: () {
-        // If we are in refine, return the selected filters and pop to caller.
         if (isRefine) {
           final result = {
-            'country': _selectedCountry,
-            'community': _selectedCommunity,
+            'countries': newFilter.selectedCountries,
+            'communities': newFilter.selectedCommunities,
           };
           Navigator.pop(context, result);
           return;
         }
-
-        // If we are in a sub-step (Apply), save selection and go back to refine view.
         setState(() => _step = FilterStep.refine);
       },
     );
   }
-
-  // Local dropdown helper to avoid depending on missing app widget
-  Widget _buildDropdown({
-    required String hint,
-    required String? value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
-  }) {
-    return DropdownButtonFormField<String>(
-      initialValue: value,
-      decoration: InputDecoration(
-        hintText: hint,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.greyLight)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.greyLight)),
-        filled: true,
-        fillColor: AppColors.white,
-      ),
-      items: items.map((e) => DropdownMenuItem<String>(value: e, child: Text(e))).toList(),
-      onChanged: onChanged,
-    );
-  }
 }
-
-enum FilterStep {
-  refine,
-  countryLivingIn,
-  community
-}
-
