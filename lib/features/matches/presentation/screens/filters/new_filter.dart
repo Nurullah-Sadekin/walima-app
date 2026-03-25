@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/provider/search_filter_provider.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/provider/new_filter_provider.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/into_tile.dart';
@@ -17,16 +15,14 @@ class NewFilterScreen extends ConsumerStatefulWidget {
   ConsumerState<NewFilterScreen> createState() => _NewFilterScreenState();
 }
 
-enum FilterStep { refine, countryLivingIn, community }
-
 class _NewFilterScreenState extends ConsumerState<NewFilterScreen> {
-  late SearchFilterProvider provider;
+  late NewFilterProvider provider;
   FilterStep _step = FilterStep.refine;
 
   @override
   void initState() {
     super.initState();
-    provider = ref.read(searchFilterProvider);
+    provider = ref.read(newFilterProvider);
     WidgetsBinding.instance.addPostFrameCallback((_) async {});
   }
 
@@ -37,24 +33,7 @@ class _NewFilterScreenState extends ConsumerState<NewFilterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    provider = ref.watch(searchFilterProvider);
-    final newFilter = ref.watch(newFilterProvider);
-
-    // Dynamic title based on step
-    String appBarTitle;
-    switch (_step) {
-      case FilterStep.countryLivingIn:
-        appBarTitle = 'Country Living In';
-        break;
-      case FilterStep.community:
-        appBarTitle = 'Community';
-        break;
-      case FilterStep.refine:
-        appBarTitle = 'Refine';
-        break;
-    }
-
-    // Intercept system back to go back to refine step first
+    provider = ref.watch(newFilterProvider);
     return WillPopScope(
       onWillPop: () async {
         if (_step != FilterStep.refine) {
@@ -67,7 +46,7 @@ class _NewFilterScreenState extends ConsumerState<NewFilterScreen> {
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.white,
         appBar: CustomBackAppBar(
-          title: Text(appBarTitle),
+          title: Text(getAppBarTitle(_step)),
           backgroundColor: Colors.transparent,
           onBackPressed: () {
             if (_step != FilterStep.refine) {
@@ -82,13 +61,13 @@ class _NewFilterScreenState extends ConsumerState<NewFilterScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Column(
               children: [
-                Expanded(child: _body(newFilter)),
+                Expanded(child: _body(provider)),
               ],
             ),
           ),
         ),
         floatingActionButton: BottomBorderedWidget(
-          widget: bottomAction(newFilter),
+          widget: bottomAction(provider),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
@@ -202,4 +181,22 @@ class _NewFilterScreenState extends ConsumerState<NewFilterScreen> {
       },
     );
   }
+
+  String getAppBarTitle(FilterStep step) {
+    switch (step) {
+      case FilterStep.countryLivingIn:
+        return 'Country Living In';
+      case FilterStep.community:
+        return 'Community';
+      case FilterStep.refine:
+        return 'Refine';
+    }
+  }
+
+}
+
+enum FilterStep {
+  refine,
+  countryLivingIn,
+  community
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 
 class InfoTile extends StatelessWidget { // Control leading image visibility
@@ -10,7 +9,7 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
     super.key,
     required this.title,
     required this.value,
-    this.leadingImagePath = AppImages.editWrite,
+    this.leadingImagePath,
     this.trailingImagePath,
     this.leadingImageColor,
     this.trailingImageColor,
@@ -58,55 +57,62 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             // Left side - Leading image and title
-            Row(
-              spacing: 8,
-              children: [
-                if (showLeadingImage && leadingImagePath != null)
-                  CircleAvatar(
-                    radius: leadingRadius,
-                    backgroundColor: leadingBackgroundColor ?? AppColors.primaryVariant,
-                    child: ShowImage(
-                      imagePath: leadingImagePath!,
-                      width: leadingImageSize,
-                      height: leadingImageSize,
-                      color: leadingImageColor ?? AppColors.primary,
-                    ),
-                  ),
-                Text(
-                  title,
-                  style: titleStyle ??
-                      TextStyle(
-                        color: AppColors.textSecondaryLight,
-                        fontSize: TextSize.font12(context),
-                        fontWeight: FontWeight.w400,
+            Expanded(
+              child: Row(
+                spacing: 8,
+                children: [
+                  if (showLeadingImage && leadingImagePath != null)
+                    CircleAvatar(
+                      radius: leadingRadius,
+                      backgroundColor: leadingBackgroundColor ?? AppColors.primaryVariant,
+                      child: ShowImage(
+                        imagePath: leadingImagePath!,
+                        width: leadingImageSize,
+                        height: leadingImageSize,
+                        color: leadingImageColor ?? AppColors.primary,
                       ),
-                ),
-              ],
+                    ),
+                  Text(
+                    title,
+                    style: titleStyle ??
+                        TextStyle(
+                          color: AppColors.textSecondaryLight,
+                          fontSize: TextSize.font12(context),
+                          fontWeight: FontWeight.w400,
+                        ),
+                  ),
+                ],
+              ),
             ),
 
             // Right side - Value and trailing image
-            Row(
-              spacing: 8,
-              children: [
-                Text(
-                  value,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: valueStyle ??
-                      TextStyle(
-                        color: AppColors.textPrimaryLight,
-                        fontSize: TextSize.font12(context),
-                        fontWeight: FontWeight.w500,
-                      ),
-                ),
-                if (showTrailingImage && trailingImagePath != null)
-                  ShowImage(
-                    imagePath: trailingImagePath!,
-                    width: trailingImageSize,
-                    height: trailingImageSize,
-                    color: trailingImageColor ?? AppColors.primary,
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                spacing: 8,
+                children: [
+                  Flexible(
+                    child: Text(
+                      value,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: valueStyle ??
+                          TextStyle(
+                            color: AppColors.textPrimaryLight,
+                            fontSize: TextSize.font12(context),
+                            fontWeight: FontWeight.w500,
+                          ),
+                    ),
                   ),
-              ],
+                  if (showTrailingImage && trailingImagePath != null)
+                    ShowImage(
+                      imagePath: trailingImagePath!,
+                      width: trailingImageSize,
+                      height: trailingImageSize,
+                      color: trailingImageColor ?? AppColors.primary,
+                    ),
+                ],
+              ),
             ),
           ],
         ),
