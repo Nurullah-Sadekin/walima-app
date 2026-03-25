@@ -123,7 +123,6 @@ class _NewFilterScreenState extends ConsumerState<NewFilterScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
         Expanded(
           child: SingleChildScrollView(
             child: Wrap(
@@ -147,13 +146,10 @@ class _NewFilterScreenState extends ConsumerState<NewFilterScreen> {
   }
 
   Widget _communityBody(NewFilterProvider newFilter) {
-    // First item full width, then two items per row for the rest.
     return LayoutBuilder(
       builder: (context, constraints) {
         const spacing = 10.0;
         final maxWidth = constraints.maxWidth;
-
-        // For two columns after the first item.
         final twoColumnItemWidth = (maxWidth - spacing) / 2;
 
         return Column(
@@ -204,20 +200,45 @@ class _NewFilterScreenState extends ConsumerState<NewFilterScreen> {
 
   Widget bottomAction(NewFilterProvider newFilter) {
     final isRefine = _step == FilterStep.refine;
-    return PrimaryButtons(
-      buttonStyle: ButtonsStyle.activePrimaryButton,
-      title: isRefine ? 'Show Matches' : 'Apply',
-      onTap: () {
-        if (isRefine) {
+
+    if (isRefine) {
+      return PrimaryButtons(
+        buttonStyle: ButtonsStyle.activePrimaryButton,
+        title: 'Show Matches',
+        onTap: () {
           final result = {
             'countries': newFilter.selectedCountries,
             'communities': newFilter.selectedCommunities,
           };
           Navigator.pop(context, result);
-          return;
-        }
-        setState(() => _step = FilterStep.refine);
-      },
+        },
+      );
+    }
+
+    return Row(
+      children: [
+        Expanded(
+          child: PrimaryButtons(
+            buttonStyle: ButtonsStyle.cancelButton,
+            title: 'Cancel',
+            onTap: () {
+              // Simply go back to refine step without altering selections
+              setState(() => _step = FilterStep.refine);
+            },
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: PrimaryButtons(
+            buttonStyle: ButtonsStyle.activePrimaryButton,
+            title: 'Apply',
+            onTap: () {
+              // Apply selections and go back to refine step
+              setState(() => _step = FilterStep.refine);
+            },
+          ),
+        ),
+      ],
     );
   }
 
