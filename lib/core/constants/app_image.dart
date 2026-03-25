@@ -80,6 +80,7 @@ class AppImages {
   static const String alertSvgIcon = 'assets/svgIcons/alert.svg';
   static const String flagSvgIcon = 'assets/svgIcons/flag.svg';
   static const String lockPasswordSvgIcon = 'assets/svgIcons/lock_password.svg';
+  static const String groupsIcon = 'assets/svgIcons/user_group.svg';
 
 
 

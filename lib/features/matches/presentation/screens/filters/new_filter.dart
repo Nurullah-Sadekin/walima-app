@@ -112,7 +112,7 @@ class _NewFilterScreenState extends ConsumerState<NewFilterScreen> {
           value: newFilter.selectedCommunities.isEmpty ? 'Not selected' : newFilter.selectedCommunities.join(', '),
           onTap: () => setState(() => _step = FilterStep.community),
           trailingImagePath: AppImages.editWrite,
-          leadingImagePath: AppImages.profileSvgIcon,
+          leadingImagePath: AppImages.groupsIcon,
         ),
         const SizedBox(height: 12),
       ],
