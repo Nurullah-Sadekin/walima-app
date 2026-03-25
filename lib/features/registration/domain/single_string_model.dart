@@ -169,6 +169,20 @@ List<SingleStringModel> countryListDataInserted = [
 
 ];
 
+List<SingleStringModel> communityListDataInserted = [
+  SingleStringModel(name: 'Open to All'),
+  SingleStringModel(name: 'Sunni'),
+  SingleStringModel(name: 'Shia'),
+  SingleStringModel(name: 'Ahmadiyya'),
+  SingleStringModel(name: 'Islam'),
+  SingleStringModel(name: 'Hindu'),
+  SingleStringModel(name: 'Buddhist'),
+  SingleStringModel(name: 'Christian'),
+  SingleStringModel(name: 'Jain'),
+  SingleStringModel(name: 'Other'),
+
+];
+
 List<SingleStringModel> verificationTypeList = [
   SingleStringModel(name: 'Mobile'),
   SingleStringModel(name: 'Email'),
@@ -205,7 +219,6 @@ List<SingleStringModel> ageListDataInserted = [
   SingleStringModel(name: '29'),
   SingleStringModel(name: '30'),
 ];
-
 
 List<SingleStringModel> haveChildrenDataListInserted = [
   SingleStringModel(name: 'No',),

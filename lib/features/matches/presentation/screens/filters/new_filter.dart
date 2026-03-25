@@ -147,28 +147,58 @@ class _NewFilterScreenState extends ConsumerState<NewFilterScreen> {
   }
 
   Widget _communityBody(NewFilterProvider newFilter) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: SingleChildScrollView(
-            child: Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: List.generate(newFilter.communities.length, (index) {
-                final item = newFilter.communities[index];
-                return SelectionCard(
-                  buttonStyle: item.isSelected ? SelectionStyle.selectedCheckbox : SelectionStyle.unSelectedCheckbox,
-                  onTap: () => ref.read(newFilterProvider).toggleCommunity(index),
-                  isSelected: item.isSelected,
-                  title: item.name,
-                  isExpand: true,
-                );
-              }),
+    // First item full width, then two items per row for the rest.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const spacing = 10.0;
+        final maxWidth = constraints.maxWidth;
+
+        // For two columns after the first item.
+        final twoColumnItemWidth = (maxWidth - spacing) / 2;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Wrap(
+                  spacing: spacing,
+                  runSpacing: spacing,
+                  children: List.generate(newFilter.communities.length, (index) {
+                    final item = newFilter.communities[index];
+
+                    // First item: full width
+                    if (index == 0) {
+                      return SizedBox(
+                        width: maxWidth,
+                        child: SelectionCard(
+                          buttonStyle: item.isSelected ? SelectionStyle.selectedCheckbox : SelectionStyle.unSelectedCheckbox,
+                          onTap: () => ref.read(newFilterProvider).toggleCommunity(index),
+                          isSelected: item.isSelected,
+                          title: item.name,
+                          isExpand: true,
+                        ),
+                      );
+                    }
+
+                    // Other items: two per row
+                    return SizedBox(
+                      width: twoColumnItemWidth,
+                      child: SelectionCard(
+                        buttonStyle: item.isSelected ? SelectionStyle.selectedCheckbox : SelectionStyle.unSelectedCheckbox,
+                        onTap: () => ref.read(newFilterProvider).toggleCommunity(index),
+                        isSelected: item.isSelected,
+                        title: item.name,
+                        isExpand: true,
+                      ),
+                    );
+                  }),
+                ),
+              ),
             ),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 

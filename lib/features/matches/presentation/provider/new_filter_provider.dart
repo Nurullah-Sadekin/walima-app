@@ -6,7 +6,7 @@ class NewFilterProvider extends BaseChangeNotifier {
 
   // Use existing list data from SingleStringModel lists
   List<SingleStringModel> countries = List.from(countryListDataInserted);
-  List<SingleStringModel> communities = List.from(creativeItemListDataInserted);
+  List<SingleStringModel> communities = List.from(communityListDataInserted);
 
   // Toggle selection for country (multi-select)
   void toggleCountry(int index) {
