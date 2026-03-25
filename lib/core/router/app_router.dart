@@ -9,6 +9,7 @@ import 'package:flutter_boilerplate/features/login/presentation/screens/reset_ps
 import 'package:flutter_boilerplate/features/login/presentation/screens/send_otp.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/screens/matches.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/screens/filters/search_filter.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/screens/filters/my_match_filter.dart';
 import 'package:flutter_boilerplate/features/onboarding_screen.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/connect_matches.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/basic_details.dart';
@@ -323,6 +324,11 @@ GoRouter goRouter(Ref ref) {
         path: Paths.newFilter,
         name: Routes.newFilter,
         builder: (context, state) => const NewFilterScreen(),
+      ),
+      GoRoute(
+        path: Paths.myMatchFilter,
+        name: Routes.myMatchFilter,
+        builder: (context, state) => const MyMatchFilterScreen(),
       ),
       GoRoute(
         path: Paths.cropImage,

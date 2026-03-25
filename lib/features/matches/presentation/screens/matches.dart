@@ -77,6 +77,9 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             } else if (provider.selectedTabIndex == 1) {
               // New tab
               context.push(Paths.newFilter);
+            } else if (provider.selectedTabIndex == 3) {
+              // My Matches tab -> open myMatch filter screen
+              context.push(Paths.myMatchFilter);
             } else {
               _filter(context);
             }

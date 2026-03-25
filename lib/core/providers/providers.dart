@@ -5,6 +5,7 @@ import 'package:flutter_boilerplate/features/login/presentation/providers/login_
 import 'package:flutter_boilerplate/features/matches/presentation/provider/matcher_provider.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/provider/search_filter_provider.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/provider/new_filter_provider.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/provider/my_match_filter_provider.dart';
 import 'package:flutter_boilerplate/features/profile/presentation/providers/profile_provider.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/providers/recommended_preferences_provider.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
@@ -17,7 +18,7 @@ final loginProvider = ChangeNotifierProvider<LoginProvider>((ref) {
 });
 
 final registrationProvider =
-    ChangeNotifierProvider<RegistrationProvider>((ref) {
+ChangeNotifierProvider<RegistrationProvider>((ref) {
   return RegistrationProvider();
 });
 
@@ -130,6 +131,10 @@ final searchFilterProvider = ChangeNotifierProvider<SearchFilterProvider>((ref) 
 
 final newFilterProvider = ChangeNotifierProvider<NewFilterProvider>((ref) {
   return NewFilterProvider();
+});
+
+final myMatchFilterProvider = ChangeNotifierProvider<MyMatchFilterProvider>((ref) {
+  return MyMatchFilterProvider();
 });
 
 final chatProvider = ChangeNotifierProvider<ChatProvider>((ref) {

@@ -55,6 +55,7 @@ abstract class Paths {
   //Filter
   static const searchFilter = '/searchFilter';
   static const newFilter = '/newFilter';
+  static const myMatchFilter = '/myMatchFilter';
 
   // Chat
   static const chatScreen = '/chatScreen';
@@ -118,6 +119,7 @@ abstract class Routes {
 
   static const searchFilter = 'searchFilter';
   static const newFilter = 'newFilter';
+  static const myMatchFilter = 'myMatchFilter';
 
 
   // Chat
