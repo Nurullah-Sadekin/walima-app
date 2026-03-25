@@ -52,11 +52,34 @@ class _NewFilterScreenState extends ConsumerState<NewFilterScreen> {
             child: _body(provider),
           ),
         ),
-        floatingActionButton: BottomBorderedWidget(
-          widget: bottomAction(provider),
-        ),
+        floatingActionButton: BottomBorderedWidget(widget: bottomAction(provider),),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
+    );
+  }
+
+  String _getAppBarTitle(FilterStep step) {
+    switch (step) {
+      case FilterStep.countryLivingIn:
+        return 'Country Living In';
+      case FilterStep.community:
+        return 'Community';
+      case FilterStep.refine:
+        return 'Refine';
+    }
+  }
+
+  PreferredSizeWidget _appBar() {
+    return CustomBackAppBar(
+      title: Text(_getAppBarTitle(_step)),
+      backgroundColor: Colors.transparent,
+      onBackPressed: () {
+        if (_step != FilterStep.refine) {
+          setState(() => _step = FilterStep.refine);
+        } else {
+          Navigator.of(context).maybePop();
+        }
+      },
     );
   }
 
@@ -164,31 +187,6 @@ class _NewFilterScreenState extends ConsumerState<NewFilterScreen> {
           return;
         }
         setState(() => _step = FilterStep.refine);
-      },
-    );
-  }
-
-  String getAppBarTitle(FilterStep step) {
-    switch (step) {
-      case FilterStep.countryLivingIn:
-        return 'Country Living In';
-      case FilterStep.community:
-        return 'Community';
-      case FilterStep.refine:
-        return 'Refine';
-    }
-  }
-
-  PreferredSizeWidget _appBar() {
-    return CustomBackAppBar(
-      title: Text(getAppBarTitle(_step)),
-      backgroundColor: Colors.transparent,
-      onBackPressed: () {
-        if (_step != FilterStep.refine) {
-          setState(() => _step = FilterStep.refine);
-        } else {
-          Navigator.of(context).maybePop();
-        }
       },
     );
   }
