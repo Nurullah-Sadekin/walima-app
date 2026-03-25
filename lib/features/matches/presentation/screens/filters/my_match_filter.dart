@@ -12,8 +12,7 @@ import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 class MyMatchFilterScreen extends ConsumerStatefulWidget {
   const MyMatchFilterScreen({super.key});
   @override
-  ConsumerState<MyMatchFilterScreen> createState() =>
-      _MyMatchFilterScreenState();
+  ConsumerState<MyMatchFilterScreen> createState() => _MyMatchFilterScreenState();
 }
 
 class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
@@ -48,9 +47,7 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
             child: _body(provider),
           ),
         ),
-        floatingActionButton: BottomBorderedWidget(
-          widget: bottomAction(provider),
-        ),
+        floatingActionButton: BottomBorderedWidget(widget: bottomAction(provider)),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
@@ -74,6 +71,8 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
         return 'Religion';
       case FilterStep.motherTongue:
         return 'Mother Tongue';
+      case FilterStep.countryLivingIn:
+        return 'Country Living In';
       case FilterStep.stateLivingIn:
         return 'State Living In';
       case FilterStep.countryGrewUpIn:
@@ -90,8 +89,6 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
         return 'Profile Managed By';
       case FilterStep.eatingHabits:
         return 'Eating Habits';
-      case FilterStep.countryLivingIn:
-        return 'Country Living In';
       case FilterStep.community:
         return 'Community';
     }
@@ -111,59 +108,52 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
     );
   }
 
-  Widget _body(MyMatchFilterProvider provider) {
+  Widget _body(MyMatchFilterProvider p) {
     switch (_step) {
-      case FilterStep.countryLivingIn:
-        return _countryBody(provider);
-      case FilterStep.community:
-        return _communityBody(provider);
       case FilterStep.refine:
-        return _refineBody(provider);
+        return _refineBody(p);
+      case FilterStep.countryLivingIn:
+        return _countryBody(p);
+      case FilterStep.community:
+        return _communityBody(p);
+
       case FilterStep.photoSetting:
-        return _photoSettingBody(provider);
+        return _photoSettingBody(p);
       case FilterStep.recentlyJoined:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        return _recentlyJoinedBody(p);
       case FilterStep.activeMembers:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        return _activeMembersBody(p);
+
       case FilterStep.annualIncome:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        return _annualIncomeBody(p);
       case FilterStep.maritalStatus:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        return _maritalStatusBody(p);
       case FilterStep.religion:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        return _religionBody(p);
       case FilterStep.motherTongue:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        return _motherTongueBody(p);
+
       case FilterStep.stateLivingIn:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        return _stateLivingInBody(p);
       case FilterStep.countryGrewUpIn:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        return _countryGrewUpInBody(p);
+
       case FilterStep.educationLevel:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        return _educationLevelBody(p);
       case FilterStep.educationArea:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        return _educationAreaBody(p);
+
       case FilterStep.workingWith:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        return _workingWithBody(p);
       case FilterStep.professionArea:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        return _professionAreaBody(p);
       case FilterStep.profileManagedBy:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        return _profileManagedByBody(p);
       case FilterStep.eatingHabits:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        return _eatingHabitsBody(p);
     }
+    // All enum cases are handled above; return a fallback
+    return const SizedBox.shrink();
   }
 
   Widget _refineBody(MyMatchFilterProvider provider) {
@@ -174,7 +164,7 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
           const SizedBox(height: 12),
           InfoTile(
             title: 'Photo Setting',
-            value: provider.photoSettingOpenToAll ? 'Open to All' : 'Custom',
+            value: _singleSelectedName(provider.photoSettingOptions, 'Open to All'),
             onTap: () => setState(() => _step = FilterStep.photoSetting),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.cameraSvgIcon,
@@ -182,59 +172,55 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
           const SizedBox(height: 8),
           InfoTile(
             title: 'Recently Joined',
-            value: provider.recentlyJoinedOpenToAll ? 'Open to All' : 'Custom',
-            onTap: () {},
+            value: _singleSelectedName(provider.recentlyJoinedOptions, 'Open to All'),
+            onTap: () => setState(() => _step = FilterStep.recentlyJoined),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.calendarSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Active Members',
-            value: provider.activeMembersOpenToAll ? 'Open to All' : 'Custom',
-            onTap: () {},
+            value: _singleSelectedName(provider.activeMembersOptions, 'Open to All'),
+            onTap: () => setState(() => _step = FilterStep.activeMembers),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.matchSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Annual Income',
-            value: provider.annualIncome,
-            onTap: () {},
+            value: _multiSelectedNames(provider.incomeRangeList, 'Open to All'),
+            onTap: () => setState(() => _step = FilterStep.annualIncome),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.contactSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Marital Status',
-            value: provider.maritalStatus.isEmpty
-                ? 'Open to All'
-                : provider.maritalStatus.join(', '),
-            onTap: () {},
+            value: _multiSelectedNames(provider.maritalStatusList, 'Open to All'),
+            onTap: () => setState(() => _step = FilterStep.maritalStatus),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.groupsIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Religion',
-            value: provider.religion,
-            onTap: () {},
+            value: _singleSelectedName(provider.religionList, 'Open to All'),
+            onTap: () => setState(() => _step = FilterStep.religion),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.religionSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Mother Tongue',
-            value: provider.motherTongueSelected.isEmpty
-                ? 'Multiple Selected'
-                : provider.motherTongueSelected.join(', '),
-            onTap: () {},
+            value: _multiSelectedNames(provider.motherTongues, 'Multiple Selected'),
+            onTap: () => setState(() => _step = FilterStep.motherTongue),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.profileSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Country Living In',
-            value: provider.countryLivingIn,
+            value: _singleSelectedName(provider.countries, 'Bangladesh'),
             onTap: () => setState(() => _step = FilterStep.countryLivingIn),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.locationSvgIcon,
@@ -242,73 +228,71 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
           const SizedBox(height: 8),
           InfoTile(
             title: 'State Living In',
-            value: provider.stateLivingIn,
-            onTap: () {},
+            value: _singleSelectedName(provider.countries, 'Open to All'),
+            onTap: () => setState(() => _step = FilterStep.stateLivingIn),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.locationSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Country Grew Up In',
-            value: provider.countryGrewUpIn,
-            onTap: () {},
+            value: _singleSelectedName(provider.countries, 'Open to All'),
+            onTap: () => setState(() => _step = FilterStep.countryGrewUpIn),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.locationSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Education Level',
-            value: provider.educationLevel,
-            onTap: () {},
+            value: _singleSelectedName(provider.educationLevelList, 'Open to All'),
+            onTap: () => setState(() => _step = FilterStep.educationLevel),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.editUserSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Education Area',
-            value: provider.educationArea,
-            onTap: () {},
+            value: _singleSelectedName(provider.educationLevelList, 'Open to All'),
+            onTap: () => setState(() => _step = FilterStep.educationArea),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.editUserSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Working With',
-            value: provider.workingWith,
-            onTap: () {},
+            value: _multiSelectedNames(provider.yourWorkList, 'Open to All'),
+            onTap: () => setState(() => _step = FilterStep.workingWith),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.editUserSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Profession Area',
-            value: provider.professionArea,
-            onTap: () {},
+            value: _multiSelectedNames(provider.youWorkAsList, 'Open to All'),
+            onTap: () => setState(() => _step = FilterStep.professionArea),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.editUserSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Profile Managed By',
-            value: provider.profileManagedBy,
-            onTap: () {},
+            value: _singleSelectedName(provider.profileManagedByList, 'Open to All'),
+            onTap: () => setState(() => _step = FilterStep.profileManagedBy),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.profileSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Eating Habits',
-            value: provider.eatingHabits,
-            onTap: () {},
+            value: _singleSelectedName(provider.eatingHabitsList, 'Open to All'),
+            onTap: () => setState(() => _step = FilterStep.eatingHabits),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.photoIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Community',
-            value: provider.selectedCommunities.isEmpty
-                ? 'Multiple Selected'
-                : provider.selectedCommunities.join(', '),
+            value: _multiSelectedNames(provider.communities, 'Multiple Selected'),
             onTap: () => setState(() => _step = FilterStep.community),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.groupsIcon,
@@ -330,11 +314,8 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
             children: List.generate(provider.countries.length, (index) {
               final item = provider.countries[index];
               return SelectionCard(
-                buttonStyle: item.isSelected
-                    ? SelectionStyle.selectedCheckbox
-                    : SelectionStyle.unSelectedCheckbox,
-                onTap: () =>
-                    ref.read(myMatchFilterProvider).toggleCountry(index),
+                buttonStyle: item.isSelected ? SelectionStyle.selectedCheckbox : SelectionStyle.unSelectedCheckbox,
+                onTap: () => ref.read(myMatchFilterProvider).toggleCountry(index),
                 isSelected: item.isSelected,
                 title: item.name,
                 isExpand: true,
@@ -347,92 +328,95 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
   }
 
   Widget _photoSettingBody(MyMatchFilterProvider newFilter) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SelectionCard(
-          buttonStyle: newFilter.photoSettingOpenToAll
-              ? SelectionStyle.selectedCheckbox
-              : SelectionStyle.unSelectedCheckbox,
-          onTap: () => ref.read(myMatchFilterProvider).photoSettingOpenToAll =
-              !newFilter.photoSettingOpenToAll,
-          isSelected: newFilter.photoSettingOpenToAll,
-          title: 'Open to All',
-          isExpand: true,
-        ),
-        const SizedBox(height: 10),
-        SelectionCard(
-          buttonStyle: !newFilter.photoSettingOpenToAll
-              ? SelectionStyle.selectedCheckbox
-              : SelectionStyle.unSelectedCheckbox,
-          onTap: () => ref.read(myMatchFilterProvider).photoSettingOpenToAll =
-              !newFilter.photoSettingOpenToAll,
-          isSelected: !newFilter.photoSettingOpenToAll,
-          title: 'Custom',
-          isExpand: true,
-        ),
-      ],
-    );
+    return _wrapSelection(newFilter.photoSettingOptions, (i) => ref.read(myMatchFilterProvider).selectPhotoSettingOption(i));
   }
 
   Widget _communityBody(MyMatchFilterProvider newFilter) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        const spacing = 10.0;
-        final maxWidth = constraints.maxWidth;
-        final twoColumnItemWidth = (maxWidth - spacing) / 2;
+    return _wrapSelection(newFilter.communities, (i) => ref.read(myMatchFilterProvider).toggleCommunity(i));
+  }
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Wrap(
-                  spacing: spacing,
-                  runSpacing: spacing,
-                  children:
-                      List.generate(newFilter.communities.length, (index) {
-                    final item = newFilter.communities[index];
+  Widget _recentlyJoinedBody(MyMatchFilterProvider p) {
+    return _wrapSelection(p.recentlyJoinedOptions, (i) => ref.read(myMatchFilterProvider).selectRecentlyJoinedOption(i));
+  }
 
-                    if (index == 0) {
-                      return SizedBox(
-                        width: maxWidth,
-                        child: SelectionCard(
-                          buttonStyle: item.isSelected
-                              ? SelectionStyle.selectedCheckbox
-                              : SelectionStyle.unSelectedCheckbox,
-                          onTap: () => ref
-                              .read(myMatchFilterProvider)
-                              .toggleCommunity(index),
-                          isSelected: item.isSelected,
-                          title: item.name,
-                          isExpand: true,
-                        ),
-                      );
-                    }
+  Widget _activeMembersBody(MyMatchFilterProvider p) {
+    return _wrapSelection(p.activeMembersOptions, (i) => ref.read(myMatchFilterProvider).selectActiveMembersOption(i));
+  }
 
-                    return SizedBox(
-                      width: twoColumnItemWidth,
-                      child: SelectionCard(
-                        buttonStyle: item.isSelected
-                            ? SelectionStyle.selectedCheckbox
-                            : SelectionStyle.unSelectedCheckbox,
-                        onTap: () => ref
-                            .read(myMatchFilterProvider)
-                            .toggleCommunity(index),
-                        isSelected: item.isSelected,
-                        title: item.name,
-                        isExpand: true,
-                      ),
-                    );
-                  }),
-                ),
+  Widget _annualIncomeBody(MyMatchFilterProvider p) {
+    return _wrapSelection(p.incomeRangeList, (i) => ref.read(myMatchFilterProvider).selectIncomeRange(i));
+  }
+
+  Widget _maritalStatusBody(MyMatchFilterProvider p) {
+    return _wrapSelection(p.maritalStatusList, (i) => ref.read(myMatchFilterProvider).toggleMaritalStatus(i));
+  }
+
+  Widget _religionBody(MyMatchFilterProvider p) {
+    return _wrapSelection(p.religionList, (i) => ref.read(myMatchFilterProvider).selectReligion(i));
+  }
+
+  Widget _motherTongueBody(MyMatchFilterProvider p) {
+    return _wrapSelection(p.motherTongues, (i) => ref.read(myMatchFilterProvider).toggleMotherTongue(i));
+  }
+
+  Widget _stateLivingInBody(MyMatchFilterProvider p) {
+    return _wrapSelection(p.countries, (i) => ref.read(myMatchFilterProvider).selectCountry(i));
+  }
+
+  Widget _countryGrewUpInBody(MyMatchFilterProvider p) {
+    return _wrapSelection(p.countries, (i) => ref.read(myMatchFilterProvider).selectCountry(i));
+  }
+
+  Widget _educationLevelBody(MyMatchFilterProvider p) {
+    return _wrapSelection(p.educationLevelList, (i) => ref.read(myMatchFilterProvider).selectEducationLevel(i));
+  }
+
+  Widget _educationAreaBody(MyMatchFilterProvider p) {
+    return _wrapSelection(p.educationLevelList, (i) => ref.read(myMatchFilterProvider).selectEducationLevel(i));
+  }
+
+  Widget _workingWithBody(MyMatchFilterProvider p) {
+    return _wrapSelection(p.yourWorkList, (i) => ref.read(myMatchFilterProvider).toggleYourWork(i));
+  }
+
+  Widget _professionAreaBody(MyMatchFilterProvider p) {
+    return _wrapSelection(p.youWorkAsList, (i) => ref.read(myMatchFilterProvider).toggleYouWorkAs(i));
+  }
+
+  Widget _profileManagedByBody(MyMatchFilterProvider p) {
+    return _wrapSelection(p.profileManagedByList, (i) => ref.read(myMatchFilterProvider).selectProfileManagedBy(i));
+  }
+
+  Widget _eatingHabitsBody(MyMatchFilterProvider p) {
+    return _wrapSelection(p.eatingHabitsList, (i) => ref.read(myMatchFilterProvider).selectEatingHabits(i));
+  }
+
+  Widget _wrapSelection(List<dynamic> items, void Function(int) onTap) {
+    return LayoutBuilder(builder: (context, constraints) {
+      const spacing = 10.0;
+      final maxWidth = constraints.maxWidth;
+      final itemWidth = (maxWidth - spacing) / 2;
+
+      return SingleChildScrollView(
+        child: Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: List.generate(items.length, (index) {
+            final item = items[index];
+            return SizedBox(
+              width: itemWidth,
+              child: SelectionCard(
+                buttonStyle: item.isSelected ? SelectionStyle.selectedCheckbox : SelectionStyle.unSelectedCheckbox,
+                onTap: () => onTap(index),
+                isSelected: item.isSelected,
+                title: item.name,
+                isExpand: true,
               ),
-            ),
-          ],
-        );
-      },
-    );
+            );
+          }),
+        ),
+      );
+    });
   }
 
   Widget bottomAction(MyMatchFilterProvider newFilter) {
@@ -475,6 +459,24 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
         ),
       ],
     );
+  }
+
+  String _singleSelectedName(List<dynamic> list, String fallback) {
+    try {
+      final sel = list.firstWhere((e) => e.isSelected, orElse: () => null);
+      return sel != null ? sel.name as String : fallback;
+    } catch (_) {
+      return fallback;
+    }
+  }
+
+  String _multiSelectedNames(List<dynamic> list, String fallback) {
+    try {
+      final sel = list.where((e) => e.isSelected).map((e) => e.name as String).toList();
+      return sel.isEmpty ? fallback : sel.join(', ');
+    } catch (_) {
+      return fallback;
+    }
   }
 }
 
