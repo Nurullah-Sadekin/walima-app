@@ -45,25 +45,11 @@ class _NewFilterScreenState extends ConsumerState<NewFilterScreen> {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.white,
-        appBar: CustomBackAppBar(
-          title: Text(getAppBarTitle(_step)),
-          backgroundColor: Colors.transparent,
-          onBackPressed: () {
-            if (_step != FilterStep.refine) {
-              setState(() => _step = FilterStep.refine);
-            } else {
-              Navigator.of(context).maybePop();
-            }
-          },
-        ),
+        appBar: _appBar(),
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Column(
-              children: [
-                Expanded(child: _body(provider)),
-              ],
-            ),
+            child: _body(provider),
           ),
         ),
         floatingActionButton: BottomBorderedWidget(
@@ -191,6 +177,20 @@ class _NewFilterScreenState extends ConsumerState<NewFilterScreen> {
       case FilterStep.refine:
         return 'Refine';
     }
+  }
+
+  PreferredSizeWidget _appBar() {
+    return CustomBackAppBar(
+      title: Text(getAppBarTitle(_step)),
+      backgroundColor: Colors.transparent,
+      onBackPressed: () {
+        if (_step != FilterStep.refine) {
+          setState(() => _step = FilterStep.refine);
+        } else {
+          Navigator.of(context).maybePop();
+        }
+      },
+    );
   }
 
 }

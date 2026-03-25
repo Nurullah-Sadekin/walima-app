@@ -65,6 +65,10 @@ List<SingleStringModel> creativeItemListDataInserted = [
   SingleStringModel(name: 'Content creation'),
   SingleStringModel(name: 'Designing'),
   SingleStringModel(name: 'Doodling'),
+  SingleStringModel(name: 'Doodling'),
+  SingleStringModel(name: 'Doodling'),
+  SingleStringModel(name: 'Doodling'),
+  SingleStringModel(name: 'Doodling'),
 ];
 
 List<SingleStringModel> funItemListDataInserted = [
