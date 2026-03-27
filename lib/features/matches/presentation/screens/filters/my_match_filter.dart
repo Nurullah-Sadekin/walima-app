@@ -12,7 +12,8 @@ import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 class MyMatchFilterScreen extends ConsumerStatefulWidget {
   const MyMatchFilterScreen({super.key});
   @override
-  ConsumerState<MyMatchFilterScreen> createState() => _MyMatchFilterScreenState();
+  ConsumerState<MyMatchFilterScreen> createState() =>
+      _MyMatchFilterScreenState();
 }
 
 class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
@@ -47,7 +48,8 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
             child: _body(provider),
           ),
         ),
-        floatingActionButton: BottomBorderedWidget(widget: bottomAction(provider)),
+        floatingActionButton:
+            BottomBorderedWidget(widget: bottomAction(provider)),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
@@ -108,49 +110,44 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
     );
   }
 
-  Widget _body(MyMatchFilterProvider p) {
+  Widget _body(MyMatchFilterProvider provider) {
     switch (_step) {
       case FilterStep.refine:
-        return _refineBody(p);
+        return _refineBody(provider);
       case FilterStep.countryLivingIn:
-        return _countryBody(p);
+        return _countryBody(provider);
       case FilterStep.community:
-        return _communityBody(p);
-
+        return _communityBody(provider);
       case FilterStep.photoSetting:
-        return _photoSettingBody(p);
+        return _photoSettingBody(provider);
       case FilterStep.recentlyJoined:
-        return _recentlyJoinedBody(p);
+        return _recentlyJoinedBody(provider);
       case FilterStep.activeMembers:
-        return _activeMembersBody(p);
-
+        return _activeMembersBody(provider);
       case FilterStep.annualIncome:
-        return _annualIncomeBody(p);
+        return _annualIncomeBody(provider);
       case FilterStep.maritalStatus:
-        return _maritalStatusBody(p);
+        return _maritalStatusBody(provider);
       case FilterStep.religion:
-        return _religionBody(p);
+        return _religionBody(provider);
       case FilterStep.motherTongue:
-        return _motherTongueBody(p);
-
+        return _motherTongueBody(provider);
       case FilterStep.stateLivingIn:
-        return _stateLivingInBody(p);
+        return _stateLivingInBody(provider);
       case FilterStep.countryGrewUpIn:
-        return _countryGrewUpInBody(p);
-
+        return _countryGrewUpInBody(provider);
       case FilterStep.educationLevel:
-        return _educationLevelBody(p);
+        return _educationLevelBody(provider);
       case FilterStep.educationArea:
-        return _educationAreaBody(p);
-
+        return _educationAreaBody(provider);
       case FilterStep.workingWith:
-        return _workingWithBody(p);
+        return _workingWithBody(provider);
       case FilterStep.professionArea:
-        return _professionAreaBody(p);
+        return _professionAreaBody(provider);
       case FilterStep.profileManagedBy:
-        return _profileManagedByBody(p);
+        return _profileManagedByBody(provider);
       case FilterStep.eatingHabits:
-        return _eatingHabitsBody(p);
+        return _eatingHabitsBody(provider);
     }
     // All enum cases are handled above; return a fallback
     return const SizedBox.shrink();
@@ -164,26 +161,29 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
           const SizedBox(height: 12),
           InfoTile(
             title: 'Photo Setting',
-            value: _singleSelectedName(provider.photoSettingOptions, 'Open to All'),
+            value: _singleSelectedName(
+                provider.photoSettingOptions, 'Open to All'),
             onTap: () => setState(() => _step = FilterStep.photoSetting),
             trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.cameraSvgIcon,
+            leadingImagePath: AppImages.albumSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Recently Joined',
-            value: _singleSelectedName(provider.recentlyJoinedOptions, 'Open to All'),
+            value: _singleSelectedName(
+                provider.recentlyJoinedOptions, 'Open to All'),
             onTap: () => setState(() => _step = FilterStep.recentlyJoined),
             trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.calendarSvgIcon,
+            leadingImagePath: AppImages.propertySvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Active Members',
-            value: _singleSelectedName(provider.activeMembersOptions, 'Open to All'),
+            value: _singleSelectedName(
+                provider.activeMembersOptions, 'Open to All'),
             onTap: () => setState(() => _step = FilterStep.activeMembers),
             trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.matchSvgIcon,
+            leadingImagePath: AppImages.radioactiveSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
@@ -191,15 +191,16 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
             value: _multiSelectedNames(provider.incomeRangeList, 'Open to All'),
             onTap: () => setState(() => _step = FilterStep.annualIncome),
             trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.contactSvgIcon,
+            leadingImagePath: AppImages.walletSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Marital Status',
-            value: _multiSelectedNames(provider.maritalStatusList, 'Open to All'),
+            value:
+                _multiSelectedNames(provider.maritalStatusList, 'Open to All'),
             onTap: () => setState(() => _step = FilterStep.maritalStatus),
             trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.groupsIcon,
+            leadingImagePath: AppImages.weddingSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
@@ -207,15 +208,16 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
             value: _singleSelectedName(provider.religionList, 'Open to All'),
             onTap: () => setState(() => _step = FilterStep.religion),
             trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.religionSvgIcon,
+            leadingImagePath: AppImages.quranSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Mother Tongue',
-            value: _multiSelectedNames(provider.motherTongues, 'Multiple Selected'),
+            value: _multiSelectedNames(
+                provider.motherTongues, 'Multiple Selected'),
             onTap: () => setState(() => _step = FilterStep.motherTongue),
             trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.profileSvgIcon,
+            leadingImagePath: AppImages.languageSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
@@ -231,7 +233,7 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
             value: _singleSelectedName(provider.countries, 'Open to All'),
             onTap: () => setState(() => _step = FilterStep.stateLivingIn),
             trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.locationSvgIcon,
+            leadingImagePath: AppImages.mapsSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
@@ -239,23 +241,25 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
             value: _singleSelectedName(provider.countries, 'Open to All'),
             onTap: () => setState(() => _step = FilterStep.countryGrewUpIn),
             trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.locationSvgIcon,
+            leadingImagePath: AppImages.userLocationSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Education Level',
-            value: _singleSelectedName(provider.educationLevelList, 'Open to All'),
+            value:
+                _singleSelectedName(provider.educationLevelList, 'Open to All'),
             onTap: () => setState(() => _step = FilterStep.educationLevel),
             trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.editUserSvgIcon,
+            leadingImagePath: AppImages.educationSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Education Area',
-            value: _singleSelectedName(provider.educationLevelList, 'Open to All'),
+            value:
+                _singleSelectedName(provider.educationLevelList, 'Open to All'),
             onTap: () => setState(() => _step = FilterStep.educationArea),
             trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.editUserSvgIcon,
+            leadingImagePath: AppImages.schoolSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
@@ -263,7 +267,7 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
             value: _multiSelectedNames(provider.yourWorkList, 'Open to All'),
             onTap: () => setState(() => _step = FilterStep.workingWith),
             trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.editUserSvgIcon,
+            leadingImagePath: AppImages.workSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
@@ -271,28 +275,31 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
             value: _multiSelectedNames(provider.youWorkAsList, 'Open to All'),
             onTap: () => setState(() => _step = FilterStep.professionArea),
             trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.editUserSvgIcon,
+            leadingImagePath: AppImages.officeSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Profile Managed By',
-            value: _singleSelectedName(provider.profileManagedByList, 'Open to All'),
+            value: _singleSelectedName(
+                provider.profileManagedByList, 'Open to All'),
             onTap: () => setState(() => _step = FilterStep.profileManagedBy),
             trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.profileSvgIcon,
+            leadingImagePath: AppImages.userAiSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Eating Habits',
-            value: _singleSelectedName(provider.eatingHabitsList, 'Open to All'),
+            value:
+                _singleSelectedName(provider.eatingHabitsList, 'Open to All'),
             onTap: () => setState(() => _step = FilterStep.eatingHabits),
             trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.photoIcon,
+            leadingImagePath: AppImages.habitSvgIcon,
           ),
           const SizedBox(height: 8),
           InfoTile(
             title: 'Community',
-            value: _multiSelectedNames(provider.communities, 'Multiple Selected'),
+            value:
+                _multiSelectedNames(provider.communities, 'Multiple Selected'),
             onTap: () => setState(() => _step = FilterStep.community),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.groupsIcon,
@@ -314,8 +321,11 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
             children: List.generate(provider.countries.length, (index) {
               final item = provider.countries[index];
               return SelectionCard(
-                buttonStyle: item.isSelected ? SelectionStyle.selectedCheckbox : SelectionStyle.unSelectedCheckbox,
-                onTap: () => ref.read(myMatchFilterProvider).toggleCountry(index),
+                buttonStyle: item.isSelected
+                    ? SelectionStyle.selectedCheckbox
+                    : SelectionStyle.unSelectedCheckbox,
+                onTap: () =>
+                    ref.read(myMatchFilterProvider).toggleCountry(index),
                 isSelected: item.isSelected,
                 title: item.name,
                 isExpand: true,
@@ -328,67 +338,83 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
   }
 
   Widget _photoSettingBody(MyMatchFilterProvider newFilter) {
-    return _wrapSelection(newFilter.photoSettingOptions, (i) => ref.read(myMatchFilterProvider).selectPhotoSettingOption(i));
+    return _wrapSelection(newFilter.photoSettingOptions,
+        (i) => ref.read(myMatchFilterProvider).selectPhotoSettingOption(i));
   }
 
   Widget _communityBody(MyMatchFilterProvider newFilter) {
-    return _wrapSelection(newFilter.communities, (i) => ref.read(myMatchFilterProvider).toggleCommunity(i));
+    return _wrapSelection(newFilter.communities,
+        (i) => ref.read(myMatchFilterProvider).toggleCommunity(i));
   }
 
   Widget _recentlyJoinedBody(MyMatchFilterProvider p) {
-    return _wrapSelection(p.recentlyJoinedOptions, (i) => ref.read(myMatchFilterProvider).selectRecentlyJoinedOption(i));
+    return _wrapSelection(p.recentlyJoinedOptions,
+        (i) => ref.read(myMatchFilterProvider).selectRecentlyJoinedOption(i));
   }
 
   Widget _activeMembersBody(MyMatchFilterProvider p) {
-    return _wrapSelection(p.activeMembersOptions, (i) => ref.read(myMatchFilterProvider).selectActiveMembersOption(i));
+    return _wrapSelection(p.activeMembersOptions,
+        (i) => ref.read(myMatchFilterProvider).selectActiveMembersOption(i));
   }
 
   Widget _annualIncomeBody(MyMatchFilterProvider p) {
-    return _wrapSelection(p.incomeRangeList, (i) => ref.read(myMatchFilterProvider).selectIncomeRange(i));
+    return _wrapSelection(p.incomeRangeList,
+        (i) => ref.read(myMatchFilterProvider).selectIncomeRange(i));
   }
 
   Widget _maritalStatusBody(MyMatchFilterProvider p) {
-    return _wrapSelection(p.maritalStatusList, (i) => ref.read(myMatchFilterProvider).toggleMaritalStatus(i));
+    return _wrapSelection(p.maritalStatusList,
+        (i) => ref.read(myMatchFilterProvider).toggleMaritalStatus(i));
   }
 
   Widget _religionBody(MyMatchFilterProvider p) {
-    return _wrapSelection(p.religionList, (i) => ref.read(myMatchFilterProvider).selectReligion(i));
+    return _wrapSelection(p.religionList,
+        (i) => ref.read(myMatchFilterProvider).selectReligion(i));
   }
 
   Widget _motherTongueBody(MyMatchFilterProvider p) {
-    return _wrapSelection(p.motherTongues, (i) => ref.read(myMatchFilterProvider).toggleMotherTongue(i));
+    return _wrapSelection(p.motherTongues,
+        (i) => ref.read(myMatchFilterProvider).toggleMotherTongue(i));
   }
 
   Widget _stateLivingInBody(MyMatchFilterProvider p) {
-    return _wrapSelection(p.countries, (i) => ref.read(myMatchFilterProvider).selectCountry(i));
+    return _wrapSelection(
+        p.countries, (i) => ref.read(myMatchFilterProvider).selectCountry(i));
   }
 
   Widget _countryGrewUpInBody(MyMatchFilterProvider p) {
-    return _wrapSelection(p.countries, (i) => ref.read(myMatchFilterProvider).selectCountry(i));
+    return _wrapSelection(
+        p.countries, (i) => ref.read(myMatchFilterProvider).selectCountry(i));
   }
 
   Widget _educationLevelBody(MyMatchFilterProvider p) {
-    return _wrapSelection(p.educationLevelList, (i) => ref.read(myMatchFilterProvider).selectEducationLevel(i));
+    return _wrapSelection(p.educationLevelList,
+        (i) => ref.read(myMatchFilterProvider).selectEducationLevel(i));
   }
 
   Widget _educationAreaBody(MyMatchFilterProvider p) {
-    return _wrapSelection(p.educationLevelList, (i) => ref.read(myMatchFilterProvider).selectEducationLevel(i));
+    return _wrapSelection(p.educationLevelList,
+        (i) => ref.read(myMatchFilterProvider).selectEducationLevel(i));
   }
 
   Widget _workingWithBody(MyMatchFilterProvider p) {
-    return _wrapSelection(p.yourWorkList, (i) => ref.read(myMatchFilterProvider).toggleYourWork(i));
+    return _wrapSelection(p.yourWorkList,
+        (i) => ref.read(myMatchFilterProvider).toggleYourWork(i));
   }
 
   Widget _professionAreaBody(MyMatchFilterProvider p) {
-    return _wrapSelection(p.youWorkAsList, (i) => ref.read(myMatchFilterProvider).toggleYouWorkAs(i));
+    return _wrapSelection(p.youWorkAsList,
+        (i) => ref.read(myMatchFilterProvider).toggleYouWorkAs(i));
   }
 
   Widget _profileManagedByBody(MyMatchFilterProvider p) {
-    return _wrapSelection(p.profileManagedByList, (i) => ref.read(myMatchFilterProvider).selectProfileManagedBy(i));
+    return _wrapSelection(p.profileManagedByList,
+        (i) => ref.read(myMatchFilterProvider).selectProfileManagedBy(i));
   }
 
   Widget _eatingHabitsBody(MyMatchFilterProvider p) {
-    return _wrapSelection(p.eatingHabitsList, (i) => ref.read(myMatchFilterProvider).selectEatingHabits(i));
+    return _wrapSelection(p.eatingHabitsList,
+        (i) => ref.read(myMatchFilterProvider).selectEatingHabits(i));
   }
 
   Widget _wrapSelection(List<dynamic> items, void Function(int) onTap) {
@@ -406,7 +432,9 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
             return SizedBox(
               width: itemWidth,
               child: SelectionCard(
-                buttonStyle: item.isSelected ? SelectionStyle.selectedCheckbox : SelectionStyle.unSelectedCheckbox,
+                buttonStyle: item.isSelected
+                    ? SelectionStyle.selectedCheckbox
+                    : SelectionStyle.unSelectedCheckbox,
                 onTap: () => onTap(index),
                 isSelected: item.isSelected,
                 title: item.name,
@@ -472,7 +500,8 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
 
   String _multiSelectedNames(List<dynamic> list, String fallback) {
     try {
-      final sel = list.where((e) => e.isSelected).map((e) => e.name as String).toList();
+      final sel =
+          list.where((e) => e.isSelected).map((e) => e.name as String).toList();
       return sel.isEmpty ? fallback : sel.join(', ');
     } catch (_) {
       return fallback;

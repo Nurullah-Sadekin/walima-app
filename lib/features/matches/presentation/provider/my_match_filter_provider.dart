@@ -36,7 +36,7 @@ class MyMatchFilterProvider extends BaseChangeNotifier {
     SingleStringModel(name: 'Master'),
     SingleStringModel(name: 'PhD'),
   ];
-  List<SingleStringModel> religionList = communityListDataInserted.where((e) => ['Sunni','Shia','Ahmadiyya','Islam','Hindu','Buddhist','Christian','Jain'].contains(e.name)).toList();
+  List<SingleStringModel> religionList = communityListDataInserted.where((e) => ['Sunni','Shia','Ahmadi','Islam','Hindu','Buddhist','Christian','Jain'].contains(e.name)).toList();
   List<SingleStringModel> motherTongues = [
     SingleStringModel(name: 'Bengali'),
     SingleStringModel(name: 'English'),
@@ -146,16 +146,36 @@ class MyMatchFilterProvider extends BaseChangeNotifier {
   List<String> get selectedEatingHabits => eatingHabitsList.where((c) => c.isSelected).map((e) => e.name).toList();
 
   void clearAll() {
-    for (var c in countries) c.isSelected = false;
-    for (var c in communities) c.isSelected = false;
-    for (var c in maritalStatusList) c.isSelected = false;
-    for (var c in incomeRangeList) c.isSelected = false;
-    for (var c in yourWorkList) c.isSelected = false;
-    for (var c in youWorkAsList) c.isSelected = false;
-    for (var c in religionList) c.isSelected = false;
-    for (var c in motherTongues) c.isSelected = false;
-    for (var c in profileManagedByList) c.isSelected = false;
-    for (var c in eatingHabitsList) c.isSelected = false;
+    for (var c in countries) {
+      c.isSelected = false;
+    }
+    for (var c in communities) {
+      c.isSelected = false;
+    }
+    for (var c in maritalStatusList) {
+      c.isSelected = false;
+    }
+    for (var c in incomeRangeList) {
+      c.isSelected = false;
+    }
+    for (var c in yourWorkList) {
+      c.isSelected = false;
+    }
+    for (var c in youWorkAsList) {
+      c.isSelected = false;
+    }
+    for (var c in religionList) {
+      c.isSelected = false;
+    }
+    for (var c in motherTongues) {
+      c.isSelected = false;
+    }
+    for (var c in profileManagedByList) {
+      c.isSelected = false;
+    }
+    for (var c in eatingHabitsList) {
+      c.isSelected = false;
+    }
     notifyListeners();
   }
 }
