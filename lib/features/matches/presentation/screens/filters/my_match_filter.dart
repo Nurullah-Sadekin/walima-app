@@ -420,8 +420,7 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
   Widget _wrapSelection(List<dynamic> items, void Function(int) onTap) {
     return LayoutBuilder(builder: (context, constraints) {
       const spacing = 10.0;
-      final maxWidth = constraints.maxWidth;
-      final itemWidth = (maxWidth - spacing) / 2;
+
 
       return SingleChildScrollView(
         child: Wrap(
@@ -429,17 +428,14 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
           runSpacing: spacing,
           children: List.generate(items.length, (index) {
             final item = items[index];
-            return SizedBox(
-              width: itemWidth,
-              child: SelectionCard(
-                buttonStyle: item.isSelected
-                    ? SelectionStyle.selectedCheckbox
-                    : SelectionStyle.unSelectedCheckbox,
-                onTap: () => onTap(index),
-                isSelected: item.isSelected,
-                title: item.name,
-                isExpand: true,
-              ),
+            return SelectionCard(
+              buttonStyle: item.isSelected
+                  ? SelectionStyle.selectedCheckbox
+                  : SelectionStyle.unSelectedCheckbox,
+              onTap: () => onTap(index),
+              isSelected: item.isSelected,
+              title: item.name,
+              isExpand: true,
             );
           }),
         ),
