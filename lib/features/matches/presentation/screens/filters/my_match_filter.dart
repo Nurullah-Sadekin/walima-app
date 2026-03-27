@@ -10,6 +10,7 @@ import 'package:flutter_boilerplate/features/matches/presentation/widgets/into_t
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
+import 'more_matches.dart';
 
 class MyMatchFilterScreen extends ConsumerStatefulWidget {
   const MyMatchFilterScreen({super.key});
@@ -121,7 +122,16 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
               ),
       )
           : null,
-      onTrailingTap: () {},
+      onTrailingTap: () {
+        if (_step == FilterStep.refine) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const MoreMatchesScreen(),
+            ),
+          );
+        }
+      },
       onBackPressed: () {
         if (_step != FilterStep.refine) {
           setState(() => _step = FilterStep.refine);
