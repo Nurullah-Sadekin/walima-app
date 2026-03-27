@@ -163,8 +163,7 @@ class _FamilyFinancialStatusScreenState
                         height: 12,
                       ),
                       KnowMoreItemCard(
-                        text:
-                            'Your Photo should be front facing and your entire face should be visible.',
+                        text: 'Your Photo should be front facing and your entire face should be visible.',
                         icon: Icons.circle,
                         iconSize: TextSize.font10(context) / 2,
                         iconPadding: TextSize.font10(context) / 2,

@@ -98,6 +98,8 @@ class AppImages {
   static const String quranSvgIcon = 'assets/svgIcons/quran.svg';
   static const String radioactiveSvgIcon = 'assets/svgIcons/radioactive.svg';
   static const String schoolSvgIcon = 'assets/svgIcons/school.svg';
+  static const String cancelCircle = 'assets/svgIcons/cancel_circle.svg';
+  static const String successCircle = 'assets/svgIcons/success_circle.svg';
 
 
 

@@ -53,7 +53,9 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(photoUploadScreenProvider);
     return TransparentLoading(
-      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor || _isPickingImage,
+      isLoading:
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor ||
+              _isPickingImage,
       child: Scaffold(
         extendBodyBehindAppBar: true,
         backgroundColor: Colors.transparent,
@@ -63,11 +65,11 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
               ? const Loading()
               : Column(
                   children: [
-                     CustomBackAppBar(
+                    CustomBackAppBar(
                       trailingText: 'Add Photos Later',
                       isTrailing: true,
-                      onTrailingTap: (){
-                       context.push(Paths.hobbiesInterests);
+                      onTrailingTap: () {
+                        context.push(Paths.hobbiesInterests);
                       },
                     ),
                     body(context),
@@ -219,37 +221,31 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
                   KnowMoreItemCard(
                     text:
                         'Your Photo should be front facing and your entire face should be visible.',
-                    icon: Icons.check_circle,
-                    iconColor: Colors.green,
+                    isActive: true,
                   ),
                   KnowMoreItemCard(
                     text:
                         'Ensure that your Photo is recent and not with a group.',
-                    icon: Icons.check_circle,
-                    iconColor: Colors.green,
+                    isActive: true,
                   ),
                   KnowMoreItemCard(
                     text: 'You can upload upto 20 Photos to your Profile.',
-                    icon: Icons.check_circle,
-                    iconColor: Colors.green,
+                    isActive: true,
                   ),
                   KnowMoreItemCard(
                     text:
                         'Each Photo must be less than 15 MB in size and must be in one of the following formats: jpg, gif, png, bmp or tiff.',
-                    icon: Icons.check_circle,
-                    iconColor: Colors.green,
+                    isActive: true,
                   ),
                   KnowMoreItemCard(
                     text:
                         'Watermarked, digitally enhanced, morphed Photos or Photos with your personal information will be rejected.',
-                    icon: Icons.cancel,
-                    iconColor: Colors.red,
+                    isActive: false,
                   ),
                   KnowMoreItemCard(
                     text:
                         'Irrelevant Photographs will lead to deactivation of your Profile and Membership.',
-                    icon: Icons.cancel,
-                    iconColor: Colors.red,
+                    isActive: false,
                   ),
                   SizedBox(height: 12),
                 ],
@@ -277,14 +273,14 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
         children: [
           _selectedImagePath == null
               ? GestureDetector(
-            onTap: () => _pickImage(ImageSource.gallery),
-                child: const ShowImage(
+                  onTap: () => _pickImage(ImageSource.gallery),
+                  child: const ShowImage(
                     imagePath: AppImages.photoUpload,
                     radius: BorderRadius.all(Radius.circular(50)),
                     width: 110,
                     height: 110,
                   ),
-              )
+                )
               : GestureDetector(
                   onTap: () => _pickImage(ImageSource.gallery),
                   child: ClipRRect(
@@ -369,7 +365,7 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-             ShowImage(
+            ShowImage(
               imagePath: AppImages.cameraUseIcon,
               width: TextSize.font20(context),
               height: TextSize.font20(context),

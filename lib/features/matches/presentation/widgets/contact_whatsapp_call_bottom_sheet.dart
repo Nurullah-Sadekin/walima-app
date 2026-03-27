@@ -4,28 +4,33 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/widgets/know_more_item.dart';
 
-class ContactAllowBottomSheet extends StatelessWidget {
-  const ContactAllowBottomSheet({
+class ContactWhatsappCallBottomSheet extends StatelessWidget {
+  const ContactWhatsappCallBottomSheet({
     super.key,
     required this.userName,
     required this.profileImagePath,
     this.profileType,
-    required this.onCallPressed,
+    required this.onPressedPrimary,
     required this.onMessagePressed,
     this.primaryButtonText,
     this.primaryButtonIcon,
     this.contactStatus = 'Contact Not Viewed',
+    this.isWhatsappContact = true,
+    this.contactNumber,
   });
 
   final String userName;
   final String profileImagePath;
   final String? profileType;
-  final VoidCallback onCallPressed;
+  final VoidCallback onPressedPrimary;
   final VoidCallback onMessagePressed;
   final String? primaryButtonText;
   final String? primaryButtonIcon;
   final String contactStatus;
+  final bool isWhatsappContact;
+  final String? contactNumber;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +42,22 @@ class ContactAllowBottomSheet extends StatelessWidget {
         _buildUserName(context),
         const SizedBox(height: 5),
         _buildProfileTypeBadge(context),
+        if(isWhatsappContact)...[
+          const SizedBox(height: 20),
+          _buildAllowInformation(context),
+        ],
+        if(!isWhatsappContact)...[
+          const SizedBox(height: 20),
+          Text(contactNumber ?? '+880 1234567890',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: TextSize.font16(context),
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimaryLight,
+            ),
+          ),
+        ],
+        const SizedBox(height: 20),
         _buildBottomButtons(context),
         const Divider(
           color: AppColors.greyLight,
@@ -86,6 +107,51 @@ class ContactAllowBottomSheet extends StatelessWidget {
     );
   }
 
+  Widget _buildAllowInformation(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: 8,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 4.0),
+          child: Text(
+            'Allowed & Not Allowed',
+            style: TextStyle(
+              fontSize: TextSize.font16(context),
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimaryLight,
+            ),
+          ),
+        ),
+
+        const KnowMoreItemCard(
+          text: 'Give a short introduction',
+          isActive: true,
+        ),
+        const KnowMoreItemCard(
+          text: 'Add your profile link',
+          isActive: true,
+        ),
+        const KnowMoreItemCard(
+          text: 'Please wait for a response',
+          isActive: true,
+        ),
+        const KnowMoreItemCard(
+          text: 'Sending excessive messages',
+          isActive: false,
+        ),
+        const KnowMoreItemCard(
+          text: 'Calling without notice',
+          isActive: false,
+        ),
+        const KnowMoreItemCard(
+          text: 'Using inappropriate content',
+          isActive: false,
+        ),
+      ],
+    );
+  }
+
   Widget _buildBottomButtons(BuildContext context) {
     return Row(
       children: [
@@ -97,7 +163,7 @@ class ContactAllowBottomSheet extends StatelessWidget {
             textColor: AppColors.textPrimaryLight,
             svgIconPath: AppImages.emailSvgIcon,
             svgIconColor: AppColors.textPrimaryLight,
-            onTap: onCallPressed,
+            onTap: onPressedPrimary,
           ),
         ),
         const SizedBox(width: 10),
@@ -107,9 +173,9 @@ class ContactAllowBottomSheet extends StatelessWidget {
             borderColor: AppColors.primary,
             bgColor: AppColors.primary,
             textColor: AppColors.white,
-            svgIconPath: primaryButtonIcon ?? AppImages.callSvgIcon,
+            svgIconPath: primaryButtonIcon ??  (isWhatsappContact ? AppImages.whatsappSvgIcon: AppImages.callSvgIcon) ,
             svgIconColor: AppColors.white,
-            title: primaryButtonText ?? 'Phone Call',
+            title: primaryButtonText ?? (isWhatsappContact ? 'Whatsapp' : 'Phone Call' ),
             onTap: onMessagePressed,
           ),
         ),
@@ -128,5 +194,4 @@ class ContactAllowBottomSheet extends StatelessWidget {
       ),
     );
   }
-
 }

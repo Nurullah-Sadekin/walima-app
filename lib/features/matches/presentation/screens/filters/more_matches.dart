@@ -5,7 +5,7 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/contact_allow_bottom_sheet.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/contact_whatsapp_call_bottom_sheet.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/contact_bottom_sheet.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/info_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/setting_switcher_title.dart';
@@ -44,7 +44,6 @@ class MoreMatchesScreen extends StatelessWidget {
             title: 'More Matches',
             value: true,
             onChanged: (value) {
-              // Handle switch state change
             },
           ),
           const SizedBox(height: 10),
@@ -52,28 +51,41 @@ class MoreMatchesScreen extends StatelessWidget {
               title: 'Profiles Matching Your Preferences',
               description:
                   'Some profiles may not match all your preferences, but you might find meaningful connections.'),
-
-          ContactBottomSheet(
-            userName: 'Sadia Sultana',
-            profileImagePath: AppImages.demoProfile,
-            profileType: 'Profile Created by Self',
-            description: 'She shares her phone number only with connected members.',
-            isDescriptionVisible: false,
-            onWalimaChatPressed: () {},
-            onWhatsappPressed: () {},
-            onCallPressed: () {},
-            onConnectionSentPressed: () {},
-            onWalimaChatButtonPressed: () {},
-          ),
-
-          ContactAllowBottomSheet(
-            userName: 'Sadia Sultana',
-            profileImagePath: AppImages.demoProfile,
-            profileType: 'Profile Created by Self',
-            onCallPressed: () {},
-            onMessagePressed: () {},
-          )
+          dummyWidgetForTest(),
+          const SizedBox(height: 80)
         ],
+      ),
+    );
+  }
+  
+  Widget dummyWidgetForTest(){
+    return Expanded(
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            ContactBottomSheet(
+              userName: 'Sadia Sultana',
+              profileImagePath: AppImages.demoProfile,
+              profileType: 'Profile Created by Self',
+              description: 'She shares her phone number only with connected members.',
+              isDescriptionVisible: false,
+              onWalimaChatPressed: () {},
+              onWhatsappPressed: () {},
+              onCallPressed: () {},
+              onConnectionSentPressed: () {},
+              onWalimaChatButtonPressed: () {},
+            ),
+        
+            ContactWhatsappCallBottomSheet(
+              userName: 'Sadia Sultana',
+              profileImagePath: AppImages.demoProfile,
+              profileType: 'Profile Created by Self',
+              onPressedPrimary: () {},
+              onMessagePressed: () {},
+              isWhatsappContact: true,
+            )
+          ],
+        ),
       ),
     );
   }
