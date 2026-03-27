@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/config/text_responsive.dart';
+import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
@@ -100,6 +102,26 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
     return CustomBackAppBar(
       title: Text(_getAppBarTitle(_step)),
       backgroundColor: Colors.transparent,
+      trailingText: _step == FilterStep.refine ? 'More Matches' : null,
+      isTrailing: _step == FilterStep.refine,
+      trailingWidget: _step == FilterStep.refine
+          ? Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                'ON',
+                style: TextStyle(
+                  fontSize: TextSize.font12(context),
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+              ),
+      )
+          : null,
+      onTrailingTap: () {},
       onBackPressed: () {
         if (_step != FilterStep.refine) {
           setState(() => _step = FilterStep.refine);

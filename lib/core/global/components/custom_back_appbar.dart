@@ -19,6 +19,7 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.isBackButton = true,
     this.backOnTap,
     this.backCancelMood = false,
+    this.trailingWidget,
   });
   final Color? backgroundColor;
   final Color? backIconBackground;
@@ -34,6 +35,7 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isBackButton;
   final VoidCallback? backOnTap;
   final bool backCancelMood;
+  final Widget ? trailingWidget;
 
   @override
   Widget build(BuildContext context) {
@@ -99,6 +101,8 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
+                        if (trailingWidget != null) trailingWidget!,
+                        if (trailingWidget == null)
                         Icon(
                           Icons.arrow_forward_ios,
                           size: iconSize ?? TextSize.font14(context),
