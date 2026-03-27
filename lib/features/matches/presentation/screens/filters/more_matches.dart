@@ -5,6 +5,7 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/contact_allow_bottom_sheet.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/contact_bottom_sheet.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/info_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/setting_switcher_title.dart';
@@ -63,6 +64,14 @@ class MoreMatchesScreen extends StatelessWidget {
             onCallPressed: () {},
             onConnectionSentPressed: () {},
             onWalimaChatButtonPressed: () {},
+          ),
+
+          ContactAllowBottomSheet(
+            userName: 'Sadia Sultana',
+            profileImagePath: AppImages.demoProfile,
+            profileType: 'Profile Created by Self',
+            onCallPressed: () {},
+            onMessagePressed: () {},
           )
         ],
       ),
