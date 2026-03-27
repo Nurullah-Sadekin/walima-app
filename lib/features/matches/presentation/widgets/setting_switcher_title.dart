@@ -83,6 +83,7 @@ class SettingsSwitchTile extends StatelessWidget { // Control switch size
         // Right side - Switch and optional trailing image
         Transform.scale(
           scale: switchScale,
+          alignment: Alignment.centerRight,
           child: Switch(
             value: value,
             onChanged: onChanged,
@@ -126,7 +127,7 @@ class SettingsSwitchTile extends StatelessWidget { // Control switch size
                 return AppColors.greyLight;
               },
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+            padding: EdgeInsets.zero,
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
         ),
