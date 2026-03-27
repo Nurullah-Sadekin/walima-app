@@ -20,6 +20,7 @@ class AcceptedCard extends StatelessWidget {
     this.onTapPhoneCall,
     this.onTapWhatsapp,
     this.isVerified = false,
+    this.isPremium = false,
   });
 
   final String imagePath;
@@ -34,6 +35,7 @@ class AcceptedCard extends StatelessWidget {
   final VoidCallback? onTapPhoneCall;
   final VoidCallback? onTapWhatsapp;
   final bool isVerified;
+  final bool isPremium;
 
   @override
   Widget build(BuildContext context) {
@@ -47,118 +49,143 @@ class AcceptedCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          SizedBox(
-            height: imageSize,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ShowImage(
-                  imagePath: imagePath,
-                  width: imageSize,
-                  height: imageSize,
-                  radius: BorderRadius.circular(8),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      name,
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                      style: TextStyle(
-                                        fontSize: TextSize.font16(context),
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.textPrimaryLight,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ShowImage(
+                imagePath: imagePath,
+                width: imageSize,
+                height: imageSize,
+                radius: BorderRadius.circular(8),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Flexible(
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        name,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                          fontSize: TextSize.font16(context),
+                                          fontWeight: FontWeight.w500,
+                                          color: AppColors.textPrimaryLight,
+                                        ),
                                       ),
-                                    ),
+                                      if (isVerified) ...[
+                                        const SizedBox(width: 4),
+                                        ShowImage(
+                                          imagePath: AppImages.verifiedBadgeSvgIcon,
+                                          width: TextSize.font14(context),
+                                          height: TextSize.font14(context),
+                                        )
+                                      ],
+                                      if (isPremium) ...[
+                                        const SizedBox(width: 4),
+                                        Container(
+                                          padding: const EdgeInsets.all(4.0),
+                                          decoration: const BoxDecoration(
+                                            color: AppColors.primary,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: ShowImage(
+                                            imagePath: AppImages.premiumSvgIcon,
+                                            width: TextSize.font12(context),
+                                            height: TextSize.font12(context),
+                                            color: AppColors.white,
+                                          ),
+                                        )
+                                      ],
+                                    ],
                                   ),
-                                  if (isVerified) ...[
-                                    const SizedBox(width: 4),
-                                    ShowImage(
-                                      imagePath: AppImages.verifiedBadgeSvgIcon,
-                                      width: TextSize.font14(context),
-                                      height: TextSize.font14(context),
-                                    )
-                                  ],
-                                  SizedBox(
-                                    height: TextSize.font12(context),
-                                    child: const Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 12.0),
-                                      child: VerticalDivider(
-                                        color: AppColors.hintTextColor,
-                                        thickness: 1,
-                                      ),
-                                    ),
-                                  ),
-                                  Text(
-                                    day??'',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontSize: TextSize.font10(context),
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColors.textSecondaryLight,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            InkWell(
-                              onTap: onMenuTap,
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 8.0),
-                                child: Icon(
-                                  Icons.more_vert,
-                                  color: AppColors.textSecondaryLight,
-                                  size: TextSize.font16(context),
                                 ),
+                                if (day != null) ...[
+                                 Row(
+                                   children: [
+                                     SizedBox(
+                                       height: TextSize.font12(context),
+                                       child: const Padding(
+                                         padding: EdgeInsets.symmetric(horizontal: 12.0),
+                                         child: VerticalDivider(
+                                           color: AppColors.hintTextColor,
+                                           thickness: 1,
+                                         ),
+                                       ),
+                                     ),
+                                     Text(
+                                       day??'',
+                                       maxLines: 1,
+                                       overflow: TextOverflow.ellipsis,
+                                       style: TextStyle(
+                                         fontSize: TextSize.font10(context),
+                                         fontWeight: FontWeight.w400,
+                                         color: AppColors.textSecondaryLight,
+                                       ),
+                                     ),
+                                   ],
+                                 )
+                                ],
+
+                              ],
+                            ),
+                          ),
+                          InkWell(
+                            onTap: onMenuTap,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 12.0),
+                              child: Icon(
+                                Icons.more_vert,
+                                color: AppColors.textSecondaryLight,
+                                size: TextSize.font16(context),
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '$age, $height',
-                          style: TextStyle(
-                            fontSize: TextSize.font12(context),
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.textSecondaryLight,
                           ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '$age, $height',
+                        style: TextStyle(
+                          fontSize: TextSize.font12(context),
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.textSecondaryLight,
                         ),
-                        Text(
-                          location,
-                          style: TextStyle(
-                            fontSize: TextSize.font12(context),
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.textSecondaryLight,
-                          ),
+                      ),
+                      Text(
+                        location,
+                        style: TextStyle(
+                          fontSize: TextSize.font12(context),
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.textSecondaryLight,
                         ),
-                        Text(
-                          profession ?? 'Undefined',
-                          style: TextStyle(
-                            fontSize: TextSize.font12(context),
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.textSecondaryLight,
-                          ),
+                      ),
+                      Text(
+                        profession ?? 'Undefined',
+                        style: TextStyle(
+                          fontSize: TextSize.font12(context),
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.textSecondaryLight,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 10.0),

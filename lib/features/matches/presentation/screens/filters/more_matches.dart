@@ -3,6 +3,7 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/accepted_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/contact_whatsapp_call_bottom_sheet.dart';
@@ -43,8 +44,7 @@ class MoreMatchesScreen extends StatelessWidget {
           SettingsSwitchTile(
             title: 'More Matches',
             value: true,
-            onChanged: (value) {
-            },
+            onChanged: (value) {},
           ),
           const SizedBox(height: 10),
           const InfoCardWidget(
@@ -57,8 +57,8 @@ class MoreMatchesScreen extends StatelessWidget {
       ),
     );
   }
-  
-  Widget dummyWidgetForTest(){
+
+  Widget dummyWidgetForTest() {
     return Expanded(
       child: SingleChildScrollView(
         child: Column(
@@ -67,7 +67,8 @@ class MoreMatchesScreen extends StatelessWidget {
               userName: 'Sadia Sultana',
               profileImagePath: AppImages.demoProfile,
               profileType: 'Profile Created by Self',
-              description: 'She shares her phone number only with connected members.',
+              description:
+                  'She shares her phone number only with connected members.',
               isDescriptionVisible: false,
               onWalimaChatPressed: () {},
               onWhatsappPressed: () {},
@@ -75,7 +76,6 @@ class MoreMatchesScreen extends StatelessWidget {
               onConnectionSentPressed: () {},
               onWalimaChatButtonPressed: () {},
             ),
-        
             ContactWhatsappCallBottomSheet(
               userName: 'Sadia Sultana',
               profileImagePath: AppImages.demoProfile,
@@ -83,7 +83,15 @@ class MoreMatchesScreen extends StatelessWidget {
               onPressedPrimary: () {},
               onMessagePressed: () {},
               isWhatsappContact: true,
-            )
+            ),
+            AcceptedCard(
+                imagePath: AppImages.demoProfile,
+                name: 'name',
+                isPremium: true,
+                age: 'age',
+                height: 'height',
+                day: 'day',
+                location: 'location')
           ],
         ),
       ),
