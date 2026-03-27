@@ -82,6 +82,22 @@ class AppImages {
   static const String lockPasswordSvgIcon = 'assets/svgIcons/lock_password.svg';
   static const String groupsIcon = 'assets/svgIcons/user_group.svg';
 
+  // Additional svgIcons added recently
+  static const String walletSvgIcon = 'assets/svgIcons/wallet.svg';
+  static const String albumSvgIcon = 'assets/svgIcons/album.svg';
+  static const String educationSvgIcon = 'assets/svgIcons/education.svg';
+  static const String habitSvgIcon = 'assets/svgIcons/habit.svg';
+  static const String languageSvgIcon = 'assets/svgIcons/language.svg';
+  static const String weddingSvgIcon = 'assets/svgIcons/wedding.svg';
+  static const String userAiSvgIcon = 'assets/svgIcons/user_ai.svg';
+  static const String workSvgIcon = 'assets/svgIcons/work.svg';
+  static const String mapsSvgIcon = 'assets/svgIcons/maps.svg';
+  static const String userLocationSvgIcon = 'assets/svgIcons/location_user.svg';
+  static const String officeSvgIcon = 'assets/svgIcons/office.svg';
+  static const String propertySvgIcon = 'assets/svgIcons/property.svg';
+  static const String quranSvgIcon = 'assets/svgIcons/quran.svg';
+  static const String radioactiveSvgIcon = 'assets/svgIcons/radioactive.svg';
+  static const String schoolSvgIcon = 'assets/svgIcons/school.svg';
 
 
 
@@ -117,6 +133,10 @@ class AppImages {
 
   static const String viewOnAccept = 'assets/svgs/view_on_accept.svg';
 
+  // Additional svgs
+  static const String photoGuidelinesSvg = 'assets/svgs/photo_guidelines.svg';
+  static const String loginBgSvg = 'assets/svgs/login_bg.svg';
+  static const String walimaSvg = 'assets/svgs/walima.svg';
 
   // Navigation icons
   static const String home = 'assets/nav_icons/home.svg';
