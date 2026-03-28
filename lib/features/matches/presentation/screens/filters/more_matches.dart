@@ -87,6 +87,7 @@ class MoreMatchesScreen extends StatelessWidget {
             const InboxCard(
                 imagePath: AppImages.demoProfile,
                 name: 'name',
+                subtitle: 'Profile Created by Self',
                 isPremium: true,
                 age: 'age',
                 height: 'height',
