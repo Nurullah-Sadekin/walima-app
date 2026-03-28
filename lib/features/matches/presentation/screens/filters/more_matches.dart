@@ -84,14 +84,16 @@ class MoreMatchesScreen extends StatelessWidget {
               onMessagePressed: () {},
               isWhatsappContact: true,
             ),
-            AcceptedCard(
+            const AcceptedCard(
                 imagePath: AppImages.demoProfile,
                 name: 'name',
                 isPremium: true,
                 age: 'age',
                 height: 'height',
                 day: 'day',
-                location: 'location')
+                location: 'location',
+               isBottomSection: false,
+            )
           ],
         ),
       ),

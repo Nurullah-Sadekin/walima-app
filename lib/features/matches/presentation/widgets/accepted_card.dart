@@ -21,6 +21,7 @@ class AcceptedCard extends StatelessWidget {
     this.onTapWhatsapp,
     this.isVerified = false,
     this.isPremium = false,
+    this.isBottomSection = true,
   });
 
   final String imagePath;
@@ -36,6 +37,7 @@ class AcceptedCard extends StatelessWidget {
   final VoidCallback? onTapWhatsapp;
   final bool isVerified;
   final bool isPremium;
+  final bool isBottomSection;
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +66,7 @@ class AcceptedCard extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 4.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Row(
@@ -173,6 +176,7 @@ class AcceptedCard extends StatelessWidget {
                           color: AppColors.textSecondaryLight,
                         ),
                       ),
+                      if (profession != null)
                       Text(
                         profession ?? 'Undefined',
                         style: TextStyle(
@@ -187,6 +191,7 @@ class AcceptedCard extends StatelessWidget {
               ),
             ],
           ),
+          if (isBottomSection) ...[
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 10.0),
             child: Divider(
@@ -305,6 +310,7 @@ class AcceptedCard extends StatelessWidget {
               ),
             ],
           ),
+          ],
         ],
       ),
     );
