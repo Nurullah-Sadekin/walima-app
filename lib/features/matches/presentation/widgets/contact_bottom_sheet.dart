@@ -48,9 +48,11 @@ class ContactBottomSheet extends StatelessWidget {
         _buildUserName(context),
         const SizedBox(height: 5),
         _buildProfileTypeBadge(context),
-        const SizedBox(height: 16),
-        _buildDescription(context),
         if (isDescriptionVisible)...[
+          const SizedBox(height: 16),
+          _buildDescription(context),
+        ],
+        if (!isDescriptionVisible)...[
           const SizedBox(height: 16),
           _buildActionButtons(context),
         ],

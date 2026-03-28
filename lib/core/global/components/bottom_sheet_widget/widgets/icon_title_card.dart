@@ -4,6 +4,23 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 
 class IconTitleCard extends StatelessWidget {
+
+  const IconTitleCard({
+    super.key,
+    required this.imagePath,
+    required this.title,
+    this.backgroundColor,
+    this.iconColor,
+    this.textColor,
+    this.iconSize = 16,
+    this.iconWidth,
+    this.iconHeight,
+    this.spacing = 6,
+    this.borderRadius = 4,
+    this.padding,
+    this.mood = IconTitleCardMood.vertical,
+    this.onTap,
+  });
   final String imagePath;
   final String title;
   final Color? backgroundColor;
@@ -17,23 +34,6 @@ class IconTitleCard extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final IconTitleCardMood mood;
   final VoidCallback? onTap;
-
-  const IconTitleCard({
-    Key? key,
-    required this.imagePath,
-    required this.title,
-    this.backgroundColor,
-    this.iconColor,
-    this.textColor,
-    this.iconSize = 16,
-    this.iconWidth,
-    this.iconHeight,
-    this.spacing = 4,
-    this.borderRadius = 4,
-    this.padding,
-    this.mood = IconTitleCardMood.vertical,
-    this.onTap,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -55,9 +55,10 @@ class IconTitleCard extends StatelessWidget {
   Widget _buildVertical(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
+      spacing: spacing,
       children: [
         _buildIconContainer(context),
-        const SizedBox(height: 4),
+
         _buildTitle(context),
       ],
     );
@@ -66,9 +67,9 @@ class IconTitleCard extends StatelessWidget {
   Widget _buildHorizontal(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
+      spacing: spacing,
       children: [
         _buildIconContainer(context),
-        const SizedBox(width: 4),
         _buildTitle(context),
       ],
     );

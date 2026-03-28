@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/global/components/bottom_sheet_widget/widgets/icon_title_card.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 
 class InboxCard extends StatelessWidget {
@@ -428,107 +429,32 @@ class InboxCard extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        InkWell(
+        IconTitleCard(
+          title: 'Walima Chat',
+          imagePath: AppImages.chatIcon,
+          backgroundColor: AppColors.primary,
+          textColor: AppColors.textSecondaryLight,
+          iconColor: AppColors.white,
           onTap: onTapWalimaChat,
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ShowImage(
-                      imagePath: AppImages.chatIcon,
-                      width: TextSize.font16(context),
-                      height: TextSize.font16(context),
-                      radius: BorderRadius.circular(8),
-                      fit: BoxFit.fitWidth,
-                      color: AppColors.white,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text('Walima Chat',
-                  style: TextStyle(
-                    fontSize: TextSize.font12(context),
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.textSecondaryLight,
-                  ))
-            ],
-          ),
+          mood: IconTitleCardMood.horizontal,
         ),
-        InkWell(
+        IconTitleCard(
+          title: middleBottomItemText ?? 'Phone Call',
+          imagePath: middleBottomItemIcon ?? AppImages.callSvgIcon,
+          backgroundColor: middleBottomItemIBgColor ?? AppColors.blue,
+          textColor: AppColors.textSecondaryLight,
+          iconColor: AppColors.white,
           onTap: onTapMiddleBottomItem,
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                decoration: BoxDecoration(
-                  color: middleBottomItemIBgColor ?? AppColors.blue,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ShowImage(
-                      imagePath: middleBottomItemIcon ?? AppImages.callSvgIcon,
-                      width: TextSize.font16(context),
-                      height: TextSize.font16(context),
-                      radius: BorderRadius.circular(8),
-                      fit: BoxFit.fitWidth,
-                      color: AppColors.white,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(middleBottomItemText ?? 'Phone Call',
-                  style: TextStyle(
-                    fontSize: TextSize.font12(context),
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.textSecondaryLight,
-                  ))
-            ],
-          ),
+          mood: IconTitleCardMood.horizontal,
         ),
-        InkWell(
+        IconTitleCard(
+          title: rightBottomItemText ?? 'Whatsapp',
+          imagePath: rightBottomItemIcon ?? AppImages.whatsappSvgIcon,
+          backgroundColor: rightBottomItemBgColor ?? AppColors.greenButtonColor,
+          textColor: AppColors.textSecondaryLight,
+          iconColor: AppColors.white,
           onTap: onTapRightBottomItem,
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                decoration: BoxDecoration(
-                  color: rightBottomItemBgColor ?? AppColors.greenButtonColor,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ShowImage(
-                      imagePath: rightBottomItemIcon ?? AppImages.whatsappSvgIcon,
-                      width: TextSize.font16(context),
-                      height: TextSize.font16(context),
-                      radius: BorderRadius.circular(8),
-                      fit: BoxFit.fitWidth,
-                      color: AppColors.white,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(rightBottomItemText ?? 'Whatsapp',
-                  style: TextStyle(
-                    fontSize: TextSize.font12(context),
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.textSecondaryLight,
-                  ))
-            ],
-          ),
+          mood: IconTitleCardMood.horizontal,
         ),
       ],
     );
