@@ -92,7 +92,7 @@ class MoreMatchesScreen extends StatelessWidget {
                 height: 'height',
                 day: 'day',
                 location: 'location',
-               isBottomSection: false,
+               isBottomSection: true,
             )
           ],
         ),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 
 class AcceptedCard extends StatelessWidget {
@@ -10,9 +9,9 @@ class AcceptedCard extends StatelessWidget {
     super.key,
     required this.imagePath,
     required this.name,
-    required this.age,
-    required this.height,
-    required this.location,
+     this.age,
+     this.height,
+     this.location,
     this.profession,
     this.day,
     this.onMenuTap,
@@ -22,13 +21,22 @@ class AcceptedCard extends StatelessWidget {
     this.isVerified = false,
     this.isPremium = false,
     this.isBottomSection = true,
+    this.scale = AcceptedCardImageScale.medium,
+
+    // for large
+    this.contact,
+    this.email,
+    this.sendSMS,
+    this.viewSMS,
+    this.onTapSendSMS,
+    this.onTapViewSMS,
   });
 
   final String imagePath;
   final String name;
-  final String age;
-  final String height;
-  final String location;
+  final String? age;
+  final String? height;
+  final String? location;
   final String? profession;
   final String? day;
   final VoidCallback? onMenuTap;
@@ -38,10 +46,24 @@ class AcceptedCard extends StatelessWidget {
   final bool isVerified;
   final bool isPremium;
   final bool isBottomSection;
+  final AcceptedCardImageScale scale;
+
+  // for large card
+  final String? contact;
+  final String? email;
+  final String? sendSMS;
+  final String? viewSMS;
+  final VoidCallback? onTapSendSMS;
+  final VoidCallback? onTapViewSMS;
 
   @override
   Widget build(BuildContext context) {
-    final double imageSize = MediaQuery.of(context).size.width * 0.2;
+
+    final double imageSize = switch (scale) {
+      AcceptedCardImageScale.small => MediaQuery.of(context).size.width * 0.15,
+      AcceptedCardImageScale.medium => MediaQuery.of(context).size.width * 0.2,
+      AcceptedCardImageScale.large => MediaQuery.of(context).size.width * 0.25,
+    };
 
     return Container(
       padding: const EdgeInsets.all(10),
@@ -160,6 +182,7 @@ class AcceptedCard extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 4),
+                      if (age != null && height != null)
                       Text(
                         '$age, $height',
                         style: TextStyle(
@@ -168,8 +191,9 @@ class AcceptedCard extends StatelessWidget {
                           color: AppColors.textSecondaryLight,
                         ),
                       ),
+                      if (location != null)
                       Text(
-                        location,
+                        location ?? 'Undefined',
                         style: TextStyle(
                           fontSize: TextSize.font12(context),
                           fontWeight: FontWeight.w400,
@@ -315,4 +339,12 @@ class AcceptedCard extends StatelessWidget {
       ),
     );
   }
+
+
+}
+
+enum AcceptedCardImageScale {
+  small,
+  medium,
+  large,
 }
