@@ -4,8 +4,8 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 
-class AcceptedCard extends StatelessWidget {
-  const AcceptedCard({
+class InboxCard extends StatelessWidget {
+  const InboxCard({
     super.key,
     required this.imagePath,
     required this.name,
@@ -21,7 +21,7 @@ class AcceptedCard extends StatelessWidget {
     this.isVerified = false,
     this.isPremium = false,
     this.isBottomSection = true,
-    this.scale = AcceptedCardImageScale.medium,
+    this.scale = InboxCardImageScale.medium,
 
     // for large
     this.contact,
@@ -46,7 +46,7 @@ class AcceptedCard extends StatelessWidget {
   final bool isVerified;
   final bool isPremium;
   final bool isBottomSection;
-  final AcceptedCardImageScale scale;
+  final InboxCardImageScale scale;
 
   // for large card
   final String? contact;
@@ -60,9 +60,9 @@ class AcceptedCard extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final double imageSize = switch (scale) {
-      AcceptedCardImageScale.small => MediaQuery.of(context).size.width * 0.15,
-      AcceptedCardImageScale.medium => MediaQuery.of(context).size.width * 0.2,
-      AcceptedCardImageScale.large => MediaQuery.of(context).size.width * 0.25,
+      InboxCardImageScale.small => MediaQuery.of(context).size.width * 0.15,
+      InboxCardImageScale.medium => MediaQuery.of(context).size.width * 0.2,
+      InboxCardImageScale.large => MediaQuery.of(context).size.width * 0.25,
     };
 
     return Container(
@@ -343,7 +343,7 @@ class AcceptedCard extends StatelessWidget {
 
 }
 
-enum AcceptedCardImageScale {
+enum InboxCardImageScale {
   small,
   medium,
   large,

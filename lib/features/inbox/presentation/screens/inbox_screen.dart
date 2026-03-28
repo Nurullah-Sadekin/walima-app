@@ -6,7 +6,7 @@ import 'package:flutter_boilerplate/core/global/components/gradient_background.d
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/provider/matcher_provider.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/accepted_card.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/inbox_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/text_tab_bar.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -114,7 +114,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProv
           const ContactsViewed(
             profileImage: AppImages.demoProfile,
           ),
-          AcceptedCard(
+          InboxCard(
             onMenuTap: () {
                _showAcceptedMenu(context,
                    imagePath: AppImages.demoProfile2,
