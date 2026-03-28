@@ -15,16 +15,25 @@ class InboxCard extends StatelessWidget {
     this.isPremium = false,
     this.day,
     this.onMenuTap,
+    this.showMenu = true,
 
     this.subtitle,
     this.subtitleColor,
 
     this.isBottomSection = true,
     this.onTapWalimaChat,
-    this.onTapPhoneCall,
-    this.onTapWhatsapp,
+    this.onTapMiddleBottomItem,
+    this.onTapRightBottomItem,
+    this.middleBottomItemText,
+    this.rightBottomItemText,
+    this.middleBottomItemIcon,
+    this.rightBottomItemIcon,
+    this.middleBottomItemIBgColor,
+    this.rightBottomItemBgColor,
 
-    this.scale = InboxCardImageScale.medium,
+    this.infoBottomMessage,
+
+    this.mood = InboxCardMood.medium,
 
     // for medium & small
     this.age,
@@ -39,6 +48,7 @@ class InboxCard extends StatelessWidget {
     this.viewSMS,
     this.onTapSendSMS,
     this.onTapViewSMS,
+    this.contactUnavailable = false,
   });
 
   // Primary
@@ -48,17 +58,25 @@ class InboxCard extends StatelessWidget {
   final bool isPremium;
   final String? day;
   final VoidCallback? onMenuTap;
+  final bool showMenu;
 
   final String? subtitle;
-  final String? subtitleColor;
+  final Color? subtitleColor;
 
   final bool isBottomSection;
   final VoidCallback? onTapWalimaChat;
-  final VoidCallback? onTapPhoneCall;
-  final VoidCallback? onTapWhatsapp;
+  final VoidCallback? onTapMiddleBottomItem;
+  final VoidCallback? onTapRightBottomItem;
+  final String? middleBottomItemText;
+  final String? rightBottomItemText;
+  final String? middleBottomItemIcon;
+  final String? rightBottomItemIcon;
+  final Color? middleBottomItemIBgColor;
+  final Color? rightBottomItemBgColor;
 
+  final String? infoBottomMessage;
 
-  final InboxCardImageScale scale;
+  final InboxCardMood mood;
 
   // for medium & small
   final String? age;
@@ -73,14 +91,14 @@ class InboxCard extends StatelessWidget {
   final String? viewSMS;
   final VoidCallback? onTapSendSMS;
   final VoidCallback? onTapViewSMS;
+  final bool contactUnavailable;
 
   @override
   Widget build(BuildContext context) {
-
-    final double imageSize = switch (scale) {
-      InboxCardImageScale.small => MediaQuery.of(context).size.width * 0.15,
-      InboxCardImageScale.medium => MediaQuery.of(context).size.width * 0.2,
-      InboxCardImageScale.large => MediaQuery.of(context).size.width * 0.25,
+    final double imageSize = switch (mood) {
+      InboxCardMood.small => MediaQuery.of(context).size.width * 0.15,
+      InboxCardMood.medium => MediaQuery.of(context).size.width * 0.2,
+      InboxCardMood.large => MediaQuery.of(context).size.width * 0.25,
     };
 
     return Container(
@@ -94,8 +112,9 @@ class InboxCard extends StatelessWidget {
           // Row -> Image + Details
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              _inboxImage(imageSize),
+              _cardImage(imageSize),
               const SizedBox(width: 12),
               // Expanded details column
               Expanded(
@@ -103,11 +122,18 @@ class InboxCard extends StatelessWidget {
                   height: imageSize,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     mainAxisSize: MainAxisSize.max,
                     children: [
-                      _inboxHeader(context),
-                      _inboxDetails(context,),
+                      _cardHeader(context),
+                      const SizedBox(height: 4),
+                      if (mood != InboxCardMood.large)
+                        Expanded(
+                            child: _cardDetails(
+                          context,
+                        )),
+                      if (mood == InboxCardMood.large)
+                        _cardDetailsForLarge(context,),
                     ],
                   ),
                 ),
@@ -125,23 +151,51 @@ class InboxCard extends StatelessWidget {
                 height: 0,
               ),
             ),
-            _inboxActions(context),
+            if (infoBottomMessage != null)
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 6.0,horizontal: 8.0),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryVariant,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Row(
+                  spacing: 6,
+                  children: [
+                    ShowImage(
+                      imagePath: AppImages.alertSvgIcon,
+                      width: TextSize.font14(context),
+                      height: TextSize.font14(context),
+                      color: AppColors.primary,
+                    ),
+                    Text(
+                      infoBottomMessage!,
+                      style: TextStyle(
+                        fontSize: TextSize.font12(context),
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            if (infoBottomMessage == null)
+            _cardActions(context),
           ],
         ],
       ),
     );
   }
 
-  Widget _inboxImage(double imageSize) {
+  Widget _cardImage(double imageSize) {
     return ShowImage(
       imagePath: imagePath,
       width: imageSize,
       height: imageSize,
-      radius:BorderRadius.circular(8),
+      radius: BorderRadius.circular(8),
     );
   }
 
-  Widget _inboxHeader(BuildContext context) {
+  Widget _cardHeader(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -178,15 +232,15 @@ class InboxCard extends StatelessWidget {
                         if (isPremium) ...[
                           const SizedBox(width: 4),
                           Container(
-                            padding: const EdgeInsets.all(4.0),
+                            padding: const EdgeInsets.all(2.0),
                             decoration: const BoxDecoration(
                               color: AppColors.primary,
                               shape: BoxShape.circle,
                             ),
                             child: ShowImage(
                               imagePath: AppImages.premiumSvgIcon,
-                              width: TextSize.font12(context),
-                              height: TextSize.font12(context),
+                              width: TextSize.font10(context),
+                              height: TextSize.font10(context),
                               color: AppColors.white,
                             ),
                           )
@@ -223,6 +277,7 @@ class InboxCard extends StatelessWidget {
                 ],
               ),
             ),
+            if (showMenu)
             InkWell(
               onTap: onMenuTap,
               child: Padding(
@@ -236,22 +291,24 @@ class InboxCard extends StatelessWidget {
             ),
           ],
         ),
-        if(subtitle != null)
+        if (subtitle != null)
           Text(
             subtitle!,
             style: TextStyle(
               fontSize: TextSize.font10(context),
               fontWeight: FontWeight.w400,
-              color: subtitleColor != null ? Color(int.parse(subtitleColor!)) : AppColors .textSecondaryLight,
+              color: subtitleColor ?? AppColors.textSecondaryLight,
             ),
           ),
       ],
     );
   }
 
-  Widget _inboxDetails(BuildContext context) {
+  Widget _cardDetails(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisSize: MainAxisSize.max,
       children: [
         if (age != null && height != null)
           Text(
@@ -271,7 +328,7 @@ class InboxCard extends StatelessWidget {
               color: AppColors.textSecondaryLight,
             ),
           ),
-        if (profession != null)
+        if (profession != null && mood == InboxCardMood.medium)
           Text(
             profession!,
             style: TextStyle(
@@ -284,7 +341,90 @@ class InboxCard extends StatelessWidget {
     );
   }
 
-  Widget _inboxActions(BuildContext context) {
+  Widget _cardDetailsForLarge(BuildContext context) {
+    return contactUnavailable
+        ? Container(
+            padding: const EdgeInsets.all(8.0),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: AppColors.disableBackground,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Contact not available',
+                  style: TextStyle(
+                    fontSize: TextSize.font12(context),
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.textPrimaryLight,
+                  ),
+                ),
+                Text(
+                  'Profile has been deactivated',
+                  style: TextStyle(
+                    fontSize: TextSize.font12(context),
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+              ],
+            ),
+          )
+        : Expanded(
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                if (contact != null)
+                  detailsRow(context, contact!, AppImages.callSvgIcon),
+                if (email != null)
+                  detailsRow(context, email!, AppImages.emailSvgIcon),
+                if (sendSMS != null && viewSMS == null)
+                  detailsRow(context, sendSMS!, AppImages.chatSvgIcon),
+                if (viewSMS != null && sendSMS == null)
+                  InkWell(
+                    onTap: onTapViewSMS,
+                    child: Text(
+                      viewSMS!,
+                      style: TextStyle(
+                        fontSize: TextSize.font12(context),
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+        );
+  }
+
+  Widget detailsRow(BuildContext context, String label, String imagePath) {
+    return Row(
+      spacing: 8,
+      children: [
+        ShowImage(
+          imagePath: imagePath,
+          width: TextSize.font14(context),
+          height: TextSize.font14(context),
+          color: AppColors.textSecondaryLight,
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: TextSize.font12(context),
+            fontWeight: FontWeight.w400,
+            color: AppColors.textPrimaryLight,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _cardActions(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
@@ -323,20 +463,20 @@ class InboxCard extends StatelessWidget {
           ),
         ),
         InkWell(
-          onTap: onTapPhoneCall,
+          onTap: onTapMiddleBottomItem,
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF335CFF),
+                  color: middleBottomItemIBgColor ?? AppColors.blue,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     ShowImage(
-                      imagePath: AppImages.callSvgIcon,
+                      imagePath: middleBottomItemIcon ?? AppImages.callSvgIcon,
                       width: TextSize.font16(context),
                       height: TextSize.font16(context),
                       radius: BorderRadius.circular(8),
@@ -347,7 +487,7 @@ class InboxCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Text('Phone Call',
+              Text(middleBottomItemText ?? 'Phone Call',
                   style: TextStyle(
                     fontSize: TextSize.font12(context),
                     fontWeight: FontWeight.w400,
@@ -357,20 +497,20 @@ class InboxCard extends StatelessWidget {
           ),
         ),
         InkWell(
-          onTap: onTapWhatsapp,
+          onTap: onTapRightBottomItem,
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                 decoration: BoxDecoration(
-                  color: AppColors.greenButtonColor,
+                  color: rightBottomItemBgColor ?? AppColors.greenButtonColor,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     ShowImage(
-                      imagePath: AppImages.whatsappSvgIcon,
+                      imagePath: rightBottomItemIcon ?? AppImages.whatsappSvgIcon,
                       width: TextSize.font16(context),
                       height: TextSize.font16(context),
                       radius: BorderRadius.circular(8),
@@ -381,7 +521,7 @@ class InboxCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Text('Whatsapp',
+              Text(rightBottomItemText ?? 'Whatsapp',
                   style: TextStyle(
                     fontSize: TextSize.font12(context),
                     fontWeight: FontWeight.w400,
@@ -393,10 +533,9 @@ class InboxCard extends StatelessWidget {
       ],
     );
   }
-
 }
 
-enum InboxCardImageScale {
+enum InboxCardMood {
   small,
   medium,
   large,

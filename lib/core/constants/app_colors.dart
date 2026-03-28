@@ -64,7 +64,8 @@ class AppColors {
   static const Color textSub600 = Color(0xFF5C5C5C);
 
 
-  static const Color greenButtonColor = Color(0XFF1FC16B);
+  static const Color greenButtonColor = Color(0xFF1FC16B);
+  static const Color blue = Color(0xFF335CFF);
 
   static LinearGradient get customBackgroundGradient => const LinearGradient(
     begin: Alignment.topLeft,

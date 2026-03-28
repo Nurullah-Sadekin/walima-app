@@ -62,6 +62,7 @@ class MoreMatchesScreen extends StatelessWidget {
     return Expanded(
       child: SingleChildScrollView(
         child: Column(
+          spacing: 20,
           children: [
             ContactBottomSheet(
               userName: 'Sadia Sultana',
@@ -87,14 +88,52 @@ class MoreMatchesScreen extends StatelessWidget {
             const InboxCard(
                 imagePath: AppImages.demoProfile,
                 name: 'name',
-                subtitle: 'Profile Created by Self',
+              subtitle: 'Profile Created by Self',
+                subtitleColor: AppColors.primary,
                 isPremium: true,
                 age: 'age',
                 height: 'height',
                 day: 'day',
                 location: 'location',
-               isBottomSection: true,
-            )
+                isBottomSection: true,
+               mood: InboxCardMood.medium,
+            ),
+            const InboxCard(
+              imagePath: AppImages.demoProfile,
+              name: 'Tanjid Amran',
+              subtitle: 'Profile Created by Self',
+              isPremium: true,
+              age: 'age',
+              height: 'height',
+              day: 'day',
+              location: 'location',
+              profession: 'profession',
+              contact: '+8801568975645',
+              email: 'tanjid470@gmail.com',
+              isBottomSection: true,
+              viewSMS: 'View SMS',
+              mood: InboxCardMood.large,
+              middleBottomItemIBgColor: AppColors.warning,
+              middleBottomItemIcon: AppImages.notificationSvgIcon,
+              middleBottomItemText: 'Remind',
+              rightBottomItemBgColor:  AppColors.blue,
+              rightBottomItemIcon: AppImages.callSvgIcon,
+              rightBottomItemText: 'Contact',
+            ),
+
+
+            const InboxCard(
+              imagePath: AppImages.demoProfile,
+              name: 'Tanjid Amran',
+              day: 'day',
+              isVerified: true,
+              isBottomSection: true,
+              viewSMS: 'View SMS',
+              mood: InboxCardMood.large,
+              contactUnavailable: true,
+              infoBottomMessage: 'She declined your request',
+              showMenu: false,
+            ),
           ],
         ),
       ),
