@@ -62,11 +62,11 @@ class AcceptedCard extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: SizedBox(
+                  height: imageSize,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Row(
