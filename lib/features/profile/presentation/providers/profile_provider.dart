@@ -1,4 +1,5 @@
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
+import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/features/profile/data/model/response/dashboard_response.dart';
 import 'package:flutter_boilerplate/features/profile/data/model/response/get_complete_profile_response.dart';
 import 'package:flutter_boilerplate/features/profile/data/repository/profile_repository.dart';
@@ -15,6 +16,7 @@ class ProfileProvider extends BaseChangeNotifier {
       profile = data.response;
       updateViewState();
     } else {
+      // await DialogUtils.showErrorDialog(context: Routes., message: data.message ?? 'Failed to load profile');
       profile = null;
     }
   }

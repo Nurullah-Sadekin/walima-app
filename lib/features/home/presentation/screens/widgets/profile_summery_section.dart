@@ -47,11 +47,11 @@ class ProfileSummerySection extends ConsumerWidget {
                 topPositionImagePath: AppImages.verifiedBadgeSvgIcon,
                 bottomPositionImagePath: AppImages.cameraSvgIcon,
                 onEdit: () async {
-                  await BottomSheetUtils.open(
-                    context: context,
-                    fullHeight: true,
-                    child: const EditProfileScreen(),
-                  );
+                  // await BottomSheetUtils.open(
+                  //   context: context,
+                  //   fullHeight: true,
+                  //   child: const EditProfileScreen(),
+                  // );
                 },
               ),
               const SizedBox(width: 12),

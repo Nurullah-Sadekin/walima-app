@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
@@ -351,33 +349,4 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
       ),
     );
   }
-}
-
-class _WaveformPainter extends CustomPainter {
-  const _WaveformPainter({required this.color});
-
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 3
-      ..strokeCap = StrokeCap.round;
-    const spacing = 8.0;
-    final centerY = size.height / 2;
-    var x = 0.0;
-    var index = 0;
-    while (x <= size.width) {
-      final amplitude = (math.sin(index * 0.65) + 1) / 2;
-      final barHeight = 9 + (amplitude * (size.height - 8));
-      canvas.drawLine(Offset(x, centerY - barHeight / 2),
-          Offset(x, centerY + barHeight / 2), paint);
-      x += spacing;
-      index++;
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
