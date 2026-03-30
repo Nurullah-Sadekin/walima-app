@@ -5,6 +5,7 @@ import 'package:flutter_boilerplate/core/global/components/gradient_background.d
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_list.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/provider/chat_provider.dart';
@@ -30,7 +31,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(chatProvider).getInitialData();
+      _initRealtime();
     });
+  }
+
+  Future<void> _initRealtime() async {
+    final token = await PrefsHelper.getAccessToken();
+    if (token.isEmpty) return;
+    await ref.read(chatProvider).initializeRealtime(token: token);
   }
 
   Future<void> _onRefresh() async {

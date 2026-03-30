@@ -6,10 +6,8 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/provider/chat_provider.dart';
-import 'package:flutter_boilerplate/features/chat/data/socket/socket_service.dart';
-import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_messages_response.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic>? extra;
@@ -19,21 +17,27 @@ class ChatScreen extends ConsumerStatefulWidget {
   ConsumerState<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObserver {
+class _ChatScreenState extends ConsumerState<ChatScreen>
+    with WidgetsBindingObserver {
   final TextEditingController _messageController = TextEditingController();
   Map<String, dynamic>? _participant;
-  StreamSubscription<Message>? _socketSub;
+  Timer? _typingStopDebounce;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     final extra = widget.extra;
-    _participant = extra != null && extra['participant'] is Map ? extra['participant'] as Map<String, dynamic> : null;
-    final conversationId = extra != null ? extra['conversationId'] as String? : null;
+    _participant = extra != null && extra['participant'] is Map
+        ? extra['participant'] as Map<String, dynamic>
+        : null;
+    final conversationId =
+        extra != null ? extra['conversationId'] as String? : null;
     if (conversationId != null && conversationId.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(chatProvider).openConversation(conversationId);
+        final provider = ref.read(chatProvider);
+        provider.setActiveReceiver(_participant?['userId'] as String?);
+        provider.openConversation(conversationId);
         _connectSocket();
       });
     }
@@ -42,17 +46,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
   Future<void> _connectSocket() async {
     final token = await PrefsHelper.getAccessToken();
     if (token.isEmpty) return;
-    await SocketService.instance.connect(token: token);
-    _socketSub = SocketService.instance.messages.listen((msg) {
-      ref.read(chatProvider).addIncomingMessage(msg);
-    });
+    await ref.read(chatProvider).initializeRealtime(token: token);
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _socketSub?.cancel();
-    SocketService.instance.disconnect();
+    _typingStopDebounce?.cancel();
     _messageController.dispose();
     super.dispose();
   }
@@ -60,9 +60,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
-      SocketService.instance.disconnect();
+      ref.read(chatProvider).onComposerChanged('');
     } else if (state == AppLifecycleState.resumed) {
       _connectSocket();
+      ref.read(chatProvider).markCurrentConversationRead();
     }
     super.didChangeAppLifecycleState(state);
   }
@@ -70,9 +71,23 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
   @override
   Widget build(BuildContext context) {
     final provider = ref.watch(chatProvider);
-    final name = _participant != null ? (_participant!['displayName'] as String?) : null;
-    final imagePath = _participant != null ? (_participant!['profilePictureUrl'] as String?) : null;
-    final isOnline = _participant != null ? (_participant!['isOnline'] as bool?) : null;
+    dynamic liveParticipant;
+    for (final conversation in provider.allConversations) {
+      if (conversation.id == provider.currentConversationId) {
+        liveParticipant = provider.getConversationCounterpart(conversation);
+        break;
+      }
+    }
+    final name = liveParticipant?.displayName as String? ??
+        (_participant != null
+            ? (_participant!['displayName'] as String?)
+            : null);
+    final imagePath = liveParticipant?.profilePictureUrl as String? ??
+        (_participant != null
+            ? (_participant!['profilePictureUrl'] as String?)
+            : null);
+    final isOnline = liveParticipant?.isOnline as bool? ??
+        (_participant != null ? (_participant!['isOnline'] as bool?) : null);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
@@ -105,11 +120,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
           Expanded(
             child: Row(
               children: [
-                _profileAvatar(
-                  imagePath: imagePath ?? AppImages.demoProfile,
-                  size: 60,
-                  showOnlineIndicator: isOnline,
-                ),
+                // _profileAvatar(
+                //   imagePath: imagePath ?? AppImages.demoProfile,
+                //   size: 60,
+                //   showOnlineIndicator: isOnline,
+                // ),
                 const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,7 +139,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      isOnline ? 'Active Now' : 'Offline',
+                      providerStatusText(ref.read(chatProvider), isOnline),
                       style: const TextStyle(
                         fontSize: 14,
                         color: Color(0xFF787878),
@@ -173,7 +188,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
   }
 
   Widget _textMessageRow({required bool isMe, required String message}) {
-    final bubbleColor = isMe ? const Color(0xFFF4E8EE) : const Color(0xFFEFEFEF);
+    final bubbleColor =
+        isMe ? const Color(0xFFF4E8EE) : const Color(0xFFEFEFEF);
     final bubbleRadius = BorderRadius.only(
       topLeft: const Radius.circular(20),
       topRight: const Radius.circular(20),
@@ -185,18 +201,25 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
       padding: const EdgeInsets.only(bottom: 14),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
           if (!isMe) _profileAvatar(imagePath: AppImages.demoProfile, size: 42),
           if (!isMe) const SizedBox(width: 10),
           ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.72),
+            constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.72),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
-              decoration: BoxDecoration(color: bubbleColor, borderRadius: bubbleRadius),
+              decoration:
+                  BoxDecoration(color: bubbleColor, borderRadius: bubbleRadius),
               child: Text(
                 message,
-                style: const TextStyle(color: Color(0xFF2C2C2C), fontSize: 16, height: 1.35, fontWeight: FontWeight.w400),
+                style: const TextStyle(
+                    color: Color(0xFF2C2C2C),
+                    fontSize: 16,
+                    height: 1.35,
+                    fontWeight: FontWeight.w400),
               ),
             ),
           ),
@@ -209,7 +232,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
 
   Widget _composerSection(ChatProvider provider) {
     return Container(
-      decoration: const BoxDecoration(border: Border(top: BorderSide(color: Color(0xFFE3E3E3), width: 1))),
+      decoration: const BoxDecoration(
+          border: Border(top: BorderSide(color: Color(0xFFE3E3E3), width: 1))),
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
       child: SafeArea(
         top: false,
@@ -226,21 +250,44 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
               Expanded(
                 child: TextField(
                   controller: _messageController,
-                  decoration: const InputDecoration(border: InputBorder.none, hintText: 'Type a message', hintStyle: TextStyle(color: Color(0xFF8F8F8F), fontSize: 16, fontWeight: FontWeight.w400)),
+                  onChanged: (value) {
+                    provider.onComposerChanged(value);
+                    _typingStopDebounce?.cancel();
+                    _typingStopDebounce = Timer(
+                      const Duration(milliseconds: 900),
+                      () => provider.onComposerChanged(''),
+                    );
+                  },
+                  decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'Type a message',
+                      hintStyle: TextStyle(
+                          color: Color(0xFF8F8F8F),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400)),
                   style: const TextStyle(fontSize: 16),
                 ),
               ),
-              IconButton(onPressed: () {}, icon: const Icon(Icons.copy_all_rounded, size: 20, color: Color(0xFF727272))),
+              IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.copy_all_rounded,
+                      size: 20, color: Color(0xFF727272))),
               const SizedBox(width: 6),
-              IconButton(onPressed: () {}, icon: const Icon(Icons.mic_none_rounded, size: 20, color: Color(0xFF727272))),
+              IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.mic_none_rounded,
+                      size: 20, color: Color(0xFF727272))),
               const SizedBox(width: 6),
               GestureDetector(
                 onTap: _onSendPressed,
                 child: Container(
                   width: 40,
                   height: 40,
-                  decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(9)),
-                  child: const Icon(Icons.near_me_rounded, size: 22, color: Colors.white),
+                  decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(9)),
+                  child: const Icon(Icons.near_me_rounded,
+                      size: 22, color: Colors.white),
                 ),
               ),
             ],
@@ -253,13 +300,25 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
   void _onSendPressed() {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
-    final receiverId = _participant != null ? (_participant!['userId'] as String?) : null;
+    final receiverId =
+        _participant != null ? (_participant!['userId'] as String?) : null;
     if (receiverId == null || receiverId.isEmpty) return;
+    ref.read(chatProvider).onComposerChanged('');
     ref.read(chatProvider).sendMessage(text, receiverId);
     _messageController.clear();
   }
 
-  Widget _profileAvatar({required String imagePath, required double size, bool showOnlineIndicator = false}) {
+  String providerStatusText(ChatProvider provider, bool isOnline) {
+    if (provider.isOtherUserTyping) {
+      return 'Typing...';
+    }
+    return isOnline ? 'Active Now' : 'Offline';
+  }
+
+  Widget _profileAvatar(
+      {required String imagePath,
+      required double size,
+      bool showOnlineIndicator = false}) {
     return SizedBox(
       width: size,
       height: size,
@@ -271,7 +330,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
             height: size,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              image: DecorationImage(image: AssetImage(imagePath), fit: BoxFit.cover),
+              image: DecorationImage(
+                  image: AssetImage(imagePath), fit: BoxFit.cover),
             ),
           ),
           if (showOnlineIndicator)
@@ -281,7 +341,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
               child: Container(
                 width: 16,
                 height: 16,
-                decoration: BoxDecoration(color: const Color(0xFF11A251), shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2)),
+                decoration: BoxDecoration(
+                    color: const Color(0xFF11A251),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2)),
               ),
             ),
         ],
@@ -297,7 +360,10 @@ class _WaveformPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = color..strokeWidth = 3..strokeCap = StrokeCap.round;
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 3
+      ..strokeCap = StrokeCap.round;
     const spacing = 8.0;
     final centerY = size.height / 2;
     var x = 0.0;
@@ -305,7 +371,8 @@ class _WaveformPainter extends CustomPainter {
     while (x <= size.width) {
       final amplitude = (math.sin(index * 0.65) + 1) / 2;
       final barHeight = 9 + (amplitude * (size.height - 8));
-      canvas.drawLine(Offset(x, centerY - barHeight / 2), Offset(x, centerY + barHeight / 2), paint);
+      canvas.drawLine(Offset(x, centerY - barHeight / 2),
+          Offset(x, centerY + barHeight / 2), paint);
       x += spacing;
       index++;
     }
