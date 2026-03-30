@@ -190,8 +190,11 @@ class AppUrls {
 
   // --- Matches & Compatibility ---
   static const String getMatches = '$baseUrl/matches'; //GET
+  static const String getPublicMatches = '$baseUrl/matches/public'; //GET
   static const String getMatchesStats = '$baseUrl/matches/stats'; //GET
   static const String getTopMatches = '$baseUrl/matches/top-matches'; //GET
+  static const String getHomepageTopMatches =
+      '$baseUrl/matches/homepage/top'; //GET
   static const String getCompatibilityResult =
       '$baseUrl/matches/compatibility/{userId}'; //GET
 
@@ -258,4 +261,6 @@ class AppUrls {
   static const String contactSupport = '$baseUrl/settings/support'; //POST
   // Plans
   static const String getAllPlans = '$baseUrl/plans'; //POST
+
+  static const String getPlanById = '$baseUrl/plans/{planId}'; //GET
 }

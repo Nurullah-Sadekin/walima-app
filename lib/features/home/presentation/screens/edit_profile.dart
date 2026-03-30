@@ -24,20 +24,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _topBar(context),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0),
-              child: ProfileSummerySection(
-                key: ValueKey('profile-summary-visible'),
-              ),
-            ),
-            _bodySection(),
-          ],
-        ),
-      ),
+      // body: SafeArea(
+      //   child: Column(
+      //     children: [
+      //       _topBar(context),
+      //       const Padding(
+      //         padding: EdgeInsets.symmetric(horizontal: 20.0),
+      //         child: ProfileSummerySection(
+      //           key: ValueKey('profile-summary-visible'),
+      //         ),
+      //       ),
+      //       _bodySection(),
+      //     ],
+      //   ),
+      // ),
       floatingActionButton: BottomBorderedWidget(
         widget: PrimaryButtons(
           title: 'Preview Profile',

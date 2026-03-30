@@ -39,8 +39,7 @@ class ProfileSummerySection extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ProfileImageCard(
-                imagePath:
-                    profile?.profilePicture?.url ?? AppImages.demoProfile,
+                imagePath: profile?.profilePicture?.url ?? AppImages.demoProfile,
                 imageSize: 97,
                 iconSize: 20,
                 showTopIcon: profile?.isVerified ?? false,

@@ -61,16 +61,16 @@ class OnboardingScreen extends StatelessWidget {
                         borderColor: Colors.white,
                         bgColor: Colors.black12,
                         onTap: () {
-                          if (kDebugMode) {
-                            context.pushNamed(
-                              Routes.emailPhone,
-                              queryParameters: const {
-                                'fromScreen': 'debugOtpSignup',
-                              },
-                              extra: 'debugOtpSignup',
-                            );
-                            return;
-                          }
+                          // if (kDebugMode) {
+                          //   context.pushNamed(
+                          //     Routes.emailPhone,
+                          //     queryParameters: const {
+                          //       'fromScreen': 'debugOtpSignup',
+                          //     },
+                          //     extra: 'debugOtpSignup',
+                          //   );
+                          //   return;
+                          // }
                           context.push(Paths.isProfileFor);
                         },
                         title: 'Sign Up with OTP',

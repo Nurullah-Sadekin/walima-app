@@ -115,7 +115,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const CompleteProfileSection(),
+              // const CompleteProfileSection(),
               _premiumMatches(),
               _recentVisitors(),
               _followUpSection(),
