@@ -67,9 +67,9 @@ class CompleteProfile {
     }
     if (json['galleryImages'] != null) {
       galleryImages = [];
-      // json['galleryImages'].forEach((v) {
-      //   galleryImages?.add(Dynamic.fromJson(v));
-      // });
+      json['galleryImages'].forEach((v) {
+        galleryImages?.add(v);
+      });
     }
     interest =
         json['interest'] != null ? Interest.fromJson(json['interest']) : null;
@@ -132,7 +132,7 @@ class CompleteProfile {
       map['contacts'] = contacts?.map((v) => v.toJson()).toList();
     }
     if (galleryImages != null) {
-      map['galleryImages'] = galleryImages?.map((v) => v.toJson()).toList();
+      map['galleryImages'] = galleryImages;
     }
     if (interest != null) {
       map['interest'] = interest?.toJson();
@@ -140,4 +140,3 @@ class CompleteProfile {
     return map;
   }
 }
-

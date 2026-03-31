@@ -134,7 +134,7 @@ class _ProfileSectionEditScreenState
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final provider = ref.read(profileProvider);
       if (provider.profile == null) {
-        await provider.getProfile();
+        await provider.getProfile(context);
       }
       if (!mounted) {
         return;
@@ -548,7 +548,7 @@ class _ProfileSectionEditScreenState
       return;
     }
 
-    await ref.read(profileProvider).getProfile();
+    await ref.read(profileProvider).getProfile(context);
     if (!mounted) {
       return;
     }

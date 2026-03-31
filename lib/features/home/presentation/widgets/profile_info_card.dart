@@ -7,11 +7,6 @@ import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 /// Reusable profile info card used in EditProfileScreen.
 /// Supports either a free-form `child` or a list of key/value pairs via `infoList`.
 class ProfileInfoCard extends StatelessWidget {
-  final String title;
-  final bool showEdit;
-  final VoidCallback? onEdit;
-  final Widget? child;
-  final List<MapEntry<String, String>>? infoList;
 
   const ProfileInfoCard({
     Key? key,
@@ -22,6 +17,11 @@ class ProfileInfoCard extends StatelessWidget {
     this.infoList,
   })  : assert(child != null || infoList != null, 'Either child or infoList must be provided'),
         super(key: key);
+  final String title;
+  final bool showEdit;
+  final VoidCallback? onEdit;
+  final Widget? child;
+  final List<MapEntry<String, String>>? infoList;
 
   @override
   Widget build(BuildContext context) {

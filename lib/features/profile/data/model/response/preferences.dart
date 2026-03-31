@@ -68,12 +68,8 @@ class Preferences {
     motherTonguePreference = json['motherTonguePreference'] != null
         ? json['motherTonguePreference'].cast<String>()
         : [];
-    spouseWorkStudyAllowed = json['spouseWorkStudyAllowed'] != null
-        ? json['spouseWorkStudyAllowed'].cast<String>()
-        : [];
-    postMarriageLivingPreference = json['postMarriageLivingPreference'] != null
-        ? json['postMarriageLivingPreference'].cast<String>()
-        : [];
+    spouseWorkStudyAllowed = json['spouseWorkStudyAllowed'];
+    postMarriageLivingPreference = json['postMarriageLivingPreference'];
     additionalPreferences = json['additionalPreferences'];
     preferredCountries = json['preferredCountries'] != null
         ? json['preferredCountries'].cast<String>()
@@ -119,8 +115,8 @@ class Preferences {
   List<String>? religionPreference;
   List<String>? communityPreference;
   List<String>? motherTonguePreference;
-  List<String>? spouseWorkStudyAllowed;
-  List<String>? postMarriageLivingPreference;
+  dynamic spouseWorkStudyAllowed;
+  dynamic postMarriageLivingPreference;
   dynamic additionalPreferences;
   List<String>? preferredCountries;
   List<String>? preferredStates;
@@ -174,4 +170,3 @@ class Preferences {
     return map;
   }
 }
-

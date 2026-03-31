@@ -9,28 +9,22 @@ class ProfileCompletion {
 
   ProfileCompletion.fromJson(dynamic json) {
     percentage = json['percentage'];
-    if (json['missingFields'] != null) {
-      missingFields = [];
-      // json['missingFields'].forEach((v) {
-      //   missingFields?.add(Dynamic.fromJson(v));
-      // });
-    }
+    missingFields = json['missingFields'] != null
+        ? List<String>.from(json['missingFields'])
+        : [];
     completedSections = json['completedSections'] != null
         ? json['completedSections'].cast<String>()
         : [];
   }
   int? percentage;
-  List<dynamic>? missingFields;
+  List<String>? missingFields;
   List<String>? completedSections;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['percentage'] = percentage;
-    if (missingFields != null) {
-      map['missingFields'] = missingFields?.map((v) => v.toJson()).toList();
-    }
+    map['missingFields'] = missingFields;
     map['completedSections'] = completedSections;
     return map;
   }
 }
-

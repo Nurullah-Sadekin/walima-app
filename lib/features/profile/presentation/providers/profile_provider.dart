@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/features/profile/data/model/response/dashboard_response.dart';
@@ -10,13 +11,13 @@ class ProfileProvider extends BaseChangeNotifier {
   CompleteProfile? profile;
   DashboardData? dashboard;
 
-  Future<void> getProfile() async {
+  Future<void> getProfile(BuildContext context) async {
     final data = await ProfileRepository.getCompleteProfile();
     if (data.code == 'SUCCESS') {
       profile = data.response;
       updateViewState();
     } else {
-      // await DialogUtils.showErrorDialog(context: Routes., message: data.message ?? 'Failed to load profile');
+      await DialogUtils.showErrorDialog(context:context , message: data.message ?? 'Failed to load profile');
       profile = null;
     }
   }

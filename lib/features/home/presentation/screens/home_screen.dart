@@ -29,7 +29,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(profileProvider).getProfile();
+      ref.read(profileProvider).getProfile(context);
       ref.read(profileProvider).getDashboard();
     });
   }
@@ -39,11 +39,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       return false;
     }
 
-    if (notification.direction == ScrollDirection.reverse &&
-        _showProfileSummary) {
+    if (notification.direction == ScrollDirection.reverse && _showProfileSummary) {
       setState(() => _showProfileSummary = false);
-    } else if (notification.direction == ScrollDirection.forward &&
-        !_showProfileSummary) {
+    } else if (notification.direction == ScrollDirection.forward && !_showProfileSummary) {
       setState(() => _showProfileSummary = true);
     }
 
@@ -115,7 +113,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // const CompleteProfileSection(),
+              const CompleteProfileSection(),
               _premiumMatches(),
               _recentVisitors(),
               _followUpSection(),

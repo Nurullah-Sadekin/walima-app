@@ -9,8 +9,8 @@ import 'package:flutter_boilerplate/features/profile/data/model/response/update_
 class ProfileRepository {
   static Future<GetCompleteProfileResponse> getCompleteProfile() async {
     try {
-      final response = await DioClient()
-          .get(AppUrls.getCompleteProfile, isTokenRequired: true);
+      final response = await DioClient().get(AppUrls.getCompleteProfile,
+          isTokenRequired: true);
       return GetCompleteProfileResponse.fromJson(response.data);
     } catch (e) {
       final errorMessage = e is DioException

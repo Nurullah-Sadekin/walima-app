@@ -4,18 +4,17 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
-import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
+import 'package:flutter_boilerplate/core/global/components/profile_summary_card.dart';
 import 'package:flutter_boilerplate/core/global/repositorys/global_repository.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/app_router.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/providers/app_drawer_provider.dart';
+import 'package:flutter_boilerplate/features/profile/presentation/utils/profile_summary_utils.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/screens/widgets/profile_action_tile.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AppDrawer extends ConsumerStatefulWidget {
   const AppDrawer({super.key});
@@ -25,20 +24,13 @@ class AppDrawer extends ConsumerStatefulWidget {
 
 class _AppDrawerState extends ConsumerState<AppDrawer> {
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {});
-  }
-
-  @override
   Widget build(BuildContext context) {
     final provider = ref.watch(drawerProvider);
     final router = ref.watch(goRouterProvider);
     return Drawer(
       width: MediaQuery.of(context).size.width,
       child: TransparentLoading(
-        isLoading:
-            provider.loaderState == DrawerScreenStates.transparentLoading,
+        isLoading: provider.loaderState == DrawerScreenStates.transparentLoading,
         child: Scaffold(
           body: SafeArea(
             child: Padding(
@@ -109,118 +101,29 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
   }
 
   Widget _profileSummary(BuildContext context) {
-    return SizedBox(
-      height: 100,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ProfileImageCard(
-            imagePath: AppImages.demoProfile,
-            imageSize: 97,
-            iconSize: 20,
-            showTopIcon: true,
-            showBottomIcon: true,
-            topPositionImagePath: AppImages.verifiedBadgeSvgIcon,
-            bottomPositionImagePath: AppImages.editSvgIcon,
-            onTopPressed: () {
-              print('Edit pressed');
-            },
-            onEdit: () {
-              print('Check pressed');
-            },
-          ),
-          const SizedBox(width: 12),
-          Expanded(child: _profileDetails(context)),
-        ],
-      ),
-    );
-  }
-
-  Widget _profileDetails(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Tahmina Rahman',
-            style: TextStyle(
-              color: AppColors.textPrimaryLight,
-              fontSize: TextSize.font20(context),
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          _memberIdChip(context),
-          _subscriptionRow(context),
-        ],
-      ),
-    );
-  }
-
-  Widget _memberIdChip(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(6.0),
-        border: Border.all(
-          color: AppColors.greyLight,
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text(
-            'ID : 1234567890',
-            style: TextStyle(
-              color: AppColors.textSecondaryLight,
-              fontSize: TextSize.font12(context),
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          const SizedBox(width: 4),
-          Icon(
-            Icons.copy_rounded,
-            color: AppColors.textSecondaryLight,
-            size: TextSize.font12(context),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _subscriptionRow(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
-          decoration: BoxDecoration(
-            color: AppColors.primary,
-            borderRadius: BorderRadius.circular(4.0),
-          ),
-          child: Text(
-            'Gold',
-            style: TextStyle(
-              color: AppColors.white,
-              fontSize: TextSize.font10(context),
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          'Expires: March 2026',
-          style: TextStyle(
-            color: AppColors.textSecondaryLight,
-            fontSize: TextSize.font14(context),
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ],
+    final profileData = ref.watch(profileProvider).dashboard?.profile;
+    final displayName = resolveDisplayName(profileData);
+    final memberId = resolveMemberId(profileData);
+    final planName = resolvePlanName(profileData?.membership);
+    final expiryText = formatExpiry(profileData?.membership?.membershipExpiresAt);
+    return ProfileSummaryCard(
+      displayName: displayName,
+      memberId: memberId,
+      planName: planName,
+      expiryText: expiryText,
+      profileImagePath: profileData?.profilePicture?.url ?? AppImages.demoProfile,
+      showTopIcon: profileData?.isVerified ?? true,
+      showBottomIcon: true,
+      topIconPath: AppImages.verifiedBadgeSvgIcon,
+      bottomIconPath: AppImages.cameraSvgIcon,
+      onTopIconPressed: () {
+        // context.pushNamed(Routes.editProfile);
+        // print('Edit pressed');
+      },
+      onBottomIconPressed: () {
+        // context.pushNamed(Routes.editProfile);
+        // print('Check pressed');
+      },
     );
   }
 
@@ -243,7 +146,9 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         ProfileActionTile(
           iconImagePath: AppImages.profileSvgIcon,
           title: 'View & Edit Your profile',
-          onTap: () {},
+          onTap: () {
+            context.pushNamed(Routes.editProfile);
+          },
         ),
         ProfileActionTile(
           iconImagePath: AppImages.shareSvgIcon,
