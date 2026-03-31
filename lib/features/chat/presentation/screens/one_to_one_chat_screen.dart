@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/provider/chat_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
-  final Map<String, dynamic>? extra;
   const ChatScreen({super.key, this.extra});
+  final Map<String, dynamic>? extra;
 
   @override
   ConsumerState<ChatScreen> createState() => _ChatScreenState();
@@ -18,6 +17,7 @@ class ChatScreen extends ConsumerStatefulWidget {
 class _ChatScreenState extends ConsumerState<ChatScreen>
     with WidgetsBindingObserver {
   final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   Map<String, dynamic>? _participant;
   Timer? _typingStopDebounce;
 
@@ -29,27 +29,31 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
     _participant = extra != null && extra['participant'] is Map
         ? extra['participant'] as Map<String, dynamic>
         : null;
-    final conversationId =
-        extra != null ? extra['conversationId'] as String? : null;
-    if (conversationId != null && conversationId.isNotEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        final provider = ref.read(chatProvider);
-        provider.setActiveReceiver(_participant?['userId'] as String?);
-        provider.openConversation(conversationId);
-        _connectSocket();
-      });
-    }
-  }
-
-  Future<void> _connectSocket() async {
-    final token = await PrefsHelper.getAccessToken();
-    if (token.isEmpty) return;
-    await ref.read(chatProvider).initializeRealtime(token: token);
+    final conversationId = extra != null ? extra['conversationId'] as String? : null;
+    _scrollController.addListener(_handleScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final provider = ref.read(chatProvider);
+      final receiverId = _participant?['userId'] as String?;
+      if (conversationId != null && conversationId.isNotEmpty) {
+        if (receiverId != null && receiverId.isNotEmpty) {
+          provider.setActiveReceiver(receiverId);
+        }
+        unawaited(provider.openConversation(conversationId));
+      } else if (receiverId != null && receiverId.isNotEmpty) {
+        unawaited(provider.openDirectChat(
+          receiverId: receiverId,
+          conversationId: conversationId,
+        ));
+      }
+    });
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _scrollController.removeListener(_handleScroll);
+    _scrollController.dispose();
     _typingStopDebounce?.cancel();
     _messageController.dispose();
     super.dispose();
@@ -57,13 +61,22 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!mounted) return;
     if (state == AppLifecycleState.paused) {
       ref.read(chatProvider).onComposerChanged('');
     } else if (state == AppLifecycleState.resumed) {
-      _connectSocket();
       ref.read(chatProvider).markCurrentConversationRead();
     }
     super.didChangeAppLifecycleState(state);
+  }
+
+  void _handleScroll() {
+    if (!_scrollController.hasClients) return;
+    final provider = ref.read(chatProvider);
+    final threshold = _scrollController.position.maxScrollExtent - 120;
+    if (_scrollController.position.pixels >= threshold) {
+      unawaited(provider.loadMoreMessages());
+    }
   }
 
   @override
@@ -174,10 +187,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
     }
 
     return ListView.builder(
+      controller: _scrollController,
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
       reverse: true,
-      itemCount: msgs.length,
+      itemCount: msgs.length + (provider.loadingMoreMessages ? 1 : 0),
       itemBuilder: (context, index) {
+        if (index == msgs.length) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
         final msg = msgs[index];
         final isMe = msg.senderId == provider.currentUserId;
         return _textMessageRow(isMe: isMe, message: msg.content ?? '');

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:flutter_boilerplate/core/network/app_urls.dart';
 import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
@@ -43,18 +44,23 @@ class SocketService {
 
   Future<void> connect({String? token}) async {
     final authToken = token ?? await PrefsHelper.getAccessToken();
-    if (authToken.isEmpty) return;
+    if (authToken.isEmpty) {
+      _log('connect skipped: no auth token');
+      return;
+    }
 
     if (_socket != null && _socket!.connected && _connectedToken == authToken) {
+      _log('connect skipped: socket already connected');
       return;
     }
 
     if (_socket != null) {
-      disconnect();
+      disconnect(reason: 'reconnect requested');
     }
 
-    final uri = AppUrls.domain.replaceAll(RegExp(r'/$'), '') + '/app';
+    final uri = '${AppUrls.domain.replaceAll(RegExp(r'/$'), '')}/app';
     _connectedToken = authToken;
+    _log('connecting to $uri');
 
     _socket = IO.io(
       uri,
@@ -72,14 +78,17 @@ class SocketService {
     );
 
     _socket?.on('connect', (_) {
+      _log('event: connect');
       _connectionStateController.add({'event': 'connect'});
     });
 
-    _socket?.on('disconnect', (_) {
+    _socket?.on('disconnect', (data) {
+      _log('event: disconnect payload=$data');
       _connectionStateController.add({'event': 'disconnect'});
     });
 
     _socket?.on('connect_error', (data) {
+      _log('event: connect_error payload=$data');
       _connectionStateController.add({
         'event': 'connect_error',
         'data': _mapFromDynamic(data),
@@ -87,6 +96,7 @@ class SocketService {
     });
 
     _socket?.on('connection:success', (data) {
+      _log('event: connection:success payload=$data');
       _connectionStateController.add({
         'event': 'connection:success',
         'data': _mapFromDynamic(data),
@@ -96,6 +106,7 @@ class SocketService {
     });
 
     _socket?.on('connection:error', (data) {
+      _log('event: connection:error payload=$data');
       _connectionStateController.add({
         'event': 'connection:error',
         'data': _mapFromDynamic(data),
@@ -105,6 +116,7 @@ class SocketService {
     _socket?.on('message:received', _handleIncomingMessage);
     _socket?.on('message:sent', _handleSentMessage);
     _socket?.on('message:status', (data) {
+      _log('event: message:status payload=$data');
       final payload = _mapFromDynamic(data);
       if (payload != null) {
         _messageStatusController.add(payload);
@@ -112,6 +124,7 @@ class SocketService {
     });
 
     _socket?.on('typing:indicator', (data) {
+      _log('event: typing:indicator payload=$data');
       final payload = _mapFromDynamic(data);
       if (payload != null) {
         _typingController.add(payload);
@@ -119,6 +132,7 @@ class SocketService {
     });
 
     _socket?.on('users:online:update', (data) {
+      _log('event: users:online:update payload=$data');
       final payload = _mapFromDynamic(data);
       if (payload != null) {
         _presenceController.add(payload);
@@ -126,6 +140,7 @@ class SocketService {
     });
 
     _socket?.on('notification:new', (data) {
+      _log('event: notification:new payload=$data');
       final payload = _mapFromDynamic(data);
       if (payload != null) {
         _notificationController.add(payload);
@@ -133,6 +148,7 @@ class SocketService {
     });
 
     _socket?.on('notification:received', (data) {
+      _log('event: notification:received payload=$data');
       final payload = _mapFromDynamic(data);
       if (payload != null) {
         _notificationController.add(payload);
@@ -141,15 +157,19 @@ class SocketService {
   }
 
   void _handleIncomingMessage(dynamic data) {
+    _log('event: message:received payload=$data');
     final msg = _messageFromDynamic(data);
     if (msg != null) {
+      _log('parsed message:received id=${msg.id} conversationId=${msg.conversationId}');
       _messageController.add(msg);
     }
   }
 
   void _handleSentMessage(dynamic data) {
+    _log('event: message:sent payload=$data');
     final msg = _messageFromDynamic(data);
     if (msg != null) {
+      _log('parsed message:sent id=${msg.id} conversationId=${msg.conversationId}');
       _sentMessageController.add(msg);
     }
   }
@@ -181,7 +201,10 @@ class SocketService {
     return null;
   }
 
-  void emit(String event, dynamic data) => _socket?.emit(event, data);
+  void emit(String event, dynamic data) {
+    _log('emit: $event payload=$data');
+    _socket?.emit(event, data);
+  }
 
   void sendMessage({
     required String receiverId,
@@ -241,7 +264,8 @@ class SocketService {
     emit('notification:subscribe', null);
   }
 
-  void disconnect() {
+  void disconnect({String reason = 'manual'}) {
+    _log('disconnect requested: $reason');
     if (_socket == null) return;
     try {
       _socket?.off('message:received');
@@ -271,6 +295,10 @@ class SocketService {
     _typingController.close();
     _connectionStateController.close();
     _notificationController.close();
-    disconnect();
+    disconnect(reason: 'service dispose');
+  }
+
+  void _log(String message) {
+    debugPrint('[SocketService] $message');
   }
 }

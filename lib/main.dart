@@ -10,6 +10,8 @@ import 'package:flutter_boilerplate/core/providers/theme_provider.dart';
 import 'package:flutter_boilerplate/core/providers/locale_provider.dart';
 import 'package:flutter_boilerplate/core/connectivity/connectivity_keys.dart';
 import 'package:flutter_boilerplate/core/connectivity/connectivity_monitor.dart';
+import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/features/chat/data/socket/socket_service.dart';
 
 void main() {
   runApp(
@@ -29,40 +31,83 @@ class MyApp extends ConsumerWidget {
     final router = ref.watch(goRouterProvider);
 
     DioClient().setLogoutHandler(() {
+      SocketService.instance.disconnect(reason: 'session expired logout');
       router.go(Paths.login);
     });
 
     final themeMode = ref.watch(themeNotifierProvider);
     final locale = ref.watch(localeNotifierProvider);
 
-    return ConnectivityMonitor(
-      child: MaterialApp.router(
-      title: 'Walima',
-      debugShowCheckedModeBanner: false,
+    return AppRealtimeBootstrap(
+      child: ConnectivityMonitor(
+        child: MaterialApp.router(
+        title: 'Walima',
+        debugShowCheckedModeBanner: false,
 
-      scaffoldMessengerKey: rootScaffoldMessengerKey,
+        scaffoldMessengerKey: rootScaffoldMessengerKey,
 
-      // Theme
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.lightTheme,
-      themeMode: themeMode,
+        // Theme
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.lightTheme,
+        themeMode: themeMode,
 
-      // Routing
-      routerConfig: router,
+        // Routing
+        routerConfig: router,
 
-      // Localization
-      locale: locale,
-      supportedLocales: const [
-        Locale('en'), // English
-        Locale('bn'), // Bangla
-      ],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-    ),
+        // Localization
+        locale: locale,
+        supportedLocales: const [
+          Locale('en'), // English
+          Locale('bn'), // Bangla
+        ],
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+      ),
+      ),
     );
+  }
+}
+
+class AppRealtimeBootstrap extends ConsumerStatefulWidget {
+  const AppRealtimeBootstrap({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  ConsumerState<AppRealtimeBootstrap> createState() =>
+      _AppRealtimeBootstrapState();
+}
+
+class _AppRealtimeBootstrapState extends ConsumerState<AppRealtimeBootstrap>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(chatProvider).initializeRealtime();
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ref.read(chatProvider).initializeRealtime();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
   }
 }

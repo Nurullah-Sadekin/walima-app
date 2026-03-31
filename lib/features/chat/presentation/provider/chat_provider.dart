@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/features/chat/data/model/response/connectable_user_response.dart';
 import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_list.dart';
 import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_messages_response.dart';
 import 'package:flutter_boilerplate/features/chat/data/repository/chat_repository.dart';
 import 'package:flutter_boilerplate/features/chat/data/socket/socket_service.dart';
+import 'package:flutter_boilerplate/features/login/data/repository/login_repository.dart';
 
 class ChatProvider extends BaseChangeNotifier {
   ChatScreenState screenStates = ChatScreenState.complete;
@@ -20,10 +22,12 @@ class ChatProvider extends BaseChangeNotifier {
   StreamSubscription<Map<String, dynamic>>? _messageStatusSub;
   StreamSubscription<Map<String, dynamic>>? _presenceSub;
   StreamSubscription<Map<String, dynamic>>? _typingSub;
+  StreamSubscription<Map<String, dynamic>>? _connectionStateSub;
 
   String? currentConversationId;
   List<Message> messages = [];
   bool messagesLoading = false;
+  bool loadingMoreMessages = false;
   bool hasMoreMessages = false;
   String? messagesNextCursor;
   bool isOtherUserTyping = false;
@@ -65,31 +69,34 @@ class ChatProvider extends BaseChangeNotifier {
 
   Future<void> getInitialData() async {
     updateViewState(loadingState: ChatScreenState.loading);
+    await _ensureCurrentUserId();
     await getConnectableUserList();
     await getConversation();
     updateViewState(screenStates: ChatScreenState.complete);
   }
 
   Future<void> initializeRealtime({String? token}) async {
-    if (_socketInitialized) {
-      await SocketService.instance.connect(token: token);
-      return;
+    if (!_socketInitialized) {
+      _incomingMessageSub = SocketService.instance.messages.listen(
+        _handleRealtimeIncomingMessage,
+      );
+      _sentMessageSub = SocketService.instance.sentMessages.listen(
+        _handleRealtimeSentMessage,
+      );
+      _messageStatusSub = SocketService.instance.messageStatuses.listen(
+        _handleMessageStatus,
+      );
+      _presenceSub =
+          SocketService.instance.presence.listen(_handlePresenceUpdate);
+      _typingSub = SocketService.instance.typing.listen(_handleTypingUpdate);
+      _connectionStateSub = SocketService.instance.connectionStates.listen(
+        _handleConnectionState,
+      );
+      _socketInitialized = true;
+      debugPrint('[ChatProvider] realtime subscriptions initialized');
     }
 
     await SocketService.instance.connect(token: token);
-    _incomingMessageSub = SocketService.instance.messages.listen(
-      _handleRealtimeIncomingMessage,
-    );
-    _sentMessageSub = SocketService.instance.sentMessages.listen(
-      _handleRealtimeSentMessage,
-    );
-    _messageStatusSub = SocketService.instance.messageStatuses.listen(
-      _handleMessageStatus,
-    );
-    _presenceSub =
-        SocketService.instance.presence.listen(_handlePresenceUpdate);
-    _typingSub = SocketService.instance.typing.listen(_handleTypingUpdate);
-    _socketInitialized = true;
   }
 
   Future<void> getConnectableUserList() async {
@@ -109,17 +116,19 @@ class ChatProvider extends BaseChangeNotifier {
     } else {
       conversations = [];
     }
-    _resolveCurrentUserId();
     updateViewState();
   }
 
   Future<void> openConversation(String conversationId) async {
-    if (conversationId == currentConversationId) {
+    if (conversationId == currentConversationId && messages.isNotEmpty) {
       _markCurrentConversationRead();
       return;
     }
+    await _ensureCurrentUserId();
+    debugPrint('[ChatProvider] openConversation start id=$conversationId currentUserId=$_currentUserId');
     currentConversationId = conversationId;
     messagesLoading = true;
+    loadingMoreMessages = false;
     messages = [];
     messagesNextCursor = null;
     hasMoreMessages = false;
@@ -131,7 +140,15 @@ class ChatProvider extends BaseChangeNotifier {
       conversationId,
       limit: 50,
     );
-    messages = resp.data ?? [];
+    messages = _sortedMessagesNewestFirst(resp.data ?? []);
+    debugPrint(
+      '[ChatProvider] openConversation loaded count=${messages.length} hasMore=${resp.hasMore} nextCursor=${resp.nextCursor}',
+    );
+    for (final message in messages) {
+      debugPrint(
+        '[ChatProvider] history message id=${message.id} senderId=${message.senderId} receiverId=${message.receiverId} content=${message.content}',
+      );
+    }
     messagesNextCursor = resp.nextCursor;
     hasMoreMessages = resp.hasMore ?? false;
     messagesLoading = false;
@@ -140,21 +157,66 @@ class ChatProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> openDirectChat({
+    required String receiverId,
+    String? conversationId,
+  }) async {
+    activeReceiverId = receiverId;
+    isOtherUserTyping = false;
+    typingConversationId = null;
+
+    if (conversationId == null || conversationId.isEmpty) {
+      currentConversationId = null;
+      messages = [];
+      messagesNextCursor = null;
+      hasMoreMessages = false;
+      messagesLoading = false;
+      loadingMoreMessages = false;
+      notifyListeners();
+      return;
+    }
+
+    await openConversation(conversationId);
+  }
+
   Future<void> loadMoreMessages() async {
     if (!hasMoreMessages ||
+        loadingMoreMessages ||
         messagesNextCursor == null ||
         currentConversationId == null) {
       return;
     }
+    loadingMoreMessages = true;
+    debugPrint(
+      '[ChatProvider] loadMoreMessages conversationId=$currentConversationId cursor=$messagesNextCursor',
+    );
+    notifyListeners();
     final resp = await ChatRepository.getConversationMessages(
       currentConversationId!,
       limit: 50,
       cursor: messagesNextCursor,
     );
-    final more = resp.data ?? [];
-    messages.addAll(more);
+    final more = _sortedMessagesNewestFirst(resp.data ?? []);
+    final existingIds = messages
+        .map((message) => message.id)
+        .whereType<String>()
+        .toSet();
+    for (final message in more) {
+      final messageId = message.id;
+      if (messageId != null && existingIds.contains(messageId)) {
+        continue;
+      }
+      messages.add(message);
+      if (messageId != null) {
+        existingIds.add(messageId);
+      }
+    }
     messagesNextCursor = resp.nextCursor;
     hasMoreMessages = resp.hasMore ?? false;
+    loadingMoreMessages = false;
+    debugPrint(
+      '[ChatProvider] loadMoreMessages merged total=${messages.length} hasMore=$hasMoreMessages nextCursor=$messagesNextCursor',
+    );
     notifyListeners();
   }
 
@@ -181,10 +243,18 @@ class ChatProvider extends BaseChangeNotifier {
         conv.lastMessageAt =
             msg.sentAt ?? DateTime.now().toUtc().toIso8601String();
         conv.unreadCount = (conv.unreadCount ?? 0) + 1;
+        _moveConversationToTop(idx);
         notifyListeners();
         return;
       }
     }
+
+    _upsertConversationFromMessage(
+      msg,
+      increaseUnread: true,
+      moveToTop: true,
+    );
+    notifyListeners();
   }
 
   Future<void> sendMessage(String content, String receiverId) async {
@@ -205,6 +275,28 @@ class ChatProvider extends BaseChangeNotifier {
     messages.insert(0, tmp);
     _updateConversationPreview(tmp);
     notifyListeners();
+
+    if (!SocketService.instance.isConnected) {
+      final sent = await ChatRepository.sendMessage(
+        conversationId: currentConversationId,
+        receiverId: receiverId,
+        content: content,
+      );
+      final optimisticIndex = messages.indexWhere((item) => item.id == tmpId);
+      if (sent != null) {
+        if (optimisticIndex != -1) {
+          messages[optimisticIndex] = sent;
+        } else if (!_hasMessage(sent.id)) {
+          messages.insert(0, sent);
+        }
+        currentConversationId ??= sent.conversationId;
+        _upsertConversationFromMessage(sent, moveToTop: true);
+      } else if (optimisticIndex != -1) {
+        messages[optimisticIndex].status = 'failed';
+      }
+      notifyListeners();
+      return;
+    }
 
     SocketService.instance.sendMessage(
       receiverId: receiverId,
@@ -258,10 +350,16 @@ class ChatProvider extends BaseChangeNotifier {
   }
 
   void _handleRealtimeIncomingMessage(Message msg) {
+    debugPrint(
+      '[ChatProvider] incoming socket message id=${msg.id} conversationId=${msg.conversationId} senderId=${msg.senderId}',
+    );
     addIncomingMessage(msg);
   }
 
   void _handleRealtimeSentMessage(Message msg) {
+    debugPrint(
+      '[ChatProvider] sent socket message id=${msg.id} conversationId=${msg.conversationId} senderId=${msg.senderId}',
+    );
     final optimisticIndex = messages.indexWhere(
       (item) =>
           item.status == 'sending' &&
@@ -276,7 +374,7 @@ class ChatProvider extends BaseChangeNotifier {
     }
 
     currentConversationId ??= msg.conversationId;
-    _updateConversationPreview(msg);
+    _upsertConversationFromMessage(msg, moveToTop: true);
     notifyListeners();
   }
 
@@ -346,6 +444,14 @@ class ChatProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
+  void _handleConnectionState(Map<String, dynamic> payload) {
+    final event = payload['event']?.toString();
+    debugPrint('[ChatProvider] socket state event=$event payload=$payload');
+    if (event == 'connection:success') {
+      unawaited(_syncAfterReconnect());
+    }
+  }
+
   void _markCurrentConversationRead() {
     final conversationId = currentConversationId;
     if (conversationId == null || conversationId.isEmpty) return;
@@ -386,6 +492,145 @@ class ChatProvider extends BaseChangeNotifier {
         DateTime.now().toUtc().toIso8601String();
   }
 
+  void _upsertConversationFromMessage(
+    Message message, {
+    bool increaseUnread = false,
+    bool moveToTop = false,
+  }) {
+    final conversationId = message.conversationId;
+    if (conversationId == null || conversationId.isEmpty) {
+      return;
+    }
+
+    conversations ??= [];
+    final index =
+        conversations!.indexWhere((item) => item.id == conversationId);
+    if (index != -1) {
+      final conversation = conversations![index];
+      conversation.lastMessage = message.content;
+      conversation.lastMessageAt = message.sentAt ??
+          message.createdAt ??
+          DateTime.now().toUtc().toIso8601String();
+      if (increaseUnread) {
+        conversation.unreadCount = (conversation.unreadCount ?? 0) + 1;
+      }
+      if (moveToTop) {
+        _moveConversationToTop(index);
+      }
+      return;
+    }
+
+    final counterpart = _participantFromMessage(message);
+    conversations!.insert(
+      0,
+      Conversations(
+        id: conversationId,
+        type: 'direct',
+        status: 'active',
+        lastMessage: message.content,
+        lastMessageAt: message.sentAt ??
+            message.createdAt ??
+            DateTime.now().toUtc().toIso8601String(),
+        unreadCount: increaseUnread ? 1 : 0,
+        participants: [
+          if (_currentUserId != null && _currentUserId!.isNotEmpty)
+            Participants(
+              userId: _currentUserId,
+            ),
+          if (counterpart != null) counterpart,
+        ],
+      ),
+    );
+  }
+
+  Participants? _participantFromMessage(Message message) {
+    final participantLite = message.senderId == _currentUserId
+        ? message.receiver
+        : message.sender;
+    final fallbackUserId = message.senderId == _currentUserId
+        ? message.receiverId
+        : message.senderId;
+    final mapped = _participantFromLite(
+      participantLite,
+      fallbackUserId: fallbackUserId,
+    );
+    if (mapped != null) {
+      return mapped;
+    }
+
+    for (final user in connectableUsers ?? const <Users>[]) {
+      final candidateId = message.senderId == _currentUserId
+          ? message.receiverId
+          : message.senderId;
+      if (user.id != candidateId) continue;
+      return Participants(
+        userId: user.id,
+        displayName: user.displayName,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        username: user.username?.toString(),
+        userReference: user.userReference,
+        profilePictureUrl: user.profilePictureUrl,
+        isOnline: user.isOnline,
+        lastSeenAt: user.lastSeenAt,
+      );
+    }
+
+    if (fallbackUserId == null || fallbackUserId.isEmpty) {
+      return null;
+    }
+
+    return Participants(userId: fallbackUserId);
+  }
+
+  Participants? _participantFromLite(
+    ParticipantLite? participantLite, {
+    String? fallbackUserId,
+  }) {
+    final resolvedUserId = participantLite?.id ?? fallbackUserId;
+    if (resolvedUserId == null || resolvedUserId.isEmpty) {
+      return null;
+    }
+
+    final displayName = [
+      participantLite?.firstName,
+      participantLite?.lastName,
+    ].whereType<String>().where((value) => value.trim().isNotEmpty).join(' ');
+
+    return Participants(
+      userId: resolvedUserId,
+      displayName: displayName.isNotEmpty ? displayName : participantLite?.username,
+      firstName: participantLite?.firstName,
+      lastName: participantLite?.lastName,
+      username: participantLite?.username,
+      userReference: participantLite?.userReference,
+      profilePictureUrl: participantLite?.profilePhoto?.url,
+      isOnline: participantLite?.isOnline,
+      lastSeenAt: participantLite?.lastSeenAt,
+    );
+  }
+
+  void _moveConversationToTop(int index) {
+    if (conversations == null || index <= 0 || index >= conversations!.length) {
+      return;
+    }
+    final conversation = conversations!.removeAt(index);
+    conversations!.insert(0, conversation);
+  }
+
+  List<Message> _sortedMessagesNewestFirst(List<Message> items) {
+    final sorted = List<Message>.from(items);
+    sorted.sort((a, b) {
+      final aTime = DateTime.tryParse(a.sentAt ?? a.createdAt ?? '');
+      final bTime = DateTime.tryParse(b.sentAt ?? b.createdAt ?? '');
+      if (aTime == null && bTime == null) return 0;
+      if (aTime == null) return 1;
+      if (bTime == null) return -1;
+      return bTime.compareTo(aTime);
+    });
+    return sorted;
+  }
+
   Map<String, Map<String, dynamic>> _extractPresenceUpdates(
     Map<String, dynamic> payload,
   ) {
@@ -413,26 +658,37 @@ class ChatProvider extends BaseChangeNotifier {
     return result;
   }
 
-  void _resolveCurrentUserId() {
-    final participantFrequency = <String, int>{};
-
-    for (final conversation in allConversations) {
-      final participants = conversation.participants ?? const <Participants>[];
-      for (final participant in participants) {
-        final userId = participant.userId;
-        if (userId == null || userId.isEmpty) continue;
-        participantFrequency[userId] = (participantFrequency[userId] ?? 0) + 1;
-      }
-    }
-
-    if (participantFrequency.isEmpty) {
-      _currentUserId = null;
+  Future<void> _ensureCurrentUserId() async {
+    if (_currentUserId != null && _currentUserId!.isNotEmpty) {
       return;
     }
 
-    _currentUserId = participantFrequency.entries
-        .reduce((a, b) => a.value >= b.value ? a : b)
-        .key;
+    final me = await LoginRepository.getMe();
+    final resolvedUserId = me.response?.user?.id;
+    if (resolvedUserId != null && resolvedUserId.isNotEmpty) {
+      _currentUserId = resolvedUserId;
+    }
+  }
+
+  Future<void> _syncAfterReconnect() async {
+    await _ensureCurrentUserId();
+    await getConnectableUserList();
+    await getConversation();
+
+    final conversationId = currentConversationId;
+    if (conversationId != null && conversationId.isNotEmpty) {
+      final resp = await ChatRepository.getConversationMessages(
+        conversationId,
+        limit: 50,
+      );
+      messages = _sortedMessagesNewestFirst(resp.data ?? []);
+      messagesNextCursor = resp.nextCursor;
+      hasMoreMessages = resp.hasMore ?? false;
+      loadingMoreMessages = false;
+      activeReceiverId = resp.otherParticipant?.id ?? activeReceiverId;
+      _markCurrentConversationRead();
+      notifyListeners();
+    }
   }
 
   void updateViewState({
@@ -453,11 +709,13 @@ class ChatProvider extends BaseChangeNotifier {
     _messageStatusSub?.cancel();
     _presenceSub?.cancel();
     _typingSub?.cancel();
+    _connectionStateSub?.cancel();
     _incomingMessageSub = null;
     _sentMessageSub = null;
     _messageStatusSub = null;
     _presenceSub = null;
     _typingSub = null;
+    _connectionStateSub = null;
     _socketInitialized = false;
   }
 

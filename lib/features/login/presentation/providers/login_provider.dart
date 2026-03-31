@@ -14,6 +14,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_boilerplate/core/constants/storage_keys.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
+import 'package:flutter_boilerplate/features/chat/data/socket/socket_service.dart';
 
 class LoginProvider extends BaseChangeNotifier {
   static const String _mobileOrEmailRequiredMessage = 'Please enter your mobile number or email ID';
@@ -282,6 +283,7 @@ class LoginProvider extends BaseChangeNotifier {
     try {
       DioClient().setAuthToken(accessToken);
     } catch (_) {}
+    await SocketService.instance.connect(token: accessToken);
   }
 
   Future<void> _saveRefreshToken(SharedPreferences prefs, String refreshToken) async {
