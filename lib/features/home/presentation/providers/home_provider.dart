@@ -21,7 +21,7 @@ class HomeProvider extends BaseChangeNotifier {
     final response = await MatchesRepository.getMatches(
        GetMatchesQueryParams(
         page: 1,
-        size: 1,
+        size: 10,
         type: 'premium_matches',
       ),
     );

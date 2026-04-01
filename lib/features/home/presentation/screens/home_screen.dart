@@ -166,6 +166,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
               ),
+              if(matches.length > 2)
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10.0,
