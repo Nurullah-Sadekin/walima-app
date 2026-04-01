@@ -13,7 +13,7 @@ class ChatListItem extends StatelessWidget {
     this.imagePath,
     required this.lastMessage,
     required this.timeAgo,
-    this.isVerified = false,
+    this.isVerified,
     this.onTap,
     this.isOnline,
   });
@@ -21,7 +21,7 @@ class ChatListItem extends StatelessWidget {
   final String? imagePath;
   final String lastMessage;
   final String timeAgo;
-  final bool isVerified;
+  final bool? isVerified;
   final VoidCallback? onTap;
   final bool? isOnline;
 
@@ -69,12 +69,13 @@ class ChatListItem extends StatelessWidget {
             ),
           ),
         ),
-        if (isVerified) ...[
+        if (isVerified == true) ...[
           const SizedBox(width: 4),
           ShowImage(
             imagePath: AppImages.verifiedBadgeSvgIcon,
             width: TextSize.font14(context),
             height: TextSize.font14(context),
+            color: AppColors.primary,
           ),
         ],
       ],
