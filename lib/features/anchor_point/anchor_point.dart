@@ -8,6 +8,7 @@ import 'package:flutter_boilerplate/features/chat/presentation/screens/chat_home
 import 'package:flutter_boilerplate/features/home/presentation/screens/home_screen.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/screens/inbox_screen.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/screens/matches.dart';
+import 'package:flutter_boilerplate/features/plans/presentation/screens/plans_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Current tab provider
@@ -25,7 +26,7 @@ class AnchorPointScreen extends ConsumerWidget {
       const MatchesScreen(),
       const InboxScreen(),
       const ChatScreen(),
-      Container(),
+      const UpgradePackageScreen(showAppBar: false,),
     ];
     return WillPopScope(
       onWillPop: () async {

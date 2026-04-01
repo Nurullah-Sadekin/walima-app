@@ -8,6 +8,7 @@ import 'package:flutter_boilerplate/core/global/components/gradient_background.d
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/plans/data/models/get_plans_response.dart';
 import 'package:flutter_boilerplate/features/plans/presentation/screens/widgets/package_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,8 +18,9 @@ import 'package:flutter_boilerplate/features/plans/presentation/providers/plans_
 import 'package:go_router/go_router.dart';
 
 class UpgradePackageScreen extends ConsumerStatefulWidget {
-  const UpgradePackageScreen({super.key, required this.fromScreen});
+  const UpgradePackageScreen({super.key, this.fromScreen, this.showAppBar = true});
   final String? fromScreen;
+  final bool showAppBar;
 
   @override
   ConsumerState<UpgradePackageScreen> createState() =>
@@ -46,7 +48,13 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
         body: GradientBackground(
           child: Column(
             children: [
+              if (widget.showAppBar)
               _appbarSection(),
+              if (!widget.showAppBar)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: AnchoredAppBar(context: context, title: 'Welcome, Samira!'),
+                ),
               provider.loaderState == UpgradePackageScreenStates.loading
                   ? const Expanded(child: Center(child: Loading()))
                   : _body(),
@@ -80,6 +88,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
       child: SingleChildScrollView(
         child: Column(
           children: [
+            const SizedBox(height: 20),
             _headerSection(),
             _bodySection(),
           ],
