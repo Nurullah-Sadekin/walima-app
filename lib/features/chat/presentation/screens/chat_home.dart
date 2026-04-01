@@ -160,7 +160,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           child: ChatListItem(
             name: displayName,
             imagePath: participant?.profilePictureUrl ?? AppImages.demoProfile2,
-            isVerified: participant?.profilePhoto?.isVerified ?? false,
+            isVerified: participant?.profilePhoto?.isVerified,
             isOnline: participant?.isOnline,
             lastMessage: (lastMessage?.isNotEmpty ?? false)
                 ? lastMessage!
