@@ -85,7 +85,7 @@ class ChatListItem extends StatelessWidget {
   Widget _buildMessageRow(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       mainAxisSize: MainAxisSize.max,
       spacing: 8,
       children: [
