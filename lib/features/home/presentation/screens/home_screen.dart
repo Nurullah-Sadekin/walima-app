@@ -7,6 +7,7 @@ import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
+import 'package:flutter_boilerplate/features/home/data/model/response/recent_visitors_response.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/complete_profile_section.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/profile_summery_section.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/social_media_icon.dart';
@@ -32,7 +33,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(profileProvider).getProfile(context);
       ref.read(profileProvider).getDashboard();
-      ref.read(homeProvider).loadPremiumMatches();
     });
   }
 
@@ -166,7 +166,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
               ),
-              if(matches.length > 2)
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10.0,
@@ -318,6 +317,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _recentVisitors() {
+    final provider = ref.watch(homeProvider);
+    final visitors = provider.recentVisitors;
+    final isLoading = provider.isLoadingRecentVisitors;
+    final errorText = provider.recentVisitorsError;
+    final subtitleText = isLoading
+        ? 'Loading recent visitors'
+        : '${visitors.length} Profiles Found';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -340,7 +347,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
                   Text(
-                    '26 Profiles Found',
+                    subtitleText,
                     style: TextStyle(
                       color: AppColors.textSecondaryLight,
                       fontSize: TextSize.font14(context),
@@ -384,35 +391,124 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         const SizedBox(height: 10),
         Padding(
           padding: const EdgeInsets.only(left: 20.0),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: List.generate(
-                10,
-                (index) => const Padding(
-                  padding: EdgeInsets.only(
-                    right: 10.0,
-                  ),
-                  child: SizedBox(
-                    width: 300,
-                    child: ProfileComprehensiveCard(
-                      imagePath: AppImages.demoProfile,
-                      imageHeight: 250,
-                      isPremiumConnect: true,
-                      name: 'Tasnim Akter',
-                      age: '28 Yr',
-                      height: '5\' 3\'" ',
-                      location: 'Gulshan, Dhaka, BD',
-                      viewOnAccept: true,
+          child: SizedBox(
+            height: 360,
+            child: Builder(
+              builder: (_) {
+                if (isLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                if (errorText != null && visitors.isEmpty) {
+                  return Center(
+                    child: Text(
+                      errorText,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppColors.textSecondaryLight,
+                        fontSize: TextSize.font16(context),
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
+                  );
+                }
+
+                if (visitors.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'No recent visitors yet.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppColors.textSecondaryLight,
+                        fontSize: TextSize.font16(context),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  );
+                }
+
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: visitors.map(_buildRecentVisitorCard).toList(),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           ),
         ),
       ],
     );
+  }
+
+  Widget _buildRecentVisitorCard(Data visitor) {
+    final location = _formatRecentVisitorLocation(visitor.location);
+    final imageUrl = visitor.profilePhoto?.url?.toString();
+    final imagePath = (imageUrl?.isNotEmpty ?? false)
+        ? imageUrl!
+        : AppImages.demoProfile;
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 10.0),
+      child: SizedBox(
+        width: 300,
+        child: ProfileComprehensiveCard(
+          imagePath: imagePath,
+          imageHeight: 250,
+          isPremiumConnect: visitor.isPremium ?? false,
+          isVerified: visitor.isVerified ?? false,
+          name: visitor.displayName ?? 'Walima Member',
+          age: visitor.age != null ? '${visitor.age?.toInt()} Yr' : null,
+          height: _formatRecentVisitorHeight(visitor.height),
+          location: location,
+          profession: visitor.profession?.toString(),
+          activeStatusText: _recentVisitorStatus(visitor),
+        ),
+      ),
+    );
+  }
+
+  String? _formatRecentVisitorHeight(num? height) {
+    if (height == null) return null;
+    return '${height.toInt()} cm';
+  }
+
+  String? _formatRecentVisitorLocation(Location? location) {
+    final parts = [
+      location?.city,
+      location?.state?.toString(),
+      location?.country,
+    ]
+        .where((value) => value != null && value.trim().isNotEmpty)
+        .map((value) => value!.trim())
+        .toList();
+    if (parts.isEmpty) return null;
+    return parts.join(', ');
+  }
+
+  String _recentVisitorStatus(Data visitor) {
+    final visitCount = _formatVisitCount(visitor.visitCount);
+    final visitedAt = _formatVisitedAt(visitor.visitedAt);
+    return '$visitCount · Visited $visitedAt';
+  }
+
+  String _formatVisitCount(num? count) {
+    if (count == null) return 'Visited';
+    final visits = count.toInt();
+    return '$visits visit${visits == 1 ? '' : 's'}';
+  }
+
+  String _formatVisitedAt(String? visitedAt) {
+    if (visitedAt == null || visitedAt.trim().isEmpty) {
+      return 'recently';
+    }
+    final parsed = DateTime.tryParse(visitedAt);
+    if (parsed != null) {
+      return '${parsed.day.toString().padLeft(2, '0')}/${parsed.month.toString().padLeft(2, '0')}/${parsed.year}';
+    }
+    return visitedAt.split('T').first;
   }
 
   Widget _followUpSection() {

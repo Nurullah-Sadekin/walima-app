@@ -1,4 +1,6 @@
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
+import 'package:flutter_boilerplate/features/home/data/model/response/recent_visitors_response.dart';
+import 'package:flutter_boilerplate/features/home/data/repository/home_repository.dart';
 import 'package:flutter_boilerplate/features/matches/data/models/request/get_matches_query_params.dart';
 import 'package:flutter_boilerplate/features/matches/data/models/response/get_matches_response.dart';
 import 'package:flutter_boilerplate/features/matches/data/repository/matches_repository.dart';
@@ -6,11 +8,27 @@ import 'package:flutter_boilerplate/features/matches/data/repository/matches_rep
 class HomeProvider extends BaseChangeNotifier {
   HomeScreenStates screenStates = HomeScreenStates.defaultState;
   HomeScreenStates loaderState = HomeScreenStates.defaultState;
-  
-  List<MatchProfile> premiumMatches = [];
+
+  HomeProvider() {
+    _loadInitialData();
+  }
+
+  void _loadInitialData() {
+    Future.microtask(() async {
+      await loadPremiumMatches();
+      await loadRecentVisitors();
+    });
+  }
+
+  final List<MatchProfile> premiumMatches = [];
   bool isLoadingPremiumMatches = false;
   String? premiumMatchesError;
   bool _hasLoadedPremiumMatches = false;
+
+  final List<Data> recentVisitors = [];
+  bool isLoadingRecentVisitors = false;
+  String? recentVisitorsError;
+  bool _hasLoadedRecentVisitors = false;
 
   Future<void> loadPremiumMatches({bool force = false}) async {
     if (_hasLoadedPremiumMatches && !force) return;
@@ -19,7 +37,7 @@ class HomeProvider extends BaseChangeNotifier {
     notifyListeners();
 
     final response = await MatchesRepository.getMatches(
-       GetMatchesQueryParams(
+      GetMatchesQueryParams(
         page: 1,
         size: 10,
         type: 'premium_matches',
@@ -28,19 +46,50 @@ class HomeProvider extends BaseChangeNotifier {
 
     isLoadingPremiumMatches = false;
 
-    final isSuccess = response.statusCode != null && response.statusCode! >= 200 && response.statusCode! < 300;
+    final isSuccess = response.statusCode != null &&
+        response.statusCode! >= 200 &&
+        response.statusCode! < 300;
 
     if (isSuccess) {
-      premiumMatches = response.data ?? [];
+      premiumMatches
+        ..clear()
+        ..addAll(response.data ?? []);
       _hasLoadedPremiumMatches = true;
-      if (premiumMatches.isEmpty) {
-        premiumMatchesError = 'No premium matches available at the moment.';
-      } else {
-        premiumMatchesError = null;
-      }
+      premiumMatchesError =
+          premiumMatches.isEmpty ? 'No premium matches available at the moment.' : null;
     } else {
       premiumMatches.clear();
       premiumMatchesError = response.message ?? 'Unable to load premium matches.';
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> loadRecentVisitors({bool force = false}) async {
+    if (_hasLoadedRecentVisitors && !force) return;
+    isLoadingRecentVisitors = true;
+    recentVisitorsError = null;
+    notifyListeners();
+
+    final response = await HomeRepository.getRecentVisitors();
+
+    isLoadingRecentVisitors = false;
+
+    final visitors = response.response?.data;
+    if (visitors != null) {
+      recentVisitors
+        ..clear()
+        ..addAll(visitors);
+      _hasLoadedRecentVisitors = true;
+      recentVisitorsError =
+          visitors.isEmpty ? 'No recent visitors found yet.' : null;
+    } else if (response.code == 'FAILED') {
+      recentVisitors.clear();
+      recentVisitorsError =
+          response.message ?? 'Unable to load recent visitors.';
+    } else {
+      recentVisitors.clear();
+      recentVisitorsError = 'No recent visitors available right now.';
     }
 
     notifyListeners();

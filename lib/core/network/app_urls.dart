@@ -32,6 +32,10 @@ class AppUrls {
   static const String updateFamily = '$baseUrl/users/profile/family';
   static const String updatePreferences = '$baseUrl/users/profile/preferences';
 
+  // Engagement Endpoints
+  static const String getRecentVisitors =
+      '$baseUrl/engagement/recent-visitors'; //GET
+
   // User Profile Endpoints
   static const String getCompleteProfile = '$baseUrl/users/profile'; //GET
   static const String getProfilePreview =
