@@ -10,6 +10,7 @@ import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/complete_profile_section.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/profile_summery_section.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/social_media_icon.dart';
+import 'package:flutter_boilerplate/features/matches/data/models/response/get_matches_response.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -31,6 +32,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(profileProvider).getProfile(context);
       ref.read(profileProvider).getDashboard();
+      ref.read(homeProvider).loadPremiumMatches();
     });
   }
 
@@ -114,17 +116,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Column(
             children: [
               const CompleteProfileSection(),
-               Container(
-                 padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                color: AppColors.greyLight,
-                 child: Text(
-                  'Api Returning internal server error, showing dummy data for now',
-                  style: TextStyle(
-                    color: AppColors.textSecondaryLight,
-                    fontSize: TextSize.font14(context),
-                    fontWeight: FontWeight.w400,
-                  ),
-               )),
               _premiumMatches(),
               _recentVisitors(),
               _followUpSection(),
@@ -136,6 +127,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _premiumMatches() {
+    final provider = ref.watch(homeProvider);
+    final matches = provider.premiumMatches;
+    final isLoading = provider.isLoadingPremiumMatches;
+    final errorText = provider.premiumMatchesError;
+    final subtitleText = isLoading
+        ? 'Fetching premium matches'
+        : '${matches.length} Profiles Found';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -158,7 +157,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
                   Text(
-                    '26 Profiles Found',
+                    subtitleText,
                     style: TextStyle(
                       color: AppColors.textSecondaryLight,
                       fontSize: TextSize.font14(context),
@@ -202,40 +201,119 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         const SizedBox(height: 10),
         Padding(
           padding: const EdgeInsets.only(left: 20.0),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: List.generate(
-                10,
-                (index) => const Padding(
-                  padding: EdgeInsets.only(
-                    right: 10.0,
-                  ),
-                  child: SizedBox(
-                    width: 300,
-                    child: ProfileComprehensiveCard(
-                      imagePath: AppImages.demoProfile2,
-                      leftIconPath: AppImages.favouriteIcon,
-                      imageHeight: 250,
-                      isPremiumConnect: true,
-                      isVerified: true,
-                      name: 'Afia Sultana',
-                      age: '28 Yr',
-                      height: '5\' 3\'" ',
-                      religion: 'Muslim',
-                      profession: 'Software Engineer',
-                      location: 'Gulshan, Dhaka, BD',
-                      activeStatusText: 'Online',
-                      isSingleButton: true,
+          child: SizedBox(
+            height: 360,
+            child: Builder(
+              builder: (_) {
+                if (isLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                if (errorText != null && matches.isEmpty) {
+                  return Center(
+                    child: Text(
+                      errorText,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppColors.textSecondaryLight,
+                        fontSize: TextSize.font16(context),
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
+                  );
+                }
+
+                if (matches.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'No premium matches available yet.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppColors.textSecondaryLight,
+                        fontSize: TextSize.font16(context),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  );
+                }
+
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: matches.map(_buildPremiumMatchCard).toList(),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           ),
         ),
       ],
     );
+  }
+
+  Widget _buildPremiumMatchCard(MatchProfile match) {
+    final location = _formatMatchLocation(match);
+    final heightText = _formatMatchHeight(match.height);
+    final activeStatus = _activeStatusText(match);
+    final profession = match.profession ?? match.education;
+    final imagePath = (match.profilePhoto?.url?.isNotEmpty ?? false)
+        ? match.profilePhoto!.url!
+        : AppImages.demoProfile;
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 10.0),
+      child: SizedBox(
+        width: 300,
+        child: ProfileComprehensiveCard(
+          imagePath: imagePath,
+          imageHeight: 250,
+          isPremiumConnect: match.isPremium ?? true,
+          isVerified: match.profilePhoto?.isVerified ?? false,
+          name: match.displayName ?? 'Walima Member',
+          age: match.age != null ? '${match.age} Yr' : null,
+          height: heightText,
+          location: location,
+          profession: profession,
+          religion: match.religion,
+          activeStatusText: activeStatus,
+        ),
+      ),
+    );
+  }
+
+  String? _formatMatchHeight(num? height) {
+    if (height == null) return null;
+    final doubleValue = height.toDouble();
+    if (doubleValue % 1 == 0) {
+      return doubleValue.toInt().toString();
+    }
+    return doubleValue.toStringAsFixed(1);
+  }
+
+  String? _formatMatchLocation(MatchProfile match) {
+    final location = match.location;
+    final parts = [
+      location?.city,
+      location?.state,
+      location?.country,
+    ]
+        .where((value) => value != null && value.trim().isNotEmpty)
+        .map((value) => value!.trim())
+        .toList();
+    if (parts.isEmpty) return null;
+    return parts.join(', ');
+  }
+
+  String _activeStatusText(MatchProfile match) {
+    if (match.isOnline == true) {
+      return 'Online';
+    }
+    if (match.lastSeenAt != null && match.lastSeenAt!.isNotEmpty) {
+      return match.lastSeenAt!;
+    }
+    return 'Offline';
   }
 
   Widget _recentVisitors() {

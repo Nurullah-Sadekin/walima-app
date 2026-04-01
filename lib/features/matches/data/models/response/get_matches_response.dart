@@ -1,49 +1,43 @@
 class GetMatchesResponse {
   GetMatchesResponse({
+    this.code,
     this.message,
     this.data,
     this.pagination,
     this.savedSearch,
+    this.traceId,
     this.statusCode,
   });
 
   GetMatchesResponse.fromJson(dynamic json, {this.statusCode}) {
-    message = json['message'];
-    if (json['data'] != null) {
+    final raw = _ensureMap(json);
+    code = raw['code'];
+    message = raw['message'];
+    traceId = raw['traceId'];
+
+    final payload = _extractPayload(raw);
+
+    if (payload['data'] != null) {
       data = [];
-      json['data'].forEach((v) {
+      payload['data'].forEach((v) {
         data?.add(MatchProfile.fromJson(v));
       });
     }
-    pagination = json['pagination'] != null
-        ? MatchesPagination.fromJson(json['pagination'])
+    pagination = payload['pagination'] != null
+        ? MatchesPagination.fromJson(payload['pagination'])
         : null;
-    savedSearch = json['savedSearch'] != null
-        ? SavedSearch.fromJson(json['savedSearch'])
+    savedSearch = payload['savedSearch'] != null
+        ? SavedSearch.fromJson(payload['savedSearch'])
         : null;
   }
 
+  String? code;
   String? message;
   List<MatchProfile>? data;
   MatchesPagination? pagination;
   SavedSearch? savedSearch;
+  String? traceId;
   int? statusCode;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['message'] = message;
-    if (data != null) {
-      map['data'] = data?.map((v) => v.toJson()).toList();
-    }
-    if (pagination != null) {
-      map['pagination'] = pagination?.toJson();
-    }
-    if (savedSearch != null) {
-      map['savedSearch'] = savedSearch?.toJson();
-    }
-    map['statusCode'] = statusCode;
-    return map;
-  }
 }
 
 class MatchProfile {
@@ -390,4 +384,17 @@ num? _parseNum(dynamic value) {
   if (value == null) return null;
   if (value is num) return value;
   return num.tryParse(value.toString());
+}
+
+Map<String, dynamic> _ensureMap(dynamic json) {
+  if (json is Map<String, dynamic>) return json;
+  if (json is Map) return Map<String, dynamic>.from(json);
+  return {};
+}
+
+Map<String, dynamic> _extractPayload(Map<String, dynamic> root) {
+  final response = root['response'];
+  if (response is Map<String, dynamic>) return response;
+  if (response is Map) return Map<String, dynamic>.from(response);
+  return root;
 }

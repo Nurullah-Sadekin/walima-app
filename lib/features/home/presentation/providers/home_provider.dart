@@ -1,24 +1,55 @@
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/features/login/data/repository/login_repository.dart';
-import 'package:flutter_boilerplate/features/profile/data/model/response/dashboard_response.dart';
-import 'package:flutter_boilerplate/features/profile/data/repository/profile_repository.dart';
+import 'package:flutter_boilerplate/features/matches/data/models/request/get_matches_query_params.dart';
+import 'package:flutter_boilerplate/features/matches/data/models/response/get_matches_response.dart';
+import 'package:flutter_boilerplate/features/matches/data/repository/matches_repository.dart';
 
 class HomeProvider extends BaseChangeNotifier {
   HomeScreenStates screenStates = HomeScreenStates.defaultState;
   HomeScreenStates loaderState = HomeScreenStates.defaultState;
-  //
-  // Future<void> getInitialData() async {
-  //   final response = await LoginRepository.getMe();
-  //   if (response.code == 'SUCCESS') {
-  //     // Handle successful response, e.g., store user data
-  //   } else {
-  //     // Handle error, e.g., show a dialog
-  //     // DialogUtils.showErrorDialog(message: response.message);
-  //   }
-  // }
+  
+  List<MatchProfile> premiumMatches = [];
+  bool isLoadingPremiumMatches = false;
+  String? premiumMatchesError;
+  bool _hasLoadedPremiumMatches = false;
 
-  void updateViewState(
-      {HomeScreenStates? screenStates, HomeScreenStates? loadingState}) {
+  Future<void> loadPremiumMatches({bool force = false}) async {
+    if (_hasLoadedPremiumMatches && !force) return;
+    isLoadingPremiumMatches = true;
+    premiumMatchesError = null;
+    notifyListeners();
+
+    final response = await MatchesRepository.getMatches(
+       GetMatchesQueryParams(
+        page: 1,
+        size: 1,
+        type: 'premium_matches',
+      ),
+    );
+
+    isLoadingPremiumMatches = false;
+
+    final isSuccess = response.statusCode != null && response.statusCode! >= 200 && response.statusCode! < 300;
+
+    if (isSuccess) {
+      premiumMatches = response.data ?? [];
+      _hasLoadedPremiumMatches = true;
+      if (premiumMatches.isEmpty) {
+        premiumMatchesError = 'No premium matches available at the moment.';
+      } else {
+        premiumMatchesError = null;
+      }
+    } else {
+      premiumMatches.clear();
+      premiumMatchesError = response.message ?? 'Unable to load premium matches.';
+    }
+
+    notifyListeners();
+  }
+
+  void updateViewState({
+    HomeScreenStates? screenStates,
+    HomeScreenStates? loadingState,
+  }) {
     if (screenStates != null) {
       this.screenStates = screenStates;
       loaderState = HomeScreenStates.defaultState;
