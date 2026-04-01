@@ -9,6 +9,7 @@ import 'package:flutter_boilerplate/core/global/repositorys/global_repository.da
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/app_router.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/core/utils/picker_dialog.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/providers/app_drawer_provider.dart';
 import 'package:flutter_boilerplate/features/profile/presentation/utils/profile_summary_utils.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/screens/widgets/profile_action_tile.dart';
@@ -116,13 +117,14 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
       showBottomIcon: true,
       topIconPath: AppImages.verifiedBadgeSvgIcon,
       bottomIconPath: AppImages.cameraSvgIcon,
-      onTopIconPressed: () {
-        // context.pushNamed(Routes.editProfile);
-        // print('Edit pressed');
-      },
-      onBottomIconPressed: () {
-        // context.pushNamed(Routes.editProfile);
-        // print('Check pressed');
+      onBottomIconPressed: () async {
+        final String? imagePath = await PickerDialog().imagePicker(context);
+        if (imagePath != null) {
+          await ref.watch(profileProvider).updateProfileImage(
+            context: context,
+            filePath: imagePath,
+          );
+        }
       },
     );
   }
