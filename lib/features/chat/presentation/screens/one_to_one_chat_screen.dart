@@ -336,7 +336,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
   Widget _profileAvatar(
       {required String imagePath,
       required double size,
-      bool showOnlineIndicator = false}) {
+      bool showOnlineIndicator = false,
+      }) {
     return SizedBox(
       width: size,
       height: size,
@@ -349,7 +350,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               image: DecorationImage(
-                  image: AssetImage(imagePath), fit: BoxFit.cover),
+                  image: AssetImage(imagePath), fit: BoxFit.cover,
+                  ),
             ),
           ),
           if (showOnlineIndicator)
@@ -362,7 +364,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                 decoration: BoxDecoration(
                     color: const Color(0xFF11A251),
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2)),
+                    border: Border.all(color: Colors.white, width: 2),
+                    ),
               ),
             ),
         ],
