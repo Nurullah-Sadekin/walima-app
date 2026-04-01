@@ -13,6 +13,7 @@ import 'package:flutter_boilerplate/features/matches/presentation/widgets/remind
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'widgets/message_bubble.dart';
+import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_messages_response.dart';
 
 enum MoreMenuAction { viewProfile, viewContact, block, report }
 
@@ -392,13 +393,25 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
               }
               final msg = message[index];
               final isMe = msg.senderId == provider.currentUserId;
-              return _textMessageRow(isMe: isMe, message: msg.content ?? '');
+              return _textMessageRow(isMe: isMe, message: msg.content ?? '', msg: msg);
             },
           );
   }
 
-  Widget _textMessageRow({required bool isMe, required String message}) {
+  Widget _textMessageRow({required bool isMe, required String message, required Message msg}) {
     final bubbleColor = isMe ? const Color(0xFFF4E8EE) : const Color(0xFFEFEFEF);
+
+    // Determine avatar image for this message. Prefer message-level participant info,
+    // fall back to navigation payload or demo assets.
+    String? avatarPath;
+    if (isMe) {
+      // If sender is current user, try sender.profilePhoto, then fallback to demo
+      avatarPath = msg.sender?.profilePhoto?.url ?? AppImages.demoProfile2;
+    } else {
+      // For incoming messages, prefer sender (other user) profile photo, then receiver, then navigation payload
+      avatarPath = msg.sender?.profilePhoto?.url ?? msg.receiver?.profilePhoto?.url ??
+          (_participant != null ? (_participant!['profilePictureUrl'] as String?) : null) ?? AppImages.demoProfile;
+    }
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
@@ -406,7 +419,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
-          if (!isMe) _profileAvatar(imagePath: AppImages.demoProfile, size: 30),
+          if (!isMe) _profileAvatar(imagePath: avatarPath ?? AppImages.demoProfile, size: 30),
           if (!isMe) const SizedBox(width: 10),
           ConstrainedBox(
             constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.72),
@@ -417,7 +430,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
             ),
           ),
           if (isMe) const SizedBox(width: 10),
-          if (isMe) _profileAvatar(imagePath: AppImages.demoProfile2, size: 30),
+          if (isMe) _profileAvatar(imagePath: avatarPath ?? AppImages.demoProfile2, size: 30),
         ],
       ),
     );
