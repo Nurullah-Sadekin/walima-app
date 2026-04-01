@@ -10,6 +10,7 @@ import 'package:flutter_boilerplate/features/chat/data/model/response/conversati
 import 'package:flutter_boilerplate/features/chat/presentation/provider/chat_provider.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/chat_list_item.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/profile_avatar_with_name.dart';
+import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/safety_First_bottom_sheet.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/tab_bar_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -64,6 +65,42 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       notificationCount: 26,
       context: context,
       tabIndex: 3,
+      onSafetyPressed: () {
+        _showSafetyBottomSheet();
+      },
+    );
+  }
+
+  void _showSafetyBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: SafeArea(
+            top: false,
+            child: Wrap(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16),
+                  child: SafetyFirst(
+                    onViewMoreTips: () {
+                      Navigator.pop(context);
+                    //  context.pushNamed(Routes.safetyTipsScreen);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
