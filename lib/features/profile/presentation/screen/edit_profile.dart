@@ -7,6 +7,7 @@ import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/core/utils/picker_dialog.dart';
 import 'package:flutter_boilerplate/features/home/presentation/widgets/profile_info_card.dart';
 import 'package:flutter_boilerplate/features/profile/data/model/response/get_complete_profile_response.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
@@ -41,20 +42,20 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ],
         ),
       ),
-      // floatingActionButton: BottomBorderedWidget(
-      //   widget: PrimaryButtons(
-      //     title: 'Preview Profile',
-      //     titleSize: TextSize.font14(context),
-      //     textColor: AppColors.white,
-      //     bgColor: AppColors.primary,
-      //     svgIconColor: AppColors.white,
-      //     onTap: () {
-      //       context.pop({'preview': true});
-      //     },
-      //     buttonStyle: ButtonsStyle.activePrimaryButton,
-      //   ),
-      // ),
-      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: BottomBorderedWidget(
+        widget: PrimaryButtons(
+          title: 'Preview Profile',
+          titleSize: TextSize.font14(context),
+          textColor: AppColors.white,
+          bgColor: AppColors.primary,
+          svgIconColor: AppColors.white,
+          onTap: () {
+            context.pop({'preview': true});
+          },
+          buttonStyle: ButtonsStyle.activePrimaryButton,
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
@@ -95,8 +96,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             showBottomIcon: true,
             topPositionImagePath: AppImages.verifiedBadgeSvgIcon,
             bottomPositionImagePath: AppImages.cameraSvgIcon,
-            onEdit: () {
-              // print('Check pressed');
+            onEdit: () async {
+              final String? imagePath = await PickerDialog().imagePicker(context);
+              if (imagePath != null) {
+                await ref.watch(profileProvider).updateProfileImage(
+                  context: context,
+                  filePath: imagePath,
+                );
+              }
             },
           ),
           const SizedBox(width: 12),

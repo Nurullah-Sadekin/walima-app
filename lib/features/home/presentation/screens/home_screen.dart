@@ -201,52 +201,49 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         const SizedBox(height: 10),
         Padding(
           padding: const EdgeInsets.only(left: 20.0),
-          child: SizedBox(
-            height: 360,
-            child: Builder(
-              builder: (_) {
-                if (isLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
+          child: Builder(
+            builder: (_) {
+              if (isLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
 
-                if (errorText != null && matches.isEmpty) {
-                  return Center(
-                    child: Text(
-                      errorText,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: AppColors.textSecondaryLight,
-                        fontSize: TextSize.font16(context),
-                        fontWeight: FontWeight.w400,
-                      ),
+              if (errorText != null && matches.isEmpty) {
+                return Center(
+                  child: Text(
+                    errorText,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppColors.textSecondaryLight,
+                      fontSize: TextSize.font16(context),
+                      fontWeight: FontWeight.w400,
                     ),
-                  );
-                }
-
-                if (matches.isEmpty) {
-                  return Center(
-                    child: Text(
-                      'No premium matches available yet.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: AppColors.textSecondaryLight,
-                        fontSize: TextSize.font16(context),
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  );
-                }
-
-                return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: matches.map(_buildPremiumMatchCard).toList(),
                   ),
                 );
-              },
-            ),
+              }
+
+              if (matches.isEmpty) {
+                return Center(
+                  child: Text(
+                    'No premium matches available yet.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppColors.textSecondaryLight,
+                      fontSize: TextSize.font16(context),
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                );
+              }
+
+              return SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: matches.map(_buildPremiumMatchCard).toList(),
+                ),
+              );
+            },
           ),
         ),
       ],
@@ -391,52 +388,49 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         const SizedBox(height: 10),
         Padding(
           padding: const EdgeInsets.only(left: 20.0),
-          child: SizedBox(
-            height: 360,
-            child: Builder(
-              builder: (_) {
-                if (isLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
+          child: Builder(
+            builder: (_) {
+              if (isLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
 
-                if (errorText != null && visitors.isEmpty) {
-                  return Center(
-                    child: Text(
-                      errorText,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: AppColors.textSecondaryLight,
-                        fontSize: TextSize.font16(context),
-                        fontWeight: FontWeight.w400,
-                      ),
+              if (errorText != null && visitors.isEmpty) {
+                return Center(
+                  child: Text(
+                    errorText,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppColors.textSecondaryLight,
+                      fontSize: TextSize.font16(context),
+                      fontWeight: FontWeight.w400,
                     ),
-                  );
-                }
-
-                if (visitors.isEmpty) {
-                  return Center(
-                    child: Text(
-                      'No recent visitors yet.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: AppColors.textSecondaryLight,
-                        fontSize: TextSize.font16(context),
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  );
-                }
-
-                return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: visitors.map(_buildRecentVisitorCard).toList(),
                   ),
                 );
-              },
-            ),
+              }
+
+              if (visitors.isEmpty) {
+                return Center(
+                  child: Text(
+                    'No recent visitors yet.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppColors.textSecondaryLight,
+                      fontSize: TextSize.font16(context),
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                );
+              }
+
+              return SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: visitors.map(_buildRecentVisitorCard).toList(),
+                ),
+              );
+            },
           ),
         ),
       ],

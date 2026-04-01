@@ -342,6 +342,7 @@ class ProfileComprehensiveCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                  if (isVerified)
                   ShowImage(
                     imagePath: AppImages.verifiedBadgeSvgIcon,
                     width: TextSize.font20(context),
