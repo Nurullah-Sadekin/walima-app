@@ -1,9 +1,15 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/provider/chat_provider.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/inbox_card.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/info_card.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/into_tile.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/remind_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
@@ -29,7 +35,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
     _participant = extra != null && extra['participant'] is Map
         ? extra['participant'] as Map<String, dynamic>
         : null;
-    final conversationId = extra != null ? extra['conversationId'] as String? : null;
+    final conversationId =
+        extra != null ? extra['conversationId'] as String? : null;
     _scrollController.addListener(_handleScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -162,47 +169,138 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
               ],
             ),
           ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.call_outlined,
-              size: 28,
-              color: Color(0xFF666666),
-            ),
-          ),
+          Row(
+            spacing: 16,
+            children: [
+              ShowImage(
+                imagePath: AppImages.callIcon,
+                width: TextSize.font20(context),
+                height: TextSize.font20(context),
+                color: const Color(0xFF666666),
+              ),            InkWell(
+                onTap: () {},
+                child: Icon(
+                  Icons.more_vert,
+                  color: AppColors.textSecondaryLight,
+                  size: TextSize.font22(context),
+                ),
+              ),
+            ],
+          )
         ],
       ),
     );
   }
 
   Widget _conversationBody(ChatProvider provider) {
+    bool freeUser = true;
     if (provider.messagesLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final msgs = provider.messages;
+    final message = provider.messages;
 
-    if (msgs.isEmpty) {
+    if (message.isEmpty) {
       return const Center(child: Text('No messages yet'));
     }
 
-    return ListView.builder(
-      controller: _scrollController,
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-      reverse: true,
-      itemCount: msgs.length + (provider.loadingMoreMessages ? 1 : 0),
-      itemBuilder: (context, index) {
-        if (index == msgs.length) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(vertical: 12),
-            child: Center(child: CircularProgressIndicator()),
+    return freeUser == true
+        ? Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 20,
+              children: [
+                RemindCard(
+                  imagePath: AppImages.demoProfile,
+                  name: 'name',
+                  leftButtonOnTap: () {},
+                  rightButtonOnTap: () {},
+                  age: '30',
+                  height: '176cm',
+                  location: 'Dhaka',
+                  singleButton: false,
+                ),
+               Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryVariant,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child:  Column(
+                    spacing: 10,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: 8,
+                        children: [
+                          ShowImage(
+                            imagePath: AppImages.lockPasswordSvgIcon,
+                            width: TextSize.font16(context),
+                            height: TextSize.font16(context),
+                            color: AppColors.textSecondaryLight,
+                          ),
+                          Flexible(
+                            child: Text(
+                              'You have 1 unread message from her please view and reply promptly for a smoother conversation.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color:  AppColors.textSecondaryLight,
+                                fontSize: TextSize.font12(context),
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      InkWell(
+                        onTap: null,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          spacing: 8,
+                          children: [
+                            Text(
+                              'Upgrade Now',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color:  AppColors.primary,
+                                fontSize: TextSize.font14(context),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            ShowImage(
+                              imagePath: AppImages.arrowRightSvgIcon,
+                              width: TextSize.font16(context),
+                              height: TextSize.font16(context),
+                              color: AppColors.primary,
+                            )
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+               )
+              ],
+            ),
+          )
+        : ListView.builder(
+            controller: _scrollController,
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+            reverse: true,
+            itemCount: message.length + (provider.loadingMoreMessages ? 1 : 0),
+            itemBuilder: (context, index) {
+              if (index == message.length) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
+              final msg = message[index];
+              final isMe = msg.senderId == provider.currentUserId;
+              return _textMessageRow(isMe: isMe, message: msg.content ?? '');
+            },
           );
-        }
-        final msg = msgs[index];
-        final isMe = msg.senderId == provider.currentUserId;
-        return _textMessageRow(isMe: isMe, message: msg.content ?? '');
-      },
-    );
   }
 
   Widget _textMessageRow({required bool isMe, required String message}) {
@@ -333,11 +431,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
     return isOnline ? 'Active Now' : 'Offline';
   }
 
-  Widget _profileAvatar(
-      {required String imagePath,
-      required double size,
-      bool showOnlineIndicator = false,
-      }) {
+  Widget _profileAvatar({
+    required String imagePath,
+    required double size,
+    bool showOnlineIndicator = false,
+  }) {
     return SizedBox(
       width: size,
       height: size,
@@ -350,8 +448,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               image: DecorationImage(
-                  image: AssetImage(imagePath), fit: BoxFit.cover,
-                  ),
+                image: AssetImage(imagePath),
+                fit: BoxFit.cover,
+              ),
             ),
           ),
           if (showOnlineIndicator)
@@ -362,10 +461,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                 width: 16,
                 height: 16,
                 decoration: BoxDecoration(
-                    color: const Color(0xFF11A251),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
-                    ),
+                  color: const Color(0xFF11A251),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                ),
               ),
             ),
         ],

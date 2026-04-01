@@ -3,23 +3,9 @@ import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 
 class InfoCardWidget extends StatelessWidget {
-  final String title;
-  final String description;
-  final Color? backgroundColor;
-  final Color? borderColor;
-  final Color? titleColor;
-  final Color? descriptionColor;
-  final double? titleFontSize;
-  final double? descriptionFontSize;
-  final FontWeight? titleFontWeight;
-  final FontWeight? descriptionFontWeight;
-  final EdgeInsetsGeometry? padding;
-  final double? spacing;
-  final double? borderRadius;
-  final double? borderWidth;
 
   const InfoCardWidget({
-    Key? key,
+    super.key,
     required this.title,
     required this.description,
     this.backgroundColor,
@@ -34,7 +20,22 @@ class InfoCardWidget extends StatelessWidget {
     this.spacing,
     this.borderRadius,
     this.borderWidth,
-  }) : super(key: key);
+  });
+
+  final String title;
+  final String description;
+  final Color? backgroundColor;
+  final Color? borderColor;
+  final Color? titleColor;
+  final Color? descriptionColor;
+  final double? titleFontSize;
+  final double? descriptionFontSize;
+  final FontWeight? titleFontWeight;
+  final FontWeight? descriptionFontWeight;
+  final EdgeInsetsGeometry? padding;
+  final double? spacing;
+  final double? borderRadius;
+  final double? borderWidth;
 
   @override
   Widget build(BuildContext context) {
