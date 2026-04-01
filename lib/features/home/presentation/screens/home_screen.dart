@@ -39,11 +39,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       return false;
     }
 
-    if (notification.direction == ScrollDirection.reverse &&
-        _showProfileSummary) {
+    if (notification.direction == ScrollDirection.reverse && _showProfileSummary) {
       setState(() => _showProfileSummary = false);
-    } else if (notification.direction == ScrollDirection.forward &&
-        !_showProfileSummary) {
+    } else if (notification.direction == ScrollDirection.forward && !_showProfileSummary) {
       setState(() => _showProfileSummary = true);
     }
 
@@ -116,6 +114,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Column(
             children: [
               const CompleteProfileSection(),
+               Container(
+                 padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                color: AppColors.greyLight,
+                 child: Text(
+                  'Api Returning internal server error, showing dummy data for now',
+                  style: TextStyle(
+                    color: AppColors.textSecondaryLight,
+                    fontSize: TextSize.font14(context),
+                    fontWeight: FontWeight.w400,
+                  ),
+               )),
               _premiumMatches(),
               _recentVisitors(),
               _followUpSection(),

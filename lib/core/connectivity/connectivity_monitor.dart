@@ -60,7 +60,8 @@ class _ConnectivityMonitorState extends State<ConnectivityMonitor> {
       messenger.hideCurrentSnackBar();
       messenger.showSnackBar(
         const SnackBar(
-          content: Text('Back online'),
+          backgroundColor: Colors.green,
+          content: Text('Back online', style: TextStyle(color: Colors.white)),  
           duration: Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
         ),
