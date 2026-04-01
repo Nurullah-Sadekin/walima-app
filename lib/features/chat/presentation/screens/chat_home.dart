@@ -63,6 +63,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       title: 'Chat',
       notificationCount: 26,
       context: context,
+      tabIndex: 3,
     );
   }
 

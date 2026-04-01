@@ -13,23 +13,27 @@ class AnchoredAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.title,
     this.onMenuPressed,
     this.onNotificationPressed,
+    this.onSafetyPressed,
     this.iconColor,
     this.textColor,
     this.iconSize,
     this.leadingWidth,
     this.showNotification = true,
     this.notificationCount = 0,
+    this.tabIndex,
   });
   final BuildContext context;
   final String title;
   final VoidCallback? onMenuPressed;
   final VoidCallback? onNotificationPressed;
+  final VoidCallback? onSafetyPressed;
   final Color? iconColor;
   final Color? textColor;
   final double? iconSize;
   final double? leadingWidth;
   final bool showNotification;
   final double? notificationCount;
+  final int? tabIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -57,37 +61,54 @@ class AnchoredAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       actions: [
-        if (showNotification)
-          Stack(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(7),
-                child: ShowImage(
-                  imagePath: AppImages.notificationSvgIcon,
-                  color: defaultIconColor,
-                  height: defaultIconSize,
-                  width: defaultIconSize,
+        if (showNotification && tabIndex != 3)
+          InkWell(
+            onTap: onNotificationPressed,
+            child: Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(7),
+                  child: ShowImage(
+                    imagePath: AppImages.notificationSvgIcon,
+                    color: defaultIconColor,
+                    height: defaultIconSize,
+                    width: defaultIconSize,
+                  ),
                 ),
+                Positioned(
+                  left: 12,
+                  top: 0,
+                  child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 5,vertical: 2),
+                    decoration: const BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                    ),
+                    child: Text('${notificationCount?.toInt() ?? 0}',
+                      textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false, applyHeightToLastDescent: false),
+                      style: TextStyle(
+                      color: Colors.white,
+                      fontSize: TextSize.font10(context),
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ),)
+              ],
+            ),
+          ),
+
+        if (tabIndex != null && tabIndex == 3)
+          InkWell(
+            onTap: onSafetyPressed,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: ShowImage(
+                imagePath: AppImages.safetySvgIcon,
+                color: defaultIconColor,
+                height: defaultIconSize,
+                width: defaultIconSize,
               ),
-              Positioned(
-                left: 12,
-                top: 0,
-                child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 5,vertical: 2),
-                  decoration: const BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                  ),
-                  child: Text('${notificationCount?.toInt() ?? 0}',
-                    textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false, applyHeightToLastDescent: false),
-                    style: TextStyle(
-                    color: Colors.white,
-                    fontSize: TextSize.font10(context),
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),)
-            ],
+            ),
           ),
       ],
       backgroundColor: Colors.transparent,
