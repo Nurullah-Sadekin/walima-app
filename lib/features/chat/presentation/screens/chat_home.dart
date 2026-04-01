@@ -152,8 +152,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         final conversation = conversations[index];
         final participant = provider.getConversationCounterpart(conversation);
         final userName = participant?.displayName?.trim();
-        final displayName =
-            (userName?.isNotEmpty ?? false) ? userName! : 'Unknown User';
+        final displayName = (userName?.isNotEmpty ?? false) ? userName! : 'Unknown User';
         final lastMessage = conversation.lastMessage?.trim();
 
         return Padding(
@@ -162,6 +161,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             name: displayName,
             imagePath: participant?.profilePictureUrl ?? AppImages.demoProfile2,
             isVerified: participant?.profilePhoto?.isVerified ?? false,
+            isOnline: participant?.isOnline,
             lastMessage: (lastMessage?.isNotEmpty ?? false)
                 ? lastMessage!
                 : 'No message',

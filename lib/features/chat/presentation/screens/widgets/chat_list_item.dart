@@ -15,6 +15,7 @@ class ChatListItem extends StatelessWidget {
     required this.timeAgo,
     this.isVerified = false,
     this.onTap,
+    this.isOnline,
   });
   final String name;
   final String? imagePath;
@@ -22,6 +23,7 @@ class ChatListItem extends StatelessWidget {
   final String timeAgo;
   final bool isVerified;
   final VoidCallback? onTap;
+  final bool? isOnline;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +35,7 @@ class ChatListItem extends StatelessWidget {
         children: [
           ProfileAvatarWithName(
             imagePath: imagePath ?? AppImages.demoProfile2,
+            indicatorColor: isOnline == true ? AppColors.greenButtonColor : Colors.red,
           ),
           const SizedBox(width: 12),
           Flexible(
