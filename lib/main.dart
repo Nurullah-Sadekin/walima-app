@@ -43,17 +43,13 @@ class MyApp extends ConsumerWidget {
         child: MaterialApp.router(
         title: 'Walima',
         debugShowCheckedModeBanner: false,
-
         scaffoldMessengerKey: rootScaffoldMessengerKey,
-
         // Theme
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.lightTheme,
         themeMode: themeMode,
-
         // Routing
         routerConfig: router,
-
         // Localization
         locale: locale,
         supportedLocales: const [

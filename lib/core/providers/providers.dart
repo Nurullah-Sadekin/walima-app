@@ -1,3 +1,4 @@
+import 'package:flutter_boilerplate/core/global/providers/global_provider.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/provider/chat_provider.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/providers/app_drawer_provider.dart';
 import 'package:flutter_boilerplate/features/home/presentation/providers/home_provider.dart';
@@ -18,7 +19,7 @@ final loginProvider = ChangeNotifierProvider<LoginProvider>((ref) {
 });
 
 final registrationProvider =
-ChangeNotifierProvider<RegistrationProvider>((ref) {
+    ChangeNotifierProvider<RegistrationProvider>((ref) {
   return RegistrationProvider();
 });
 
@@ -68,10 +69,9 @@ final aboutYourselfScreenProvider =
 });
 
 final verifyOtpForSignUp =
-ChangeNotifierProvider<RegistrationScreenStateProvider>((ref) {
+    ChangeNotifierProvider<RegistrationScreenStateProvider>((ref) {
   return RegistrationScreenStateProvider();
 });
-
 
 final verifyNumberScreenProvider =
     ChangeNotifierProvider<RegistrationScreenStateProvider>((ref) {
@@ -125,7 +125,8 @@ final profileProvider = ChangeNotifierProvider<ProfileProvider>((ref) {
   return ProfileProvider();
 });
 
-final searchFilterProvider = ChangeNotifierProvider<SearchFilterProvider>((ref) {
+final searchFilterProvider =
+    ChangeNotifierProvider<SearchFilterProvider>((ref) {
   return SearchFilterProvider();
 });
 
@@ -133,10 +134,15 @@ final newFilterProvider = ChangeNotifierProvider<NewFilterProvider>((ref) {
   return NewFilterProvider();
 });
 
-final myMatchFilterProvider = ChangeNotifierProvider<MyMatchFilterProvider>((ref) {
+final myMatchFilterProvider =
+    ChangeNotifierProvider<MyMatchFilterProvider>((ref) {
   return MyMatchFilterProvider();
 });
 
 final chatProvider = ChangeNotifierProvider<ChatProvider>((ref) {
   return ChatProvider();
+});
+
+final globalProvider = ChangeNotifierProvider<GlobalProvider>((ref) {
+  return GlobalProvider();
 });
