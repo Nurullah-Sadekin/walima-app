@@ -132,13 +132,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
         children: [
           IconButton(
             onPressed: () => Navigator.of(context).maybePop(),
-            icon: const Icon(
-              Icons.chevron_left_rounded,
-              size: 34,
-              color: Color(0xFF5B5B5B),
+            icon: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              size: TextSize.font18(context),
+              color: AppColors.textSecondaryLight,
             ),
           ),
-          const SizedBox(width: 4),
           Expanded(
             child: Row(
               children: [
@@ -147,7 +146,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                 //   size: 60,
                 //   showOnlineIndicator: isOnline,
                 // ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 8),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -174,7 +173,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
             ),
           ),
           Row(
-            spacing: 16,
+            spacing: 12,
             children: [
               ShowImage(
                 imagePath: AppImages.callIcon,
@@ -198,7 +197,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                   PopupMenuItem(
                     value: MoreMenuAction.viewProfile,
                     height: 32.0,
-                    padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
+                    padding:const EdgeInsets.fromLTRB(16, 10, 35, 10),
                     child: Text('View Profile',
                         style: TextStyle(fontSize: TextSize.font12(context), color: AppColors.textPrimaryLight,fontWeight: FontWeight.w400)
                     ),
@@ -206,7 +205,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                   PopupMenuItem(
                     value: MoreMenuAction.viewContact,
                     height: 32.0,
-                    padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
+                    padding:const EdgeInsets.fromLTRB(16, 10, 35, 10),
                     child: Text('View Contact',
                         style: TextStyle(fontSize: TextSize.font12(context), color: AppColors.textPrimaryLight,fontWeight: FontWeight.w400)
                     ),
@@ -214,7 +213,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                   PopupMenuItem(
                     value: MoreMenuAction.block,
                     height: 32.0,
-                    padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
+                    padding:const EdgeInsets.fromLTRB(16, 10, 35, 10),
                     child: Text('Block',
                         style: TextStyle(fontSize: TextSize.font12(context), color: AppColors.textPrimaryLight,fontWeight: FontWeight.w400)
                     ),
@@ -222,7 +221,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                   PopupMenuItem(
                     value: MoreMenuAction.report,
                     height: 32.0,
-                    padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
+                    padding:const EdgeInsets.fromLTRB(16, 10, 35, 10),
                     child: Text('Report',
                         style: TextStyle(fontSize: TextSize.font12(context), color: AppColors.textPrimaryLight,fontWeight: FontWeight.w400)
                     ),
