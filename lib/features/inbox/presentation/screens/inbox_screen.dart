@@ -18,7 +18,7 @@ import 'package:flutter_boilerplate/features/matches/presentation/widgets/filter
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/image_carousel.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/info_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/into_tile.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/message_bubble.dart';
+import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/message_bubble.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/new_matches_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/remind_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/safety_first_card.dart';

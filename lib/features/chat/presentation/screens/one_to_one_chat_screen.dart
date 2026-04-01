@@ -12,6 +12,8 @@ import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/remind_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'widgets/message_bubble.dart';
+
 enum MoreMenuAction { viewProfile, viewContact, block, report }
 
 class ChatScreen extends ConsumerStatefulWidget {
@@ -396,43 +398,26 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
   }
 
   Widget _textMessageRow({required bool isMe, required String message}) {
-    final bubbleColor =
-        isMe ? const Color(0xFFF4E8EE) : const Color(0xFFEFEFEF);
-    final bubbleRadius = BorderRadius.only(
-      topLeft: const Radius.circular(20),
-      topRight: const Radius.circular(20),
-      bottomLeft: Radius.circular(isMe ? 20 : 8),
-      bottomRight: Radius.circular(isMe ? 8 : 20),
-    );
+    final bubbleColor = isMe ? const Color(0xFFF4E8EE) : const Color(0xFFEFEFEF);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment:
-            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
-          if (!isMe) _profileAvatar(imagePath: AppImages.demoProfile, size: 32),
+          if (!isMe) _profileAvatar(imagePath: AppImages.demoProfile, size: 30),
           if (!isMe) const SizedBox(width: 10),
           ConstrainedBox(
-            constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.72),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
-              decoration:
-                  BoxDecoration(color: bubbleColor, borderRadius: bubbleRadius),
-              child: Text(
-                message,
-                style: const TextStyle(
-                    color: Color(0xFF2C2C2C),
-                    fontSize: 16,
-                    height: 1.35,
-                    fontWeight: FontWeight.w400),
-              ),
+            constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.72),
+            child: MessageBubble(
+              message: message,
+              backgroundColor: bubbleColor,
+              senderMessage: !isMe
             ),
           ),
           if (isMe) const SizedBox(width: 10),
-          if (isMe) _profileAvatar(imagePath: AppImages.demoProfile2, size: 32),
+          if (isMe) _profileAvatar(imagePath: AppImages.demoProfile2, size: 30),
         ],
       ),
     );

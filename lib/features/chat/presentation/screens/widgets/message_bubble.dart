@@ -30,9 +30,9 @@ class MessageBubble extends StatelessWidget {
   final bool showSenderName;
   final bool senderMessage;
 
+
   @override
   Widget build(BuildContext context) {
-
 
     final Widget bubbleContent = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,7 +63,6 @@ class MessageBubble extends StatelessWidget {
     );
 
     Widget container = Container(
-      width: double.infinity,
       padding: padding ?? const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: backgroundColor ?? AppColors.primaryVariant,
