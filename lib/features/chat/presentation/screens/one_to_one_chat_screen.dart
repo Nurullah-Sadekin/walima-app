@@ -102,7 +102,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
         (_participant != null
             ? (_participant!['displayName'] as String?)
             : null);
-    final imagePath = liveParticipant?.profilePictureUrl as String? ??
+    // Participants model uses `profilePhoto?.url` for the image. Keep the
+    // existing map-based fallback (from navigation payload) too.
+    final imagePath = (liveParticipant?.profilePhoto?.url as String?) ??
         (_participant != null
             ? (_participant!['profilePictureUrl'] as String?)
             : null);
@@ -376,7 +378,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
           )
         : ListView.builder(
             controller: _scrollController,
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 80),
             reverse: true,
             itemCount: message.length + (provider.loadingMoreMessages ? 1 : 0),
             itemBuilder: (context, index) {
