@@ -100,6 +100,7 @@ class AppImages {
   static const String schoolSvgIcon = 'assets/svgIcons/school.svg';
   static const String cancelCircle = 'assets/svgIcons/cancel_circle.svg';
   static const String successCircle = 'assets/svgIcons/success_circle.svg';
+  static const String callIcon = 'assets/svgIcons/call_icon.svg';
 
 
 

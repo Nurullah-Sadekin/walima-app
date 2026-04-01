@@ -8,7 +8,7 @@ import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 class RemindCard extends StatelessWidget {
   const RemindCard({
     super.key,
-    required this.onTap,
+    this.onTap,
     required this.imagePath,
     required this.name,
     required this.age,
@@ -18,7 +18,7 @@ class RemindCard extends StatelessWidget {
     this.singleButton = true,
     this.leftButtonTitle = 'Reject',
     this.leftButtonOnTap,
-    this.leftButtonBackgroundColor = AppColors.white,
+    this.leftButtonBackgroundColor = AppColors.transparent,
     this.leftButtonBorderColor = AppColors.greyLight,
     this.leftButtonTextColor = AppColors.textPrimaryLight,
     this.leftButtonSvgIconPath = AppImages.cancelSvgIcon,
@@ -34,7 +34,7 @@ class RemindCard extends StatelessWidget {
     this.rightButtonIconSize = 16,
   });
 
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final String imagePath;
   final String name;
   final String age;
@@ -153,7 +153,7 @@ class RemindCard extends StatelessWidget {
           if (singleButton)
             PrimaryButtons(
               buttonStyle: ButtonsStyle.iconicDynamicButton,
-              onTap: onTap,
+              onTap: onTap ?? () {},
               title: 'Remind',
               borderColor: AppColors.primary,
               textColor: AppColors.primary,
