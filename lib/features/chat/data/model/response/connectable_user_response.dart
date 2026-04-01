@@ -1,3 +1,4 @@
+import 'conversation_list.dart';
 
 class ConnectableUserResponse {
   ConnectableUserResponse({
@@ -47,7 +48,7 @@ class Users {
       this.lastName, 
       this.username, 
       this.userReference, 
-      this.profilePictureUrl, 
+      this.profilePhoto,
       this.isConnected, 
       this.conversationId, 
       this.lastMessagePreview, 
@@ -66,7 +67,8 @@ class Users {
     lastName = json['lastName'];
     username = json['username'];
     userReference = json['userReference'];
-    profilePictureUrl = json['profilePictureUrl'];
+    // correctly parse profilePhoto into ProfilePhoto model if present
+    profilePhoto = json['profilePhoto'] != null ? ProfilePhoto.fromJson(json['profilePhoto']) : null;
     isConnected = json['isConnected'];
     conversationId = json['conversationId'];
     lastMessagePreview = json['lastMessagePreview'];
@@ -84,7 +86,7 @@ class Users {
   String? lastName;
   dynamic username;
   String? userReference;
-  String? profilePictureUrl;
+  ProfilePhoto? profilePhoto;
   bool? isConnected;
   String? conversationId;
   String? lastMessagePreview;
@@ -104,7 +106,9 @@ class Users {
     map['lastName'] = lastName;
     map['username'] = username;
     map['userReference'] = userReference;
-    map['profilePictureUrl'] = profilePictureUrl;
+    if (profilePhoto != null) {
+      map['profilePhoto'] = profilePhoto?.toJson();
+    }
     map['isConnected'] = isConnected;
     map['conversationId'] = conversationId;
     map['lastMessagePreview'] = lastMessagePreview;

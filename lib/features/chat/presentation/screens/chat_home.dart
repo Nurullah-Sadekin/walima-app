@@ -246,7 +246,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               ),
               child: ProfileAvatarWithName(
                 name: user.displayName,
-                imagePath: user.profilePictureUrl ?? AppImages.demoProfile2,
+                imagePath: user.profilePhoto?.url ?? AppImages.demoProfile2,
                 indicatorColor: user.isOnline == true
                     ? AppColors.greenButtonColor
                     : Colors.red,
@@ -256,7 +256,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     'participant': {
                       'userId': user.id,
                       'displayName': user.displayName,
-                      'profilePictureUrl': user.profilePictureUrl,
+                      'profilePictureUrl': user.profilePhoto?.url,
                       'isOnline': user.isOnline,
                     },
                   };

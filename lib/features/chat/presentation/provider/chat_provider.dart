@@ -570,9 +570,9 @@ class ChatProvider extends BaseChangeNotifier {
         lastName: user.lastName,
         username: user.username?.toString(),
         userReference: user.userReference,
-        profilePhoto: user.profilePictureUrl != null
+        profilePhoto: user.profilePhoto?.url != null
             ? ProfilePhoto(
-                url: user.profilePictureUrl,
+                url: user.profilePhoto?.url,
                 isVerified: false,
               )
             : null,
