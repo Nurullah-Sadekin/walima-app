@@ -16,6 +16,7 @@ class ChatListItem extends StatelessWidget {
     this.isVerified,
     this.onTap,
     this.isOnline,
+    this.unReadMessage,
   });
   final String name;
   final String? imagePath;
@@ -24,6 +25,7 @@ class ChatListItem extends StatelessWidget {
   final bool? isVerified;
   final VoidCallback? onTap;
   final bool? isOnline;
+  final bool? unReadMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -57,27 +59,38 @@ class ChatListItem extends StatelessWidget {
   Widget _buildNameRow(BuildContext context) {
     return Row(
       children: [
-        Flexible(
-          child: Text(
-            name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: TextSize.font18(context),
-              color: AppColors.textPrimaryLight,
-              fontWeight: FontWeight.w600,
-            ),
+        Expanded(
+          child: Row(
+            children: [
+              Flexible(
+                child: Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: TextSize.font18(context),
+                    color: AppColors.textPrimaryLight,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              if (isVerified == true) ...[
+                const SizedBox(width: 4),
+                ShowImage(
+                  imagePath: AppImages.verifiedBadgeSvgIcon,
+                  width: TextSize.font14(context),
+                  height: TextSize.font14(context),
+                ),
+              ],
+            ],
           ),
         ),
-        if (isVerified == true) ...[
-          const SizedBox(width: 4),
-          ShowImage(
-            imagePath: AppImages.verifiedBadgeSvgIcon,
-            width: TextSize.font14(context),
-            height: TextSize.font14(context),
-            color: AppColors.primary,
-          ),
-        ],
+        if (unReadMessage == true)
+        const Icon(
+          Icons.circle,
+          size: 10,
+          color: AppColors.primary,
+        ),
       ],
     );
   }

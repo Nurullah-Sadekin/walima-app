@@ -162,6 +162,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             imagePath: participant?.profilePhoto?.url ?? AppImages.demoProfile2,
             isVerified: participant?.profilePhoto?.isVerified,
             isOnline: participant?.isOnline,
+            unReadMessage: conversation.unreadCount != 0,
             lastMessage: (lastMessage?.isNotEmpty ?? false)
                 ? lastMessage!
                 : 'No message',
