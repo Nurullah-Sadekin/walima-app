@@ -249,7 +249,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 imagePath: user.profilePictureUrl ?? AppImages.demoProfile2,
                 indicatorColor: user.isOnline == true
                     ? AppColors.greenButtonColor
-                    : AppColors.grey.withValues(alpha: 0.5),
+                    : Colors.red,
                 onTap: () {
                   final payload = {
                     'conversationId': user.conversationId,
