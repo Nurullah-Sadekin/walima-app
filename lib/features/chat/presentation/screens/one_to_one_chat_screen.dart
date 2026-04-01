@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/provider/chat_provider.dart';
@@ -186,6 +187,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                 onSelected: (action) => _handleMoreMenuAction(action, participant),
                 padding: EdgeInsets.zero,
                 position: PopupMenuPosition.under,
+                color: Colors.white,
                 popUpAnimationStyle: AnimationStyle.noAnimation,
                 icon: Icon(
                   Icons.more_vert,
@@ -195,24 +197,32 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                 itemBuilder: (context) => [
                   PopupMenuItem(
                     value: MoreMenuAction.viewProfile,
+                    height: 32.0,
+                    padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
                     child: Text('View Profile',
                         style: TextStyle(fontSize: TextSize.font12(context), color: AppColors.textPrimaryLight,fontWeight: FontWeight.w400)
                     ),
                   ),
                   PopupMenuItem(
                     value: MoreMenuAction.viewContact,
+                    height: 32.0,
+                    padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
                     child: Text('View Contact',
                         style: TextStyle(fontSize: TextSize.font12(context), color: AppColors.textPrimaryLight,fontWeight: FontWeight.w400)
                     ),
                   ),
                   PopupMenuItem(
                     value: MoreMenuAction.block,
+                    height: 32.0,
+                    padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
                     child: Text('Block',
                         style: TextStyle(fontSize: TextSize.font12(context), color: AppColors.textPrimaryLight,fontWeight: FontWeight.w400)
                     ),
                   ),
                   PopupMenuItem(
                     value: MoreMenuAction.report,
+                    height: 32.0,
+                    padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
                     child: Text('Report',
                         style: TextStyle(fontSize: TextSize.font12(context), color: AppColors.textPrimaryLight,fontWeight: FontWeight.w400)
                     ),
@@ -230,42 +240,25 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
   void _handleMoreMenuAction(MoreMenuAction action, dynamic participant) async {
     switch (action) {
       case MoreMenuAction.viewProfile:
-        await showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: const Text('View Profile'),
-            content: Text('Open profile for ${participant?.displayName ?? 'user'}.') ,
-            actions: [
-              TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK')),
-            ],
-          ),
-        );
         break;
       case MoreMenuAction.viewContact:
-        await showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: const Text('View Contact'),
-            content: Text('Show contact details for ${participant?.displayName ?? 'user'}.') ,
-            actions: [
-              TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK')),
-            ],
-          ),
-        );
         break;
       case MoreMenuAction.block:
         await showDialog(
           context: context,
           builder: (_) => AlertDialog(
-            title: const Text('Block User'),
-            content: Text('Are you sure you want to block ${participant?.displayName ?? 'this user'}?'),
+            title: Text('Block ${participant?.displayName}? Are you sure?'),
+            content: const Text('Blocked members cannot view your profile or contact you on walima.com.'),
+            buttonPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+
             actions: [
-              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-              TextButton(onPressed: () {
-                Navigator.pop(context);
-                // TODO: call provider block method if exists
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('User blocked')));
-              }, child: const Text('Block')),
+              Row(
+                spacing: 8,
+                children: [
+                  Expanded(child: PrimaryButtons(buttonStyle: ButtonsStyle.cancelButton, onTap: () => Navigator.pop(context), title: 'Cancel',bgColor: Colors.transparent)),
+                  Expanded(child: PrimaryButtons(buttonStyle: ButtonsStyle.activePrimaryButton, onTap: (){}, title: 'Block')),
+                ],
+              )
             ],
           ),
         );

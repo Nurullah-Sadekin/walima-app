@@ -160,7 +160,7 @@ class PrimaryButtons extends StatelessWidget {
           vertical: 10,
         ),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: bgColor ?? Colors.white,
           borderRadius: BorderRadius.circular(6),
           border: Border.all(color: AppColors.greyLight, width: 1),
         ),
