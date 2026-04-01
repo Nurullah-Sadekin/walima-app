@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_boilerplate/core/network/app_urls.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
+import 'package:flutter_boilerplate/features/login/data/models/get_me_response_body.dart';
 import 'package:flutter_boilerplate/features/login/data/models/login_body.dart';
 import 'package:flutter_boilerplate/features/login/data/models/login_response.dart';
 import 'package:flutter_boilerplate/features/login/data/models/login_with_otp_body.dart';
@@ -21,13 +22,13 @@ class LoginRepository {
     }
   }
 
-  static Future<LoginResponse> getMe() async {
+  static Future<GetMeResponseBody> getMe() async {
     try {
       final response = await DioClient().get(AppUrls.getMe, isTokenRequired: true);
-      return LoginResponse.fromJson(response.data);
+      return GetMeResponseBody.fromJson(response.data);
     } catch (e) {
       final errorMessage = e is DioException ? e.response?.data['message'] ?? e.message : e.toString();
-      return LoginResponse(code: 'FAILED', message: errorMessage);
+      return GetMeResponseBody(code: 'FAILED', message: errorMessage);
     }
   }
 
