@@ -53,8 +53,7 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(photoUploadScreenProvider);
     return TransparentLoading(
-      isLoading:
-          screenProvider.loaderState == RegistrationScreenStates.isProfileFor ||
+      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor ||
               _isPickingImage,
       child: Scaffold(
         extendBodyBehindAppBar: true,
@@ -219,13 +218,11 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
                 spacing: 8,
                 children: [
                   KnowMoreItemCard(
-                    text:
-                        'Your Photo should be front facing and your entire face should be visible.',
+                    text: 'Your Photo should be front facing and your entire face should be visible.',
                     isActive: true,
                   ),
                   KnowMoreItemCard(
-                    text:
-                        'Ensure that your Photo is recent and not with a group.',
+                    text: 'Ensure that your Photo is recent and not with a group.',
                     isActive: true,
                   ),
                   KnowMoreItemCard(
@@ -233,18 +230,15 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
                     isActive: true,
                   ),
                   KnowMoreItemCard(
-                    text:
-                        'Each Photo must be less than 15 MB in size and must be in one of the following formats: jpg, gif, png, bmp or tiff.',
+                    text: 'Each Photo must be less than 15 MB in size and must be in one of the following formats: jpg, gif, png, bmp or tiff.',
                     isActive: true,
                   ),
                   KnowMoreItemCard(
-                    text:
-                        'Watermarked, digitally enhanced, morphed Photos or Photos with your personal information will be rejected.',
+                    text: 'Watermarked, digitally enhanced, morphed Photos or Photos with your personal information will be rejected.',
                     isActive: false,
                   ),
                   KnowMoreItemCard(
-                    text:
-                        'Irrelevant Photographs will lead to deactivation of your Profile and Membership.',
+                    text: 'Irrelevant Photographs will lead to deactivation of your Profile and Membership.',
                     isActive: false,
                   ),
                   SizedBox(height: 12),
@@ -299,7 +293,9 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
                 style: TextStyle(
                     fontSize: TextSize.font14(context),
                     fontWeight: FontWeight.w400,
-                    color: AppColors.textSecondaryLight)),
+                    color: AppColors.textSecondaryLight,
+                ),
+            ),
           ),
           Row(
             children: [
@@ -315,7 +311,9 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
                     style: TextStyle(
                         fontSize: TextSize.font14(context),
                         fontWeight: FontWeight.w400,
-                        color: AppColors.textSecondaryLight)),
+                        color: AppColors.textSecondaryLight,
+                    ),
+                ),
               ),
               Expanded(
                 child: Container(
@@ -330,15 +328,6 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
             icon: Icons.camera_alt_outlined,
             onTap: () => _pickImage(ImageSource.camera),
           ),
-          // if (_selectedImagePath != null)
-          //   TextButton(
-          //     onPressed: () {
-          //       setState(() {
-          //         _selectedImagePath = null;
-          //       });
-          //     },
-          //     child: const Text('Remove Photo'),
-          //   ),
         ],
       ),
     );

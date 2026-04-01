@@ -2,18 +2,28 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 
 class PickerDialog {
-  // image picker dialog
   Future<String?> imagePicker(BuildContext context) async {
     final String? selectedSource = await showImageTypeSelector(context);
     if (selectedSource == null) {
       return null; // user cancelled the selection
     }
-    return null;
-  }
 
+    final ImageSource source = selectedSource == 'camera' ? ImageSource.camera : ImageSource.gallery;
+    final pickedFile = await ImagePicker().pickImage(source: source);
+    if (pickedFile == null) return null;
+
+    // Crop the selected image. If cropping is cancelled or fails, return the original file path.
+    try {
+      final croppedFile = await ImageCropper().cropImage(sourcePath: pickedFile.path);
+      return croppedFile?.path ?? pickedFile.path;
+    } catch (_) {
+      return pickedFile.path;
+    }
+  }
   Future<String?> showImageTypeSelector(BuildContext context) async {
     return showModalBottomSheet(
       context: context,
@@ -53,7 +63,9 @@ class PickerDialog {
               Row(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(left: 20.0,),
+                    padding: const EdgeInsets.only(
+                      left: 20.0,
+                    ),
                     child: Text(
                       'Select Image Source',
                       style: Theme.of(context).textTheme.titleMedium,

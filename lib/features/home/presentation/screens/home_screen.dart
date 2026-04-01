@@ -39,9 +39,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       return false;
     }
 
-    if (notification.direction == ScrollDirection.reverse && _showProfileSummary) {
+    if (notification.direction == ScrollDirection.reverse &&
+        _showProfileSummary) {
       setState(() => _showProfileSummary = false);
-    } else if (notification.direction == ScrollDirection.forward && !_showProfileSummary) {
+    } else if (notification.direction == ScrollDirection.forward &&
+        !_showProfileSummary) {
       setState(() => _showProfileSummary = true);
     }
 

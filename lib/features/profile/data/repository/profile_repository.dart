@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_boilerplate/core/network/app_urls.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
+import 'package:flutter_boilerplate/features/profile/data/model/request/update_profile_photo_request.dart';
 import 'package:flutter_boilerplate/features/profile/data/model/request/update_profile_section_request_body.dart';
 import 'package:flutter_boilerplate/features/profile/data/model/response/dashboard_response.dart';
 import 'package:flutter_boilerplate/features/profile/data/model/response/get_complete_profile_response.dart';
@@ -9,8 +10,8 @@ import 'package:flutter_boilerplate/features/profile/data/model/response/update_
 class ProfileRepository {
   static Future<GetCompleteProfileResponse> getCompleteProfile() async {
     try {
-      final response = await DioClient().get(AppUrls.getCompleteProfile,
-          isTokenRequired: true);
+      final response = await DioClient()
+          .get(AppUrls.getCompleteProfile, isTokenRequired: true);
       return GetCompleteProfileResponse.fromJson(response.data);
     } catch (e) {
       final errorMessage = e is DioException
@@ -75,6 +76,43 @@ class ProfileRepository {
       return UpdateProfileSectionResponse(
         code: 'FAILED',
         message: 'Failed to update profile',
+      );
+    } catch (e) {
+      final errorMessage = e is DioException
+          ? e.response?.data['message'] ?? e.message
+          : e.toString();
+      return UpdateProfileSectionResponse(
+        code: 'FAILED',
+        message: errorMessage,
+      );
+    }
+  }
+
+  static Future<UpdateProfileSectionResponse> updateProfilePhotos(
+    List<UpdateProfilePhotoRequest> photos,
+  ) async {
+    try {
+      final payload = photos.map((photo) => photo.toJson()).toList();
+      final response = await DioClient().put(
+        AppUrls.updateProfilePhotos,
+        data: payload,
+        isTokenRequired: true,
+      );
+
+      final data = response.data;
+      if (data is Map<String, dynamic>) {
+        return UpdateProfileSectionResponse.fromJson(data);
+      }
+
+      if (data is Map) {
+        return UpdateProfileSectionResponse.fromJson(
+          Map<String, dynamic>.from(data),
+        );
+      }
+
+      return UpdateProfileSectionResponse(
+        code: 'FAILED',
+        message: 'Failed to update profile photos',
       );
     } catch (e) {
       final errorMessage = e is DioException
