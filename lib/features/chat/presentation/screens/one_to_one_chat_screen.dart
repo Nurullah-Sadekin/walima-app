@@ -6,6 +6,7 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/provider/chat_provider.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/inbox_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/info_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/into_tile.dart';
@@ -114,10 +115,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
           children: [
             _headerSection(name ?? 'Unknown', imagePath, isOnline ?? false),
             Expanded(child: _conversationBody(provider)),
-            _composerSection(provider),
           ],
         ),
       ),
+      floatingActionButton: BottomBorderedWidget(
+        widget:  _composerSection(provider),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
@@ -348,67 +352,74 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
 
   Widget _composerSection(ChatProvider provider) {
     return Container(
-      decoration: const BoxDecoration(
-          border: Border(top: BorderSide(color: Color(0xFFE3E3E3), width: 1))),
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
-      child: SafeArea(
-        top: false,
-        child: Container(
-          height: 60,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF8F8F8),
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(color: const Color(0xFFE0E0E0), width: 1),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _messageController,
-                  onChanged: (value) {
-                    provider.onComposerChanged(value);
-                    _typingStopDebounce?.cancel();
-                    _typingStopDebounce = Timer(
-                      const Duration(milliseconds: 900),
+      padding: const EdgeInsets.fromLTRB(0, 0, 14, 0),
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFE0E0E0), width: 1),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _messageController,
+              maxLines: null,
+              minLines: 1,
+              keyboardType: TextInputType.multiline,
+              onChanged: (value) {
+                provider.onComposerChanged(value);
+                _typingStopDebounce?.cancel();
+                _typingStopDebounce = Timer(
+                  const Duration(milliseconds: 900),
                       () => provider.onComposerChanged(''),
-                    );
-                  },
-                  decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Type a message',
-                      hintStyle: TextStyle(
-                          color: Color(0xFF8F8F8F),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400)),
-                  style: const TextStyle(fontSize: 16),
-                ),
-              ),
-              IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.copy_all_rounded,
-                      size: 20, color: Color(0xFF727272))),
-              const SizedBox(width: 6),
-              IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.mic_none_rounded,
-                      size: 20, color: Color(0xFF727272))),
-              const SizedBox(width: 6),
-              GestureDetector(
-                onTap: _onSendPressed,
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(9)),
-                  child: const Icon(Icons.near_me_rounded,
-                      size: 22, color: Colors.white),
-                ),
-              ),
-            ],
+                );
+              },
+              decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  focusedErrorBorder: InputBorder.none,
+                  hintText: 'Type a message',
+                  filled: true,
+                  fillColor: Colors.transparent,
+                  hintStyle: TextStyle(
+                      color: Color(0xFF8F8F8F),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400)),
+              style: const TextStyle(fontSize: 16),
+            ),
           ),
-        ),
+          ShowImage(
+            imagePath: AppImages.albumSvgIcon,
+            width: TextSize.font20(context),
+            height: TextSize.font20(context),
+            color: const Color(0xFF727272),
+          ),
+          const SizedBox(width: 6),
+          ShowImage(
+            imagePath: AppImages.micIcon,
+            width: TextSize.font28(context),
+            height: TextSize.font28(context),
+            color: const Color(0xFF727272),
+          ),
+          const SizedBox(width: 6),
+          GestureDetector(
+            onTap: _onSendPressed,
+            child: Container(
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(4)),
+              child:   ShowImage(
+                imagePath: AppImages.sentMessage,
+                width: TextSize.font20(context),
+                height: TextSize.font20(context),
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
