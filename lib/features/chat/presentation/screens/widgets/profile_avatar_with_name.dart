@@ -16,6 +16,7 @@ class ProfileAvatarWithName extends StatelessWidget {
     this.borderColor = AppColors.white,
     this.borderWidth = 2,
     this.onTap,
+    this.showOnlineIndicator = true,
   });
   final String imagePath;
   final String? name;
@@ -26,6 +27,7 @@ class ProfileAvatarWithName extends StatelessWidget {
   final Color borderColor;
   final double borderWidth;
   final VoidCallback? onTap;
+  final bool showOnlineIndicator;
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +56,7 @@ class ProfileAvatarWithName extends StatelessWidget {
           height: avatarSize,
           radius: const BorderRadius.all(Radius.circular(999)),
         ),
+        if (showOnlineIndicator)
         Positioned(
           bottom: 0,
           right: 0,

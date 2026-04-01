@@ -7,6 +7,7 @@ import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/provider/chat_provider.dart';
+import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/profile_avatar_with_name.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/remind_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -141,11 +142,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
           Expanded(
             child: Row(
               children: [
-                // _profileAvatar(
-                //   imagePath: imagePath ?? AppImages.demoProfile,
-                //   size: 60,
-                //   showOnlineIndicator: isOnline,
-                // ),
+                _profileAvatar(
+                  imagePath: imagePath ?? AppImages.demoProfile,
+                  size: 48,
+                  isOnline: isOnline,
+                  showOnlineIndicator: true,
+                ),
                 const SizedBox(width: 8),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -281,7 +283,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
   }
 
   Widget _conversationBody(ChatProvider provider) {
-    bool freeUser = true;
+    bool freeUser = false;
     if (provider.messagesLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -408,7 +410,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
         mainAxisAlignment:
             isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
-          if (!isMe) _profileAvatar(imagePath: AppImages.demoProfile, size: 42),
+          if (!isMe) _profileAvatar(imagePath: AppImages.demoProfile, size: 32),
           if (!isMe) const SizedBox(width: 10),
           ConstrainedBox(
             constraints: BoxConstraints(
@@ -428,7 +430,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
             ),
           ),
           if (isMe) const SizedBox(width: 10),
-          if (isMe) _profileAvatar(imagePath: AppImages.demoProfile2, size: 42),
+          if (isMe) _profileAvatar(imagePath: AppImages.demoProfile2, size: 32),
         ],
       ),
     );
@@ -530,40 +532,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
     required String imagePath,
     required double size,
     bool showOnlineIndicator = false,
+    bool isOnline = false,
   }) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                image: AssetImage(imagePath),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          if (showOnlineIndicator)
-            Positioned(
-              right: -2,
-              bottom: -2,
-              child: Container(
-                width: 16,
-                height: 16,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF11A251),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2),
-                ),
-              ),
-            ),
-        ],
-      ),
+    return  ProfileAvatarWithName(
+      imagePath: imagePath,
+      indicatorColor: isOnline == true ? AppColors.greenButtonColor : Colors.red,
+      showOnlineIndicator: showOnlineIndicator,
+      indicatorSize: size * 0.3,
+      avatarSize: size,
     );
   }
 }

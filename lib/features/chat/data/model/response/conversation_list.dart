@@ -137,7 +137,6 @@ class Participants {
     this.username,
     this.userReference,
     this.profilePhoto,
-    this.profilePictureUrl,
     this.isOnline,
     this.lastSeenAt,
   });
@@ -152,10 +151,6 @@ class Participants {
     profilePhoto = json['profilePhoto'] != null
         ? ProfilePhoto.fromJson(json['profilePhoto'])
         : null;
-    final directProfilePictureUrl = json['profilePictureUrl'];
-    profilePictureUrl = directProfilePictureUrl is String
-        ? directProfilePictureUrl
-        : profilePhoto?.url;
     isOnline = json['isOnline'];
     lastSeenAt = json['lastSeenAt'];
   }
@@ -167,7 +162,6 @@ class Participants {
   String? username;
   String? userReference;
   ProfilePhoto? profilePhoto;
-  String? profilePictureUrl;
   bool? isOnline;
   String? lastSeenAt;
 
@@ -182,7 +176,6 @@ class Participants {
     if (profilePhoto != null) {
       map['profilePhoto'] = profilePhoto?.toJson();
     }
-    map['profilePictureUrl'] = profilePictureUrl;
     map['isOnline'] = isOnline;
     map['lastSeenAt'] = lastSeenAt;
     return map;

@@ -159,7 +159,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           padding: const EdgeInsets.only(bottom: 16),
           child: ChatListItem(
             name: displayName,
-            imagePath: participant?.profilePictureUrl ?? AppImages.demoProfile2,
+            imagePath: participant?.profilePhoto?.url ?? AppImages.demoProfile2,
             isVerified: participant?.profilePhoto?.isVerified,
             isOnline: participant?.isOnline,
             lastMessage: (lastMessage?.isNotEmpty ?? false)
@@ -172,7 +172,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 'participant': {
                   'userId': participant?.userId,
                   'displayName': displayName,
-                  'profilePictureUrl': participant?.profilePictureUrl,
+                  'profilePictureUrl': participant?.profilePhoto?.url,
                   'isOnline': participant?.isOnline,
                 }
               };

@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/features/chat/data/model/response/connectable_user_response.dart';
 import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_list.dart';
-import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_messages_response.dart';
+import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_messages_response.dart' hide ProfilePhoto;
 import 'package:flutter_boilerplate/features/chat/data/repository/chat_repository.dart';
 import 'package:flutter_boilerplate/features/chat/data/socket/socket_service.dart';
 import 'package:flutter_boilerplate/features/login/data/repository/login_repository.dart';
@@ -570,7 +570,12 @@ class ChatProvider extends BaseChangeNotifier {
         lastName: user.lastName,
         username: user.username?.toString(),
         userReference: user.userReference,
-        profilePictureUrl: user.profilePictureUrl,
+        profilePhoto: user.profilePictureUrl != null
+            ? ProfilePhoto(
+                url: user.profilePictureUrl,
+                isVerified: false,
+              )
+            : null,
         isOnline: user.isOnline,
         lastSeenAt: user.lastSeenAt,
       );
@@ -604,7 +609,6 @@ class ChatProvider extends BaseChangeNotifier {
       lastName: participantLite?.lastName,
       username: participantLite?.username,
       userReference: participantLite?.userReference,
-      profilePictureUrl: participantLite?.profilePhoto?.url,
       isOnline: participantLite?.isOnline,
       lastSeenAt: participantLite?.lastSeenAt,
     );
