@@ -290,6 +290,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
           builder: (_) => AlertDialog(
             title: Text('Block ${participant?.displayName}? Are you sure?'),
             content: const Text('Blocked members cannot view your profile or contact you on walima.com.'),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0), // Minimized border radius
+            ),
             actions: [
               Row(
                 spacing: 8,
