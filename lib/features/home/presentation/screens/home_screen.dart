@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
@@ -14,6 +15,7 @@ import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/s
 import 'package:flutter_boilerplate/features/matches/data/models/response/get_matches_response.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -41,9 +43,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       return false;
     }
 
-    if (notification.direction == ScrollDirection.reverse && _showProfileSummary) {
+    if (notification.direction == ScrollDirection.reverse &&
+        _showProfileSummary) {
       setState(() => _showProfileSummary = false);
-    } else if (notification.direction == ScrollDirection.forward && !_showProfileSummary) {
+    } else if (notification.direction == ScrollDirection.forward &&
+        !_showProfileSummary) {
       setState(() => _showProfileSummary = true);
     }
 
@@ -105,7 +109,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _topBar(BuildContext context) {
-    return AnchoredAppBar(context: context, title: 'My Walima');
+    return AnchoredAppBar(
+      context: context,
+      title: 'My Walima',
+      onNotificationPressed: () => context.pushNamed(Routes.notifications),
+    );
   }
 
   Widget _bodySection() {
@@ -440,9 +448,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildRecentVisitorCard(Data visitor) {
     final location = _formatRecentVisitorLocation(visitor.location);
     final imageUrl = visitor.profilePhoto?.url?.toString();
-    final imagePath = (imageUrl?.isNotEmpty ?? false)
-        ? imageUrl!
-        : AppImages.demoProfile;
+    final imagePath =
+        (imageUrl?.isNotEmpty ?? false) ? imageUrl! : AppImages.demoProfile;
 
     return Padding(
       padding: const EdgeInsets.only(right: 10.0),

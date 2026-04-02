@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
+import 'package:flutter_boilerplate/features/notification/presentation/notification_icon_with_badge.dart';
 
 class AnchoredAppBar extends StatelessWidget implements PreferredSizeWidget {
 
@@ -62,40 +63,9 @@ class AnchoredAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       actions: [
         if (showNotification && tabIndex != 3)
-          InkWell(
-            onTap: onNotificationPressed,
-            child: Stack(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(7),
-                  child: ShowImage(
-                    imagePath: AppImages.notificationSvgIcon,
-                    color: defaultIconColor,
-                    height: defaultIconSize,
-                    width: defaultIconSize,
-                  ),
-                ),
-                Positioned(
-                  left: 12,
-                  top: 0,
-                  child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 5,vertical: 2),
-                    decoration: const BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                    ),
-                    child: Text('${notificationCount?.toInt() ?? 0}',
-                      textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false, applyHeightToLastDescent: false),
-                      style: TextStyle(
-                      color: Colors.white,
-                      fontSize: TextSize.font10(context),
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),)
-              ],
-            ),
-          ),
+          NotificationIconWithBadge(
+            onNotificationPressed: onNotificationPressed,
+         ),
 
         if (tabIndex != null && tabIndex == 3)
           InkWell(

@@ -10,6 +10,7 @@ import 'package:flutter_boilerplate/features/login/presentation/screens/send_otp
 import 'package:flutter_boilerplate/features/matches/presentation/screens/matches.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/screens/filters/search_filter.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/screens/filters/my_match_filter.dart';
+import 'package:flutter_boilerplate/features/notification/presentation/notification_screen.dart';
 import 'package:flutter_boilerplate/features/onboarding_screen.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/connect_matches.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/basic_details.dart';
@@ -109,6 +110,11 @@ GoRouter goRouter(Ref ref) {
         path: Paths.settings,
         name: Routes.settings,
         builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: Paths.notifications,
+        name: Routes.notifications,
+        builder: (context, state) => const NotificationScreen(),
       ),
       GoRoute(
         path: Paths.onboarding,
@@ -345,7 +351,9 @@ GoRouter goRouter(Ref ref) {
         path: Paths.chatScreen,
         name: Routes.chatScreen,
         builder: (context, state) {
-          final extra = state.extra is Map<String, dynamic> ? state.extra as Map<String, dynamic> : null;
+          final extra = state.extra is Map<String, dynamic>
+              ? state.extra as Map<String, dynamic>
+              : null;
           return ChatScreen(extra: extra);
         },
       ),
@@ -353,7 +361,9 @@ GoRouter goRouter(Ref ref) {
         path: Paths.profilePreview,
         name: Routes.profilePreview,
         builder: (context, state) {
-          final userData = state.extra is Map<String, dynamic> ? state.extra as Map<String, dynamic> : null;
+          final userData = state.extra is Map<String, dynamic>
+              ? state.extra as Map<String, dynamic>
+              : null;
           return ProfilePreviewScreen(userData: userData);
         },
       ),

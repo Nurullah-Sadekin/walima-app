@@ -65,6 +65,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       notificationCount: 26,
       context: context,
       tabIndex: 3,
+      onNotificationPressed: () => context.pushNamed(Routes.notifications),
       onSafetyPressed: () {
         _showSafetyBottomSheet();
       },
@@ -88,11 +89,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             child: Wrap(
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 16),
                   child: SafetyFirst(
                     onViewMoreTips: () {
                       Navigator.pop(context);
-                    //  context.pushNamed(Routes.safetyTipsScreen);
+                      //  context.pushNamed(Routes.safetyTipsScreen);
                     },
                   ),
                 ),
@@ -190,7 +192,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         final conversation = conversations[index];
         final participant = provider.getConversationCounterpart(conversation);
         final userName = participant?.displayName?.trim();
-        final displayName = (userName?.isNotEmpty ?? false) ? userName! : 'Unknown User';
+        final displayName =
+            (userName?.isNotEmpty ?? false) ? userName! : 'Unknown User';
         final lastMessage = conversation.lastMessage?.trim();
 
         return Padding(

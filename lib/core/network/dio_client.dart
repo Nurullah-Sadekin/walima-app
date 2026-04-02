@@ -17,15 +17,17 @@ class DioClient {
     _dio = Dio(
       BaseOptions(
         baseUrl: AppTexts.baseUrl,
-        connectTimeout: const Duration(seconds: 30),
-        receiveTimeout: const Duration(seconds: 30),
-        sendTimeout: const Duration(seconds: 30),
+        connectTimeout: const Duration(seconds: 60),
+        receiveTimeout: const Duration(seconds: 60),
+        sendTimeout: const Duration(seconds: 60),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
+        // Treat 4xx as errors so token-expiry responses reach onError interceptor
+        // where refresh-token retry logic is handled.
         validateStatus: (status) {
-          return status != null && status < 500;
+          return status != null && status < 400;
         },
       ),
     );

@@ -11,6 +11,7 @@ abstract class Paths {
   static const splash = '/';
   static const anchor = '/anchor';
   static const settings = '/settings';
+  static const notifications = '/notifications';
   static const onboarding = '/onboarding';
 
   // Registration Screens
@@ -77,6 +78,7 @@ abstract class Routes {
   static const splash = 'splash';
   static const anchor = 'anchor';
   static const settings = 'settings';
+  static const notifications = 'notifications';
   static const onboarding = 'onboarding';
 
   // Registration Screens
@@ -123,7 +125,6 @@ abstract class Routes {
   static const searchFilter = 'searchFilter';
   static const newFilter = 'newFilter';
   static const myMatchFilter = 'myMatchFilter';
-
 
   // Chat
   static const chatHome = 'chatHome';
