@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/global/components/bottom_sheet_widget/widgets/icon_title_card.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
@@ -66,8 +67,7 @@ class ProfilePreviewScreen extends StatelessWidget {
             _familyDetailsSection(context),
             const SizedBox(height: 16),
             _educationCareerSection(context),
-            const SizedBox(height: 32),
-            _actionButtons(context),
+            const SizedBox(height: 100),
           ],
         ),
       ),
@@ -172,7 +172,7 @@ class ProfilePreviewScreen extends StatelessWidget {
     return const ProfileViewCard(
       title: 'Background',
       subtitle: 'About Background',
-      iconPath: AppImages.habitSvgIcon,
+      iconPath: AppImages.propertySvgIcon,
       infoList: [
         MapEntry('Religion', 'Muslim'),
         MapEntry('Community', 'Sunni'),
@@ -215,84 +215,38 @@ class ProfilePreviewScreen extends StatelessWidget {
     );
   }
 
-  Widget _infoCard(
-    BuildContext context, {
-    required String title,
-    required List<MapEntry<String, String>> items,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.primary,
-          width: 1,
-        ),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: TextSize.font14(context),
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimaryLight,
-            ),
-          ),
-          const SizedBox(height: 12),
-          ...List.generate(
-            items.length,
-            (index) => Padding(
-              padding:
-                  EdgeInsets.only(bottom: index < items.length - 1 ? 12 : 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    items[index].key,
-                    style: TextStyle(
-                      fontSize: TextSize.font12(context),
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.45,
-                    child: Text(
-                      items[index].value,
-                      textAlign: TextAlign.end,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: TextSize.font12(context),
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textPrimaryLight,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _actionButtons(BuildContext context) {
     return BottomBorderedWidget(
-      widget: PrimaryButtons(
-        title: 'Preview Profile',
-        titleSize: TextSize.font14(context),
-        textColor: AppColors.white,
-        bgColor: AppColors.primary,
-        svgIconColor: AppColors.white,
-        onTap: () {
-          context.pop({'preview': true});
-        },
-        buttonStyle: ButtonsStyle.activePrimaryButton,
+      widget: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          IconTitleCard(
+            title: 'Super Connect',
+            imagePath: AppImages.chatIcon,
+            backgroundColor: AppColors.primary,
+            textColor: AppColors.textSecondaryLight,
+            iconColor: AppColors.white,
+            onTap: (){},
+          ),
+          IconTitleCard(
+            title: 'Connect Now',
+            imagePath: AppImages.favouriteIcon,
+            backgroundColor: AppColors.greenButtonColor,
+            textColor: AppColors.textSecondaryLight,
+            iconColor: AppColors.white,
+            onTap: (){},
+          ),
+          IconTitleCard(
+            title: 'Contact Now',
+            imagePath: AppImages.callIcon,
+            backgroundColor: Colors.transparent,
+            borderColor: AppColors.primary,
+            textColor: AppColors.textSecondaryLight,
+            iconColor: AppColors.primary,
+            onTap: (){},
+          ),
+        ],
       ),
     );
   }
