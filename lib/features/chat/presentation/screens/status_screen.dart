@@ -48,13 +48,16 @@ class StatusScreen extends StatelessWidget {
                       color: AppColors.textPrimaryLight,
                     ),
                   ),
-                  Text(
-                    subtitle,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: TextSize.font14(context),
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.textSecondaryLight,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Text(
+                      subtitle,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: TextSize.font14(context),
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.textSecondaryLight,
+                      ),
                     ),
                   ),
                 ],

@@ -90,9 +90,6 @@ class _ReportScreenState extends State<ReportScreen> {
   void _onApply() {
     if (_activeIndex == null) return;
 
-    final selectedReason = _reasons[_activeIndex!].reportType;
-    final details = _detailsController.text.trim();
-
     context.pushNamed(
       Routes.reportStatus,
       extra: {
