@@ -6,6 +6,9 @@ import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.da
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
+import 'package:go_router/go_router.dart';
 
 class ProfilePreviewScreen extends StatelessWidget {
   const ProfilePreviewScreen({
@@ -24,13 +27,14 @@ class ProfilePreviewScreen extends StatelessWidget {
         isBackButton: true,
         backIconBackground: Colors.transparent,
         elevation: 0,
+        title: Text('Profile Preview',
+            style: TextStyle(color: AppColors.textPrimaryLight)),
       ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Column(
             children: [
-              const SizedBox(height: 16),
               _profileHeader(context),
               const SizedBox(height: 24),
               _basicDetailsSection(context),
@@ -49,92 +53,33 @@ class ProfilePreviewScreen extends StatelessWidget {
           ),
         ),
       ),
+      floatingActionButton: BottomBorderedWidget(
+        widget: PrimaryButtons(
+          title: 'Preview Profile',
+          titleSize: TextSize.font14(context),
+          textColor: AppColors.white,
+          bgColor: AppColors.primary,
+          svgIconColor: AppColors.white,
+          onTap: () {
+            context.pop({'preview': true});
+          },
+          buttonStyle: ButtonsStyle.activePrimaryButton,
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
   Widget _profileHeader(BuildContext context) {
     return Column(
       children: [
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppColors.primaryVariant,
-                  width: 4,
-                ),
-              ),
-              child: ShowImage(
-                imagePath: userData?['profilePictureUrl'] ?? AppImages.demoProfile,
-                radius: BorderRadius.circular(1000),
-              ),
-            ),
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryVariant,
-                  shape: BoxShape.circle,
-                ),
-                child: ShowImage(
-                  imagePath: AppImages.callIcon,
-                  width: 20,
-                  height: 20,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              userData?['displayName'] ?? 'User Name',
-              style: TextStyle(
-                fontSize: TextSize.font20(context),
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimaryLight,
-              ),
-            ),
-            const SizedBox(width: 6),
-            ShowImage(
-              imagePath: AppImages.callIcon,
-              width: TextSize.font16(context),
-              height: TextSize.font16(context),
-            ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        Text(
-          userData?['profileType'] ?? 'Profile Created by Self',
-          style: TextStyle(
-            fontSize: TextSize.font12(context),
-            fontWeight: FontWeight.w400,
-            color: AppColors.textSecondaryLight,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: AppColors.primaryVariant.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Text(
-            'Time Left to Connect: 0d 24m 48s',
-            style: TextStyle(
-              fontSize: TextSize.font10(context),
-              fontWeight: FontWeight.w500,
-              color: AppColors.primaryVariant,
-            ),
-          ),
+        ProfileComprehensiveCard(
+          imagePath: AppImages.demoProfile,
+          name: '${userData?['firstName'] ?? 'John'} ${userData?['lastName'] ?? 'Doe'}',
+          noButton: true,
+          activeStatusText: 'Online',
+          photoCount: '5',
+          menu: true,
         ),
       ],
     );
@@ -149,7 +94,8 @@ class ProfilePreviewScreen extends StatelessWidget {
         MapEntry('Date of Birth', userData?['dateOfBirth'] ?? '23 Aug 2002'),
         MapEntry('Height', userData?['height'] ?? '5\'8"(165cm)'),
         MapEntry('Grown up in', userData?['grewUpIn'] ?? 'Desh'),
-        MapEntry('Marital Status', userData?['maritalStatus'] ?? 'Never Married'),
+        MapEntry(
+            'Marital Status', userData?['maritalStatus'] ?? 'Never Married'),
       ],
     );
   }
@@ -160,7 +106,8 @@ class ProfilePreviewScreen extends StatelessWidget {
       title: 'Demographics',
       items: [
         MapEntry('Occupation', userData?['occupation'] ?? 'Software Engineer'),
-        MapEntry('Highest Qualification', userData?['qualification'] ?? 'Bachelor\'s Degree'),
+        MapEntry('Highest Qualification',
+            userData?['qualification'] ?? 'Bachelor\'s Degree'),
         MapEntry('Annual Income', userData?['income'] ?? 'Not Mentioned'),
         MapEntry('Family Status', userData?['familyStatus'] ?? 'Middle Class'),
       ],
@@ -173,7 +120,8 @@ class ProfilePreviewScreen extends StatelessWidget {
       title: 'Lifestyle & Interests',
       items: [
         MapEntry('Hobbies', userData?['hobbies'] ?? 'Reading, Gaming'),
-        MapEntry('Interests', userData?['interests'] ?? 'Technology, Traveling'),
+        MapEntry(
+            'Interests', userData?['interests'] ?? 'Technology, Traveling'),
         MapEntry('Diet', userData?['diet'] ?? 'Non-Vegetarian'),
         MapEntry('Smoking', userData?['smoking'] ?? 'None'),
       ],
@@ -199,9 +147,12 @@ class ProfilePreviewScreen extends StatelessWidget {
       context,
       title: 'Education & Career',
       items: [
-        MapEntry('Highest Qualification', userData?['highestQualification'] ?? 'MBA - Management'),
-        MapEntry('Qualification In', userData?['qualificationIn'] ?? 'Technology'),
-        MapEntry('Working With', userData?['workingWith'] ?? 'Software Company'),
+        MapEntry('Highest Qualification',
+            userData?['highestQualification'] ?? 'MBA - Management'),
+        MapEntry(
+            'Qualification In', userData?['qualificationIn'] ?? 'Technology'),
+        MapEntry(
+            'Working With', userData?['workingWith'] ?? 'Software Company'),
         MapEntry('Working As', userData?['workingAs'] ?? 'Senior Developer'),
       ],
     );
@@ -237,7 +188,8 @@ class ProfilePreviewScreen extends StatelessWidget {
           ...List.generate(
             items.length,
             (index) => Padding(
-              padding: EdgeInsets.only(bottom: index < items.length - 1 ? 12 : 0),
+              padding:
+                  EdgeInsets.only(bottom: index < items.length - 1 ? 12 : 0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
