@@ -1,0 +1,226 @@
+import 'dart:convert';
+ConnectResponse connectResponseFromJson(String str) => ConnectResponse.fromJson(json.decode(str));
+String connectResponseToJson(ConnectResponse data) => json.encode(data.toJson());
+class ConnectResponse {
+  ConnectResponse({
+      this.id, 
+      this.userReference, 
+      this.displayName, 
+      this.profilePhoto, 
+      this.connection, 
+      this.age, 
+      this.height, 
+      this.gender, 
+      this.location, 
+      this.religion, 
+      this.community, 
+      this.motherTongue, 
+      this.maritalStatus, 
+      this.isOnline, 
+      this.lastSeenAt,});
+
+  ConnectResponse.fromJson(dynamic json) {
+    id = json['id'];
+    userReference = json['userReference'];
+    displayName = json['displayName'];
+    profilePhoto = json['profilePhoto'] != null ? ProfilePhoto.fromJson(json['profilePhoto']) : null;
+    connection = json['connection'] != null ? Connection.fromJson(json['connection']) : null;
+    age = json['age'];
+    height = json['height'];
+    gender = json['gender'];
+    location = json['location'] != null ? Location.fromJson(json['location']) : null;
+    religion = json['religion'];
+    community = json['community'];
+    motherTongue = json['motherTongue'];
+    maritalStatus = json['maritalStatus'];
+    isOnline = json['isOnline'];
+    lastSeenAt = json['lastSeenAt'];
+  }
+  String? id;
+  String? userReference;
+  String? displayName;
+  ProfilePhoto? profilePhoto;
+  Connection? connection;
+  num? age;
+  num? height;
+  String? gender;
+  Location? location;
+  String? religion;
+  String? community;
+  String? motherTongue;
+  String? maritalStatus;
+  bool? isOnline;
+  String? lastSeenAt;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    map['userReference'] = userReference;
+    map['displayName'] = displayName;
+    if (profilePhoto != null) {
+      map['profilePhoto'] = profilePhoto?.toJson();
+    }
+    if (connection != null) {
+      map['connection'] = connection?.toJson();
+    }
+    map['age'] = age;
+    map['height'] = height;
+    map['gender'] = gender;
+    if (location != null) {
+      map['location'] = location?.toJson();
+    }
+    map['religion'] = religion;
+    map['community'] = community;
+    map['motherTongue'] = motherTongue;
+    map['maritalStatus'] = maritalStatus;
+    map['isOnline'] = isOnline;
+    map['lastSeenAt'] = lastSeenAt;
+    return map;
+  }
+
+}
+
+Location locationFromJson(String str) => Location.fromJson(json.decode(str));
+String locationToJson(Location data) => json.encode(data.toJson());
+class Location {
+  Location({
+      this.locationType, 
+      this.city, 
+      this.state, 
+      this.country,});
+
+  Location.fromJson(dynamic json) {
+    locationType = json['locationType'];
+    city = json['city'];
+    state = json['state'];
+    country = json['country'];
+  }
+  String? locationType;
+  String? city;
+  String? state;
+  String? country;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['locationType'] = locationType;
+    map['city'] = city;
+    map['state'] = state;
+    map['country'] = country;
+    return map;
+  }
+
+}
+
+Connection connectionFromJson(String str) => Connection.fromJson(json.decode(str));
+String connectionToJson(Connection data) => json.encode(data.toJson());
+class Connection {
+  Connection({
+      this.id, 
+      this.direction, 
+      this.requestType, 
+      this.status, 
+      this.isPriority, 
+      this.viewCount, 
+      this.reminderCount, 
+      this.createdAt, 
+      this.updatedAt, 
+      this.message, 
+      this.responseMessage, 
+      this.respondedAt, 
+      this.expiresAt, 
+      this.lastViewedAt, 
+      this.lastReminderAt, 
+      this.conversationId, 
+      this.isOnline, 
+      this.lastSeenAt,});
+
+  Connection.fromJson(dynamic json) {
+    id = json['id'];
+    direction = json['direction'];
+    requestType = json['requestType'];
+    status = json['status'];
+    isPriority = json['isPriority'];
+    viewCount = json['viewCount'];
+    reminderCount = json['reminderCount'];
+    createdAt = json['createdAt'];
+    updatedAt = json['updatedAt'];
+    message = json['message'];
+    responseMessage = json['responseMessage'];
+    respondedAt = json['respondedAt'];
+    expiresAt = json['expiresAt'];
+    lastViewedAt = json['lastViewedAt'];
+    lastReminderAt = json['lastReminderAt'];
+    conversationId = json['conversationId'];
+    isOnline = json['isOnline'];
+    lastSeenAt = json['lastSeenAt'];
+  }
+  String? id;
+  String? direction;
+  String? requestType;
+  String? status;
+  bool? isPriority;
+  num? viewCount;
+  num? reminderCount;
+  String? createdAt;
+  String? updatedAt;
+  String? message;
+  String? responseMessage;
+  String? respondedAt;
+  String? expiresAt;
+  String? lastViewedAt;
+  String? lastReminderAt;
+  String? conversationId;
+  bool? isOnline;
+  String? lastSeenAt;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    map['direction'] = direction;
+    map['requestType'] = requestType;
+    map['status'] = status;
+    map['isPriority'] = isPriority;
+    map['viewCount'] = viewCount;
+    map['reminderCount'] = reminderCount;
+    map['createdAt'] = createdAt;
+    map['updatedAt'] = updatedAt;
+    map['message'] = message;
+    map['responseMessage'] = responseMessage;
+    map['respondedAt'] = respondedAt;
+    map['expiresAt'] = expiresAt;
+    map['lastViewedAt'] = lastViewedAt;
+    map['lastReminderAt'] = lastReminderAt;
+    map['conversationId'] = conversationId;
+    map['isOnline'] = isOnline;
+    map['lastSeenAt'] = lastSeenAt;
+    return map;
+  }
+
+}
+
+ProfilePhoto profilePhotoFromJson(String str) => ProfilePhoto.fromJson(json.decode(str));
+String profilePhotoToJson(ProfilePhoto data) => json.encode(data.toJson());
+class ProfilePhoto {
+  ProfilePhoto({
+      this.url, 
+      this.visibilityStatus, 
+      this.isVerified,});
+
+  ProfilePhoto.fromJson(dynamic json) {
+    url = json['url'];
+    visibilityStatus = json['visibilityStatus'];
+    isVerified = json['isVerified'];
+  }
+  String? url;
+  String? visibilityStatus;
+  bool? isVerified;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['url'] = url;
+    map['visibilityStatus'] = visibilityStatus;
+    map['isVerified'] = isVerified;
+    return map;
+  }
+
+}
