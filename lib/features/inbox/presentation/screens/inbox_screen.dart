@@ -4,12 +4,14 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/bottom_sheet_widget/contacts_viewed.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/provider/matcher_provider.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/inbox_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/text_tab_bar.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/count_down_timer.dart';
@@ -32,7 +34,8 @@ class InboxScreen extends ConsumerStatefulWidget {
   ConsumerState<InboxScreen> createState() => _InboxScreenState();
 }
 
-class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProviderStateMixin {
+class _InboxScreenState extends ConsumerState<InboxScreen>
+    with SingleTickerProviderStateMixin {
   TabController? _tabController;
   final _tabs = const ['Accepted by Her', 'Accepted by Me'];
 
@@ -68,6 +71,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProv
       title: 'Inbox',
       notificationCount: 26,
       context: context,
+      onNotificationPressed: () => context.pushNamed(Routes.notifications),
     );
   }
 
@@ -107,7 +111,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProv
   }
 
   Widget _acceptedByHer() {
-    return  SingleChildScrollView(
+    return SingleChildScrollView(
       child: Column(
         spacing: 10,
         children: [
@@ -116,9 +120,8 @@ class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProv
           ),
           InboxCard(
             onMenuTap: () {
-               _showAcceptedMenu(context,
-                   imagePath: AppImages.demoProfile2,
-                   name: 'Tasnova Ahmed');
+              _showAcceptedMenu(context,
+                  imagePath: AppImages.demoProfile2, name: 'Tasnova Ahmed');
             },
             imagePath: AppImages.demoProfile2,
             name: 'Tasnova Ahmed',
@@ -128,12 +131,15 @@ class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProv
             location: 'Gulshan, Dhaka, BD',
             isVerified: true,
           ),
-      
           FilterWidget(
             title: 'Sort by',
             iconPath: AppImages.sortIcon,
-            items: provider.sortByDataList.map((item) =>
-                FilterItem(name: item.name, isSelected: item.isSelected),).toList(),
+            items: provider.sortByDataList
+                .map(
+                  (item) =>
+                      FilterItem(name: item.name, isSelected: item.isSelected),
+                )
+                .toList(),
             onItemTap: (index) {
               provider.sortBy(index);
             },
@@ -176,7 +182,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProv
             title: 'No Matches Yet!',
             imagePath: AppImages.viewOnAccept,
             subtitle:
-            'We do not have new matches at this point. Checkout my matches to find profiles matching your preference',
+                'We do not have new matches at this point. Checkout my matches to find profiles matching your preference',
             buttonText: 'My Matches',
             onTap: () {
               // Navigate to matches screen
@@ -185,7 +191,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProv
           const InfoCardWidget(
             title: 'Profiles Matching Your Preferences',
             description:
-            'Some profiles may not match all your preferences, but you might find meaningful connections.',
+                'Some profiles may not match all your preferences, but you might find meaningful connections.',
           ),
           SelectionCard(
             buttonStyle: SelectionStyle.selectedCheckbox,
@@ -193,7 +199,6 @@ class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProv
             title: 'Open to All',
             isExpand: true,
           ),
-      
           RemindCard(
             onTap: () {},
             imagePath: AppImages.demoProfile,
@@ -215,7 +220,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProv
           ),
           const MessageBubble(
             message:
-            'Hello, I have liked your profile and believe it to be a good Match. If you like my profile too, kindly accept this Invitation. Please feel free to contact me to take this conversation ahead. Warm Regards, Mehedi Hasan',
+                'Hello, I have liked your profile and believe it to be a good Match. If you like my profile too, kindly accept this Invitation. Please feel free to contact me to take this conversation ahead. Warm Regards, Mehedi Hasan',
             senderName: 'Mehedi Hasan',
             showSenderName: true,
           ),
@@ -274,7 +279,8 @@ class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProv
     );
   }
 
-  Future<void> _showAcceptedMenu(BuildContext context, {required String imagePath, required String name}) async {
+  Future<void> _showAcceptedMenu(BuildContext context,
+      {required String imagePath, required String name}) async {
     await showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -289,7 +295,11 @@ class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProv
             children: [
               Row(
                 children: [
-                  ShowImage(imagePath: imagePath, width: 56, height: 56, radius: BorderRadius.circular(8)),
+                  ShowImage(
+                      imagePath: imagePath,
+                      width: 56,
+                      height: 56,
+                      radius: BorderRadius.circular(8)),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -297,12 +307,17 @@ class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProv
                       children: [
                         Text(
                           name,
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimaryLight),
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimaryLight),
                         ),
                         const SizedBox(height: 4),
                         const Text(
                           'Gulshan, Dhaka, BD',
-                          style: TextStyle(fontSize: 13, color: AppColors.textSecondaryLight),
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textSecondaryLight),
                         ),
                       ],
                     ),
@@ -339,7 +354,8 @@ class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProv
               TextButton(
                 onPressed: () => Navigator.of(sheetCtx).pop(),
                 child: Center(
-                  child: Text('Cancel', style: TextStyle(color: AppColors.textSecondaryLight)),
+                  child: Text('Cancel',
+                      style: TextStyle(color: AppColors.textSecondaryLight)),
                 ),
               ),
             ],
@@ -348,5 +364,4 @@ class _InboxScreenState extends ConsumerState<InboxScreen> with SingleTickerProv
       },
     );
   }
-
 }

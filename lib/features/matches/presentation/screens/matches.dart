@@ -25,7 +25,14 @@ class MatchesScreen extends ConsumerStatefulWidget {
 
 class _MatchesScreenState extends ConsumerState<MatchesScreen> {
   MatchesProvider provider = MatchesProvider();
-  final tabs = ['Search', 'New', 'Daily', 'My Matches', 'Near Me', 'More Matches'];
+  final tabs = [
+    'Search',
+    'New',
+    'Daily',
+    'My Matches',
+    'Near Me',
+    'More Matches'
+  ];
 
   @override
   void initState() {
@@ -56,6 +63,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
       title: 'Matches',
       notificationCount: 26,
       context: context,
+      onNotificationPressed: () => context.pushNamed(Routes.notifications),
     );
   }
 
@@ -233,7 +241,8 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
         SizedBox(height: 50),
         EmptyStateWidget(
           title: 'No Matches Yet!',
-          subtitle: 'We do not have new matches at this point. Checkout my matches to find profiles matching your preference',
+          subtitle:
+              'We do not have new matches at this point. Checkout my matches to find profiles matching your preference',
           buttonText: 'My Matches',
           onTap: null,
         ),
@@ -253,7 +262,10 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
         ),
         SizedBox(height: 30),
         EmptyStateWidget(
-            title: 'Sorry!', subtitle: 'No today’s matches found. Please try again till then, search for your partner.', buttonText: 'Search Now')
+            title: 'Sorry!',
+            subtitle:
+                'No today’s matches found. Please try again till then, search for your partner.',
+            buttonText: 'Search Now')
       ],
     );
   }
@@ -347,7 +359,8 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
                 iconPath: AppImages.filterSvgIcon,
                 items: provider.sortByDataList
                     .map(
-                      (item) => FilterItem(name: item.name, isSelected: item.isSelected),
+                      (item) => FilterItem(
+                          name: item.name, isSelected: item.isSelected),
                     )
                     .toList(),
                 onItemTap: (index) {

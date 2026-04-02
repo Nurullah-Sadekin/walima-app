@@ -3,6 +3,7 @@ import 'package:flutter_boilerplate/core/network/app_urls.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
 import 'package:flutter_boilerplate/features/home/data/model/response/homepage_top_matches_response.dart';
 import 'package:flutter_boilerplate/features/home/data/model/response/recent_visitors_response.dart';
+import 'package:flutter_boilerplate/features/home/data/model/response/unread_notification_count.dart';
 
 class HomeRepository {
   static Future<HomepageTopMatchesResponse> getHomepageTopMatches() async {
@@ -49,4 +50,5 @@ class HomeRepository {
       );
     }
   }
+  
 }
