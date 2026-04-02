@@ -55,11 +55,13 @@ class ProfilePreviewScreen extends StatelessWidget {
             const SizedBox(height: 16),
             _aboutSection(context),
             const SizedBox(height: 16),
-            _demographicsSection(context),
+            _habitsAndInterests(context),
             const SizedBox(height: 16),
-            _backgroundSection(context),
+            _contact(context),
             const SizedBox(height: 16),
             _lifestyleSection(context),
+            const SizedBox(height: 16),
+            _backgroundSection(context),
             const SizedBox(height: 16),
             _familyDetailsSection(context),
             const SizedBox(height: 16),
@@ -122,30 +124,61 @@ class ProfilePreviewScreen extends StatelessWidget {
     );
   }
 
-  Widget _demographicsSection(BuildContext context) {
-    return _infoCard(
-      context,
-      title: 'Demographics',
-      items: [
-        MapEntry('Occupation', userData?['occupation'] ?? 'Software Engineer'),
-        MapEntry('Highest Qualification',
-            userData?['qualification'] ?? 'Bachelor\'s Degree'),
-        MapEntry('Annual Income', userData?['income'] ?? 'Not Mentioned'),
-        MapEntry('Family Status', userData?['familyStatus'] ?? 'Middle Class'),
+  Widget _habitsAndInterests(BuildContext context) {
+    return const ProfileViewCard(
+      title: 'Habits & Interests',
+      subtitle: 'Activities, Hobbies, Interests, Lifestyle',
+      iconPath: AppImages.educationSvgIcon,
+      itemList: [
+        'Reading',
+        'Traveling',
+        'Cooking',
+        'Sports',
+        'Music',
+        'Movies',
+        'Fitness',
+        'Photography',
+      ],
+    );
+  }
+
+  Widget _contact(BuildContext context) {
+    return const ProfileViewCard(
+      title: 'Contact',
+      subtitle: 'Contact Information',
+      iconPath: AppImages.educationSvgIcon,
+      itemList: [
+        'Phone: +88018774******',
+        'Email: *********@gmail.com'
       ],
     );
   }
 
   Widget _lifestyleSection(BuildContext context) {
-    return _infoCard(
-      context,
-      title: 'Lifestyle & Interests',
-      items: [
-        MapEntry('Hobbies', userData?['hobbies'] ?? 'Reading, Gaming'),
-        MapEntry(
-            'Interests', userData?['interests'] ?? 'Technology, Traveling'),
-        MapEntry('Diet', userData?['diet'] ?? 'Non-Vegetarian'),
-        MapEntry('Smoking', userData?['smoking'] ?? 'None'),
+    return const ProfileViewCard(
+      title: 'Lifestyle',
+      subtitle: 'Lifestyle, Hobbies, Interests',
+      iconPath: AppImages.educationSvgIcon,
+      itemList: [
+        'Diet: Non-Vegetarian',
+        'Smoking: No',
+        'Drinking: No',
+        'Exercise: Regularly',
+      ],
+    );
+  }
+
+  Widget _backgroundSection(BuildContext context) {
+    return const ProfileViewCard(
+      title: 'Background',
+      subtitle: 'About Background',
+      iconPath: AppImages.habitSvgIcon,
+      infoList: [
+        MapEntry('Religion', 'Muslim'),
+        MapEntry('Community', 'Sunni'),
+        MapEntry('Marital Status', 'Never Married'),
+        MapEntry('Location', 'Dhaka'),
+        MapEntry('Residency Status', 'Citizen'),
       ],
     );
   }
@@ -166,33 +199,18 @@ class ProfilePreviewScreen extends StatelessWidget {
     );
   }
 
-  Widget _backgroundSection(BuildContext context) {
-    return const ProfileViewCard(
-      title: 'Background',
-      subtitle: 'About Background',
-      iconPath: AppImages.educationSvgIcon,
-      infoList: [
-        MapEntry('Religion', 'Muslim'),
-        MapEntry('Community', 'Sunni'),
-        MapEntry('Marital Status', 'Never Married'),
-        MapEntry('Location', 'Dhaka'),
-        MapEntry('Residency Status', 'Citizen'),
-      ],
-    );
-  }
-
-
   Widget _educationCareerSection(BuildContext context) {
     return const ProfileViewCard(
       title: 'Education & Career',
       subtitle: 'Her Educational & career journey',
       iconPath: AppImages.educationSvgIcon,
       infoList: [
-        MapEntry('Religion', 'Muslim'),
-        MapEntry('Community', 'Sunni'),
-        MapEntry('Marital Status', 'Never Married'),
-        MapEntry('Location', 'Dhaka'),
-        MapEntry('Residency Status', 'Citizen'),
+        MapEntry('Height Qualification', 'Bachelor\'s Degree'),
+        MapEntry('College\'s Attended', 'Northern University Bangladesh Engineer'),
+        MapEntry('Annual Income', 'Not Mentioned'),
+        MapEntry('Working With', 'Business'),
+        MapEntry('Working As', 'Business Owner'),
+        MapEntry('Employer Name', 'Walima'),
       ],
     );
   }

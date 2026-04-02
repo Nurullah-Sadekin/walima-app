@@ -13,11 +13,12 @@ class ProfileViewCard extends StatelessWidget {
     this.subtitle,
     this.iconPath,
     this.userId,
-    this.copyUserIdOnTap ,
+    this.copyUserIdOnTap,
     this.profileManageStatus,
     this.child,
     this.infoList,
-  }) : assert(child != null || infoList != null,
+    this.itemList,
+  }) : assert(child != null || infoList != null || itemList != null,
             'Either child or infoList must be provided');
 
   final String title;
@@ -28,6 +29,7 @@ class ProfileViewCard extends StatelessWidget {
   final String? profileManageStatus;
   final Widget? child;
   final List<MapEntry<String, String>>? infoList;
+  final List<String>? itemList;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +41,7 @@ class ProfileViewCard extends StatelessWidget {
         border: Border.all(color: AppColors.greyLight),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
@@ -88,69 +91,73 @@ class ProfileViewCard extends StatelessWidget {
                     ],
                   )
                 : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 6,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        color: AppColors.textPrimaryLight,
-                        fontSize: TextSize.font14(context),
-                        fontWeight: FontWeight.w400,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 6,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          color: AppColors.textPrimaryLight,
+                          fontSize: TextSize.font14(context),
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
-                    ),
-                    Row(
-                      children: [
-                        InkWell(
-                          onTap: copyUserIdOnTap,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: AppColors.greyLight, width: 1),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            child: Row(
-                              spacing: 4,
-                              children: [
-                                Text(
-                                   'ID: $userId',
-                                  style: TextStyle(
-                                    color: AppColors.textSecondaryLight,
-                                    fontSize: TextSize.font12(context),
-                                    fontWeight: FontWeight.w400,
+                      Row(
+                        children: [
+                          InkWell(
+                            onTap: copyUserIdOnTap,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                    color: AppColors.greyLight, width: 1),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
+                              child: Row(
+                                spacing: 4,
+                                children: [
+                                  Text(
+                                    'ID: $userId',
+                                    style: TextStyle(
+                                      color: AppColors.textSecondaryLight,
+                                      fontSize: TextSize.font12(context),
+                                      fontWeight: FontWeight.w400,
+                                    ),
                                   ),
-                                ),
-                                ShowImage(
-                                  imagePath: AppImages.copy,
-                                  width: TextSize.font14(context),
-                                  height: TextSize.font14(context),
+                                  ShowImage(
+                                    imagePath: AppImages.copy,
+                                    width: TextSize.font14(context),
+                                    height: TextSize.font14(context),
+                                    color: AppColors.textSecondaryLight,
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                          if (profileManageStatus != null)
+                            Container(
+                              margin: const EdgeInsets.only(left: 8),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                    color: AppColors.greyLight, width: 1),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
+                              child: Text(
+                                profileManageStatus ?? '',
+                                style: TextStyle(
                                   color: AppColors.textSecondaryLight,
-                                )
-                              ],
+                                  fontSize: TextSize.font12(context),
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        if (profileManageStatus != null)
-                        Container(
-                          margin: const EdgeInsets.only(left: 8),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: AppColors.greyLight, width: 1),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          child: Text(
-                             profileManageStatus ?? '',
-                            style: TextStyle(
-                              color: AppColors.textSecondaryLight,
-                              fontSize: TextSize.font12(context),
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                        ],
+                      ),
+                    ],
+                  ),
           ),
           if (child != null)
             Padding(
@@ -199,6 +206,35 @@ class ProfileViewCard extends StatelessWidget {
                 }).toList(),
               ),
             ),
+           if (itemList != null)
+             Padding(
+               padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
+               child: Wrap(
+                 spacing: 8,
+                 runSpacing: 8,
+                 alignment: WrapAlignment.start,
+                 crossAxisAlignment: WrapCrossAlignment.start,
+                 children: itemList!.map((item) {
+                   return Container(
+                     decoration: BoxDecoration(
+                       border: Border.all(color: AppColors.greyLight, width: 1),
+                       borderRadius: BorderRadius.circular(100),
+                     ),
+                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                     child: Text(
+                       item,
+                       maxLines: 2,
+                       overflow: TextOverflow.ellipsis,
+                       style: TextStyle(
+                         color: AppColors.textPrimaryLight,
+                         fontSize: TextSize.font12(context),
+                         fontWeight: FontWeight.w500,
+                       ),
+                     ),
+                   );
+                 }).toList(),
+               ),
+             )
         ],
       ),
     );
