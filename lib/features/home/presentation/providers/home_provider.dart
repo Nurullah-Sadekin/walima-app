@@ -127,15 +127,27 @@ class HomeProvider extends BaseChangeNotifier {
         message: response.message ?? 'Connection request sent successfully.',
       );
     } else {
-       await DialogUtils.show(
-         context: context,
-         child: LimitOver(
-           onExtendPlan: (){
-             context.pushNamed(Routes.upgradePackage);
-             context.pop();
-           },
-         )
-       );
+      if(response.message?.contains('daily_connect')??false){
+        return await DialogUtils.show(
+            context: context,
+            child: LimitOver(
+              onExtendPlan: (){
+                context.pushNamed(Routes.upgradePackage);
+                context.pop();
+              },
+            ),
+        );
+      }
+      else{
+        await DialogUtils.showErrorDialog(
+          context: context,
+          title: 'Connection Failed',
+          buttonText: 'OK',
+          message: response.message ?? 'Unable to send connection request. Please try again later.',
+        );
+      }
+
+
     }
     if (!context.mounted) return;
     updateViewState(screenStates: HomeScreenStates.complete);
