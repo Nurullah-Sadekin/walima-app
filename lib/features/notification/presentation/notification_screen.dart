@@ -6,6 +6,7 @@ import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.da
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
 import 'package:flutter_boilerplate/features/notification/data/notification_response.dart';
 import 'package:flutter_boilerplate/features/notification/presentation/providers/notificaiton_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -216,7 +217,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          _formatDate(item.createdAtDateTime),
+                          DateTimeUtils.formatDate(item.createdAtDateTime),
                           style: TextStyle(
                             color: AppColors.hintTextColor,
                             fontSize: TextSize.font10(context),
@@ -317,10 +318,5 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
         ),
       ),
     );
-  }
-
-  String _formatDate(DateTime? dateTime) {
-    if (dateTime == null) return '--';
-    return DateFormat('dd MMM, h:mm a').format(dateTime.toLocal());
   }
 }
