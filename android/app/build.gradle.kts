@@ -11,6 +11,8 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        // Enable core library desugaring required by some dependencies (e.g. flutter_local_notifications)
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -41,4 +43,11 @@ android {
 
 flutter {
     source = "../.."
+}
+
+// Add the core library desugaring dependency required when desugaring is enabled.
+dependencies {
+    // Use a compatible desugar_jdk_libs version. If your Android Gradle Plugin requires a specific
+    // version, update this accordingly. 2.0.3 is commonly compatible with newer AGP versions.
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 }
