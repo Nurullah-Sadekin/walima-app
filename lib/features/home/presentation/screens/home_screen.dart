@@ -3,12 +3,14 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
 import 'package:flutter_boilerplate/features/home/data/model/response/recent_visitors_response.dart';
+import 'package:flutter_boilerplate/features/home/presentation/providers/home_provider.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/complete_profile_section.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/profile_summery_section.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/social_media_icon.dart';
@@ -56,14 +58,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      drawer: const AppDrawer(),
-      body: Column(
-        children: [
-          _headerSection(context),
-          _bodySection(),
-        ],
+    return TransparentLoading(
+      isLoading: ref.watch(homeProvider).screenStates == HomeScreenStates.transparentLoading,
+      child: Scaffold(
+        key: _scaffoldKey,
+        drawer: const AppDrawer(),
+        body: Column(
+          children: [
+            _headerSection(context),
+            _bodySection(),
+          ],
+        ),
       ),
     );
   }
@@ -73,7 +78,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       children: [
         const Positioned.fill(
           child: ShowImage(
-            imagePath: AppImages.homeProfileBg,
+            imagePath: AppImages.homeProfileBg,/**/
             fit: BoxFit.cover,
           ),
         ),
@@ -282,6 +287,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           location: location,
           profession: profession,
           religion: match.religion,
+          onTapLeftButton: () {
+            ref.read(homeProvider).connect(context, match);
+            // print('Left button tapped for ${match.displayName}');
+          },
           activeStatusText: activeStatus,
         ),
       ),

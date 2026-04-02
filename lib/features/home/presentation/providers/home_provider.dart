@@ -1,17 +1,24 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_boilerplate/core/global/components/limit_over.dart';
+import 'package:flutter_boilerplate/core/global/enums/global_status.dart' show ConnectionRequestType;
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/features/home/data/model/response/recent_visitors_response.dart';
 import 'package:flutter_boilerplate/features/home/data/repository/home_repository.dart';
 import 'package:flutter_boilerplate/features/matches/data/models/request/get_matches_query_params.dart';
 import 'package:flutter_boilerplate/features/matches/data/models/response/get_matches_response.dart';
 import 'package:flutter_boilerplate/features/matches/data/repository/matches_repository.dart';
+import 'package:flutter_boilerplate/features/matches/domain/request/create_connection_request_body.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeProvider extends BaseChangeNotifier {
-  HomeScreenStates screenStates = HomeScreenStates.defaultState;
-  HomeScreenStates loaderState = HomeScreenStates.defaultState;
-
   HomeProvider() {
     _loadInitialData();
   }
+  HomeScreenStates screenStates = HomeScreenStates.defaultState;
+  HomeScreenStates loaderState = HomeScreenStates.defaultState;
+  MatchesRepository matchesRepository = MatchesRepository();
 
   void _loadInitialData() {
     Future.microtask(() async {
@@ -46,17 +53,14 @@ class HomeProvider extends BaseChangeNotifier {
 
     isLoadingPremiumMatches = false;
 
-    final isSuccess = response.statusCode != null &&
-        response.statusCode! >= 200 &&
-        response.statusCode! < 300;
+    final isSuccess = response.statusCode != null && response.statusCode! >= 200 && response.statusCode! < 300;
 
     if (isSuccess) {
       premiumMatches
         ..clear()
         ..addAll(response.data ?? []);
       _hasLoadedPremiumMatches = true;
-      premiumMatchesError =
-          premiumMatches.isEmpty ? 'No premium matches available at the moment.' : null;
+      premiumMatchesError = premiumMatches.isEmpty ? 'No premium matches available at the moment.' : null;
     } else {
       premiumMatches.clear();
       premiumMatchesError = response.message ?? 'Unable to load premium matches.';
@@ -81,12 +85,10 @@ class HomeProvider extends BaseChangeNotifier {
         ..clear()
         ..addAll(visitors);
       _hasLoadedRecentVisitors = true;
-      recentVisitorsError =
-          visitors.isEmpty ? 'No recent visitors found yet.' : null;
+      recentVisitorsError = visitors.isEmpty ? 'No recent visitors found yet.' : null;
     } else if (response.code == 'FAILED') {
       recentVisitors.clear();
-      recentVisitorsError =
-          response.message ?? 'Unable to load recent visitors.';
+      recentVisitorsError = response.message ?? 'Unable to load recent visitors.';
     } else {
       recentVisitors.clear();
       recentVisitorsError = 'No recent visitors available right now.';
@@ -105,6 +107,38 @@ class HomeProvider extends BaseChangeNotifier {
     }
     if (loadingState != null) loaderState = loadingState;
     notifyListeners();
+  }
+
+  Future<void> connect(BuildContext context, MatchProfile match) async {
+    updateViewState(screenStates: HomeScreenStates.transparentLoading);
+    final body = CreateConnectionRequestBody(
+      receiverId: match.id,
+      requestType: ConnectionRequestType.match.name,
+      message: 'Hi ${match.displayName}, I would like to connect with you!',
+      markAsDefaultConnectionMessage: true,
+      expiresAt: DateTime.now().add(const Duration(days: 7)).toIso8601String(),
+      isPriority: false,
+    );
+    final response = await matchesRepository.createConnectionRequest(body);
+    if (!context.mounted) return;
+    if (response.isSuccess) {
+      await DialogUtils.showSuccessDialog(
+        context: context,
+        message: response.message ?? 'Connection request sent successfully.',
+      );
+    } else {
+       await DialogUtils.show(
+         context: context,
+         child: LimitOver(
+           onExtendPlan: (){
+             context.pushNamed(Routes.upgradePackage);
+             context.pop();
+           },
+         )
+       );
+    }
+    if (!context.mounted) return;
+    updateViewState(screenStates: HomeScreenStates.complete);
   }
 }
 

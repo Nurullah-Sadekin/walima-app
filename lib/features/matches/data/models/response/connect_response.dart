@@ -1,41 +1,57 @@
 import 'dart:convert';
-ConnectResponse connectResponseFromJson(String str) => ConnectResponse.fromJson(json.decode(str));
-String connectResponseToJson(ConnectResponse data) => json.encode(data.toJson());
+
+ConnectResponse connectResponseFromJson(String str) =>
+    ConnectResponse.fromJson(json.decode(str));
+String connectResponseToJson(ConnectResponse data) =>
+    json.encode(data.toJson());
+
 class ConnectResponse {
   ConnectResponse({
-      this.id, 
-      this.userReference, 
-      this.displayName, 
-      this.profilePhoto, 
-      this.connection, 
-      this.age, 
-      this.height, 
-      this.gender, 
-      this.location, 
-      this.religion, 
-      this.community, 
-      this.motherTongue, 
-      this.maritalStatus, 
-      this.isOnline, 
-      this.lastSeenAt,});
+    this.code,
+    this.message,
+    this.traceId,
+    this.statusCode,
+    this.id,
+    this.userReference,
+    this.displayName,
+    this.profilePhoto,
+    this.connection,
+    this.age,
+    this.height,
+    this.gender,
+    this.location,
+    this.religion,
+    this.community,
+    this.motherTongue,
+    this.maritalStatus,
+    this.isOnline,
+    this.lastSeenAt,
+  });
 
-  ConnectResponse.fromJson(dynamic json) {
-    id = json['id'];
-    userReference = json['userReference'];
-    displayName = json['displayName'];
-    profilePhoto = json['profilePhoto'] != null ? ProfilePhoto.fromJson(json['profilePhoto']) : null;
-    connection = json['connection'] != null ? Connection.fromJson(json['connection']) : null;
-    age = json['age'];
-    height = json['height'];
-    gender = json['gender'];
-    location = json['location'] != null ? Location.fromJson(json['location']) : null;
-    religion = json['religion'];
-    community = json['community'];
-    motherTongue = json['motherTongue'];
-    maritalStatus = json['maritalStatus'];
-    isOnline = json['isOnline'];
-    lastSeenAt = json['lastSeenAt'];
+  ConnectResponse.fromJson(dynamic json, {this.statusCode}) {
+    code = json['code']?.toString();
+    message = json['message']?.toString();
+    traceId = json['traceId']?.toString();
+
+    dynamic payload = json;
+    final response = json['response'];
+    if (response is Map) {
+      if (response['data'] is Map) {
+        payload = response['data'];
+      } else if (response['connection'] is Map) {
+        payload = response['connection'];
+      } else if (response['receiver'] is Map) {
+        payload = response['receiver'];
+      } else if (response.isNotEmpty) {
+        payload = response;
+      }
+    }
+    _mapPayload(payload);
   }
+  String? code;
+  String? message;
+  String? traceId;
+  int? statusCode;
   String? id;
   String? userReference;
   String? displayName;
@@ -52,8 +68,45 @@ class ConnectResponse {
   bool? isOnline;
   String? lastSeenAt;
 
+  bool get isSuccess {
+    if ((code ?? '').toUpperCase() == 'SUCCESS') return true;
+    if (statusCode != null && statusCode! >= 200 && statusCode! < 300) {
+      return true;
+    }
+    return false;
+  }
+
+  void _mapPayload(dynamic payload) {
+    if (payload is! Map) return;
+    id = payload['id']?.toString();
+    userReference = payload['userReference']?.toString();
+    displayName = payload['displayName']?.toString();
+    profilePhoto = payload['profilePhoto'] != null
+        ? ProfilePhoto.fromJson(payload['profilePhoto'])
+        : null;
+    connection = payload['connection'] != null
+        ? Connection.fromJson(payload['connection'])
+        : null;
+    age = payload['age'];
+    height = payload['height'];
+    gender = payload['gender']?.toString();
+    location = payload['location'] != null
+        ? Location.fromJson(payload['location'])
+        : null;
+    religion = payload['religion']?.toString();
+    community = payload['community']?.toString();
+    motherTongue = payload['motherTongue']?.toString();
+    maritalStatus = payload['maritalStatus']?.toString();
+    isOnline = payload['isOnline'] == true;
+    lastSeenAt = payload['lastSeenAt']?.toString();
+  }
+
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
+    map['code'] = code;
+    map['message'] = message;
+    map['traceId'] = traceId;
+    map['statusCode'] = statusCode;
     map['id'] = id;
     map['userReference'] = userReference;
     map['displayName'] = displayName;
@@ -77,17 +130,18 @@ class ConnectResponse {
     map['lastSeenAt'] = lastSeenAt;
     return map;
   }
-
 }
 
 Location locationFromJson(String str) => Location.fromJson(json.decode(str));
 String locationToJson(Location data) => json.encode(data.toJson());
+
 class Location {
   Location({
-      this.locationType, 
-      this.city, 
-      this.state, 
-      this.country,});
+    this.locationType,
+    this.city,
+    this.state,
+    this.country,
+  });
 
   Location.fromJson(dynamic json) {
     locationType = json['locationType'];
@@ -108,31 +162,33 @@ class Location {
     map['country'] = country;
     return map;
   }
-
 }
 
-Connection connectionFromJson(String str) => Connection.fromJson(json.decode(str));
+Connection connectionFromJson(String str) =>
+    Connection.fromJson(json.decode(str));
 String connectionToJson(Connection data) => json.encode(data.toJson());
+
 class Connection {
   Connection({
-      this.id, 
-      this.direction, 
-      this.requestType, 
-      this.status, 
-      this.isPriority, 
-      this.viewCount, 
-      this.reminderCount, 
-      this.createdAt, 
-      this.updatedAt, 
-      this.message, 
-      this.responseMessage, 
-      this.respondedAt, 
-      this.expiresAt, 
-      this.lastViewedAt, 
-      this.lastReminderAt, 
-      this.conversationId, 
-      this.isOnline, 
-      this.lastSeenAt,});
+    this.id,
+    this.direction,
+    this.requestType,
+    this.status,
+    this.isPriority,
+    this.viewCount,
+    this.reminderCount,
+    this.createdAt,
+    this.updatedAt,
+    this.message,
+    this.responseMessage,
+    this.respondedAt,
+    this.expiresAt,
+    this.lastViewedAt,
+    this.lastReminderAt,
+    this.conversationId,
+    this.isOnline,
+    this.lastSeenAt,
+  });
 
   Connection.fromJson(dynamic json) {
     id = json['id'];
@@ -195,16 +251,18 @@ class Connection {
     map['lastSeenAt'] = lastSeenAt;
     return map;
   }
-
 }
 
-ProfilePhoto profilePhotoFromJson(String str) => ProfilePhoto.fromJson(json.decode(str));
+ProfilePhoto profilePhotoFromJson(String str) =>
+    ProfilePhoto.fromJson(json.decode(str));
 String profilePhotoToJson(ProfilePhoto data) => json.encode(data.toJson());
+
 class ProfilePhoto {
   ProfilePhoto({
-      this.url, 
-      this.visibilityStatus, 
-      this.isVerified,});
+    this.url,
+    this.visibilityStatus,
+    this.isVerified,
+  });
 
   ProfilePhoto.fromJson(dynamic json) {
     url = json['url'];
@@ -222,5 +280,4 @@ class ProfilePhoto {
     map['isVerified'] = isVerified;
     return map;
   }
-
 }
