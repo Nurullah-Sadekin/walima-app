@@ -169,32 +169,30 @@ class ProfilePreviewScreen extends StatelessWidget {
   Widget _backgroundSection(BuildContext context) {
     return const ProfileViewCard(
       title: 'Background',
-      subtitle: 'About Family background',
-      iconPath: AppImages.groupsIcon,
+      subtitle: 'About Background',
+      iconPath: AppImages.educationSvgIcon,
       infoList: [
-        MapEntry('Father\'s Status', 'Employed'),
-        MapEntry('Mother\'s Status', 'Homemaker'),
-        MapEntry('Siblings', '1 Brother, 1 Sister'),
-        MapEntry('Family Type', 'Joint Family'),
-        MapEntry('Family Status', 'Middle Class'),
-        MapEntry('Family Location','Dhaka'),
+        MapEntry('Religion', 'Muslim'),
+        MapEntry('Community', 'Sunni'),
+        MapEntry('Marital Status', 'Never Married'),
+        MapEntry('Location', 'Dhaka'),
+        MapEntry('Residency Status', 'Citizen'),
       ],
     );
   }
 
 
   Widget _educationCareerSection(BuildContext context) {
-    return _infoCard(
-      context,
+    return const ProfileViewCard(
       title: 'Education & Career',
-      items: [
-        MapEntry('Highest Qualification',
-            userData?['highestQualification'] ?? 'MBA - Management'),
-        MapEntry(
-            'Qualification In', userData?['qualificationIn'] ?? 'Technology'),
-        MapEntry(
-            'Working With', userData?['workingWith'] ?? 'Software Company'),
-        MapEntry('Working As', userData?['workingAs'] ?? 'Senior Developer'),
+      subtitle: 'Her Educational & career journey',
+      iconPath: AppImages.educationSvgIcon,
+      infoList: [
+        MapEntry('Religion', 'Muslim'),
+        MapEntry('Community', 'Sunni'),
+        MapEntry('Marital Status', 'Never Married'),
+        MapEntry('Location', 'Dhaka'),
+        MapEntry('Residency Status', 'Citizen'),
       ],
     );
   }
