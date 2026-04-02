@@ -35,8 +35,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
   Widget build(BuildContext context) {
     provider = ref.watch(notiProvider);
     return TransparentLoading(
-      isLoading:
-          provider.loaderState == NotificationScreenStates.transparentLoading,
+      isLoading: provider.loaderState == NotificationScreenStates.transparentLoading,
       child: Scaffold(
         body: GradientBackground(
           child: Column(
@@ -52,9 +51,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                 ),
               ),
               Expanded(
-                child: provider.screenStates == NotificationScreenStates.loading
-                    ? const Loading()
-                    : _body(),
+                child: provider.screenStates == NotificationScreenStates.loading ? const Loading() : _body(),
               ),
             ],
           ),
@@ -81,17 +78,14 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
             color: AppColors.primary,
             child: NotificationListener<ScrollNotification>(
               onNotification: (scrollNotification) {
-                if (scrollNotification.metrics.pixels >=
-                    scrollNotification.metrics.maxScrollExtent - 120) {
+                if (scrollNotification.metrics.pixels >= scrollNotification.metrics.maxScrollExtent - 120) {
                   provider.loadMoreNotifications();
                 }
                 return false;
               },
               child: ListView.separated(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                itemCount: provider.notifications.length +
-                    (provider.isLoadingMore ? 1 : 0),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                itemCount: provider.notifications.length + (provider.isLoadingMore ? 1 : 0),
                 separatorBuilder: (_, __) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
                   if (index >= provider.notifications.length) {
@@ -112,8 +106,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
   }
 
   Widget _actionBar() {
-    final unreadCount =
-        provider.notifications.where((item) => item.isRead != true).length;
+    final unreadCount = provider.notifications.where((item) => item.isRead != true).length;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: Row(
@@ -143,11 +136,8 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
 
   Widget _notificationCard(NotificationItem item) {
     final senderName = item.sender?.displayName?.trim();
-    final displayName =
-        (senderName?.isNotEmpty ?? false) ? senderName! : 'Walima';
-    final title = (item.title?.trim().isNotEmpty ?? false)
-        ? item.title!.trim()
-        : displayName;
+    final displayName = (senderName?.isNotEmpty ?? false) ? senderName! : 'Walima';
+    final title = (item.title?.trim().isNotEmpty ?? false) ? item.title!.trim() : displayName;
     final message = item.message?.trim() ?? '';
     final isRead = item.isRead == true;
 

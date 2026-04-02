@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/global/components/limit_over.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 
@@ -185,7 +186,6 @@ class DialogUtils {
     await dialogFuture;
   }
 
-
   static Widget statusDialogs({
     required BuildContext context,
     required bool isSuccess,
@@ -288,5 +288,12 @@ class DialogUtils {
     );
     return shouldClose ??
         false; // Return false if dialog is dismissed without selection
+  }
+  
+  static Future<void> show({required BuildContext context,required Widget child}) async {
+    await showDialog(
+      context: context,
+      builder: (context) => child,
+    );
   }
 }
