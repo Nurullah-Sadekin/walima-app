@@ -3,6 +3,8 @@ import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:go_router/go_router.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key, this.userName});
@@ -91,23 +93,22 @@ class _ReportScreenState extends State<ReportScreen> {
     final selectedReason = _reasons[_activeIndex!].reportType;
     final details = _detailsController.text.trim();
 
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Report submitted'),
-        content: Text(
-          details.isEmpty
-              ? 'Thanks. Reported for: $selectedReason.'
-              : 'Thanks. Reported for: $selectedReason.\n\nDetails: $details',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    ).then((_) => Navigator.of(context).maybePop());
+    context.pushNamed(
+      Routes.reportStatus,
+      extra: {
+        'title': 'Report Successfully!',
+        'subtitle': 'Report submitted successfully. We’ll review it shortly. Thank you for reporting.',
+        'buttonText': 'Done',
+        'onTapButton': () {
+          if (context.canPop()) {
+            context.pop();
+          }
+          if (context.canPop()) {
+            context.pop();
+          }
+        },
+      },
+    );
   }
 
   @override

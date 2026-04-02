@@ -49,6 +49,7 @@ import '../../features/chat/presentation/screens/one_to_one_chat_screen.dart';
 import '../../features/profile_preview/presentation/screens/profile_preview_screen.dart';
 import 'route_name.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/screens/report_screen.dart';
+import 'package:flutter_boilerplate/features/chat/presentation/screens/status_screen.dart';
 part 'app_router.g.dart';
 
 @riverpod
@@ -367,6 +368,21 @@ GoRouter goRouter(Ref ref) {
               : null;
           final userName = extra != null ? (extra['displayName'] as String?) : null;
           return ReportScreen(userName: userName);
+        },
+      ),
+      GoRoute(
+        path: Paths.reportStatus,
+        name: Routes.reportStatus,
+        builder: (context, state) {
+          final extra = state.extra is Map<String, dynamic>
+              ? state.extra as Map<String, dynamic>
+              : const <String, dynamic>{};
+          return StatusScreen(
+            title: extra['title'] as String? ?? 'Report submitted',
+            subtitle: extra['subtitle'] as String? ?? 'Thanks. Your report has been received and will be reviewed.',
+            buttonText: extra['buttonText'] as String? ?? 'Done',
+            onTapButton: extra['onTapButton'] as VoidCallback? ?? () => Navigator.of(context).maybePop(),
+          );
         },
       ),
       GoRoute(

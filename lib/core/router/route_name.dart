@@ -61,6 +61,7 @@ abstract class Paths {
   // Chat
   static const chatScreen = '/chatScreen';
   static const report = '/report';
+  static const reportStatus = '/reportStatus';
 
   // Profile Preview
   static const profilePreview = '/profilePreview';
@@ -131,6 +132,7 @@ abstract class Routes {
   static const chatHome = 'chatHome';
   static const chatScreen = 'chatScreen';
   static const report = 'report';
+  static const reportStatus = 'reportStatus';
 
   // Profile Preview
   static const profilePreview = 'profilePreview';
