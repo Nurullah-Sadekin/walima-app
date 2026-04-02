@@ -298,7 +298,26 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                 spacing: 8,
                 children: [
                   Expanded(child: PrimaryButtons(buttonStyle: ButtonsStyle.cancelButton, onTap: () => Navigator.pop(context), title: 'Cancel',bgColor: Colors.transparent)),
-                  Expanded(child: PrimaryButtons(buttonStyle: ButtonsStyle.activePrimaryButton, onTap: (){}, title: 'Block')),
+                  Expanded(child: PrimaryButtons(buttonStyle: ButtonsStyle.activePrimaryButton, onTap: (){
+                    context.pop();
+                    context.pushNamed(
+                      Routes.reportStatus,
+                      extra: {
+                        'title': 'Blocked Successfully!',
+                        'subtitle': 'You have blocked Nusrat Jahan. Nusrat Jahan can no longer view your profile or send you messages.',
+                        'buttonText': 'Done',
+                        'onTapButton': () {
+                          if (context.canPop()) {
+                            context.pop();
+                          }
+                          if (context.canPop()) {
+                            context.pop();
+                          }
+                        },
+                      },
+                    );
+                  }, title: 'Block'),
+                  ),
                 ],
               )
             ],
