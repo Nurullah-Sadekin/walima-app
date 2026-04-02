@@ -112,7 +112,7 @@ class ProfilePreviewScreen extends StatelessWidget {
     return ProfileViewCard(
       title: 'About',
       subtitle: 'Her short bio',
-      iconPath: AppImages.profileSvgIcon,
+      iconPath: AppImages.person,
       child: Text(
         'I have obtained my Masters in Management. I\'ve been an active student throughout my academic years. I am self-employed and handle my own business.A kind heart and a bright smile would be an apt way to describe me. I am seeking a simple and loving partner who will support me in every phase of life. Thank you for expressing interest in my profile.',
         style: TextStyle(
@@ -128,7 +128,7 @@ class ProfilePreviewScreen extends StatelessWidget {
     return const ProfileViewCard(
       title: 'Habits & Interests',
       subtitle: 'Activities, Hobbies, Interests, Lifestyle',
-      iconPath: AppImages.educationSvgIcon,
+      iconPath: AppImages.habitsSvgIcon,
       itemList: [
         'Reading',
         'Traveling',
@@ -146,7 +146,7 @@ class ProfilePreviewScreen extends StatelessWidget {
     return const ProfileViewCard(
       title: 'Contact',
       subtitle: 'Contact Information',
-      iconPath: AppImages.educationSvgIcon,
+      iconPath: AppImages.contactPreview,
       itemList: [
         'Phone: +88018774******',
         'Email: *********@gmail.com'
@@ -158,7 +158,7 @@ class ProfilePreviewScreen extends StatelessWidget {
     return const ProfileViewCard(
       title: 'Lifestyle',
       subtitle: 'Lifestyle, Hobbies, Interests',
-      iconPath: AppImages.educationSvgIcon,
+      iconPath: AppImages.lifeStyleSvgIcon,
       itemList: [
         'Diet: Non-Vegetarian',
         'Smoking: No',

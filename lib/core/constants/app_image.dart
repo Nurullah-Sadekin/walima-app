@@ -88,6 +88,10 @@ class AppImages {
   static const String albumSvgIcon = 'assets/svgIcons/album.svg';
   static const String educationSvgIcon = 'assets/svgIcons/education.svg';
   static const String habitSvgIcon = 'assets/svgIcons/habit.svg';
+  static const String habitsSvgIcon = 'assets/svgIcons/habits.svg';
+  static const String lifeStyleSvgIcon = 'assets/svgIcons/life_style.svg';
+  static const String person = 'assets/svgIcons/person.svg';
+  static const String contactPreview = 'assets/svgIcons/contact_preview.svg';
   static const String languageSvgIcon = 'assets/svgIcons/language.svg';
   static const String weddingSvgIcon = 'assets/svgIcons/wedding.svg';
   static const String userAiSvgIcon = 'assets/svgIcons/user_ai.svg';
