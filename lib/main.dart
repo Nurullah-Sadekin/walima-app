@@ -11,13 +11,18 @@ import 'package:flutter_boilerplate/core/providers/locale_provider.dart';
 import 'package:flutter_boilerplate/core/connectivity/connectivity_keys.dart';
 import 'package:flutter_boilerplate/core/connectivity/connectivity_monitor.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/utils/foreground_alert_service.dart';
 import 'package:flutter_boilerplate/features/chat/data/socket/socket_service.dart';
 
 void main() {
   runApp(
     const ProviderScope(
       child: SafeArea(
-          bottom: true, top: false, left: false, right: false, child: MyApp(),
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: MyApp(),
       ),
     ),
   );
@@ -31,6 +36,7 @@ class MyApp extends ConsumerWidget {
     final router = ref.watch(goRouterProvider);
 
     DioClient().setLogoutHandler(() {
+      ref.read(chatProvider).clearChatState();
       SocketService.instance.disconnect(reason: 'session expired logout');
       router.go(Paths.login);
     });
@@ -41,28 +47,28 @@ class MyApp extends ConsumerWidget {
     return AppRealtimeBootstrap(
       child: ConnectivityMonitor(
         child: MaterialApp.router(
-        title: 'Walima',
-        debugShowCheckedModeBanner: false,
-        scaffoldMessengerKey: rootScaffoldMessengerKey,
-        // Theme
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.lightTheme,
-        themeMode: themeMode,
-        // Routing
-        routerConfig: router,
-        // Localization
-        locale: locale,
-        supportedLocales: const [
-          Locale('en'), // English
-          Locale('bn'), // Bangla
-        ],
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-      ),
+          title: 'Walima',
+          debugShowCheckedModeBanner: false,
+          scaffoldMessengerKey: rootScaffoldMessengerKey,
+          // Theme
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.lightTheme,
+          themeMode: themeMode,
+          // Routing
+          routerConfig: router,
+          // Localization
+          locale: locale,
+          supportedLocales: const [
+            Locale('en'), // English
+            Locale('bn'), // Bangla
+          ],
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+        ),
       ),
     );
   }
@@ -85,6 +91,8 @@ class _AppRealtimeBootstrapState extends ConsumerState<AppRealtimeBootstrap>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      ForegroundAlertService.instance.initialize();
+      ForegroundAlertService.instance.setAppForeground(true);
       ref.read(chatProvider).initializeRealtime();
     });
   }
@@ -97,6 +105,8 @@ class _AppRealtimeBootstrapState extends ConsumerState<AppRealtimeBootstrap>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    ForegroundAlertService.instance
+        .setAppForeground(state == AppLifecycleState.resumed);
     if (state == AppLifecycleState.resumed) {
       ref.read(chatProvider).initializeRealtime();
     }

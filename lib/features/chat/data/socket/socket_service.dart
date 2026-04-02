@@ -2,8 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'package:flutter_boilerplate/core/network/app_urls.dart';
+import 'package:flutter_boilerplate/core/utils/foreground_alert_service.dart';
 import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
 import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_messages_response.dart';
 
@@ -12,7 +13,7 @@ class SocketService {
 
   static final SocketService instance = SocketService._internal();
 
-  IO.Socket? _socket;
+  io.Socket? _socket;
   final StreamController<Message> _messageController =
       StreamController<Message>.broadcast();
   final StreamController<Message> _sentMessageController =
@@ -62,7 +63,7 @@ class SocketService {
     _connectedToken = authToken;
     _log('connecting to $uri');
 
-    _socket = IO.io(
+    _socket = io.io(
       uri,
       <String, dynamic>{
         'path': '/socket.io',
@@ -160,7 +161,10 @@ class SocketService {
     _log('event: message:received payload=$data');
     final msg = _messageFromDynamic(data);
     if (msg != null) {
-      _log('parsed message:received id=${msg.id} conversationId=${msg.conversationId}');
+      _log(
+        'parsed message:received id=${msg.id} conversationId=${msg.conversationId}',
+      );
+      unawaited(ForegroundAlertService.instance.notifyIncomingMessage(msg));
       _messageController.add(msg);
     }
   }
@@ -169,7 +173,9 @@ class SocketService {
     _log('event: message:sent payload=$data');
     final msg = _messageFromDynamic(data);
     if (msg != null) {
-      _log('parsed message:sent id=${msg.id} conversationId=${msg.conversationId}');
+      _log(
+        'parsed message:sent id=${msg.id} conversationId=${msg.conversationId}',
+      );
       _sentMessageController.add(msg);
     }
   }

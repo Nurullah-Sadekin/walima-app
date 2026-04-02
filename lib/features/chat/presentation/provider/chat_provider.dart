@@ -4,7 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/features/chat/data/model/response/connectable_user_response.dart';
 import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_list.dart';
-import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_messages_response.dart' hide ProfilePhoto;
+import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_messages_response.dart'
+    hide ProfilePhoto;
 import 'package:flutter_boilerplate/features/chat/data/repository/chat_repository.dart';
 import 'package:flutter_boilerplate/features/chat/data/socket/socket_service.dart';
 import 'package:flutter_boilerplate/features/login/data/repository/login_repository.dart';
@@ -125,7 +126,9 @@ class ChatProvider extends BaseChangeNotifier {
       return;
     }
     await _ensureCurrentUserId();
-    debugPrint('[ChatProvider] openConversation start id=$conversationId currentUserId=$_currentUserId');
+    debugPrint(
+      '[ChatProvider] openConversation start id=$conversationId currentUserId=$_currentUserId',
+    );
     currentConversationId = conversationId;
     messagesLoading = true;
     loadingMoreMessages = false;
@@ -197,10 +200,8 @@ class ChatProvider extends BaseChangeNotifier {
       cursor: messagesNextCursor,
     );
     final more = _sortedMessagesNewestFirst(resp.data ?? []);
-    final existingIds = messages
-        .map((message) => message.id)
-        .whereType<String>()
-        .toSet();
+    final existingIds =
+        messages.map((message) => message.id).whereType<String>().toSet();
     for (final message in more) {
       final messageId = message.id;
       if (messageId != null && existingIds.contains(messageId)) {
@@ -544,9 +545,8 @@ class ChatProvider extends BaseChangeNotifier {
   }
 
   Participants? _participantFromMessage(Message message) {
-    final participantLite = message.senderId == _currentUserId
-        ? message.receiver
-        : message.sender;
+    final participantLite =
+        message.senderId == _currentUserId ? message.receiver : message.sender;
     final fallbackUserId = message.senderId == _currentUserId
         ? message.receiverId
         : message.senderId;
@@ -604,7 +604,8 @@ class ChatProvider extends BaseChangeNotifier {
 
     return Participants(
       userId: resolvedUserId,
-      displayName: displayName.isNotEmpty ? displayName : participantLite?.username,
+      displayName:
+          displayName.isNotEmpty ? displayName : participantLite?.username,
       firstName: participantLite?.firstName,
       lastName: participantLite?.lastName,
       username: participantLite?.username,
@@ -721,6 +722,30 @@ class ChatProvider extends BaseChangeNotifier {
     _typingSub = null;
     _connectionStateSub = null;
     _socketInitialized = false;
+  }
+
+  void clearChatState({bool notify = true}) {
+    disposeRealtime();
+    connectableUsers = [];
+    conversations = [];
+    _currentUserId = null;
+    selectedTabIndex = 0;
+
+    currentConversationId = null;
+    messages = [];
+    messagesLoading = false;
+    loadingMoreMessages = false;
+    hasMoreMessages = false;
+    messagesNextCursor = null;
+    isOtherUserTyping = false;
+    typingConversationId = null;
+    activeReceiverId = null;
+    screenStates = ChatScreenState.complete;
+    loaderState = ChatScreenState.complete;
+
+    if (notify) {
+      notifyListeners();
+    }
   }
 
   @override
