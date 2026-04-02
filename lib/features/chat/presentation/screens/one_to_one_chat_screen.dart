@@ -5,6 +5,7 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/provider/chat_provider.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/profile_avatar_with_name.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/contact_bottom_sheet.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/remind_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import 'widgets/message_bubble.dart';
 import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_messages_response.dart';
@@ -247,9 +249,40 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
   void _handleMoreMenuAction(MoreMenuAction action, dynamic participant) async {
     switch (action) {
       case MoreMenuAction.viewProfile:
+        context.pushNamed(
+          Routes.profilePreview,
+          extra: {
+            'displayName': participant?.displayName ?? 'User',
+            'profilePictureUrl': participant?.profilePhoto?.url,
+            'profileType': 'Profile Created by Self',
+            'age': '28',
+            'dateOfBirth': '23 Aug 1996',
+            'height': '5\'8"(165cm)',
+            'grewUpIn': 'Dhaka',
+            'maritalStatus': 'Never Married',
+            'occupation': 'Software Engineer',
+            'qualification': 'Bachelor\'s Degree',
+            'income': 'Not Mentioned',
+            'familyStatus': 'Middle Class',
+            'hobbies': 'Reading, Gaming',
+            'interests': 'Technology, Traveling',
+            'diet': 'Non-Vegetarian',
+            'smoking': 'None',
+            'fatherStatus': 'Service',
+            'motherStatus': 'Homemaker',
+            'brothers': '1',
+            'sisters': '2',
+            'familyClass': 'Middle Class',
+            'highestQualification': 'MBA - Management',
+            'qualificationIn': 'Technology',
+            'workingWith': 'Software Company',
+            'workingAs': 'Senior Developer',
+          },
+        );
         break;
       case MoreMenuAction.viewContact:
-           _viewContactBottomSheet();
+        _viewContactBottomSheet();
+
         break;
       case MoreMenuAction.block:
         await showDialog(
