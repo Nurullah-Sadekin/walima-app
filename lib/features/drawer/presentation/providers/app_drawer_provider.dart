@@ -10,8 +10,12 @@ class DrawerProvider extends BaseChangeNotifier {
   DrawerScreenStates screenStates = DrawerScreenStates.defaultState;
   DrawerScreenStates loaderState = DrawerScreenStates.defaultState;
 
-  Future<void> logout(VoidCallback onLogout) async {
+  Future<void> logout(
+    VoidCallback onLogout, {
+    VoidCallback? onBeforeLogout,
+  }) async {
     updateViewState(loadingState: DrawerScreenStates.loading);
+    onBeforeLogout?.call();
     await LogoutRepository.logout();
     SocketService.instance.disconnect(reason: 'user logout');
     DioClient().removeAuthToken();

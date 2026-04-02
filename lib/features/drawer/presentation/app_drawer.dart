@@ -31,7 +31,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
     return Drawer(
       width: MediaQuery.of(context).size.width,
       child: TransparentLoading(
-        isLoading: provider.loaderState == DrawerScreenStates.transparentLoading,
+        isLoading:
+            provider.loaderState == DrawerScreenStates.transparentLoading,
         child: Scaffold(
           body: SafeArea(
             child: Padding(
@@ -67,6 +68,9 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   () {
                     router.go(Paths.login);
                   },
+                  onBeforeLogout: () {
+                    ref.read(chatProvider).clearChatState();
+                  },
                 );
               },
               buttonStyle: ButtonsStyle.iconicDynamicButton,
@@ -85,8 +89,10 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
       children: [
         IconButton(
           onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.close_rounded,
-              color: AppColors.textPrimaryLight),
+          icon: const Icon(
+            Icons.close_rounded,
+            color: AppColors.textPrimaryLight,
+          ),
         ),
         Text(
           'Profile',
@@ -106,24 +112,27 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
     final displayName = resolveDisplayName(profileData);
     final memberId = resolveMemberId(profileData);
     final planName = resolvePlanName(profileData?.membership);
-    final expiryText = formatExpiry(profileData?.membership?.membershipExpiresAt);
+    final expiryText =
+        formatExpiry(profileData?.membership?.membershipExpiresAt);
     return ProfileSummaryCard(
       displayName: displayName,
       memberId: memberId,
       planName: planName,
       expiryText: expiryText,
-      profileImagePath: profileData?.profilePicture?.url ?? AppImages.demoProfile,
+      profileImagePath:
+          profileData?.profilePicture?.url ?? AppImages.demoProfile,
       showTopIcon: profileData?.isVerified ?? true,
       showBottomIcon: true,
       topIconPath: AppImages.verifiedBadgeSvgIcon,
       bottomIconPath: AppImages.cameraSvgIcon,
       onBottomIconPressed: () async {
         final String? imagePath = await PickerDialog().imagePicker(context);
+        if (!context.mounted) return;
         if (imagePath != null) {
           await ref.watch(profileProvider).updateProfileImage(
-            context: context,
-            filePath: imagePath,
-          );
+                context: context,
+                filePath: imagePath,
+              );
         }
       },
     );
