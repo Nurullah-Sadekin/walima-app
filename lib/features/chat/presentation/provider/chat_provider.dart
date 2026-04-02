@@ -34,6 +34,7 @@ class ChatProvider extends BaseChangeNotifier {
   bool isOtherUserTyping = false;
   String? typingConversationId;
   String? activeReceiverId;
+  final Set<String> _typingConversationIds = <String>{};
 
   List<Conversations> get allConversations => conversations ?? const [];
 
@@ -60,6 +61,11 @@ class ChatProvider extends BaseChangeNotifier {
   }
 
   String? get currentUserId => _currentUserId;
+
+  bool isConversationTyping(String? conversationId) {
+    if (conversationId == null || conversationId.isEmpty) return false;
+    return _typingConversationIds.contains(conversationId);
+  }
 
   void setSelectedTab(int index) {
     if (index == selectedTabIndex) return;
@@ -117,6 +123,10 @@ class ChatProvider extends BaseChangeNotifier {
     } else {
       conversations = [];
     }
+    _typingConversationIds.removeWhere(
+      (id) => !(conversations?.any((conversation) => conversation.id == id) ??
+          false),
+    );
     updateViewState();
   }
 
@@ -130,6 +140,7 @@ class ChatProvider extends BaseChangeNotifier {
       '[ChatProvider] openConversation start id=$conversationId currentUserId=$_currentUserId',
     );
     currentConversationId = conversationId;
+    _typingConversationIds.remove(conversationId);
     messagesLoading = true;
     loadingMoreMessages = false;
     messages = [];
@@ -222,11 +233,21 @@ class ChatProvider extends BaseChangeNotifier {
   }
 
   void addIncomingMessage(Message msg) {
+    final incomingConversationId = msg.conversationId;
+    if (incomingConversationId != null && incomingConversationId.isNotEmpty) {
+      _typingConversationIds.remove(incomingConversationId);
+    }
+
     if (msg.conversationId != null &&
         msg.conversationId == currentConversationId) {
       if (!_hasMessage(msg.id)) {
         messages.insert(0, msg);
       }
+      _upsertConversationFromMessage(
+        msg,
+        increaseUnread: false,
+        moveToTop: true,
+      );
       if (msg.id != null && msg.id!.isNotEmpty) {
         SocketService.instance.markMessageDelivered(msg.id!);
         SocketService.instance.markMessageRead(msg.id!);
@@ -308,6 +329,13 @@ class ChatProvider extends BaseChangeNotifier {
 
   void setActiveReceiver(String? receiverId) {
     activeReceiverId = receiverId;
+  }
+
+  void closeActiveConversation() {
+    currentConversationId = null;
+    activeReceiverId = null;
+    isOtherUserTyping = false;
+    typingConversationId = null;
   }
 
   void onComposerChanged(String value) {
@@ -426,22 +454,39 @@ class ChatProvider extends BaseChangeNotifier {
   }
 
   void _handleTypingUpdate(Map<String, dynamic> payload) {
-    final conversationId = payload['conversationId']?.toString();
+    String? conversationId = payload['conversationId']?.toString();
     final senderId =
         payload['senderId']?.toString() ?? payload['userId']?.toString();
-    if (conversationId != null &&
-        currentConversationId != null &&
-        conversationId != currentConversationId) {
-      return;
-    }
     if (senderId != null && senderId == _currentUserId) return;
 
     final isTyping = payload['isTyping'] == true ||
         payload['typing'] == true ||
         payload['status']?.toString() == 'start' ||
         payload['event']?.toString() == 'typing:start';
-    isOtherUserTyping = isTyping;
-    typingConversationId = conversationId;
+
+    if (conversationId == null || conversationId.isEmpty) {
+      conversationId = _resolveConversationIdByParticipant(senderId);
+    }
+
+    if (conversationId != null && conversationId.isNotEmpty) {
+      if (isTyping) {
+        _typingConversationIds.add(conversationId);
+      } else {
+        _typingConversationIds.remove(conversationId);
+      }
+    }
+
+    if (currentConversationId != null &&
+        conversationId != null &&
+        conversationId == currentConversationId) {
+      isOtherUserTyping = isTyping;
+      typingConversationId = conversationId;
+    } else if (!isTyping &&
+        typingConversationId != null &&
+        conversationId == typingConversationId) {
+      isOtherUserTyping = false;
+      typingConversationId = null;
+    }
     notifyListeners();
   }
 
@@ -636,6 +681,21 @@ class ChatProvider extends BaseChangeNotifier {
     return sorted;
   }
 
+  String? _resolveConversationIdByParticipant(String? participantUserId) {
+    if (participantUserId == null || participantUserId.isEmpty) return null;
+    for (final conversation in conversations ?? const <Conversations>[]) {
+      final participants = conversation.participants ?? const <Participants>[];
+      final hasParticipant = participants
+          .any((participant) => participant.userId == participantUserId);
+      if (!hasParticipant) continue;
+      final conversationId = conversation.id;
+      if (conversationId != null && conversationId.isNotEmpty) {
+        return conversationId;
+      }
+    }
+    return null;
+  }
+
   Map<String, Map<String, dynamic>> _extractPresenceUpdates(
     Map<String, dynamic> payload,
   ) {
@@ -739,6 +799,7 @@ class ChatProvider extends BaseChangeNotifier {
     messagesNextCursor = null;
     isOtherUserTyping = false;
     typingConversationId = null;
+    _typingConversationIds.clear();
     activeReceiverId = null;
     screenStates = ChatScreenState.complete;
     loaderState = ChatScreenState.complete;

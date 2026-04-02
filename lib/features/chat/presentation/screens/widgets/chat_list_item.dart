@@ -6,7 +6,6 @@ import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/profile_avatar_with_name.dart';
 
 class ChatListItem extends StatelessWidget {
-
   const ChatListItem({
     super.key,
     required this.name,
@@ -17,6 +16,7 @@ class ChatListItem extends StatelessWidget {
     this.onTap,
     this.isOnline,
     this.unReadMessage,
+    this.isTyping = false,
   });
   final String name;
   final String? imagePath;
@@ -26,6 +26,7 @@ class ChatListItem extends StatelessWidget {
   final VoidCallback? onTap;
   final bool? isOnline;
   final bool? unReadMessage;
+  final bool isTyping;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +38,8 @@ class ChatListItem extends StatelessWidget {
         children: [
           ProfileAvatarWithName(
             imagePath: imagePath ?? AppImages.demoProfile2,
-            indicatorColor: isOnline == true ? AppColors.greenButtonColor : Colors.red,
+            indicatorColor:
+                isOnline == true ? AppColors.greenButtonColor : Colors.red,
           ),
           const SizedBox(width: 12),
           Flexible(
@@ -86,11 +88,11 @@ class ChatListItem extends StatelessWidget {
           ),
         ),
         if (unReadMessage == true)
-        const Icon(
-          Icons.circle,
-          size: 10,
-          color: AppColors.primary,
-        ),
+          const Icon(
+            Icons.circle,
+            size: 10,
+            color: AppColors.primary,
+          ),
       ],
     );
   }
@@ -104,34 +106,37 @@ class ChatListItem extends StatelessWidget {
       children: [
         Flexible(
           child: Text(
-            lastMessage,
+            isTyping ? 'Typing...' : lastMessage,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: TextSize.font14(context),
-              color: AppColors.textSecondaryLight,
-              fontWeight: FontWeight.w400,
+              color:
+                  isTyping ? AppColors.primary : AppColors.textSecondaryLight,
+              fontWeight: isTyping ? FontWeight.w600 : FontWeight.w400,
+              fontStyle: isTyping ? FontStyle.italic : FontStyle.normal,
             ),
           ),
         ),
-        Row(
-          children: [
-            const Icon(
-              Icons.circle,
-              size: 4,
-              color: AppColors.textSecondaryLight,
-            ),
-            const SizedBox(width: 10),
-            Text(
-              timeAgo,
-              style: TextStyle(
-                fontSize: TextSize.font14(context),
+        if (!isTyping)
+          Row(
+            children: [
+              const Icon(
+                Icons.circle,
+                size: 4,
                 color: AppColors.textSecondaryLight,
-                fontWeight: FontWeight.w400,
               ),
-            ),
-          ],
-        ),
+              const SizedBox(width: 10),
+              Text(
+                timeAgo,
+                style: TextStyle(
+                  fontSize: TextSize.font14(context),
+                  color: AppColors.textSecondaryLight,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
       ],
     );
   }

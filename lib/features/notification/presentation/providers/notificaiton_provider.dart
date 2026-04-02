@@ -65,8 +65,8 @@ class NotificationProvider extends BaseChangeNotifier {
     final response = await NotificationRepository.getNotifications(
       page: _currentPage,
       limit: _limit,
-      filter: 'all_activities',
-      type: 'connection',
+      // filter: 'all_activities',
+      // type: 'connection',
     );
 
     final list = response.response?.data ?? <NotificationItem>[];

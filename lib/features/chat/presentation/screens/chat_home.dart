@@ -30,6 +30,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(chatProvider).closeActiveConversation();
       ref.read(chatProvider).getInitialData();
     });
   }
@@ -90,7 +91,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 20.0, vertical: 16),
+                    horizontal: 20.0,
+                    vertical: 16,
+                  ),
                   child: SafetyFirst(
                     onViewMoreTips: () {
                       Navigator.pop(context);
@@ -195,6 +198,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         final displayName =
             (userName?.isNotEmpty ?? false) ? userName! : 'Unknown User';
         final lastMessage = conversation.lastMessage?.trim();
+        final isTyping = provider.isConversationTyping(conversation.id);
 
         return Padding(
           padding: const EdgeInsets.only(bottom: 16),
@@ -204,6 +208,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             isVerified: participant?.profilePhoto?.isVerified,
             isOnline: participant?.isOnline,
             unReadMessage: conversation.unreadCount != 0,
+            isTyping: isTyping,
             lastMessage: (lastMessage?.isNotEmpty ?? false)
                 ? lastMessage!
                 : 'No message',
@@ -216,7 +221,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   'displayName': displayName,
                   'profilePictureUrl': participant?.profilePhoto?.url,
                   'isOnline': participant?.isOnline,
-                }
+                },
               };
               context.pushNamed(Routes.chatScreen, extra: payload);
             },
