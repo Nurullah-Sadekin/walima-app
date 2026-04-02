@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
+import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
+import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 
 class ReportScreen extends StatefulWidget {
@@ -11,45 +12,99 @@ class ReportScreen extends StatefulWidget {
   State<ReportScreen> createState() => _ReportScreenState();
 }
 
-class ReportItem {
-  ReportItem({required this.name, this.isSelected = false});
-  final String name;
+enum ReportStep { reasons, details }
+
+class ReportReason {
+  ReportReason({required this.reportType, this.isSelected = false});
+  final String reportType;
   bool isSelected;
 }
 
 class _ReportScreenState extends State<ReportScreen> {
-   List<ReportItem> _items = [];
-  static const double spacing = 10.0;
+  final List<ReportReason> _reasons = [
+    ReportReason(reportType: 'Fake / Misleading profile information'),
+    ReportReason(reportType: 'Multiple profiles'),
+    ReportReason(reportType: 'Phone number is incorrect'),
+    ReportReason(reportType: 'Photos are fake or obscene'),
+    ReportReason(reportType: 'Has sent abusive emails / chats'),
+    ReportReason(reportType: 'Is already married / engaged'),
+    ReportReason(reportType: 'Asking for money / scammer'),
+    ReportReason(reportType: 'Not responding'),
+    ReportReason(reportType: 'Other misuse reason'),
+  ];
+
+  static const double _spacing = 10;
+  static const int _maxChars = 500;
+
+  ReportStep _step = ReportStep.reasons;
+  int? _activeIndex;
+  final TextEditingController _detailsController = TextEditingController();
+  final FocusNode _detailsFocusNode = FocusNode();
 
   @override
-  void initState() {
-    super.initState();
-    _items = [
-      ReportItem(name: 'Fake/ Misleading profile information'),
-      ReportItem(name: 'Multiple profiles'),
-      ReportItem(name: 'Phone number is incorrect'),
-      ReportItem(name: 'Photos are fake or obscene'),
-      ReportItem(name: 'Has sent abusive Emails / Chats'),
-      ReportItem(name: 'Is already married / Engaged'),
-      ReportItem(name: 'Asking for money / Scammer'),
-      ReportItem(name: 'Not Responding'),
-      ReportItem(name: 'Other misuse reason'),
-    ];
+  void dispose() {
+    _detailsController.dispose();
+    _detailsFocusNode.dispose();
+    super.dispose();
+  }
+
+  String get _title {
+    // if (_step == ReportStep.details && _activeIndex != null) {
+    //   return _reasons[_activeIndex!].reportType;
+    // }
+    return 'Report';
+  }
+
+  void _selectReason(int index) {
+    setState(() {
+      for (final reason in _reasons) {
+        reason.isSelected = false;
+      }
+      _reasons[index].isSelected = true;
+      _activeIndex = index;
+      // stay on reasons step; the primary button moves to details
+      _step = ReportStep.reasons;
+      _detailsController.clear();
+    });
+  }
+
+  void _goToDetails() {
+    if (_activeIndex == null) return;
+    setState(() {
+      _step = ReportStep.details;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _detailsFocusNode.requestFocus();
+    });
+  }
+
+  void _goBackToReasons() {
+    setState(() {
+      _step = ReportStep.reasons;
+    });
   }
 
   void _onApply() {
-    final selectedReasons = _items.where((i) => i.isSelected).map((e) => e.name).toList();
+    if (_activeIndex == null) return;
 
-    // For now just show a simple confirmation and pop back
+    final selectedReason = _reasons[_activeIndex!].reportType;
+    final details = _detailsController.text.trim();
+
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Report submitted'),
-        content: Text(selectedReasons.isEmpty
-            ? 'No reason selected. We will still review the profile.'
-            : 'Thanks. Reported for: ${selectedReasons.join(", ")}. Our team will review it.'),
+        content: Text(
+          details.isEmpty
+              ? 'Thanks. Reported for: $selectedReason.'
+              : 'Thanks. Reported for: $selectedReason.\n\nDetails: $details',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK'))
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
         ],
       ),
     ).then((_) => Navigator.of(context).maybePop());
@@ -58,57 +113,151 @@ class _ReportScreenState extends State<ReportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomBackAppBar(
-        title: Text('Report'),
+      appBar: CustomBackAppBar(
+        title: Text(_title),
         isBackButton: true,
+        onBackPressed: () {
+          if (_step == ReportStep.details) {
+            _goBackToReasons();
+          } else {
+            Navigator.of(context).maybePop();
+          }
+        },
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Wrap(
-            spacing: spacing,
-            runSpacing: spacing,
-            children: List.generate(_items.length, (index) {
-              final item = _items[index];
-              return SelectionCard(
-                buttonStyle: item.isSelected ? SelectionStyle.selectedCheckbox : SelectionStyle.unSelectedCheckbox,
-                onTap: () => setState(() => _items[index].isSelected = !_items[index].isSelected),
-                isSelected: item.isSelected,
-                title: item.name,
-                isExpand: true,
-              );
-            }),
-          ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: _body(),
         ),
+      ),
+      bottomNavigationBar: _bottomAction(),
+    );
+  }
+
+  Widget _body() {
+    switch (_step) {
+      case ReportStep.reasons:
+        return _reasonsBody();
+      case ReportStep.details:
+        return _detailsBody();
+    }
+  }
+
+  Widget _reasonsBody() {
+    return SingleChildScrollView(
+      child: Wrap(
+        spacing: _spacing,
+        runSpacing: _spacing,
+        children: List.generate(_reasons.length, (index) {
+          final item = _reasons[index];
+          return SelectionCard(
+            buttonStyle: item.isSelected
+                ? SelectionStyle.selectedCheckbox
+                : SelectionStyle.unSelectedCheckbox,
+            onTap: () => _selectReason(index),
+            isSelected: item.isSelected,
+            title: item.reportType,
+            isExpand: true,
+          );
+        }),
       ),
     );
   }
 
-  Widget _bottomAction(){
+  Widget _detailsBody() {
+    if (_activeIndex == null) return const SizedBox.shrink();
+
+    final selectedReason = _reasons[_activeIndex!].reportType;
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            selectedReason,
+            style: TextStyle(
+              fontSize: TextSize.font16(context),
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimaryLight,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: _detailsController,
+                focusNode: _detailsFocusNode,
+                maxLines: 8,
+                maxLength: _maxChars,
+                decoration: const InputDecoration(
+                  hintText: 'Details  section...',
+                  hintStyle: TextStyle(
+                    color: AppColors.textSecondaryLight,
+                  ),
+
+                  border: InputBorder.none,
+                  fillColor: AppColors.white,
+                  filled: true,
+                  focusColor: AppColors.white,
+                  counterText: '',
+                ),
+                style: TextStyle(
+                  color: AppColors.textPrimaryLight,
+                  fontSize: TextSize.font14(context),
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _bottomAction() {
+    final isDetails = _step == ReportStep.details;
+    final canProceed = _activeIndex != null;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
       child: Row(
         children: [
           Expanded(
             child: OutlinedButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () {
+                if (isDetails) {
+                  _goBackToReasons();
+                } else {
+                  Navigator.of(context).pop();
+                }
+              },
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.textPrimaryLight,
                 side: const BorderSide(color: AppColors.greyLight),
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
-              child: const Text('Cancel'),
+              child: Text(isDetails ? 'Back' : 'Cancel'),
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: ElevatedButton(
-              onPressed: _onApply,
+              onPressed: !canProceed
+                  ? null
+                  : () {
+                      if (_step == ReportStep.reasons) {
+                        _goToDetails();
+                      } else {
+                        _onApply();
+                      }
+                    },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
+                disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.4),
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
-              child: const Text('Apply'),
+              child: Text(isDetails ? 'Apply' : 'Next'),
             ),
           ),
         ],
