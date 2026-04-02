@@ -32,28 +32,29 @@ class _NotificationIconWithBadgeState extends ConsumerState<NotificationIconWith
       if(provider.totalUnreadCount == '0') {
         return InkWell(
           onTap: widget.onNotificationPressed,
-          child: const Padding(
-            padding: EdgeInsets.all(7),
+          child:  Padding(
+            padding: const EdgeInsets.all(7),
             child: ShowImage(
               imagePath: AppImages.notificationSvgIcon,
               color: AppColors.textPrimaryLight,
-              height: 30,
-              width: 30,
+              height:  TextSize.font22(context),
+              width:  TextSize.font24(context),
             ),
           ),
         );
       }
+
     return InkWell(
       onTap: widget.onNotificationPressed,
       child: Stack(
         children: [
-          const Padding(
-            padding: EdgeInsets.all(7),
+           Padding(
+            padding: const EdgeInsets.all(7),
             child: ShowImage(
               imagePath: AppImages.notificationSvgIcon,
               color: AppColors.textPrimaryLight,
-              height: 30,
-              width: 30,
+              height:  TextSize.font22(context),
+              width:  TextSize.font24(context),
             ),
           ),
           Positioned(
