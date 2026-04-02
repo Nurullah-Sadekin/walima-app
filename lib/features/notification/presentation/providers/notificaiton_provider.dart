@@ -17,10 +17,9 @@ class NotificationProvider extends BaseChangeNotifier {
 
   Future<void> getNotificationCount() async {
     final response = await NotificationRepository.getUnReadNotificationCount();
-    if(response.response?.data?.unreadCount != null) {
+    if (response.response?.data?.unreadCount != null) {
       totalUnreadCount = response.response!.data!.unreadCount.toString();
-    }
-    else {
+    } else {
       totalUnreadCount = '0';
     }
     updateViewState();
@@ -61,6 +60,7 @@ class NotificationProvider extends BaseChangeNotifier {
     }
 
     errorMessage = null;
+    _currentPage = 1;
 
     final response = await NotificationRepository.getNotifications(
       page: _currentPage,
@@ -127,6 +127,80 @@ class NotificationProvider extends BaseChangeNotifier {
 
     isLoadingMore = false;
     notifyListeners();
+  }
+
+  Future<bool> markSingleNotificationAsRead(String notificationId) async {
+    if (notificationId.trim().isEmpty) return false;
+
+    final targetIndex = notifications.indexWhere(
+      (item) => item.id == notificationId,
+    );
+    if (targetIndex < 0) return false;
+    if (notifications[targetIndex].isRead == true) return true;
+
+    updateViewState(loadingState: NotificationScreenStates.transparentLoading);
+    final response = await NotificationRepository.markNotificationsAsRead(
+      notificationIds: [notificationId],
+    );
+    updateViewState(loadingState: NotificationScreenStates.defaultState);
+
+    final isSuccess = response.code == 'SUCCESS' ||
+        (response.statusCode != null &&
+            response.statusCode! >= 200 &&
+            response.statusCode! < 300);
+
+    if (!isSuccess) {
+      return false;
+    }
+
+    notifications[targetIndex].isRead = true;
+    _syncStatsAfterReadChange();
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> markAllNotificationsAsRead() async {
+    final unreadIds = notifications
+        .where((item) => item.isRead != true)
+        .map((item) => item.id)
+        .whereType<String>()
+        .where((id) => id.trim().isNotEmpty)
+        .toList();
+    if (unreadIds.isEmpty) return true;
+
+    updateViewState(loadingState: NotificationScreenStates.transparentLoading);
+    final response = await NotificationRepository.markNotificationsAsRead(
+      notificationIds: unreadIds,
+    );
+    updateViewState(loadingState: NotificationScreenStates.defaultState);
+
+    final isSuccess = response.code == 'SUCCESS' ||
+        (response.statusCode != null &&
+            response.statusCode! >= 200 &&
+            response.statusCode! < 300);
+
+    if (!isSuccess) {
+      return false;
+    }
+
+    for (final item in notifications) {
+      item.isRead = true;
+    }
+    _syncStatsAfterReadChange();
+    notifyListeners();
+    return true;
+  }
+
+  void _syncStatsAfterReadChange() {
+    final totalCount = stats?.total ?? notifications.length;
+    final unreadCount =
+        notifications.where((item) => item.isRead != true).length;
+    stats ??= NotificationStats();
+    stats!
+      ..total = totalCount
+      ..unread = unreadCount
+      ..read = totalCount - unreadCount;
+    totalUnreadCount = unreadCount.toString();
   }
 }
 
