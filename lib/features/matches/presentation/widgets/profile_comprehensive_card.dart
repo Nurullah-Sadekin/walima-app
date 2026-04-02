@@ -50,6 +50,7 @@ class ProfileComprehensiveCard extends StatelessWidget {
     this.singleButtonText = 'Connect Now',
     this.onMenuTap,
     this.noButton = false,
+    this.isOnline = false,
   });
 
   final String imagePath;
@@ -98,6 +99,7 @@ class ProfileComprehensiveCard extends StatelessWidget {
   final String? singleButtonText;
 
   final bool noButton;
+  final bool isOnline;
 
 
   @override
@@ -233,8 +235,8 @@ class ProfileComprehensiveCard extends StatelessWidget {
                         Container(
                           width: TextSize.font8(context),
                           height: TextSize.font8(context),
-                          decoration: const BoxDecoration(
-                            color: Color(0XFF1FC16B),
+                          decoration: BoxDecoration(
+                            color: isOnline ? const Color(0XFF1FC16B) : AppColors.disableBackground,
                             shape: BoxShape.circle,
                           ),
                         ),

@@ -10,6 +10,7 @@ class IconTitleCard extends StatelessWidget {
     required this.imagePath,
     required this.title,
     this.backgroundColor,
+    this.borderColor,
     this.iconColor,
     this.textColor,
     this.iconSize = 16,
@@ -24,6 +25,7 @@ class IconTitleCard extends StatelessWidget {
   final String imagePath;
   final String title;
   final Color? backgroundColor;
+  final Color? borderColor;
   final Color? iconColor;
   final Color? textColor;
   final double iconSize;
@@ -80,6 +82,7 @@ class IconTitleCard extends StatelessWidget {
       padding: padding ?? const EdgeInsets.all(5),
       decoration: BoxDecoration(
         color: backgroundColor ?? AppColors.primary,
+        border: Border.all(color: borderColor ?? AppColors.transparent),
         borderRadius: BorderRadius.circular(borderRadius),
       ),
       child: ShowImage(

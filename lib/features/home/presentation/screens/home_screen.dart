@@ -6,6 +6,7 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
@@ -286,9 +287,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           height: heightText,
           location: location,
           profession: profession,
-          // match.profilePhoto?.visibilityStatus != 'public',
-          // match.connection?.status == 'none',
+          leftButtonColor: match.connection?.status == 'none' ? AppColors.greenButtonColor : AppColors.disableBackground,
+          leftButtonTextColor: match.connection?.status == 'none' ? AppColors.white : AppColors.disableText,
+          leftButtonIconColor: match.connection?.status == 'none' ? AppColors.white : AppColors.disableText,
+          leftButtonBorderColor: match.connection?.status == 'none' ? AppColors.greenButtonColor : AppColors.disableBackground,
+          viewOnAccept: match.profilePhoto?.visibilityStatus != 'public',
           religion: match.religion,
+          isOnline: match.isOnline ?? false,
           onTapLeftButton: () {
             ref.read(homeProvider).connect(context, match);
             // print('Left button tapped for ${match.displayName}');
@@ -327,7 +332,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       return 'Online';
     }
     if (match.lastSeenAt != null && match.lastSeenAt!.isNotEmpty) {
-      return match.lastSeenAt!;
+      return DateTimeUtils.formatDate(DateTime.tryParse(match.lastSeenAt! ?? ''));
     }
     return 'Offline';
   }
@@ -475,7 +480,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           age: visitor.age != null ? '${visitor.age?.toInt()} Yr' : null,
           height: _formatRecentVisitorHeight(visitor.height),
           location: location,
-          profession: visitor.profession?.toString(),
+          leftButtonColor: visitor.connection?.status == 'none' ? AppColors.greenButtonColor : AppColors.disableBackground,
+          leftButtonTextColor: visitor.connection?.status == 'none' ? AppColors.white : AppColors.disableText,
+          leftButtonIconColor: visitor.connection?.status == 'none' ? AppColors.white : AppColors.disableText,
+          leftButtonBorderColor: visitor.connection?.status == 'none' ? AppColors.greenButtonColor : AppColors.disableBackground,
+          viewOnAccept: visitor.profilePhoto?.visibilityStatus != 'public',
           activeStatusText: _recentVisitorStatus(visitor),
         ),
       ),
@@ -501,26 +510,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   String _recentVisitorStatus(Data visitor) {
-    final visitCount = _formatVisitCount(visitor.visitCount);
-    final visitedAt = _formatVisitedAt(visitor.visitedAt);
-    return '$visitCount · Visited $visitedAt';
-  }
-
-  String _formatVisitCount(num? count) {
-    if (count == null) return 'Visited';
-    final visits = count.toInt();
-    return '$visits visit${visits == 1 ? '' : 's'}';
-  }
-
-  String _formatVisitedAt(String? visitedAt) {
-    if (visitedAt == null || visitedAt.trim().isEmpty) {
-      return 'recently';
-    }
-    final parsed = DateTime.tryParse(visitedAt);
-    if (parsed != null) {
-      return '${parsed.day.toString().padLeft(2, '0')}/${parsed.month.toString().padLeft(2, '0')}/${parsed.year}';
-    }
-    return visitedAt.split('T').first;
+    final visitedAt =  DateTimeUtils.formatDate(DateTime.tryParse(visitor.visitedAt ?? ''));
+    return visitedAt;
   }
 
   Widget _followUpSection() {

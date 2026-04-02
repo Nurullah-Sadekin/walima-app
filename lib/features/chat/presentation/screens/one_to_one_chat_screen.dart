@@ -290,6 +290,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
           builder: (_) => AlertDialog(
             title: Text('Block ${participant?.displayName}? Are you sure?'),
             content: const Text('Blocked members cannot view your profile or contact you on walima.com.'),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0), // Minimized border radius
+            ),
             actions: [
               Row(
                 spacing: 8,
@@ -303,21 +306,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
         );
         break;
       case MoreMenuAction.report:
-        await showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: const Text('Report User'),
-            content: Text('Report ${participant?.displayName ?? 'this user'} for inappropriate behavior.'),
-            actions: [
-              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-              TextButton(onPressed: () {
-                Navigator.pop(context);
-                // TODO: call report flow
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('User reported')));
-              }, child: const Text('Report')),
-            ],
-          ),
-        );
+        // Navigate to the Report screen and pass participant info as extra
+        final extra = <String, dynamic>{
+          'displayName': participant?.displayName ?? participant?['displayName'] ?? 'User',
+          'profilePictureUrl': participant?.profilePhoto?.url ?? participant?['profilePictureUrl'],
+        };
+        context.pushNamed(Routes.report, extra: extra);
         break;
     }
   }
