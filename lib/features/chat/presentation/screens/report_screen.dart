@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
+import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key, this.userName});
@@ -11,27 +11,34 @@ class ReportScreen extends StatefulWidget {
   State<ReportScreen> createState() => _ReportScreenState();
 }
 
+class ReportItem {
+  ReportItem({required this.name, this.isSelected = false});
+  final String name;
+  bool isSelected;
+}
+
 class _ReportScreenState extends State<ReportScreen> {
-  final List<String> _reasons = [
-    'Inappropriate content',
-    'Spam or scam',
-    'Harassment or hate speech',
-    'Fake profile',
-    'Other',
-  ];
-  late List<bool> _selected;
+   List<ReportItem> _items = [];
+  static const double spacing = 10.0;
 
   @override
   void initState() {
     super.initState();
-    _selected = List<bool>.filled(_reasons.length, false);
+    _items = [
+      ReportItem(name: 'Fake/ Misleading profile information'),
+      ReportItem(name: 'Multiple profiles'),
+      ReportItem(name: 'Phone number is incorrect'),
+      ReportItem(name: 'Photos are fake or obscene'),
+      ReportItem(name: 'Has sent abusive Emails / Chats'),
+      ReportItem(name: 'Is already married / Engaged'),
+      ReportItem(name: 'Asking for money / Scammer'),
+      ReportItem(name: 'Not Responding'),
+      ReportItem(name: 'Other misuse reason'),
+    ];
   }
 
   void _onApply() {
-    final selectedReasons = <String>[];
-    for (var i = 0; i < _reasons.length; i++) {
-      if (_selected[i]) selectedReasons.add(_reasons[i]);
-    }
+    final selectedReasons = _items.where((i) => i.isSelected).map((e) => e.name).toList();
 
     // For now just show a simple confirmation and pop back
     showDialog(
@@ -56,87 +63,56 @@ class _ReportScreenState extends State<ReportScreen> {
         isBackButton: true,
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Report ${widget.userName ?? "user"}',
-                  style: TextStyle(
-                    fontSize: TextSize.font16(context),
-                    color: AppColors.textPrimaryLight,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-            const Divider(height: 1),
-            Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.all(12),
-                itemBuilder: (_, index) {
-                  return InkWell(
-                    onTap: () => setState(() => _selected[index] = !_selected[index]),
-                    child: Row(
-                      children: [
-                        Checkbox(
-                          value: _selected[index],
-                          onChanged: (v) => setState(() => _selected[index] = v ?? false),
-                          activeColor: AppColors.primary,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            _reasons[index],
-                            style: TextStyle(
-                              fontSize: TextSize.font14(context),
-                              color: AppColors.textPrimaryLight,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-                separatorBuilder: (_, __) => const SizedBox(height: 8),
-                itemCount: _reasons.length,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.textPrimaryLight,
-                        side: const BorderSide(color: AppColors.greyLight),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      child: const Text('Cancel'),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: _onApply,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      child: const Text('Apply'),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Wrap(
+            spacing: spacing,
+            runSpacing: spacing,
+            children: List.generate(_items.length, (index) {
+              final item = _items[index];
+              return SelectionCard(
+                buttonStyle: item.isSelected ? SelectionStyle.selectedCheckbox : SelectionStyle.unSelectedCheckbox,
+                onTap: () => setState(() => _items[index].isSelected = !_items[index].isSelected),
+                isSelected: item.isSelected,
+                title: item.name,
+                isExpand: true,
+              );
+            }),
+          ),
         ),
       ),
     );
   }
-}
 
+  Widget _bottomAction(){
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton(
+              onPressed: () => Navigator.of(context).pop(),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.textPrimaryLight,
+                side: const BorderSide(color: AppColors.greyLight),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+              child: const Text('Cancel'),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: _onApply,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+              child: const Text('Apply'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
