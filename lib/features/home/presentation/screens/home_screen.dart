@@ -286,6 +286,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           height: heightText,
           location: location,
           profession: profession,
+          // match.profilePhoto?.visibilityStatus != 'public',
+          // match.connection?.status == 'none',
           religion: match.religion,
           onTapLeftButton: () {
             ref.read(homeProvider).connect(context, match);
