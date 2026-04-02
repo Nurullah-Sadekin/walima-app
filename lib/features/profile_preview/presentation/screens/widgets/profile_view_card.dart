@@ -7,18 +7,25 @@ import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 /// Reusable profile info card used in EditProfileScreen.
 /// Supports either a free-form `child` or a list of key/value pairs via `infoList`.
 class ProfileViewCard extends StatelessWidget {
-
   const ProfileViewCard({
     super.key,
     required this.title,
-    this.showEdit = false,
-    this.onEdit,
+    this.subtitle,
+    this.iconPath,
+    this.userId,
+    this.copyUserIdOnTap ,
+    this.profileManageStatus,
     this.child,
     this.infoList,
-  })  : assert(child != null || infoList != null, 'Either child or infoList must be provided');
+  }) : assert(child != null || infoList != null,
+            'Either child or infoList must be provided');
+
   final String title;
-  final bool showEdit;
-  final VoidCallback? onEdit;
+  final String? subtitle;
+  final String? iconPath;
+  final String? userId;
+  final VoidCallback? copyUserIdOnTap;
+  final String? profileManageStatus;
   final Widget? child;
   final List<MapEntry<String, String>>? infoList;
 
@@ -35,53 +42,116 @@ class ProfileViewCard extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: AppColors.textPrimaryLight,
-                    fontSize: TextSize.font14(context),
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                if (showEdit)
-                  GestureDetector(
-                    onTap: onEdit,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.circular(8.0),
-                        border: Border.all(color: AppColors.greyLight),
+            child: userId == null
+                ? Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    spacing: 10,
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        padding: const EdgeInsets.all(8.0),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.rectangle,
+                          color: AppColors.primaryVariant,
+                          border: Border.all(
+                              color: AppColors.primaryShade300, width: 1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: ShowImage(
+                          imagePath: iconPath ?? AppImages.profileSvgIcon,
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                      child: Row(
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          ShowImage(
-                            imagePath: AppImages.editWrite,
-                            width: TextSize.font16(context),
-                            height: TextSize.font16(context),
-                            color: AppColors.primary,
-                          ),
-                          const SizedBox(width: 4),
                           Text(
-                            'Edit',
+                            title,
                             style: TextStyle(
-                              color: AppColors.primary,
+                              color: AppColors.textPrimaryLight,
                               fontSize: TextSize.font14(context),
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          Text(
+                            subtitle ?? '',
+                            style: TextStyle(
+                              color: AppColors.textSecondaryLight,
+                              fontSize: TextSize.font12(context),
+                              fontWeight: FontWeight.w400,
                             ),
                           ),
                         ],
                       ),
+                    ],
+                  )
+                : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 6,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        color: AppColors.textPrimaryLight,
+                        fontSize: TextSize.font14(context),
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
-                  ),
-              ],
-            ),
+                    Row(
+                      children: [
+                        InkWell(
+                          onTap: copyUserIdOnTap,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: AppColors.greyLight, width: 1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            child: Row(
+                              spacing: 4,
+                              children: [
+                                Text(
+                                   'ID: $userId',
+                                  style: TextStyle(
+                                    color: AppColors.textSecondaryLight,
+                                    fontSize: TextSize.font12(context),
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                ShowImage(
+                                  imagePath: AppImages.copy,
+                                  width: TextSize.font14(context),
+                                  height: TextSize.font14(context),
+                                  color: AppColors.textSecondaryLight,
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                        if (profileManageStatus != null)
+                        Container(
+                          margin: const EdgeInsets.only(left: 8),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: AppColors.greyLight, width: 1),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          child: Text(
+                             profileManageStatus ?? '',
+                            style: TextStyle(
+                              color: AppColors.textSecondaryLight,
+                              fontSize: TextSize.font12(context),
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
           ),
-          const Divider(height: 1, color: AppColors.greyLight),
           if (child != null)
             Padding(
               padding: const EdgeInsets.all(12.0),
@@ -89,7 +159,8 @@ class ProfileViewCard extends StatelessWidget {
             )
           else if (infoList != null)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: infoList!.map((entry) {
@@ -133,4 +204,3 @@ class ProfileViewCard extends StatelessWidget {
     );
   }
 }
-

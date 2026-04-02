@@ -40,6 +40,7 @@ class AppImages {
   static const String cameraUseIcon = 'assets/svgIcons/camera_use.svg';
   static const String unselectedCheckbox = 'assets/svgIcons/unselectedCheckbox.svg';
   static const String selectedCheckbox = 'assets/svgIcons/selectedCheckbox.svg';
+  static const String copy = 'assets/svgIcons/copy.svg';
 
   // Social media icons
   static const String facebookIcon = 'assets/svgIcons/facebook.svg';

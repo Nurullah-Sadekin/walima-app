@@ -10,6 +10,8 @@ import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
 import 'package:go_router/go_router.dart';
 
+import 'widgets/profile_view_card.dart';
+
 class ProfilePreviewScreen extends StatelessWidget {
   const ProfilePreviewScreen({
     super.key,
@@ -21,52 +23,52 @@ class ProfilePreviewScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F9F9),
-      appBar: const CustomBackAppBar(
-        backgroundColor: Color(0xFFF9F9F9),
-        isBackButton: true,
-        backIconBackground: Colors.transparent,
-        elevation: 0,
-        title: Text('Profile Preview',
-            style: TextStyle(color: AppColors.textPrimaryLight)),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Column(
-            children: [
-              _profileHeader(context),
-              const SizedBox(height: 24),
-              _basicDetailsSection(context),
-              const SizedBox(height: 16),
-              _demographicsSection(context),
-              const SizedBox(height: 16),
-              _lifestyleSection(context),
-              const SizedBox(height: 16),
-              _familyDetailsSection(context),
-              const SizedBox(height: 16),
-              _educationCareerSection(context),
-              const SizedBox(height: 32),
-              _actionButtons(context),
-              const SizedBox(height: 24),
-            ],
-          ),
-        ),
-      ),
-      floatingActionButton: BottomBorderedWidget(
-        widget: PrimaryButtons(
-          title: 'Preview Profile',
-          titleSize: TextSize.font14(context),
-          textColor: AppColors.white,
-          bgColor: AppColors.primary,
-          svgIconColor: AppColors.white,
-          onTap: () {
-            context.pop({'preview': true});
-          },
-          buttonStyle: ButtonsStyle.activePrimaryButton,
-        ),
-      ),
+      backgroundColor: Colors.white,
+      appBar: _appBar(context),
+      body: _body(context),
+      floatingActionButton: _actionButtons(context),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+    );
+  }
+
+
+  PreferredSizeWidget _appBar(BuildContext context) {
+    return const CustomBackAppBar(
+      backgroundColor: Colors.white,
+      isBackButton: true,
+      backIconBackground: Colors.transparent,
+      elevation: 0,
+      title: Text('Profile Preview',
+          style: TextStyle(color: AppColors.textPrimaryLight)),
+    );
+  }
+
+  Widget _body(BuildContext context) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: Column(
+          children: [
+            _profileHeader(context),
+            const SizedBox(height: 24),
+            _basicDetailsSection(context),
+            const SizedBox(height: 16),
+            _aboutSection(context),
+            const SizedBox(height: 16),
+            _demographicsSection(context),
+            const SizedBox(height: 16),
+            _backgroundSection(context),
+            const SizedBox(height: 16),
+            _lifestyleSection(context),
+            const SizedBox(height: 16),
+            _familyDetailsSection(context),
+            const SizedBox(height: 16),
+            _educationCareerSection(context),
+            const SizedBox(height: 32),
+            _actionButtons(context),
+          ],
+        ),
+      ),
     );
   }
 
@@ -86,17 +88,37 @@ class ProfilePreviewScreen extends StatelessWidget {
   }
 
   Widget _basicDetailsSection(BuildContext context) {
-    return _infoCard(
-      context,
+    return const ProfileViewCard(
       title: 'Basic Details',
-      items: [
-        MapEntry('Age', '${userData?['age'] ?? 'N/A'} years'),
-        MapEntry('Date of Birth', userData?['dateOfBirth'] ?? '23 Aug 2002'),
-        MapEntry('Height', userData?['height'] ?? '5\'8"(165cm)'),
-        MapEntry('Grown up in', userData?['grewUpIn'] ?? 'Desh'),
-        MapEntry(
-            'Marital Status', userData?['maritalStatus'] ?? 'Never Married'),
+      userId: 'SH3563XTS',
+      profileManageStatus: 'Profile Created by Self',
+      infoList: [
+        MapEntry('Age', '20'),
+        MapEntry('Date of Birth', '07-Aug-1995'),
+        MapEntry('Marital Status', 'Never Married'),
+        MapEntry('Height', '170cm'),
+        MapEntry('Grew up in', 'Bangladesh'),
+        MapEntry('Diet', 'Non-Vegetarian'),
+        MapEntry('Blood Group', 'B+ (B positive)'),
+        MapEntry('Health Information', 'Well'),
+        MapEntry('Disability', 'None'),
       ],
+    );
+  }
+
+  Widget _aboutSection(BuildContext context) {
+    return ProfileViewCard(
+      title: 'About',
+      subtitle: 'Her short bio',
+      iconPath: AppImages.profileSvgIcon,
+      child: Text(
+        'I have obtained my Masters in Management. I\'ve been an active student throughout my academic years. I am self-employed and handle my own business.A kind heart and a bright smile would be an apt way to describe me. I am seeking a simple and loving partner who will support me in every phase of life. Thank you for expressing interest in my profile.',
+        style: TextStyle(
+          fontSize: TextSize.font12(context),
+          fontWeight: FontWeight.w400,
+          color: AppColors.textSecondaryLight,
+        ),
+      ),
     );
   }
 
@@ -129,18 +151,37 @@ class ProfilePreviewScreen extends StatelessWidget {
   }
 
   Widget _familyDetailsSection(BuildContext context) {
-    return _infoCard(
-      context,
-      title: 'Family Details',
-      items: [
-        MapEntry('Father Status', userData?['fatherStatus'] ?? 'Service'),
-        MapEntry('Mother Status', userData?['motherStatus'] ?? 'Homemaker'),
-        MapEntry('No. of Brothers', userData?['brothers'] ?? '1'),
-        MapEntry('No. of Sisters', userData?['sisters'] ?? '2'),
-        MapEntry('Family Status', userData?['familyClass'] ?? 'Middle Class'),
+    return const ProfileViewCard(
+      title: 'Family',
+      subtitle: 'About Family background',
+      iconPath: AppImages.groupsIcon,
+      infoList: [
+        MapEntry('Father\'s Status', 'Employed'),
+        MapEntry('Mother\'s Status', 'Homemaker'),
+        MapEntry('Siblings', '1 Brother, 1 Sister'),
+        MapEntry('Family Type', 'Joint Family'),
+        MapEntry('Family Status', 'Middle Class'),
+        MapEntry('Family Location','Dhaka'),
       ],
     );
   }
+
+  Widget _backgroundSection(BuildContext context) {
+    return const ProfileViewCard(
+      title: 'Background',
+      subtitle: 'About Family background',
+      iconPath: AppImages.groupsIcon,
+      infoList: [
+        MapEntry('Father\'s Status', 'Employed'),
+        MapEntry('Mother\'s Status', 'Homemaker'),
+        MapEntry('Siblings', '1 Brother, 1 Sister'),
+        MapEntry('Family Type', 'Joint Family'),
+        MapEntry('Family Status', 'Middle Class'),
+        MapEntry('Family Location','Dhaka'),
+      ],
+    );
+  }
+
 
   Widget _educationCareerSection(BuildContext context) {
     return _infoCard(
@@ -225,48 +266,18 @@ class ProfilePreviewScreen extends StatelessWidget {
   }
 
   Widget _actionButtons(BuildContext context) {
-    return Column(
-      spacing: 12,
-      children: [
-        PrimaryButtons(
-          title: 'Super Connect',
-          buttonStyle: ButtonsStyle.activePrimaryButton,
-          onTap: () {},
-        ),
-        PrimaryButtons(
-          title: 'Connect Now',
-          buttonStyle: ButtonsStyle.activePrimaryButton,
-          onTap: () {},
-        ),
-        Row(
-          children: [
-            Expanded(
-              child: PrimaryButtons(
-                title: 'Contact Now',
-                buttonStyle: ButtonsStyle.activePrimaryButton,
-                onTap: () {},
-              ),
-            ),
-            const SizedBox(width: 12),
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color: AppColors.primaryVariant,
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: ShowImage(
-                  imagePath: AppImages.callIcon,
-                  width: TextSize.font20(context),
-                  height: TextSize.font20(context),
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
+    return BottomBorderedWidget(
+      widget: PrimaryButtons(
+        title: 'Preview Profile',
+        titleSize: TextSize.font14(context),
+        textColor: AppColors.white,
+        bgColor: AppColors.primary,
+        svgIconColor: AppColors.white,
+        onTap: () {
+          context.pop({'preview': true});
+        },
+        buttonStyle: ButtonsStyle.activePrimaryButton,
+      ),
     );
   }
 }
