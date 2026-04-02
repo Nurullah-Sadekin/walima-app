@@ -34,7 +34,8 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
   Widget build(BuildContext context) {
     provider = ref.watch(notiProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == NotificationScreenStates.transparentLoading,
+      isLoading:
+          provider.loaderState == NotificationScreenStates.transparentLoading,
       child: Scaffold(
         body: GradientBackground(
           child: Column(
@@ -70,33 +71,71 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
       return _emptyState();
     }
 
-    return RefreshIndicator(
-      onRefresh: () => provider.getAllNotification(isRefresh: true),
-      color: AppColors.primary,
-      child: NotificationListener<ScrollNotification>(
-        onNotification: (scrollNotification) {
-          if (scrollNotification.metrics.pixels >=
-              scrollNotification.metrics.maxScrollExtent - 120) {
-            provider.loadMoreNotifications();
-          }
-          return false;
-        },
-        child: ListView.separated(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-          itemCount:
-              provider.notifications.length + (provider.isLoadingMore ? 1 : 0),
-          separatorBuilder: (_, __) => const SizedBox(height: 10),
-          itemBuilder: (context, index) {
-            if (index >= provider.notifications.length) {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 12),
-                child: Center(child: CircularProgressIndicator()),
-              );
-            }
-            final item = provider.notifications[index];
-            return _notificationCard(item);
-          },
+    return Column(
+      children: [
+        _actionBar(),
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: () => provider.getAllNotification(isRefresh: true),
+            color: AppColors.primary,
+            child: NotificationListener<ScrollNotification>(
+              onNotification: (scrollNotification) {
+                if (scrollNotification.metrics.pixels >=
+                    scrollNotification.metrics.maxScrollExtent - 120) {
+                  provider.loadMoreNotifications();
+                }
+                return false;
+              },
+              child: ListView.separated(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                itemCount: provider.notifications.length +
+                    (provider.isLoadingMore ? 1 : 0),
+                separatorBuilder: (_, __) => const SizedBox(height: 10),
+                itemBuilder: (context, index) {
+                  if (index >= provider.notifications.length) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                  final item = provider.notifications[index];
+                  return _notificationCard(item);
+                },
+              ),
+            ),
+          ),
         ),
+      ],
+    );
+  }
+
+  Widget _actionBar() {
+    final unreadCount =
+        provider.notifications.where((item) => item.isRead != true).length;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              '$unreadCount unread',
+              style: TextStyle(
+                color: AppColors.textSecondaryLight,
+                fontSize: TextSize.font12(context),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: unreadCount == 0
+                ? null
+                : () {
+                    provider.markAllNotificationsAsRead();
+                  },
+            child: const Text('Mark all as read'),
+          ),
+        ],
       ),
     );
   }
@@ -111,71 +150,96 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     final message = item.message?.trim() ?? '';
     final isRead = item.isRead == true;
 
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: isRead ? AppColors.white : AppColors.primaryShade200,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.greyLight),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _avatar(item),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        title,
-                        style: TextStyle(
-                          color: AppColors.textPrimaryLight,
-                          fontSize: TextSize.font14(context),
-                          fontWeight: FontWeight.w600,
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: isRead
+          ? null
+          : () {
+              final id = item.id?.trim();
+              if (id == null || id.isEmpty) return;
+              provider.markSingleNotificationAsRead(id);
+            },
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isRead ? AppColors.white : AppColors.primaryShade200,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.greyLight),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _avatar(item),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: TextStyle(
+                            color: AppColors.textPrimaryLight,
+                            fontSize: TextSize.font14(context),
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
+                      ),
+                      if (!isRead)
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: AppColors.primary,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                    ],
+                  ),
+                  if (message.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      message,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: AppColors.textSecondaryLight,
+                        fontSize: TextSize.font12(context),
+                        fontWeight: FontWeight.w400,
                       ),
                     ),
-                    if (!isRead)
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(
-                          color: AppColors.primary,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
                   ],
-                ),
-                if (message.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    message,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: AppColors.textSecondaryLight,
-                      fontSize: TextSize.font12(context),
-                      fontWeight: FontWeight.w400,
-                    ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _formatDate(item.createdAtDateTime),
+                          style: TextStyle(
+                            color: AppColors.hintTextColor,
+                            fontSize: TextSize.font10(context),
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                      if (!isRead)
+                        Text(
+                          'Mark read',
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontSize: TextSize.font10(context),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                    ],
                   ),
                 ],
-                const SizedBox(height: 6),
-                Text(
-                  _formatDate(item.createdAtDateTime),
-                  style: TextStyle(
-                    color: AppColors.hintTextColor,
-                    fontSize: TextSize.font10(context),
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

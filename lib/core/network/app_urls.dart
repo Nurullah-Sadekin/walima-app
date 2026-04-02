@@ -248,6 +248,8 @@ class AppUrls {
   static const String getNotifications = '$baseUrl/notifications'; //GET
   static const String getUnreadNotificationCount =
       '$baseUrl/notifications/unread-count'; //GET
+  static const String bulkReadNotifications =
+      '$baseUrl/notifications/bulk-read'; //PATCH
   static const String markNotificationAsRead =
       '$baseUrl/notifications/{id}/read'; //PATCH
   static const String markAllNotificationsAsRead =
