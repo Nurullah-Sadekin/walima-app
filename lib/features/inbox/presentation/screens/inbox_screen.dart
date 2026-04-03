@@ -189,7 +189,11 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
                   await BottomSheetUtils.open(
                     context: context,
                     fullHeight: false,
-                    child:  _receivedFilter(context),
+                    child: Consumer(
+                      builder: (context, ref, _) {
+                        return _receivedFilter(ref.watch(inboxProvider), context);
+                      },
+                    ),
                   );
                 },
                 child: Container(
@@ -503,7 +507,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
     );
   }
 
-  Widget _receivedFilter(BuildContext context,){
+  Widget _receivedFilter(InboxProvider provider, BuildContext context,){
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
