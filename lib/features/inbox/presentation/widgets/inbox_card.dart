@@ -310,8 +310,8 @@ class InboxCard extends StatelessWidget {
                         .map(
                           (entry) => PopupMenuItem<int>(
                             value: entry.key,
-                            height: 32,
-                            padding: const EdgeInsets.fromLTRB(16, 10, 35, 10),
+                            height: 28,
+                            padding: const EdgeInsets.fromLTRB(16, 6, 35, 6),
                             child: Text(
                               entry.value.name,
                               style: TextStyle(
@@ -344,7 +344,7 @@ class InboxCard extends StatelessWidget {
   Widget _cardDetails(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       mainAxisSize: MainAxisSize.max,
       children: [
         if (age != null && height != null)
@@ -382,6 +382,7 @@ class InboxCard extends StatelessWidget {
     return contactUnavailable
         ? Container(
             padding: const EdgeInsets.all(8.0),
+            margin: const EdgeInsets.only(top: 8.0),
             width: double.infinity,
             decoration: BoxDecoration(
               color: AppColors.disableBackground,
