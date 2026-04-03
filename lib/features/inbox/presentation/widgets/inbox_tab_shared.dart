@@ -7,6 +7,61 @@ import 'package:go_router/go_router.dart';
 
 enum InboxMoreMenuAction { viewProfile, viewContact, block, report }
 
+/// Handle menu actions directly without requiring TapDownDetails
+void handleMenuAction({
+  required BuildContext context,
+  required InboxMoreMenuAction action,
+  required String displayName,
+  required String imagePath,
+}) {
+  switch (action) {
+    case InboxMoreMenuAction.viewProfile:
+      context.pushNamed(
+        Routes.profilePreview,
+        extra: {
+          'displayName': displayName,
+          'profilePictureUrl': imagePath,
+          'profileType': 'Profile Created by Self',
+        },
+      );
+      break;
+    case InboxMoreMenuAction.viewContact:
+      _showContactPreviewSheet(
+        context: context,
+        displayName: displayName,
+        imagePath: imagePath,
+      );
+      break;
+    case InboxMoreMenuAction.block:
+      context.pushNamed(
+        Routes.reportStatus,
+        extra: {
+          'title': 'Blocked Successfully!',
+          'subtitle': '$displayName can no longer view your profile or send you messages.',
+          'buttonText': 'Done',
+          'onTapButton': () {
+            if (context.canPop()) {
+              context.pop();
+            }
+            if (context.canPop()) {
+              context.pop();
+            }
+          },
+        },
+      );
+      break;
+    case InboxMoreMenuAction.report:
+      context.pushNamed(
+        Routes.report,
+        extra: {
+          'displayName': displayName,
+          'profilePictureUrl': imagePath,
+        },
+      );
+      break;
+  }
+}
+
 Future<void> showInboxMoreMenu({
   required BuildContext context,
   required Offset tapPosition,
@@ -68,52 +123,12 @@ Future<void> showInboxMoreMenu({
 
   if (action == null) return;
 
-  switch (action) {
-    case InboxMoreMenuAction.viewProfile:
-      context.pushNamed(
-        Routes.profilePreview,
-        extra: {
-          'displayName': displayName,
-          'profilePictureUrl': imagePath,
-          'profileType': 'Profile Created by Self',
-        },
-      );
-      break;
-    case InboxMoreMenuAction.viewContact:
-      _showContactPreviewSheet(
-        context: context,
-        displayName: displayName,
-        imagePath: imagePath,
-      );
-      break;
-    case InboxMoreMenuAction.block:
-      context.pushNamed(
-        Routes.reportStatus,
-        extra: {
-          'title': 'Blocked Successfully!',
-          'subtitle': '$displayName can no longer view your profile or send you messages.',
-          'buttonText': 'Done',
-          'onTapButton': () {
-            if (context.canPop()) {
-              context.pop();
-            }
-            if (context.canPop()) {
-              context.pop();
-            }
-          },
-        },
-      );
-      break;
-    case InboxMoreMenuAction.report:
-      context.pushNamed(
-        Routes.report,
-        extra: {
-          'displayName': displayName,
-          'profilePictureUrl': imagePath,
-        },
-      );
-      break;
-  }
+  handleMenuAction(
+    context: context,
+    action: action,
+    displayName: displayName,
+    imagePath: imagePath,
+  );
 }
 
 void _showContactPreviewSheet({

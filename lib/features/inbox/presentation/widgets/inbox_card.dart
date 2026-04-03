@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/bottom_sheet_widget/widgets/icon_title_card.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:flutter_boilerplate/features/inbox/data/models/menu_item_model.dart';
 
 class InboxCard extends StatelessWidget {
   const InboxCard({
@@ -15,7 +16,7 @@ class InboxCard extends StatelessWidget {
     this.isVerified = false,
     this.isPremium = false,
     this.day,
-    this.onMenuTap,
+    this.menuItems,
     this.showMenu = true,
 
     this.subtitle,
@@ -58,7 +59,7 @@ class InboxCard extends StatelessWidget {
   final bool isVerified;
   final bool isPremium;
   final String? day;
-  final void Function(TapDownDetails details)? onMenuTap;
+  final List<MenuItem>? menuItems;
   final bool showMenu;
 
   final String? subtitle;
@@ -109,6 +110,7 @@ class InboxCard extends StatelessWidget {
         border: Border.all(color: AppColors.greyLight, width: 1),
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           // Row -> Image + Details
           Row(
@@ -122,12 +124,11 @@ class InboxCard extends StatelessWidget {
                 child: SizedBox(
                   height: imageSize,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisAlignment: MainAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.max,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       _cardHeader(context),
-                      const SizedBox(height: 4),
                       if (mood != InboxCardMood.large)
                         Expanded(
                             child: _cardDetails(
@@ -199,9 +200,12 @@ class InboxCard extends StatelessWidget {
   Widget _cardHeader(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.max,
           children: [
             Expanded(
               child: Row(
@@ -278,18 +282,50 @@ class InboxCard extends StatelessWidget {
                 ],
               ),
             ),
-            if (showMenu)
-            InkWell(
-              onTapDown: onMenuTap,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 12.0),
-                child: Icon(
-                  Icons.more_vert,
-                  color: AppColors.textSecondaryLight,
-                  size: TextSize.font16(context),
+            if (showMenu && menuItems != null && menuItems!.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(left: 6.0),
+                child: SizedBox(
+                  width: TextSize.font16(context), // Force exact icon size
+                  height: TextSize.font16(context),
+                  child: PopupMenuButton<int>(
+                    onSelected: (index) {
+                      if (index >= 0 && index < menuItems!.length) {
+                        menuItems![index].onTap();
+                      }
+                    },
+                    padding: EdgeInsets.zero,
+                    position: PopupMenuPosition.under,
+                    popUpAnimationStyle: AnimationStyle.noAnimation,
+                    color: Colors.white,
+                    iconSize: TextSize.font16(context),
+                    icon: Icon(
+                      Icons.more_vert,
+                      color: AppColors.textSecondaryLight,
+                      size: TextSize.font16(context),
+                    ),
+                    itemBuilder: (context) => menuItems!
+                        .asMap()
+                        .entries
+                        .map(
+                          (entry) => PopupMenuItem<int>(
+                            value: entry.key,
+                            height: 32,
+                            padding: const EdgeInsets.fromLTRB(16, 10, 35, 10),
+                            child: Text(
+                              entry.value.name,
+                              style: TextStyle(
+                                fontSize: TextSize.font12(context),
+                                color: AppColors.textPrimaryLight,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
                 ),
               ),
-            ),
           ],
         ),
         if (subtitle != null)
@@ -308,7 +344,7 @@ class InboxCard extends StatelessWidget {
   Widget _cardDetails(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       mainAxisSize: MainAxisSize.max,
       children: [
         if (age != null && height != null)

@@ -11,7 +11,7 @@ import 'package:flutter_boilerplate/features/chat/presentation/provider/chat_pro
 import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/profile_avatar_with_name.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/contact_bottom_sheet.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/remind_card.dart';
+import 'package:flutter_boilerplate/features/inbox/presentation/widgets/remind_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 

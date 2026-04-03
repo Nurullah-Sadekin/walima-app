@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/features/inbox/data/models/menu_item_model.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/providers/inbox_providers.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/screens/tabs/inbox_received_tab.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_tab_shared.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/inbox_card.dart';
+import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/text_tab_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -61,17 +61,14 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
 
 
   Widget _acceptedByHer(InboxProvider provider) {
-    return  Column(
+    return Column(
       children: [
         InboxCard(
-          onMenuTap: (details) {
-            showInboxMoreMenu(
-              context: context,
-              tapPosition: details.globalPosition,
-              imagePath: AppImages.demoProfile2,
-              displayName: 'Tasnova Ahmed',
-            );
-          },
+          menuItems: _buildMenuItems(
+            context: context,
+            displayName: 'Tasnova Ahmed',
+            imagePath: AppImages.demoProfile2,
+          ),
           imagePath: AppImages.demoProfile2,
           name: 'Tasnova Ahmed',
           age: '28 Yr',
@@ -83,6 +80,51 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
         ),
       ],
     );
+  }
+
+  List<MenuItem> _buildMenuItems({
+    required BuildContext context,
+    required String displayName,
+    required String imagePath,
+  }) {
+    return [
+      MenuItem(
+        name: 'View Profile',
+        onTap: () => handleMenuAction(
+          context: context,
+          action: InboxMoreMenuAction.viewProfile,
+          displayName: displayName,
+          imagePath: imagePath,
+        ),
+      ),
+      MenuItem(
+        name: 'View Contact',
+        onTap: () => handleMenuAction(
+          context: context,
+          action: InboxMoreMenuAction.viewContact,
+          displayName: displayName,
+          imagePath: imagePath,
+        ),
+      ),
+      MenuItem(
+        name: 'Block',
+        onTap: () => handleMenuAction(
+          context: context,
+          action: InboxMoreMenuAction.block,
+          displayName: displayName,
+          imagePath: imagePath,
+        ),
+      ),
+      MenuItem(
+        name: 'Report',
+        onTap: () => handleMenuAction(
+          context: context,
+          action: InboxMoreMenuAction.report,
+          displayName: displayName,
+          imagePath: imagePath,
+        ),
+      ),
+    ];
   }
 }
 
