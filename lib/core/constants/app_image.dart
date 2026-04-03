@@ -108,6 +108,7 @@ class AppImages {
   static const String callIcon = 'assets/svgIcons/call_icon.svg';
   static const String micIcon = 'assets/svgIcons/mic.svg';
   static const String sentMessage = 'assets/svgIcons/sent.svg';
+  static const String sortFilter = 'assets/svgIcons/sort_filter.svg';
 
 
 

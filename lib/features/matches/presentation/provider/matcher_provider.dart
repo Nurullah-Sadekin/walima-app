@@ -24,6 +24,7 @@ class MatchesProvider extends BaseChangeNotifier {
 
   String? selectedIsWithFamilyStatus;
   List<SingleStringModel> sortByDataList = sortByListDataInserted;
+  List<SingleStringModel> filterByDataList = sortByListDataInserted;
 
   int selectedTabIndex = 0;
 

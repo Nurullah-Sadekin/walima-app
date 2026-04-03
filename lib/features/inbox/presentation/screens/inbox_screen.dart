@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
 import 'package:flutter_boilerplate/core/global/components/bottom_sheet_widget/contacts_viewed.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
@@ -166,7 +168,68 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
   }
 
   Widget _receivedTab() {
-    return _receivedBody();
+    return  SingleChildScrollView(
+      child: Column(
+        spacing: 10,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'All Requests (26)',
+                style: TextStyle(
+                  color: AppColors.textSecondaryLight,
+                  fontSize: TextSize.font12(context),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              InkWell(
+                onTap: () async {
+                  await BottomSheetUtils.open(
+                    context: context,
+                    fullHeight: false,
+                    child:  _receivedFilter(context),
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.transparent,
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: AppColors.greyLight, width: 1),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+                  child:  ShowImage(
+                    imagePath: AppImages.sortFilter,
+                    width: TextSize.font16(context),
+                    height: TextSize.font16(context),
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+              )
+            ],
+          ),
+          ProfileComprehensiveCard(
+            imagePath: AppImages.demoProfile,
+            leftIconPath: AppImages.favouriteIcon,
+            isPremiumConnect: false,
+            isVerified: true,
+            name: 'Tasnova Ahmed',
+            age: '28 Yr',
+            height: '5\' 3\'" ',
+            location: 'Gulshan, Dhaka, BD',
+            activeStatusText: '1 day ago',
+            menu: true,
+            photoRequest: false,
+            onTapLeftButton: null,
+            onTapRightButton: null,
+            photoCount: '1',
+            leftButtonText: 'Accept',
+            rightButtonText: 'Reject',
+            rightIconPath: AppImages.cancelSvgIcon,
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _acceptedTab() {
@@ -303,19 +366,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
             location: 'Gulshan, Dhaka, BD',
             isVerified: true,
           ),
-          FilterWidget(
-            title: 'Sort by',
-            iconPath: AppImages.sortIcon,
-            items: provider.sortByDataList
-                .map(
-                  (item) =>
-                      FilterItem(name: item.name, isSelected: item.isSelected),
-                )
-                .toList(),
-            onItemTap: (index) {
-              provider.sortBy(index);
-            },
-          ),
+
           InfoTile(
             title: 'Country Living in',
             value: 'Bangladesh',
@@ -448,6 +499,54 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
     return Container(
       color: Colors.blue,
       child: const Center(child: Text('Accepted by Me')),
+    );
+  }
+
+  Widget _receivedFilter(BuildContext context,){
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SettingsSwitchTile(
+            title: 'Enable Card View',
+            value: provider.switcherValue ?? false,
+            trailingImage: AppImages.cardView,
+            showTrailingImage: true,
+            onChanged: (newValue) {
+              provider.switcherValue = newValue;
+              provider.updateViewState();
+            },
+          ),
+          FilterWidget(
+            title: 'Sort by',
+            iconPath: AppImages.sortIcon,
+            items: provider.sortByDataList
+                .map(
+                  (item) =>
+                  FilterItem(name: item.name, isSelected: item.isSelected),
+            )
+                .toList(),
+            onItemTap: (index) {
+              provider.sortBy(index);
+            },
+          ),
+          FilterWidget(
+            title: 'Filter by',
+            iconPath: AppImages.filterSvgIcon,
+            items: provider.sortByDataList
+                .map(
+                  (item) =>
+                  FilterItem(name: item.name, isSelected: item.isSelected),
+            )
+                .toList(),
+            onItemTap: (index) {
+              provider.sortBy(index);
+            },
+          ),
+        ],
+      ),
     );
   }
 
