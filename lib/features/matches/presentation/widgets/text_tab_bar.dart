@@ -29,11 +29,25 @@ class TextTabBar extends StatefulWidget {
 class _TextTabBarState extends State<TextTabBar>
     with SingleTickerProviderStateMixin {
   TabController? _tabController;
+  bool _ownsController = false;
+
   @override
   void initState() {
-    _tabController = widget.controller ??
-        TabController(length: widget.tabs?.length ?? 0, vsync: this);
     super.initState();
+    if (widget.controller != null) {
+      _tabController = widget.controller;
+    } else {
+      _ownsController = true;
+      _tabController = TabController(length: widget.tabs?.length ?? 0, vsync: this);
+    }
+  }
+
+  @override
+  void dispose() {
+    if (_ownsController) {
+      _tabController?.dispose();
+    }
+    super.dispose();
   }
 
   @override

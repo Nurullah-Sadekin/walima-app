@@ -8,11 +8,11 @@ import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/provider/matcher_provider.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/inbox_card.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/tab_bar_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/text_tab_bar.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/count_down_timer.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/empty_state.dart';
@@ -35,17 +35,39 @@ class InboxScreen extends ConsumerStatefulWidget {
 }
 
 class _InboxScreenState extends ConsumerState<InboxScreen>
-    with SingleTickerProviderStateMixin {
-  TabController? _tabController;
-  final _tabs = const ['Accepted by Her', 'Accepted by Me'];
+    with TickerProviderStateMixin {
+  late final TabController _primaryTabController;
+  late final TabController _acceptedSubTabController;
+  late final TabController _contactsSubTabController;
+
+  final _primaryTabs = const ['Received', 'Accepted', 'Contacts', 'Sent', 'More'];
+  final _acceptedTabs = const ['Accepted by Her', 'Accepted by Me'];
+  final _contactsTabs = const ['Contacts Received', 'Contacts Sent'];
 
   MatchesProvider provider = MatchesProvider();
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(initialIndex: 0, length: 2, vsync: this);
+    _primaryTabController = TabController(initialIndex: 0, length: 5, vsync: this)
+      ..addListener(_handlePrimaryTabChange);
+    _acceptedSubTabController = TabController(initialIndex: 0, length: 2, vsync: this);
+    _contactsSubTabController = TabController(initialIndex: 0, length: 2, vsync: this);
     provider = ref.read(matchesProvider);
+  }
+
+  void _handlePrimaryTabChange() {
+    if (!mounted || _primaryTabController.indexIsChanging) return;
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _primaryTabController.removeListener(_handlePrimaryTabChange);
+    _primaryTabController.dispose();
+    _acceptedSubTabController.dispose();
+    _contactsSubTabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -58,7 +80,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
           child: Column(
             children: [
               _appbarSection(),
-              // Expanded(child: _body()),
+              Expanded(child: _body()),
             ],
           ),
         ),
@@ -79,38 +101,188 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        TextTabBar(
-            isScrollable: false,
-            tabAlignment: TabAlignment.fill,
-            controller: _tabController,
-            onTabChange: (index) {
-              //provider?.updateTab(index: index);
-            },
-            tabs: _tabs),
+        _buildPrimaryTabs(),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.only(top: 10.0),
-            child: _tabBarView(),
+            child: TabBarView(
+              controller: _primaryTabController,
+              physics: const NeverScrollableScrollPhysics(),
+              children: [
+                _receivedTab(),
+                _acceptedTab(),
+                _contactsTab(),
+                _sentTab(),
+                _moreTab(),
+              ],
+            ),
           ),
-        )
+        ),
       ],
     );
   }
 
-  Widget _tabBarView() {
-    return TabBarView(
-      controller: _tabController,
-      physics: const ScrollPhysics(
-        parent: NeverScrollableScrollPhysics(),
+  Widget _buildPrimaryTabs() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        spacing: 8,
+        children: [
+          TabBarWidget(
+            text: _primaryTabs[0],
+            isSelected: _primaryTabController.index == 0,
+            onTap: () => _primaryTabController.animateTo(0),
+          ),
+          TabBarWidget(
+            text: _primaryTabs[1],
+            isSelected: _primaryTabController.index == 1,
+            onTap: () => _primaryTabController.animateTo(1),
+          ),
+          TabBarWidget(
+            text: _primaryTabs[2],
+            isSelected: _primaryTabController.index == 2,
+            onTap: () => _primaryTabController.animateTo(2),
+          ),
+          TabBarWidget(
+            text: _primaryTabs[3],
+            isSelected: _primaryTabController.index == 3,
+            selectedBackgroundColor: AppColors.primary,
+            selectedTextColor: AppColors.white,
+            selectedBorderColor: AppColors.primary,
+            onTap: () => _primaryTabController.animateTo(3),
+          ),
+          TabBarWidget(
+            text: _primaryTabs[4],
+            isSelected: _primaryTabController.index == 4,
+            selectedBackgroundColor: AppColors.primary,
+            selectedTextColor: AppColors.white,
+            selectedBorderColor: AppColors.primary,
+            onTap: () => _primaryTabController.animateTo(4),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _receivedTab() {
+    return _receivedBody();
+  }
+
+  Widget _acceptedTab() {
+    return Column(
       children: [
-        _acceptedByHer(),
-        _acceptedByMe(),
+        TextTabBar(
+          isScrollable: false,
+          tabAlignment: TabAlignment.fill,
+          controller: _acceptedSubTabController,
+          onTabChange: (_) {},
+          tabs: _acceptedTabs,
+        ),
+        const SizedBox(height: 10),
+        Expanded(
+          child: TabBarView(
+            controller: _acceptedSubTabController,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              _receivedBody(),
+              _acceptedByMe(),
+            ],
+          ),
+        ),
       ],
     );
   }
 
-  Widget _acceptedByHer() {
+  Widget _contactsTab() {
+    return Column(
+      children: [
+        TextTabBar(
+          isScrollable: false,
+          tabAlignment: TabAlignment.fill,
+          controller: _contactsSubTabController,
+          onTabChange: (_) {},
+          tabs: _contactsTabs,
+        ),
+        const SizedBox(height: 10),
+        Expanded(
+          child: TabBarView(
+            controller: _contactsSubTabController,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              _contactsReceived(),
+              _contactsSent(),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _sentTab() {
+    return _buildSimplePlaceholder(
+      title: 'Sent',
+      subtitle: 'All sent inbox items will appear here.',
+    );
+  }
+
+  Widget _moreTab() {
+    return _buildSimplePlaceholder(
+      title: 'More',
+      subtitle: 'More inbox options will appear here.',
+    );
+  }
+
+  Widget _contactsReceived() {
+    return _buildSimplePlaceholder(
+      title: 'Contacts Received',
+      subtitle: 'Profiles that contacted you will appear here.',
+    );
+  }
+
+  Widget _contactsSent() {
+    return _buildSimplePlaceholder(
+      title: 'Contacts Sent',
+      subtitle: 'Profiles you contacted will appear here.',
+    );
+  }
+
+  Widget _buildSimplePlaceholder({
+    required String title,
+    required String subtitle,
+  }) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: AppColors.textPrimaryLight,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              subtitle,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: AppColors.textSecondaryLight,
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _receivedBody() {
     return SingleChildScrollView(
       child: Column(
         spacing: 10,
