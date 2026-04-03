@@ -7,6 +7,7 @@ import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/core/utils/picker_dialog.dart';
 import 'package:flutter_boilerplate/features/home/presentation/widgets/profile_info_card.dart';
 import 'package:flutter_boilerplate/features/profile/data/model/response/get_complete_profile_response.dart';
@@ -38,7 +39,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             _topBar(context),
             _headerSection(context, profile),
             _bodySection(profile),
-            // SizedBox(height: 50,)
+             const SizedBox(height: 50,)
           ],
         ),
       ),
@@ -157,11 +158,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             ),
           ),
           const SizedBox(width: 4),
-          Icon(
-            Icons.copy_rounded,
+          ShowImage(
+            imagePath: AppImages.copy,
+            width: TextSize.font12(context),
+            height: TextSize.font12(context),
             color: AppColors.textSecondaryLight,
-            size: TextSize.font12(context),
-          ),
+          )
         ],
       ),
     );
