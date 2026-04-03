@@ -2,6 +2,7 @@ import 'package:flutter_boilerplate/core/global/providers/global_provider.dart';
 import 'package:flutter_boilerplate/features/chat/presentation/provider/chat_provider.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/providers/app_drawer_provider.dart';
 import 'package:flutter_boilerplate/features/home/presentation/providers/home_provider.dart';
+import 'package:flutter_boilerplate/features/inbox/presentation/providers/inbox_providers.dart';
 import 'package:flutter_boilerplate/features/login/presentation/providers/login_provider.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/provider/matcher_provider.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/provider/search_filter_provider.dart';
@@ -118,6 +119,9 @@ final drawerProvider = ChangeNotifierProvider<DrawerProvider>((ref) {
 });
 final plansProvider = ChangeNotifierProvider<PlansProvider>((ref) {
   return PlansProvider();
+});
+final inboxProvider = ChangeNotifierProvider<InboxProvider>((ref) {
+  return InboxProvider();
 });
 final matchesProvider = ChangeNotifierProvider<MatchesProvider>((ref) {
   return MatchesProvider();

@@ -8,13 +8,14 @@ import 'package:flutter_boilerplate/core/global/components/gradient_background.d
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/provider/matcher_provider.dart';
+import 'package:flutter_boilerplate/features/inbox/presentation/providers/inbox_providers.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/inbox_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/tab_bar_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/text_tab_bar.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/count_down_timer.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/empty_state.dart';
@@ -46,7 +47,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
   final _acceptedTabs = const ['Accepted by Her', 'Accepted by Me'];
   final _contactsTabs = const ['Contacts Received', 'Contacts Sent'];
 
-  MatchesProvider provider = MatchesProvider();
+  InboxProvider provider = InboxProvider();
 
   @override
   void initState() {
@@ -55,7 +56,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
       ..addListener(_handlePrimaryTabChange);
     _acceptedSubTabController = TabController(initialIndex: 0, length: 2, vsync: this);
     _contactsSubTabController = TabController(initialIndex: 0, length: 2, vsync: this);
-    provider = ref.read(matchesProvider);
+    provider = ref.read(inboxProvider);
   }
 
   void _handlePrimaryTabChange() {
@@ -74,7 +75,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
 
   @override
   Widget build(BuildContext context) {
-    provider = ref.watch(matchesProvider);
+    provider = ref.watch(inboxProvider);
     return Scaffold(
       body: GradientBackground(
         child: Padding(
