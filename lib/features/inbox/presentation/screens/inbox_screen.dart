@@ -74,20 +74,18 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildPrimaryTabs(),
+        const SizedBox(height: 10),
         Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 10.0),
-            child: TabBarView(
-              controller: _primaryTabController,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                const InboxReceivedTab(),
-                const InboxAcceptedTab(),
-                InboxContactsTab(),
-                const InboxSentTab(),
-                const InboxMoreTab(),
-              ],
-            ),
+          child: TabBarView(
+            controller: _primaryTabController,
+            physics: const NeverScrollableScrollPhysics(),
+            children: const [
+              InboxReceivedTab(),
+              InboxAcceptedTab(),
+              InboxContactsTab(),
+              InboxSentTab(),
+              InboxMoreTab(),
+            ],
           ),
         ),
       ],

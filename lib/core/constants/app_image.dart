@@ -109,6 +109,8 @@ class AppImages {
   static const String micIcon = 'assets/svgIcons/mic.svg';
   static const String sentMessage = 'assets/svgIcons/sent.svg';
   static const String sortFilter = 'assets/svgIcons/sort_filter.svg';
+  static const String viewOffSlash = 'assets/svgIcons/view_off_slash.svg';
+  static const String addTeam = 'assets/svgIcons/add_team.svg';
 
 
 

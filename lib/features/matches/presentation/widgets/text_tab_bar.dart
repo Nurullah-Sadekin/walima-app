@@ -58,7 +58,8 @@ class _TextTabBarState extends State<TextTabBar>
       dividerColor: AppColors.hintTextColor,
       isScrollable: widget.isScrollable ?? true,
       tabAlignment: widget.tabAlignment ?? TabAlignment.fill,
-      indicatorPadding: const EdgeInsets.all(0),
+      indicatorPadding:  EdgeInsets.zero,
+      labelPadding: EdgeInsets.zero,
       padding: widget.padding?? EdgeInsets.zero,
       indicator: const BoxDecoration(
         border: Border(
@@ -71,14 +72,15 @@ class _TextTabBarState extends State<TextTabBar>
       labelColor: AppColors.primary,
       unselectedLabelColor: AppColors.textSecondaryLight,
       labelStyle: TextStyle(
-        fontSize: TextSize.font16(context),
+        fontSize: TextSize.font14(context),
         fontWeight: FontWeight.w500,
+
       ),
       indicatorSize: TabBarIndicatorSize.tab,
       controller: _tabController,
       tabs: widget.tabs
           ?.map((e) => Tab(
-        height: widget.tabHeight,
+        height: widget.tabHeight ?? 32,
         text: e,
       ))
           .toList() ??
