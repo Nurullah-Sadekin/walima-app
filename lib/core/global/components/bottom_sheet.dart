@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
+import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 
 class BottomSheetUtils {
   /// Shows a bottom sheet with a list of items for single selection (Dropdown style)
@@ -87,10 +89,10 @@ class BottomSheetUtils {
   }
 
 
-  static Future<dynamic> open({required BuildContext context,required Widget child,bool? fullHeight}) async {
+  static Future<dynamic> open({required BuildContext context, required Widget child, bool? fullHeight}) async {
     return showModalBottomSheet(
       context: context,
-      isScrollControlled: fullHeight ?? false,
+      isScrollControlled: true, // Always true to allow custom sizing
       backgroundColor: Colors.transparent,
       useSafeArea: true,
       shape: const RoundedRectangleBorder(
@@ -100,7 +102,9 @@ class BottomSheetUtils {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return Container(
-              // height: maxHeight, // Dynamic height based on content
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.5, // Never exceed half screen
+              ),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
@@ -109,7 +113,7 @@ class BottomSheetUtils {
                 ),
               ),
               child: Column(
-                mainAxisSize: MainAxisSize.min, // Important: minimizes height
+                mainAxisSize: MainAxisSize.min, // Takes minimum height needed
                 children: [
                   // Header section with drag handle
                   Row(
@@ -126,10 +130,33 @@ class BottomSheetUtils {
                       ),
                     ],
                   ),
-                  // Wrap the child so any `Navigator.pop(context, data)` from inside the child's
-                  // subtree will be forwarded as the modal bottom sheet result.
-                  Expanded(child: _wrapChildForReturn(context, child)),
-                  const SizedBox(height: 20), // Add some spacing at the bottom
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        InkWell(
+                          onTap: () => Navigator.pop(context),
+                          child: ShowImage(
+                            imagePath: AppImages.cancelSvgIcon,
+                            width: TextSize.font20(context),
+                            height: TextSize.font20(context),
+                            color: AppColors.textSecondaryLight,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Content - scrollable only if needed
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height * 0.5 - 72, // Subtract header and padding
+                    ),
+                    child: SingleChildScrollView(
+                      child: _wrapChildForReturn(context, child),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                 ],
               ),
             );
@@ -138,7 +165,6 @@ class BottomSheetUtils {
       },
     );
   }
-
   /// Wraps the provided child in a nested [Navigator] which intercepts any
   /// pop from the child's navigator (via [onPopPage]) and forwards the
   /// popped `result` to the modal bottom sheet by calling
