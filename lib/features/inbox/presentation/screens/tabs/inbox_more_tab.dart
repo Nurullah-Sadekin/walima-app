@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_tab_shared.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class InboxMoreTab extends ConsumerStatefulWidget {
@@ -12,11 +11,12 @@ class InboxMoreTab extends ConsumerStatefulWidget {
 class _InboxMoreTabState extends ConsumerState<InboxMoreTab> {
   @override
   Widget build(BuildContext context) {
-    return buildInboxPlaceholder(
-      context: context,
-      title: 'More',
-      subtitle: 'More inbox options will appear here.',
+    return const Text(' More',
+        style: TextStyle(
+          color: Colors.red,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
     );
   }
 }
-

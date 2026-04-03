@@ -51,7 +51,7 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
             physics: const NeverScrollableScrollPhysics(),
             children: [
               _acceptedByHer(provider),
-              _acceptedByHer(provider),
+              _acceptedByMe(provider),
             ],
           ),
         ),
@@ -64,11 +64,15 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
     return Column(
       children: [
         InboxCard(
-          menuItems: _buildMenuItems(
-            context: context,
-            displayName: 'Tasnova Ahmed',
-            imagePath: AppImages.demoProfile2,
-          ),
+          menuItems: [
+            MenuItem(
+              name: 'Cancel Request',
+              onTap: () => handleMenuAction(
+                context: context,
+                action: InboxMoreMenuAction.cancelRequest,
+              ),
+            ),
+          ],
           imagePath: AppImages.demoProfile2,
           name: 'Tasnova Ahmed',
           age: '28 Yr',
@@ -82,50 +86,32 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
     );
   }
 
-  List<MenuItem> _buildMenuItems({
-    required BuildContext context,
-    required String displayName,
-    required String imagePath,
-  }) {
-    return [
-      MenuItem(
-        name: 'View Profile',
-        onTap: () => handleMenuAction(
-          context: context,
-          action: InboxMoreMenuAction.viewProfile,
-          displayName: displayName,
-          imagePath: imagePath,
+  Widget _acceptedByMe(InboxProvider provider) {
+    return Column(
+      children: [
+        InboxCard(
+          menuItems: [
+            MenuItem(
+              name: 'Decline',
+              onTap: () => handleMenuAction(
+                context: context,
+                action: InboxMoreMenuAction.decline,
+              ),
+            ),
+          ],
+          imagePath: AppImages.demoProfile2,
+          name: 'Tasnova Ahmed',
+          age: '28 Yr',
+          height: '5\' 3\'" ',
+          day: 'Today',
+          location: 'Gulshan, Dhaka, BD',
+          profession: 'Software Engineer',
+          isVerified: true,
         ),
-      ),
-      MenuItem(
-        name: 'View Contact',
-        onTap: () => handleMenuAction(
-          context: context,
-          action: InboxMoreMenuAction.viewContact,
-          displayName: displayName,
-          imagePath: imagePath,
-        ),
-      ),
-      MenuItem(
-        name: 'Block',
-        onTap: () => handleMenuAction(
-          context: context,
-          action: InboxMoreMenuAction.block,
-          displayName: displayName,
-          imagePath: imagePath,
-        ),
-      ),
-      MenuItem(
-        name: 'Report',
-        onTap: () => handleMenuAction(
-          context: context,
-          action: InboxMoreMenuAction.report,
-          displayName: displayName,
-          imagePath: imagePath,
-        ),
-      ),
-    ];
+      ],
+    );
   }
+
 }
 
 
