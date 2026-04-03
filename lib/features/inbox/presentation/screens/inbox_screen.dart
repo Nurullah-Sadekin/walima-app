@@ -209,7 +209,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
               )
             ],
           ),
-          ProfileComprehensiveCard(
+          const ProfileComprehensiveCard(
             imagePath: AppImages.demoProfile,
             leftIconPath: AppImages.favouriteIcon,
             isPremiumConnect: false,
@@ -505,7 +505,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
 
   Widget _receivedFilter(BuildContext context,){
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -520,6 +520,13 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
               provider.updateViewState();
             },
           ),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(0,8.0,0,16.0),
+            child: Divider(
+              color: AppColors.greyLight,
+              thickness: 1,
+            ),
+          ),
           FilterWidget(
             title: 'Sort by',
             iconPath: AppImages.sortIcon,
@@ -532,6 +539,13 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
             onItemTap: (index) {
               provider.sortBy(index);
             },
+          ),
+          const Padding(
+            padding: EdgeInsets.only(bottom: 16.0),
+            child: Divider(
+              color: AppColors.greyLight,
+              thickness: 1,
+            ),
           ),
           FilterWidget(
             title: 'Filter by',
