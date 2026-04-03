@@ -279,8 +279,8 @@ class ChatProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> sendMessage(String content, String receiverId) async {
-    if (content.isEmpty) return;
+  Future<bool> sendMessage(String content, String receiverId) async {
+    if (content.isEmpty) return false;
     activeReceiverId = receiverId;
     final tmpId = 'tmp-${DateTime.now().millisecondsSinceEpoch}';
     final tmp = Message(
@@ -317,7 +317,7 @@ class ChatProvider extends BaseChangeNotifier {
         messages[optimisticIndex].status = 'failed';
       }
       notifyListeners();
-      return;
+      return sent != null;
     }
 
     SocketService.instance.sendMessage(
@@ -325,6 +325,7 @@ class ChatProvider extends BaseChangeNotifier {
       message: content,
       messageType: 'text',
     );
+    return true;
   }
 
   void setActiveReceiver(String? receiverId) {

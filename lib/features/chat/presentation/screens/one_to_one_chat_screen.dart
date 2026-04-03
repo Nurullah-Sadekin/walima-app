@@ -30,6 +30,7 @@ class ChatScreen extends ConsumerStatefulWidget {
 
 class _ChatScreenState extends ConsumerState<ChatScreen>
     with WidgetsBindingObserver {
+  static const String _sendMessageQuotaKey = 'send_message';
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   Map<String, dynamic>? _participant;
@@ -97,6 +98,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
   @override
   Widget build(BuildContext context) {
     final provider = ref.watch(chatProvider);
+    final quotaProvider = ref.watch(globalProvider);
+    final canSendMessage = quotaProvider.canUseFeature(_sendMessageQuotaKey);
     dynamic liveParticipant;
     for (final conversation in provider.allConversations) {
       if (conversation.id == provider.currentConversationId) {
@@ -122,19 +125,26 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
       body: SafeArea(
         child: Column(
           children: [
-            _headerSection(name ?? 'Unknown', imagePath, isOnline ?? false, liveParticipant),
-            Expanded(child: _conversationBody(provider)),
+            _headerSection(name ?? 'Unknown', imagePath, isOnline ?? false,
+                liveParticipant),
+            Expanded(
+              child: _conversationBody(
+                provider,
+                canSendMessage: canSendMessage,
+              ),
+            ),
           ],
         ),
       ),
       floatingActionButton: BottomBorderedWidget(
-        widget:  _composerSection(provider),
+        widget: _composerSection(provider),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
-  Widget _headerSection(String displayName, String? imagePath, bool isOnline, dynamic participant) {
+  Widget _headerSection(String displayName, String? imagePath, bool isOnline,
+      dynamic participant) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 8, 8, 6),
       child: Row(
@@ -193,7 +203,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
               ),
               // Replace the simple InkWell icon with a PopupMenuButton for actions
               PopupMenuButton<MoreMenuAction>(
-                onSelected: (action) => _handleMoreMenuAction(action, participant),
+                onSelected: (action) =>
+                    _handleMoreMenuAction(action, participant),
                 padding: EdgeInsets.zero,
                 position: PopupMenuPosition.under,
                 color: Colors.white,
@@ -207,34 +218,42 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                   PopupMenuItem(
                     value: MoreMenuAction.viewProfile,
                     height: 32.0,
-                    padding:const EdgeInsets.fromLTRB(16, 10, 35, 10),
+                    padding: const EdgeInsets.fromLTRB(16, 10, 35, 10),
                     child: Text('View Profile',
-                        style: TextStyle(fontSize: TextSize.font12(context), color: AppColors.textPrimaryLight,fontWeight: FontWeight.w400)
-                    ),
+                        style: TextStyle(
+                            fontSize: TextSize.font12(context),
+                            color: AppColors.textPrimaryLight,
+                            fontWeight: FontWeight.w400)),
                   ),
                   PopupMenuItem(
                     value: MoreMenuAction.viewContact,
                     height: 32.0,
-                    padding:const EdgeInsets.fromLTRB(16, 10, 35, 10),
+                    padding: const EdgeInsets.fromLTRB(16, 10, 35, 10),
                     child: Text('View Contact',
-                        style: TextStyle(fontSize: TextSize.font12(context), color: AppColors.textPrimaryLight,fontWeight: FontWeight.w400)
-                    ),
+                        style: TextStyle(
+                            fontSize: TextSize.font12(context),
+                            color: AppColors.textPrimaryLight,
+                            fontWeight: FontWeight.w400)),
                   ),
                   PopupMenuItem(
                     value: MoreMenuAction.block,
                     height: 32.0,
-                    padding:const EdgeInsets.fromLTRB(16, 10, 35, 10),
+                    padding: const EdgeInsets.fromLTRB(16, 10, 35, 10),
                     child: Text('Block',
-                        style: TextStyle(fontSize: TextSize.font12(context), color: AppColors.textPrimaryLight,fontWeight: FontWeight.w400)
-                    ),
+                        style: TextStyle(
+                            fontSize: TextSize.font12(context),
+                            color: AppColors.textPrimaryLight,
+                            fontWeight: FontWeight.w400)),
                   ),
                   PopupMenuItem(
                     value: MoreMenuAction.report,
                     height: 32.0,
-                    padding:const EdgeInsets.fromLTRB(16, 10, 35, 10),
+                    padding: const EdgeInsets.fromLTRB(16, 10, 35, 10),
                     child: Text('Report',
-                        style: TextStyle(fontSize: TextSize.font12(context), color: AppColors.textPrimaryLight,fontWeight: FontWeight.w400)
-                    ),
+                        style: TextStyle(
+                            fontSize: TextSize.font12(context),
+                            color: AppColors.textPrimaryLight,
+                            fontWeight: FontWeight.w400)),
                   ),
                 ],
               ),
@@ -289,34 +308,46 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
           context: context,
           builder: (_) => AlertDialog(
             title: Text('Block ${participant?.displayName}? Are you sure?'),
-            content: const Text('Blocked members cannot view your profile or contact you on walima.com.'),
+            content: const Text(
+                'Blocked members cannot view your profile or contact you on walima.com.'),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.0), // Minimized border radius
+              borderRadius:
+                  BorderRadius.circular(16.0), // Minimized border radius
             ),
             actions: [
               Row(
                 spacing: 8,
                 children: [
-                  Expanded(child: PrimaryButtons(buttonStyle: ButtonsStyle.cancelButton, onTap: () => Navigator.pop(context), title: 'Cancel',bgColor: Colors.transparent)),
-                  Expanded(child: PrimaryButtons(buttonStyle: ButtonsStyle.activePrimaryButton, onTap: (){
-                    context.pop();
-                    context.pushNamed(
-                      Routes.reportStatus,
-                      extra: {
-                        'title': 'Blocked Successfully!',
-                        'subtitle': 'You have blocked Nusrat Jahan. Nusrat Jahan can no longer view your profile or send you messages.',
-                        'buttonText': 'Done',
-                        'onTapButton': () {
-                          if (context.canPop()) {
-                            context.pop();
-                          }
-                          if (context.canPop()) {
-                            context.pop();
-                          }
+                  Expanded(
+                      child: PrimaryButtons(
+                          buttonStyle: ButtonsStyle.cancelButton,
+                          onTap: () => Navigator.pop(context),
+                          title: 'Cancel',
+                          bgColor: Colors.transparent)),
+                  Expanded(
+                    child: PrimaryButtons(
+                        buttonStyle: ButtonsStyle.activePrimaryButton,
+                        onTap: () {
+                          context.pop();
+                          context.pushNamed(
+                            Routes.reportStatus,
+                            extra: {
+                              'title': 'Blocked Successfully!',
+                              'subtitle':
+                                  'You have blocked Nusrat Jahan. Nusrat Jahan can no longer view your profile or send you messages.',
+                              'buttonText': 'Done',
+                              'onTapButton': () {
+                                if (context.canPop()) {
+                                  context.pop();
+                                }
+                                if (context.canPop()) {
+                                  context.pop();
+                                }
+                              },
+                            },
+                          );
                         },
-                      },
-                    );
-                  }, title: 'Block'),
+                        title: 'Block'),
                   ),
                 ],
               )
@@ -327,13 +358,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
       case MoreMenuAction.report:
         // Navigate to the Report screen and pass participant info as extra
         final extra = <String, dynamic>{
-          'displayName': participant?.displayName ?? participant?['displayName'] ?? 'User',
-          'profilePictureUrl': participant?.profilePhoto?.url ?? participant?['profilePictureUrl'],
+          'displayName':
+              participant?.displayName ?? participant?['displayName'] ?? 'User',
+          'profilePictureUrl': participant?.profilePhoto?.url ??
+              participant?['profilePictureUrl'],
         };
         context.pushNamed(Routes.report, extra: extra);
         break;
     }
   }
+
   void _viewContactBottomSheet() {
     showModalBottomSheet(
       context: context,
@@ -351,13 +385,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
             child: Wrap(
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 16),
                   child: ContactBottomSheet(
                     userName: 'Sadia Sultana',
                     profileImagePath: AppImages.demoProfile,
                     profileType: 'Profile Created by Self',
                     description:
-                    'She shares her phone number only with connected members.',
+                        'She shares her phone number only with connected members.',
                     isDescriptionVisible: false,
                     onWalimaChatPressed: () {},
                     onWhatsappPressed: () {},
@@ -374,7 +409,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
     );
   }
 
-  Widget _conversationBody(ChatProvider provider) {
+  Widget _conversationBody(
+    ChatProvider provider, {
+    required bool canSendMessage,
+  }) {
     bool freeUser = false;
     if (provider.messagesLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -403,121 +441,201 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                   location: 'Dhaka',
                   singleButton: false,
                 ),
-               Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryVariant,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child:  Column(
-                    spacing: 10,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 8,
-                        children: [
-                          ShowImage(
-                            imagePath: AppImages.lockPasswordSvgIcon,
-                            width: TextSize.font16(context),
-                            height: TextSize.font16(context),
-                            color: AppColors.textSecondaryLight,
-                          ),
-                          Flexible(
-                            child: Text(
-                              'You have 1 unread message from her please view and reply promptly for a smoother conversation.',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color:  AppColors.textSecondaryLight,
-                                fontSize: TextSize.font12(context),
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      InkWell(
-                        onTap: null,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          spacing: 8,
-                          children: [
-                            Text(
-                              'Upgrade Now',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color:  AppColors.primary,
-                                fontSize: TextSize.font14(context),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            ShowImage(
-                              imagePath: AppImages.arrowRightSvgIcon,
-                              width: TextSize.font16(context),
-                              height: TextSize.font16(context),
-                              color: AppColors.primary,
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-               )
+                _upgradeForMassage(),
               ],
             ),
           )
-        : ListView.builder(
-            controller: _scrollController,
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 80),
-            reverse: true,
-            itemCount: message.length + (provider.loadingMoreMessages ? 1 : 0),
-            itemBuilder: (context, index) {
-              if (index == message.length) {
-                return const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  child: Center(child: CircularProgressIndicator()),
-                );
-              }
-              final msg = message[index];
-              final isMe = msg.senderId == provider.currentUserId;
-              return _textMessageRow(isMe: isMe, message: msg.content ?? '', msg: msg);
-            },
+        : Column(
+            children: [
+              if (!canSendMessage) _limitOverSection(),
+              Expanded(
+                child: ListView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 80),
+                  reverse: true,
+                  itemCount:
+                      message.length + (provider.loadingMoreMessages ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index == message.length) {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    }
+                    final msg = message[index];
+                    final isMe = msg.senderId == provider.currentUserId;
+                    return _textMessageRow(isMe: isMe, message: msg.content ?? '', msg: msg);
+                  },
+                ),
+              ),
+            ],
           );
   }
 
-  Widget _textMessageRow({required bool isMe, required String message, required Message msg}) {
-    final bubbleColor = isMe ? const Color(0xFFF4E8EE) : const Color(0xFFEFEFEF);
+  Widget _limitOverSection() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      decoration: BoxDecoration(
+        color: AppColors.primaryVariant,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        spacing: 10,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 8,
+            children: [
+              ShowImage(
+                imagePath: AppImages.lockPasswordSvgIcon,
+                width: TextSize.font16(context),
+                height: TextSize.font16(context),
+                color: AppColors.textSecondaryLight,
+              ),
+              Flexible(
+                child: Text(
+                  'Your daily message quota is finished. Please try again after reset or upgrade your plan.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.textSecondaryLight,
+                    fontSize: TextSize.font12(context),
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          InkWell(
+            onTap: () {
+              context.pushNamed(Routes.upgradePackage);
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 8,
+              children: [
+                Text(
+                  'Upgrade Now',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontSize: TextSize.font14(context),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                ShowImage(
+                  imagePath: AppImages.arrowRightSvgIcon,
+                  width: TextSize.font16(context),
+                  height: TextSize.font16(context),
+                  color: AppColors.primary,
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-    // Determine avatar image for this message. Prefer message-level participant info,
-    // fall back to navigation payload or demo assets.
+  Widget _upgradeForMassage() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      decoration: BoxDecoration(
+        color: AppColors.primaryVariant,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        spacing: 10,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 8,
+            children: [
+              ShowImage(
+                imagePath: AppImages.lockPasswordSvgIcon,
+                width: TextSize.font16(context),
+                height: TextSize.font16(context),
+                color: AppColors.textSecondaryLight,
+              ),
+              Flexible(
+                child: Text(
+                  'You have 1 unread message from her please view and reply promptly for a smoother conversation.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.textSecondaryLight,
+                    fontSize: TextSize.font12(context),
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          InkWell(
+            onTap: () {
+              context.pushNamed(Routes.upgradePackage);
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 8,
+              children: [
+                Text(
+                  'Upgrade Now',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontSize: TextSize.font14(context),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                ShowImage(
+                  imagePath: AppImages.arrowRightSvgIcon,
+                  width: TextSize.font16(context),
+                  height: TextSize.font16(context),
+                  color: AppColors.primary,
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _textMessageRow(
+      {required bool isMe, required String message, required Message msg}) {
+    final bubbleColor = isMe ? const Color(0xFFF4E8EE) : const Color(0xFFEFEFEF);
     String? avatarPath;
     if (isMe) {
-      // If sender is current user, try sender.profilePhoto, then fallback to demo
       avatarPath = msg.sender?.profilePhoto?.url ?? AppImages.demoProfile2;
     } else {
-      // For incoming messages, prefer sender (other user) profile photo, then receiver, then navigation payload
-      avatarPath = msg.sender?.profilePhoto?.url ?? msg.receiver?.profilePhoto?.url ??
-          (_participant != null ? (_participant!['profilePictureUrl'] as String?) : null) ?? AppImages.demoProfile;
+      avatarPath = msg.sender?.profilePhoto?.url ??
+          msg.receiver?.profilePhoto?.url ??
+          (_participant != null
+              ? (_participant!['profilePictureUrl'] as String?)
+              : null) ??
+          AppImages.demoProfile;
     }
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
-          if (!isMe) _profileAvatar(imagePath: avatarPath ?? AppImages.demoProfile, size: 30),
+          if (!isMe) _profileAvatar(imagePath: avatarPath, size: 30),
           if (!isMe) const SizedBox(width: 10),
           ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.72),
+            constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.72),
             child: MessageBubble(
-              message: message,
-              backgroundColor: bubbleColor,
-              senderMessage: !isMe
-            ),
+                message: message,
+                backgroundColor: bubbleColor,
+                senderMessage: !isMe),
           ),
           if (isMe) const SizedBox(width: 10),
-          if (isMe) _profileAvatar(imagePath: avatarPath ?? AppImages.demoProfile2, size: 30),
+          if (isMe) _profileAvatar(imagePath: avatarPath, size: 30),
         ],
       ),
     );
@@ -544,7 +662,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                 _typingStopDebounce?.cancel();
                 _typingStopDebounce = Timer(
                   const Duration(milliseconds: 900),
-                      () => provider.onComposerChanged(''),
+                  () => provider.onComposerChanged(''),
                 );
               },
               decoration: const InputDecoration(
@@ -584,7 +702,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
               decoration: BoxDecoration(
                   color: AppColors.primary,
                   borderRadius: BorderRadius.circular(4)),
-              child:   ShowImage(
+              child: ShowImage(
                 imagePath: AppImages.sentMessage,
                 width: TextSize.font20(context),
                 height: TextSize.font20(context),
@@ -597,15 +715,40 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
     );
   }
 
-  void _onSendPressed() {
+  Future<void> _onSendPressed() async {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
     final receiverId =
         _participant != null ? (_participant!['userId'] as String?) : null;
     if (receiverId == null || receiverId.isEmpty) return;
+
+    final quotaProvider = ref.read(globalProvider);
+    var canSend = quotaProvider.canUseFeature(_sendMessageQuotaKey);
+
+    if (!canSend) {
+      await quotaProvider.refreshCurrentUserAndQuota(silent: true);
+      canSend = quotaProvider.canUseFeature(_sendMessageQuotaKey);
+    }
+
+    if (!canSend) {
+      return;
+    }
+
+    final consumed = quotaProvider.consumeFeature(_sendMessageQuotaKey);
+    if (!consumed) {
+      return;
+    }
+
     ref.read(chatProvider).onComposerChanged('');
-    ref.read(chatProvider).sendMessage(text, receiverId);
-    _messageController.clear();
+    final sent = await ref.read(chatProvider).sendMessage(text, receiverId);
+    if (sent) {
+      _messageController.clear();
+      return;
+    }
+
+    quotaProvider.rollbackFeature(_sendMessageQuotaKey);
+    await quotaProvider.refreshCurrentUserAndQuota(silent: true);
+    if (!mounted) return;
   }
 
   String providerStatusText(ChatProvider provider, bool isOnline) {
@@ -621,9 +764,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
     bool showOnlineIndicator = false,
     bool isOnline = false,
   }) {
-    return  ProfileAvatarWithName(
+    return ProfileAvatarWithName(
       imagePath: imagePath,
-      indicatorColor: isOnline == true ? AppColors.greenButtonColor : Colors.red,
+      indicatorColor:
+          isOnline == true ? AppColors.greenButtonColor : Colors.red,
       showOnlineIndicator: showOnlineIndicator,
       indicatorSize: size * 0.3,
       avatarSize: size,
