@@ -15,7 +15,6 @@ import 'package:flutter_boilerplate/features/matches/presentation/widgets/text_t
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/count_down_timer.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/empty_state.dart';
@@ -43,7 +42,13 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
   late final TabController _acceptedSubTabController;
   late final TabController _contactsSubTabController;
 
-  final _primaryTabs = const ['Received', 'Accepted', 'Contacts', 'Sent', 'More'];
+  final _primaryTabs = const [
+    'Received',
+    'Accepted',
+    'Contacts',
+    'Sent',
+    'More'
+  ];
   final _acceptedTabs = const ['Accepted by Her', 'Accepted by Me'];
   final _contactsTabs = const ['Contacts Received', 'Contacts Sent'];
 
@@ -52,10 +57,13 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
   @override
   void initState() {
     super.initState();
-    _primaryTabController = TabController(initialIndex: 0, length: 5, vsync: this)
-      ..addListener(_handlePrimaryTabChange);
-    _acceptedSubTabController = TabController(initialIndex: 0, length: 2, vsync: this);
-    _contactsSubTabController = TabController(initialIndex: 0, length: 2, vsync: this);
+    _primaryTabController =
+        TabController(initialIndex: 0, length: 5, vsync: this)
+          ..addListener(_handlePrimaryTabChange);
+    _acceptedSubTabController =
+        TabController(initialIndex: 0, length: 2, vsync: this);
+    _contactsSubTabController =
+        TabController(initialIndex: 0, length: 2, vsync: this);
     provider = ref.read(inboxProvider);
   }
 
@@ -169,7 +177,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
   }
 
   Widget _receivedTab() {
-    return  SingleChildScrollView(
+    return SingleChildScrollView(
       child: Column(
         spacing: 10,
         children: [
@@ -191,7 +199,8 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
                     fullHeight: false,
                     child: Consumer(
                       builder: (context, ref, _) {
-                        return _receivedFilter(ref.watch(inboxProvider), context);
+                        return _receivedFilter(
+                            ref.watch(inboxProvider), context);
                       },
                     ),
                   );
@@ -202,8 +211,9 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
                     borderRadius: BorderRadius.circular(4),
                     border: Border.all(color: AppColors.greyLight, width: 1),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
-                  child:  ShowImage(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+                  child: ShowImage(
                     imagePath: AppImages.sortFilter,
                     width: TextSize.font16(context),
                     height: TextSize.font16(context),
@@ -356,9 +366,12 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
         spacing: 10,
         children: [
           InboxCard(
-            onMenuTap: () {
-              _showAcceptedMenu(context,
-                  imagePath: AppImages.demoProfile2, name: 'Tasnova Ahmed');
+            onMenuTap: (details) {
+              _showInboxMoreMenu(
+                details.globalPosition,
+                imagePath: AppImages.demoProfile2,
+                displayName: 'Tasnova Ahmed',
+              );
             },
             imagePath: AppImages.demoProfile2,
             name: 'Tasnova Ahmed',
@@ -382,7 +395,10 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
     );
   }
 
-  Widget _receivedFilter(InboxProvider provider, BuildContext context,){
+  Widget _receivedFilter(
+    InboxProvider provider,
+    BuildContext context,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
@@ -400,7 +416,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
             },
           ),
           const Padding(
-            padding: EdgeInsets.fromLTRB(0,8.0,0,16.0),
+            padding: EdgeInsets.fromLTRB(0, 8.0, 0, 16.0),
             child: Divider(
               color: AppColors.greyLight,
               thickness: 1,
@@ -412,8 +428,8 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
             items: provider.sortByDataList
                 .map(
                   (item) =>
-                  FilterItem(name: item.name, isSelected: item.isSelected),
-            )
+                      FilterItem(name: item.name, isSelected: item.isSelected),
+                )
                 .toList(),
             onItemTap: (index) {
               provider.sortBy(index);
@@ -432,8 +448,8 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
             items: provider.sortByDataList
                 .map(
                   (item) =>
-                  FilterItem(name: item.name, isSelected: item.isSelected),
-            )
+                      FilterItem(name: item.name, isSelected: item.isSelected),
+                )
                 .toList(),
             onItemTap: (index) {
               provider.sortBy(index);
@@ -444,102 +460,65 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
     );
   }
 
-  Future<void> _showAcceptedMenu(BuildContext context,
-      {required String imagePath, required String name}) async {
-    await showModalBottomSheet(
+  Future<void> _showInboxMoreMenu(
+    Offset tapPosition, {
+    required String imagePath,
+    required String displayName,
+  }) async {
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final selectedAction = await showMenu<InboxMoreMenuAction>(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+      color: Colors.white,
+      elevation: 8,
+      position: RelativeRect.fromRect(
+        Rect.fromLTWH(tapPosition.dx, tapPosition.dy, 0, 0),
+        Offset.zero & overlay.size,
       ),
-      builder: (sheetCtx) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  ShowImage(
-                      imagePath: imagePath,
-                      width: 56,
-                      height: 56,
-                      radius: BorderRadius.circular(8)),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          name,
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimaryLight),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'Gulshan, Dhaka, BD',
-                          style: TextStyle(
-                              fontSize: 13,
-                              color: AppColors.textSecondaryLight),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              const Divider(),
-              ListTile(
-                leading: const Icon(Icons.person_outline),
-                title: const Text('View Profile'),
-                onTap: () {
-                  Navigator.of(sheetCtx).pop();
-                  // TODO: Navigate to profile screen
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.message_outlined),
-                title: const Text('Send Message'),
-                onTap: () {
-                  Navigator.of(sheetCtx).pop();
-                  // TODO: Open chat screen
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.close),
-                title: const Text('Remove Match'),
-                onTap: () {
-                  Navigator.of(sheetCtx).pop();
-                  // TODO: Call provider to remove match
-                },
-              ),
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: () => Navigator.of(sheetCtx).pop(),
-                child: Center(
-                  child: Text('Cancel',
-                      style: TextStyle(color: AppColors.textSecondaryLight)),
-                ),
-              ),
-            ],
+      items: [
+        PopupMenuItem(
+          value: InboxMoreMenuAction.decline,
+          height: 32,
+          padding: const EdgeInsets.fromLTRB(16, 10, 35, 10),
+          child: Text(
+            'Decline',
+            style: TextStyle(
+              fontSize: TextSize.font12(context),
+              color: AppColors.textPrimaryLight,
+              fontWeight: FontWeight.w400,
+            ),
           ),
-        );
-      },
+        ),
+      ],
     );
+
+    if (selectedAction == null) return;
+    _handleInboxMoreMenuAction(selectedAction, imagePath, displayName);
   }
 
-  Widget _dummyWidgets(){
+  void _handleInboxMoreMenuAction(
+    InboxMoreMenuAction action,
+    String imagePath,
+    String displayName,
+  ) {
+    switch (action) {
+      case InboxMoreMenuAction.decline:
+        break;
+    }
+  }
+
+  Widget _dummyWidgets() {
     return Column(
       children: [
         const ContactsViewed(
           profileImage: AppImages.demoProfile,
         ),
         InboxCard(
-          onMenuTap: () {
-            _showAcceptedMenu(context,
-                imagePath: AppImages.demoProfile2, name: 'Tasnova Ahmed');
+          onMenuTap: (details) {
+            _showInboxMoreMenu(
+              details.globalPosition,
+              imagePath: AppImages.demoProfile2,
+              displayName: 'Tasnova Ahmed',
+            );
           },
           imagePath: AppImages.demoProfile2,
           name: 'Tasnova Ahmed',
@@ -549,7 +528,6 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
           location: 'Gulshan, Dhaka, BD',
           isVerified: true,
         ),
-
         InfoTile(
           title: 'Country Living in',
           value: 'Bangladesh',
@@ -588,7 +566,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
           title: 'No Matches Yet!',
           imagePath: AppImages.viewOnAccept,
           subtitle:
-          'We do not have new matches at this point. Checkout my matches to find profiles matching your preference',
+              'We do not have new matches at this point. Checkout my matches to find profiles matching your preference',
           buttonText: 'My Matches',
           onTap: () {
             // Navigate to matches screen
@@ -597,7 +575,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
         const InfoCardWidget(
           title: 'Profiles Matching Your Preferences',
           description:
-          'Some profiles may not match all your preferences, but you might find meaningful connections.',
+              'Some profiles may not match all your preferences, but you might find meaningful connections.',
         ),
         SelectionCard(
           buttonStyle: SelectionStyle.selectedCheckbox,
@@ -626,7 +604,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
         ),
         const MessageBubble(
           message:
-          'Hello, I have liked your profile and believe it to be a good Match. If you like my profile too, kindly accept this Invitation. Please feel free to contact me to take this conversation ahead. Warm Regards, Mehedi Hasan',
+              'Hello, I have liked your profile and believe it to be a good Match. If you like my profile too, kindly accept this Invitation. Please feel free to contact me to take this conversation ahead. Warm Regards, Mehedi Hasan',
           senderName: 'Mehedi Hasan',
           showSenderName: true,
         ),
@@ -677,3 +655,5 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
     );
   }
 }
+
+enum InboxMoreMenuAction {decline}

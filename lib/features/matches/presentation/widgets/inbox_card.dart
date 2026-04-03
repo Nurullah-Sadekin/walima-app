@@ -58,7 +58,7 @@ class InboxCard extends StatelessWidget {
   final bool isVerified;
   final bool isPremium;
   final String? day;
-  final VoidCallback? onMenuTap;
+  final void Function(TapDownDetails details)? onMenuTap;
   final bool showMenu;
 
   final String? subtitle;
@@ -280,7 +280,7 @@ class InboxCard extends StatelessWidget {
             ),
             if (showMenu)
             InkWell(
-              onTap: onMenuTap,
+              onTapDown: onMenuTap,
               child: Padding(
                 padding: const EdgeInsets.only(left: 12.0),
                 child: Icon(
