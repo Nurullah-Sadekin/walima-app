@@ -24,6 +24,36 @@ class PrefsHelper {
     await prefs.setString(StorageKeys.refreshToken, token);
   }
 
+  static Future<void> setMeSnapshot(String json) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(StorageKeys.meSnapshot, json);
+  }
+
+  static Future<String> getMeSnapshot() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(StorageKeys.meSnapshot) ?? '';
+  }
+
+  static Future<void> clearMeSnapshot() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(StorageKeys.meSnapshot);
+  }
+
+  static Future<void> setQuotaSnapshot(String json) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(StorageKeys.quotaSnapshot, json);
+  }
+
+  static Future<String> getQuotaSnapshot() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(StorageKeys.quotaSnapshot) ?? '';
+  }
+
+  static Future<void> clearQuotaSnapshot() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(StorageKeys.quotaSnapshot);
+  }
+
   static Future<void> clearTokens() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(StorageKeys.accessToken);
