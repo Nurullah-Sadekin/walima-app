@@ -142,7 +142,7 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
                     .read(inboxProvider)
                     .respondToRequestedConnection(
                       connection: connection,
-                      status: 'accepted',
+                      status: 'accept',
                     );
 
                 if (!mounted) return;
@@ -164,7 +164,7 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
                     .read(inboxProvider)
                     .respondToRequestedConnection(
                       connection: connection,
-                      status: 'deleted',
+                      status: 'reject',
                     );
 
                 if (!mounted) return;

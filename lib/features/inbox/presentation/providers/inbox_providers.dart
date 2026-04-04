@@ -207,7 +207,7 @@ class InboxProvider extends BaseChangeNotifier {
         }
         totalItems = (totalItems ?? 0) > 0 ? (totalItems ?? 0) - 1 : 0;
 
-        if (status == 'accepted') {
+        if (status == 'accept') {
           await fetchAcceptedConnections();
         }
 
