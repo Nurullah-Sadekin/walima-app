@@ -5,6 +5,7 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
 import 'package:flutter_boilerplate/core/global/components/empty_state.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
 import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/providers/inbox_providers.dart';
@@ -113,7 +114,7 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
               name: name,
               viewOnAccept: connection.profilePhoto?.visibilityStatus == 'public' ? false : true,
               age: '$age Yr',
-              height: (connection.maritalStatus ?? '').isEmpty ? '' : (connection.maritalStatus ?? '')[0].toUpperCase() + (connection.maritalStatus ?? '').substring(1),
+              height: CamelCaseUtils.formatCamelCase(connection.maritalStatus ?? ''),
               location: location,
               activeStatusText: DateTimeUtils.formatDate(DateTime.tryParse(connection.lastSeenAt ?? '')),
               isOnline: connection.isOnline ?? false,
@@ -205,7 +206,7 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
             items: provider.sortByDataList
                 .map((item) => FilterItem(name: item.name, isSelected: item.isSelected))
                 .toList(),
-            onItemTap: provider.sortBy,
+            onItemTap: provider.selectSortByIndex,
           ),
           const Padding(
             padding: EdgeInsets.only(bottom: 16.0),
@@ -217,15 +218,7 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
             items: provider.sortByDataList
                 .map((item) => FilterItem(name: item.name, isSelected: item.isSelected))
                 .toList(),
-            onItemTap: provider.sortBy,
-          ),
-          FilterWidget(
-            title: 'Filter by',
-            iconPath: AppImages.filterSvgIcon,
-            items: provider.sortByDataList
-                .map((item) => FilterItem(name: item.name, isSelected: item.isSelected))
-                .toList(),
-            onItemTap: provider.sortBy,
+            onItemTap: provider.selectSortByIndex,
           ),
         ],
       ),

@@ -12,14 +12,24 @@ class InboxProvider extends BaseChangeNotifier {
   List<Data>? receivedConnections = [];
   ReceivedConnectionResponse? receivedConnectionsResponse;
 
+  List<Data>? acceptedConnections = [];
+  ReceivedConnectionResponse? acceptedConnectionsResponse;
+  bool isAcceptedLoading = false;
+  bool isAcceptedHasError = false;
+  String? acceptedErrorMessage;
+
   List<SingleStringModel> sortByDataList = sortByListDataInserted
       .map((item) => item.copyWith())
       .toList();
 
-  // Pagination
   int currentPage = 1;
   int pageSize = 10;
   int totalItems = 0;
+
+  String sortBy = 'id';
+  String sortOrder = 'ASC';
+  String searchQuery = '';
+  String filterType = 'most_relevant';
 
   void updateViewState({bool? switcherValue}) {
     if (switcherValue != null) {
@@ -28,9 +38,7 @@ class InboxProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
-  bool _isValidIndex(int index, int length) {
-    return index >= 0 && index < length;
-  }
+  bool _isValidIndex(int index, int length) => index >= 0 && index < length;
 
   void _setSingleSelection<T>(
     List<T> list,
@@ -42,7 +50,7 @@ class InboxProvider extends BaseChangeNotifier {
     }
   }
 
-  void sortBy(int index) {
+  void selectSortByIndex(int index) {
     if (!_isValidIndex(index, sortByDataList.length)) return;
     _setSingleSelection(
       sortByDataList,
@@ -52,10 +60,43 @@ class InboxProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
-  /// Fetch requested connections
+  void setSortBy(String sortField, {String order = 'ASC'}) {
+    sortBy = sortField;
+    sortOrder = order;
+    currentPage = 1;
+    notifyListeners();
+  }
+
+  void setSearchQuery(String query) {
+    searchQuery = query;
+    currentPage = 1;
+    notifyListeners();
+  }
+
+  void setFilterType(String filter) {
+    filterType = filter;
+    currentPage = 1;
+    notifyListeners();
+  }
+
+  Future<void> applyFilters({
+    String? sortByField,
+    String? sortOrderValue,
+    String? search,
+    String? filter,
+  }) async {
+    if (sortByField != null) sortBy = sortByField;
+    if (sortOrderValue != null) sortOrder = sortOrderValue;
+    if (search != null) searchQuery = search;
+    if (filter != null) filterType = filter;
+
+    currentPage = 1;
+    await fetchRequestedConnections(page: 1, size: pageSize);
+  }
+
   Future<void> fetchRequestedConnections({
-    int page = 1,
-    int size = 10,
+    int? page,
+    int? size,
     String responseFormat = 'short',
   }) async {
     isLoading = true;
@@ -65,28 +106,32 @@ class InboxProvider extends BaseChangeNotifier {
 
     try {
       receivedConnectionsResponse = await InboxRepository.getRequestedConnections(
-        page: page,
-        size: size,
+        page: page ?? currentPage,
+        size: size ?? pageSize,
         responseFormat: responseFormat,
+        sortBy: sortBy,
+        sortOrder: sortOrder,
+        search: searchQuery,
+        filter: filterType,
       );
 
       if (receivedConnectionsResponse?.code == 'SUCCESS' ||
           receivedConnectionsResponse?.code == '1') {
         receivedConnections = receivedConnectionsResponse?.response?.data ?? [];
 
-        // Extract pagination info if available
-        if (receivedConnectionsResponse?.response?.pagination != null) {
-          final pagination = receivedConnectionsResponse!.response!.pagination!;
+        final pagination = receivedConnectionsResponse?.response?.pagination;
+        if (pagination != null) {
           totalItems = pagination.total ?? 0;
-          currentPage = pagination.page ?? page;
-          pageSize = pagination.size ?? size;
+          currentPage = pagination.page ?? (page ?? currentPage);
+          pageSize = pagination.size ?? (size ?? pageSize);
         }
 
         isLoading = false;
         hasError = false;
       } else {
         hasError = true;
-        errorMessage = receivedConnectionsResponse?.message ?? 'Failed to load requests';
+        errorMessage =
+            receivedConnectionsResponse?.message ?? 'Failed to load requests';
         receivedConnections = [];
         isLoading = false;
       }
@@ -99,7 +144,6 @@ class InboxProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
-  /// Load more requested connections (pagination)
   Future<void> loadMoreRequestedConnections() async {
     if (isLoading) return;
 
@@ -108,6 +152,10 @@ class InboxProvider extends BaseChangeNotifier {
       page: currentPage,
       size: pageSize,
       responseFormat: 'short',
+      sortBy: sortBy,
+      sortOrder: sortOrder,
+      search: searchQuery,
+      filter: filterType,
     );
 
     if (newResponse.code == 'SUCCESS' || newResponse.code == '1') {
@@ -118,7 +166,61 @@ class InboxProvider extends BaseChangeNotifier {
     }
   }
 
-  /// Clear received connections
+  List<Data> get acceptedReceivedConnections =>
+      _acceptedConnectionsByDirection('received');
+
+  List<Data> get acceptedSentConnections =>
+      _acceptedConnectionsByDirection('sent');
+
+  List<Data> _acceptedConnectionsByDirection(String direction) {
+    final items = acceptedConnections ?? const <Data>[];
+    final normalizedDirection = direction.toLowerCase().trim();
+    return items.where((item) {
+      final itemDirection =
+          item.connection?.direction?.toLowerCase().trim() ?? '';
+      return itemDirection == normalizedDirection;
+    }).toList();
+  }
+
+  Future<void> fetchAcceptedConnections({
+    int page = 1,
+    int size = 10,
+    String responseFormat = 'short',
+  }) async {
+    isAcceptedLoading = true;
+    isAcceptedHasError = false;
+    acceptedErrorMessage = null;
+    notifyListeners();
+
+    try {
+      acceptedConnectionsResponse =
+          await InboxRepository.getAcceptedConnections(
+        page: page,
+        size: size,
+        responseFormat: responseFormat,
+      );
+
+      if (acceptedConnectionsResponse?.code == 'SUCCESS' ||
+          acceptedConnectionsResponse?.code == '1') {
+        acceptedConnections = acceptedConnectionsResponse?.response?.data ?? [];
+        isAcceptedLoading = false;
+        isAcceptedHasError = false;
+      } else {
+        isAcceptedHasError = true;
+        acceptedErrorMessage = acceptedConnectionsResponse?.message ??
+            'Failed to load accepted connections';
+        acceptedConnections = [];
+        isAcceptedLoading = false;
+      }
+    } catch (e) {
+      isAcceptedLoading = false;
+      isAcceptedHasError = true;
+      acceptedErrorMessage = e.toString();
+      acceptedConnections = [];
+    }
+    notifyListeners();
+  }
+
   void clearReceivedConnections() {
     receivedConnections = [];
     receivedConnectionsResponse = null;
@@ -127,7 +229,19 @@ class InboxProvider extends BaseChangeNotifier {
     isLoading = false;
     hasError = false;
     errorMessage = null;
+    sortBy = 'id';
+    sortOrder = 'ASC';
+    searchQuery = '';
+    filterType = 'most_relevant';
+    notifyListeners();
+  }
+
+  void clearAcceptedConnections() {
+    acceptedConnections = [];
+    acceptedConnectionsResponse = null;
+    isAcceptedLoading = false;
+    isAcceptedHasError = false;
+    acceptedErrorMessage = null;
     notifyListeners();
   }
 }
-

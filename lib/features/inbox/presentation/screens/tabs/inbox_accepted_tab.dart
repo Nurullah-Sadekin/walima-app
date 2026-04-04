@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
+import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
+import 'package:flutter_boilerplate/features/inbox/data/models/received_connection_response.dart';
 import 'package:flutter_boilerplate/features/inbox/domain/models/menu_item_model.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/providers/inbox_providers.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_tab_shared.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_card.dart';
+import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_tab_shared.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/text_tab_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -24,6 +27,10 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
   void initState() {
     super.initState();
     _subTabController = TabController(length: _tabs.length, vsync: this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(inboxProvider).fetchAcceptedConnections();
+    });
   }
 
   @override
@@ -35,6 +42,9 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
   @override
   Widget build(BuildContext context) {
     final provider = ref.watch(inboxProvider);
+    final receivedItems = provider.acceptedReceivedConnections;
+    final sentItems = provider.acceptedSentConnections;
+
     return Column(
       children: [
         TextTabBar(
@@ -50,8 +60,28 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
             controller: _subTabController,
             physics: const NeverScrollableScrollPhysics(),
             children: [
-              _acceptedByHer(provider),
-              _acceptedByMe(provider),
+              _buildTabBody(
+                context: context,
+                isLoading: provider.isAcceptedLoading,
+                isError: provider.isAcceptedHasError,
+                errorMessage: provider.acceptedErrorMessage,
+                items: receivedItems,
+                emptyMessage: 'No accepted-by-her requests found',
+                onRetry: () =>
+                    ref.read(inboxProvider).fetchAcceptedConnections(),
+                isReceivedDirection: true,
+              ),
+              _buildTabBody(
+                context: context,
+                isLoading: provider.isAcceptedLoading,
+                isError: provider.isAcceptedHasError,
+                errorMessage: provider.acceptedErrorMessage,
+                items: sentItems,
+                emptyMessage: 'No accepted-by-me requests found',
+                onRetry: () =>
+                    ref.read(inboxProvider).fetchAcceptedConnections(),
+                isReceivedDirection: false,
+              ),
             ],
           ),
         ),
@@ -59,59 +89,100 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
     );
   }
 
+  Widget _buildTabBody({
+    required BuildContext context,
+    required bool isLoading,
+    required bool isError,
+    required String? errorMessage,
+    required List<Data> items,
+    required String emptyMessage,
+    required VoidCallback onRetry,
+    required bool isReceivedDirection,
+  }) {
+    if (isLoading && items.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-  Widget _acceptedByHer(InboxProvider provider) {
-    return Column(
-      children: [
-        InboxCard(
-          menuItems: [
-            MenuItem(
-              name: 'Cancel Request',
-              onTap: () => handleMenuAction(
-                context: context,
-                action: InboxMoreMenuAction.cancelRequest,
+    if (isError && items.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                errorMessage ?? 'Failed to load accepted connections',
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: AppColors.textPrimaryLight),
               ),
-            ),
-          ],
-          imagePath: AppImages.demoProfile2,
-          name: 'Tasnova Ahmed',
-          age: '28 Yr',
-          height: '5\' 3\'" ',
-          day: 'Today',
-          location: 'Gulshan, Dhaka, BD',
-          profession: 'Software Engineer',
-          isVerified: true,
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: onRetry,
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
         ),
-      ],
+      );
+    }
+
+    if (items.isEmpty) {
+      return Center(
+        child: Text(
+          emptyMessage,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: AppColors.textSecondaryLight),
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => ref.read(inboxProvider).fetchAcceptedConnections(),
+      child: ListView.separated(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        itemCount: items.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        itemBuilder: (context, index) {
+          final item = items[index];
+          return InboxCard(
+            imagePath: item.profilePhoto?.url ?? AppImages.demoProfile2,
+            name: item.displayName ?? 'Unknown',
+            subtitleColor: AppColors.primary,
+            day: DateTimeUtils.onlyDate(
+                DateTime.tryParse(item.connection?.createdAt ?? '')),
+            age: '${item.age} Yr',
+            height: CamelCaseUtils.formatCamelCase(item.religion ?? ''),
+            location: [
+              item.location?.city,
+              item.location?.state,
+              item.location?.country
+            ].whereType<String>().where((value) => value.trim().isNotEmpty).join(', ').isEmpty
+                ? 'N/A'
+                : [
+                    item.location?.city,
+                    item.location?.state,
+                    item.location?.country
+                  ].whereType<String>().where((value) => value.trim().isNotEmpty).join(', '),
+            profession:
+                CamelCaseUtils.formatCamelCase(item.maritalStatus ?? ''),
+            isVerified: item.profilePhoto?.isVerified ?? false,
+            isBottomSection: true,
+            mood: InboxCardMood.medium,
+            menuItems: [
+              MenuItem(
+                name: isReceivedDirection ? 'Cancel Request' : 'Decline',
+                onTap: () => handleMenuAction(
+                  context: context,
+                  action: isReceivedDirection
+                      ? InboxMoreMenuAction.cancelRequest
+                      : InboxMoreMenuAction.decline,
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
-
-  Widget _acceptedByMe(InboxProvider provider) {
-    return Column(
-      children: [
-        InboxCard(
-          menuItems: [
-            MenuItem(
-              name: 'Decline',
-              onTap: () => handleMenuAction(
-                context: context,
-                action: InboxMoreMenuAction.decline,
-              ),
-            ),
-          ],
-          imagePath: AppImages.demoProfile2,
-          name: 'Tasnova Ahmed',
-          age: '28 Yr',
-          height: '5\' 3\'" ',
-          day: 'Today',
-          location: 'Gulshan, Dhaka, BD',
-          profession: 'Software Engineer',
-          isVerified: true,
-        ),
-      ],
-    );
-  }
-
 }
-
-

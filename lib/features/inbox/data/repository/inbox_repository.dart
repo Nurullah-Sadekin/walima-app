@@ -8,10 +8,47 @@ class InboxRepository {
     int page = 1,
     int size = 10,
     String responseFormat = 'short',
+    String sortBy = 'id',
+    String sortOrder = 'ASC',
+    String search = '',
+    String filter = 'most_relevant',
+  }) async {
+    try {
+      final queryParameters = {
+        'page': page,
+        'size': size,
+        'responseFormat': responseFormat,
+        'sortBy': sortBy,
+        'sortOrder': sortOrder,
+        if (search.isNotEmpty) 'search': search,
+        if (filter.isNotEmpty) 'filter': filter,
+      };
+
+      final response = await DioClient().get(
+        AppUrls.getRequestedConnections,
+        isTokenRequired: true,
+        queryParameters: queryParameters,
+      );
+      return ReceivedConnectionResponse.fromJson(response.data);
+    } catch (e) {
+      final errorMessage = e is DioException
+          ? e.response?.data['message'] ?? e.message
+          : e.toString();
+      return ReceivedConnectionResponse(
+        code: 'FAILED',
+        message: errorMessage,
+      );
+    }
+  }
+
+  static Future<ReceivedConnectionResponse> getAcceptedConnections({
+    int page = 1,
+    int size = 10,
+    String responseFormat = 'short',
   }) async {
     try {
       final response = await DioClient().get(
-        AppUrls.getRequestedConnections,
+        AppUrls.getAcceptedConnections,
         isTokenRequired: true,
         queryParameters: {
           'page': page,
@@ -31,4 +68,3 @@ class InboxRepository {
     }
   }
 }
-

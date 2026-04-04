@@ -121,7 +121,7 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
         items: provider.sortByDataList
             .map((item) => FilterItem(name: item.name, isSelected: item.isSelected))
             .toList(),
-        onItemTap: provider.sortBy,
+        onItemTap: provider.selectSortByIndex,
       ),
     );
   }
