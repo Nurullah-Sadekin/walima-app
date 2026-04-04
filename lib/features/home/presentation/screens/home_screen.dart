@@ -8,6 +8,7 @@ import 'package:flutter_boilerplate/core/global/enums/global_status.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
+import 'package:flutter_boilerplate/core/utils/height_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/core/utils/link_opener.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
@@ -306,8 +307,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           isPremiumConnect: match.isPremium ?? true,
           isVerified: match.profilePhoto?.isVerified ?? false,
           name: match.displayName ?? 'Walima Member',
-          age: match.age != null ? '${match.age} Yr' : null,
-          height: heightText,
+          age:  '${match.age ?? 'Undefine'} Yr' ,
+          height: HeightUtils.formatHeight(heightText),
           location: location,
           profession: profession,
           leftButtonColor: match.connection?.status == 'none' ? AppColors.greenButtonColor : AppColors.disableBackground,
@@ -500,8 +501,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           isPremiumConnect: visitor.isPremium ?? false,
           isVerified: visitor.isVerified ?? false,
           name: visitor.displayName ?? 'Walima Member',
-          age: visitor.age != null ? '${visitor.age?.toInt()} Yr' : null,
-          height: _formatRecentVisitorHeight(visitor.height),
+          age:  '${visitor.age?.toInt() ?? 'Undefine'} Yr' ,
+          height: HeightUtils.formatHeight(visitor.height.toString()),
           location: location,
           leftButtonColor: visitor.connection?.status == 'none' ? AppColors.greenButtonColor : AppColors.disableBackground,
           leftButtonTextColor: visitor.connection?.status == 'none' ? AppColors.white : AppColors.disableText,
