@@ -98,6 +98,9 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
     return Column(
       children: [
         ...provider.receivedConnections!.map((connection) {
+          final connectionId = connection.connection?.id ?? '';
+          final isUpdatingThisCard = provider.isUpdatingReceivedConnection &&
+              provider.updatingReceivedConnectionId == connectionId;
           final age = connection.age.toString();
           final name = connection.displayName ?? 'Unknown';
           final city = connection.location?.city ?? '';
@@ -132,14 +135,53 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
               ),
               isOnline: connection.isOnline ?? false,
               menu: true,
-              onTapLeftButton: () {
-                // Accept connection logic here
+              onTapLeftButton: () async {
+                if (isUpdatingThisCard) return;
+
+                final success = await ref
+                    .read(inboxProvider)
+                    .respondToRequestedConnection(
+                      connection: connection,
+                      status: 'accepted',
+                    );
+
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success
+                          ? 'Connection accepted successfully'
+                          : provider.receivedActionErrorMessage ??
+                              'Failed to accept connection',
+                    ),
+                  ),
+                );
               },
-              onTapRightButton: () {
-                // Reject connection logic here
+              onTapRightButton: () async {
+                if (isUpdatingThisCard) return;
+
+                final success = await ref
+                    .read(inboxProvider)
+                    .respondToRequestedConnection(
+                      connection: connection,
+                      status: 'deleted',
+                    );
+
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success
+                          ? 'Connection request removed successfully'
+                          : provider.receivedActionErrorMessage ??
+                              'Failed to remove connection request',
+                    ),
+                  ),
+                );
               },
               leftButtonText: 'Accept',
-              rightButtonText: 'Reject',
+              rightButtonText:
+                  isUpdatingThisCard ? 'Please wait...' : 'Reject',
               rightIconPath: AppImages.cancelSvgIcon,
             ),
           );
@@ -219,8 +261,12 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
             title: 'Sort by',
             iconPath: AppImages.sortIcon,
             items: provider.sortList
-                .map((item) =>
-                    FilterItem(name: item.label, isSelected: item.isSelected))
+                .map(
+                  (item) => FilterItem(
+                    name: item.label,
+                    isSelected: item.isSelected,
+                  ),
+                )
                 .toList(),
             onItemTap: provider.selectSortOrderIndex,
           ),
@@ -232,8 +278,12 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
             title: 'Filter by',
             iconPath: AppImages.filterSvgIcon,
             items: provider.filterList
-                .map((item) =>
-                    FilterItem(name: item.label, isSelected: item.isSelected))
+                .map(
+                  (item) => FilterItem(
+                    name: item.label,
+                    isSelected: item.isSelected,
+                  ),
+                )
                 .toList(),
             onItemTap: provider.selectFilterTypeIndex,
           ),

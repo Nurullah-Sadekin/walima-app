@@ -21,8 +21,8 @@ class NotificationRepository {
         queryParameters: {
           'page': page,
           'limit': limit,
-          'filter': filter,
-          'type': type,
+          // 'filter': filter,
+          // 'type': type,
         },
       );
 

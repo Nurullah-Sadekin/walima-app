@@ -1,6 +1,7 @@
 import 'package:flutter_boilerplate/core/global/models/filter_model.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/features/connections/data/models/request/get_requested_connections_query_params.dart';
+import 'package:flutter_boilerplate/features/connections/data/models/request/perform_connection_action_request_body.dart';
 import 'package:flutter_boilerplate/features/connections/data/models/response/get_accepted_connection_response.dart'
     as accepted_models;
 import 'package:flutter_boilerplate/features/connections/data/models/response/get_requested_connections_response.dart'
@@ -17,6 +18,9 @@ class InboxProvider extends BaseChangeNotifier {
   bool isLoading = false;
   bool hasError = false;
   String? errorMessage;
+  bool isUpdatingReceivedConnection = false;
+  String? updatingReceivedConnectionId;
+  String? receivedActionErrorMessage;
 
   List<requested_models.RequestedConnectionUser>? receivedConnections = [];
   requested_models.GetRequestedConnectionsResponse? receivedConnectionsResponse;
@@ -160,6 +164,68 @@ class InboxProvider extends BaseChangeNotifier {
 
     isLoading = false;
     notifyListeners();
+  }
+
+  Future<bool> respondToRequestedConnection({
+    required requested_models.RequestedConnectionUser connection,
+    required String status,
+  }) async {
+    final connectionId = connection.connection?.id;
+    if (connectionId == null || connectionId.isEmpty) {
+      receivedActionErrorMessage = 'Connection id is missing';
+      notifyListeners();
+      return false;
+    }
+
+    isUpdatingReceivedConnection = true;
+    updatingReceivedConnectionId = connectionId;
+    receivedActionErrorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await ConnectionsRepository.performConnectionAction(
+        connectionId,
+        PerformConnectionActionRequestBody(
+          action: 'respond',
+          status: status,
+          message: connection.connection?.message,
+          expiresAt: connection.connection?.expiresAt,
+          isPriority: connection.connection?.isPriority,
+        ),
+      );
+
+      if (response.isSuccess) {
+        receivedConnections = (receivedConnections ?? [])
+            .where((item) => item.connection?.id != connectionId)
+            .toList();
+        if (receivedConnectionsResponse?.response != null) {
+          receivedConnectionsResponse!.response!.data = receivedConnections;
+          final currentTotal =
+              receivedConnectionsResponse?.response?.pagination?.total ?? 0;
+          receivedConnectionsResponse!.response!.pagination?.total =
+              currentTotal > 0 ? currentTotal - 1 : 0;
+        }
+        totalItems = (totalItems ?? 0) > 0 ? (totalItems ?? 0) - 1 : 0;
+
+        if (status == 'accepted') {
+          await fetchAcceptedConnections();
+        }
+
+        isUpdatingReceivedConnection = false;
+        updatingReceivedConnectionId = null;
+        notifyListeners();
+        return true;
+      }
+
+      receivedActionErrorMessage = response.message;
+    } catch (e) {
+      receivedActionErrorMessage = e.toString();
+    }
+
+    isUpdatingReceivedConnection = false;
+    updatingReceivedConnectionId = null;
+    notifyListeners();
+    return false;
   }
 
   List<accepted_models.Data> get acceptedReceivedConnections =>
@@ -329,6 +395,9 @@ class InboxProvider extends BaseChangeNotifier {
     isLoading = false;
     hasError = false;
     errorMessage = null;
+    isUpdatingReceivedConnection = false;
+    updatingReceivedConnectionId = null;
+    receivedActionErrorMessage = null;
     sortBy = 'id';
     sortOrder = 'ASC';
     searchQuery = '';
