@@ -9,6 +9,7 @@ import 'package:flutter_boilerplate/core/global/repositorys/global_repository.da
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/app_router.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/core/utils/link_opener.dart';
 import 'package:flutter_boilerplate/core/utils/picker_dialog.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/providers/app_drawer_provider.dart';
 import 'package:flutter_boilerplate/features/profile/presentation/utils/profile_summary_utils.dart';
@@ -24,6 +25,20 @@ class AppDrawer extends ConsumerStatefulWidget {
 }
 
 class _AppDrawerState extends ConsumerState<AppDrawer> {
+  static const String _helpCenterUrl =
+      'https://dev.walima.app/en/account/help-desk';
+  static const String _beSafeOnlineUrl =
+      'https://dev.walima.app/en/be-safe-online';
+  static const String _termsUrl = 'https://dev.walima.app/en/terms';
+
+  Future<void> _openLink(String title, String url) {
+    return LinkOpener.open(
+      context,
+      title: title,
+      url: url,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = ref.watch(drawerProvider);
@@ -250,12 +265,12 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         ProfileActionTile(
           iconImagePath: AppImages.customerSupportSvgIcon,
           title: 'Help & Support',
-          onTap: () {},
+          onTap: () => _openLink('Help Center', _helpCenterUrl),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.bubbleChatSvgIcon,
           title: 'Be Safe Online',
-          onTap: () {},
+          onTap: () => _openLink('Be Safe Online', _beSafeOnlineUrl),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.starSvgIcon,
@@ -265,7 +280,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         ProfileActionTile(
           iconImagePath: AppImages.documentValidationSvgIcon,
           title: 'Terms & Conditions',
-          onTap: () {},
+          onTap: () => _openLink('Terms & Conditions', _termsUrl),
         ),
       ],
     );

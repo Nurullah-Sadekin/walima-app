@@ -8,6 +8,7 @@ import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:flutter_boilerplate/core/utils/link_opener.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
 import 'package:flutter_boilerplate/features/home/data/model/response/recent_visitors_response.dart';
@@ -28,9 +29,30 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  static const String _facebookUrl = 'https://www.facebook.com/WalimaApp';
+  static const String _instagramUrl = 'https://www.instagram.com/walima.app';
+  static const String _linkedInUrl =
+      'https://www.linkedin.com/company/walima-app';
+  static const String _privacyUrl = 'https://dev.walima.app/en/privacy';
+  static const String _xUrl = 'https://x.com/WalimaApp';
+  static const String _tikTokUrl = 'https://www.tiktok.com/@walima.app';
+  static const String _helpCenterUrl =
+      'https://dev.walima.app/en/account/help-desk';
+  static const String _beSafeOnlineUrl =
+      'https://dev.walima.app/en/be-safe-online';
+  static const String _termsUrl = 'https://dev.walima.app/en/terms';
+
   final Key profileImageKey = const ValueKey('home_profile_image');
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _showProfileSummary = true;
+
+  Future<void> _openLink(String title, String url) {
+    return LinkOpener.open(
+      context,
+      title: title,
+      url: url,
+    );
+  }
 
   @override
   void initState() {
@@ -332,7 +354,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       return 'Online';
     }
     if (match.lastSeenAt != null && match.lastSeenAt!.isNotEmpty) {
-      return DateTimeUtils.formatDate(DateTime.tryParse(match.lastSeenAt! ?? ''));
+      return DateTimeUtils.formatDate(DateTime.tryParse(match.lastSeenAt!));
     }
     return 'Offline';
   }
@@ -551,31 +573,95 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 children: [
                   SocialMediaIcon(
                     imagePath: AppImages.instagramIcon,
-                    onTap: () {
-                      // print('Facebook tapped');
-                    },
+                    onTap: () => _openLink('Instagram', _instagramUrl),
                   ),
                   SocialMediaIcon(
                     imagePath: AppImages.facebookIcon,
-                    onTap: () {
-                      // print('Facebook tapped');
-                    },
+                    onTap: () => _openLink('Facebook', _facebookUrl),
                   ),
                   SocialMediaIcon(
                     imagePath: AppImages.twitterIcon,
-                    onTap: () {
-                      // print('Facebook tapped');
-                    },
+                    onTap: () => _openLink('X', _xUrl),
                   ),
                   SocialMediaIcon(
-                    imagePath: AppImages.youtubeIcon,
+                    imagePath: AppImages.whatsappSvgIcon,
                     onTap: () {
-                      // print('Facebook tapped');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Whatsapp link is not configured yet'),
+                        ),
+                      );
                     },
                   ),
                 ],
               ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  _followUpIcon(
+                    label: 'LinkedIn',
+                    imagePath: AppImages.workSvgIcon,
+                    onTap: () => _openLink('LinkedIn', _linkedInUrl),
+                  ),
+                  _followUpIcon(
+                    label: 'TikTok',
+                    imagePath: AppImages.chatIcon,
+                    onTap: () => _openLink('TikTok', _tikTokUrl),
+                  ),
+                  _followUpIcon(
+                    label: 'Privacy',
+                    imagePath: AppImages.lockPasswordSvgIcon,
+                    onTap: () => _openLink('Privacy', _privacyUrl),
+                  ),
+                  _followUpIcon(
+                    label: 'Help Center',
+                    imagePath: AppImages.customerSupportSvgIcon,
+                    onTap: () => _openLink('Help Center', _helpCenterUrl),
+                  ),
+                  _followUpIcon(
+                    label: 'Be Safe Online',
+                    imagePath: AppImages.safetySvgIcon,
+                    onTap: () => _openLink('Be Safe Online', _beSafeOnlineUrl),
+                  ),
+                  _followUpIcon(
+                    label: 'Terms',
+                    imagePath: AppImages.documentValidationSvgIcon,
+                    onTap: () => _openLink('Terms & Conditions', _termsUrl),
+                  ),
+                ],
+              ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _followUpIcon({
+    required String label,
+    required String imagePath,
+    required VoidCallback onTap,
+  }) {
+    return SizedBox(
+      width: 72,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SocialMediaIcon(
+            imagePath: imagePath,
+            onTap: onTap,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: AppColors.textPrimaryLight,
+              fontSize: TextSize.font12(context),
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ),
