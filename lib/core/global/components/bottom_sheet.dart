@@ -89,7 +89,14 @@ class BottomSheetUtils {
   }
 
 
-  static Future<dynamic> open({required BuildContext context, required Widget child, bool? fullHeight}) async {
+  static Future<dynamic> open({
+    required BuildContext context,
+    required Widget child,
+    bool? fullHeight,
+    bool showHeader = true,
+  }) async {
+    final maxHeightFactor = fullHeight == true ? 0.88 : 0.5;
+
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true, // Always true to allow custom sizing
@@ -103,7 +110,7 @@ class BottomSheetUtils {
           builder: (BuildContext context, StateSetter setState) {
             return Container(
               constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.5, // Never exceed half screen
+                maxHeight: MediaQuery.of(context).size.height * maxHeightFactor,
               ),
               decoration: const BoxDecoration(
                 color: Colors.white,
@@ -115,42 +122,44 @@ class BottomSheetUtils {
               child: Column(
                 mainAxisSize: MainAxisSize.min, // Takes minimum height needed
                 children: [
-                  // Header section with drag handle
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 4,
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.black26,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                  if (showHeader) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        InkWell(
-                          onTap: () => Navigator.pop(context),
-                          child: ShowImage(
-                            imagePath: AppImages.cancelSvgIcon,
-                            width: TextSize.font20(context),
-                            height: TextSize.font20(context),
-                            color: AppColors.textSecondaryLight,
+                        Container(
+                          width: 40,
+                          height: 4,
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.black26,
+                            borderRadius: BorderRadius.circular(2),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  // Content - scrollable only if needed
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          InkWell(
+                            onTap: () => Navigator.pop(context),
+                            child: ShowImage(
+                              imagePath: AppImages.cancelSvgIcon,
+                              width: TextSize.font20(context),
+                              height: TextSize.font20(context),
+                              color: AppColors.textSecondaryLight,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   ConstrainedBox(
                     constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height * 0.5 - 72, // Subtract header and padding
+                      maxHeight: MediaQuery.of(context).size.height *
+                          maxHeightFactor -
+                          (showHeader ? 72 : 0),
                     ),
                     child: SingleChildScrollView(
                       child: _wrapChildForReturn(context, child),
@@ -172,8 +181,9 @@ class BottomSheetUtils {
   /// `Navigator.pop(childContext, data)` behave as if it returned `data`
   /// from the `showModalBottomSheet` Future.
   static Widget _wrapChildForReturn(BuildContext modalContext, Widget child) {
+    final navigator = Navigator.of(modalContext);
+
     return Navigator(
-      // ignore: deprecated_member_use
       onPopPage: (Route<dynamic> route, dynamic result) {
         final bool didPop = route.didPop(result);
         if (didPop) {
@@ -181,8 +191,8 @@ class BottomSheetUtils {
           // to avoid calling pop synchronously while the nested route is
           // finishing its own pop handling.
           Future.microtask(() {
-            if (Navigator.of(modalContext).canPop()) {
-              Navigator.of(modalContext).pop(result);
+            if (navigator.canPop()) {
+              navigator.pop(result);
             }
           });
         }
@@ -235,7 +245,7 @@ class BottomSheetUtils {
     dynamic selectedValue,
     Function(dynamic) onItemSelected,
   ) {
-    String _display(dynamic item) {
+    String display(dynamic item) {
       try {
         if (item == null) return '';
         if (item is String) return item;
@@ -280,7 +290,7 @@ class BottomSheetUtils {
       ),
       itemBuilder: (context, index) {
         final item = items[index];
-        final displayText = _display(item);
+        final displayText = display(item);
         final selectedText = selectedValue != null ? selectedValue.toString() : '';
         final isSelected = displayText == selectedText;
 

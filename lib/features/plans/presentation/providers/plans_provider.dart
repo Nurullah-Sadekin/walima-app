@@ -122,10 +122,12 @@ class PlansProvider extends BaseChangeNotifier {
     final hasExistingPlan = hasCurrentSubscription;
 
     if (hasExistingPlan) {
-      final quoteData = await _fetchAndValidateQuote(
-        context: context,
-        purchaseInput: purchaseInput,
-      );
+      final quoteData = _hasMatchingLatestQuote(purchaseInput)
+          ? latestUpgradeQuote
+          : await _fetchAndValidateQuote(
+              context: context,
+              purchaseInput: purchaseInput,
+            );
       if (quoteData == null) return null;
       if (!context.mounted) {
         updateViewState(screenStates: UpgradePackageScreenStates.complete);
@@ -143,6 +145,37 @@ class PlansProvider extends BaseChangeNotifier {
     latestPaymentSession = paymentData;
     updateViewState(screenStates: UpgradePackageScreenStates.complete);
     return paymentData.redirectUrl?.trim();
+  }
+
+  Future<PlanOrderSummaryPreview?> prepareOrderSummaryPreview({
+    required BuildContext context,
+    required Plans selectedPlan,
+  }) async {
+    updateViewState(screenStates: UpgradePackageScreenStates.transparent);
+
+    final purchaseInput = _resolvePurchaseInput(selectedPlan);
+    if (purchaseInput == null) {
+      return _handleOrderSummaryError(
+        context,
+        'Selected package is invalid. Please try another package.',
+      );
+    }
+
+    final quoteData = _hasMatchingLatestQuote(purchaseInput)
+        ? latestUpgradeQuote
+        : await _fetchAndValidateQuote(
+            context: context,
+            purchaseInput: purchaseInput,
+          );
+    if (quoteData == null) {
+      return null;
+    }
+
+    updateViewState(screenStates: UpgradePackageScreenStates.complete);
+    return PlanOrderSummaryPreview(
+      isUpgrade: true,
+      upgradeQuote: quoteData,
+    );
   }
 
   _PurchaseInput? _resolvePurchaseInput(Plans selectedPlan) {
@@ -206,6 +239,17 @@ class PlansProvider extends BaseChangeNotifier {
     return quoteData;
   }
 
+  bool _hasMatchingLatestQuote(_PurchaseInput purchaseInput) {
+    final quote = latestUpgradeQuote;
+    if (quote == null) return false;
+
+    final targetPlanId = quote.targetPlan?.id?.trim() ?? '';
+    final billingCycle = (quote.billingCycle ?? '').trim().toLowerCase();
+
+    return targetPlanId == purchaseInput.targetPlanId &&
+        billingCycle == purchaseInput.billingCycle;
+  }
+
   Future<InitiatePaymentData?> _initiatePaymentSession({
     required BuildContext context,
     required _PurchaseInput purchaseInput,
@@ -264,6 +308,20 @@ class PlansProvider extends BaseChangeNotifier {
     return null;
   }
 
+  Future<PlanOrderSummaryPreview?> _handleOrderSummaryError(
+    BuildContext context,
+    String message,
+  ) async {
+    updateViewState(screenStates: UpgradePackageScreenStates.complete);
+    if (context.mounted) {
+      await DialogUtils.showErrorDialog(
+        context: context,
+        message: message,
+      );
+    }
+    return null;
+  }
+
   void updateViewState({
     UpgradePackageScreenStates? screenStates,
     UpgradePackageScreenStates? loadingState,
@@ -297,4 +355,14 @@ enum UpgradePackageScreenStates {
 
 extension _ListSafeAccess<T> on List<T> {
   T? get firstOrNull => isEmpty ? null : first;
+}
+
+class PlanOrderSummaryPreview {
+  PlanOrderSummaryPreview({
+    required this.isUpgrade,
+    this.upgradeQuote,
+  });
+
+  final bool isUpgrade;
+  final UpgradeQuoteData? upgradeQuote;
 }

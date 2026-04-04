@@ -3,6 +3,7 @@ import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
+import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_expansion_tile.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/plans/data/models/get_plans_response.dart';
 import 'package:flutter_boilerplate/features/plans/presentation/screens/widgets/package_card.dart';
+import 'package:flutter_boilerplate/features/plans/presentation/screens/widgets/order_summary_bottom_sheet.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
@@ -58,8 +60,6 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
               provider.loaderState == UpgradePackageScreenStates.loading
                   ? const Expanded(child: Center(child: Loading()))
                   : _body(),
-              // if(provider.screenStates == UpgradePackageScreenStates.transparent)
-              //   TransparentLoading(child: child, isLoading: isLoading)
             ],
           ),
         ),
@@ -162,6 +162,24 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
                   ? () {}
                   : () async {
                       final plansState = ref.read(plansProvider);
+                      final preview =
+                          await plansState.prepareOrderSummaryPreview(
+                        context: context,
+                        selectedPlan: item,
+                      );
+                      if (preview == null || !context.mounted) return;
+
+                      final proceed = await BottomSheetUtils.open(
+                        context: context,
+                        fullHeight: true,
+                        showHeader: false,
+                        child: OrderSummaryBottomSheet(
+                          plan: item,
+                          upgradeQuote: preview.upgradeQuote,
+                        ),
+                      );
+                      if (proceed != true || !context.mounted) return;
+
                       final redirectUrl = await plansState.startPlanPurchase(
                         context: context,
                         selectedPlan: item,
