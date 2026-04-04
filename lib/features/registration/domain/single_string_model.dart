@@ -1,4 +1,6 @@
 
+import 'package:flutter_boilerplate/core/global/enums/enums.dart';
+
 class SingleStringModel {
   SingleStringModel({
     required this.name,
@@ -24,14 +26,11 @@ class SingleStringModel {
 }
 
 List<SingleStringModel> dietDataListInserted = [
-  SingleStringModel(name: 'Vegetarian', value: 'vegetarian'),
-  SingleStringModel(name: 'Non-Vegetarian', value: 'non_vegetarian'),
-  SingleStringModel(name: 'Halal Only', value: 'halal_only'),
-  SingleStringModel(name: 'Vegan', value: 'vegan'),
-  SingleStringModel(name: 'Jain Vegetarian', value: 'jain_vegetarian'),
-  SingleStringModel(
-    name: 'Occasionally Non-Veg',
-    value: 'occasionally_non_veg',
+  ...RegistrationDiet.values.map(
+    (diet) => SingleStringModel(
+      name: diet.label,
+      value: diet.apiValue,
+    ),
   ),
 ];
 
@@ -157,14 +156,12 @@ List<SingleStringModel> siblingCountListDataInserted = [
 ];
 
 List<SingleStringModel> maritalStatusListDataInserted = [
-  SingleStringModel(name: 'Open to All'),
-  SingleStringModel(name: 'Never Married'),
-  SingleStringModel(name: 'Divorced'),
-  SingleStringModel(name: 'Widowed'),
-  SingleStringModel(name: 'Separated'),
-  SingleStringModel(name: 'Married'),
-  SingleStringModel(name: 'Awaiting Divorce'),
-  SingleStringModel(name: 'Annulled'),
+  ...RegistrationMaritalStatus.values.map(
+    (status) => SingleStringModel(
+      name: status.label,
+      value: status.apiValue,
+    ),
+  ),
 ];
 
 List<SingleStringModel> countryListDataInserted = [

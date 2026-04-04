@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/core/global/enums/enums.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
 import 'package:flutter_boilerplate/features/login/data/models/resend_otp_body.dart';
@@ -202,36 +203,26 @@ class RegistrationProvider extends BaseChangeNotifier {
     'visitor': 'visitor',
   };
 
-  static const Map<String, String> _maritalStatusAliases = <String, String>{
-    'open to all': 'open_to_all',
-    'single': 'never_married',
-    'never married': 'never_married',
-    'married': 'married',
-    'divorced': 'divorced',
-    'widowed': 'widowed',
-    'separated': 'separated',
-    'awaiting divorce': 'awaiting_divorce',
-    'annulled': 'annulled',
+  static final Map<String, String> _maritalStatusAliases = <String, String>{
+    for (final status in RegistrationMaritalStatus.values)
+      status.label.toLowerCase(): status.apiValue,
+    'single': RegistrationMaritalStatus.neverMarried.apiValue,
   };
 
-  static const Map<String, String> _dietAliases = <String, String>{
-    'vegetarian': 'vegetarian',
-    'non vegetarian': 'non_vegetarian',
-    'halal only': 'halal_only',
-    'vegan': 'vegan',
-    'jain vegetarian': 'jain_vegetarian',
-    'occasionally non veg': 'occasionally_non_veg',
-    'occasionally non-veg': 'occasionally_non_veg',
-    'healthy': 'occasionally_non_veg',
-    'modern balanced diet': 'occasionally_non_veg',
-    'junk food lover': 'occasionally_non_veg',
-    'low carb': 'occasionally_non_veg',
-    'low fat': 'occasionally_non_veg',
-    'low sodium': 'occasionally_non_veg',
-    'low cholesterol': 'occasionally_non_veg',
-    'low sugar': 'occasionally_non_veg',
-    'low salt': 'occasionally_non_veg',
-    'no preferences': 'occasionally_non_veg',
+  static final Map<String, String> _dietAliases = <String, String>{
+    for (final diet in RegistrationDiet.values)
+      diet.label.toLowerCase(): diet.apiValue,
+    'occasionally non veg': RegistrationDiet.occasionallyNonVeg.apiValue,
+    'healthy': RegistrationDiet.occasionallyNonVeg.apiValue,
+    'modern balanced diet': RegistrationDiet.occasionallyNonVeg.apiValue,
+    'junk food lover': RegistrationDiet.occasionallyNonVeg.apiValue,
+    'low carb': RegistrationDiet.occasionallyNonVeg.apiValue,
+    'low fat': RegistrationDiet.occasionallyNonVeg.apiValue,
+    'low sodium': RegistrationDiet.occasionallyNonVeg.apiValue,
+    'low cholesterol': RegistrationDiet.occasionallyNonVeg.apiValue,
+    'low sugar': RegistrationDiet.occasionallyNonVeg.apiValue,
+    'low salt': RegistrationDiet.occasionallyNonVeg.apiValue,
+    'no preferences': RegistrationDiet.occasionallyNonVeg.apiValue,
   };
 
   static const Map<String, String> _familyEconomicConditionAliases =
@@ -254,9 +245,9 @@ class RegistrationProvider extends BaseChangeNotifier {
     'my sister',
   };
 
-  static final List<int> _heightCmOptions = List<int>.generate(
+  static final List<int> _heightInchOptions = List<int>.generate(
     33,
-    (index) => 130 + index,
+    (index) => 51 + index,
   );
 
   List<TextEditingController> get _managedControllers => [
@@ -1350,8 +1341,8 @@ class RegistrationProvider extends BaseChangeNotifier {
     controller.text = value is String ? value : '';
   }
 
-  List<String> get heightDropdownItems => _heightCmOptions
-      .map((heightCm) => _formatHeightDisplay(heightCm))
+  List<String> get heightDropdownItems => _heightInchOptions
+      .map((heightInches) => _formatHeightDisplay(heightInches))
       .toList(growable: false);
 
   void selectHeight(String? displayValue) {
@@ -1408,15 +1399,14 @@ class RegistrationProvider extends BaseChangeNotifier {
       final feet = int.tryParse(match.group(1)!);
       final inches = int.tryParse(match.group(2)!);
       if (feet != null && inches != null) {
-        return ((feet * 12) + inches) * 2.54 ~/ 1;
+        return (((feet * 12) + inches) * 2.54).round();
       }
     }
 
     return _normalizeHeightCmValue(displayValue);
   }
 
-  String _formatHeightDisplay(int heightCm) {
-    final totalInches = (heightCm / 2.54).round();
+  String _formatHeightDisplay(int totalInches) {
     final feet = totalInches ~/ 12;
     final inches = totalInches % 12;
     return '$feet ft $inches in';
