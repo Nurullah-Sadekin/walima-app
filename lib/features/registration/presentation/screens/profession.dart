@@ -30,6 +30,7 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider.getInitialData();
       provider.initControllersListener();
+      provider.loadProfessionLookupData();
     });
   }
 
@@ -132,7 +133,7 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
           popUpHeader: 'Select Income Range',
           items: provider.incomeRangeDropdownItems,
           controller: provider.incomeRangeController,
-          onTap: provider.loadLookupData,
+          onTap: provider.loadProfessionLookupData,
           onConfirm: (value) => provider.selectIncomeRange(value?.toString()),
           isSearch: true,
         ),
@@ -155,7 +156,7 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
           popUpHeader: 'Select Profession',
           items: provider.professionDropdownItems,
           controller: provider.youWorkAsController,
-          onTap: provider.loadLookupData,
+          onTap: provider.loadProfessionLookupData,
           onConfirm: (value) => provider.selectYouWorkAs(value?.toString()),
           isSearch: true,
         ),

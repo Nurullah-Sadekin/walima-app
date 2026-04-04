@@ -26,6 +26,8 @@ class ConnectResponse {
     this.maritalStatus,
     this.isOnline,
     this.lastSeenAt,
+    this.successfulRequests,
+    this.failedRequests,
   });
 
   ConnectResponse.fromJson(dynamic json, {this.statusCode}) {
@@ -36,6 +38,12 @@ class ConnectResponse {
     dynamic payload = json;
     final response = json['response'];
     if (response is Map) {
+      successfulRequests = (response['successful'] as List<dynamic>?)
+          ?.map((item) => ConnectionBatchResult.fromJson(item))
+          .toList();
+      failedRequests = (response['failed'] as List<dynamic>?)
+          ?.map((item) => ConnectionBatchResult.fromJson(item))
+          .toList();
       if (response['data'] is Map) {
         payload = response['data'];
       } else if (response['connection'] is Map) {
@@ -67,6 +75,8 @@ class ConnectResponse {
   String? maritalStatus;
   bool? isOnline;
   String? lastSeenAt;
+  List<ConnectionBatchResult>? successfulRequests;
+  List<ConnectionBatchResult>? failedRequests;
 
   bool get isSuccess {
     if ((code ?? '').toUpperCase() == 'SUCCESS') return true;
@@ -74,6 +84,17 @@ class ConnectResponse {
       return true;
     }
     return false;
+  }
+
+  int get successfulCount => successfulRequests?.length ?? 0;
+
+  int get failedCount => failedRequests?.length ?? 0;
+
+  bool get isFullyFailed => failedCount > 0 && successfulCount == 0;
+
+  bool get hasPartialOrFullSuccess {
+    if (successfulCount > 0) return true;
+    return isSuccess && failedCount == 0;
   }
 
   void _mapPayload(dynamic payload) {
@@ -128,7 +149,35 @@ class ConnectResponse {
     map['maritalStatus'] = maritalStatus;
     map['isOnline'] = isOnline;
     map['lastSeenAt'] = lastSeenAt;
+    if (successfulRequests != null) {
+      map['successful'] = successfulRequests?.map((item) => item.toJson()).toList();
+    }
+    if (failedRequests != null) {
+      map['failed'] = failedRequests?.map((item) => item.toJson()).toList();
+    }
     return map;
+  }
+}
+
+class ConnectionBatchResult {
+  ConnectionBatchResult({
+    this.userId,
+    this.reason,
+  });
+
+  ConnectionBatchResult.fromJson(dynamic json) {
+    userId = json['userId']?.toString();
+    reason = json['reason']?.toString();
+  }
+
+  String? userId;
+  String? reason;
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'userId': userId,
+      'reason': reason,
+    };
   }
 }
 

@@ -247,7 +247,10 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
           iconImagePath: AppImages.settingsSvgIcon,
           title: 'Partner Preferences',
           onTap: () {
-            context.pushNamed(Routes.partnerPreferences);
+            context.pushNamed(
+              Routes.partnerPreferences,
+              extra: <String, dynamic>{'fromDrawer': true},
+            );
           },
         ),
         ProfileActionTile(

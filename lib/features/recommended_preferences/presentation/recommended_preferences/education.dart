@@ -28,6 +28,7 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider.getInitialData();
       provider.initControllersListener();
+      provider.loadEducationLookupData();
     });
   }
 
@@ -42,12 +43,12 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
     provider = ref.watch(recommendedPreferencesProvider);
     return TransparentLoading(
       isLoading: provider.loaderState ==
-          RecommendedPreferencesScreenStates.preferences,
+              RecommendedPreferencesScreenStates.preferences ||
+          provider.isEducationLookupLoading,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates ==
-                  RecommendedPreferencesScreenStates.preferences
+          child: provider.screenStates == RecommendedPreferencesScreenStates.preferences
               ? const Loading()
               : Column(
                   children: [

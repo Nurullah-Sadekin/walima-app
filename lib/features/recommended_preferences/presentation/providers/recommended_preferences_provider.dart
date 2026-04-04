@@ -1,45 +1,27 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/connectivity/connectivity_keys.dart';
+import 'package:flutter_boilerplate/core/global/enums/enums.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
+import 'package:flutter_boilerplate/features/matches/data/models/request/get_matches_query_params.dart';
+import 'package:flutter_boilerplate/features/matches/data/models/response/get_matches_response.dart';
+import 'package:flutter_boilerplate/features/matches/data/repository/matches_repository.dart';
+import 'package:flutter_boilerplate/features/matches/domain/enums/match_education_level.dart';
+import 'package:flutter_boilerplate/features/matches/domain/enums/match_marital_status.dart';
+import 'package:flutter_boilerplate/features/matches/domain/request/bulk_send_connections_request_body.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/data/models/request/update_preferences_request_body.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/data/repository/preferences_repository.dart';
+import 'package:flutter_boilerplate/features/registration/data/models/lookup_option.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/location_data_repository_impl.dart';
+import 'package:flutter_boilerplate/features/registration/data/repository/lookup_repository.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/religion_data_repository_impl.dart';
 import 'package:flutter_boilerplate/features/registration/domain/location_data_model.dart';
-import 'package:flutter_boilerplate/features/registration/domain/profile_for_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/religion_option_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/repository/location_data_repository.dart';
 import 'package:flutter_boilerplate/features/registration/domain/repository/religion_data_repository.dart';
 import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
-
-const List<String> _educationShortNameOptions = <String>[
-  'SSC/O-Level',
-  'HSC/A-Level',
-  'Cert/Cert I-IV',
-  'Dip/Diploma',
-  'AA/AS',
-  'BA',
-  'BS/BSc',
-  'BBA',
-  'BEd',
-  'BTech/BE',
-  'LLB',
-  'MBBS',
-  'PG',
-  'MA',
-  'MS/MSc',
-  'MBA',
-  'MEd',
-  'MTech/ME',
-  'LLM',
-  'MD/DMD',
-  'PhD/DPhil',
-  'GPA',
-  'CGPA',
-  'STEM',
-];
 
 class RecommendedPreferencesProvider extends BaseChangeNotifier {
   RecommendedPreferencesScreenStates screenStates =
@@ -53,6 +35,7 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
       ReligionDataRepositoryImpl();
   final LocationDataRepository _locationDataRepository =
       LocationDataRepositoryImpl();
+  final LookupRepository _lookupRepository = LookupRepository();
   VoidCallback? _controllersListener;
 
   List<ReligionOptionModel> religionOptions = <ReligionOptionModel>[];
@@ -60,6 +43,14 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   List<String> communityDropdownItems = <String>[];
   bool isReligionDataLoading = false;
   String? religionDataError;
+  bool isEducationLookupLoading = false;
+  String? educationLookupError;
+  bool isCareerLookupLoading = false;
+  String? careerLookupError;
+  bool isConnectMatchesLoading = false;
+  String? connectMatchesError;
+  bool isBulkSendingConnections = false;
+  bool isDrawerEditFlow = false;
 
   List<CountryLocationModel> countryOptions = <CountryLocationModel>[];
   List<String> countryDropdownItems = <String>[];
@@ -251,20 +242,32 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   }
 
   List<SingleStringModel> maritalStatusDataList = maritalStatusListDataInserted;
-  List<SingleStringModel> educationDataList = _educationShortNameOptions
+  List<LookupOption> educationLookupOptions = <LookupOption>[];
+  List<SingleStringModel> educationDataList = <SingleStringModel>[];
+  List<SingleStringModel> profileManageByDataList =
+      RegistrationProfileManagedBy.values
       .map(
-        (name) => SingleStringModel(name: name),
-      )
-      .toList(growable: false);
-  List<SingleStringModel> profileManageByDataList = profileForListInserted
-      .map(
-        (item) => SingleStringModel(name: item.name),
+        (item) => SingleStringModel(
+          name: item.label,
+          value: item.apiValue,
+        ),
       )
       .toList(growable: false);
   List<SingleStringModel> countryDataList = countryListDataInserted;
   List<SingleStringModel> dietDataList = dietDataListInserted;
-  List<SingleStringModel> incomeRangeDataList = incomeRangeListInserted;
-  List<SingleStringModel> professionDataList = fatherDetailsItemListDataInserted;
+  List<LookupOption> professionLookupOptions = <LookupOption>[];
+  List<LookupOption> incomeRangeLookupOptions = <LookupOption>[];
+  List<SingleStringModel> incomeRangeDataList = <SingleStringModel>[];
+  List<SingleStringModel> professionDataList = <SingleStringModel>[];
+  List<MatchProfile> connectMatches = <MatchProfile>[];
+  final Set<String> selectedConnectMatchIds = <String>{};
+  final MatchesRepository _matchesRepository = MatchesRepository();
+
+  void setPreferenceFlowSource({required bool isFromDrawer}) {
+    if (isDrawerEditFlow == isFromDrawer) return;
+    isDrawerEditFlow = isFromDrawer;
+    notifyListeners();
+  }
 
   final List<String> preferableMaritalStatuses = [];
   final List<String> preferableEducations = [];
@@ -299,6 +302,82 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   int heightStart = 160;
   int heightEnd = 180;
 
+  Future<void> loadEducationLookupData() async {
+    if (isEducationLookupLoading) return;
+
+    if (educationLookupOptions.isNotEmpty) {
+      notifyListeners();
+      return;
+    }
+
+    isEducationLookupLoading = true;
+    educationLookupError = null;
+    notifyListeners();
+
+    try {
+      educationLookupOptions = await _lookupRepository.getLookups(
+        'qualifications',
+      );
+      educationDataList = educationLookupOptions
+          .map(
+            (item) => SingleStringModel(
+              name: item.label,
+              value: item.key,
+            ),
+          )
+          .toList(growable: false);
+    } catch (e) {
+      educationLookupError = e.toString();
+    } finally {
+      isEducationLookupLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> loadCareerLookupData() async {
+    if (isCareerLookupLoading) return;
+
+    if (professionLookupOptions.isNotEmpty && incomeRangeLookupOptions.isNotEmpty) {
+      notifyListeners();
+      return;
+    }
+
+    isCareerLookupLoading = true;
+    careerLookupError = null;
+    notifyListeners();
+
+    try {
+      final results = await Future.wait<List<LookupOption>>([
+        _lookupRepository.getLookups('professions'),
+        _lookupRepository.getLookups('income-range'),
+      ]);
+
+      professionLookupOptions = results[0];
+      incomeRangeLookupOptions = results[1];
+      professionDataList = professionLookupOptions
+          .map(
+            (item) => SingleStringModel(
+              name: item.label,
+              value: item.key,
+            ),
+          )
+          .toList(growable: false);
+      incomeRangeDataList = incomeRangeLookupOptions
+          .map(
+            (item) => SingleStringModel(
+              name: item.label,
+              value: item.key,
+            ),
+          )
+          .toList(growable: false);
+    } catch (e) {
+      careerLookupError = e.toString();
+    } finally {
+      isCareerLookupLoading = false;
+      notifyListeners();
+    }
+  }
+
   void toggleMaritalStatus(int index) {
     if (index < 0 || index >= maritalStatusDataList.length) return;
     final item = maritalStatusDataList[index];
@@ -315,13 +394,14 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   void toggleEducation(int index) {
     if (index < 0 || index >= educationDataList.length) return;
     final item = educationDataList[index];
+    final itemValue = (item.value ?? item.name).trim();
     item.isSelected = !item.isSelected;
     if (item.isSelected) {
-      if (!preferableEducations.contains(item.name)) {
-        preferableEducations.add(item.name);
+      if (!preferableEducations.contains(itemValue)) {
+        preferableEducations.add(itemValue);
       }
     } else {
-      preferableEducations.remove(item.name);
+      preferableEducations.remove(itemValue);
     }
     notifyListeners();
   }
@@ -329,13 +409,14 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   void toggleProfileManageBy(int index) {
     if (index < 0 || index >= profileManageByDataList.length) return;
     final item = profileManageByDataList[index];
+    final itemValue = (item.value ?? item.name).trim();
     item.isSelected = !item.isSelected;
     if (item.isSelected) {
-      if (!preferableProfileManagedBy.contains(item.name)) {
-        preferableProfileManagedBy.add(item.name);
+      if (!preferableProfileManagedBy.contains(itemValue)) {
+        preferableProfileManagedBy.add(itemValue);
       }
     } else {
-      preferableProfileManagedBy.remove(item.name);
+      preferableProfileManagedBy.remove(itemValue);
     }
     notifyListeners();
   }
@@ -343,11 +424,14 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   void toggleProfession(int index) {
     if (index < 0 || index >= professionDataList.length) return;
     final item = professionDataList[index];
+    final itemValue = (item.value ?? item.name).trim();
     item.isSelected = !item.isSelected;
     if (item.isSelected) {
-      if (!preferableWorkingAs.contains(item.name)) preferableWorkingAs.add(item.name);
+      if (!preferableWorkingAs.contains(itemValue)) {
+        preferableWorkingAs.add(itemValue);
+      }
     } else {
-      preferableWorkingAs.remove(item.name);
+      preferableWorkingAs.remove(itemValue);
     }
     notifyListeners();
   }
@@ -367,13 +451,299 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   void toggleDiet(int index) {
     if (index < 0 || index >= dietDataList.length) return;
     final item = dietDataList[index];
+    final itemValue = (item.value ?? item.name).trim();
     item.isSelected = !item.isSelected;
     if (item.isSelected) {
-      if (!preferableDiet.contains(item.name)) preferableDiet.add(item.name);
+      if (!preferableDiet.contains(itemValue)) preferableDiet.add(itemValue);
     } else {
-      preferableDiet.remove(item.name);
+      preferableDiet.remove(itemValue);
     }
     notifyListeners();
+  }
+
+  Future<void> loadConnectMatches() async {
+    if (isConnectMatchesLoading) return;
+
+    isConnectMatchesLoading = true;
+    connectMatchesError = null;
+    notifyListeners();
+
+    try {
+      final response = await MatchesRepository.getMatches(
+        GetMatchesQueryParams(
+          type: 'today',
+          page: 1,
+          size: 10,
+          ageMin: ageStart,
+          ageMax: ageEnd,
+          heightMin: heightStart,
+          heightMax: heightEnd,
+          maritalStatus: _resolveMaritalStatusPreference(),
+          religion: _resolveReligionPreference(),
+          motherTongue: _trimmedOrNull(motherTonguePreferenceController.text),
+          countryLivingIn: _singleListOrNull(countryPreferenceController.text),
+          community: _singleListOrNull(communityPreferenceController.text),
+          stateLivingIn:
+              preferableCity.isNotEmpty ? List<String>.from(preferableCity) : null,
+          qualification: _resolveEducationPreferences(),
+          professionArea: _resolveProfessionPreference(),
+          annualIncome: _resolveAnnualIncomePreference(),
+          eatingHabits: preferableDiet.isNotEmpty ? preferableDiet.first : null,
+        ),
+      );
+
+      if (response.code == 'SUCCESS') {
+        connectMatches = response.data ?? <MatchProfile>[];
+      } else {
+        connectMatches = <MatchProfile>[];
+        connectMatchesError = response.message ?? 'Failed to load matches.';
+      }
+    } catch (e) {
+      connectMatches = <MatchProfile>[];
+      connectMatchesError = e.toString();
+    } finally {
+      isConnectMatchesLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void toggleConnectMatchSelection(String matchId) {
+    final normalized = matchId.trim();
+    if (normalized.isEmpty) return;
+    if (!selectedConnectMatchIds.add(normalized)) {
+      selectedConnectMatchIds.remove(normalized);
+    }
+    notifyListeners();
+  }
+
+  BuildContext? get _dialogContext => rootNavigatorKey.currentContext;
+
+  Future<BulkConnectionSendResult?> sendBulkConnectionRequests() async {
+    if (isBulkSendingConnections) return null;
+
+    final matchUserIds = selectedConnectMatchIds.toList(growable: false);
+    if (matchUserIds.isEmpty) {
+      final dialogContext = _dialogContext;
+      if (dialogContext == null) return null;
+      await DialogUtils.showErrorDialog(
+        context: dialogContext,
+        title: 'No Selection',
+        message: 'Select at least one match to send a connection request.',
+      );
+      return null;
+    }
+
+    isBulkSendingConnections = true;
+    notifyListeners();
+
+    try {
+      final response = await _matchesRepository.bulkSendConnectionRequests(
+        BulkSendConnectionsRequestBody(
+          matchUserIds: matchUserIds,
+          requestType: 'connection',
+          message: 'string',
+          isPriority: false,
+        ),
+      );
+
+      if (response.hasPartialOrFullSuccess) {
+        selectedConnectMatchIds.clear();
+        notifyListeners();
+        return BulkConnectionSendResult(
+          isSuccessDialog: true,
+          message:
+              response.message ??
+              'Your connection requests have been sent successfully.',
+        );
+      }
+
+      if (response.isFullyFailed) {
+        return BulkConnectionSendResult(
+          isSuccessDialog: false,
+          message:
+              response.message ??
+              'Unable to send connection requests right now.',
+        );
+      }
+
+      final dialogContext = _dialogContext;
+      if (dialogContext == null) return null;
+      await DialogUtils.showErrorDialog(
+        context: dialogContext,
+        title: 'Connection Failed',
+        message:
+            response.message ?? 'Unable to send connection requests right now.',
+      );
+      return null;
+    } catch (e) {
+      final dialogContext = _dialogContext;
+      if (dialogContext == null) return null;
+      await DialogUtils.showErrorDialog(
+        context: dialogContext,
+        title: 'Connection Failed',
+        message: e.toString(),
+      );
+      return null;
+    } finally {
+      isBulkSendingConnections = false;
+      notifyListeners();
+    }
+  }
+
+  String? _trimmedOrNull(String text) {
+    final trimmed = text.trim();
+    return trimmed.isEmpty ? null : trimmed;
+  }
+
+  List<String>? _singleListOrNull(String text) {
+    final trimmed = _trimmedOrNull(text);
+    return trimmed == null ? null : <String>[trimmed];
+  }
+
+  String? _resolveReligionPreference() {
+    final selected = religionPreferenceController.text.trim().toLowerCase();
+    if (selected.isEmpty) return null;
+
+    for (final option in religionOptions) {
+      if (option.name.toLowerCase() == selected ||
+          option.value.toLowerCase() == selected) {
+        return option.value;
+      }
+    }
+
+    return selected;
+  }
+
+  String? _resolveMaritalStatusPreference() {
+    if (preferableMaritalStatuses.isEmpty) return null;
+
+    final resolved = preferableMaritalStatuses
+        .map((item) => MatchMaritalStatus.fromLabel(item)?.apiValue)
+        .whereType<String>()
+        .toList();
+
+    return resolved.isEmpty ? null : resolved.first;
+  }
+
+  List<String>? _resolveEducationPreferences() {
+    if (preferableEducations.isEmpty) return null;
+
+    final resolved = preferableEducations
+        .map(_resolveEducationPreferenceValue)
+        .whereType<String>()
+        .toList();
+
+    return resolved.isEmpty ? null : resolved;
+  }
+
+  String? _resolveEducationPreferenceValue(String rawValue) {
+    final normalized = rawValue.trim().toLowerCase();
+    if (normalized.isEmpty) return null;
+
+    const allowed = <String>{
+      'no_formal_education',
+      'primary',
+      'secondary',
+      'higher_secondary',
+      'diploma',
+      'bachelor',
+      'masters',
+      'phd',
+      'doctorate',
+      'professional_degree',
+      'vocational_training',
+      'certificate',
+      'others',
+    };
+
+    if (allowed.contains(normalized)) {
+      return normalized;
+    }
+
+    final enumMatch = MatchEducationLevel.fromLabel(rawValue)?.apiValue;
+    if (enumMatch != null && enumMatch != MatchEducationLevel.openToAll.apiValue) {
+      return enumMatch == MatchEducationLevel.highSchool.apiValue
+          ? 'secondary'
+          : enumMatch;
+    }
+
+    if (normalized.contains('no formal')) return 'no_formal_education';
+    if (normalized.contains('primary')) return 'primary';
+    if (normalized.contains('higher secondary') ||
+        normalized.contains('high secondary') ||
+        normalized.contains('hsc') ||
+        normalized.contains('a-level') ||
+        normalized.contains('intermediate')) {
+      return 'higher_secondary';
+    }
+    if (normalized.contains('secondary') ||
+        normalized.contains('ssc') ||
+        normalized.contains('o-level') ||
+        normalized == 'high_school') {
+      return 'secondary';
+    }
+    if (normalized.contains('diploma') || normalized.startsWith('dip')) {
+      return 'diploma';
+    }
+    if (normalized.contains('bachelor') ||
+        normalized == 'ba' ||
+        normalized == 'bsc' ||
+        normalized == 'bs/bsc' ||
+        normalized == 'bba' ||
+        normalized == 'bed' ||
+        normalized == 'btech/be' ||
+        normalized == 'llb') {
+      return 'bachelor';
+    }
+    if (normalized.contains('master') ||
+        normalized == 'ma' ||
+        normalized == 'msc' ||
+        normalized == 'ms/msc' ||
+        normalized == 'mba' ||
+        normalized == 'med' ||
+        normalized == 'mtech/me' ||
+        normalized == 'llm') {
+      return 'masters';
+    }
+    if (normalized.contains('phd')) return 'phd';
+    if (normalized.contains('doctorate')) return 'doctorate';
+    if (normalized.contains('professional') ||
+        normalized == 'mbbs' ||
+        normalized == 'md/dmd') {
+      return 'professional_degree';
+    }
+    if (normalized.contains('vocational')) return 'vocational_training';
+    if (normalized.contains('cert')) return 'certificate';
+
+    return null;
+  }
+
+  String? _resolveProfessionPreference() {
+    final selected = professionPreferenceController.text.trim().toLowerCase();
+    if (selected.isEmpty) return null;
+
+    for (final option in professionLookupOptions) {
+      if (option.label.toLowerCase() == selected ||
+          option.key.toLowerCase() == selected) {
+        return option.key;
+      }
+    }
+
+    return selected;
+  }
+
+  String? _resolveAnnualIncomePreference() {
+    final selected = annualIncomePreferenceController.text.trim().toLowerCase();
+    if (selected.isEmpty) return null;
+
+    for (final option in incomeRangeLookupOptions) {
+      if (option.label.toLowerCase() == selected ||
+          option.key.toLowerCase() == selected) {
+        return option.key;
+      }
+    }
+
+    return selected;
   }
 
   void setAgeRange(RangeValues values) {
@@ -540,6 +910,16 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
       return false;
     }
   }
+}
+
+class BulkConnectionSendResult {
+  const BulkConnectionSendResult({
+    required this.isSuccessDialog,
+    required this.message,
+  });
+
+  final bool isSuccessDialog;
+  final String message;
 }
 
 enum RecommendedPreferencesScreenStates {

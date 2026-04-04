@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
+import 'package:flutter_boilerplate/core/global/enums/enums.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_expansion_tile.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
@@ -142,17 +143,19 @@ class _FamilyFinancialStatusScreenState
               spacing: 10,
               children: [
                 CustomExpansionTile(
-                  title: 'Elite',
+                  title: RegistrationFamilyEconomicCondition.eliteClass.label,
                   borderColor: AppColors.primary,
                   backgroundColor: AppColors.primaryVariant,
                   isLeading: true,
                   allowDeselect: false,
                   selected:
                       provider.selectedFamilyEconomicCondition?.toLowerCase() ==
-                          'elite',
+                          RegistrationFamilyEconomicCondition
+                              .eliteClass.label
+                              .toLowerCase(),
                   onSelected: (isSelected) {
                     provider.onFamilyEconomicConditionSelected(
-                      'Elite',
+                      RegistrationFamilyEconomicCondition.eliteClass.label,
                       selected: isSelected,
                     );
                   },
@@ -176,17 +179,19 @@ class _FamilyFinancialStatusScreenState
                   ),
                 ),
                 CustomExpansionTile(
-                  title: 'High',
+                  title: RegistrationFamilyEconomicCondition.upperClass.label,
                   borderColor: AppColors.primary,
                   backgroundColor: AppColors.primaryVariant,
                   isLeading: true,
                   allowDeselect: false,
                   selected:
                       provider.selectedFamilyEconomicCondition?.toLowerCase() ==
-                          'high',
+                          RegistrationFamilyEconomicCondition
+                              .upperClass.label
+                              .toLowerCase(),
                   onSelected: (isSelected) {
                     provider.onFamilyEconomicConditionSelected(
-                      'High',
+                      RegistrationFamilyEconomicCondition.upperClass.label,
                       selected: isSelected,
                     );
                   },
@@ -211,17 +216,19 @@ class _FamilyFinancialStatusScreenState
                   ),
                 ),
                 CustomExpansionTile(
-                  title: 'Middle',
+                  title: RegistrationFamilyEconomicCondition.middleClass.label,
                   borderColor: AppColors.primary,
                   backgroundColor: AppColors.primaryVariant,
                   isLeading: true,
                   allowDeselect: false,
                   selected:
                       provider.selectedFamilyEconomicCondition?.toLowerCase() ==
-                          'middle',
+                          RegistrationFamilyEconomicCondition
+                              .middleClass.label
+                              .toLowerCase(),
                   onSelected: (isSelected) {
                     provider.onFamilyEconomicConditionSelected(
-                      'Middle',
+                      RegistrationFamilyEconomicCondition.middleClass.label,
                       selected: isSelected,
                     );
                   },
@@ -246,17 +253,23 @@ class _FamilyFinancialStatusScreenState
                   ),
                 ),
                 CustomExpansionTile(
-                  title: 'Aspiring',
+                  title: RegistrationFamilyEconomicCondition
+                      .lowerMiddleClass
+                      .label,
                   borderColor: AppColors.primary,
                   backgroundColor: AppColors.primaryVariant,
                   isLeading: true,
                   allowDeselect: false,
                   selected:
                       provider.selectedFamilyEconomicCondition?.toLowerCase() ==
-                          'aspiring',
+                          RegistrationFamilyEconomicCondition
+                              .lowerMiddleClass.label
+                              .toLowerCase(),
                   onSelected: (isSelected) {
                     provider.onFamilyEconomicConditionSelected(
-                      'Aspiring',
+                      RegistrationFamilyEconomicCondition
+                          .lowerMiddleClass
+                          .label,
                       selected: isSelected,
                     );
                   },

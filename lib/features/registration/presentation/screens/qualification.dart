@@ -29,6 +29,8 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider.getInitialData();
       provider.initControllersListener();
+      provider.loadEducationLookupData();
+      
     });
   }
 
@@ -91,7 +93,7 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
           hintText: 'Select',
           popUpHeader: 'Select Highest Qualification',
           items: provider.educationLevelDropdownItems,
-          onTap: provider.loadLookupData,
+          onTap: provider.loadEducationLookupData,
           onConfirm: (value) {
             if (value == null) return;
             provider.highestQualification.text = value.toString();

@@ -213,7 +213,12 @@ GoRouter goRouter(Ref ref) {
       GoRoute(
         path: Paths.partnerPreferences,
         name: Routes.partnerPreferences,
-        builder: (context, state) => const PartnerPreferencesScreen(),
+        builder: (context, state) {
+          final extra = state.extra;
+          final isFromDrawer = extra is Map<String, dynamic> &&
+              extra['fromDrawer'] == true;
+          return PartnerPreferencesScreen(isFromDrawer: isFromDrawer);
+        },
       ),
       GoRoute(
         path: Paths.basicDetails,

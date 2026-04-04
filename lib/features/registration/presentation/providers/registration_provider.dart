@@ -225,14 +225,21 @@ class RegistrationProvider extends BaseChangeNotifier {
     'no preferences': RegistrationDiet.occasionallyNonVeg.apiValue,
   };
 
-  static const Map<String, String> _familyEconomicConditionAliases =
+  static final Map<String, String> _familyEconomicConditionAliases =
       <String, String>{
-    'elite': 'elite',
-    'high': 'high',
-    'middle': 'middle_class',
-    'middle class': 'middle_class',
-    'middle_class': 'middle_class',
-    'aspiring': 'aspiring',
+    for (final condition in RegistrationFamilyEconomicCondition.values)
+      condition.label.toLowerCase(): condition.apiValue,
+    'elite': RegistrationFamilyEconomicCondition.eliteClass.apiValue,
+    'elite class': RegistrationFamilyEconomicCondition.eliteClass.apiValue,
+    'high': RegistrationFamilyEconomicCondition.upperClass.apiValue,
+    'upper class': RegistrationFamilyEconomicCondition.upperClass.apiValue,
+    'middle': RegistrationFamilyEconomicCondition.middleClass.apiValue,
+    'middle class': RegistrationFamilyEconomicCondition.middleClass.apiValue,
+    'middle_class': RegistrationFamilyEconomicCondition.middleClass.apiValue,
+    'aspiring':
+        RegistrationFamilyEconomicCondition.lowerMiddleClass.apiValue,
+    'lower middle class':
+        RegistrationFamilyEconomicCondition.lowerMiddleClass.apiValue,
   };
 
   static const Set<String> _maleLockedProfileNames = <String>{
@@ -502,7 +509,6 @@ class RegistrationProvider extends BaseChangeNotifier {
     await _restoreRegistrationDraft();
     await loadReligionData();
     await loadLocationData();
-    await loadLookupData();
     _isDraftInitialized = true;
     notifyListeners();
   }
@@ -598,13 +604,76 @@ class RegistrationProvider extends BaseChangeNotifier {
     return null;
   }
 
-  Future<void> loadLookupData() async {
+  Future<void> loadEducationLookupData() async {
     if (isLookupDataLoading) return;
 
-    if (educationLevelOptions.isNotEmpty &&
-        professionOptions.isNotEmpty &&
-        incomeRangeOptions.isNotEmpty &&
-        creativeItemList.isNotEmpty &&
+    if (educationLevelOptions.isNotEmpty) {
+      notifyListeners();
+      return;
+    }
+
+    isLookupDataLoading = true;
+    lookupDataError = null;
+    notifyListeners();
+
+    try {
+      educationLevelOptions = await _lookupRepository.getLookups(
+        'education-levels',
+      );
+    } catch (e) {
+      lookupDataError = e.toString();
+    } finally {
+      isLookupDataLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> loadProfessionLookupData() async {
+    if (isLookupDataLoading) return;
+
+    if (professionOptions.isNotEmpty && incomeRangeOptions.isNotEmpty) {
+      notifyListeners();
+      return;
+    }
+
+    isLookupDataLoading = true;
+    lookupDataError = null;
+    notifyListeners();
+
+    try {
+      final results = await Future.wait<List<LookupOption>>([
+        _lookupRepository.getLookups('professions'),
+        _lookupRepository.getLookups('income-range'),
+      ]);
+
+      professionOptions = results[0];
+      incomeRangeOptions = results[1];
+      incomeRangeList = _toSingleStringModels(incomeRangeOptions);
+      youWorkAsList = _toSingleStringModels(professionOptions);
+      _applySingleSelectionByName(
+        incomeRangeList,
+        selectedIncomeRange,
+        (item) => item.name,
+        (item, selected) => item.isSelected = selected,
+      );
+      _applySingleSelectionByName(
+        youWorkAsList,
+        selectedYouWorkAs,
+        (item) => item.name,
+        (item, selected) => item.isSelected = selected,
+      );
+    } catch (e) {
+      lookupDataError = e.toString();
+    } finally {
+      isLookupDataLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> loadHobbyLookupData() async {
+    if (isLookupDataLoading) return;
+
+    if (creativeItemList.isNotEmpty &&
         funItemList.isNotEmpty &&
         fitnessItemList.isNotEmpty &&
         otherInterestsItemList.isNotEmpty &&
@@ -620,9 +689,6 @@ class RegistrationProvider extends BaseChangeNotifier {
 
     try {
       final results = await Future.wait<List<LookupOption>>([
-        _lookupRepository.getLookups('education-levels'),
-        _lookupRepository.getLookups('professions'),
-        _lookupRepository.getLookups('income-range'),
         _lookupRepository.getLookups('creative-pursuits'),
         _lookupRepository.getLookups('outdoor-activities'),
         _lookupRepository.getLookups('fitness-and-sports'),
@@ -631,29 +697,12 @@ class RegistrationProvider extends BaseChangeNotifier {
         _lookupRepository.getLookups('travel-and-leisure'),
       ]);
 
-      educationLevelOptions = results[0];
-      professionOptions = results[1];
-      incomeRangeOptions = results[2];
-      creativeItemList = _toSingleStringModels(results[3]);
-      funItemList = _toSingleStringModels(results[4]);
-      fitnessItemList = _toSingleStringModels(results[5]);
-      otherInterestsItemList = _toSingleStringModels(results[6]);
-      foodCuisineItemList = _toSingleStringModels(results[7]);
-      travelLeisureItemList = _toSingleStringModels(results[8]);
-      incomeRangeList = _toSingleStringModels(incomeRangeOptions);
-      youWorkAsList = _toSingleStringModels(professionOptions);
-      _applySingleSelectionByName(
-        incomeRangeList,
-        selectedIncomeRange,
-        (item) => item.name,
-        (item, selected) => item.isSelected = selected,
-      );
-      _applySingleSelectionByName(
-        youWorkAsList,
-        selectedYouWorkAs,
-        (item) => item.name,
-        (item, selected) => item.isSelected = selected,
-      );
+      creativeItemList = _toSingleStringModels(results[0]);
+      funItemList = _toSingleStringModels(results[1]);
+      fitnessItemList = _toSingleStringModels(results[2]);
+      otherInterestsItemList = _toSingleStringModels(results[3]);
+      foodCuisineItemList = _toSingleStringModels(results[4]);
+      travelLeisureItemList = _toSingleStringModels(results[5]);
       _applyMultiSelectionByNames(
         creativeItemList,
         selectedHobbies,
@@ -1587,11 +1636,12 @@ class RegistrationProvider extends BaseChangeNotifier {
     if (selected.isEmpty) return '';
 
     final lookupMatch = _findLookupOption(educationLevelOptions, selected);
-    if (lookupMatch != null) {
-      return lookupMatch.key;
+    final lookupKey = lookupMatch?.key.trim().toLowerCase() ?? '';
+    if (_allowedEducationValues.contains(lookupKey)) {
+      return lookupKey;
     }
 
-    final normalized = selected.toLowerCase();
+    final normalized = selected.toLowerCase().replaceAll('’', "'");
 
     if (normalized.contains('no formal')) {
       return 'no_formal_education';

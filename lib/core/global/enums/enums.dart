@@ -112,3 +112,84 @@ extension RegistrationDietX on RegistrationDiet {
     }
   }
 }
+
+enum RegistrationFamilyEconomicCondition {
+  eliteClass,
+  upperClass,
+  middleClass,
+  lowerMiddleClass,
+}
+
+extension RegistrationFamilyEconomicConditionX
+    on RegistrationFamilyEconomicCondition {
+  String get apiValue {
+    switch (this) {
+      case RegistrationFamilyEconomicCondition.eliteClass:
+        return 'elite_class';
+      case RegistrationFamilyEconomicCondition.upperClass:
+        return 'upper_class';
+      case RegistrationFamilyEconomicCondition.middleClass:
+        return 'middle_class';
+      case RegistrationFamilyEconomicCondition.lowerMiddleClass:
+        return 'lower_middle_class';
+    }
+  }
+
+  String get label {
+    switch (this) {
+      case RegistrationFamilyEconomicCondition.eliteClass:
+        return 'Elite Class';
+      case RegistrationFamilyEconomicCondition.upperClass:
+        return 'Upper Class';
+      case RegistrationFamilyEconomicCondition.middleClass:
+        return 'Middle Class';
+      case RegistrationFamilyEconomicCondition.lowerMiddleClass:
+        return 'Lower Middle Class';
+    }
+  }
+}
+
+enum RegistrationProfileManagedBy {
+  self,
+  parent,
+  sibling,
+  relative,
+  friend,
+  other,
+}
+
+extension RegistrationProfileManagedByX on RegistrationProfileManagedBy {
+  String get apiValue {
+    switch (this) {
+      case RegistrationProfileManagedBy.self:
+        return 'self';
+      case RegistrationProfileManagedBy.parent:
+        return 'parent';
+      case RegistrationProfileManagedBy.sibling:
+        return 'sibling';
+      case RegistrationProfileManagedBy.relative:
+        return 'relative';
+      case RegistrationProfileManagedBy.friend:
+        return 'friend';
+      case RegistrationProfileManagedBy.other:
+        return 'other';
+    }
+  }
+
+  String get label {
+    switch (this) {
+      case RegistrationProfileManagedBy.self:
+        return 'Self';
+      case RegistrationProfileManagedBy.parent:
+        return 'Parent';
+      case RegistrationProfileManagedBy.sibling:
+        return 'Sibling';
+      case RegistrationProfileManagedBy.relative:
+        return 'Relative';
+      case RegistrationProfileManagedBy.friend:
+        return 'Friend';
+      case RegistrationProfileManagedBy.other:
+        return 'Other';
+    }
+  }
+}

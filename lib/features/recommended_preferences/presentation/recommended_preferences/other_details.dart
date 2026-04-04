@@ -11,6 +11,7 @@ import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/features/anchor_point/anchor_point.dart';
 import 'package:go_router/go_router.dart';
 
 class OtherDetailsScreen extends ConsumerStatefulWidget {
@@ -110,7 +111,7 @@ class _OtherDetailsScreenState extends ConsumerState<OtherDetailsScreen> {
                           provider.toggleProfileManageBy(index);
                         },
                         isSelected: item.isSelected,
-                        title: item.name.replaceAll('My', ''),
+                        title: item.name,
                       );
                     }),
                   );
@@ -173,6 +174,11 @@ class _OtherDetailsScreenState extends ConsumerState<OtherDetailsScreen> {
         onTap: () async {
           final success = await provider.updatePreferences(context);
           if (success && context.mounted) {
+            if (provider.isDrawerEditFlow) {
+              ref.read(currentTabProvider.notifier).state = 0;
+              context.goNamed(Routes.anchor);
+              return;
+            }
             context.push(Paths.connectMatches);
           }
         },
