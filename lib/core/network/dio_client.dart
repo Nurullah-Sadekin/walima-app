@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/connectivity/connectivity_keys.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
@@ -52,6 +53,10 @@ class DioClient {
       InterceptorsWrapper(
         onRequest: (options, handler) async {
           final isTokenRequired = options.extra[_isTokenKey] == true;
+          final requestId = ++_requestCounter;
+
+          options.extra[_requestIdKey] = requestId;
+          options.extra[_requestStartAtKey] = DateTime.now().toIso8601String();
 
           if (isTokenRequired) {
             final accessToken = (_authToken?.isNotEmpty ?? false) ? _authToken! : await PrefsHelper.getAccessToken();
@@ -65,9 +70,12 @@ class DioClient {
             options.headers.remove('Authorization');
           }
 
+          _logRequestStart(options, requestId: requestId);
+
           handler.next(options);
         },
         onResponse: (response, handler) {
+          _logResponse(response);
           handler.next(response);
         },
         onError: (error, handler) async {
@@ -78,11 +86,13 @@ class DioClient {
           final isTokenRequired = error.requestOptions.extra[_isTokenKey] == true;
 
           if ((statusCode == 403 || statusCode == 401) && isTokenRequired && !isRefreshRequest && !isRetried) {
+            _logRetryStart(error.requestOptions, statusCode: statusCode);
             final refreshSuccess = await _refreshAccessTokenWithLock();
 
             if (refreshSuccess) {
               try {
                 final response = await _retryRequest(error.requestOptions);
+                _logRetrySuccess(error.requestOptions);
                 handler.resolve(response);
                 return;
               } catch (_) {
@@ -91,6 +101,7 @@ class DioClient {
             }
           }
 
+          _logError(error);
           handler.next(error);
         },
       ),
@@ -101,12 +112,15 @@ class DioClient {
   static const int _maxRefreshAttempts = 3;
   static const String _retryKey = 'isRetriedAfterRefresh';
   static const String _isTokenKey = 'isTokenRequired';
+  static const String _requestStartAtKey = 'requestStartAt';
+  static const String _requestIdKey = 'requestId';
 
   late Dio _dio;
   Completer<bool>? _refreshCompleter;
   VoidCallback? _onLogout;
   String? _authToken;
   bool _isShowingTimeoutDialog = false;
+  int _requestCounter = 0;
 
   /// Get Dio instance
   Dio get dio => _dio;
@@ -161,6 +175,7 @@ class DioClient {
 
   Future<bool> _refreshAccessTokenWithLock() async {
     if (_refreshCompleter != null) {
+      debugPrint('[DioClient] waiting for active refresh-token request');
       return _refreshCompleter!.future;
     }
 
@@ -168,13 +183,18 @@ class DioClient {
     try {
       bool refreshed = false;
       for (var attempt = 0; attempt < _maxRefreshAttempts; attempt++) {
+        debugPrint(
+          '[DioClient] refresh-token attempt ${attempt + 1}/$_maxRefreshAttempts',
+        );
         refreshed = await GlobalRepository.refreshAccessToken();
         if (refreshed) {
+          debugPrint('[DioClient] refresh-token success');
           break;
         }
       }
 
       if (!refreshed) {
+        debugPrint('[DioClient] refresh-token failed, logging out user');
         await _logoutUser();
       }
 
@@ -219,6 +239,11 @@ class DioClient {
       validateStatus: requestOptions.validateStatus,
     );
 
+    debugPrint(
+      '[DioClient] retrying request #${requestOptions.extra[_requestIdKey]} '
+      '${requestOptions.method} ${requestOptions.uri}',
+    );
+
     return _dio.request<dynamic>(
       requestOptions.path,
       data: requestOptions.data,
@@ -228,6 +253,72 @@ class DioClient {
       onSendProgress: requestOptions.onSendProgress,
       onReceiveProgress: requestOptions.onReceiveProgress,
     );
+  }
+
+  void _logRequestStart(RequestOptions options, {required int requestId}) {
+    debugPrint(
+      '[DioClient] --> #$requestId ${options.method} ${options.uri} '
+      'tokenRequired=${options.extra[_isTokenKey] == true} '
+      'retried=${options.extra[_retryKey] == true} '
+      'connectTimeout=${options.connectTimeout?.inMilliseconds ?? _dio.options.connectTimeout?.inMilliseconds}ms '
+      'sendTimeout=${options.sendTimeout?.inMilliseconds ?? _dio.options.sendTimeout?.inMilliseconds}ms '
+      'receiveTimeout=${options.receiveTimeout?.inMilliseconds ?? _dio.options.receiveTimeout?.inMilliseconds}ms '
+      'query=${options.queryParameters}',
+    );
+  }
+
+  void _logResponse(Response response) {
+    final requestId = response.requestOptions.extra[_requestIdKey];
+    final startedAt = _parseStartedAt(response.requestOptions);
+    final elapsed = startedAt == null
+        ? 'unknown'
+        : '${DateTime.now().difference(startedAt).inMilliseconds}ms';
+
+    debugPrint(
+      '[DioClient] <-- #$requestId ${response.statusCode} '
+      '${response.requestOptions.method} ${response.requestOptions.uri} '
+      'duration=$elapsed',
+    );
+  }
+
+  void _logError(DioException error) {
+    final requestOptions = error.requestOptions;
+    final requestId = requestOptions.extra[_requestIdKey];
+    final startedAt = _parseStartedAt(requestOptions);
+    final elapsed = startedAt == null
+        ? 'unknown'
+        : '${DateTime.now().difference(startedAt).inMilliseconds}ms';
+
+    debugPrint(
+      '[DioClient] xx #$requestId ${error.type} '
+      '${requestOptions.method} ${requestOptions.uri} '
+      'duration=$elapsed '
+      'status=${error.response?.statusCode} '
+      'message=${error.message}',
+    );
+  }
+
+  void _logRetryStart(RequestOptions requestOptions, {int? statusCode}) {
+    debugPrint(
+      '[DioClient] auth retry triggered for request #${requestOptions.extra[_requestIdKey]} '
+      '${requestOptions.method} ${requestOptions.uri} '
+      'status=$statusCode',
+    );
+  }
+
+  void _logRetrySuccess(RequestOptions requestOptions) {
+    debugPrint(
+      '[DioClient] auth retry success for request #${requestOptions.extra[_requestIdKey]} '
+      '${requestOptions.method} ${requestOptions.uri}',
+    );
+  }
+
+  DateTime? _parseStartedAt(RequestOptions options) {
+    final raw = options.extra[_requestStartAtKey];
+    if (raw is String) {
+      return DateTime.tryParse(raw);
+    }
+    return null;
   }
 
   Future<void> _logoutUser() async {
