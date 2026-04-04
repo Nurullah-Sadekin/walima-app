@@ -518,6 +518,10 @@ class RegistrationProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> loadCommunityData() async {
+    await _syncCommunityOptionsFromSelectedReligion();
+  }
+
   void onReligionSelected(String? value) {
     final selectedValue = value?.trim() ?? '';
     if (selectedValue.isEmpty) return;

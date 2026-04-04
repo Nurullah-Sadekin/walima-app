@@ -46,7 +46,7 @@ class BottomSheetUtils {
               ),
               child: SafeArea(
                 child: Column(
-                  mainAxisSize: MainAxisSize.min, // Important: minimizes height
+                  mainAxisSize: MainAxisSize.max,
                   children: [
                     // Header section with drag handle
                     Row(
@@ -64,8 +64,7 @@ class BottomSheetUtils {
                       ],
                     ),
                     _buildHeader(context, header),
-                    // Items list - no Expanded, use Flexible with fit
-                    Flexible(
+                    Expanded(
                       child: _buildItemsList(
                         context,
                         items,
@@ -77,7 +76,7 @@ class BottomSheetUtils {
                         },
                       ),
                     ),
-                    const SizedBox(height: 20), // Add some spacing at the bottom
+                    const SizedBox(height: 12),
                   ],
                 ),
               ),
@@ -119,54 +118,52 @@ class BottomSheetUtils {
                   topRight: Radius.circular(20),
                 ),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min, // Takes minimum height needed
-                children: [
-                  if (showHeader) ...[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 40,
-                          height: 4,
-                          margin: const EdgeInsets.symmetric(vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.black26,
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+              child: SafeArea(
+                top: false,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (showHeader) ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          InkWell(
-                            onTap: () => Navigator.pop(context),
-                            child: ShowImage(
-                              imagePath: AppImages.cancelSvgIcon,
-                              width: TextSize.font20(context),
-                              height: TextSize.font20(context),
-                              color: AppColors.textSecondaryLight,
+                          Container(
+                            width: 40,
+                            height: 4,
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.black26,
+                              borderRadius: BorderRadius.circular(2),
                             ),
                           ),
                         ],
                       ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            InkWell(
+                              onTap: () => Navigator.pop(context),
+                              child: ShowImage(
+                                imagePath: AppImages.cancelSvgIcon,
+                                width: TextSize.font20(context),
+                                height: TextSize.font20(context),
+                                color: AppColors.textSecondaryLight,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    Flexible(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        child: _wrapChildForReturn(context, child),
+                      ),
                     ),
                   ],
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height *
-                          maxHeightFactor -
-                          (showHeader ? 72 : 0),
-                    ),
-                    child: SingleChildScrollView(
-                      child: _wrapChildForReturn(context, child),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
+                ),
               ),
             );
           },

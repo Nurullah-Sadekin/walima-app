@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
@@ -38,7 +40,7 @@ class DropDownField extends StatefulWidget {
   final Widget? suffix;
   final dynamic errorText;
   final Function(dynamic)? onConfirm;
-  final VoidCallback? onTap;
+  final FutureOr<void> Function()? onTap;
   final bool? noPrefix;
   final bool? hideHeadline;
   final Function(String searchKey)? searchItemList;
@@ -62,15 +64,28 @@ class _DropDownFieldState extends State<DropDownField> {
       headLineInfoIcon: widget.headLineInfoIcon,
       noPrefix: true,
       onTap: () async {
-        // Call the provided onTap callback if it exists
         if (widget.onTap != null) {
-          widget.onTap!();
+          await widget.onTap!.call();
+          if (!mounted) return;
+          setState(() {});
+          await Future<void>.delayed(Duration.zero);
         }
 
-        // Show bottom sheet and get selected value
+        if (!context.mounted) return;
+        List<dynamic> effectiveItems = List<dynamic>.from(widget.items);
+        if (effectiveItems.isEmpty) {
+          await WidgetsBinding.instance.endOfFrame;
+          if (!context.mounted) return;
+          effectiveItems = List<dynamic>.from(widget.items);
+        }
+
+        if (effectiveItems.isEmpty) {
+          return;
+        }
+
         var dropdownValue = await BottomSheetUtils.singleItemSelectBottomSheet(
           context: context,
-          items: widget.items,
+          items: effectiveItems,
           header: widget.popUpHeader,
           selectedValue: (widget.controller != null && (widget.controller!.text).isNotEmpty)
               ? widget.controller!.text
@@ -78,12 +93,10 @@ class _DropDownFieldState extends State<DropDownField> {
           hintText: widget.hintText,
         );
 
-        // Update if a value was selected
         if (dropdownValue != null) {
           widget.controller?.text = dropdownValue.toString();
           setState(() {});
 
-          // Call onConfirm callback if it exists
           if (widget.onConfirm != null) {
             widget.onConfirm!(widget.controller?.text);
           }

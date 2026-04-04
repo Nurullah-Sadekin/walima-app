@@ -19,10 +19,16 @@ class LookupRepository {
       );
 
       final data = response.data;
-      final items = data is Map<String, dynamic>
-          ? data['data']
+      final Map<String, dynamic>? payload = data is Map<String, dynamic>
+          ? data
           : data is Map
-              ? Map<String, dynamic>.from(data)['data']
+              ? Map<String, dynamic>.from(data)
+              : null;
+      final nestedResponse = payload?['response'];
+      final items = nestedResponse is Map<String, dynamic>
+          ? nestedResponse['data']
+          : nestedResponse is Map
+              ? Map<String, dynamic>.from(nestedResponse)['data']
               : null;
 
       if (items is! List) {

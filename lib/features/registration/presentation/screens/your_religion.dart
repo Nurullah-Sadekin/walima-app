@@ -90,7 +90,7 @@ class _YourRegionState extends ConsumerState<YourReligion> {
           popUpHeader: 'Select Religion',
           items: provider.religionDropdownItems,
           controller: provider.religionController,
-          onTap: provider.loadReligionData,
+          onTap: provider.loadCommunityData,
           onConfirm: (value) => provider.onReligionSelected(value?.toString()),
           isSearch: true,
         ),
@@ -103,9 +103,8 @@ class _YourRegionState extends ConsumerState<YourReligion> {
                 headLineInfoIcon: true,
                 items: provider.communityDropdownItems,
                 controller: provider.communityController,
-                onTap: () {},
-                onConfirm: (value) =>
-                    provider.onCommunitySelected(value?.toString()),
+                onTap: provider.loadLocationData,
+                onConfirm: (value) => provider.onCommunitySelected(value?.toString()),
                 isSearch: true,
               ),
         provider.religionController.text.isEmpty ||
