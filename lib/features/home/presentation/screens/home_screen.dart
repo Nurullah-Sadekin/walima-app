@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
+import 'package:flutter_boilerplate/core/global/enums/global_status.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
@@ -317,7 +318,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           religion: match.religion,
           isOnline: match.isOnline ?? false,
           onTapLeftButton: () {
-            ref.read(homeProvider).connect(context, match);
+            ref.read(homeProvider).connect(context, match.id ?? '', match.displayName ?? 'Unknown', ConnectionRequestType.match.name);
             // print('Left button tapped for ${match.displayName}');
           },
           activeStatusText: activeStatus,
@@ -508,6 +509,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           leftButtonBorderColor: visitor.connection?.status == 'none' ? AppColors.greenButtonColor : AppColors.disableBackground,
           viewOnAccept: visitor.profilePhoto?.visibilityStatus != 'public',
           activeStatusText: _recentVisitorStatus(visitor),
+          onTapLeftButton: () {
+
+            ref.read(homeProvider).connect(context, visitor.id ?? '', visitor.displayName ?? 'Unknown', ConnectionRequestType.match.name);
+            // print('Left button tapped for ${visitor.displayName}');
+          },
         ),
       ),
     );

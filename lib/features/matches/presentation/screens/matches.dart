@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/empty_state.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
+import 'package:flutter_boilerplate/core/global/enums/global_status.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
@@ -253,8 +254,12 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             religion: CamelCaseUtils.formatCamelCase(match.religion ?? ''),
             noButton: false,
             onTapLeftButton: () {
-              // Handle left button tap
+              ref.read(homeProvider).connect(context, match.id ?? '', match.displayName ?? 'Unknown', ConnectionRequestType.match.name);
             },
+            leftButtonColor: match.connection?.status == 'none' ? AppColors.greenButtonColor : AppColors.disableBackground,
+            leftButtonTextColor: match.connection?.status == 'none' ? AppColors.white : AppColors.disableText,
+            leftButtonIconColor: match.connection?.status == 'none' ? AppColors.white : AppColors.disableText,
+            leftButtonBorderColor: match.connection?.status == 'none' ? AppColors.greenButtonColor : AppColors.disableBackground,
             onTapRightButton: () {
               // Handle right button tap
             },

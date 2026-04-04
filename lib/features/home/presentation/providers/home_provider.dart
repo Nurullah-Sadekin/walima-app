@@ -109,12 +109,12 @@ class HomeProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> connect(BuildContext context, MatchProfile match) async {
+  Future<void> connect(BuildContext context, String id, String userName, String connectionRequestType) async {
     updateViewState(screenStates: HomeScreenStates.transparentLoading);
     final body = CreateConnectionRequestBody(
-      receiverId: match.id,
-      requestType: ConnectionRequestType.match.name,
-      message: 'Hi ${match.displayName}, I would like to connect with you!',
+      receiverId: id,
+      requestType: connectionRequestType,
+      message: 'Hi $userName, I would like to connect with you!',
       markAsDefaultConnectionMessage: true,
       expiresAt: DateTime.now().add(const Duration(days: 7)).toIso8601String(),
       isPriority: false,
@@ -126,7 +126,7 @@ class HomeProvider extends BaseChangeNotifier {
         context: context,
         message: response.message ?? 'Connection request sent successfully.',
       );
-      await updateConnectionStatus(context, match.id ?? '');
+      await updateConnectionStatus(context, id ?? '');
     } else {
       if(response.message?.contains('daily_connect')??false){
         return await DialogUtils.show(
