@@ -4,6 +4,9 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/features/matches/domain/enums/match_education_level.dart';
+import 'package:flutter_boilerplate/features/matches/domain/enums/match_filter_type.dart';
+import 'package:flutter_boilerplate/features/matches/domain/enums/match_marital_status.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/provider/my_match_filter_provider.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/into_tile.dart';
@@ -181,8 +184,6 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
       case FilterStep.eatingHabits:
         return _eatingHabitsBody(provider);
     }
-    // All enum cases are handled above; return a fallback
-    return const SizedBox.shrink();
   }
 
   Widget _refineBody(MyMatchFilterProvider provider) {
@@ -484,8 +485,53 @@ class _MyMatchFilterScreenState extends ConsumerState<MyMatchFilterScreen> {
         title: 'Show Matches',
         onTap: () {
           final result = {
-            'countries': newFilter.selectedCountries,
-            'communities': newFilter.selectedCommunities,
+            'countryLivingIn': newFilter.selectedCountries,
+            'community': newFilter.selectedCommunities,
+            'maritalStatus': newFilter.selectedMaritalStatus.isEmpty
+                ? null
+                : MatchMaritalStatus.fromLabel(
+                    newFilter.selectedMaritalStatus.first,
+                  )?.apiValue,
+            'annualIncome': newFilter.selectedIncomeRanges.isEmpty
+                ? null
+                : newFilter.selectedIncomeRanges.join(','),
+            'religion': newFilter.selectedReligion.isEmpty
+                ? null
+                : newFilter.selectedReligion.first,
+            'motherTongue': newFilter.selectedMotherTongues.isEmpty
+                ? null
+                : newFilter.selectedMotherTongues.join(','),
+            'stateLivingIn': newFilter.selectedCountries,
+            'countryGrewUpIn': newFilter.selectedCountries.isEmpty
+                ? null
+                : newFilter.selectedCountries.first,
+            'qualification': newFilter.educationLevelList
+                .where((item) => item.isSelected)
+                .map((item) => MatchEducationLevel.fromLabel(item.name)?.apiValue)
+                .whereType<String>()
+                .toList(),
+            'workingWith': newFilter.selectedYourWork.isEmpty
+                ? null
+                : newFilter.selectedYourWork.join(','),
+            'professionArea': newFilter.selectedYouWorkAs.isEmpty
+                ? null
+                : newFilter.selectedYouWorkAs.join(','),
+            'eatingHabits': newFilter.selectedEatingHabits.isEmpty
+                ? null
+                : newFilter.selectedEatingHabits.first,
+            'photoVisibility': _singleSelectedName(
+              newFilter.photoSettingOptions,
+              '',
+            ),
+            'recentlyJoined': _singleSelectedName(
+              newFilter.recentlyJoinedOptions,
+              '',
+            ),
+            'activeMembers': _singleSelectedName(
+              newFilter.activeMembersOptions,
+              '',
+            ),
+            'matchFilterType': MatchFilterType.openToAll.apiValue,
           };
           Navigator.pop(context, result);
         },

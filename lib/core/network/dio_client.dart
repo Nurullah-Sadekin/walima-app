@@ -2,10 +2,12 @@ import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/connectivity/connectivity_keys.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:flutter_boilerplate/core/constants/app_texts.dart';
 import 'package:flutter_boilerplate/core/global/repositorys/global_repository.dart';
 import 'package:flutter_boilerplate/core/network/app_urls.dart';
+import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
 
 /// Singleton Dio client for handling all API calls
@@ -104,6 +106,7 @@ class DioClient {
   Completer<bool>? _refreshCompleter;
   VoidCallback? _onLogout;
   String? _authToken;
+  bool _isShowingTimeoutDialog = false;
 
   /// Get Dio instance
   Dio get dio => _dio;
@@ -233,6 +236,26 @@ class DioClient {
     _onLogout?.call();
   }
 
+  Future<void> _showGlobalTimeoutDialog() async {
+    if (_isShowingTimeoutDialog) return;
+
+    final context = rootNavigatorKey.currentContext;
+    if (context == null) return;
+
+    _isShowingTimeoutDialog = true;
+    try {
+      await DialogUtils.showErrorDialog(
+        context: context,
+        title: 'API Not Responding',
+        message:
+            'The API is not responding. The request timed out after 60 seconds. Please try again.',
+        buttonText: 'OK',
+      );
+    } finally {
+      _isShowingTimeoutDialog = false;
+    }
+  }
+
   /// Handle response based on status code
   ApiResponse _handleResponse(Response response) {
     switch (response.statusCode) {
@@ -311,8 +334,9 @@ class DioClient {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
+        unawaited(_showGlobalTimeoutDialog());
         return ApiResponse.error(
-          message: 'Connection timeout. Please try again.',
+          message: 'The API is not responding. The request timed out after 60 seconds.',
           statusCode: 0,
         );
       case DioExceptionType.badResponse:

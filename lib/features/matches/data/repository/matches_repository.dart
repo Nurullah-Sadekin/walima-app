@@ -88,8 +88,6 @@ class MatchesRepository {
     }
   }
 
-  // create connection request
-
   Future<ConnectResponse> createConnectionRequest(
     CreateConnectionRequestBody? body,
   ) async {

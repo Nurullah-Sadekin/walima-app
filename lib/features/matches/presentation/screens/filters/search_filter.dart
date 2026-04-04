@@ -2,22 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
-import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/provider/search_filter_provider.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/setting_switcher_title.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
-import 'package:go_router/go_router.dart';
 
 class SearchFilterScreen extends ConsumerStatefulWidget {
   const SearchFilterScreen({super.key});
@@ -494,7 +487,42 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
       buttonStyle: ButtonsStyle.activePrimaryButton,
       title: 'Search Now',
       onTap: () {
-        Navigator.pop(context);
+        Navigator.pop(context, {
+          'profileId': provider.profileIdController.text.trim(),
+          'ageMin': int.tryParse(provider.ageFromController.text.trim()),
+          'ageMax': int.tryParse(provider.ageToController.text.trim()),
+          'heightMin': int.tryParse(provider.heightFromController.text.trim()),
+          'heightMax': int.tryParse(provider.heightToController.text.trim()),
+          'maritalStatus': provider.maritalStatusController.text.trim(),
+          'religion': provider.religionController.text.trim(),
+          'community': provider.communityController.text.trim().isEmpty
+              ? <String>[]
+              : <String>[provider.communityController.text.trim()],
+          'motherTongue': provider.motherTongueController.text.trim(),
+          'countryLivingIn': provider.countryLivingController.text.trim().isEmpty
+              ? <String>[]
+              : <String>[provider.countryLivingController.text.trim()],
+          'stateLivingIn': provider.stateLivingController.text.trim().isEmpty
+              ? <String>[]
+              : <String>[provider.stateLivingController.text.trim()],
+          'countryGrewUpIn': provider.grewUpController.text.trim(),
+          'residencyStatus': provider.residencyStatusController.text.trim(),
+          'photoVisibility': provider.photoSettingController.text.trim(),
+          'qualification': provider.qualificationController.text.trim().isEmpty
+              ? <String>[]
+              : <String>[provider.qualificationController.text.trim()],
+          'educationArea': provider.educationAreaController.text.trim().isEmpty
+              ? <String>[]
+              : <String>[provider.educationAreaController.text.trim()],
+          'workingWith': provider.workingWithController.text.trim(),
+          'professionArea': provider.professionAreaController.text.trim(),
+          'annualIncome': provider.selectedAnnualIncomeRangeStatus,
+          'eatingHabits': provider.selectedDietStatus,
+          'haveChildren': provider.selectedHaveChildrenStatus,
+          'searchTitle': provider.profileManageByController.text.trim(),
+          'includeFilteredProfiles': provider.filteredProfiles ?? false,
+          'includeViewedProfiles': provider.viewedProfile ?? false,
+        });
       },
     );
   }

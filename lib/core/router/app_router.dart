@@ -34,6 +34,7 @@ import 'package:flutter_boilerplate/features/registration/presentation/screens/p
 import 'package:flutter_boilerplate/features/registration/presentation/screens/verify_otp_for_sign_up.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/your_religion.dart';
 import 'package:flutter_boilerplate/features/settings/presentation/screens/settings_screen.dart';
+import 'package:flutter_boilerplate/core/connectivity/connectivity_keys.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -55,6 +56,7 @@ part 'app_router.g.dart';
 @riverpod
 GoRouter goRouter(Ref ref) {
   return GoRouter(
+    navigatorKey: rootNavigatorKey,
     initialLocation: Paths.splash,
     debugLogDiagnostics: true,
     routes: [
