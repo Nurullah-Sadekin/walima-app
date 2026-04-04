@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter_boilerplate/core/global/models/limit_info.dart';
-import 'package:flutter_boilerplate/core/global/enums/global_status.dart';
+import 'package:flutter_boilerplate/core/global/enums/enums.dart';
 import 'package:flutter_boilerplate/core/global/repositorys/global_repository.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/features/login/data/models/get_me_response_body.dart'

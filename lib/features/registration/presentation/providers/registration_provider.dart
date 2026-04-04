@@ -62,6 +62,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       TextEditingController();
   final TextEditingController maritalStatusController = TextEditingController();
   final TextEditingController heightController = TextEditingController();
+  final TextEditingController heightDisplayController = TextEditingController();
   final TextEditingController highestQualification = TextEditingController();
   final TextEditingController instituteController = TextEditingController();
   final TextEditingController anotherInstituteController =
@@ -252,6 +253,11 @@ class RegistrationProvider extends BaseChangeNotifier {
     'my daughter',
     'my sister',
   };
+
+  static final List<int> _heightCmOptions = List<int>.generate(
+    33,
+    (index) => 130 + index,
+  );
 
   List<TextEditingController> get _managedControllers => [
         firstNameController,
@@ -1160,6 +1166,7 @@ class RegistrationProvider extends BaseChangeNotifier {
         _restoreControllerText(
             maritalStatusController, controllerValues['maritalStatus']);
         _restoreControllerText(heightController, controllerValues['height']);
+        syncHeightDisplayFromStoredValue();
         _restoreControllerText(
             highestQualification, controllerValues['highestQualification']);
         _restoreControllerText(
@@ -1343,11 +1350,76 @@ class RegistrationProvider extends BaseChangeNotifier {
     controller.text = value is String ? value : '';
   }
 
+  List<String> get heightDropdownItems => _heightCmOptions
+      .map((heightCm) => _formatHeightDisplay(heightCm))
+      .toList(growable: false);
+
+  void selectHeight(String? displayValue) {
+    final selectedValue = displayValue?.trim() ?? '';
+    if (selectedValue.isEmpty) return;
+
+    final heightInCm = _heightCmFromDisplay(selectedValue);
+    if (heightInCm == null) return;
+
+    heightController.text = heightInCm.toString();
+    heightDisplayController.text = _formatHeightDisplay(heightInCm);
+    _notifyAndPersist();
+  }
+
+  void syncHeightDisplayFromStoredValue() {
+    final normalized = _normalizeHeightCmValue(heightController.text);
+    if (normalized == null) {
+      heightDisplayController.clear();
+      return;
+    }
+
+    heightController.text = normalized.toString();
+    heightDisplayController.text = _formatHeightDisplay(normalized);
+  }
+
   String? _asStringOrNull(dynamic value) {
     if (value is String && value.isNotEmpty) {
       return value;
     }
     return null;
+  }
+
+  int? _normalizeHeightCmValue(String rawValue) {
+    final value = rawValue.trim();
+    if (value.isEmpty) return null;
+
+    final directValue = int.tryParse(value);
+    if (directValue != null) {
+      return directValue;
+    }
+
+    final match = RegExp(r'\d+').firstMatch(value);
+    if (match == null) {
+      return null;
+    }
+
+    return int.tryParse(match.group(0)!);
+  }
+
+  int? _heightCmFromDisplay(String displayValue) {
+    final normalized = displayValue.trim().toLowerCase();
+    final match = RegExp(r'^(\d+)\s*ft\s*(\d+)\s*in$').firstMatch(normalized);
+    if (match != null) {
+      final feet = int.tryParse(match.group(1)!);
+      final inches = int.tryParse(match.group(2)!);
+      if (feet != null && inches != null) {
+        return ((feet * 12) + inches) * 2.54 ~/ 1;
+      }
+    }
+
+    return _normalizeHeightCmValue(displayValue);
+  }
+
+  String _formatHeightDisplay(int heightCm) {
+    final totalInches = (heightCm / 2.54).round();
+    final feet = totalInches ~/ 12;
+    final inches = totalInches % 12;
+    return '$feet ft $inches in';
   }
 
   List<String> _asStringList(dynamic value) {

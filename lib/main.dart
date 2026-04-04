@@ -11,6 +11,7 @@ import 'package:flutter_boilerplate/core/providers/locale_provider.dart';
 import 'package:flutter_boilerplate/core/connectivity/connectivity_keys.dart';
 import 'package:flutter_boilerplate/core/connectivity/connectivity_monitor.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
 import 'package:flutter_boilerplate/core/utils/foreground_alert_service.dart';
 import 'package:flutter_boilerplate/features/chat/data/socket/socket_service.dart';
 
@@ -93,8 +94,11 @@ class _AppRealtimeBootstrapState extends ConsumerState<AppRealtimeBootstrap>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ForegroundAlertService.instance.initialize();
       ForegroundAlertService.instance.setAppForeground(true);
-      ref.read(globalProvider).initialize().then((_) {
-        ref.read(globalProvider).refreshCurrentUserAndQuota(silent: true);
+      ref.read(globalProvider).initialize().then((_) async {
+        final accessToken = await PrefsHelper.getAccessToken();
+        if (accessToken.trim().isNotEmpty) {
+          ref.read(globalProvider).refreshCurrentUserAndQuota(silent: true);
+        }
       });
       ref.read(chatProvider).initializeRealtime();
     });

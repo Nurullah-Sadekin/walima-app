@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_boilerplate/core/global/components/limit_over.dart';
-import 'package:flutter_boilerplate/core/global/enums/global_status.dart' show ConnectionRequestType;
+import 'package:flutter_boilerplate/core/global/enums/enums.dart' show ConnectionRequestType;
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';

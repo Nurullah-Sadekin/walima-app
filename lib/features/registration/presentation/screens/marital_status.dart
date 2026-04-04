@@ -7,6 +7,7 @@ import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
@@ -91,26 +92,26 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
             headLine: 'Marital Status',
             hintText: 'Select',
             popUpHeader: 'Select Marital Status',
-            items: const ['Single', 'Married', 'Divorced', 'Widowed'],
+            items: maritalStatusListDataInserted
+                .map((item) => item.name)
+                .toList(growable: false),
             controller: provider.maritalStatusController,
+            onConfirm: (value) {
+              if (value == null) return;
+              provider.maritalStatusController.text = value.toString();
+            },
             onTap: () {},
-            isSearch: false,
+            isSearch: true,
           ),
           DropDownField(
             headLine: 'Height',
             hintText: 'Select',
             popUpHeader: 'Select Height',
-            items: const [
-              '170 cm',
-              '171 cm',
-              '172 cm',
-              '173 cm',
-              '174 cm',
-              '175 cm'
-            ],
-            controller: provider.heightController,
+            items: provider.heightDropdownItems,
+            controller: provider.heightDisplayController,
+            onConfirm: (value) => provider.selectHeight(value?.toString()),
             onTap: () {},
-            isSearch: false,
+            isSearch: true,
           ),
           Row(
             spacing: 4,
