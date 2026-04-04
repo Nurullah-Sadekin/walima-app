@@ -4,7 +4,8 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
 import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
-import 'package:flutter_boilerplate/features/inbox/data/models/accepted_connection_response.dart';
+import 'package:flutter_boilerplate/features/connections/data/models/response/get_accepted_connection_response.dart'
+    as accepted_models;
 import 'package:flutter_boilerplate/features/inbox/domain/models/menu_item_model.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_card.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_tab_shared.dart';
@@ -27,10 +28,6 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
   void initState() {
     super.initState();
     _subTabController = TabController(length: _tabs.length, vsync: this);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      ref.read(inboxProvider).fetchAcceptedConnections();
-    });
   }
 
   @override
@@ -94,7 +91,7 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
     required bool isLoading,
     required bool isError,
     required String? errorMessage,
-    required List<AcceptedData> items,
+    required List<accepted_models.Data> items,
     required String emptyMessage,
     required VoidCallback onRetry,
     required bool isReceivedDirection,
@@ -150,21 +147,31 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
             name: item.displayName ?? 'Unknown',
             subtitleColor: AppColors.primary,
             day: DateTimeUtils.onlyDate(
-                DateTime.tryParse(item.connection?.createdAt ?? '')),
+              DateTime.tryParse(item.connection?.createdAt ?? ''),
+            ),
             age: '${item.age} Yr',
             height: CamelCaseUtils.formatCamelCase(item.religion ?? ''),
-            location: [item.location?.city, item.location?.state, item.location?.country]
+            location: [
+              item.location?.city,
+              item.location?.state,
+              item.location?.country,
+            ]
                 .whereType<String>()
                 .where((value) => value.trim().isNotEmpty)
                 .join(', ')
                 .isEmpty
-                ? 'N/A'
-                : [
-                    item.location?.city,
-                    item.location?.state,
-                    item.location?.country
-                  ].whereType<String>().where((value) => value.trim().isNotEmpty).join(', '),
-            profession: CamelCaseUtils.formatCamelCase(item.maritalStatus ?? ''),
+                  ? 'N/A'
+                  : [
+                      item.location?.city,
+                      item.location?.state,
+                      item.location?.country,
+                    ]
+                        .whereType<String>()
+                        .where((value) => value.trim().isNotEmpty)
+                        .join(', '),
+            profession: CamelCaseUtils.formatCamelCase(
+              item.maritalStatus ?? '',
+            ),
             isVerified: item.profilePhoto?.isVerified ?? false,
             isBottomSection: true,
             mood: InboxCardMood.medium,

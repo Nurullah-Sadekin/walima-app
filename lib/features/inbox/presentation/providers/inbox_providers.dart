@@ -1,8 +1,13 @@
 import 'package:flutter_boilerplate/core/global/models/filter_model.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/features/inbox/data/models/accepted_connection_response.dart';
-import 'package:flutter_boilerplate/features/inbox/data/models/received_connection_response.dart';
-import 'package:flutter_boilerplate/features/inbox/data/repository/inbox_repository.dart';
+import 'package:flutter_boilerplate/features/connections/data/models/request/get_requested_connections_query_params.dart';
+import 'package:flutter_boilerplate/features/connections/data/models/response/get_accepted_connection_response.dart'
+    as accepted_models;
+import 'package:flutter_boilerplate/features/connections/data/models/response/get_requested_connections_response.dart'
+    as requested_models;
+import 'package:flutter_boilerplate/features/connections/data/models/response/get_sent_connection_response.dart'
+    as sent_models;
+import 'package:flutter_boilerplate/features/connections/data/repository/connections_repository.dart';
 
 class InboxProvider extends BaseChangeNotifier {
   InboxScreenStates screenStates = InboxScreenStates.defaultState;
@@ -13,28 +18,33 @@ class InboxProvider extends BaseChangeNotifier {
   bool hasError = false;
   String? errorMessage;
 
-  List<Data>? receivedConnections = [];
-  ReceivedConnectionResponse? receivedConnectionsResponse;
+  List<requested_models.RequestedConnectionUser>? receivedConnections = [];
+  requested_models.GetRequestedConnectionsResponse? receivedConnectionsResponse;
 
-  List<AcceptedData>? acceptedConnections = [];
-  AcceptedConnectionResponse? acceptedConnectionsResponse;
+  List<accepted_models.Data>? acceptedConnections = [];
+  accepted_models.GetAcceptedConnectionResponse? acceptedConnectionsResponse;
   bool isAcceptedLoading = false;
   bool isAcceptedHasError = false;
   String? acceptedErrorMessage;
 
+  List<sent_models.Data>? sentConnections = [];
+  sent_models.GetSentConnectionResponse? sentConnectionsResponse;
+  bool isSentLoading = false;
+  bool isSentHasError = false;
+  bool isDeletingSentConnection = false;
+  String? sentErrorMessage;
+
   List<Filter> filterList = filterDataList;
   List<Filter> sortList = sortDataList;
 
-
-  // filter item
   int? currentPage;
   int? pageSize;
   int? totalItems = 0;
-  String? sortBy;
-  String? sortOrder;
-  String? searchQuery;
-  String? filterType;
-  String? responseFormat;
+  String? sortBy = 'id';
+  String? sortOrder = 'ASC';
+  String? searchQuery = '';
+  String? filterType = 'most_relevant';
+  String? responseFormat = 'short';
 
   void switcherStatusUpdate({bool? switcherValue}) {
     if (switcherValue != null) {
@@ -65,6 +75,28 @@ class InboxProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
+  GetRequestedConnectionsQueryParams _queryParams({
+    int? page,
+    int? size,
+    String? responseFormat,
+    String? sortBy,
+    String? sortOrder,
+    String? search,
+    String? filter,
+  }) {
+    return GetRequestedConnectionsQueryParams(
+      page: page,
+      size: size,
+      sortBy: sortBy,
+      sortOrder: sortOrder,
+      filter: filter,
+      extraParams: {
+        'responseFormat': responseFormat,
+        'search': search,
+      },
+    );
+  }
+
   Future<void> fetchRequestedConnections() async {
     isLoading = true;
     hasError = false;
@@ -75,46 +107,53 @@ class InboxProvider extends BaseChangeNotifier {
     );
 
     try {
-      receivedConnectionsResponse = await InboxRepository.getRequestedConnections(
-        page:  currentPage,
-        size:  pageSize,
-        responseFormat: responseFormat,
-        sortBy: sortBy,
-        sortOrder: sortOrder,
-        search: searchQuery,
-        filter: filterType,
+      receivedConnectionsResponse =
+          await ConnectionsRepository.getRequestedConnections(
+        _queryParams(
+          page: currentPage,
+          size: pageSize,
+          responseFormat: responseFormat,
+          sortBy: sortBy,
+          sortOrder: sortOrder,
+          search: searchQuery,
+          filter: filterType,
+        ),
       );
 
       if (receivedConnectionsResponse?.code == 'SUCCESS') {
         receivedConnections = receivedConnectionsResponse?.response?.data ?? [];
-        isLoading = false;
+        totalItems =
+            receivedConnectionsResponse?.response?.pagination?.total?.toInt() ??
+                receivedConnections?.length ??
+                0;
         hasError = false;
         updateViewState(screenStates: InboxScreenStates.complete);
       } else {
         hasError = true;
-        errorMessage = receivedConnectionsResponse?.message ?? 'Failed to load requests';
+        errorMessage =
+            receivedConnectionsResponse?.message ?? 'Failed to load requests';
         receivedConnections = [];
-        isLoading = false;
         updateViewState(screenStates: InboxScreenStates.defaultState);
       }
     } catch (e) {
-      isLoading = false;
       hasError = true;
       errorMessage = e.toString();
       receivedConnections = [];
       updateViewState(screenStates: InboxScreenStates.defaultState);
     }
+
+    isLoading = false;
     notifyListeners();
   }
 
-  List<AcceptedData> get acceptedReceivedConnections =>
+  List<accepted_models.Data> get acceptedReceivedConnections =>
       _acceptedConnectionsByDirection('received');
 
-  List<AcceptedData> get acceptedSentConnections =>
+  List<accepted_models.Data> get acceptedSentConnections =>
       _acceptedConnectionsByDirection('sent');
 
-  List<AcceptedData> _acceptedConnectionsByDirection(String direction) {
-    final items = acceptedConnections ?? const <AcceptedData>[];
+  List<accepted_models.Data> _acceptedConnectionsByDirection(String direction) {
+    final items = acceptedConnections ?? const <accepted_models.Data>[];
     final normalizedDirection = direction.toLowerCase().trim();
     return items.where((item) {
       final itemDirection =
@@ -125,8 +164,12 @@ class InboxProvider extends BaseChangeNotifier {
 
   Future<void> fetchAcceptedConnections({
     int page = 1,
-    int size = 10,
+    int size = 20,
     String responseFormat = 'short',
+    String sortBy = 'id',
+    String sortOrder = 'ASC',
+    String search = '',
+    String filter = 'all_accepted',
   }) async {
     isAcceptedLoading = true;
     isAcceptedHasError = false;
@@ -135,31 +178,131 @@ class InboxProvider extends BaseChangeNotifier {
 
     try {
       acceptedConnectionsResponse =
-          await InboxRepository.getAcceptedConnections(
-        page: page,
-        size: size,
-        responseFormat: responseFormat,
+          await ConnectionsRepository.getAcceptedConnections(
+        _queryParams(
+          page: page,
+          size: size,
+          responseFormat: responseFormat,
+          sortBy: sortBy,
+          sortOrder: sortOrder,
+          search: search,
+          filter: filter,
+        ),
       );
 
       if (acceptedConnectionsResponse?.code == 'SUCCESS' ||
           acceptedConnectionsResponse?.code == '1') {
         acceptedConnections = acceptedConnectionsResponse?.response?.data ?? [];
-        isAcceptedLoading = false;
         isAcceptedHasError = false;
       } else {
         isAcceptedHasError = true;
         acceptedErrorMessage = acceptedConnectionsResponse?.message ??
             'Failed to load accepted connections';
         acceptedConnections = [];
-        isAcceptedLoading = false;
       }
     } catch (e) {
-      isAcceptedLoading = false;
       isAcceptedHasError = true;
       acceptedErrorMessage = e.toString();
       acceptedConnections = [];
     }
+
+    isAcceptedLoading = false;
     notifyListeners();
+  }
+
+  Future<void> fetchSentConnections({
+    int page = 1,
+    int size = 20,
+    String responseFormat = 'short',
+    String sortBy = 'id',
+    String sortOrder = 'ASC',
+    String search = '',
+    String filter = 'most_relevant',
+  }) async {
+    isSentLoading = true;
+    isSentHasError = false;
+    sentErrorMessage = null;
+    notifyListeners();
+
+    try {
+      sentConnectionsResponse = await ConnectionsRepository.getSentConnections(
+        _queryParams(
+          page: page,
+          size: size,
+          responseFormat: responseFormat,
+          sortBy: sortBy,
+          sortOrder: sortOrder,
+          search: search,
+          filter: filter,
+        ),
+      );
+
+      if (sentConnectionsResponse?.code == 'SUCCESS' ||
+          sentConnectionsResponse?.code == '1') {
+        sentConnections = sentConnectionsResponse?.response?.data ?? [];
+        isSentHasError = false;
+      } else {
+        isSentHasError = true;
+        sentErrorMessage =
+            sentConnectionsResponse?.message ?? 'Failed to load sent connections';
+        sentConnections = [];
+      }
+    } catch (e) {
+      isSentHasError = true;
+      sentErrorMessage = e.toString();
+      sentConnections = [];
+    }
+
+    isSentLoading = false;
+    notifyListeners();
+  }
+
+  Future<bool> deleteSentConnection(String connectionId) async {
+    isDeletingSentConnection = true;
+    notifyListeners();
+
+    try {
+      final response = await ConnectionsRepository.deleteConnection(connectionId);
+      if (response.isSuccess) {
+        sentConnections = (sentConnections ?? [])
+            .where((item) => item.connection?.id != connectionId)
+            .toList();
+        if (sentConnectionsResponse?.response != null) {
+          sentConnectionsResponse!.response!.data = sentConnections;
+        }
+        isDeletingSentConnection = false;
+        notifyListeners();
+        return true;
+      }
+
+      sentErrorMessage = response.message;
+    } catch (e) {
+      sentErrorMessage = e.toString();
+    }
+
+    isDeletingSentConnection = false;
+    notifyListeners();
+    return false;
+  }
+
+  Future<void> loadPrimaryTab(int tabIndex) async {
+    switch (tabIndex) {
+      case 0:
+        if ((receivedConnections?.isEmpty ?? true) && !isLoading) {
+          await fetchRequestedConnections();
+        }
+        break;
+      case 1:
+        if ((acceptedConnections?.isEmpty ?? true) && !isAcceptedLoading) {
+          await fetchAcceptedConnections();
+        }
+        break;
+      case 3:
+        if ((sentConnections?.isEmpty ?? true) && !isSentLoading) {
+          await fetchSentConnections();
+        }
+        break;
+    }
   }
 
   void clearReceivedConnections() {
@@ -174,6 +317,7 @@ class InboxProvider extends BaseChangeNotifier {
     sortOrder = 'ASC';
     searchQuery = '';
     filterType = 'most_relevant';
+    responseFormat = 'short';
     notifyListeners();
   }
 
@@ -183,6 +327,16 @@ class InboxProvider extends BaseChangeNotifier {
     isAcceptedLoading = false;
     isAcceptedHasError = false;
     acceptedErrorMessage = null;
+    notifyListeners();
+  }
+
+  void clearSentConnections() {
+    sentConnections = [];
+    sentConnectionsResponse = null;
+    isSentLoading = false;
+    isSentHasError = false;
+    isDeletingSentConnection = false;
+    sentErrorMessage = null;
     notifyListeners();
   }
 

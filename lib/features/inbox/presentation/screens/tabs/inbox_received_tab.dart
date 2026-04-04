@@ -24,15 +24,6 @@ class InboxReceivedTab extends ConsumerStatefulWidget {
 
 class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
   @override
-  void initState() {
-    super.initState();
-    // Fetch data when tab is initialized
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(inboxProvider).fetchRequestedConnections();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     final provider = ref.watch(inboxProvider);
 
@@ -133,10 +124,12 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
                       : true,
               age: '$age Yr',
               height: CamelCaseUtils.formatCamelCase(
-                  connection.maritalStatus ?? ''),
+                connection.maritalStatus ?? '',
+              ),
               location: location,
               activeStatusText: DateTimeUtils.formatDate(
-                  DateTime.tryParse(connection.lastSeenAt ?? '')),
+                DateTime.tryParse(connection.lastSeenAt ?? ''),
+              ),
               isOnline: connection.isOnline ?? false,
               menu: true,
               onTapLeftButton: () {
@@ -150,7 +143,7 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
               rightIconPath: AppImages.cancelSvgIcon,
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }
@@ -196,7 +189,7 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
               color: AppColors.textSecondaryLight,
             ),
           ),
-        )
+        ),
       ],
     );
   }
@@ -227,7 +220,7 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
             iconPath: AppImages.sortIcon,
             items: provider.sortList
                 .map((item) =>
-                    FilterItem(name: item.label, isSelected: item.isSelected))
+                    FilterItem(name: item.label, isSelected: item.isSelected),)
                 .toList(),
             onItemTap: provider.selectSortByIndex,
           ),
@@ -240,17 +233,29 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
             iconPath: AppImages.filterSvgIcon,
             items: provider.filterList
                 .map((item) =>
-                    FilterItem(name: item.label, isSelected: item.isSelected))
+                    FilterItem(name: item.label, isSelected: item.isSelected),)
                 .toList(),
             onItemTap: provider.selectSortByIndex,
           ),
           Row(
             spacing: 10,
             children: [
-              Expanded(child: PrimaryButtons(buttonStyle: ButtonsStyle.cancelButton, onTap: (){}, title: 'Reset')),
-              Expanded(child: PrimaryButtons(buttonStyle: ButtonsStyle.activePrimaryButton, onTap: (){}, title: 'Apply')),
+              Expanded(
+                child: PrimaryButtons(
+                  buttonStyle: ButtonsStyle.cancelButton,
+                  onTap: () {},
+                  title: 'Reset',
+                ),
+              ),
+              Expanded(
+                child: PrimaryButtons(
+                  buttonStyle: ButtonsStyle.activePrimaryButton,
+                  onTap: () {},
+                  title: 'Apply',
+                ),
+              ),
             ],
-          )
+          ),
         ],
       ),
     );

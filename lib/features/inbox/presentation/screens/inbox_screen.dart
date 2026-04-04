@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
+import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/screens/tabs/inbox_accepted_tab.dart';
@@ -29,10 +30,15 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
     super.initState();
     _primaryTabController = TabController(initialIndex: 0, length: 5, vsync: this)
       ..addListener(_handlePrimaryTabChange);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(inboxProvider).loadPrimaryTab(_primaryTabController.index);
+    });
   }
 
   void _handlePrimaryTabChange() {
     if (!mounted || _primaryTabController.indexIsChanging) return;
+    ref.read(inboxProvider).loadPrimaryTab(_primaryTabController.index);
     setState(() {});
   }
 

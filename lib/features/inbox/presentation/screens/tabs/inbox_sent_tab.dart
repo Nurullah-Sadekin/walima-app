@@ -3,12 +3,14 @@ import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
+import 'package:flutter_boilerplate/core/global/components/empty_state.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
+import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/inbox/domain/models/menu_item_model.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/providers/inbox_providers.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_card.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_tab_shared.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/filter_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -27,7 +29,7 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          _header(),
+          _header(provider),
           const SizedBox(height: 10),
           _body(provider),
         ],
@@ -35,47 +37,114 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
     );
   }
 
-
   Widget _body(InboxProvider provider) {
-    return Column(
-      children: [
-        InboxCard(
-          menuItems: [
-            MenuItem(
-              name: 'Cancel Request',
-              onTap: () => handleMenuAction(
-                context: context,
-                action: InboxMoreMenuAction.cancelRequest,
-              ),
+    if (provider.isSentLoading && (provider.sentConnections?.isEmpty ?? true)) {
+      return const Padding(
+        padding: EdgeInsets.all(32),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (provider.isSentHasError && (provider.sentConnections?.isEmpty ?? true)) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const EmptyStateWidget(
+              imagePath: AppImages.sentMessage,
+              title: 'Error Loading Sent Requests',
+              subtitle: 'Unable to load your sent connection requests',
+              buttonText: 'Retry',
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => ref.read(inboxProvider).fetchSentConnections(),
+              child: const Text('Retry'),
             ),
           ],
-          imagePath: AppImages.demoProfile2,
-          name: 'Tasnova Ahmed',
-          age: '28 Yr',
-          height: '5\' 3\'" ',
-          day: 'Today',
-          location: 'Gulshan, Dhaka, BD',
-          subtitle: 'Supper Contact',
-          subtitleColor: AppColors.primary,
-          isVerified: true,
-          middleBottomItemIBgColor:  AppColors.warning,
-          middleBottomItemIcon: AppImages.notificationSvgIcon,
-          middleBottomItemText: 'Remind',
-          rightBottomItemIcon: AppImages.callIcon,
-          rightBottomItemText: 'Contact',
-          rightBottomItemBgColor: AppColors.blue,
-
         ),
-      ],
+      );
+    }
+
+    if (provider.sentConnections?.isEmpty ?? true) {
+      return const EmptyStateWidget(
+        imagePath: AppImages.sentMessage,
+        title: 'No Sent Requests',
+        subtitle: 'Your sent connection requests will appear here',
+        buttonText: 'Refresh',
+      );
+    }
+
+    return Column(
+      children: provider.sentConnections!.map((item) {
+        final location = [
+          item.location?.city,
+          item.location?.state,
+          item.location?.country,
+        ].whereType<String>().where((value) => value.trim().isNotEmpty).join(', ');
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: InboxCard(
+            menuItems: [
+              MenuItem(
+                name: 'Cancel Request',
+                onTap: () async {
+                  final connectionId = item.connection?.id;
+                  if (connectionId == null || provider.isDeletingSentConnection) {
+                    return;
+                  }
+
+                  final success = await ref
+                      .read(inboxProvider)
+                      .deleteSentConnection(connectionId);
+
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        success
+                            ? 'Request cancelled successfully'
+                            : provider.sentErrorMessage ??
+                                'Failed to cancel request',
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+            imagePath: item.profilePhoto?.url ?? AppImages.demoProfile2,
+            name: item.displayName ?? 'Unknown',
+            age: '${item.age ?? ''} Yr',
+            height: CamelCaseUtils.formatCamelCase(item.religion ?? ''),
+            day: DateTimeUtils.onlyDate(
+              DateTime.tryParse(item.connection?.createdAt ?? ''),
+            ),
+            location: location.isEmpty ? 'N/A' : location,
+            profession: CamelCaseUtils.formatCamelCase(item.maritalStatus ?? ''),
+            subtitle: 'Pending Request',
+            subtitleColor: AppColors.primary,
+            isVerified: item.profilePhoto?.isVerified ?? false,
+            middleBottomItemIBgColor: AppColors.warning,
+            middleBottomItemIcon: AppImages.notificationSvgIcon,
+            middleBottomItemText: 'Remind',
+            rightBottomItemIcon: AppImages.callIcon,
+            rightBottomItemText: 'Contact',
+            rightBottomItemBgColor: AppColors.blue,
+          ),
+        );
+      }).toList(),
     );
   }
 
-  Widget _header(){
+  Widget _header(InboxProvider provider) {
+    final count = provider.sentConnections?.length ?? 0;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          'All Requests (26)',
+          'All Requests ($count)',
           style: TextStyle(
             color: AppColors.textSecondaryLight,
             fontSize: TextSize.font12(context),
@@ -108,7 +177,7 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
               color: AppColors.textSecondaryLight,
             ),
           ),
-        )
+        ),
       ],
     );
   }
@@ -119,12 +188,13 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
       child: FilterWidget(
         title: 'Filter My Sent Requests',
         items: provider.filterList
-            .map((item) => FilterItem(name: item.label, isSelected: item.isSelected))
+            .map(
+              (item) =>
+                  FilterItem(name: item.label, isSelected: item.isSelected),
+            )
             .toList(),
         onItemTap: provider.selectSortByIndex,
       ),
     );
   }
-
 }
-
