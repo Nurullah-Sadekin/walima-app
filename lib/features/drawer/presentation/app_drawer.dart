@@ -11,6 +11,7 @@ import 'package:flutter_boilerplate/core/router/app_router.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/link_opener.dart';
 import 'package:flutter_boilerplate/core/utils/picker_dialog.dart';
+import 'package:flutter_boilerplate/features/anchor_point/anchor_point.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/providers/app_drawer_provider.dart';
 import 'package:flutter_boilerplate/features/profile/presentation/utils/profile_summary_utils.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/screens/widgets/profile_action_tile.dart';
@@ -201,17 +202,29 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         ProfileActionTile(
           iconImagePath: AppImages.userLoveSvgIcon,
           title: 'Matches',
-          onTap: () {},
+          onTap: () {
+            Navigator.of(context).pop();
+            ref.read(currentTabProvider.notifier).state = 1;
+            context.goNamed(Routes.anchor);
+          },
         ),
         ProfileActionTile(
           iconImagePath: AppImages.emailSvgIcon,
           title: 'Inbox',
-          onTap: () {},
+          onTap: () {
+            Navigator.of(context).pop();
+            ref.read(currentTabProvider.notifier).state = 2;
+            context.goNamed(Routes.anchor);
+          },
         ),
         ProfileActionTile(
           iconImagePath: AppImages.chatSvgIcon,
           title: 'Chat',
-          onTap: () {},
+          onTap: () {
+            Navigator.of(context).pop();
+            ref.read(currentTabProvider.notifier).state = 3;
+            context.goNamed(Routes.anchor);
+          },
         ),
       ],
     );
@@ -233,7 +246,9 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         ProfileActionTile(
           iconImagePath: AppImages.settingsSvgIcon,
           title: 'Partner Preferences',
-          onTap: () {},
+          onTap: () {
+            context.pushNamed(Routes.partnerPreferences);
+          },
         ),
         ProfileActionTile(
           iconImagePath: AppImages.filterSvgIcon,
