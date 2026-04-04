@@ -8,6 +8,7 @@ import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
 import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
+import 'package:flutter_boilerplate/core/utils/height_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
 import 'package:flutter_boilerplate/features/matches/data/models/response/get_matches_response.dart';
@@ -241,20 +242,24 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             isVerified: match.profilePhoto?.isVerified ?? false,
             name: match.displayName ?? 'Unknown',
             age: match.age != null ? '${match.age} Yr' : null,
-            height: _matchHeight(match.height),
+            height: HeightUtils.formatHeight(match.height.toString()),
             location: _matchLocation(match),
             activeStatusText: _activeStatusText(match),
             menu: true,
             photoRequest: false,
             photoCount: '1',
-            profession: CamelCaseUtils.formatCamelCase(match.profession ?? ''),
-            maritalStatus:
-                CamelCaseUtils.formatCamelCase(match.maritalStatus ?? ''),
+            profession: CamelCaseUtils.formatCamelCase(match.maritalStatus ?? ''),
+            maritalStatus: CamelCaseUtils.formatCamelCase(match.community ?? ''),
             religion: CamelCaseUtils.formatCamelCase(match.religion ?? ''),
-            noButton: true,
+            noButton: false,
+            onTapLeftButton: () {
+              // Handle left button tap
+            },
+            onTapRightButton: () {
+              // Handle right button tap
+            },
             isOnline: match.isOnline ?? false,
-            viewOnAccept:
-                match.profilePhoto?.visibilityStatus?.toLowerCase() != 'public',
+            viewOnAccept: match.profilePhoto?.visibilityStatus?.toLowerCase() != 'public',
           );
         },
       ),
