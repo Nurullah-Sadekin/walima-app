@@ -145,7 +145,7 @@ final myMatchFilterProvider =
 });
 
 final chatProvider = ChangeNotifierProvider<ChatProvider>((ref) {
-  return ChatProvider();
+  return ChatProvider(ref);
 });
 
 final globalProvider = ChangeNotifierProvider<GlobalProvider>((ref) {

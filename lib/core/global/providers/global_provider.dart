@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter_boilerplate/core/global/models/limit_info.dart';
@@ -21,6 +22,7 @@ class GlobalProvider extends BaseChangeNotifier {
   String languageCode = 'en';
   String currentUserId = '';
   DateTime? lastQuotaSyncAt;
+  Completer<bool>? _refreshCompleter;
   final Map<String, LimitInfo> _quotaByKey = <String, LimitInfo>{};
 
   UnmodifiableMapView<String, LimitInfo> get quotaByKey =>
@@ -71,6 +73,13 @@ class GlobalProvider extends BaseChangeNotifier {
   }
 
   Future<bool> refreshCurrentUserAndQuota({bool silent = false}) async {
+    final activeRefresh = _refreshCompleter;
+    if (activeRefresh != null) {
+      return activeRefresh.future;
+    }
+
+    _refreshCompleter = Completer<bool>();
+
     if (!silent) {
       _setStatus(GlobalStatus.loading);
     }
@@ -85,6 +94,7 @@ class GlobalProvider extends BaseChangeNotifier {
         } else {
           notifyListeners();
         }
+        _refreshCompleter?.complete(true);
         return true;
       }
 
@@ -92,13 +102,17 @@ class GlobalProvider extends BaseChangeNotifier {
       if (!silent) {
         _setStatus(GlobalStatus.failure);
       }
+      _refreshCompleter?.complete(false);
       return false;
     } catch (error) {
       errorMessage = error.toString();
       if (!silent) {
         _setStatus(GlobalStatus.failure);
       }
+      _refreshCompleter?.complete(false);
       return false;
+    } finally {
+      _refreshCompleter = null;
     }
   }
 

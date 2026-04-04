@@ -99,7 +99,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
   Widget build(BuildContext context) {
     final provider = ref.watch(chatProvider);
     final quotaProvider = ref.watch(globalProvider);
-    final canSendMessage = quotaProvider.canUseFeature(_sendMessageQuotaKey);
+    final messageQuota = quotaProvider.quotaFor(_sendMessageQuotaKey);
+    final canSendMessage = messageQuota == null
+        ? true
+        : quotaProvider.canUseFeature(_sendMessageQuotaKey);
     dynamic liveParticipant;
     for (final conversation in provider.allConversations) {
       if (conversation.id == provider.currentConversationId) {
@@ -414,6 +417,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
     required bool canSendMessage,
   }) {
     bool freeUser = false;
+    final quotaProvider = ref.watch(globalProvider);
+    final messageQuota = quotaProvider.quotaFor(_sendMessageQuotaKey);
+    final shouldShowLimitOverSection =
+        messageQuota != null && !canSendMessage;
+
     if (provider.messagesLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -447,7 +455,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
           )
         : Column(
             children: [
-              if (!canSendMessage) _limitOverSection(),
+              if (shouldShowLimitOverSection) _limitOverSection(),
               Expanded(
                 child: ListView.builder(
                   controller: _scrollController,
@@ -747,7 +755,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
     }
 
     quotaProvider.rollbackFeature(_sendMessageQuotaKey);
-    await quotaProvider.refreshCurrentUserAndQuota(silent: true);
     if (!mounted) return;
   }
 

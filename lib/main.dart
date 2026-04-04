@@ -93,6 +93,9 @@ class _AppRealtimeBootstrapState extends ConsumerState<AppRealtimeBootstrap>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ForegroundAlertService.instance.initialize();
       ForegroundAlertService.instance.setAppForeground(true);
+      ref.read(globalProvider).initialize().then((_) {
+        ref.read(globalProvider).refreshCurrentUserAndQuota(silent: true);
+      });
       ref.read(chatProvider).initializeRealtime();
     });
   }

@@ -2,15 +2,19 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
+import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/chat/data/model/response/connectable_user_response.dart';
 import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_list.dart';
 import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_messages_response.dart'
     hide ProfilePhoto;
 import 'package:flutter_boilerplate/features/chat/data/repository/chat_repository.dart';
 import 'package:flutter_boilerplate/features/chat/data/socket/socket_service.dart';
-import 'package:flutter_boilerplate/features/login/data/repository/login_repository.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ChatProvider extends BaseChangeNotifier {
+  ChatProvider(this._ref);
+
+  final Ref _ref;
   ChatScreenState screenStates = ChatScreenState.complete;
   ChatScreenState loaderState = ChatScreenState.complete;
   List<Users>? connectableUsers;
@@ -729,9 +733,15 @@ class ChatProvider extends BaseChangeNotifier {
       return;
     }
 
-    final me = await LoginRepository.getMe();
-    final resolvedUserId = me.response?.user?.id;
-    if (resolvedUserId != null && resolvedUserId.isNotEmpty) {
+    final global = _ref.read(globalProvider);
+    var resolvedUserId = global.currentUserId;
+
+    if (resolvedUserId.isEmpty) {
+      await global.refreshCurrentUserAndQuota(silent: true);
+      resolvedUserId = global.currentUserId;
+    }
+
+    if (resolvedUserId.isNotEmpty) {
       _currentUserId = resolvedUserId;
     }
   }
