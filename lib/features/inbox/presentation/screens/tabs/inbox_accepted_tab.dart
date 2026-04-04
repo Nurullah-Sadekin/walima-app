@@ -4,7 +4,7 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
 import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
-import 'package:flutter_boilerplate/features/inbox/data/models/received_connection_response.dart';
+import 'package:flutter_boilerplate/features/inbox/data/models/accepted_connection_response.dart';
 import 'package:flutter_boilerplate/features/inbox/domain/models/menu_item_model.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_card.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_tab_shared.dart';
@@ -94,7 +94,7 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
     required bool isLoading,
     required bool isError,
     required String? errorMessage,
-    required List<Data> items,
+    required List<AcceptedData> items,
     required String emptyMessage,
     required VoidCallback onRetry,
     required bool isReceivedDirection,
@@ -153,19 +153,18 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
                 DateTime.tryParse(item.connection?.createdAt ?? '')),
             age: '${item.age} Yr',
             height: CamelCaseUtils.formatCamelCase(item.religion ?? ''),
-            location: [
-              item.location?.city,
-              item.location?.state,
-              item.location?.country
-            ].whereType<String>().where((value) => value.trim().isNotEmpty).join(', ').isEmpty
+            location: [item.location?.city, item.location?.state, item.location?.country]
+                .whereType<String>()
+                .where((value) => value.trim().isNotEmpty)
+                .join(', ')
+                .isEmpty
                 ? 'N/A'
                 : [
                     item.location?.city,
                     item.location?.state,
                     item.location?.country
                   ].whereType<String>().where((value) => value.trim().isNotEmpty).join(', '),
-            profession:
-                CamelCaseUtils.formatCamelCase(item.maritalStatus ?? ''),
+            profession: CamelCaseUtils.formatCamelCase(item.maritalStatus ?? ''),
             isVerified: item.profilePhoto?.isVerified ?? false,
             isBottomSection: true,
             mood: InboxCardMood.medium,

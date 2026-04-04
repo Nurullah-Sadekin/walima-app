@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_boilerplate/core/network/app_urls.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
+import 'package:flutter_boilerplate/features/inbox/data/models/accepted_connection_response.dart';
 import 'package:flutter_boilerplate/features/inbox/data/models/received_connection_response.dart';
 
 class InboxRepository {
@@ -41,7 +42,7 @@ class InboxRepository {
     }
   }
 
-  static Future<ReceivedConnectionResponse> getAcceptedConnections({
+  static Future<AcceptedConnectionResponse> getAcceptedConnections({
     int page = 1,
     int size = 10,
     String responseFormat = 'short',
@@ -56,12 +57,12 @@ class InboxRepository {
           'responseFormat': responseFormat,
         },
       );
-      return ReceivedConnectionResponse.fromJson(response.data);
+      return AcceptedConnectionResponse.fromJson(response.data);
     } catch (e) {
       final errorMessage = e is DioException
           ? e.response?.data['message'] ?? e.message
           : e.toString();
-      return ReceivedConnectionResponse(
+      return AcceptedConnectionResponse(
         code: 'FAILED',
         message: errorMessage,
       );

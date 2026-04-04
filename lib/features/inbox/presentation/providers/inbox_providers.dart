@@ -1,4 +1,5 @@
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
+import 'package:flutter_boilerplate/features/inbox/data/models/accepted_connection_response.dart';
 import 'package:flutter_boilerplate/features/inbox/data/models/received_connection_response.dart';
 import 'package:flutter_boilerplate/features/inbox/data/repository/inbox_repository.dart';
 import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
@@ -12,8 +13,8 @@ class InboxProvider extends BaseChangeNotifier {
   List<Data>? receivedConnections = [];
   ReceivedConnectionResponse? receivedConnectionsResponse;
 
-  List<Data>? acceptedConnections = [];
-  ReceivedConnectionResponse? acceptedConnectionsResponse;
+  List<AcceptedData>? acceptedConnections = [];
+  AcceptedConnectionResponse? acceptedConnectionsResponse;
   bool isAcceptedLoading = false;
   bool isAcceptedHasError = false;
   String? acceptedErrorMessage;
@@ -166,14 +167,14 @@ class InboxProvider extends BaseChangeNotifier {
     }
   }
 
-  List<Data> get acceptedReceivedConnections =>
+  List<AcceptedData> get acceptedReceivedConnections =>
       _acceptedConnectionsByDirection('received');
 
-  List<Data> get acceptedSentConnections =>
+  List<AcceptedData> get acceptedSentConnections =>
       _acceptedConnectionsByDirection('sent');
 
-  List<Data> _acceptedConnectionsByDirection(String direction) {
-    final items = acceptedConnections ?? const <Data>[];
+  List<AcceptedData> _acceptedConnectionsByDirection(String direction) {
+    final items = acceptedConnections ?? const <AcceptedData>[];
     final normalizedDirection = direction.toLowerCase().trim();
     return items.where((item) {
       final itemDirection =
