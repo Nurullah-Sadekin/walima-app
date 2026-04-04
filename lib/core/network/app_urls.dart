@@ -184,8 +184,8 @@ class AppUrls {
   static const String getConnectionStats = '$baseUrl/connections/stats'; //GET
   static const String viewContact =
       '$baseUrl/connections/view-contact/{userId}'; //GET
-  static const String performConnectionAction =
-      '$baseUrl/connections/{id}/action'; //PATCH
+  static  String performConnectionAction(String id)=>
+      '$baseUrl/connections/$id/action'; //PATCH
   static const String createConnection = '$baseUrl/connections'; //POST
   static const String bulkSendConnectionRequests =
       '$baseUrl/connections/bulk-send'; //POST

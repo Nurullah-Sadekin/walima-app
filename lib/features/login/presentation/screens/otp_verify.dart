@@ -110,63 +110,63 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(provider.otpControllers.length, (index) {
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 6),
-                  width: 42,
-                  height: 40,
-                  child: TextField(
-                    controller: provider.otpControllers[index],
-                    focusNode: provider.otpFocusNodesController[index],
-                    textAlign: TextAlign.center,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    maxLength: 1,
-                    style: TextStyle(
-                      fontSize: TextSize.font18(context),
-                      fontWeight: FontWeight.w600,
-                    ),
-                    decoration: InputDecoration(
-                      counterText: '',
-                      fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.all(0),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: AppColors.grey),
+                return Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 5),
+                    child: TextField(
+                      controller: provider.otpControllers[index],
+                      focusNode: provider.otpFocusNodesController[index],
+                      textAlign: TextAlign.center,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      maxLength: 1,
+                      style: TextStyle(
+                        fontSize: TextSize.font18(context),
+                        fontWeight: FontWeight.w600,
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: AppColors.greyLight),
+                      decoration: InputDecoration(
+                        counterText: '',
+                        fillColor: Colors.white,
+                        contentPadding: const EdgeInsets.all(0),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: AppColors.grey),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: AppColors.greyLight),
+                        ),
                       ),
-                    ),
-                    onChanged: (value) {
-                      // Handle paste (multiple chars) and normal single char entry
-                      if (value.length > 1) {
-                        final chars = value.split('');
-                        for (var i = 0; i < chars.length && (index + i) < provider.otpControllers.length; i++) {
-                          provider.otpControllers[index + i].text = chars[i];
+                      onChanged: (value) {
+                        // Handle paste (multiple chars) and normal single char entry
+                        if (value.length > 1) {
+                          final chars = value.split('');
+                          for (var i = 0; i < chars.length && (index + i) < provider.otpControllers.length; i++) {
+                            provider.otpControllers[index + i].text = chars[i];
+                          }
+                          final next = index + chars.length;
+                          if (next >= provider.otpFocusNodesController.length) {
+                            provider.otpFocusNodesController.last.requestFocus();
+                            provider.otpFocusNodesController.last.unfocus();
+                          } else {
+                            provider.otpFocusNodesController[next].requestFocus();
+                          }
+                          setState(() {});
+                          return;
                         }
-                        final next = index + chars.length;
-                        if (next >= provider.otpFocusNodesController.length) {
-                          provider.otpFocusNodesController.last.requestFocus();
-                          provider.otpFocusNodesController.last.unfocus();
-                        } else {
-                          provider.otpFocusNodesController[next].requestFocus();
+                  
+                        if (value.isNotEmpty) {
+                          if (index + 1 < provider.otpFocusNodesController.length) {
+                            provider.otpFocusNodesController[index + 1].requestFocus();
+                          } else {
+                            provider.otpFocusNodesController[index].unfocus();
+                          }
+                        } else if (index - 1 >= 0) {
+                          provider.otpFocusNodesController[index - 1].requestFocus();
                         }
                         setState(() {});
-                        return;
-                      }
-
-                      if (value.isNotEmpty) {
-                        if (index + 1 < provider.otpFocusNodesController.length) {
-                          provider.otpFocusNodesController[index + 1].requestFocus();
-                        } else {
-                          provider.otpFocusNodesController[index].unfocus();
-                        }
-                      } else if (index - 1 >= 0) {
-                        provider.otpFocusNodesController[index - 1].requestFocus();
-                      }
-                      setState(() {});
-                    },
+                      },
+                    ),
                   ),
                 );
               }),

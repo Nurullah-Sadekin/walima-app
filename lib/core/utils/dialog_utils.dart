@@ -11,7 +11,7 @@ class DialogUtils {
     required BuildContext context,
     String title = 'Success',
     String? message,
-    String buttonText = 'View order',
+    String buttonText = 'OK',
     bool autoClose = true,
     String? imagePath,
     Duration autoCloseDuration = const Duration(seconds: 2),

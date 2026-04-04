@@ -135,7 +135,7 @@ class ConnectionsRepository {
   ) async {
     try {
       return await DioClient().patch(
-        AppUrls.performConnectionAction.replaceFirst('{id}', connectionId),
+        AppUrls.performConnectionAction(connectionId),
         isTokenRequired: true,
         data: body.toJson(),
       );

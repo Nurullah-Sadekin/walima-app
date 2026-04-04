@@ -48,7 +48,6 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
           isScrollable: false,
           tabAlignment: TabAlignment.fill,
           controller: _subTabController,
-          onTabChange: (_) {},
           tabs: _tabs,
         ),
         const SizedBox(height: 10),
@@ -57,17 +56,7 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
             controller: _subTabController,
             physics: const NeverScrollableScrollPhysics(),
             children: [
-              _buildTabBody(
-                context: context,
-                isLoading: provider.isAcceptedLoading,
-                isError: provider.isAcceptedHasError,
-                errorMessage: provider.acceptedErrorMessage,
-                items: receivedItems,
-                emptyMessage: 'No accepted-by-her requests found',
-                onRetry: () =>
-                    ref.read(inboxProvider).fetchAcceptedConnections(),
-                isReceivedDirection: true,
-              ),
+
               _buildTabBody(
                 context: context,
                 isLoading: provider.isAcceptedLoading,
@@ -75,9 +64,18 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
                 errorMessage: provider.acceptedErrorMessage,
                 items: sentItems,
                 emptyMessage: 'No accepted-by-me requests found',
-                onRetry: () =>
-                    ref.read(inboxProvider).fetchAcceptedConnections(),
+                onRetry: () => ref.read(inboxProvider).fetchAcceptedConnections(),
                 isReceivedDirection: false,
+              ),
+              _buildTabBody(
+                context: context,
+                isLoading: provider.isAcceptedLoading,
+                isError: provider.isAcceptedHasError,
+                errorMessage: provider.acceptedErrorMessage,
+                items: receivedItems,
+                emptyMessage: 'No accepted-by-her requests found',
+                onRetry: () => ref.read(inboxProvider).fetchAcceptedConnections(),
+                isReceivedDirection: true,
               ),
             ],
           ),
