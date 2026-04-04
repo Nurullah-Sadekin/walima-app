@@ -65,14 +65,30 @@ class InboxProvider extends BaseChangeNotifier {
     }
   }
 
-  void selectSortByIndex(int index) {
+  void selectSortOrderIndex(int index) {
+    if (!_isValidIndex(index, sortList.length)) return;
+    _setSingleSelection(
+      sortList,
+      index,
+      (item, selected) => item.isSelected = selected,
+    );
+    sortOrder = sortList[index].value;
+    notifyListeners();
+  }
+
+  void selectFilterTypeIndex(int index) {
     if (!_isValidIndex(index, filterList.length)) return;
     _setSingleSelection(
       filterList,
       index,
       (item, selected) => item.isSelected = selected,
     );
+    filterType = filterList[index].value;
     notifyListeners();
+  }
+
+  void selectSortByIndex(int index) {
+    selectSortOrderIndex(index);
   }
 
   GetRequestedConnectionsQueryParams _queryParams({

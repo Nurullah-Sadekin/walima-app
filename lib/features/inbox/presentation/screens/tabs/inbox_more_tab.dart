@@ -105,7 +105,7 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab> {
         items: provider.filterList
             .map((item) => FilterItem(name: item.label, isSelected: item.isSelected))
             .toList(),
-        onItemTap: provider.selectSortByIndex,
+        onItemTap: provider.selectFilterTypeIndex,
       ),
     );
   }

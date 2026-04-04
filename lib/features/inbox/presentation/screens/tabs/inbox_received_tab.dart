@@ -220,9 +220,9 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
             iconPath: AppImages.sortIcon,
             items: provider.sortList
                 .map((item) =>
-                    FilterItem(name: item.label, isSelected: item.isSelected),)
+                    FilterItem(name: item.label, isSelected: item.isSelected))
                 .toList(),
-            onItemTap: provider.selectSortByIndex,
+            onItemTap: provider.selectSortOrderIndex,
           ),
           const Padding(
             padding: EdgeInsets.only(bottom: 16.0),
@@ -233,9 +233,9 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
             iconPath: AppImages.filterSvgIcon,
             items: provider.filterList
                 .map((item) =>
-                    FilterItem(name: item.label, isSelected: item.isSelected),)
+                    FilterItem(name: item.label, isSelected: item.isSelected))
                 .toList(),
-            onItemTap: provider.selectSortByIndex,
+            onItemTap: provider.selectFilterTypeIndex,
           ),
           Row(
             spacing: 10,

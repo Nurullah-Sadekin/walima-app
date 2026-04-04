@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/global/components/empty_state.dart';
+import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
+import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
-import 'package:flutter_boilerplate/core/global/components/empty_state.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
-import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/inbox/domain/models/menu_item_model.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/providers/inbox_providers.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/filter_widget.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class InboxSentTab extends ConsumerStatefulWidget {
   const InboxSentTab({super.key});
@@ -188,12 +188,9 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
       child: FilterWidget(
         title: 'Filter My Sent Requests',
         items: provider.filterList
-            .map(
-              (item) =>
-                  FilterItem(name: item.label, isSelected: item.isSelected),
-            )
+            .map((item) => FilterItem(name: item.label, isSelected: item.isSelected))
             .toList(),
-        onItemTap: provider.selectSortByIndex,
+        onItemTap: provider.selectFilterTypeIndex,
       ),
     );
   }
