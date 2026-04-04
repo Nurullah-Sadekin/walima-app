@@ -5,7 +5,7 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
-import 'package:flutter_boilerplate/features/inbox/data/models/menu_item_model.dart';
+import 'package:flutter_boilerplate/features/inbox/domain/models/menu_item_model.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/providers/inbox_providers.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_card.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_tab_shared.dart';
