@@ -193,7 +193,7 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
             showTrailingImage: true,
             onChanged: (newValue) {
               provider.switcherValue = newValue;
-              provider.updateViewState();
+              provider.switcherStatusUpdate();
             },
           ),
           const Padding(

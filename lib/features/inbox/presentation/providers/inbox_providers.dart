@@ -5,6 +5,10 @@ import 'package:flutter_boilerplate/features/inbox/data/repository/inbox_reposit
 import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 
 class InboxProvider extends BaseChangeNotifier {
+
+  InboxScreenStates screenStates = InboxScreenStates.defaultState;
+  InboxScreenStates loaderState = InboxScreenStates.defaultState;
+
   bool? switcherValue = false;
   bool isLoading = false;
   bool hasError = false;
@@ -32,11 +36,11 @@ class InboxProvider extends BaseChangeNotifier {
   String searchQuery = '';
   String filterType = 'most_relevant';
 
-  void updateViewState({bool? switcherValue}) {
+  void switcherStatusUpdate({bool? switcherValue}) {
     if (switcherValue != null) {
       this.switcherValue = switcherValue;
     }
-    notifyListeners();
+    updateViewState();
   }
 
   bool _isValidIndex(int index, int length) => index >= 0 && index < length;
@@ -167,11 +171,9 @@ class InboxProvider extends BaseChangeNotifier {
     }
   }
 
-  List<AcceptedData> get acceptedReceivedConnections =>
-      _acceptedConnectionsByDirection('received');
+  List<AcceptedData> get acceptedReceivedConnections => _acceptedConnectionsByDirection('received');
 
-  List<AcceptedData> get acceptedSentConnections =>
-      _acceptedConnectionsByDirection('sent');
+  List<AcceptedData> get acceptedSentConnections => _acceptedConnectionsByDirection('sent');
 
   List<AcceptedData> _acceptedConnectionsByDirection(String direction) {
     final items = acceptedConnections ?? const <AcceptedData>[];
@@ -245,4 +247,24 @@ class InboxProvider extends BaseChangeNotifier {
     acceptedErrorMessage = null;
     notifyListeners();
   }
+
+  void updateViewState({
+    InboxScreenStates? screenStates,
+    InboxScreenStates? loadingState,
+  }) {
+    if (screenStates != null) {
+      this.screenStates = screenStates;
+      loaderState = InboxScreenStates.defaultState;
+    }
+    if (loadingState != null) loaderState = loadingState;
+    notifyListeners();
+  }
 }
+
+enum InboxScreenStates {
+  defaultState,
+  loading,
+  complete,
+  transparentLoading,
+}
+
