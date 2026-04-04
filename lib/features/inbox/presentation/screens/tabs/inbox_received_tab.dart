@@ -4,7 +4,10 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
 import 'package:flutter_boilerplate/core/global/components/empty_state.dart';
+import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
+import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/providers/inbox_providers.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/filter_widget.dart';
@@ -21,13 +24,32 @@ class InboxReceivedTab extends ConsumerStatefulWidget {
 
 class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
   @override
+  void initState() {
+    super.initState();
+    // Fetch data when tab is initialized
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(inboxProvider).fetchRequestedConnections();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final provider = ref.watch(inboxProvider);
 
     return SingleChildScrollView(
       child: Column(
         children: [
-          _header(),
+          _header(provider),
+          if (provider.screenStates == InboxScreenStates.loading ||
+              provider.loaderState == InboxScreenStates.transparentLoading)
+            const Padding(
+              padding: EdgeInsets.only(top: 8.0),
+              child: LinearProgressIndicator(
+                minHeight: 2,
+                color: AppColors.primary,
+                backgroundColor: AppColors.greyLight,
+              ),
+            ),
           const SizedBox(height: 10),
           _body(provider),
         ],
@@ -35,44 +57,113 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
     );
   }
 
-
   Widget _body(InboxProvider provider) {
-    return const Column(
+    // Show loading state
+    if (provider.isLoading && (provider.receivedConnections?.isEmpty ?? true)) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(32.0),
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    // Show error state
+    if (provider.hasError) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const EmptyStateWidget(
+              imagePath: AppImages.addTeam,
+              title: 'Error Loading Requests',
+              subtitle: 'Unable to load your connection requests',
+              buttonText: 'Retry',
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                provider.fetchRequestedConnections();
+              },
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Show empty state
+    if (provider.receivedConnections?.isEmpty ?? true) {
+      return const EmptyStateWidget(
+        imagePath: AppImages.addTeam,
+        title: 'No Pending Requests!',
+        subtitle:
+            'Take the next step view your accepted matches for better connections',
+        buttonText: 'Explore Accepted Matches',
+      );
+    }
+
+    // Show list of received connections
+    return Column(
       children: [
-        ProfileComprehensiveCard(
-          imagePath: AppImages.demoProfile,
-          leftIconPath: AppImages.favouriteIcon,
-          isPremiumConnect: false,
-          isVerified: true,
-          name: 'Tasnova Ahmed',
-          age: '28 Yr',
-          height: '5\' 3\'" ',
-          location: 'Gulshan, Dhaka, BD',
-          activeStatusText: '1 day ago',
-          menu: true,
-          onTapLeftButton: null,
-          onTapRightButton: null,
-          photoCount: '1',
-          leftButtonText: 'Accept',
-          rightButtonText: 'Reject',
-          rightIconPath: AppImages.cancelSvgIcon,
-        ),
-         EmptyStateWidget(
-          imagePath: AppImages.addTeam,
-          title: 'No Pending Requests!',
-          subtitle: 'Take the next step view your accepted matches for better connections',
-          buttonText: 'Explore Accepted Matches',
-        ),
+        ...provider.receivedConnections!.map((connection) {
+          final age = connection.age.toString();
+          final name = connection.displayName ?? 'Unknown';
+          final city = connection.location?.city ?? '';
+          final state = connection.location?.state ?? '';
+          final locationText =
+              [city, state].where((s) => s.isNotEmpty).join(', ');
+          final location =
+              locationText.isNotEmpty ? locationText : 'Unknown location';
+          final profilePhotoUrl =
+              connection.profilePhoto?.url ?? AppImages.demoProfile;
+          final isVerified = connection.profilePhoto?.isVerified ?? false;
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: ProfileComprehensiveCard(
+              imagePath: profilePhotoUrl,
+              leftIconPath: AppImages.favouriteIcon,
+              isPremiumConnect: false,
+              isVerified: isVerified,
+              name: name,
+              viewOnAccept:
+                  connection.profilePhoto?.visibilityStatus == 'public'
+                      ? false
+                      : true,
+              age: '$age Yr',
+              height: CamelCaseUtils.formatCamelCase(
+                  connection.maritalStatus ?? ''),
+              location: location,
+              activeStatusText: DateTimeUtils.formatDate(
+                  DateTime.tryParse(connection.lastSeenAt ?? '')),
+              isOnline: connection.isOnline ?? false,
+              menu: true,
+              onTapLeftButton: () {
+                // Accept connection logic here
+              },
+              onTapRightButton: () {
+                // Reject connection logic here
+              },
+              leftButtonText: 'Accept',
+              rightButtonText: 'Reject',
+              rightIconPath: AppImages.cancelSvgIcon,
+            ),
+          );
+        }).toList(),
       ],
     );
   }
 
-  Widget _header(){
+  Widget _header(InboxProvider provider) {
+    final count = provider.totalItems! > 0
+        ? provider.totalItems
+        : provider.receivedConnections?.length ?? 0;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          'All Requests (26)',
+          'All Requests ($count)',
           style: TextStyle(
             color: AppColors.textSecondaryLight,
             fontSize: TextSize.font12(context),
@@ -124,7 +215,7 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
             showTrailingImage: true,
             onChanged: (newValue) {
               provider.switcherValue = newValue;
-              provider.updateViewState();
+              provider.switcherStatusUpdate();
             },
           ),
           const Padding(
@@ -134,10 +225,11 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
           FilterWidget(
             title: 'Sort by',
             iconPath: AppImages.sortIcon,
-            items: provider.sortByDataList
-                .map((item) => FilterItem(name: item.name, isSelected: item.isSelected))
+            items: provider.sortList
+                .map((item) =>
+                    FilterItem(name: item.label, isSelected: item.isSelected))
                 .toList(),
-            onItemTap: provider.sortBy,
+            onItemTap: provider.selectSortByIndex,
           ),
           const Padding(
             padding: EdgeInsets.only(bottom: 16.0),
@@ -146,23 +238,21 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
           FilterWidget(
             title: 'Filter by',
             iconPath: AppImages.filterSvgIcon,
-            items: provider.sortByDataList
-                .map((item) => FilterItem(name: item.name, isSelected: item.isSelected))
+            items: provider.filterList
+                .map((item) =>
+                    FilterItem(name: item.label, isSelected: item.isSelected))
                 .toList(),
-            onItemTap: provider.sortBy,
+            onItemTap: provider.selectSortByIndex,
           ),
-          FilterWidget(
-            title: 'Filter by',
-            iconPath: AppImages.filterSvgIcon,
-            items: provider.sortByDataList
-                .map((item) => FilterItem(name: item.name, isSelected: item.isSelected))
-                .toList(),
-            onItemTap: provider.sortBy,
-          ),
+          Row(
+            spacing: 10,
+            children: [
+              Expanded(child: PrimaryButtons(buttonStyle: ButtonsStyle.cancelButton, onTap: (){}, title: 'Reset')),
+              Expanded(child: PrimaryButtons(buttonStyle: ButtonsStyle.activePrimaryButton, onTap: (){}, title: 'Apply')),
+            ],
+          )
         ],
       ),
     );
   }
-
 }
-

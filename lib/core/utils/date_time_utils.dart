@@ -9,4 +9,13 @@ class DateTimeUtils {
       return '--';
     }
   }
+
+  static String onlyDate(DateTime? dateTime) {
+    if (dateTime == null) return '--';
+    try {
+      return DateFormat('dd MMM').format(dateTime.toLocal());
+    } catch (_) {
+      return '--';
+    }
+  }
 }

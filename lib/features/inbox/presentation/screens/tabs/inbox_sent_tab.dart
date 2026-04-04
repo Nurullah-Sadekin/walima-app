@@ -5,7 +5,7 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
-import 'package:flutter_boilerplate/features/inbox/data/models/menu_item_model.dart';
+import 'package:flutter_boilerplate/features/inbox/domain/models/menu_item_model.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/providers/inbox_providers.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_card.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_tab_shared.dart';
@@ -118,10 +118,10 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: FilterWidget(
         title: 'Filter My Sent Requests',
-        items: provider.sortByDataList
-            .map((item) => FilterItem(name: item.name, isSelected: item.isSelected))
+        items: provider.filterList
+            .map((item) => FilterItem(name: item.label, isSelected: item.isSelected))
             .toList(),
-        onItemTap: provider.sortBy,
+        onItemTap: provider.selectSortByIndex,
       ),
     );
   }
