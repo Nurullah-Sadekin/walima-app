@@ -34,6 +34,7 @@ class InboxProvider extends BaseChangeNotifier {
   String? sortOrder;
   String? searchQuery;
   String? filterType;
+  String? responseFormat;
 
   void switcherStatusUpdate({bool? switcherValue}) {
     if (switcherValue != null) {
@@ -64,11 +65,7 @@ class InboxProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchRequestedConnections({
-    int? page,
-    int? size,
-    String responseFormat = 'short',
-  }) async {
+  Future<void> fetchRequestedConnections() async {
     isLoading = true;
     hasError = false;
     errorMessage = null;
@@ -78,10 +75,9 @@ class InboxProvider extends BaseChangeNotifier {
     );
 
     try {
-      receivedConnectionsResponse =
-          await InboxRepository.getRequestedConnections(
-        page: page ?? currentPage,
-        size: size ?? pageSize,
+      receivedConnectionsResponse = await InboxRepository.getRequestedConnections(
+        page:  currentPage,
+        size:  pageSize,
         responseFormat: responseFormat,
         sortBy: sortBy,
         sortOrder: sortOrder,
@@ -89,24 +85,14 @@ class InboxProvider extends BaseChangeNotifier {
         filter: filterType,
       );
 
-      if (receivedConnectionsResponse?.code == 'SUCCESS' ||
-          receivedConnectionsResponse?.code == '1') {
+      if (receivedConnectionsResponse?.code == 'SUCCESS') {
         receivedConnections = receivedConnectionsResponse?.response?.data ?? [];
-
-        final pagination = receivedConnectionsResponse?.response?.pagination;
-        if (pagination != null) {
-          totalItems = pagination.total ?? 0;
-          currentPage = pagination.page ?? (page ?? currentPage);
-          pageSize = pagination.size ?? (size ?? pageSize);
-        }
-
         isLoading = false;
         hasError = false;
         updateViewState(screenStates: InboxScreenStates.complete);
       } else {
         hasError = true;
-        errorMessage =
-            receivedConnectionsResponse?.message ?? 'Failed to load requests';
+        errorMessage = receivedConnectionsResponse?.message ?? 'Failed to load requests';
         receivedConnections = [];
         isLoading = false;
         updateViewState(screenStates: InboxScreenStates.defaultState);

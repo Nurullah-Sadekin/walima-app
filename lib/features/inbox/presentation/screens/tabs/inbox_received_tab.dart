@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
 import 'package:flutter_boilerplate/core/global/components/empty_state.dart';
+import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
 import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
@@ -224,7 +225,7 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
           FilterWidget(
             title: 'Sort by',
             iconPath: AppImages.sortIcon,
-            items: provider.filterList
+            items: provider.sortList
                 .map((item) =>
                     FilterItem(name: item.label, isSelected: item.isSelected))
                 .toList(),
@@ -243,6 +244,13 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
                 .toList(),
             onItemTap: provider.selectSortByIndex,
           ),
+          Row(
+            spacing: 10,
+            children: [
+              Expanded(child: PrimaryButtons(buttonStyle: ButtonsStyle.cancelButton, onTap: (){}, title: 'Reset')),
+              Expanded(child: PrimaryButtons(buttonStyle: ButtonsStyle.activePrimaryButton, onTap: (){}, title: 'Apply')),
+            ],
+          )
         ],
       ),
     );

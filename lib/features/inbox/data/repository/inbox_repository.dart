@@ -15,7 +15,7 @@ class InboxRepository {
     String? filter,
   }) async {
     try {
-      final queryParameters = {
+      final queryParameters = <String, dynamic>{
         'page': page,
         'size': size,
         'responseFormat': responseFormat,
@@ -23,7 +23,7 @@ class InboxRepository {
         'sortOrder': sortOrder,
         'search': search,
         'filter': filter,
-      };
+      }..removeWhere((_, value) => value == null);
 
       final response = await DioClient().get(
         AppUrls.getRequestedConnections,
