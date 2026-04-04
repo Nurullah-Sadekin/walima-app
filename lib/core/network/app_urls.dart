@@ -118,6 +118,7 @@ class AppUrls {
   //General User Endpoints
 
   static const String getCurrentUserInfo = '$baseUrl/users'; //GET
+  static const String getLookups = '$baseUrl/lookups'; //GET
   static const String getUserDashboard = '$baseUrl/users/dashboard'; //GET
   static const String checkUsername = '$baseUrl/users/check-username'; //GET
   static const String checkEmail = '$baseUrl/users/check-email'; //GET

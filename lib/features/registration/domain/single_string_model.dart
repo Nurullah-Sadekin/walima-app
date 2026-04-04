@@ -2,27 +2,37 @@
 class SingleStringModel {
   SingleStringModel({
     required this.name,
+    this.value,
     this.isSelected = false
   });
 
   final String name;
+  final String? value;
   bool isSelected;
 
   SingleStringModel copyWith({
     String? name,
+    String? value,
     bool? isSelected,
   }) {
     return SingleStringModel(
       name: name ?? this.name,
+      value: value ?? this.value,
       isSelected: isSelected ?? this.isSelected,
     );
   }
 }
 
 List<SingleStringModel> dietDataListInserted = [
-  SingleStringModel(name: 'Veg'),
-  SingleStringModel(name: 'Non-Veg'),
-  SingleStringModel(name: 'Jain'),
+  SingleStringModel(name: 'Vegetarian', value: 'vegetarian'),
+  SingleStringModel(name: 'Non-Vegetarian', value: 'non_vegetarian'),
+  SingleStringModel(name: 'Halal Only', value: 'halal_only'),
+  SingleStringModel(name: 'Vegan', value: 'vegan'),
+  SingleStringModel(name: 'Jain Vegetarian', value: 'jain_vegetarian'),
+  SingleStringModel(
+    name: 'Occasionally Non-Veg',
+    value: 'occasionally_non_veg',
+  ),
 ];
 
 List<SingleStringModel> incomeRangeListInserted = [
@@ -34,19 +44,21 @@ List<SingleStringModel> incomeRangeListInserted = [
 ];
 
 List<SingleStringModel> yourWorkListInserted = [
-  SingleStringModel(name: 'Full-time'),
-  SingleStringModel(name: 'Part-time'),
-  SingleStringModel(name: 'Self-employed'),
-  SingleStringModel(name: 'Student'),
-  SingleStringModel(name: 'Unemployed'),
-];
-
-List<SingleStringModel> youWorkAsListInserted = [
-  SingleStringModel(name: 'Engineer'),
-  SingleStringModel(name: 'Doctor'),
-  SingleStringModel(name: 'Teacher'),
-  SingleStringModel(name: 'Business'),
-  SingleStringModel(name: 'Other'),
+  SingleStringModel(name: 'Open to All', value: 'open_to_all'),
+  SingleStringModel(
+    name: 'Business / Self Employed',
+    value: 'business_self_employed',
+  ),
+  SingleStringModel(name: 'Private Company', value: 'private_company'),
+  SingleStringModel(
+    name: 'Government / Public Sector',
+    value: 'government_public_sector',
+  ),
+  SingleStringModel(
+    name: 'Defense / Civil Service',
+    value: 'defense_civil_service',
+  ),
+  SingleStringModel(name: 'Not Working', value: 'not_working'),
 ];
 
 List<SingleStringModel> creativeItemListDataInserted = [

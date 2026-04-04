@@ -4,13 +4,22 @@ import 'package:flutter_boilerplate/features/registration/domain/single_string_m
 class MyMatchFilterProvider extends BaseChangeNotifier {
   MyMatchFilterProvider();
 
+  static final List<SingleStringModel> _professionFallbackList =
+      <SingleStringModel>[
+        SingleStringModel(name: 'Engineer'),
+        SingleStringModel(name: 'Doctor'),
+        SingleStringModel(name: 'Teacher'),
+        SingleStringModel(name: 'Business'),
+        SingleStringModel(name: 'Other'),
+      ];
+
   // Lists used for selection UIs
   List<SingleStringModel> countries = List.from(countryListDataInserted);
   List<SingleStringModel> communities = List.from(communityListDataInserted);
   List<SingleStringModel> maritalStatusList = List.from(maritalStatusListDataInserted);
   List<SingleStringModel> incomeRangeList = List.from(incomeRangeListInserted);
   List<SingleStringModel> yourWorkList = List.from(yourWorkListInserted);
-  List<SingleStringModel> youWorkAsList = List.from(youWorkAsListInserted);
+  List<SingleStringModel> youWorkAsList = List.from(_professionFallbackList);
   // fallback / small default lists
   List<SingleStringModel> booleanOptionList = [
     SingleStringModel(name: 'Open to All'),

@@ -45,7 +45,8 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
     final screenProvider = ref.watch(professionScreenProvider);
     return TransparentLoading(
       isLoading:
-          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor ||
+              provider.isLookupDataLoading,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
@@ -129,9 +130,11 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
           headLine: 'Income Range',
           hintText: 'Select',
           popUpHeader: 'Select Income Range',
-          items: provider.incomeRangeList,
+          items: provider.incomeRangeDropdownItems,
           controller: provider.incomeRangeController,
-          isSearch: false,
+          onTap: provider.loadLookupData,
+          onConfirm: (value) => provider.selectIncomeRange(value?.toString()),
+          isSearch: true,
         ),
 
         // Your Work Dropdown
@@ -141,6 +144,7 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
           popUpHeader: 'Select Your Work',
           items: provider.yourWorkList,
           controller: provider.yourWorkController,
+          onConfirm: (value) => provider.selectYourWork(value?.toString()),
           isSearch: false,
         ),
 
@@ -149,9 +153,11 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
           headLine: 'You Work As',
           hintText: 'Select',
           popUpHeader: 'Select Profession',
-          items: provider.youWorkAsList,
+          items: provider.professionDropdownItems,
           controller: provider.youWorkAsController,
-          isSearch: false,
+          onTap: provider.loadLookupData,
+          onConfirm: (value) => provider.selectYouWorkAs(value?.toString()),
+          isSearch: true,
         ),
 
         PrimaryTextField(

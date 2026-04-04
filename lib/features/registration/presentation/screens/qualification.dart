@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
@@ -43,7 +44,8 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
     final screenProvider = ref.watch(qualificationScreenProvider);
     return TransparentLoading(
       isLoading:
-          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor ||
+              provider.isLookupDataLoading,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
@@ -83,13 +85,18 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
     return Column(
       spacing: 20,
       children: [
-        PrimaryTextField(
+        DropDownField(
           controller: provider.highestQualification,
           headLine: 'Highest Qualification',
-          hintText: 'Write here',
-          errorText: null,
-          noPrefix: true,
-          onTap: () {},
+          hintText: 'Select',
+          popUpHeader: 'Select Highest Qualification',
+          items: provider.educationLevelDropdownItems,
+          onTap: provider.loadLookupData,
+          onConfirm: (value) {
+            if (value == null) return;
+            provider.highestQualification.text = value.toString();
+          },
+          isSearch: true,
         ),
         PrimaryTextField(
           controller: provider.instituteController,

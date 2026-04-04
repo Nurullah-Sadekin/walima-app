@@ -46,7 +46,8 @@ class _HobbiesInterestsScreenState
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(hobbiesInterestsScreenProvider);
     return TransparentLoading(
-      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor ||
+          provider.isLookupDataLoading,
       child: Scaffold(
         extendBodyBehindAppBar: true,
         backgroundColor: Colors.transparent,
@@ -125,11 +126,33 @@ class _HobbiesInterestsScreenState
                   ),
                   HobbiesInterestsCard(
                     dataList: provider.otherInterestsItemList,
-                    title: 'Other Interests',
+                    title: 'Media & Learning',
                     onItemTap: (index) {
                       provider.toggleHobbySelection(
                           index, provider.otherInterestsItemList,
                           context: context);
+                    },
+                  ),
+                  HobbiesInterestsCard(
+                    dataList: provider.foodCuisineItemList,
+                    title: 'Food & Cuisine',
+                    onItemTap: (index) {
+                      provider.toggleHobbySelection(
+                        index,
+                        provider.foodCuisineItemList,
+                        context: context,
+                      );
+                    },
+                  ),
+                  HobbiesInterestsCard(
+                    dataList: provider.travelLeisureItemList,
+                    title: 'Travel & Leisure',
+                    onItemTap: (index) {
+                      provider.toggleHobbySelection(
+                        index,
+                        provider.travelLeisureItemList,
+                        context: context,
+                      );
                     },
                   ),
                   const SizedBox(

@@ -17,16 +17,15 @@ import 'package:flutter_boilerplate/features/registration/data/models/request/up
 import 'package:flutter_boilerplate/features/registration/data/models/request/update_family_request_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/response/onboarding_response.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/response/upload_media_response.dart';
+import 'package:flutter_boilerplate/features/registration/data/models/lookup_option.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/interests_repository.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/family_repository.dart';
+import 'package:flutter_boilerplate/features/registration/data/repository/lookup_repository.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/location_data_repository_impl.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/media_repository.dart';
-import 'package:flutter_boilerplate/features/registration/data/repository/religion_data_repository_impl.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/registration_repository.dart';
 import 'package:flutter_boilerplate/features/registration/domain/location_data_model.dart';
-import 'package:flutter_boilerplate/features/registration/domain/religion_option_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/repository/location_data_repository.dart';
-import 'package:flutter_boilerplate/features/registration/domain/repository/religion_data_repository.dart';
 import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/is_with_family_status_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/profile_for_model.dart';
@@ -83,14 +82,15 @@ class RegistrationProvider extends BaseChangeNotifier {
   List<IsWithFamilyModel> isWithFamilyDataList = isWithFamilyDataListInserted;
   List<IsWithFamilyModel> incomePeriodDataList = incomePeriodDataListInserted;
   List<SingleStringModel> dietDataList = dietDataListInserted;
-  List<SingleStringModel> incomeRangeList = incomeRangeListInserted;
+  List<SingleStringModel> incomeRangeList = <SingleStringModel>[];
   List<SingleStringModel> yourWorkList = yourWorkListInserted;
-  List<SingleStringModel> youWorkAsList = youWorkAsListInserted;
-  List<SingleStringModel> creativeItemList = creativeItemListDataInserted;
-  List<SingleStringModel> funItemList = funItemListDataInserted;
-  List<SingleStringModel> fitnessItemList = fitnessItemListDataInserted;
-  List<SingleStringModel> otherInterestsItemList =
-      otherInterestsItemListDataInserted;
+  List<SingleStringModel> youWorkAsList = <SingleStringModel>[];
+  List<SingleStringModel> creativeItemList = <SingleStringModel>[];
+  List<SingleStringModel> funItemList = <SingleStringModel>[];
+  List<SingleStringModel> fitnessItemList = <SingleStringModel>[];
+  List<SingleStringModel> otherInterestsItemList = <SingleStringModel>[];
+  List<SingleStringModel> foodCuisineItemList = <SingleStringModel>[];
+  List<SingleStringModel> travelLeisureItemList = <SingleStringModel>[];
   List<SingleStringModel> motherDetailsItemList =
       motherDetailsItemListDataInserted;
   List<SingleStringModel> fatherDetailsItemList =
@@ -108,19 +108,24 @@ class RegistrationProvider extends BaseChangeNotifier {
 
   String selectedVerificationType = 'email'; // or 'phone'
 
-  final ReligionDataRepository _religionDataRepository =
-      ReligionDataRepositoryImpl();
   final LocationDataRepository _locationDataRepository =
       LocationDataRepositoryImpl();
+  final LookupRepository _lookupRepository = LookupRepository();
   final MediaRepository _mediaRepository = MediaRepository();
   final InterestsRepository _interestsRepository = InterestsRepository();
   final FamilyRepository _familyRepository = FamilyRepository();
 
-  List<ReligionOptionModel> religionOptions = <ReligionOptionModel>[];
+  List<LookupOption> religionOptions = <LookupOption>[];
+  List<LookupOption> communityOptions = <LookupOption>[];
+  List<LookupOption> educationLevelOptions = <LookupOption>[];
+  List<LookupOption> professionOptions = <LookupOption>[];
+  List<LookupOption> incomeRangeOptions = <LookupOption>[];
   List<String> religionDropdownItems = <String>[];
   List<String> communityDropdownItems = <String>[];
   bool isReligionDataLoading = false;
   String? religionDataError;
+  bool isLookupDataLoading = false;
+  String? lookupDataError;
 
   List<CountryLocationModel> countryOptions = <CountryLocationModel>[];
   List<ResidencyStatusOptionModel> residencyStatusOptions =
@@ -134,18 +139,13 @@ class RegistrationProvider extends BaseChangeNotifier {
   UploadMediaData? uploadedProfileMedia;
   String profileImageUploadErrorMessage = '';
 
-  static const Set<String> _allowedReligionValues = <String>{
-    'islam',
-    'hinduism',
-    'christianity',
-    'buddhism',
-    'judaism',
-    'sikhism',
-    'jainism',
-    'others',
-    'no_religion',
-    'spiritual',
-  };
+  static const List<LookupOption> _staticReligionOptions = <LookupOption>[
+    LookupOption(key: 'islam', label: 'Islam'),
+    LookupOption(key: 'hinduism', label: 'Hinduism'),
+    LookupOption(key: 'christianity', label: 'Christianity'),
+    LookupOption(key: 'buddhism', label: 'Buddhism'),
+    LookupOption(key: 'others', label: 'Others'),
+  ];
 
   static const Set<String> _allowedResidencyStatusValues = <String>{
     'citizen',
@@ -505,34 +505,17 @@ class RegistrationProvider extends BaseChangeNotifier {
     await _restoreRegistrationDraft();
     await loadReligionData();
     await loadLocationData();
+    await loadLookupData();
     _isDraftInitialized = true;
     notifyListeners();
   }
 
   Future<void> loadReligionData() async {
-    if (isReligionDataLoading) return;
-
-    if (religionOptions.isNotEmpty) {
-      _syncCommunityOptionsFromSelectedReligion();
-      notifyListeners();
-      return;
-    }
-
-    isReligionDataLoading = true;
-    religionDataError = null;
+    religionOptions = List<LookupOption>.from(_staticReligionOptions);
+    religionDropdownItems =
+        religionOptions.map((item) => item.label).toList(growable: false);
+    await _syncCommunityOptionsFromSelectedReligion();
     notifyListeners();
-
-    try {
-      religionOptions = await _religionDataRepository.getReligionOptions();
-      religionDropdownItems =
-          religionOptions.map((item) => item.name).toList(growable: false);
-      _syncCommunityOptionsFromSelectedReligion();
-    } catch (e) {
-      religionDataError = e.toString();
-    } finally {
-      isReligionDataLoading = false;
-      notifyListeners();
-    }
   }
 
   void onReligionSelected(String? value) {
@@ -544,7 +527,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       communityController.clear();
     }
 
-    _syncCommunityOptionsFromSelectedReligion();
+    unawaited(_syncCommunityOptionsFromSelectedReligion());
     _notifyAndPersist();
   }
 
@@ -556,23 +539,37 @@ class RegistrationProvider extends BaseChangeNotifier {
     _notifyAndPersist();
   }
 
-  void _syncCommunityOptionsFromSelectedReligion() {
+  Future<void> _syncCommunityOptionsFromSelectedReligion() async {
     final selectedReligion = religionController.text.trim();
     if (selectedReligion.isEmpty) {
+      communityOptions = <LookupOption>[];
       communityDropdownItems = <String>[];
+      notifyListeners();
       return;
     }
 
     final matchedReligion = _findReligionOption(selectedReligion);
     if (matchedReligion == null) {
+      communityOptions = <LookupOption>[];
       communityDropdownItems = <String>[];
+      notifyListeners();
       return;
     }
 
-    communityDropdownItems = matchedReligion.community.flattenCommunityLabels();
+    isReligionDataLoading = true;
+    religionDataError = null;
+    notifyListeners();
 
-    if (communityDropdownItems.isEmpty) {
-      communityDropdownItems = matchedReligion.community.topLevelLabels();
+    try {
+      communityOptions = await _lookupRepository.getLookups(matchedReligion.key);
+      communityDropdownItems =
+          communityOptions.map((item) => item.label).toList(growable: false);
+    } catch (e) {
+      communityOptions = <LookupOption>[];
+      communityDropdownItems = <String>[];
+      religionDataError = e.toString();
+    } finally {
+      isReligionDataLoading = false;
     }
 
     if (communityController.text.isNotEmpty) {
@@ -585,18 +582,139 @@ class RegistrationProvider extends BaseChangeNotifier {
         communityController.clear();
       }
     }
+    notifyListeners();
   }
 
-  ReligionOptionModel? _findReligionOption(String religion) {
+  LookupOption? _findReligionOption(String religion) {
     final normalized = religion.trim().toLowerCase();
     for (final option in religionOptions) {
-      final byName = option.name.toLowerCase() == normalized;
-      final byValue = option.value.toLowerCase() == normalized;
+      final byName = option.label.toLowerCase() == normalized;
+      final byValue = option.key.toLowerCase() == normalized;
       if (byName || byValue) {
         return option;
       }
     }
     return null;
+  }
+
+  Future<void> loadLookupData() async {
+    if (isLookupDataLoading) return;
+
+    if (educationLevelOptions.isNotEmpty &&
+        professionOptions.isNotEmpty &&
+        incomeRangeOptions.isNotEmpty &&
+        creativeItemList.isNotEmpty &&
+        funItemList.isNotEmpty &&
+        fitnessItemList.isNotEmpty &&
+        otherInterestsItemList.isNotEmpty &&
+        foodCuisineItemList.isNotEmpty &&
+        travelLeisureItemList.isNotEmpty) {
+      notifyListeners();
+      return;
+    }
+
+    isLookupDataLoading = true;
+    lookupDataError = null;
+    notifyListeners();
+
+    try {
+      final results = await Future.wait<List<LookupOption>>([
+        _lookupRepository.getLookups('education-levels'),
+        _lookupRepository.getLookups('professions'),
+        _lookupRepository.getLookups('income-range'),
+        _lookupRepository.getLookups('creative-pursuits'),
+        _lookupRepository.getLookups('outdoor-activities'),
+        _lookupRepository.getLookups('fitness-and-sports'),
+        _lookupRepository.getLookups('media-and-learning'),
+        _lookupRepository.getLookups('food-and-cuisine'),
+        _lookupRepository.getLookups('travel-and-leisure'),
+      ]);
+
+      educationLevelOptions = results[0];
+      professionOptions = results[1];
+      incomeRangeOptions = results[2];
+      creativeItemList = _toSingleStringModels(results[3]);
+      funItemList = _toSingleStringModels(results[4]);
+      fitnessItemList = _toSingleStringModels(results[5]);
+      otherInterestsItemList = _toSingleStringModels(results[6]);
+      foodCuisineItemList = _toSingleStringModels(results[7]);
+      travelLeisureItemList = _toSingleStringModels(results[8]);
+      incomeRangeList = _toSingleStringModels(incomeRangeOptions);
+      youWorkAsList = _toSingleStringModels(professionOptions);
+      _applySingleSelectionByName(
+        incomeRangeList,
+        selectedIncomeRange,
+        (item) => item.name,
+        (item, selected) => item.isSelected = selected,
+      );
+      _applySingleSelectionByName(
+        youWorkAsList,
+        selectedYouWorkAs,
+        (item) => item.name,
+        (item, selected) => item.isSelected = selected,
+      );
+      _applyMultiSelectionByNames(
+        creativeItemList,
+        selectedHobbies,
+        (item) => item.name,
+        (item, selected) => item.isSelected = selected,
+      );
+      _applyMultiSelectionByNames(
+        funItemList,
+        selectedHobbies,
+        (item) => item.name,
+        (item, selected) => item.isSelected = selected,
+      );
+      _applyMultiSelectionByNames(
+        fitnessItemList,
+        selectedHobbies,
+        (item) => item.name,
+        (item, selected) => item.isSelected = selected,
+      );
+      _applyMultiSelectionByNames(
+        otherInterestsItemList,
+        selectedHobbies,
+        (item) => item.name,
+        (item, selected) => item.isSelected = selected,
+      );
+      _applyMultiSelectionByNames(
+        foodCuisineItemList,
+        selectedHobbies,
+        (item) => item.name,
+        (item, selected) => item.isSelected = selected,
+      );
+      _applyMultiSelectionByNames(
+        travelLeisureItemList,
+        selectedHobbies,
+        (item) => item.name,
+        (item, selected) => item.isSelected = selected,
+      );
+    } catch (e) {
+      lookupDataError = e.toString();
+    } finally {
+      isLookupDataLoading = false;
+      notifyListeners();
+    }
+  }
+
+  List<String> get educationLevelDropdownItems =>
+      educationLevelOptions.map((item) => item.label).toList(growable: false);
+
+  List<String> get professionDropdownItems =>
+      professionOptions.map((item) => item.label).toList(growable: false);
+
+  List<String> get incomeRangeDropdownItems =>
+      incomeRangeOptions.map((item) => item.label).toList(growable: false);
+
+  List<SingleStringModel> _toSingleStringModels(List<LookupOption> items) {
+    return items
+        .map(
+          (item) => SingleStringModel(
+            name: item.label,
+            value: item.key,
+          ),
+        )
+        .toList(growable: false);
   }
 
   Future<void> loadLocationData() async {
@@ -1195,6 +1313,18 @@ class RegistrationProvider extends BaseChangeNotifier {
         (item) => item.name,
         (item, selected) => item.isSelected = selected,
       );
+      _applyMultiSelectionByNames(
+        foodCuisineItemList,
+        selectedHobbies,
+        (item) => item.name,
+        (item, selected) => item.isSelected = selected,
+      );
+      _applyMultiSelectionByNames(
+        travelLeisureItemList,
+        selectedHobbies,
+        (item) => item.name,
+        (item, selected) => item.isSelected = selected,
+      );
 
       _syncCommunityOptionsFromSelectedReligion();
       await _syncCityOptionsFromSelectedCountry(notify: false);
@@ -1318,9 +1448,9 @@ class RegistrationProvider extends BaseChangeNotifier {
 
     final matchedReligion = _findReligionOption(selected);
     final candidate =
-        matchedReligion?.value.trim().toLowerCase() ?? _toSnakeCase(selected);
+        matchedReligion?.key.trim().toLowerCase() ?? _toSnakeCase(selected);
 
-    if (_allowedReligionValues.contains(candidate)) {
+    if (_staticReligionOptions.any((item) => item.key == candidate)) {
       return candidate;
     }
     return 'others';
@@ -1390,6 +1520,11 @@ class RegistrationProvider extends BaseChangeNotifier {
     final selected = highestQualification.text.trim();
     if (selected.isEmpty) return '';
 
+    final lookupMatch = _findLookupOption(educationLevelOptions, selected);
+    if (lookupMatch != null) {
+      return lookupMatch.key;
+    }
+
     final normalized = selected.toLowerCase();
 
     if (normalized.contains('no formal')) {
@@ -1445,6 +1580,57 @@ class RegistrationProvider extends BaseChangeNotifier {
       return candidate;
     }
     return 'others';
+  }
+
+  String _resolveIncomeRangeValue() {
+    final selected = incomeRangeController.text.trim();
+    if (selected.isEmpty) return '';
+
+    final lookupMatch = _findLookupOption(incomeRangeOptions, selected);
+    return lookupMatch?.key ?? selected;
+  }
+
+  String _resolveWorkTypeValue() {
+    final selected = selectedYourWork?.trim() ?? yourWorkController.text.trim();
+    if (selected.isEmpty) return '';
+
+    for (final option in yourWorkList) {
+      final optionName = option.name.trim().toLowerCase();
+      final optionValue = (option.value ?? '').trim().toLowerCase();
+      if (optionName == selected.toLowerCase() ||
+          optionValue == selected.toLowerCase()) {
+        return option.value ?? option.name;
+      }
+    }
+
+    return _toSnakeCase(selected);
+  }
+
+  String _resolveWorkingAsValue() {
+    final selected = youWorkAsController.text.trim();
+    if (selected.isEmpty) return '';
+
+    final lookupMatch = _findLookupOption(professionOptions, selected);
+    return lookupMatch?.key ?? _toSnakeCase(selected);
+  }
+
+  String _resolveCommunityValue() {
+    final selected = communityController.text.trim();
+    if (selected.isEmpty) return '';
+
+    final lookupMatch = _findLookupOption(communityOptions, selected);
+    return lookupMatch?.key ?? _toSnakeCase(selected);
+  }
+
+  LookupOption? _findLookupOption(List<LookupOption> options, String selected) {
+    final normalized = selected.trim().toLowerCase();
+    for (final option in options) {
+      if (option.label.toLowerCase() == normalized ||
+          option.key.toLowerCase() == normalized) {
+        return option;
+      }
+    }
+    return null;
   }
 
   String _resolveLocationTypeValue(String residencyStatusValue) {
@@ -1577,7 +1763,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       firstName: firstNameController.text,
       lastName: lastNameController.text,
       religionName: religionValue,
-      community: communityController.text,
+      community: _resolveCommunityValue(),
       livingIn: livingInController.text,
       cityName: cityController.text,
       dateOfBirth: '1990-01-01',
@@ -1588,10 +1774,10 @@ class RegistrationProvider extends BaseChangeNotifier {
       height: num.tryParse(heightController.text),
       diet: dietValue,
       highestLevelOfEducation: highestEducationValue,
-      incomeRange: incomeRangeController.text,
+      incomeRange: _resolveIncomeRangeValue(),
       incomeRangeFrequency: selectedIncomePeriodStatus?.toLowerCase() ?? '',
-      workWith: selectedYourWork?.toLowerCase() ?? '',
-      workingAs: selectedYouWorkAs?.toLowerCase() ?? '',
+      workWith: _resolveWorkTypeValue(),
+      workingAs: _resolveWorkingAsValue(),
       currentCompany: currentCompanyNameController.text,
       bio: aboutYourselfController.text,
       termsAndConditionsAccepted: true,
@@ -1642,7 +1828,9 @@ class RegistrationProvider extends BaseChangeNotifier {
       firstName: firstName,
       lastName: lastName,
       religionName: religionValue,
-      community: _valueOrDefault(communityController.text, 'sunni'),
+      community: _resolveCommunityValue().isNotEmpty
+          ? _resolveCommunityValue()
+          : 'sunni',
       livingIn: _valueOrDefault(livingInController.text, fallbackCountryName),
       cityName: _valueOrDefault(cityController.text, 'Dhaka'),
       dateOfBirth: '1990-01-01',
@@ -1653,14 +1841,18 @@ class RegistrationProvider extends BaseChangeNotifier {
       height: num.tryParse(heightController.text) ?? 170,
       diet: dietValue,
       highestLevelOfEducation: highestEducationValue,
-      incomeRange: _valueOrDefault(incomeRangeController.text, '50000-100000'),
+      incomeRange: _resolveIncomeRangeValue().isNotEmpty
+          ? _resolveIncomeRangeValue()
+          : '50k-100k',
       incomeRangeFrequency:
           _valueOrDefault(selectedIncomePeriodStatus ?? '', 'monthly')
               .toLowerCase(),
-      workWith:
-          _valueOrDefault(selectedYourWork ?? '', 'private').toLowerCase(),
-      workingAs: _valueOrDefault(selectedYouWorkAs ?? '', 'software_engineer')
-          .toLowerCase(),
+      workWith: _resolveWorkTypeValue().isNotEmpty
+          ? _resolveWorkTypeValue()
+          : 'private_company',
+      workingAs: _resolveWorkingAsValue().isNotEmpty
+          ? _resolveWorkingAsValue()
+          : 'software-engineer',
       currentCompany:
           _valueOrDefault(currentCompanyNameController.text, 'Walima QA'),
       bio: _valueOrDefault(
@@ -1806,14 +1998,17 @@ class RegistrationProvider extends BaseChangeNotifier {
       final fitnessAndSports = _getSelectedHobbiesFromList(fitnessItemList);
       final mediaAndLearning =
           _getSelectedHobbiesFromList(otherInterestsItemList);
+      final foodAndCuisine = _getSelectedHobbiesFromList(foodCuisineItemList);
+      final travelAndLeisure =
+          _getSelectedHobbiesFromList(travelLeisureItemList);
 
       final body = UpdateInterestsRequestBody(
         creativePursuits: creativePursuits,
         outdoorActivities: outdoorActivities,
         fitnessAndSports: fitnessAndSports,
         mediaAndLearning: mediaAndLearning,
-        foodAndCuisine: <String>[],
-        travelAndLeisure: <String>[],
+        foodAndCuisine: foodAndCuisine,
+        travelAndLeisure: travelAndLeisure,
       );
 
       final response = await _interestsRepository.updateInterests(body);
@@ -1826,7 +2021,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   List<String> _getSelectedHobbiesFromList(List<SingleStringModel> list) {
     return list
         .where((item) => item.isSelected)
-        .map((item) => item.name)
+        .map((item) => item.value ?? item.name)
         .toList();
   }
 
