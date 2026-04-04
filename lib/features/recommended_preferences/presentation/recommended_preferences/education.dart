@@ -83,11 +83,12 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
   Widget view() {
     return Expanded(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: 10,
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Education  Qualification',
+            'Education Qualification',
             style: TextStyle(
               fontSize: TextSize.font14(context),
               fontWeight: FontWeight.w500,
