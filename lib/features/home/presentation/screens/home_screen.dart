@@ -595,43 +595,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  _followUpIcon(
-                    label: 'LinkedIn',
-                    imagePath: AppImages.workSvgIcon,
-                    onTap: () => _openLink('LinkedIn', _linkedInUrl),
-                  ),
-                  _followUpIcon(
-                    label: 'TikTok',
-                    imagePath: AppImages.chatIcon,
-                    onTap: () => _openLink('TikTok', _tikTokUrl),
-                  ),
-                  _followUpIcon(
-                    label: 'Privacy',
-                    imagePath: AppImages.lockPasswordSvgIcon,
-                    onTap: () => _openLink('Privacy', _privacyUrl),
-                  ),
-                  _followUpIcon(
-                    label: 'Help Center',
-                    imagePath: AppImages.customerSupportSvgIcon,
-                    onTap: () => _openLink('Help Center', _helpCenterUrl),
-                  ),
-                  _followUpIcon(
-                    label: 'Be Safe Online',
-                    imagePath: AppImages.safetySvgIcon,
-                    onTap: () => _openLink('Be Safe Online', _beSafeOnlineUrl),
-                  ),
-                  _followUpIcon(
-                    label: 'Terms',
-                    imagePath: AppImages.documentValidationSvgIcon,
-                    onTap: () => _openLink('Terms & Conditions', _termsUrl),
-                  ),
-                ],
-              ),
             ],
           ),
         ],
