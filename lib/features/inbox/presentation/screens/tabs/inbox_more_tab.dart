@@ -102,8 +102,8 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab> {
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: FilterWidget(
         title: 'Filter My Sent Requests',
-        items: provider.sortByDataList
-            .map((item) => FilterItem(name: item.name, isSelected: item.isSelected))
+        items: provider.filterList
+            .map((item) => FilterItem(name: item.label, isSelected: item.isSelected))
             .toList(),
         onItemTap: provider.selectSortByIndex,
       ),

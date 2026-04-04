@@ -1,11 +1,10 @@
+import 'package:flutter_boilerplate/core/global/models/filter_model.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/features/inbox/data/models/accepted_connection_response.dart';
 import 'package:flutter_boilerplate/features/inbox/data/models/received_connection_response.dart';
 import 'package:flutter_boilerplate/features/inbox/data/repository/inbox_repository.dart';
-import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 
 class InboxProvider extends BaseChangeNotifier {
-
   InboxScreenStates screenStates = InboxScreenStates.defaultState;
   InboxScreenStates loaderState = InboxScreenStates.defaultState;
 
@@ -23,18 +22,18 @@ class InboxProvider extends BaseChangeNotifier {
   bool isAcceptedHasError = false;
   String? acceptedErrorMessage;
 
-  List<SingleStringModel> sortByDataList = sortByListDataInserted
-      .map((item) => item.copyWith())
-      .toList();
+  List<Filter> filterList = filterDataList;
+  List<Filter> sortList = sortDataList;
 
-  int currentPage = 1;
-  int pageSize = 10;
-  int totalItems = 0;
 
-  String sortBy = 'id';
-  String sortOrder = 'ASC';
-  String searchQuery = '';
-  String filterType = 'most_relevant';
+  // filter item
+  int? currentPage;
+  int? pageSize;
+  int? totalItems = 0;
+  String? sortBy;
+  String? sortOrder;
+  String? searchQuery;
+  String? filterType;
 
   void switcherStatusUpdate({bool? switcherValue}) {
     if (switcherValue != null) {
@@ -56,47 +55,13 @@ class InboxProvider extends BaseChangeNotifier {
   }
 
   void selectSortByIndex(int index) {
-    if (!_isValidIndex(index, sortByDataList.length)) return;
+    if (!_isValidIndex(index, filterList.length)) return;
     _setSingleSelection(
-      sortByDataList,
+      filterList,
       index,
       (item, selected) => item.isSelected = selected,
     );
     notifyListeners();
-  }
-
-  void setSortBy(String sortField, {String order = 'ASC'}) {
-    sortBy = sortField;
-    sortOrder = order;
-    currentPage = 1;
-    notifyListeners();
-  }
-
-  void setSearchQuery(String query) {
-    searchQuery = query;
-    currentPage = 1;
-    notifyListeners();
-  }
-
-  void setFilterType(String filter) {
-    filterType = filter;
-    currentPage = 1;
-    notifyListeners();
-  }
-
-  Future<void> applyFilters({
-    String? sortByField,
-    String? sortOrderValue,
-    String? search,
-    String? filter,
-  }) async {
-    if (sortByField != null) sortBy = sortByField;
-    if (sortOrderValue != null) sortOrder = sortOrderValue;
-    if (search != null) searchQuery = search;
-    if (filter != null) filterType = filter;
-
-    currentPage = 1;
-    await fetchRequestedConnections(page: 1, size: pageSize);
   }
 
   Future<void> fetchRequestedConnections({
@@ -107,10 +72,14 @@ class InboxProvider extends BaseChangeNotifier {
     isLoading = true;
     hasError = false;
     errorMessage = null;
-    notifyListeners();
+    updateViewState(
+      screenStates: InboxScreenStates.loading,
+      loadingState: InboxScreenStates.transparentLoading,
+    );
 
     try {
-      receivedConnectionsResponse = await InboxRepository.getRequestedConnections(
+      receivedConnectionsResponse =
+          await InboxRepository.getRequestedConnections(
         page: page ?? currentPage,
         size: size ?? pageSize,
         responseFormat: responseFormat,
@@ -133,47 +102,30 @@ class InboxProvider extends BaseChangeNotifier {
 
         isLoading = false;
         hasError = false;
+        updateViewState(screenStates: InboxScreenStates.complete);
       } else {
         hasError = true;
         errorMessage =
             receivedConnectionsResponse?.message ?? 'Failed to load requests';
         receivedConnections = [];
         isLoading = false;
+        updateViewState(screenStates: InboxScreenStates.defaultState);
       }
     } catch (e) {
       isLoading = false;
       hasError = true;
       errorMessage = e.toString();
       receivedConnections = [];
+      updateViewState(screenStates: InboxScreenStates.defaultState);
     }
     notifyListeners();
   }
 
-  Future<void> loadMoreRequestedConnections() async {
-    if (isLoading) return;
+  List<AcceptedData> get acceptedReceivedConnections =>
+      _acceptedConnectionsByDirection('received');
 
-    currentPage++;
-    final newResponse = await InboxRepository.getRequestedConnections(
-      page: currentPage,
-      size: pageSize,
-      responseFormat: 'short',
-      sortBy: sortBy,
-      sortOrder: sortOrder,
-      search: searchQuery,
-      filter: filterType,
-    );
-
-    if (newResponse.code == 'SUCCESS' || newResponse.code == '1') {
-      if (newResponse.response?.data != null) {
-        receivedConnections?.addAll(newResponse.response!.data!);
-      }
-      notifyListeners();
-    }
-  }
-
-  List<AcceptedData> get acceptedReceivedConnections => _acceptedConnectionsByDirection('received');
-
-  List<AcceptedData> get acceptedSentConnections => _acceptedConnectionsByDirection('sent');
+  List<AcceptedData> get acceptedSentConnections =>
+      _acceptedConnectionsByDirection('sent');
 
   List<AcceptedData> _acceptedConnectionsByDirection(String direction) {
     final items = acceptedConnections ?? const <AcceptedData>[];
@@ -267,4 +219,3 @@ enum InboxScreenStates {
   complete,
   transparentLoading,
 }
-

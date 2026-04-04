@@ -6,13 +6,13 @@ import 'package:flutter_boilerplate/features/inbox/data/models/received_connecti
 
 class InboxRepository {
   static Future<ReceivedConnectionResponse> getRequestedConnections({
-    int page = 1,
-    int size = 10,
-    String responseFormat = 'short',
-    String sortBy = 'id',
-    String sortOrder = 'ASC',
-    String search = '',
-    String filter = 'most_relevant',
+    int? page,
+    int? size,
+    String? responseFormat,
+    String? sortBy,
+    String? sortOrder,
+    String? search,
+    String? filter,
   }) async {
     try {
       final queryParameters = {
@@ -21,8 +21,8 @@ class InboxRepository {
         'responseFormat': responseFormat,
         'sortBy': sortBy,
         'sortOrder': sortOrder,
-        if (search.isNotEmpty) 'search': search,
-        if (filter.isNotEmpty) 'filter': filter,
+        'search': search,
+        'filter': filter,
       };
 
       final response = await DioClient().get(

@@ -39,6 +39,16 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
       child: Column(
         children: [
           _header(provider),
+          if (provider.screenStates == InboxScreenStates.loading ||
+              provider.loaderState == InboxScreenStates.transparentLoading)
+            const Padding(
+              padding: EdgeInsets.only(top: 8.0),
+              child: LinearProgressIndicator(
+                minHeight: 2,
+                color: AppColors.primary,
+                backgroundColor: AppColors.greyLight,
+              ),
+            ),
           const SizedBox(height: 10),
           _body(provider),
         ],
@@ -86,7 +96,8 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
       return const EmptyStateWidget(
         imagePath: AppImages.addTeam,
         title: 'No Pending Requests!',
-        subtitle: 'Take the next step view your accepted matches for better connections',
+        subtitle:
+            'Take the next step view your accepted matches for better connections',
         buttonText: 'Explore Accepted Matches',
       );
     }
@@ -99,9 +110,12 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
           final name = connection.displayName ?? 'Unknown';
           final city = connection.location?.city ?? '';
           final state = connection.location?.state ?? '';
-          final locationText = [city, state].where((s) => s.isNotEmpty).join(', ');
-          final location = locationText.isNotEmpty ? locationText : 'Unknown location';
-          final profilePhotoUrl = connection.profilePhoto?.url ?? AppImages.demoProfile;
+          final locationText =
+              [city, state].where((s) => s.isNotEmpty).join(', ');
+          final location =
+              locationText.isNotEmpty ? locationText : 'Unknown location';
+          final profilePhotoUrl =
+              connection.profilePhoto?.url ?? AppImages.demoProfile;
           final isVerified = connection.profilePhoto?.isVerified ?? false;
 
           return Padding(
@@ -112,11 +126,16 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
               isPremiumConnect: false,
               isVerified: isVerified,
               name: name,
-              viewOnAccept: connection.profilePhoto?.visibilityStatus == 'public' ? false : true,
+              viewOnAccept:
+                  connection.profilePhoto?.visibilityStatus == 'public'
+                      ? false
+                      : true,
               age: '$age Yr',
-              height: CamelCaseUtils.formatCamelCase(connection.maritalStatus ?? ''),
+              height: CamelCaseUtils.formatCamelCase(
+                  connection.maritalStatus ?? ''),
               location: location,
-              activeStatusText: DateTimeUtils.formatDate(DateTime.tryParse(connection.lastSeenAt ?? '')),
+              activeStatusText: DateTimeUtils.formatDate(
+                  DateTime.tryParse(connection.lastSeenAt ?? '')),
               isOnline: connection.isOnline ?? false,
               menu: true,
               onTapLeftButton: () {
@@ -136,7 +155,9 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
   }
 
   Widget _header(InboxProvider provider) {
-    final count = provider.totalItems > 0 ? provider.totalItems : provider.receivedConnections?.length ?? 0;
+    final count = provider.totalItems! > 0
+        ? provider.totalItems
+        : provider.receivedConnections?.length ?? 0;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -203,8 +224,9 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
           FilterWidget(
             title: 'Sort by',
             iconPath: AppImages.sortIcon,
-            items: provider.sortByDataList
-                .map((item) => FilterItem(name: item.name, isSelected: item.isSelected))
+            items: provider.filterList
+                .map((item) =>
+                    FilterItem(name: item.label, isSelected: item.isSelected))
                 .toList(),
             onItemTap: provider.selectSortByIndex,
           ),
@@ -215,8 +237,9 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
           FilterWidget(
             title: 'Filter by',
             iconPath: AppImages.filterSvgIcon,
-            items: provider.sortByDataList
-                .map((item) => FilterItem(name: item.name, isSelected: item.isSelected))
+            items: provider.filterList
+                .map((item) =>
+                    FilterItem(name: item.label, isSelected: item.isSelected))
                 .toList(),
             onItemTap: provider.selectSortByIndex,
           ),
@@ -224,6 +247,4 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
       ),
     );
   }
-
 }
-
