@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/global/components/empty_state.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
+import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
+import 'package:flutter_boilerplate/features/matches/data/models/response/get_matches_response.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/provider/matcher_provider.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/count_down_timer.dart';
-import 'package:flutter_boilerplate/core/global/components/empty_state.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/screens/filters/more_matches.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/filter_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/tab_bar_widget.dart';
@@ -24,25 +27,27 @@ class MatchesScreen extends ConsumerStatefulWidget {
 }
 
 class _MatchesScreenState extends ConsumerState<MatchesScreen> {
-  MatchesProvider provider = MatchesProvider();
-  final tabs = [
+  final tabs = const [
     'Search',
     'New',
     'Daily',
     'My Matches',
     'Near Me',
-    'More Matches'
+    'More Matches',
   ];
 
   @override
   void initState() {
     super.initState();
-    provider = ref.read(matchesProvider);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(matchesProvider).loadMatchesForSelectedTab();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    provider = ref.watch(matchesProvider);
+    final provider = ref.watch(matchesProvider);
+
     return Scaffold(
       body: GradientBackground(
         child: Padding(
@@ -50,7 +55,15 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
           child: Column(
             children: [
               _appbarSection(),
-              Expanded(child: _body()),
+              Expanded(
+                child: Column(
+                  spacing: 10,
+                  children: [
+                    _headerSection(provider),
+                    Expanded(child: _tabContent(provider)),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -67,31 +80,11 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
     );
   }
 
-  Widget _body() {
-    return Column(spacing: 10, children: [
-      _headerSection(),
-      Expanded(child: _tabBarViewSection()),
-    ]);
-  }
-
-  Widget _headerSection() {
+  Widget _headerSection(MatchesProvider provider) {
     return Row(
       children: [
         InkWell(
-          onTap: () {
-            if (provider.selectedTabIndex == 0) {
-              // Search tab
-              context.push(Paths.searchFilter);
-            } else if (provider.selectedTabIndex == 1) {
-              // New tab
-              context.push(Paths.newFilter);
-            } else if (provider.selectedTabIndex == 3) {
-              // My Matches tab -> open myMatch filter screen
-              context.push(Paths.myMatchFilter);
-            } else {
-              _filter(context);
-            }
-          },
+          onTap: () => _openFilter(provider),
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
@@ -116,12 +109,12 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             ),
           ),
         ),
-        Flexible(child: _customTabBar()),
+        Flexible(child: _customTabBar(provider)),
       ],
     );
   }
 
-  Widget _customTabBar() {
+  Widget _customTabBar(MatchesProvider provider) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -132,18 +125,17 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             text: tabs[0],
             isSelected: provider.selectedTabIndex == 0,
             prefixImagePath: AppImages.searchSvgIcon,
-            onTap: () => provider.setSelectedTab(0),
+            onTap: () => ref.read(matchesProvider).setSelectedTab(0),
           ),
           TabBarWidget(
             text: tabs[1],
             isSelected: provider.selectedTabIndex == 1,
-            onTap: () => provider.setSelectedTab(1),
+            onTap: () => ref.read(matchesProvider).setSelectedTab(1),
           ),
           TabBarWidget(
             text: tabs[2],
-            count: 28,
             isSelected: provider.selectedTabIndex == 2,
-            onTap: () => provider.setSelectedTab(2),
+            onTap: () => ref.read(matchesProvider).setSelectedTab(2),
           ),
           TabBarWidget(
             text: tabs[3],
@@ -151,182 +143,197 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             selectedBackgroundColor: AppColors.primary,
             selectedTextColor: AppColors.white,
             selectedBorderColor: AppColors.primary,
-            onTap: () => provider.setSelectedTab(3),
+            onTap: () => ref.read(matchesProvider).setSelectedTab(3),
           ),
           TabBarWidget(
             text: tabs[4],
             isSelected: provider.selectedTabIndex == 4,
             selectedBackgroundColor: AppColors.primary,
-            onTap: () => provider.setSelectedTab(4),
+            onTap: () => ref.read(matchesProvider).setSelectedTab(4),
           ),
           TabBarWidget(
             text: tabs[5],
             isSelected: provider.selectedTabIndex == 5,
-            onTap: () => provider.setSelectedTab(5),
+            onTap: () => ref.read(matchesProvider).setSelectedTab(5),
           ),
         ],
       ),
     );
   }
 
-  Widget _tabBarViewSection() {
-    return Builder(builder: (context) {
-      switch (provider.selectedTabIndex) {
-        case 0:
-          return _searchTabContent();
-        case 1:
-          return _newTabContent();
-        case 2:
-          return _dailyTabContent();
-        case 3:
-          return _myMatchesContent();
-        case 4:
-          return _nearMeContent();
-        case 5:
-          return _moreMatchesContent();
-        default:
-          return _searchTabContent();
+  Widget _tabContent(MatchesProvider provider) {
+    if (provider.isLoadingMatches && provider.matches.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (provider.matchesError != null && provider.matches.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            EmptyStateWidget(
+              title: '${provider.selectedTabTitle} Unavailable',
+              subtitle: provider.matchesError!,
+              buttonText: 'Retry',
+              onTap: () => ref.read(matchesProvider).loadMatchesForSelectedTab(
+                    force: true,
+                  ),
+            ),
+            if (provider.apiError != null)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(height: TextSize.font16(context)),
+                Text(
+                  'Error fetching data from server:',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: TextSize.font18(context),
+                  ),
+                ),
+                Text(
+                  provider.apiError!,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: TextSize.font14(context),
+                  ),
+                ),
+              ],
+            ),
+            // const SizedBox(height: 12),
+            // ElevatedButton(
+            //   onPressed: () => ref.read(matchesProvider).loadMatchesForSelectedTab(force: true,),
+            //   child: const Text('Retry'),
+            // ),
+          ],
+        ),
+      );
+    }
+
+    if (provider.matches.isEmpty) {
+      return EmptyStateWidget(
+        title: 'No ${provider.selectedTabTitle} Matches Yet',
+        subtitle:
+            'We could not find any profiles for this section right now. Try changing your filters and check again.',
+        buttonText: 'Refresh',
+        onTap: () => ref.read(matchesProvider).loadMatchesForSelectedTab(
+              force: true,
+            ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => ref.read(matchesProvider).loadMatchesForSelectedTab(
+            force: true,
+          ),
+      child: ListView.separated(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.only(bottom: 12),
+        itemCount: provider.matches.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 10),
+        itemBuilder: (context, index) {
+          final match = provider.matches[index];
+          return ProfileComprehensiveCard(
+            imagePath: match.profilePhoto?.url ?? AppImages.demoProfile,
+            leftIconPath: AppImages.favouriteIcon,
+            isPremiumConnect: match.isPremium ?? false,
+            isVerified: match.profilePhoto?.isVerified ?? false,
+            name: match.displayName ?? 'Unknown',
+            age: match.age != null ? '${match.age} Yr' : null,
+            height: _matchHeight(match.height),
+            location: _matchLocation(match),
+            activeStatusText: _activeStatusText(match),
+            menu: true,
+            photoRequest: false,
+            photoCount: '1',
+            profession: CamelCaseUtils.formatCamelCase(match.profession ?? ''),
+            maritalStatus:
+                CamelCaseUtils.formatCamelCase(match.maritalStatus ?? ''),
+            religion: CamelCaseUtils.formatCamelCase(match.religion ?? ''),
+            noButton: true,
+            isOnline: match.isOnline ?? false,
+            viewOnAccept:
+                match.profilePhoto?.visibilityStatus?.toLowerCase() != 'public',
+          );
+        },
+      ),
+    );
+  }
+
+  String _activeStatusText(MatchProfile match) {
+    if (match.isOnline == true) {
+      return 'Online';
+    }
+    if (match.lastSeenAt != null && match.lastSeenAt!.isNotEmpty) {
+      return DateTimeUtils.formatDate(DateTime.tryParse(match.lastSeenAt!));
+    }
+    return 'Offline';
+  }
+
+  String _matchLocation(MatchProfile match) {
+    final parts = [
+      match.location?.city,
+      match.location?.state,
+      match.location?.country,
+    ]
+        .whereType<String>()
+        .where((value) => value.trim().isNotEmpty)
+        .toList();
+
+    return parts.isEmpty ? 'N/A' : parts.join(', ');
+  }
+
+  String _matchHeight(num? height) {
+    if (height == null) return 'N/A';
+    return '$height';
+  }
+
+  Future<void> _openFilter(MatchesProvider provider) async {
+    dynamic result;
+
+    if (provider.selectedTabIndex == 0) {
+      result = await context.push(Paths.searchFilter);
+      if (result is Map<String, dynamic>) {
+        await ref.read(matchesProvider).applySearchFilters(result);
       }
-    });
-  }
+      return;
+    }
 
-  Widget _searchTabContent() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child: Column(
-        children: List.generate(
-          10,
-          (index) => const Padding(
-            padding: EdgeInsets.only(
-              bottom: 10.0,
-            ),
-            child: ProfileComprehensiveCard(
-              imagePath: AppImages.demoProfile,
-              leftIconPath: AppImages.favouriteIcon,
-              isPremiumConnect: false,
-              isVerified: true,
-              name: 'Tasnova Ahmed',
-              age: '28 Yr',
-              height: '5\' 3\'" ',
-              location: 'Gulshan, Dhaka, BD',
-              activeStatusText: '1 day ago',
-              menu: true,
-              photoRequest: true,
-              onTapLeftButton: null,
-              onTapRightButton: null,
-              photoCount: '1',
-              profession: 'Software Engineer',
-              maritalStatus: 'Never Married',
-              religion: 'Islam',
-            ),
-          ),
+    if (provider.selectedTabIndex == 1) {
+      result = await context.push(Paths.newFilter);
+      if (result is Map<String, dynamic>) {
+        await ref.read(matchesProvider).applyNewFilters(result);
+      }
+      return;
+    }
+
+    if (provider.selectedTabIndex == 3) {
+      result = await context.push(Paths.myMatchFilter);
+      if (result is Map<String, dynamic>) {
+        await ref.read(matchesProvider).applyMyMatchesFilters(result);
+      }
+      return;
+    }
+
+    if (provider.selectedTabIndex == 5) {
+      result = await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => const MoreMatchesScreen(),
         ),
-      ),
-    );
+      );
+      if (result is Map<String, dynamic>) {
+        await ref.read(matchesProvider).applyMoreMatchesFilters(result);
+      }
+      return;
+    }
+
+    await _sortFilterSheet(context, provider);
   }
 
-  Widget _newTabContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        _newTabEmptyView(),
-      ],
-    );
-  }
-
-  Widget _newTabEmptyView() {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SizedBox(height: 50),
-        EmptyStateWidget(
-          title: 'No Matches Yet!',
-          subtitle:
-              'We do not have new matches at this point. Checkout my matches to find profiles matching your preference',
-          buttonText: 'My Matches',
-          onTap: null,
-        ),
-      ],
-    );
-  }
-
-  Widget _dailyTabContent() {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SizedBox(height: 50),
-        CountdownTimer(
-          initialHours: 8,
-          initialMinutes: 24,
-          initialSeconds: 48,
-        ),
-        SizedBox(height: 30),
-        EmptyStateWidget(
-            title: 'Sorry!',
-            subtitle:
-                'No today’s matches found. Please try again till then, search for your partner.',
-            buttonText: 'Search Now')
-      ],
-    );
-  }
-
-  Widget _myMatchesContent() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child: Column(
-        children: List.generate(
-          10,
-          (index) => const Padding(
-            padding: EdgeInsets.only(
-              bottom: 10.0,
-            ),
-            child: ProfileComprehensiveCard(
-              imagePath: AppImages.demoProfile,
-              leftIconPath: AppImages.favouriteIcon,
-              isPremiumConnect: true,
-              isVerified: true,
-              name: 'Tasnova Ahmed',
-              age: '28 Yr',
-              height: '5\' 3\'" ',
-              location: 'Gulshan, Dhaka, BD',
-              activeStatusText: '1 day ago',
-              menu: true,
-              photoRequest: false,
-              onTapLeftButton: null,
-              onTapRightButton: null,
-              photoCount: '1',
-              profession: 'Software Engineer',
-              maritalStatus: 'Never Married',
-              religion: 'Islam',
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _nearMeContent() {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(height: 8),
-        Text('Near Me content'),
-      ],
-    );
-  }
-
-  Widget _moreMatchesContent() {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(height: 8),
-        Text('More Matches content'),
-      ],
-    );
-  }
-
-  Future<void> _filter(
+  Future<void> _sortFilterSheet(
     BuildContext context,
+    MatchesProvider provider,
   ) async {
     await showModalBottomSheet(
       context: context,
@@ -360,11 +367,13 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
                 items: provider.sortByDataList
                     .map(
                       (item) => FilterItem(
-                          name: item.name, isSelected: item.isSelected),
+                        name: item.name,
+                        isSelected: item.isSelected,
+                      ),
                     )
                     .toList(),
-                onItemTap: (index) {
-                  provider.sortBy(index);
+                onItemTap: (index) async {
+                  await ref.read(matchesProvider).sortBy(index);
                 },
               ),
             ],

@@ -207,8 +207,8 @@ class _NewFilterScreenState extends ConsumerState<NewFilterScreen> {
         title: 'Show Matches',
         onTap: () {
           final result = {
-            'countries': newFilter.selectedCountries,
-            'communities': newFilter.selectedCommunities,
+            'countryLivingIn': newFilter.selectedCountries,
+            'community': newFilter.selectedCommunities,
           };
           Navigator.pop(context, result);
         },

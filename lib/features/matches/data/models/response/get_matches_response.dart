@@ -5,6 +5,7 @@ class GetMatchesResponse {
     this.data,
     this.pagination,
     this.savedSearch,
+    this.errors,
     this.traceId,
     this.statusCode,
   });
@@ -29,6 +30,7 @@ class GetMatchesResponse {
     savedSearch = payload['savedSearch'] != null
         ? SavedSearch.fromJson(payload['savedSearch'])
         : null;
+    errors = _parseErrors(payload['errors']);
   }
 
   String? code;
@@ -36,8 +38,36 @@ class GetMatchesResponse {
   List<MatchProfile>? data;
   MatchesPagination? pagination;
   SavedSearch? savedSearch;
+  Map<String, List<String>>? errors;
   String? traceId;
   int? statusCode;
+
+  String? firstErrorFor(String field) {
+    final fieldErrors = errors?[field];
+    if (fieldErrors == null || fieldErrors.isEmpty) return null;
+    return fieldErrors.first;
+  }
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['code'] = code;
+    map['message'] = message;
+    if (data != null) {
+      map['data'] = data?.map((item) => item.toJson()).toList();
+    }
+    if (pagination != null) {
+      map['pagination'] = pagination?.toJson();
+    }
+    if (savedSearch != null) {
+      map['savedSearch'] = savedSearch?.toJson();
+    }
+    if (errors != null) {
+      map['errors'] = errors;
+    }
+    map['traceId'] = traceId;
+    map['statusCode'] = statusCode;
+    return map;
+  }
 }
 
 class MatchProfile {
@@ -397,4 +427,26 @@ Map<String, dynamic> _extractPayload(Map<String, dynamic> root) {
   if (response is Map<String, dynamic>) return response;
   if (response is Map) return Map<String, dynamic>.from(response);
   return root;
+}
+
+Map<String, List<String>>? _parseErrors(dynamic raw) {
+  if (raw is! Map) return null;
+
+  final parsed = <String, List<String>>{};
+  raw.forEach((key, value) {
+    final normalizedKey = key.toString();
+    if (value is List) {
+      final messages = value.map((item) => item.toString()).toList();
+      if (messages.isNotEmpty) {
+        parsed[normalizedKey] = messages;
+      }
+      return;
+    }
+
+    if (value != null) {
+      parsed[normalizedKey] = [value.toString()];
+    }
+  });
+
+  return parsed.isEmpty ? null : parsed;
 }
