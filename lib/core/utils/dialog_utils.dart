@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/limit_over.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 
@@ -296,4 +295,46 @@ class DialogUtils {
       builder: (context) => child,
     );
   }
+  
+  static Future<void> showFullScreenImage({
+    required BuildContext context,
+    required String imagePath,
+    bool barrierDismissible = true,
+  }) async {
+    await showDialog(
+      context: context,
+      barrierDismissible: barrierDismissible,
+      builder: (context) => Container(
+        height: double.infinity,
+        width: double.infinity,
+        color: Colors.black.withOpacity(0.8),
+        child: Stack(
+          children: [
+            ShowImage(
+              imagePath: imagePath,
+              width: double.infinity,
+              height: double.infinity,
+              fit: BoxFit.contain,
+              radius: BorderRadius.zero,
+            ),
+            Positioned(
+              top: 10,
+              right: 10,
+              child: GestureDetector(
+                onTap: () => Navigator.of(context).pop(),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: Colors.black54,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close, color: Colors.white, size: 24),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+}
 }

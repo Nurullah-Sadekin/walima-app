@@ -9,6 +9,7 @@ import 'package:flutter_boilerplate/core/global/repositorys/global_repository.da
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/app_router.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/link_opener.dart';
 import 'package:flutter_boilerplate/core/utils/picker_dialog.dart';
 import 'package:flutter_boilerplate/features/anchor_point/anchor_point.dart';
@@ -26,10 +27,8 @@ class AppDrawer extends ConsumerStatefulWidget {
 }
 
 class _AppDrawerState extends ConsumerState<AppDrawer> {
-  static const String _helpCenterUrl =
-      'https://dev.walima.app/en/account/help-desk';
-  static const String _beSafeOnlineUrl =
-      'https://dev.walima.app/en/be-safe-online';
+  static const String _helpCenterUrl = 'https://dev.walima.app/en/account/help-desk';
+  static const String _beSafeOnlineUrl = 'https://dev.walima.app/en/be-safe-online';
   static const String _termsUrl = 'https://dev.walima.app/en/terms';
 
   Future<void> _openLink(String title, String url) {
@@ -47,8 +46,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
     return Drawer(
       width: MediaQuery.of(context).size.width,
       child: TransparentLoading(
-        isLoading:
-            provider.loaderState == DrawerScreenStates.transparentLoading,
+        isLoading: provider.loaderState == DrawerScreenStates.transparentLoading,
         child: Scaffold(
           body: SafeArea(
             child: Padding(
@@ -92,8 +90,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
               buttonStyle: ButtonsStyle.iconicDynamicButton,
             ),
           ),
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerDocked,
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         ),
       ),
     );
@@ -128,20 +125,20 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
     final displayName = resolveDisplayName(profileData);
     final memberId = resolveMemberId(profileData);
     final planName = resolvePlanName(profileData?.membership);
-    final expiryText =
-        formatExpiry(profileData?.membership?.membershipExpiresAt);
+    final expiryText = formatExpiry(profileData?.membership?.membershipExpiresAt);
     return ProfileSummaryCard(
       displayName: displayName,
       memberId: memberId,
       planName: planName,
       expiryText: expiryText,
-      profileImagePath:
-          profileData?.profilePicture?.url ?? AppImages.demoProfile,
+      profileImagePath: profileData?.profilePicture?.url ?? AppImages.demoProfile,
       showTopIcon: profileData?.isVerified ?? true,
       showBottomIcon: true,
       topIconPath: AppImages.verifiedBadgeSvgIcon,
       bottomIconPath: AppImages.cameraSvgIcon,
       onBottomIconPressed: () async {
+        await DialogUtils.showFullScreenImage(context: context,
+            imagePath: profileData?.profilePicture?.url ?? AppImages.demoProfile);
         final String? imagePath = await PickerDialog().imagePicker(context);
         if (!context.mounted) return;
         if (imagePath != null) {
@@ -336,11 +333,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
           FutureBuilder<String>(
             future: GlobalRepository().getAppVersion(),
             builder: (context, snapshot) {
-              final versionLabel =
-                  snapshot.connectionState == ConnectionState.done &&
-                          snapshot.hasData
-                      ? 'Version ${snapshot.data}'
-                      : 'Version';
+              final versionLabel = snapshot.connectionState == ConnectionState.done && snapshot.hasData ? 'Version ${snapshot.data}' : 'Version';
               return Text(
                 versionLabel,
                 textAlign: TextAlign.center,
