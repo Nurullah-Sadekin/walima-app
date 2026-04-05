@@ -125,6 +125,7 @@ class HomeProvider extends BaseChangeNotifier {
        DialogUtils.showSuccessDialog(
         context: context,
         message: response.message ?? 'Connection request sent successfully.',
+         autoClose: false,
       );
       await updateConnectionStatus(context, id ?? '');
     } else {

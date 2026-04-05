@@ -7,10 +7,8 @@ import 'package:flutter_boilerplate/features/matches/domain/enums/match_sort_by.
 import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 
 class MatchesProvider extends BaseChangeNotifier {
-  MatchesProviderScreenStates screenStates =
-      MatchesProviderScreenStates.defaultLoading;
-  MatchesProviderScreenStates loaderState =
-      MatchesProviderScreenStates.defaultLoading;
+  MatchesProviderScreenStates screenStates = MatchesProviderScreenStates.defaultLoading;
+  MatchesProviderScreenStates loaderState = MatchesProviderScreenStates.defaultLoading;
 
   List<SingleStringModel> sortByDataList = sortByListDataInserted;
   final List<MatchProfile> matches = [];
@@ -72,8 +70,7 @@ class MatchesProvider extends BaseChangeNotifier {
   Future<void> applyMoreMatchesFilters(Map<String, dynamic> filters) async {
     _tabFilters[5] = {
       ...filters,
-      if (filters['applied'] == true)
-        'matchFilterType': MatchFilterType.twoWayMatches.apiValue,
+      if (filters['applied'] == true) 'matchFilterType': MatchFilterType.twoWayMatches.apiValue,
     };
     await loadMatchesForSelectedTab(force: true);
   }
@@ -118,10 +115,7 @@ class MatchesProvider extends BaseChangeNotifier {
     matchesResponse = response;
     isLoadingMatches = false;
 
-    final isSuccess = response.code == 'SUCCESS' ||
-        (response.statusCode != null &&
-            response.statusCode! >= 200 &&
-            response.statusCode! < 300);
+    final isSuccess = response.code == 'SUCCESS' || (response.statusCode != null && response.statusCode! >= 200 && response.statusCode! < 300);
 
     if (isSuccess) {
       matches
@@ -131,13 +125,10 @@ class MatchesProvider extends BaseChangeNotifier {
       apiError = null;
     } else {
       matches.clear();
-      apiError = response.errors?.entries
-          .map((e) => '${e.key}: ${e.value.join(', ')}')
-          .join('\n');
+      apiError = response.errors?.entries.map((e) => '${e.key}: ${e.value.join(', ')}').join('\n');
       matchesError = response.message ?? 'Unable to load matches.';
     }
-
-    notifyListeners();
+    updateViewState(screenStates: MatchesProviderScreenStates.loadingComplete);
   }
 
   GetMatchesQueryParams _buildQueryParams(int tabIndex) {
@@ -178,10 +169,8 @@ class MatchesProvider extends BaseChangeNotifier {
       searchTitle: tabFilters['searchTitle'] as String?,
       extraParams: {
         if (tabFilters['profileId'] != null) 'profileId': tabFilters['profileId'],
-        if (tabFilters['includeFilteredProfiles'] != null)
-          'includeFilteredProfiles': tabFilters['includeFilteredProfiles'],
-        if (tabFilters['includeViewedProfiles'] != null)
-          'includeViewedProfiles': tabFilters['includeViewedProfiles'],
+        if (tabFilters['includeFilteredProfiles'] != null) 'includeFilteredProfiles': tabFilters['includeFilteredProfiles'],
+        if (tabFilters['includeViewedProfiles'] != null) 'includeViewedProfiles': tabFilters['includeViewedProfiles'],
       },
     );
   }
@@ -221,4 +210,5 @@ class MatchesProvider extends BaseChangeNotifier {
 enum MatchesProviderScreenStates {
   defaultLoading,
   loadingComplete,
+  transParentLoading,
 }

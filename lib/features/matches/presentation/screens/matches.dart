@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/empty_state.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
+import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/enums/enums.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
@@ -50,23 +51,26 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
   Widget build(BuildContext context) {
     final provider = ref.watch(matchesProvider);
 
-    return Scaffold(
-      body: GradientBackground(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Column(
-            children: [
-              _appbarSection(),
-              Expanded(
-                child: Column(
-                  spacing: 10,
-                  children: [
-                    _headerSection(provider),
-                    Expanded(child: _tabContent(provider)),
-                  ],
+    return TransparentLoading(
+      isLoading: provider.screenStates == MatchesProviderScreenStates.transParentLoading,
+      child: Scaffold(
+        body: GradientBackground(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Column(
+              children: [
+                _appbarSection(),
+                Expanded(
+                  child: Column(
+                    spacing: 10,
+                    children: [
+                      _headerSection(provider),
+                      Expanded(child: _tabContent(provider)),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -182,27 +186,27 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
                   ),
             ),
             if (provider.apiError != null)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: TextSize.font16(context)),
-                Text(
-                  'Error fetching data from server:',
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontSize: TextSize.font18(context),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(height: TextSize.font16(context)),
+                  Text(
+                    'Error fetching data from server:',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: TextSize.font18(context),
+                    ),
                   ),
-                ),
-                Text(
-                  provider.apiError!,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontSize: TextSize.font14(context),
+                  Text(
+                    provider.apiError!,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: TextSize.font14(context),
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
             // const SizedBox(height: 12),
             // ElevatedButton(
             //   onPressed: () => ref.read(matchesProvider).loadMatchesForSelectedTab(force: true,),
@@ -216,8 +220,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
     if (provider.matches.isEmpty) {
       return EmptyStateWidget(
         title: 'No ${provider.selectedTabTitle} Matches Yet',
-        subtitle:
-            'We could not find any profiles for this section right now. Try changing your filters and check again.',
+        subtitle: 'We could not find any profiles for this section right now. Try changing your filters and check again.',
         buttonText: 'Refresh',
         onTap: () => ref.read(matchesProvider).loadMatchesForSelectedTab(
               force: true,
@@ -226,9 +229,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
     }
 
     return RefreshIndicator(
-      onRefresh: () => ref.read(matchesProvider).loadMatchesForSelectedTab(
-            force: true,
-          ),
+      onRefresh: () => ref.read(matchesProvider).loadMatchesForSelectedTab(force: true),
       child: ListView.separated(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.only(bottom: 12),
@@ -253,9 +254,11 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             maritalStatus: CamelCaseUtils.formatCamelCase(match.community ?? ''),
             religion: CamelCaseUtils.formatCamelCase(match.religion ?? ''),
             noButton: false,
-            onTapLeftButton: () {
-              ref.read(homeProvider).connect(context, match.id ?? '', match.displayName ?? 'Unknown', ConnectionRequestType.match.name);
-            },
+            onTapLeftButton: () async{
+             provider.updateViewState(screenStates: MatchesProviderScreenStates.transParentLoading);
+             await ref.read(homeProvider).connect(context, match.id ?? '', match.displayName ?? 'Unknown', ConnectionRequestType.match.name);
+             await ref.read(matchesProvider).loadMatchesForSelectedTab(force: true); 
+             },
             leftButtonColor: match.connection?.status == 'none' ? AppColors.greenButtonColor : AppColors.disableBackground,
             leftButtonTextColor: match.connection?.status == 'none' ? AppColors.white : AppColors.disableText,
             leftButtonIconColor: match.connection?.status == 'none' ? AppColors.white : AppColors.disableText,
@@ -286,10 +289,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
       match.location?.city,
       match.location?.state,
       match.location?.country,
-    ]
-        .whereType<String>()
-        .where((value) => value.trim().isNotEmpty)
-        .toList();
+    ].whereType<String>().where((value) => value.trim().isNotEmpty).toList();
 
     return parts.isEmpty ? 'N/A' : parts.join(', ');
   }
