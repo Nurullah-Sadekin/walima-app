@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
+import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/constants/app_texts.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
+import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/notification/data/notification_response.dart';
 import 'package:flutter_boilerplate/features/notification/presentation/providers/notificaiton_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -259,15 +261,16 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     return Container(
       width: 46,
       height: 46,
+      padding: const EdgeInsets.all(10),
       decoration: const BoxDecoration(
         color: AppColors.greyLight,
         shape: BoxShape.circle,
       ),
-      child: const Icon(
-        Icons.notifications_none_rounded,
+      child:  const ShowImage(
+        imagePath: AppImages.notificationSvgIcon,
         color: AppColors.textSecondaryLight,
-      ),
-    );
+      )
+      );
   }
 
   Widget _emptyState() {
