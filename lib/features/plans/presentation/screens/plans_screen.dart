@@ -55,7 +55,9 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
               if (!widget.showAppBar)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: AnchoredAppBar(context: context, title: 'Welcome, Samira!'),
+                  child: AnchoredAppBar(context: context, title: 'Welcome, Samira!',
+                    onNotificationPressed: () => context.pushNamed(Routes.notifications),
+                  ),
                 ),
               provider.loaderState == UpgradePackageScreenStates.loading
                   ? const Expanded(child: Center(child: Loading()))

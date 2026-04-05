@@ -73,7 +73,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
         children: [
-          _actionBar(),
+         // _actionBar(),
           Expanded(
             child: RefreshIndicator(
               onRefresh: () => provider.getAllNotification(isRefresh: true),
@@ -88,7 +88,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                 child: ListView.separated(
                   padding:  EdgeInsets.zero,
                   itemCount: provider.notifications.length + (provider.isLoadingMore ? 1 : 0),
-                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  separatorBuilder: (_, __) => const SizedBox(height: 16),
                   itemBuilder: (context, index) {
                     if (index >= provider.notifications.length) {
                       return const Padding(
@@ -103,6 +103,16 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
               ),
             ),
           ),
+           Text(
+            provider.pagination?.page == provider.pagination?.totalPages ?
+            'No more' : 'Swipe down for more',
+            style: const TextStyle(
+              color: AppColors.textSecondaryLight,
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          const SizedBox(height: 10),
         ],
       ),
     );

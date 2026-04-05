@@ -257,7 +257,6 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
           iconImagePath: AppImages.filterSvgIcon,
           title: 'Contacts Filters',
           onTap: () {
-            Navigator.of(context).pop();
             context.pushNamed(Routes.contactFilter);
           },
         ),
@@ -265,7 +264,6 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
           iconImagePath: AppImages.accountSettingSvgIcon,
           title: 'Account Settings',
           onTap: () {
-            Navigator.of(context).pop();
             context.pushNamed(Routes.accountSetting);
           },
         ),
