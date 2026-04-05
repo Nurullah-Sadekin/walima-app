@@ -7,7 +7,6 @@ import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/contact_filter/presentation/providers/contact_filter_provider.dart';
-import 'package:flutter_boilerplate/features/matches/domain/enums/match_education_level.dart';
 import 'package:flutter_boilerplate/features/matches/domain/enums/match_filter_type.dart';
 import 'package:flutter_boilerplate/features/matches/domain/enums/match_marital_status.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
@@ -23,7 +22,7 @@ class ContactFilterScreen extends ConsumerStatefulWidget {
 
 class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
   late ContactFilterProvider provider;
-  FilterStep _step = FilterStep.refine;
+  FilterStep _step = FilterStep.contactFilterScreen;
 
   @override
   void initState() {
@@ -36,10 +35,10 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
     provider = ref.watch(contactFilterProvider);
 
     return PopScope(
-      canPop: _step == FilterStep.refine,
+      canPop: _step == FilterStep.contactFilterScreen,
       onPopInvokedWithResult: (didPop, result) {
-        if (!didPop && _step != FilterStep.refine) {
-          setState(() => _step = FilterStep.refine);
+        if (!didPop && _step != FilterStep.contactFilterScreen) {
+          setState(() => _step = FilterStep.contactFilterScreen);
         }
       },
       child: Scaffold(
@@ -52,85 +51,19 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
             child: _body(provider),
           ),
         ),
-        floatingActionButton:
-            BottomBorderedWidget(widget: bottomAction(provider)),
+        floatingActionButton: BottomBorderedWidget(widget: bottomAction(provider)),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
   }
 
-  String _getAppBarTitle(FilterStep step) {
-    switch (step) {
-      case FilterStep.refine:
-        return 'Refine';
-      case FilterStep.photoSetting:
-        return 'Photo Setting';
-      case FilterStep.recentlyJoined:
-        return 'Recently Joined';
-      case FilterStep.activeMembers:
-        return 'Active Members';
-      case FilterStep.annualIncome:
-        return 'Annual Income';
-      case FilterStep.maritalStatus:
-        return 'Marital Status';
-      case FilterStep.religion:
-        return 'Religion';
-      case FilterStep.motherTongue:
-        return 'Mother Tongue';
-      case FilterStep.countryLivingIn:
-        return 'Country Living In';
-      case FilterStep.stateLivingIn:
-        return 'State Living In';
-      case FilterStep.countryGrewUpIn:
-        return 'Country Grew Up In';
-      case FilterStep.educationLevel:
-        return 'Education Level';
-      case FilterStep.educationArea:
-        return 'Education Area';
-      case FilterStep.workingWith:
-        return 'Working With';
-      case FilterStep.professionArea:
-        return 'Profession Area';
-      case FilterStep.profileManagedBy:
-        return 'Profile Managed By';
-      case FilterStep.eatingHabits:
-        return 'Eating Habits';
-      case FilterStep.community:
-        return 'Community';
-    }
-  }
-
   PreferredSizeWidget _appBar() {
     return CustomBackAppBar(
-      title: Text(_getAppBarTitle(_step)),
+      title: Text(_step == FilterStep.contactFilterScreen ? 'Contact Filter' : _getAppBarTitle(_step)),
       backgroundColor: Colors.transparent,
-      trailingText: _step == FilterStep.refine ? 'More Matches' : null,
-      isTrailing: _step == FilterStep.refine,
-      trailingWidget: _step == FilterStep.refine
-          ? Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                'ON',
-                style: TextStyle(
-                  fontSize: TextSize.font12(context),
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
-              ),
-            )
-          : null,
-      onTrailingTap: () {
-        if (_step == FilterStep.refine) {
-          Navigator.of(context).maybePop();
-        }
-      },
       onBackPressed: () {
-        if (_step != FilterStep.refine) {
-          setState(() => _step = FilterStep.refine);
+        if (_step != FilterStep.contactFilterScreen) {
+          setState(() => _step = FilterStep.contactFilterScreen);
         } else {
           Navigator.of(context).maybePop();
         }
@@ -138,464 +71,283 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
     );
   }
 
-  Widget _body(ContactFilterProvider provider) {
-    switch (_step) {
-      case FilterStep.refine:
-        return _refineBody(provider);
-      case FilterStep.countryLivingIn:
-        return _countryBody(provider);
-      case FilterStep.community:
-        return _communityBody(provider);
-      case FilterStep.photoSetting:
-        return _photoSettingBody(provider);
-      case FilterStep.recentlyJoined:
-        return _recentlyJoinedBody(provider);
-      case FilterStep.activeMembers:
-        return _activeMembersBody(provider);
-      case FilterStep.annualIncome:
-        return _annualIncomeBody(provider);
+  String _getAppBarTitle(FilterStep step) {
+    switch (step) {
+      case FilterStep.contactFilterScreen:
+        return 'Refine';
+      case FilterStep.ageRange:
+        return 'Age Range';
+      case FilterStep.heightRange:
+        return 'Height Range';
       case FilterStep.maritalStatus:
-        return _maritalStatusBody(provider);
+        return 'Marital Status';
       case FilterStep.religion:
-        return _religionBody(provider);
+        return 'Religion';
+      case FilterStep.community:
+        return 'Community';
       case FilterStep.motherTongue:
-        return _motherTongueBody(provider);
-      case FilterStep.stateLivingIn:
-        return _stateLivingInBody(provider);
-      case FilterStep.countryGrewUpIn:
-        return _countryGrewUpInBody(provider);
-      case FilterStep.educationLevel:
-        return _educationLevelBody(provider);
-      case FilterStep.educationArea:
-        return _educationAreaBody(provider);
+        return 'Mother Tongue';
+      case FilterStep.countryLivingIn:
+        return 'Country Living In';
       case FilterStep.workingWith:
-        return _workingWithBody(provider);
-      case FilterStep.professionArea:
-        return _professionAreaBody(provider);
-      case FilterStep.profileManagedBy:
-        return _profileManagedByBody(provider);
-      case FilterStep.eatingHabits:
-        return _eatingHabitsBody(provider);
+        return 'Working With';
+      case FilterStep.annualIncome:
+      return 'Annual Income';
     }
   }
 
-  Widget _refineBody(ContactFilterProvider provider) {
+  Widget _body(ContactFilterProvider provider) {
+    switch (_step) {
+      case FilterStep.contactFilterScreen:
+        return _contactFilterBody(provider);
+      case FilterStep.ageRange:
+        return _ageRange(provider);
+      case FilterStep.heightRange:
+      // TODO: Handle this case.
+        throw UnimplementedError();
+      case FilterStep.maritalStatus:
+        return _maritalStatusBody(provider);
+      case FilterStep.religion:
+      // TODO: Handle this case.
+        throw UnimplementedError();
+      case FilterStep.community:
+        return _communityBody(provider);
+      case FilterStep.motherTongue:
+        return _motherTongueBody(provider);
+      case FilterStep.countryLivingIn:
+        return _countryBody(provider);
+      case FilterStep.workingWith:
+      // TODO: Handle this case.
+        throw UnimplementedError();
+      case FilterStep.annualIncome:
+      // TODO: Handle this case.
+        throw UnimplementedError();
+    }
+  }
+
+  Widget _contactFilterBody(ContactFilterProvider provider) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 8,
         children: [
-          const SizedBox(height: 12),
+          const SizedBox(height: 6),
           InfoTile(
-            title: 'Photo Setting',
-            value: _singleSelectedName(provider.photoSettingOptions, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.photoSetting),
+            title: 'Age Range',
+            value: _singleSelectedName(provider.selectedCountries, '20 -26'),
+            onTap: () => setState(() => _step = FilterStep.ageRange),
             trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.albumSvgIcon,
+            leadingImagePath: AppImages.calendarSvgIcon,
           ),
-          const SizedBox(height: 8),
           InfoTile(
-            title: 'Recently Joined',
-            value: _singleSelectedName(provider.recentlyJoinedOptions, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.recentlyJoined),
+            title: 'Height Range',
+            value: _singleSelectedName(provider.selectedCountries, '5\'0" - 6\'0" '),
+            onTap: () => setState(() => _step = FilterStep.heightRange),
             trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.propertySvgIcon,
+            leadingImagePath: AppImages.heightSvgIcon,
           ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Active Members',
-            value: _singleSelectedName(provider.activeMembersOptions, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.activeMembers),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.radioactiveSvgIcon,
-          ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Annual Income',
-            value: _multiSelectedNames(provider.incomeRangeList, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.annualIncome),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.walletSvgIcon,
-          ),
-          const SizedBox(height: 8),
           InfoTile(
             title: 'Marital Status',
-            value: _multiSelectedNames(provider.maritalStatusList, 'Open to All'),
+            value: _multiSelectedNames(provider.selectedMaritalStatus, 'Open to All'),
             onTap: () => setState(() => _step = FilterStep.maritalStatus),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.weddingSvgIcon,
           ),
-          const SizedBox(height: 8),
           InfoTile(
             title: 'Religion',
-            value: _singleSelectedName(provider.religionList, 'Open to All'),
+            value: _multiSelectedNames(provider.selectedCommunities, 'Multiple Selected'),
             onTap: () => setState(() => _step = FilterStep.religion),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.quranSvgIcon,
           ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Mother Tongue',
-            value: _multiSelectedNames(provider.motherTongues, 'Multiple Selected'),
-            onTap: () => setState(() => _step = FilterStep.motherTongue),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.languageSvgIcon,
-          ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Country Living In',
-            value: _singleSelectedName(provider.countries, 'Bangladesh'),
-            onTap: () => setState(() => _step = FilterStep.countryLivingIn),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.locationSvgIcon,
-          ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'State Living In',
-            value: _singleSelectedName(provider.countries, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.stateLivingIn),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.mapsSvgIcon,
-          ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Country Grew Up In',
-            value: _singleSelectedName(provider.countries, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.countryGrewUpIn),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.userLocationSvgIcon,
-          ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Education Level',
-            value: _singleSelectedName(provider.educationLevelList, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.educationLevel),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.educationSvgIcon,
-          ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Education Area',
-            value: _singleSelectedName(provider.educationLevelList, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.educationArea),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.schoolSvgIcon,
-          ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Working With',
-            value: _multiSelectedNames(provider.yourWorkList, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.workingWith),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.workSvgIcon,
-          ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Profession Area',
-            value: _multiSelectedNames(provider.youWorkAsList, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.professionArea),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.officeSvgIcon,
-          ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Profile Managed By',
-            value: _singleSelectedName(provider.profileManagedByList, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.profileManagedBy),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.userAiSvgIcon,
-          ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Eating Habits',
-            value: _singleSelectedName(provider.eatingHabitsList, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.eatingHabits),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.habitSvgIcon,
-          ),
-          const SizedBox(height: 8),
           InfoTile(
             title: 'Community',
-            value: _multiSelectedNames(provider.communities, 'Multiple Selected'),
+            value: _multiSelectedNames(provider.selectedCommunities, 'Multiple Selected'),
             onTap: () => setState(() => _step = FilterStep.community),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.groupsIcon,
           ),
+
+
+          InfoTile(
+            title: 'Mother Tongue',
+            value: _multiSelectedNames(provider.selectedMotherTongues, 'Multiple Selected'),
+            onTap: () => setState(() => _step = FilterStep.motherTongue),
+            trailingImagePath: AppImages.editWrite,
+            leadingImagePath: AppImages.languageSvgIcon,
+          ),
+          InfoTile(
+            title: 'Country Living In',
+            value: _singleSelectedName(provider.selectedCountries, 'Bangladesh'),
+            onTap: () => setState(() => _step = FilterStep.countryLivingIn),
+            trailingImagePath: AppImages.editWrite,
+            leadingImagePath: AppImages.locationSvgIcon,
+          ),
+
+          InfoTile(
+            title: 'Working With',
+            value: _multiSelectedNames(provider.selectedCommunities, 'Multiple Selected'),
+            onTap: () => setState(() => _step = FilterStep.workingWith),
+            trailingImagePath: AppImages.editWrite,
+            leadingImagePath: AppImages.workSvgIcon,
+          ),
+
+          InfoTile(
+            title: 'Annual Income',
+            value: _multiSelectedNames(provider.selectedCommunities, 'Multiple Selected'),
+            onTap: () => setState(() => _step = FilterStep.annualIncome),
+            trailingImagePath: AppImages.editWrite,
+            leadingImagePath: AppImages.propertySvgIcon,
+          ),
+
           const SizedBox(height: 80),
         ],
       ),
     );
   }
 
+  Widget _ageRange(ContactFilterProvider provider) {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+
+        children: [
+          const SizedBox(height: 6),
+          Text('Select Age Range',
+            style:  TextStyle(fontSize: TextSize.font16(context), color: AppColors.textPrimaryLight, fontWeight: FontWeight.w500)
+            ),
+          Text('Select a 2-year minimum age range',
+            style:  TextStyle(fontSize: TextSize.font12(context), color: AppColors.textSecondaryLight, fontWeight: FontWeight.w400)
+          ),
+          const SizedBox(height: 20),
+          RangeSlider(
+            values: RangeValues(provider.ageStart.toDouble(), provider.ageEnd.toDouble()),
+            min: provider.ageMinLimit.toDouble(),
+            max: provider.ageMaxLimit.toDouble(),
+            divisions: provider.ageMaxLimit - provider.ageMinLimit,
+            labels: RangeLabels('${provider.ageStart}', '${provider.ageEnd}'),
+            onChanged: (values) => provider.setAgeRange(values),
+            activeColor: AppColors.primary,
+            inactiveColor: const Color(0xFFEAEAEA),
+            overlayColor: WidgetStateProperty.resolveWith((states) {
+              return AppColors.primaryVariant;
+            }),
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+          ),
+          Text(
+            'Height Range',
+            style: TextStyle(
+              fontSize: TextSize.font14(context),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          // Height range slider
+          RangeSlider(
+            values: RangeValues(provider.heightStart.toDouble(), provider.heightEnd.toDouble()),
+            min: provider.heightMinLimit.toDouble(),
+            max: provider.heightMaxLimit.toDouble(),
+            divisions: ((provider.heightMaxLimit - provider.heightMinLimit) ~/ 1) > 0 ? (provider.heightMaxLimit - provider.heightMinLimit) ~/ 1 : null,
+            labels: RangeLabels('${provider.heightStart} cm', '${provider.heightEnd} cm'),
+            activeColor: AppColors.primary,
+            inactiveColor: const Color(0xFFEAEAEA),
+            overlayColor: WidgetStateProperty.resolveWith((states) {
+              return AppColors.primaryVariant;
+            }),
+            onChanged: (values) => provider.setHeightRange(values),
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _countryBody(ContactFilterProvider provider) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SingleChildScrollView(
-          child: Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: List.generate(provider.countries.length, (index) {
-              final item = provider.countries[index];
-              return SelectionCard(
-                buttonStyle: item.isSelected
-                    ? SelectionStyle.selectedCheckbox
-                    : SelectionStyle.unSelectedCheckbox,
-                onTap: () => ref.read(contactFilterProvider).toggleCountry(index),
-                isSelected: item.isSelected,
-                title: item.name,
-                isExpand: true,
-              );
-            }),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _photoSettingBody(ContactFilterProvider p) {
     return _wrapSelection(
-      p.photoSettingOptions,
-      (i) => ref.read(contactFilterProvider).selectPhotoSettingOption(i),
+      provider.countries,
+      (index) => _runSectionAction(() => ref.read(contactFilterProvider).toggleCountry(index)),
     );
   }
 
-  Widget _communityBody(ContactFilterProvider p) {
+  Widget _communityBody(ContactFilterProvider provider) {
     return _wrapSelection(
-      p.communities,
-      (i) => ref.read(contactFilterProvider).toggleCommunity(i),
+      provider.communities,
+      (index) => _runSectionAction(() => ref.read(contactFilterProvider).toggleCommunity(index)),
     );
   }
 
-  Widget _recentlyJoinedBody(ContactFilterProvider p) {
+  Widget _maritalStatusBody(ContactFilterProvider provider) {
     return _wrapSelection(
-      p.recentlyJoinedOptions,
-      (i) => ref.read(contactFilterProvider).selectRecentlyJoinedOption(i),
+      provider.maritalStatusList,
+      (index) => _runSectionAction(() => ref.read(contactFilterProvider).toggleMaritalStatus(index)),
     );
   }
 
-  Widget _activeMembersBody(ContactFilterProvider p) {
+  Widget _motherTongueBody(ContactFilterProvider provider) {
     return _wrapSelection(
-      p.activeMembersOptions,
-      (i) => ref.read(contactFilterProvider).selectActiveMembersOption(i),
+      provider.motherTongues,
+      (index) => _runSectionAction(() => ref.read(contactFilterProvider).toggleMotherTongue(index)),
     );
   }
 
-  Widget _annualIncomeBody(ContactFilterProvider p) {
-    return _wrapSelection(
-      p.incomeRangeList,
-      (i) => ref.read(contactFilterProvider).selectIncomeRange(i),
+  Widget _wrapSelection(List<dynamic> items, void Function(int index) onTap) {
+    return SingleChildScrollView(
+      child: Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: List.generate(items.length, (index) {
+          final item = items[index];
+          return SelectionCard(
+            buttonStyle: item.isSelected ? SelectionStyle.selectedCheckbox : SelectionStyle.unSelectedCheckbox,
+            onTap: () => onTap(index),
+            isSelected: item.isSelected,
+            title: item.name,
+            isExpand: true,
+          );
+        }),
+      ),
     );
   }
 
-  Widget _maritalStatusBody(ContactFilterProvider p) {
-    return _wrapSelection(
-      p.maritalStatusList,
-      (i) => ref.read(contactFilterProvider).toggleMaritalStatus(i),
-    );
+  void _runSectionAction(VoidCallback action) {
+    action();
+    if (mounted) setState(() {});
   }
 
-  Widget _religionBody(ContactFilterProvider p) {
-    return _wrapSelection(
-      p.religionList,
-      (i) => ref.read(contactFilterProvider).selectReligion(i),
-    );
-  }
-
-  Widget _motherTongueBody(ContactFilterProvider p) {
-    return _wrapSelection(
-      p.motherTongues,
-      (i) => ref.read(contactFilterProvider).toggleMotherTongue(i),
-    );
-  }
-
-  Widget _stateLivingInBody(ContactFilterProvider p) {
-    return _wrapSelection(
-      p.countries,
-      (i) => ref.read(contactFilterProvider).selectCountry(i),
-    );
-  }
-
-  Widget _countryGrewUpInBody(ContactFilterProvider p) {
-    return _wrapSelection(
-      p.countries,
-      (i) => ref.read(contactFilterProvider).selectCountry(i),
-    );
-  }
-
-  Widget _educationLevelBody(ContactFilterProvider p) {
-    return _wrapSelection(
-      p.educationLevelList,
-      (i) => ref.read(contactFilterProvider).selectEducationLevel(i),
-    );
-  }
-
-  Widget _educationAreaBody(ContactFilterProvider p) {
-    return _wrapSelection(
-      p.educationLevelList,
-      (i) => ref.read(contactFilterProvider).selectEducationLevel(i),
-    );
-  }
-
-  Widget _workingWithBody(ContactFilterProvider p) {
-    return _wrapSelection(
-      p.yourWorkList,
-      (i) => ref.read(contactFilterProvider).toggleYourWork(i),
-    );
-  }
-
-  Widget _professionAreaBody(ContactFilterProvider p) {
-    return _wrapSelection(
-      p.youWorkAsList,
-      (i) => ref.read(contactFilterProvider).toggleYouWorkAs(i),
-    );
-  }
-
-  Widget _profileManagedByBody(ContactFilterProvider p) {
-    return _wrapSelection(
-      p.profileManagedByList,
-      (i) => ref.read(contactFilterProvider).selectProfileManagedBy(i),
-    );
-  }
-
-  Widget _eatingHabitsBody(ContactFilterProvider p) {
-    return _wrapSelection(
-      p.eatingHabitsList,
-      (i) => ref.read(contactFilterProvider).selectEatingHabits(i),
-    );
-  }
-
-  Widget _wrapSelection(List<dynamic> items, void Function(int) onTap) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        const spacing = 10.0;
-
-        return SingleChildScrollView(
-          child: Wrap(
-            spacing: spacing,
-            runSpacing: spacing,
-            children: List.generate(items.length, (index) {
-              final item = items[index];
-              return SelectionCard(
-                buttonStyle: item.isSelected
-                    ? SelectionStyle.selectedCheckbox
-                    : SelectionStyle.unSelectedCheckbox,
-                onTap: () => onTap(index),
-                isSelected: item.isSelected,
-                title: item.name,
-                isExpand: true,
-              );
-            }),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget bottomAction(ContactFilterProvider p) {
-    final isRefine = _step == FilterStep.refine;
-
-    if (isRefine) {
+  Widget bottomAction(ContactFilterProvider provider) {
+    if (_step == FilterStep.contactFilterScreen) {
       return PrimaryButtons(
         buttonStyle: ButtonsStyle.activePrimaryButton,
         title: 'Show Matches',
         onTap: () {
-          final result = {
-            'countryLivingIn': p.selectedCountries,
-            'community': p.selectedCommunities,
-            'maritalStatus': p.selectedMaritalStatus.isEmpty
-                ? null
-                : MatchMaritalStatus.fromLabel(
-                    p.selectedMaritalStatus.first,
-                  )?.apiValue,
-            'annualIncome': p.selectedIncomeRanges.isEmpty
-                ? null
-                : p.selectedIncomeRanges.join(','),
-            'religion': p.selectedReligion.isEmpty ? null : p.selectedReligion.first,
-            'motherTongue': p.selectedMotherTongues.isEmpty
-                ? null
-                : p.selectedMotherTongues.join(','),
-            'stateLivingIn': p.selectedCountries,
-            'countryGrewUpIn': p.selectedCountries.isEmpty ? null : p.selectedCountries.first,
-            'qualification': p.educationLevelList
-                .where((item) => item.isSelected)
-                .map((item) => MatchEducationLevel.fromLabel(item.name)?.apiValue)
-                .whereType<String>()
-                .toList(),
-            'workingWith': p.selectedYourWork.isEmpty ? null : p.selectedYourWork.join(','),
-            'professionArea': p.selectedYouWorkAs.isEmpty ? null : p.selectedYouWorkAs.join(','),
-            'eatingHabits': p.selectedEatingHabits.isEmpty ? null : p.selectedEatingHabits.first,
-            'photoVisibility': _singleSelectedName(p.photoSettingOptions, ''),
-            'recentlyJoined': _singleSelectedName(p.recentlyJoinedOptions, ''),
-            'activeMembers': _singleSelectedName(p.activeMembersOptions, ''),
-            'matchFilterType': MatchFilterType.openToAll.apiValue,
-          };
-          Navigator.pop(context, result);
         },
       );
     }
 
-    return Row(
-      children: [
-        Expanded(
-          child: PrimaryButtons(
-            buttonStyle: ButtonsStyle.cancelButton,
-            title: 'Cancel',
-            onTap: () {
-              setState(() => _step = FilterStep.refine);
-            },
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: PrimaryButtons(
-            buttonStyle: ButtonsStyle.activePrimaryButton,
-            title: 'Apply',
-            onTap: () {
-              setState(() => _step = FilterStep.refine);
-            },
-          ),
-        ),
-      ],
+    return PrimaryButtons(
+      buttonStyle: ButtonsStyle.activePrimaryButton,
+      title: 'Save Changes',
+      onTap: () => setState(() => _step = FilterStep.contactFilterScreen),
     );
   }
 
-  String _singleSelectedName(List<dynamic> list, String fallback) {
-    try {
-      final sel = list.firstWhere((e) => e.isSelected, orElse: () => null);
-      return sel != null ? sel.name as String : fallback;
-    } catch (_) {
-      return fallback;
-    }
+  String _singleSelectedName(List<String> items, String fallback) {
+    return items.isEmpty ? fallback : items.first;
   }
 
-  String _multiSelectedNames(List<dynamic> list, String fallback) {
-    try {
-      final sel =
-          list.where((e) => e.isSelected).map((e) => e.name as String).toList();
-      return sel.isEmpty ? fallback : sel.join(', ');
-    } catch (_) {
-      return fallback;
-    }
+  String _multiSelectedNames(List<String> items, String fallback) {
+    return items.isEmpty ? fallback : items.join(', ');
   }
 }
 
 enum FilterStep {
-  refine,
-  photoSetting,
-  recentlyJoined,
-  activeMembers,
-  annualIncome,
+  contactFilterScreen,
+  ageRange,
+  heightRange,
   maritalStatus,
   religion,
+  community,
   motherTongue,
   countryLivingIn,
-  stateLivingIn,
-  countryGrewUpIn,
-  educationLevel,
-  educationArea,
   workingWith,
-  professionArea,
-  profileManagedBy,
-  eatingHabits,
-  community
+  annualIncome,
 }
