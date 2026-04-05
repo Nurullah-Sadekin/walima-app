@@ -60,7 +60,7 @@ class _PartnerPreferencesScreenState extends ConsumerState<PartnerPreferencesScr
                     const UpperLayer(
                         imagePath: AppImages.recommendedPreferences,
                         isShowAppbar: true,
-                        isBackButton: false,
+                        isBackButton: true,
                         isTrailing: true,
                         trailingText: 'Skip',
                         onTrailingTap: null),

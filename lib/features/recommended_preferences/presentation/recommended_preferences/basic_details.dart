@@ -53,7 +53,7 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
               const UpperLayer(
                   imagePath: AppImages.recommendedPreferences,
                   isShowAppbar: true,
-                  isBackButton: false,
+                  isBackButton: true,
                   isTrailing: true,
                   trailingText: 'Skip',
                   onTrailingTap: null),
