@@ -316,7 +316,7 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
 
     try {
       educationLookupOptions = await _lookupRepository.getLookups(
-        'qualifications',
+        'qualification-level',
       );
       educationDataList = educationLookupOptions
           .map(
