@@ -6,10 +6,10 @@ import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.da
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/features/account_setting/presentation/providers/account_setting_provider.dart';
 import 'package:flutter_boilerplate/features/matches/domain/enums/match_education_level.dart';
 import 'package:flutter_boilerplate/features/matches/domain/enums/match_filter_type.dart';
 import 'package:flutter_boilerplate/features/matches/domain/enums/match_marital_status.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/provider/my_match_filter_provider.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/into_tile.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,18 +22,18 @@ class AccountSettingScreen extends ConsumerStatefulWidget {
 }
 
 class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
-  late MyMatchFilterProvider provider;
+  late AccountSettingProvider provider;
   FilterStep _step = FilterStep.refine;
 
   @override
   void initState() {
     super.initState();
-    provider = ref.read(myMatchFilterProvider);
+    provider = ref.read(accountSettingProvider);
   }
 
   @override
   Widget build(BuildContext context) {
-    provider = ref.watch(myMatchFilterProvider);
+    provider = ref.watch(accountSettingProvider);
 
     return PopScope(
       canPop: _step == FilterStep.refine,
@@ -138,7 +138,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     );
   }
 
-  Widget _body(MyMatchFilterProvider provider) {
+  Widget _body(AccountSettingProvider provider) {
     switch (_step) {
       case FilterStep.refine:
         return _refineBody(provider);
@@ -179,7 +179,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     }
   }
 
-  Widget _refineBody(MyMatchFilterProvider provider) {
+  Widget _refineBody(AccountSettingProvider provider) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -326,7 +326,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     );
   }
 
-  Widget _countryBody(MyMatchFilterProvider provider) {
+  Widget _countryBody(AccountSettingProvider provider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -340,7 +340,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
                 buttonStyle: item.isSelected
                     ? SelectionStyle.selectedCheckbox
                     : SelectionStyle.unSelectedCheckbox,
-                onTap: () => ref.read(myMatchFilterProvider).toggleCountry(index),
+                onTap: () => ref.read(accountSettingProvider).toggleCountry(index),
                 isSelected: item.isSelected,
                 title: item.name,
                 isExpand: true,
@@ -352,115 +352,115 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     );
   }
 
-  Widget _photoSettingBody(MyMatchFilterProvider p) {
+  Widget _photoSettingBody(AccountSettingProvider p) {
     return _wrapSelection(
       p.photoSettingOptions,
-      (i) => ref.read(myMatchFilterProvider).selectPhotoSettingOption(i),
+      (i) => ref.read(accountSettingProvider).selectPhotoSettingOption(i),
     );
   }
 
-  Widget _communityBody(MyMatchFilterProvider p) {
+  Widget _communityBody(AccountSettingProvider p) {
     return _wrapSelection(
       p.communities,
-      (i) => ref.read(myMatchFilterProvider).toggleCommunity(i),
+      (i) => ref.read(accountSettingProvider).toggleCommunity(i),
     );
   }
 
-  Widget _recentlyJoinedBody(MyMatchFilterProvider p) {
+  Widget _recentlyJoinedBody(AccountSettingProvider p) {
     return _wrapSelection(
       p.recentlyJoinedOptions,
-      (i) => ref.read(myMatchFilterProvider).selectRecentlyJoinedOption(i),
+      (i) => ref.read(accountSettingProvider).selectRecentlyJoinedOption(i),
     );
   }
 
-  Widget _activeMembersBody(MyMatchFilterProvider p) {
+  Widget _activeMembersBody(AccountSettingProvider p) {
     return _wrapSelection(
       p.activeMembersOptions,
-      (i) => ref.read(myMatchFilterProvider).selectActiveMembersOption(i),
+      (i) => ref.read(accountSettingProvider).selectActiveMembersOption(i),
     );
   }
 
-  Widget _annualIncomeBody(MyMatchFilterProvider p) {
+  Widget _annualIncomeBody(AccountSettingProvider p) {
     return _wrapSelection(
       p.incomeRangeList,
-      (i) => ref.read(myMatchFilterProvider).selectIncomeRange(i),
+      (i) => ref.read(accountSettingProvider).selectIncomeRange(i),
     );
   }
 
-  Widget _maritalStatusBody(MyMatchFilterProvider p) {
+  Widget _maritalStatusBody(AccountSettingProvider p) {
     return _wrapSelection(
       p.maritalStatusList,
-      (i) => ref.read(myMatchFilterProvider).toggleMaritalStatus(i),
+      (i) => ref.read(accountSettingProvider).toggleMaritalStatus(i),
     );
   }
 
-  Widget _religionBody(MyMatchFilterProvider p) {
+  Widget _religionBody(AccountSettingProvider p) {
     return _wrapSelection(
       p.religionList,
-      (i) => ref.read(myMatchFilterProvider).selectReligion(i),
+      (i) => ref.read(accountSettingProvider).selectReligion(i),
     );
   }
 
-  Widget _motherTongueBody(MyMatchFilterProvider p) {
+  Widget _motherTongueBody(AccountSettingProvider p) {
     return _wrapSelection(
       p.motherTongues,
-      (i) => ref.read(myMatchFilterProvider).toggleMotherTongue(i),
+      (i) => ref.read(accountSettingProvider).toggleMotherTongue(i),
     );
   }
 
-  Widget _stateLivingInBody(MyMatchFilterProvider p) {
+  Widget _stateLivingInBody(AccountSettingProvider p) {
     return _wrapSelection(
       p.countries,
-      (i) => ref.read(myMatchFilterProvider).selectCountry(i),
+      (i) => ref.read(accountSettingProvider).selectCountry(i),
     );
   }
 
-  Widget _countryGrewUpInBody(MyMatchFilterProvider p) {
+  Widget _countryGrewUpInBody(AccountSettingProvider p) {
     return _wrapSelection(
       p.countries,
-      (i) => ref.read(myMatchFilterProvider).selectCountry(i),
+      (i) => ref.read(accountSettingProvider).selectCountry(i),
     );
   }
 
-  Widget _educationLevelBody(MyMatchFilterProvider p) {
+  Widget _educationLevelBody(AccountSettingProvider p) {
     return _wrapSelection(
       p.educationLevelList,
-      (i) => ref.read(myMatchFilterProvider).selectEducationLevel(i),
+      (i) => ref.read(accountSettingProvider).selectEducationLevel(i),
     );
   }
 
-  Widget _educationAreaBody(MyMatchFilterProvider p) {
+  Widget _educationAreaBody(AccountSettingProvider p) {
     return _wrapSelection(
       p.educationLevelList,
-      (i) => ref.read(myMatchFilterProvider).selectEducationLevel(i),
+      (i) => ref.read(accountSettingProvider).selectEducationLevel(i),
     );
   }
 
-  Widget _workingWithBody(MyMatchFilterProvider p) {
+  Widget _workingWithBody(AccountSettingProvider p) {
     return _wrapSelection(
       p.yourWorkList,
-      (i) => ref.read(myMatchFilterProvider).toggleYourWork(i),
+      (i) => ref.read(accountSettingProvider).toggleYourWork(i),
     );
   }
 
-  Widget _professionAreaBody(MyMatchFilterProvider p) {
+  Widget _professionAreaBody(AccountSettingProvider p) {
     return _wrapSelection(
       p.youWorkAsList,
-      (i) => ref.read(myMatchFilterProvider).toggleYouWorkAs(i),
+      (i) => ref.read(accountSettingProvider).toggleYouWorkAs(i),
     );
   }
 
-  Widget _profileManagedByBody(MyMatchFilterProvider p) {
+  Widget _profileManagedByBody(AccountSettingProvider p) {
     return _wrapSelection(
       p.profileManagedByList,
-      (i) => ref.read(myMatchFilterProvider).selectProfileManagedBy(i),
+      (i) => ref.read(accountSettingProvider).selectProfileManagedBy(i),
     );
   }
 
-  Widget _eatingHabitsBody(MyMatchFilterProvider p) {
+  Widget _eatingHabitsBody(AccountSettingProvider p) {
     return _wrapSelection(
       p.eatingHabitsList,
-      (i) => ref.read(myMatchFilterProvider).selectEatingHabits(i),
+      (i) => ref.read(accountSettingProvider).selectEatingHabits(i),
     );
   }
 
@@ -491,7 +491,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     );
   }
 
-  Widget bottomAction(MyMatchFilterProvider p) {
+  Widget bottomAction(AccountSettingProvider p) {
     final isRefine = _step == FilterStep.refine;
 
     if (isRefine) {

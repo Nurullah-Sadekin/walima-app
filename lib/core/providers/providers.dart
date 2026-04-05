@@ -14,6 +14,8 @@ import 'package:flutter_boilerplate/features/recommended_preferences/presentatio
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_screen_state_provider.dart';
 import 'package:flutter_boilerplate/features/plans/presentation/providers/plans_provider.dart';
+import 'package:flutter_boilerplate/features/account_setting/presentation/providers/account_setting_provider.dart';
+import 'package:flutter_boilerplate/features/contact_filter/presentation/providers/contact_filter_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final loginProvider = ChangeNotifierProvider<LoginProvider>((ref) {
@@ -142,6 +144,16 @@ final newFilterProvider = ChangeNotifierProvider<NewFilterProvider>((ref) {
 final myMatchFilterProvider =
     ChangeNotifierProvider<MyMatchFilterProvider>((ref) {
   return MyMatchFilterProvider();
+});
+
+final accountSettingProvider =
+    ChangeNotifierProvider<AccountSettingProvider>((ref) {
+  return AccountSettingProvider();
+});
+
+final contactFilterProvider =
+    ChangeNotifierProvider<ContactFilterProvider>((ref) {
+  return ContactFilterProvider();
 });
 
 final chatProvider = ChangeNotifierProvider<ChatProvider>((ref) {
