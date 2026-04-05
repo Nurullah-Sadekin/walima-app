@@ -7,8 +7,6 @@ import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/contact_filter/presentation/providers/contact_filter_provider.dart';
-import 'package:flutter_boilerplate/features/matches/domain/enums/match_filter_type.dart';
-import 'package:flutter_boilerplate/features/matches/domain/enums/match_marital_status.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/into_tile.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
