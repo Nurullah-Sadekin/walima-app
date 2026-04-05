@@ -253,12 +253,18 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         ProfileActionTile(
           iconImagePath: AppImages.filterSvgIcon,
           title: 'Contacts Filters',
-          onTap: () {},
+          onTap: () {
+            Navigator.of(context).pop();
+            context.pushNamed(Routes.contactFilter);
+          },
         ),
         ProfileActionTile(
           iconImagePath: AppImages.accountSettingSvgIcon,
           title: 'Account Settings',
-          onTap: () {},
+          onTap: () {
+            Navigator.of(context).pop();
+            context.pushNamed(Routes.accountSetting);
+          },
         ),
       ],
     );

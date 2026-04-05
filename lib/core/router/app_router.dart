@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/screens/filters/new_filter.dart';
+import 'package:flutter_boilerplate/features/contact_filter/presentation/screens/contact_filter_screen.dart';
+import 'package:flutter_boilerplate/features/account_setting/presentation/screens/account_setting_screen.dart';
 import 'package:flutter_boilerplate/features/profile/presentation/screen/edit_profile.dart';
 import 'package:flutter_boilerplate/features/profile/presentation/screen/profile_edit_section.dart';
 import 'package:flutter_boilerplate/features/profile/presentation/screen/profile_section_edit_screen.dart';
@@ -340,6 +342,16 @@ GoRouter goRouter(Ref ref) {
         path: Paths.myMatchFilter,
         name: Routes.myMatchFilter,
         builder: (context, state) => const MyMatchFilterScreen(),
+      ),
+      GoRoute(
+        path: Paths.contactFilter,
+        name: Routes.contactFilter,
+        builder: (context, state) => const ContactFilterScreen(),
+      ),
+      GoRoute(
+        path: Paths.accountSetting,
+        name: Routes.accountSetting,
+        builder: (context, state) => const AccountSettingScreen(),
       ),
       GoRoute(
         path: Paths.cropImage,
