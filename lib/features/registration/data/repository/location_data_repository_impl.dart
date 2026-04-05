@@ -10,11 +10,14 @@ class LocationDataRepositoryImpl implements LocationDataRepository {
   static const String _residencyAssetPath =
       'lib/features/registration/domain/json/residency_status_options.json';
   static const int _pageSize = 1000;
+  static const int _cityPageSize = 100;
 
   final DioClient _dioClient = DioClient();
   List<CountryLocationModel>? _cachedCountries;
   final Map<String, List<String>> _cachedCitiesByCountry =
       <String, List<String>>{};
+  final Map<String, Map<int, PaginatedCityResult>> _cachedCityPagesByCountry =
+      <String, Map<int, PaginatedCityResult>>{};
   List<ResidencyStatusOptionModel>? _cachedResidencyStatuses;
 
   Map<String, dynamic>? _asMap(dynamic value) {
@@ -119,42 +122,24 @@ class LocationDataRepositoryImpl implements LocationDataRepository {
     }
 
     final cities = <String>[];
-    final seen = <String>{};
     var page = 1;
 
     while (true) {
-      final response = await _dioClient.get(
-        AppUrls.getCityByCountry,
-        queryParameters: <String, dynamic>{
-          'page': page,
-          'size': _pageSize,
-          // 'sortBy': 'id',
-          // 'sortOrder': 'ASC',
-          'countries': normalized,
-        },
-        isTokenRequired: true,
+      final pageResult = await getCitiesByCountryPage(
+        country: normalized,
+        page: page,
+        size: _cityPageSize,
       );
 
-      if (!response.isSuccess) {
-        throw Exception(response.message);
-      }
-
-      final pageItems = _extractPaginatedData(response.data);
-      for (final item in pageItems) {
-        final cityMap = _asMap(item);
-        final cityName = cityMap?['name']?.toString().trim() ?? '';
-        if (cityName.isEmpty) {
-          continue;
-        }
-
-        final marker = cityName.toLowerCase();
-        if (seen.add(marker)) {
+      for (final cityName in pageResult.items) {
+        if (!cities.any(
+          (item) => item.toLowerCase() == cityName.toLowerCase(),
+        )) {
           cities.add(cityName);
         }
       }
 
-      final hasNextPage = _extractHasNextPage(response.data);
-      if (!hasNextPage || pageItems.isEmpty) {
+      if (!pageResult.hasNextPage || pageResult.items.isEmpty) {
         break;
       }
 
@@ -163,6 +148,64 @@ class LocationDataRepositoryImpl implements LocationDataRepository {
 
     _cachedCitiesByCountry[cacheKey] = cities;
     return cities;
+  }
+
+  @override
+  Future<PaginatedCityResult> getCitiesByCountryPage({
+    required String country,
+    required int page,
+    int size = _cityPageSize,
+  }) async {
+    final normalized = country.trim();
+    if (normalized.isEmpty) {
+      return const PaginatedCityResult(items: <String>[], hasNextPage: false);
+    }
+
+    final cacheKey = normalized.toLowerCase();
+    final cachedPages = _cachedCityPagesByCountry[cacheKey];
+    final cachedPage = cachedPages?[page];
+    if (cachedPage != null) {
+      return cachedPage;
+    }
+
+    final response = await _dioClient.get(
+      AppUrls.getCityByCountry,
+      queryParameters: <String, dynamic>{
+        'page': page,
+        'size': size,
+        'countries': normalized,
+      },
+      isTokenRequired: true,
+    );
+
+    if (!response.isSuccess) {
+      throw Exception(response.message);
+    }
+
+    final seen = <String>{};
+    final cities = <String>[];
+    final pageItems = _extractPaginatedData(response.data);
+    for (final item in pageItems) {
+      final cityMap = _asMap(item);
+      final cityName = cityMap?['name']?.toString().trim() ?? '';
+      if (cityName.isEmpty) {
+        continue;
+      }
+
+      final marker = cityName.toLowerCase();
+      if (seen.add(marker)) {
+        cities.add(cityName);
+      }
+    }
+
+    final result = PaginatedCityResult(
+      items: cities,
+      hasNextPage: _extractHasNextPage(response.data),
+    );
+
+    _cachedCityPagesByCountry[cacheKey] ??= <int, PaginatedCityResult>{};
+    _cachedCityPagesByCountry[cacheKey]![page] = result;
+    return result;
   }
 
   @override

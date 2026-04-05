@@ -1906,3 +1906,25 @@ enum HttpMethod implements ApiUiEnum {
   @override
   String get label => _label ?? EnumMapper.labelFromValue(apiValue);
 }
+
+enum LookupCategory implements ApiUiEnum {
+  educationLevels('education-level'),
+  qualificationLevel('qualification-level'),
+  professions('professions'),
+  incomeRange('income-range'),
+  creativePursuits('creative-pursuits'),
+  outdoorActivities('outdoor-activities'),
+  fitnessAndSports('fitness-and-sports'),
+  mediaAndLearning('media-and-learning'),
+  foodAndCuisine('food-and-cuisine'),
+  travelAndLeisure('travel-and-leisure');
+
+  const LookupCategory(this.apiValue, [this._label]);
+
+  @override
+  final String apiValue;
+  final String? _label;
+
+  @override
+  String get label => _label ?? EnumMapper.labelFromValue(apiValue);
+}

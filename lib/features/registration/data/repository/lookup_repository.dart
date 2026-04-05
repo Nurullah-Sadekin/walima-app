@@ -1,10 +1,21 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_boilerplate/core/global/enums/enums.dart';
 import 'package:flutter_boilerplate/core/network/app_urls.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/lookup_option.dart';
 
 class LookupRepository {
   Future<List<LookupOption>> getLookups(
+    LookupCategory category, {
+    String? search,
+  }) async {
+    return getLookupsBySlug(
+      category.apiValue,
+      search: search,
+    );
+  }
+
+  Future<List<LookupOption>> getLookupsBySlug(
     String categorySlug, {
     String? search,
   }) async {
@@ -38,7 +49,8 @@ class LookupRepository {
       return items
           .whereType<Map>()
           .map((item) => LookupOption.fromJson(Map<String, dynamic>.from(item)))
-          .where((item) => item.key.trim().isNotEmpty && item.label.trim().isNotEmpty)
+          .where((item) =>
+              item.key.trim().isNotEmpty && item.label.trim().isNotEmpty)
           .toList(growable: false);
     } catch (e) {
       final message = e is DioException

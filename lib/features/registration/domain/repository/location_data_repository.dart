@@ -10,6 +10,12 @@ abstract class LocationDataRepository {
     bool includeCapitalWhenNoStates = true,
   });
 
+  Future<PaginatedCityResult> getCitiesByCountryPage({
+    required String country,
+    required int page,
+    int size = 100,
+  });
+
   Future<List<ResidencyStatusOptionModel>> getResidencyStatuses();
 
   Future<List<String>> getResidencyStatusNames();

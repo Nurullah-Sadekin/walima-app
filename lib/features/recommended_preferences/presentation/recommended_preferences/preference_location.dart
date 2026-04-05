@@ -23,11 +23,13 @@ class PreferenceLocationScreen extends ConsumerStatefulWidget {
 class _PreferenceLocationScreenState
     extends ConsumerState<PreferenceLocationScreen> {
   late RecommendedPreferencesProvider provider;
+  final ScrollController _cityScrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     provider = ref.read(recommendedPreferencesProvider);
+    _cityScrollController.addListener(_onCityScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       provider.getInitialData();
       await provider.loadLocationData();
@@ -37,8 +39,22 @@ class _PreferenceLocationScreenState
 
   @override
   void dispose() {
+    _cityScrollController
+      ..removeListener(_onCityScroll)
+      ..dispose();
     provider.disposeControllersListener();
     super.dispose();
+  }
+
+  void _onCityScroll() {
+    if (!_cityScrollController.hasClients) return;
+
+    final position = _cityScrollController.position;
+    if (position.pixels >= position.maxScrollExtent - 120) {
+      ref
+          .read(recommendedPreferencesProvider)
+          .loadMoreCitiesForSelectedCountry();
+    }
   }
 
   @override
@@ -97,47 +113,78 @@ class _PreferenceLocationScreenState
             items: provider.countryDropdownItems,
             controller: provider.countryPreferenceController,
             // onTap: provider.loadLocationData,
-            onConfirm: (value) => provider.onCountryPreferenceSelected(value?.toString()),
+            onConfirm: (value) =>
+                provider.onCountryPreferenceSelected(value?.toString()),
             isSearch: true,
-          ),
-          Text(
-            'City',
-            style: TextStyle(
-              fontSize: TextSize.font14(context),
-              fontWeight: FontWeight.w500,
-            ),
           ),
           provider.countryPreferenceController.text.isEmpty
               ? const SizedBox.shrink()
               : Expanded(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: Consumer(builder: (context, ref, _) {
+                  child: Consumer(
+                    builder: (context, ref, _) {
                       final provider =
                           ref.watch(recommendedPreferencesProvider);
-                      if (provider.cityDropdownItems.isEmpty) {
-                        return const Center(child: Text('No cities available for the selected country.'));
+
+                      if (provider.isCityLoading &&
+                          provider.cityDropdownItems.isEmpty) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
                       }
+
+                      if (provider.cityDropdownItems.isEmpty) {
+                        return const Center(
+                          child: Text(
+                            'No cities available for the selected country.',
+                          ),
+                        );
+                      }
+
                       const double spacing = 10.0;
-                      return Wrap(
-                        spacing: spacing,
-                        runSpacing: spacing,
-                        children: provider.cityDropdownItems.map((cityName) {
-                          final isSelected =
-                              provider.preferableCity.contains(cityName);
-                          return SelectionCard(
-                            buttonStyle: isSelected
-                                ? SelectionStyle.selectedCheckbox
-                                : SelectionStyle.unSelectedCheckbox,
-                            onTap: () {
-                              provider.togglePreferableCity(cityName);
-                            },
-                            isSelected: isSelected,
-                            title: cityName,
-                          );
-                        }).toList(),
+                      return SingleChildScrollView(
+                        controller: _cityScrollController,
+                        scrollDirection: Axis.vertical,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                            'City',
+                            style: TextStyle(
+                              fontSize: TextSize.font14(context),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),                             
+                          const SizedBox(height: spacing),
+                            Wrap(
+                              spacing: spacing,
+                              runSpacing: spacing,
+                              children:
+                                  provider.cityDropdownItems.map((cityName) {
+                                final isSelected =
+                                    provider.preferableCity.contains(cityName);
+                                return SelectionCard(
+                                  buttonStyle: isSelected
+                                      ? SelectionStyle.selectedCheckbox
+                                      : SelectionStyle.unSelectedCheckbox,
+                                  onTap: () {
+                                    provider.togglePreferableCity(cityName);
+                                  },
+                                  isSelected: isSelected,
+                                  title: cityName,
+                                );
+                              }).toList(),
+                            ),
+                            if (provider.isCityLoadingMore)
+                              const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 16),
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              ),
+                          ],
+                        ),
                       );
-                    }),
+                    },
                   ),
                 ),
         ],

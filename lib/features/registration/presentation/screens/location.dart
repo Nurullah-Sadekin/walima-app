@@ -44,15 +44,12 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(locationScreenProvider);
     return TransparentLoading(
-      isLoading:
-          screenProvider.loaderState == RegistrationScreenStates.isProfileFor ||
-              provider.isLocationDataLoading,
+      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor || provider.isLocationDataLoading,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: screenProvider.screenStates ==
-                  RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates == RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
@@ -90,20 +87,9 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
       children: [
         DropDownField(
           headLine: 'City',
-          hintText: provider.livingInController.text.isEmpty
-              ? 'Select Living In first'
-              : 'Select',
+          hintText: provider.livingInController.text.isEmpty ? 'Select Living In first' : 'Select',
           popUpHeader: 'Select City',
-          items: [
-            'Barisal',
-            'Chattogram',
-            'Dhaka',
-            'Khulna',
-            'Mymensingh',
-            'Rajshahi',
-            'Rangpur',
-            'Sylhet'
-          ],
+          items: cityItems,
           controller: provider.cityController,
           enabled: provider.livingInController.text.isNotEmpty,
           // onTap: provider.loadLocationData,
@@ -124,8 +110,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
             Wrap(
               spacing: 10,
               runSpacing: 10,
-              children:
-                  List.generate(provider.isWithFamilyDataList.length, (index) {
+              children: List.generate(provider.isWithFamilyDataList.length, (index) {
                 final isWithFamily = provider.isWithFamilyDataList[index];
 
                 double screenWidth = MediaQuery.of(context).size.width - 40;
@@ -134,9 +119,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
                 return SizedBox(
                   width: itemWidth,
                   child: SelectionCard(
-                    buttonStyle: isWithFamily.isSelected
-                        ? SelectionStyle.selectedRadio
-                        : SelectionStyle.unSelectedRadio,
+                    buttonStyle: isWithFamily.isSelected ? SelectionStyle.selectedRadio : SelectionStyle.unSelectedRadio,
                     onTap: () {
                       provider.selectedIsWithFamily(index);
                     },
@@ -164,16 +147,13 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: provider.cityController.text.isNotEmpty &&
-              provider.residencyStatusController.text.isNotEmpty &&
-              provider.selectedIsWithFamilyStatus != null
-          ? ButtonsStyle.activePrimaryButton
-          : ButtonsStyle.disableButton,
+      buttonStyle:
+          provider.cityController.text.isNotEmpty && provider.residencyStatusController.text.isNotEmpty && provider.selectedIsWithFamilyStatus != null
+              ? ButtonsStyle.activePrimaryButton
+              : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
-        if (provider.cityController.text.isEmpty ||
-            provider.residencyStatusController.text.isEmpty ||
-            provider.selectedIsWithFamilyStatus == null) {
+        if (provider.cityController.text.isEmpty || provider.residencyStatusController.text.isEmpty || provider.selectedIsWithFamilyStatus == null) {
           return;
         }
         context.push(Paths.maritalStatus);

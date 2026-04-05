@@ -93,10 +93,8 @@ class RegistrationProvider extends BaseChangeNotifier {
   List<SingleStringModel> otherInterestsItemList = <SingleStringModel>[];
   List<SingleStringModel> foodCuisineItemList = <SingleStringModel>[];
   List<SingleStringModel> travelLeisureItemList = <SingleStringModel>[];
-  List<SingleStringModel> motherDetailsItemList =
-      motherDetailsItemListDataInserted;
-  List<SingleStringModel> fatherDetailsItemList =
-      fatherDetailsItemListDataInserted;
+  List<SingleStringModel> motherDetailsItemList = motherDetailsItemListDataInserted;
+  List<SingleStringModel> fatherDetailsItemList = fatherDetailsItemListDataInserted;
   List<SingleStringModel> siblingCountList = siblingCountListDataInserted;
   List<SingleStringModel> verificationList = verificationTypeList;
   static const int hobbiesSelectionMax = 5;
@@ -236,8 +234,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     'middle': RegistrationFamilyEconomicCondition.middleClass.apiValue,
     'middle class': RegistrationFamilyEconomicCondition.middleClass.apiValue,
     'middle_class': RegistrationFamilyEconomicCondition.middleClass.apiValue,
-    'aspiring':
-        RegistrationFamilyEconomicCondition.lowerMiddleClass.apiValue,
+    'aspiring': RegistrationFamilyEconomicCondition.lowerMiddleClass.apiValue,
     'lower middle class':
         RegistrationFamilyEconomicCondition.lowerMiddleClass.apiValue,
   };
@@ -568,7 +565,9 @@ class RegistrationProvider extends BaseChangeNotifier {
     notifyListeners();
 
     try {
-      communityOptions = await _lookupRepository.getLookups(matchedReligion.key);
+      communityOptions = await _lookupRepository.getLookupsBySlug(
+        matchedReligion.key,
+      );
       communityDropdownItems =
           communityOptions.map((item) => item.label).toList(growable: false);
     } catch (e) {
@@ -618,7 +617,7 @@ class RegistrationProvider extends BaseChangeNotifier {
 
     try {
       educationLevelOptions = await _lookupRepository.getLookups(
-        'education-levels',
+        LookupCategory.educationLevels,
       );
     } catch (e) {
       lookupDataError = e.toString();
@@ -642,8 +641,8 @@ class RegistrationProvider extends BaseChangeNotifier {
 
     try {
       final results = await Future.wait<List<LookupOption>>([
-        _lookupRepository.getLookups('professions'),
-        _lookupRepository.getLookups('income-range'),
+        _lookupRepository.getLookups(LookupCategory.professions),
+        _lookupRepository.getLookups(LookupCategory.incomeRange),
       ]);
 
       professionOptions = results[0];
@@ -689,12 +688,12 @@ class RegistrationProvider extends BaseChangeNotifier {
 
     try {
       final results = await Future.wait<List<LookupOption>>([
-        _lookupRepository.getLookups('creative-pursuits'),
-        _lookupRepository.getLookups('outdoor-activities'),
-        _lookupRepository.getLookups('fitness-and-sports'),
-        _lookupRepository.getLookups('media-and-learning'),
-        _lookupRepository.getLookups('food-and-cuisine'),
-        _lookupRepository.getLookups('travel-and-leisure'),
+        _lookupRepository.getLookups(LookupCategory.creativePursuits),
+        _lookupRepository.getLookups(LookupCategory.outdoorActivities),
+        _lookupRepository.getLookups(LookupCategory.fitnessAndSports),
+        _lookupRepository.getLookups(LookupCategory.mediaAndLearning),
+        _lookupRepository.getLookups(LookupCategory.foodAndCuisine),
+        _lookupRepository.getLookups(LookupCategory.travelAndLeisure),
       ]);
 
       creativeItemList = _toSingleStringModels(results[0]);

@@ -55,6 +55,11 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   List<CountryLocationModel> countryOptions = <CountryLocationModel>[];
   List<String> countryDropdownItems = <String>[];
   List<String> cityDropdownItems = <String>[];
+  bool isCityLoading = false;
+  bool isCityLoadingMore = false;
+  bool hasMoreCities = true;
+  int _cityPage = 1;
+  String? _selectedCityCountry;
   bool isLocationDataLoading = false;
   String? locationDataError;
 
@@ -175,27 +180,44 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     if (selected.isEmpty) return;
 
     final previous = countryPreferenceController.text;
+    final isSameCountry = previous.toLowerCase() == selected.toLowerCase();
     countryPreferenceController.text = selected;
 
-    if (previous.toLowerCase() != selected.toLowerCase()) {
+    if (!isSameCountry) {
       cityDropdownItems = <String>[];
       preferableCity.clear();
+      hasMoreCities = true;
+      _cityPage = 1;
+      _selectedCityCountry = selected;
     }
 
-    unawaited(_syncCityOptionsFromSelectedCountry());
+    if (isSameCountry && cityDropdownItems.isNotEmpty) {
+      notifyListeners();
+      return;
+    }
+
+    unawaited(_syncCityOptionsFromSelectedCountry(reset: !isSameCountry));
     notifyListeners();
   }
 
-  Future<void> _syncCityOptionsFromSelectedCountry({bool notify = true}) async {
+  Future<void> _syncCityOptionsFromSelectedCountry({
+    bool notify = true,
+    bool reset = true,
+  }) async {
     final selectedCountry = countryPreferenceController.text.trim();
     if (selectedCountry.isEmpty) {
       cityDropdownItems = <String>[];
+      hasMoreCities = false;
       if (notify) notifyListeners();
       return;
     }
 
     if (countryOptions.isEmpty) {
       if (notify) notifyListeners();
+      return;
+    }
+
+    if (isCityLoading || isCityLoadingMore) {
       return;
     }
 
@@ -210,17 +232,52 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
 
     if (matched == null) {
       cityDropdownItems = <String>[];
+      hasMoreCities = false;
       if (notify) notifyListeners();
       return;
     }
 
     try {
-      cityDropdownItems = await _locationDataRepository.getCitiesByCountry(
+      if (reset ||
+          _selectedCityCountry?.toLowerCase() != matched.name.toLowerCase()) {
+        _selectedCityCountry = matched.name;
+        _cityPage = 1;
+        hasMoreCities = true;
+        cityDropdownItems = <String>[];
+        isCityLoading = true;
+      } else {
+        isCityLoadingMore = true;
+      }
+      if (notify) notifyListeners();
+
+      final result = await _locationDataRepository.getCitiesByCountryPage(
         country: matched.name,
+        page: _cityPage,
+        size: 100,
       );
+
+      if (_selectedCityCountry?.toLowerCase() != matched.name.toLowerCase()) {
+        return;
+      }
+
+      final merged = reset ? <String>[] : List<String>.from(cityDropdownItems);
+      for (final city in result.items) {
+        if (!merged.any((item) => item.toLowerCase() == city.toLowerCase())) {
+          merged.add(city);
+        }
+      }
+
+      cityDropdownItems = merged;
+      hasMoreCities = result.hasNextPage;
+      if (result.hasNextPage) {
+        _cityPage++;
+      }
       locationDataError = null;
     } catch (e) {
       locationDataError = e.toString();
+    } finally {
+      isCityLoading = false;
+      isCityLoadingMore = false;
     }
 
     // Remove any city selections that are no longer valid
@@ -230,6 +287,11 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     );
 
     if (notify) notifyListeners();
+  }
+
+  Future<void> loadMoreCitiesForSelectedCountry() async {
+    if (!hasMoreCities || isCityLoading || isCityLoadingMore) return;
+    await _syncCityOptionsFromSelectedCountry(reset: false);
   }
 
   void togglePreferableCity(String cityName) {
@@ -246,13 +308,13 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   List<SingleStringModel> educationDataList = <SingleStringModel>[];
   List<SingleStringModel> profileManageByDataList =
       RegistrationProfileManagedBy.values
-      .map(
-        (item) => SingleStringModel(
-          name: item.label,
-          value: item.apiValue,
-        ),
-      )
-      .toList(growable: false);
+          .map(
+            (item) => SingleStringModel(
+              name: item.label,
+              value: item.apiValue,
+            ),
+          )
+          .toList(growable: false);
   List<SingleStringModel> countryDataList = countryListDataInserted;
   List<SingleStringModel> dietDataList = dietDataListInserted;
   List<LookupOption> professionLookupOptions = <LookupOption>[];
@@ -316,7 +378,7 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
 
     try {
       educationLookupOptions = await _lookupRepository.getLookups(
-        'qualification-level',
+        LookupCategory.educationLevels,
       );
       educationDataList = educationLookupOptions
           .map(
@@ -337,7 +399,8 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   Future<void> loadCareerLookupData() async {
     if (isCareerLookupLoading) return;
 
-    if (professionLookupOptions.isNotEmpty && incomeRangeLookupOptions.isNotEmpty) {
+    if (professionLookupOptions.isNotEmpty &&
+        incomeRangeLookupOptions.isNotEmpty) {
       notifyListeners();
       return;
     }
@@ -348,8 +411,8 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
 
     try {
       final results = await Future.wait<List<LookupOption>>([
-        _lookupRepository.getLookups('professions'),
-        _lookupRepository.getLookups('income-range'),
+        _lookupRepository.getLookups(LookupCategory.professions),
+        _lookupRepository.getLookups(LookupCategory.incomeRange),
       ]);
 
       professionLookupOptions = results[0];
@@ -483,8 +546,9 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
           motherTongue: _trimmedOrNull(motherTonguePreferenceController.text),
           countryLivingIn: _singleListOrNull(countryPreferenceController.text),
           community: _singleListOrNull(communityPreferenceController.text),
-          stateLivingIn:
-              preferableCity.isNotEmpty ? List<String>.from(preferableCity) : null,
+          stateLivingIn: preferableCity.isNotEmpty
+              ? List<String>.from(preferableCity)
+              : null,
           qualification: _resolveEducationPreferences(),
           professionArea: _resolveProfessionPreference(),
           annualIncome: _resolveAnnualIncomePreference(),
@@ -551,8 +615,7 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
         notifyListeners();
         return BulkConnectionSendResult(
           isSuccessDialog: true,
-          message:
-              response.message ??
+          message: response.message ??
               'Your connection requests have been sent successfully.',
         );
       }
@@ -560,8 +623,7 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
       if (response.isFullyFailed) {
         return BulkConnectionSendResult(
           isSuccessDialog: false,
-          message:
-              response.message ??
+          message: response.message ??
               'Unable to send connection requests right now.',
         );
       }
@@ -661,7 +723,8 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     }
 
     final enumMatch = MatchEducationLevel.fromLabel(rawValue)?.apiValue;
-    if (enumMatch != null && enumMatch != MatchEducationLevel.openToAll.apiValue) {
+    if (enumMatch != null &&
+        enumMatch != MatchEducationLevel.openToAll.apiValue) {
       return enumMatch == MatchEducationLevel.highSchool.apiValue
           ? 'secondary'
           : enumMatch;

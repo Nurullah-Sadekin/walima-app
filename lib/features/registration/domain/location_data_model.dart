@@ -106,3 +106,13 @@ class ResidencyStatusOptionModel {
   final String name;
   final String value;
 }
+
+class PaginatedCityResult {
+  const PaginatedCityResult({
+    required this.items,
+    required this.hasNextPage,
+  });
+
+  final List<String> items;
+  final bool hasNextPage;
+}
