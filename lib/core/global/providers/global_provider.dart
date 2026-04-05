@@ -56,7 +56,7 @@ class GlobalProvider extends BaseChangeNotifier {
       _setStatus(GlobalStatus.failure);
     }
   }
-
+ 
   Future<void> hydrateSessionFromCache() async {
     try {
       final cachedMe = await _repository.getCachedMeSnapshot();

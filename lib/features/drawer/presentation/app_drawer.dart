@@ -82,7 +82,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                     router.go(Paths.login);
                   },
                   onBeforeLogout: () {
-                    ref.read(currentTabProvider.notifier).state = 0;
+                    ref.invalidate(homeProvider);
+                    ref.invalidate(currentTabProvider);
                     ref.invalidate(profileProvider);
                     ref.invalidate(matchesProvider);
                     ref.invalidate(inboxProvider);
