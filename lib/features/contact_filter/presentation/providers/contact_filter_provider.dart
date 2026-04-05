@@ -1,4 +1,6 @@
+import 'package:flutter_boilerplate/core/global/enums/enums.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
+import 'package:flutter_boilerplate/features/registration/data/models/lookup_option.dart';
 import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 import 'package:flutter/material.dart';
 
@@ -7,7 +9,14 @@ class ContactFilterProvider extends BaseChangeNotifier {
 
   List<SingleStringModel> countries = List.from(countryListDataInserted);
   List<SingleStringModel> communities = List.from(communityListDataInserted);
-  List<SingleStringModel> maritalStatusList = List.from(maritalStatusListDataInserted);
+  List<SingleStringModel> maritalStatusList = [
+    ...RegistrationMaritalStatus.values.map(
+          (status) => SingleStringModel(
+        name: status.label,
+        value: status.apiValue,
+      ),
+    ),
+  ];
   List<SingleStringModel> motherTongues = [
     SingleStringModel(name: 'Bengali'),
     SingleStringModel(name: 'English'),
@@ -44,6 +53,7 @@ class ContactFilterProvider extends BaseChangeNotifier {
     }
     notifyListeners();
   }
+
   void toggleCountry(int index) {
     if (index < 0 || index >= countries.length) return;
     countries[index].isSelected = !countries[index].isSelected;
@@ -67,6 +77,7 @@ class ContactFilterProvider extends BaseChangeNotifier {
     motherTongues[index].isSelected = !motherTongues[index].isSelected;
     notifyListeners();
   }
+
 
   List<String> get selectedCountries => countries.where((c) => c.isSelected).map((e) => e.name).toList();
   List<String> get selectedCommunities => communities.where((c) => c.isSelected).map((e) => e.name).toList();

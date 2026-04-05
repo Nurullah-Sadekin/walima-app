@@ -103,13 +103,11 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
       case FilterStep.ageRange:
         return _ageRange(provider);
       case FilterStep.heightRange:
-      // TODO: Handle this case.
-        throw UnimplementedError();
+       return _heightRange(provider);
       case FilterStep.maritalStatus:
         return _maritalStatusBody(provider);
       case FilterStep.religion:
-      // TODO: Handle this case.
-        throw UnimplementedError();
+         return _religionBody(provider);
       case FilterStep.community:
         return _communityBody(provider);
       case FilterStep.motherTongue:
@@ -117,11 +115,9 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
       case FilterStep.countryLivingIn:
         return _countryBody(provider);
       case FilterStep.workingWith:
-      // TODO: Handle this case.
-        throw UnimplementedError();
+        return _workingWithBody(provider);
       case FilterStep.annualIncome:
-      // TODO: Handle this case.
-        throw UnimplementedError();
+        return _annualIncomeBody(provider);
     }
   }
 
@@ -168,7 +164,6 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
             leadingImagePath: AppImages.groupsIcon,
           ),
 
-
           InfoTile(
             title: 'Mother Tongue',
             value: _multiSelectedNames(provider.selectedMotherTongues, 'Multiple Selected'),
@@ -207,57 +202,87 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
   }
 
   Widget _ageRange(ContactFilterProvider provider) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 6),
+        Text('Age Range: ${provider.ageStart} to  ${provider.ageEnd} Years',
+          style:  TextStyle(fontSize: TextSize.font16(context), color: AppColors.textPrimaryLight, fontWeight: FontWeight.w500)
+          ),
+        Text('Select a 2-year minimum age range',
+          style:  TextStyle(fontSize: TextSize.font12(context), color: AppColors.textSecondaryLight, fontWeight: FontWeight.w400)
+        ),
+        const SizedBox(height: 16),
+        _StyledRangeSlider(
+          values: RangeValues(
+            provider.ageStart.toDouble(),
+            provider.ageEnd.toDouble(),
+          ),
+          min: provider.ageMinLimit.toDouble(),
+          max: provider.ageMaxLimit.toDouble(),
+          divisions: provider.ageMaxLimit - provider.ageMinLimit,
+          startLabel: '${provider.ageStart}',
+          endLabel: '${provider.ageEnd}',
+          onChanged: provider.setAgeRange,
+        ),
 
-        children: [
-          const SizedBox(height: 6),
-          Text('Select Age Range',
-            style:  TextStyle(fontSize: TextSize.font16(context), color: AppColors.textPrimaryLight, fontWeight: FontWeight.w500)
-            ),
-          Text('Select a 2-year minimum age range',
-            style:  TextStyle(fontSize: TextSize.font12(context), color: AppColors.textSecondaryLight, fontWeight: FontWeight.w400)
+      ],
+    );
+  }
+
+  Widget _heightRange(ContactFilterProvider provider) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 6),
+        Text('Height Range: ${provider.heightStart} to  ${provider.heightEnd} cm',
+          style:  TextStyle(fontSize: TextSize.font16(context), color: AppColors.textPrimaryLight, fontWeight: FontWeight.w500)
           ),
-          const SizedBox(height: 20),
-          RangeSlider(
-            values: RangeValues(provider.ageStart.toDouble(), provider.ageEnd.toDouble()),
-            min: provider.ageMinLimit.toDouble(),
-            max: provider.ageMaxLimit.toDouble(),
-            divisions: provider.ageMaxLimit - provider.ageMinLimit,
-            labels: RangeLabels('${provider.ageStart}', '${provider.ageEnd}'),
-            onChanged: (values) => provider.setAgeRange(values),
-            activeColor: AppColors.primary,
-            inactiveColor: const Color(0xFFEAEAEA),
-            overlayColor: WidgetStateProperty.resolveWith((states) {
-              return AppColors.primaryVariant;
-            }),
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
+        Text('Select a 4-inch minimum height range',
+          style:  TextStyle(fontSize: TextSize.font12(context), color: AppColors.textSecondaryLight, fontWeight: FontWeight.w400)
+        ),
+        const SizedBox(height: 16),
+        _StyledRangeSlider(
+          values: RangeValues(
+            provider.heightStart.toDouble(),
+            provider.heightEnd.toDouble(),
           ),
-          Text(
-            'Height Range',
-            style: TextStyle(
-              fontSize: TextSize.font14(context),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          // Height range slider
-          RangeSlider(
-            values: RangeValues(provider.heightStart.toDouble(), provider.heightEnd.toDouble()),
-            min: provider.heightMinLimit.toDouble(),
-            max: provider.heightMaxLimit.toDouble(),
-            divisions: ((provider.heightMaxLimit - provider.heightMinLimit) ~/ 1) > 0 ? (provider.heightMaxLimit - provider.heightMinLimit) ~/ 1 : null,
-            labels: RangeLabels('${provider.heightStart} cm', '${provider.heightEnd} cm'),
-            activeColor: AppColors.primary,
-            inactiveColor: const Color(0xFFEAEAEA),
-            overlayColor: WidgetStateProperty.resolveWith((states) {
-              return AppColors.primaryVariant;
-            }),
-            onChanged: (values) => provider.setHeightRange(values),
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-          ),
-        ],
-      ),
+          min: provider.heightMinLimit.toDouble(),
+          max: provider.heightMaxLimit.toDouble(),
+          divisions: provider.heightMaxLimit - provider.heightMinLimit,
+          startLabel: _formatHeight(provider.heightStart),
+          endLabel: _formatHeight(provider.heightEnd),
+          onChanged: provider.setHeightRange,
+        ),
+      ],
+    );
+  }
+
+  Widget _maritalStatusBody(ContactFilterProvider provider) {
+    return _wrapSelection(
+      provider.maritalStatusList,
+          (index) => _runSectionAction(() => ref.read(contactFilterProvider).toggleMaritalStatus(index)),
+    );
+  }
+
+  Widget _religionBody(ContactFilterProvider provider) {
+    return _wrapSelection(
+      provider.maritalStatusList,
+          (index) => _runSectionAction(() => ref.read(contactFilterProvider).toggleMaritalStatus(index)),
+    );
+  }
+
+  Widget _communityBody(ContactFilterProvider provider) {
+    return _wrapSelection(
+      provider.communities,
+          (index) => _runSectionAction(() => ref.read(contactFilterProvider).toggleCommunity(index)),
+    );
+  }
+
+  Widget _motherTongueBody(ContactFilterProvider provider) {
+    return _wrapSelection(
+      provider.motherTongues,
+          (index) => _runSectionAction(() => ref.read(contactFilterProvider).toggleMotherTongue(index)),
     );
   }
 
@@ -268,24 +293,17 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
     );
   }
 
-  Widget _communityBody(ContactFilterProvider provider) {
+  Widget _workingWithBody(ContactFilterProvider provider) {
     return _wrapSelection(
-      provider.communities,
-      (index) => _runSectionAction(() => ref.read(contactFilterProvider).toggleCommunity(index)),
+      provider.countries,
+      (index) => _runSectionAction(() => ref.read(contactFilterProvider).toggleCountry(index)),
     );
   }
 
-  Widget _maritalStatusBody(ContactFilterProvider provider) {
-    return _wrapSelection(
-      provider.maritalStatusList,
-      (index) => _runSectionAction(() => ref.read(contactFilterProvider).toggleMaritalStatus(index)),
-    );
-  }
-
-  Widget _motherTongueBody(ContactFilterProvider provider) {
+  Widget _annualIncomeBody(ContactFilterProvider provider) {
     return _wrapSelection(
       provider.motherTongues,
-      (index) => _runSectionAction(() => ref.read(contactFilterProvider).toggleMotherTongue(index)),
+          (index) => _runSectionAction(() => ref.read(contactFilterProvider).toggleMotherTongue(index)),
     );
   }
 
@@ -337,6 +355,13 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
   String _multiSelectedNames(List<String> items, String fallback) {
     return items.isEmpty ? fallback : items.join(', ');
   }
+
+  static String _formatHeight(int heightCm) {
+    final totalInches = (heightCm / 2.54).round();
+    final feet = totalInches ~/ 12;
+    final inches = totalInches % 12;
+    return "$feet' $inches\"";
+  }
 }
 
 enum FilterStep {
@@ -351,3 +376,175 @@ enum FilterStep {
   workingWith,
   annualIncome,
 }
+
+class _StyledRangeSlider extends StatelessWidget {
+  const _StyledRangeSlider({
+    required this.values,
+    required this.min,
+    required this.max,
+    required this.startLabel,
+    required this.endLabel,
+    required this.onChanged,
+    this.divisions,
+  });
+
+  final RangeValues values;
+  final double min;
+  final double max;
+  final int? divisions;
+  final String startLabel;
+  final String endLabel;
+  final ValueChanged<RangeValues> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    const horizontalPadding = 20.0;
+    const thumbDiameter = 22.0;
+    const sliderTop = 34.0;
+    final availableWidth =
+        MediaQuery.of(context).size.width - 40 - (horizontalPadding * 2);
+    final startFactor = ((values.start - min) / (max - min)).clamp(0.0, 1.0);
+    final endFactor = ((values.end - min) / (max - min)).clamp(0.0, 1.0);
+    final startLeft = (availableWidth * startFactor) - 22;
+    final endLeft = (availableWidth * endFactor) - 22;
+
+    return SizedBox(
+      height: 74,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Positioned(
+            left: horizontalPadding + startLeft,
+            top: 0,
+            child: IgnorePointer(
+              child: _SliderBubble(label: startLabel),
+            ),
+          ),
+          Positioned(
+            left: horizontalPadding + endLeft,
+            top: 0,
+            child: IgnorePointer(
+              child: _SliderBubble(label: endLabel),
+            ),
+          ),
+          Positioned.fill(
+            top: sliderTop,
+            child: SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                trackHeight: 6,
+                activeTrackColor: AppColors.primary,
+                inactiveTrackColor: const Color(0xFFF0F0F0),
+                overlayShape: SliderComponentShape.noOverlay,
+                rangeTrackShape: const RoundedRectRangeSliderTrackShape(),
+                thumbColor: Colors.white,
+                activeTickMarkColor: Colors.transparent,
+                inactiveTickMarkColor: Colors.transparent,
+                rangeThumbShape: const _RingRangeThumbShape(
+                  thumbRadius: thumbDiameter / 2,
+                ),
+              ),
+              child: RangeSlider(
+                values: values,
+                min: min,
+                max: max,
+                divisions: divisions,
+                onChanged: onChanged,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SliderBubble extends StatelessWidget {
+  const _SliderBubble({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(5),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x12000000),
+                blurRadius: 18,
+                offset: Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimaryLight,
+            ),
+          ),
+        ),
+        CustomPaint(
+          size: const Size(18, 10),
+          painter: _BubblePointerPainter(),
+        ),
+      ],
+    );
+  }
+}
+
+class _BubblePointerPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = Colors.white;
+    final path = Path()
+      ..moveTo(0, 0)
+      ..lineTo(size.width / 2, size.height)
+      ..lineTo(size.width, 0)
+      ..close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _RingRangeThumbShape extends RangeSliderThumbShape {
+  const _RingRangeThumbShape({required this.thumbRadius});
+
+  final double thumbRadius;
+
+  @override
+  Size getPreferredSize(bool isEnabled, bool isDiscrete) {
+    return Size.fromRadius(thumbRadius);
+  }
+
+  @override
+  void paint(
+      PaintingContext context,
+      Offset center, {
+        required Animation<double> activationAnimation,
+        required Animation<double> enableAnimation,
+        bool isDiscrete = false,
+        bool isEnabled = false,
+        bool isOnTop = false,
+        required SliderThemeData sliderTheme,
+        TextDirection textDirection = TextDirection.ltr,
+        Thumb thumb = Thumb.start,
+        bool isPressed = false,
+      }) {
+    final canvas = context.canvas;
+    final outerPaint = Paint()..color = Colors.white;
+    final innerPaint = Paint()..color = AppColors.primary;
+
+    canvas.drawCircle(center, thumbRadius, outerPaint);
+    canvas.drawCircle(center, thumbRadius - 7, innerPaint);
+  }
+}
+
