@@ -84,6 +84,7 @@ class _NewFilterScreenState extends ConsumerState<NewFilterScreen> {
   }
 
   Widget _body(NewFilterProvider newFilter) {
+    
     switch (_step) {
       case FilterStep.countryLivingIn:
         return _countryBody(newFilter);
