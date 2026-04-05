@@ -29,6 +29,7 @@ class _CareerScreenState extends ConsumerState<CareerScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider.getInitialData();
       provider.initControllersListener();
+      provider.loadCareerLookupData();
     });
   }
 
@@ -42,7 +43,8 @@ class _CareerScreenState extends ConsumerState<CareerScreen> {
   Widget build(BuildContext context) {
     final provider = ref.watch(recommendedPreferencesProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == RecommendedPreferencesScreenStates.preferences,
+      isLoading: provider.loaderState == RecommendedPreferencesScreenStates.preferences ||
+          provider.isCareerLookupLoading,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
@@ -105,8 +107,7 @@ class _CareerScreenState extends ConsumerState<CareerScreen> {
             popUpHeader: 'Select Profession',
             items: provider.professionDataList,
             controller: provider.professionPreferenceController,
-            onTap: () {
-            },
+            onTap: provider.loadCareerLookupData,
             isSearch: true,
           ),
           DropDownField(
@@ -115,8 +116,7 @@ class _CareerScreenState extends ConsumerState<CareerScreen> {
             popUpHeader: 'Annual Income',
             items: provider.incomeRangeDataList,
             controller: provider.annualIncomePreferenceController,
-            onTap: () {
-            },
+            onTap: provider.loadCareerLookupData,
             isSearch: true,
           ),
           const Spacer(),

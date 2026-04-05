@@ -32,6 +32,7 @@ class _HobbiesInterestsScreenState
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider.getInitialData();
       provider.initControllersListener();
+      provider.loadHobbyLookupData();
     });
   }
 

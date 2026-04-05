@@ -94,21 +94,19 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
               fontWeight: FontWeight.w500,
             ),
           ),
-          // Age range slider
-          RangeSlider(
-            values: RangeValues(provider.ageStart.toDouble(), provider.ageEnd.toDouble()),
+          _StyledRangeSlider(
+            values: RangeValues(
+              provider.ageStart.toDouble(),
+              provider.ageEnd.toDouble(),
+            ),
             min: provider.ageMinLimit.toDouble(),
             max: provider.ageMaxLimit.toDouble(),
             divisions: provider.ageMaxLimit - provider.ageMinLimit,
-            labels: RangeLabels('${provider.ageStart}', '${provider.ageEnd}'),
-            onChanged: (values) => provider.setAgeRange(values),
-            activeColor: AppColors.primary,
-            inactiveColor: const Color(0xFFEAEAEA),
-            overlayColor: WidgetStateProperty.resolveWith((states) {
-              return AppColors.primaryVariant;
-            }),
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            startLabel: '${provider.ageStart}',
+            endLabel: '${provider.ageEnd}',
+            onChanged: provider.setAgeRange,
           ),
+          const SizedBox(height: 18),
           Text(
             'Height Range',
             style: TextStyle(
@@ -116,20 +114,17 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
               fontWeight: FontWeight.w500,
             ),
           ),
-          // Height range slider
-          RangeSlider(
-            values: RangeValues(provider.heightStart.toDouble(), provider.heightEnd.toDouble()),
+          _StyledRangeSlider(
+            values: RangeValues(
+              provider.heightStart.toDouble(),
+              provider.heightEnd.toDouble(),
+            ),
             min: provider.heightMinLimit.toDouble(),
             max: provider.heightMaxLimit.toDouble(),
-            divisions: ((provider.heightMaxLimit - provider.heightMinLimit) ~/ 1) > 0 ? (provider.heightMaxLimit - provider.heightMinLimit) ~/ 1 : null,
-            labels: RangeLabels('${provider.heightStart} cm', '${provider.heightEnd} cm'),
-            activeColor: AppColors.primary,
-            inactiveColor: const Color(0xFFEAEAEA),
-            overlayColor: WidgetStateProperty.resolveWith((states) {
-              return AppColors.primaryVariant;
-            }),
-            onChanged: (values) => provider.setHeightRange(values),
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            divisions: provider.heightMaxLimit - provider.heightMinLimit,
+            startLabel: _formatHeight(provider.heightStart),
+            endLabel: _formatHeight(provider.heightEnd),
+            onChanged: provider.setHeightRange,
           ),
           Text(
             'Martial Status',
@@ -182,5 +177,183 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
         context.push(Paths.community);
       },
     );
+  }
+
+  static String _formatHeight(int heightCm) {
+    final totalInches = (heightCm / 2.54).round();
+    final feet = totalInches ~/ 12;
+    final inches = totalInches % 12;
+    return "$feet' $inches\"";
+  }
+}
+
+class _StyledRangeSlider extends StatelessWidget {
+  const _StyledRangeSlider({
+    required this.values,
+    required this.min,
+    required this.max,
+    required this.startLabel,
+    required this.endLabel,
+    required this.onChanged,
+    this.divisions,
+  });
+
+  final RangeValues values;
+  final double min;
+  final double max;
+  final int? divisions;
+  final String startLabel;
+  final String endLabel;
+  final ValueChanged<RangeValues> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    const horizontalPadding = 20.0;
+    const thumbDiameter = 22.0;
+    const sliderTop = 34.0;
+    final availableWidth =
+        MediaQuery.of(context).size.width - 40 - (horizontalPadding * 2);
+    final startFactor = ((values.start - min) / (max - min)).clamp(0.0, 1.0);
+    final endFactor = ((values.end - min) / (max - min)).clamp(0.0, 1.0);
+    final startLeft = (availableWidth * startFactor) - 22;
+    final endLeft = (availableWidth * endFactor) - 22;
+
+    return SizedBox(
+      height: 74,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Positioned(
+            left: horizontalPadding + startLeft,
+            top: 0,
+            child: IgnorePointer(
+              child: _SliderBubble(label: startLabel),
+            ),
+          ),
+          Positioned(
+            left: horizontalPadding + endLeft,
+            top: 0,
+            child: IgnorePointer(
+              child: _SliderBubble(label: endLabel),
+            ),
+          ),
+          Positioned.fill(
+            top: sliderTop,
+            child: SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                trackHeight: 6,
+                activeTrackColor: AppColors.primary,
+                inactiveTrackColor: const Color(0xFFF0F0F0),
+                overlayShape: SliderComponentShape.noOverlay,
+                rangeTrackShape: const RoundedRectRangeSliderTrackShape(),
+                thumbColor: Colors.white,
+                activeTickMarkColor: Colors.transparent,
+                inactiveTickMarkColor: Colors.transparent,
+                rangeThumbShape: const _RingRangeThumbShape(
+                  thumbRadius: thumbDiameter / 2,
+                ),
+              ),
+              child: RangeSlider(
+                values: values,
+                min: min,
+                max: max,
+                divisions: divisions,
+                onChanged: onChanged,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SliderBubble extends StatelessWidget {
+  const _SliderBubble({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(5),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x12000000),
+                blurRadius: 18,
+                offset: Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimaryLight,
+            ),
+          ),
+        ),
+        CustomPaint(
+          size: const Size(18, 10),
+          painter: _BubblePointerPainter(),
+        ),
+      ],
+    );
+  }
+}
+
+class _BubblePointerPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = Colors.white;
+    final path = Path()
+      ..moveTo(0, 0)
+      ..lineTo(size.width / 2, size.height)
+      ..lineTo(size.width, 0)
+      ..close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _RingRangeThumbShape extends RangeSliderThumbShape {
+  const _RingRangeThumbShape({required this.thumbRadius});
+
+  final double thumbRadius;
+
+  @override
+  Size getPreferredSize(bool isEnabled, bool isDiscrete) {
+    return Size.fromRadius(thumbRadius);
+  }
+
+  @override
+  void paint(
+    PaintingContext context,
+    Offset center, {
+    required Animation<double> activationAnimation,
+    required Animation<double> enableAnimation,
+    bool isDiscrete = false,
+    bool isEnabled = false,
+    bool isOnTop = false,
+    required SliderThemeData sliderTheme,
+    TextDirection textDirection = TextDirection.ltr,
+    Thumb thumb = Thumb.start,
+    bool isPressed = false,
+  }) {
+    final canvas = context.canvas;
+    final outerPaint = Paint()..color = Colors.white;
+    final innerPaint = Paint()..color = AppColors.primary;
+
+    canvas.drawCircle(center, thumbRadius, outerPaint);
+    canvas.drawCircle(center, thumbRadius - 7, innerPaint);
   }
 }

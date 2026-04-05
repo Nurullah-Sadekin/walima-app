@@ -5,6 +5,7 @@ import 'package:flutter_boilerplate/features/matches/data/models/request/get_mat
 import 'package:flutter_boilerplate/features/matches/data/models/response/connect_response.dart';
 import 'package:flutter_boilerplate/features/matches/data/models/response/get_matches_response.dart';
 import 'package:flutter_boilerplate/features/matches/data/models/response/get_public_matches_response.dart';
+import 'package:flutter_boilerplate/features/matches/domain/request/bulk_send_connections_request_body.dart';
 import 'package:flutter_boilerplate/features/matches/domain/request/create_connection_request_body.dart';
 
 class MatchesRepository {
@@ -148,5 +149,65 @@ class MatchesRepository {
     }
 
     // Implement the logic to create a connection request
+  }
+
+  Future<ConnectResponse> bulkSendConnectionRequests(
+    BulkSendConnectionsRequestBody body,
+  ) async {
+    try {
+      final response = await DioClient().post(
+        AppUrls.bulkSendConnectionRequests,
+        data: body.toJson(),
+        isTokenRequired: true,
+      );
+
+      final data = response.data;
+      if (data is Map<String, dynamic>) {
+        return ConnectResponse.fromJson(
+          data,
+          statusCode: response.statusCode,
+        );
+      }
+
+      if (data is Map) {
+        return ConnectResponse.fromJson(
+          Map<String, dynamic>.from(data),
+          statusCode: response.statusCode,
+        );
+      }
+
+      return ConnectResponse(
+        code: response.statusCode >= 200 && response.statusCode < 300
+            ? 'SUCCESS'
+            : 'FAILED',
+        message: response.message,
+        statusCode: response.statusCode,
+      );
+    } catch (e) {
+      final dioException = e is DioException ? e : null;
+      final errorMessage = dioException != null
+          ? dioException.response?.data['message'] ?? dioException.message
+          : e.toString();
+
+      final data = dioException?.response?.data;
+      if (data is Map<String, dynamic>) {
+        return ConnectResponse.fromJson(
+          data,
+          statusCode: dioException?.response?.statusCode,
+        );
+      }
+      if (data is Map) {
+        return ConnectResponse.fromJson(
+          Map<String, dynamic>.from(data),
+          statusCode: dioException?.response?.statusCode,
+        );
+      }
+
+      return ConnectResponse(
+        code: 'FAILED',
+        message: errorMessage.toString(),
+        statusCode: dioException?.response?.statusCode ?? 0,
+      );
+    }
   }
 }
