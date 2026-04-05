@@ -52,7 +52,8 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
     final provider = ref.watch(matchesProvider);
 
     return TransparentLoading(
-      isLoading: provider.screenStates == MatchesProviderScreenStates.transParentLoading,
+      isLoading: provider.screenStates ==
+          MatchesProviderScreenStates.transParentLoading,
       child: Scaffold(
         body: GradientBackground(
           child: Padding(
@@ -220,7 +221,8 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
     if (provider.matches.isEmpty) {
       return EmptyStateWidget(
         title: 'No ${provider.selectedTabTitle} Matches Yet',
-        subtitle: 'We could not find any profiles for this section right now. Try changing your filters and check again.',
+        subtitle:
+            'We could not find any profiles for this section right now. Try changing your filters and check again.',
         buttonText: 'Refresh',
         onTap: () => ref.read(matchesProvider).loadMatchesForSelectedTab(
               force: true,
@@ -229,7 +231,8 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
     }
 
     return RefreshIndicator(
-      onRefresh: () => ref.read(matchesProvider).loadMatchesForSelectedTab(force: true),
+      onRefresh: () =>
+          ref.read(matchesProvider).loadMatchesForSelectedTab(force: true),
       child: ListView.separated(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.only(bottom: 12),
@@ -250,24 +253,44 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             menu: true,
             photoRequest: false,
             photoCount: '1',
-            profession: CamelCaseUtils.formatCamelCase(match.maritalStatus ?? ''),
-            maritalStatus: CamelCaseUtils.formatCamelCase(match.community ?? ''),
+            profession:
+                CamelCaseUtils.formatCamelCase(match.maritalStatus ?? ''),
+            maritalStatus:
+                CamelCaseUtils.formatCamelCase(match.community ?? ''),
             religion: CamelCaseUtils.formatCamelCase(match.religion ?? ''),
             noButton: false,
-            onTapLeftButton: () async{
-             provider.updateViewState(screenStates: MatchesProviderScreenStates.transParentLoading);
-             await ref.read(homeProvider).connect(context, match.id ?? '', match.displayName ?? 'Unknown', ConnectionRequestType.match.name);
-             await ref.read(matchesProvider).loadMatchesForSelectedTab(force: true); 
-             },
-            leftButtonColor: match.connection?.status == 'none' ? AppColors.greenButtonColor : AppColors.disableBackground,
-            leftButtonTextColor: match.connection?.status == 'none' ? AppColors.white : AppColors.disableText,
-            leftButtonIconColor: match.connection?.status == 'none' ? AppColors.white : AppColors.disableText,
-            leftButtonBorderColor: match.connection?.status == 'none' ? AppColors.greenButtonColor : AppColors.disableBackground,
+            onTapLeftButton: () async {
+              provider.updateViewState(
+                screenStates: MatchesProviderScreenStates.transParentLoading,
+              );
+              await ref.read(homeProvider).connect(
+                    context,
+                    match.id ?? '',
+                    match.displayName ?? 'Unknown',
+                    ConnectionRequestType.match.apiValue,
+                  );
+              await ref
+                  .read(matchesProvider)
+                  .loadMatchesForSelectedTab(force: true);
+            },
+            leftButtonColor: match.connection?.status == 'none'
+                ? AppColors.greenButtonColor
+                : AppColors.disableBackground,
+            leftButtonTextColor: match.connection?.status == 'none'
+                ? AppColors.white
+                : AppColors.disableText,
+            leftButtonIconColor: match.connection?.status == 'none'
+                ? AppColors.white
+                : AppColors.disableText,
+            leftButtonBorderColor: match.connection?.status == 'none'
+                ? AppColors.greenButtonColor
+                : AppColors.disableBackground,
             onTapRightButton: () {
               // Handle right button tap
             },
             isOnline: match.isOnline ?? false,
-            viewOnAccept: match.profilePhoto?.visibilityStatus?.toLowerCase() != 'public',
+            viewOnAccept:
+                match.profilePhoto?.visibilityStatus?.toLowerCase() != 'public',
           );
         },
       ),

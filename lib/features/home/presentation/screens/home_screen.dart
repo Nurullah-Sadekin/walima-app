@@ -84,7 +84,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return TransparentLoading(
-      isLoading: ref.watch(homeProvider).screenStates == HomeScreenStates.transparentLoading,
+      isLoading: ref.watch(homeProvider).screenStates ==
+          HomeScreenStates.transparentLoading,
       child: Scaffold(
         key: _scaffoldKey,
         drawer: const AppDrawer(),
@@ -103,7 +104,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       children: [
         const Positioned.fill(
           child: ShowImage(
-            imagePath: AppImages.homeProfileBg,/**/
+            imagePath: AppImages.homeProfileBg,
+            /**/
             fit: BoxFit.cover,
           ),
         ),
@@ -307,19 +309,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           isPremiumConnect: match.isPremium ?? true,
           isVerified: match.profilePhoto?.isVerified ?? false,
           name: match.displayName ?? 'Walima Member',
-          age:  '${match.age ?? 'Undefine'} Yr' ,
+          age: '${match.age ?? 'Undefine'} Yr',
           height: HeightUtils.formatHeight(heightText),
           location: location,
           profession: profession,
-          leftButtonColor: match.connection?.status == 'none' ? AppColors.greenButtonColor : AppColors.disableBackground,
-          leftButtonTextColor: match.connection?.status == 'none' ? AppColors.white : AppColors.disableText,
-          leftButtonIconColor: match.connection?.status == 'none' ? AppColors.white : AppColors.disableText,
-          leftButtonBorderColor: match.connection?.status == 'none' ? AppColors.greenButtonColor : AppColors.disableBackground,
+          leftButtonColor: match.connection?.status == 'none'
+              ? AppColors.greenButtonColor
+              : AppColors.disableBackground,
+          leftButtonTextColor: match.connection?.status == 'none'
+              ? AppColors.white
+              : AppColors.disableText,
+          leftButtonIconColor: match.connection?.status == 'none'
+              ? AppColors.white
+              : AppColors.disableText,
+          leftButtonBorderColor: match.connection?.status == 'none'
+              ? AppColors.greenButtonColor
+              : AppColors.disableBackground,
           viewOnAccept: match.profilePhoto?.visibilityStatus != 'public',
           religion: match.religion,
           isOnline: match.isOnline ?? false,
           onTapLeftButton: () {
-            ref.read(homeProvider).connect(context, match.id ?? '', match.displayName ?? 'Unknown', ConnectionRequestType.match.name);
+            ref.read(homeProvider).connect(
+                  context,
+                  match.id ?? '',
+                  match.displayName ?? 'Unknown',
+                  ConnectionRequestType.match.apiValue,
+                );
             // print('Left button tapped for ${match.displayName}');
           },
           activeStatusText: activeStatus,
@@ -501,18 +516,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           isPremiumConnect: visitor.isPremium ?? false,
           isVerified: visitor.isVerified ?? false,
           name: visitor.displayName ?? 'Walima Member',
-          age:  '${visitor.age?.toInt() ?? 'Undefine'} Yr' ,
+          age: '${visitor.age?.toInt() ?? 'Undefine'} Yr',
           height: HeightUtils.formatHeight(visitor.height.toString()),
           location: location,
-          leftButtonColor: visitor.connection?.status == 'none' ? AppColors.greenButtonColor : AppColors.disableBackground,
-          leftButtonTextColor: visitor.connection?.status == 'none' ? AppColors.white : AppColors.disableText,
-          leftButtonIconColor: visitor.connection?.status == 'none' ? AppColors.white : AppColors.disableText,
-          leftButtonBorderColor: visitor.connection?.status == 'none' ? AppColors.greenButtonColor : AppColors.disableBackground,
+          leftButtonColor: visitor.connection?.status == 'none'
+              ? AppColors.greenButtonColor
+              : AppColors.disableBackground,
+          leftButtonTextColor: visitor.connection?.status == 'none'
+              ? AppColors.white
+              : AppColors.disableText,
+          leftButtonIconColor: visitor.connection?.status == 'none'
+              ? AppColors.white
+              : AppColors.disableText,
+          leftButtonBorderColor: visitor.connection?.status == 'none'
+              ? AppColors.greenButtonColor
+              : AppColors.disableBackground,
           viewOnAccept: visitor.profilePhoto?.visibilityStatus != 'public',
           activeStatusText: _recentVisitorStatus(visitor),
           onTapLeftButton: () {
-
-            ref.read(homeProvider).connect(context, visitor.id ?? '', visitor.displayName ?? 'Unknown', ConnectionRequestType.match.name);
+            ref.read(homeProvider).connect(
+                  context,
+                  visitor.id ?? '',
+                  visitor.displayName ?? 'Unknown',
+                  ConnectionRequestType.match.apiValue,
+                );
             // print('Left button tapped for ${visitor.displayName}');
           },
         ),
@@ -539,7 +566,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   String _recentVisitorStatus(Data visitor) {
-    final visitedAt =  DateTimeUtils.formatDate(DateTime.tryParse(visitor.visitedAt ?? ''));
+    final visitedAt =
+        DateTimeUtils.formatDate(DateTime.tryParse(visitor.visitedAt ?? ''));
     return visitedAt;
   }
 
