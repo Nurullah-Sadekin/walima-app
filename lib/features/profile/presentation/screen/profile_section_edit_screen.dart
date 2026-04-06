@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
+import 'package:flutter_boilerplate/core/global/enums/enums.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
@@ -36,6 +37,22 @@ class ProfileSectionEditScreen extends ConsumerStatefulWidget {
 
 class _ProfileSectionEditScreenState
     extends ConsumerState<ProfileSectionEditScreen> {
+  static final Map<String, String> _familyEconomicConditionAliases =
+      <String, String>{
+    for (final condition in RegistrationFamilyEconomicCondition.values)
+      condition.label.toLowerCase(): condition.apiValue,
+    'elite': RegistrationFamilyEconomicCondition.eliteClass.apiValue,
+    'elite class': RegistrationFamilyEconomicCondition.eliteClass.apiValue,
+    'high': RegistrationFamilyEconomicCondition.upperClass.apiValue,
+    'upper class': RegistrationFamilyEconomicCondition.upperClass.apiValue,
+    'middle': RegistrationFamilyEconomicCondition.middleClass.apiValue,
+    'middle class': RegistrationFamilyEconomicCondition.middleClass.apiValue,
+    'middle_class': RegistrationFamilyEconomicCondition.middleClass.apiValue,
+    'aspiring': RegistrationFamilyEconomicCondition.lowerMiddleClass.apiValue,
+    'lower middle class':
+        RegistrationFamilyEconomicCondition.lowerMiddleClass.apiValue,
+  };
+
   final PreferencesRepository _preferencesRepository = PreferencesRepository();
   final FamilyRepository _familyRepository = FamilyRepository();
 
@@ -322,6 +339,9 @@ class _ProfileSectionEditScreenState
             _field(
               label: 'Family Financial Status',
               controller: _familyFinancialController,
+              hintText: 'Select Family Financial Status',
+              readOnly: true,
+              onTap: _pickFamilyEconomicCondition,
             ),
           ],
         );
@@ -497,9 +517,11 @@ class _ProfileSectionEditScreenState
     required TextEditingController controller,
     TextInputType? keyboardType,
     bool datePicker = false,
+    bool readOnly = false,
     int minLines = 1,
     int maxLines = 1,
     String? hintText,
+    VoidCallback? onTap,
   }) {
     return PrimaryTextField(
       headLine: label,
@@ -507,11 +529,75 @@ class _ProfileSectionEditScreenState
       controller: controller,
       keyboardType: keyboardType,
       datePicker: datePicker,
+      readOnly: readOnly,
       minLine: minLines,
       maxLine: maxLines,
       errorText: '',
-      onTap: () {},
+      onTap: onTap ?? () {},
     );
+  }
+
+  Future<void> _pickFamilyEconomicCondition() async {
+    final currentValue = _resolveFamilyEconomicConditionValue(
+      _familyFinancialController.text,
+    );
+    final selected =
+        await showModalBottomSheet<RegistrationFamilyEconomicCondition>(
+      context: context,
+      backgroundColor: Colors.white,
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 8),
+              Container(
+                width: 48,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.greyLight,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Select Family Financial Status',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              ...RegistrationFamilyEconomicCondition.values.map((condition) {
+                final isSelected = currentValue == condition.apiValue;
+                return ListTile(
+                  title: Text(condition.label),
+                  trailing: isSelected
+                      ? const Icon(
+                          Icons.check_circle,
+                          color: AppColors.primary,
+                        )
+                      : null,
+                  onTap: () => Navigator.of(context).pop(condition),
+                );
+              }),
+              const SizedBox(height: 8),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (selected == null || !mounted) {
+      return;
+    }
+
+    setState(() {
+      _familyFinancialController.text = selected.label;
+    });
   }
 
   List<Widget> _withSpacing(List<Widget> children) {
@@ -603,6 +689,15 @@ class _ProfileSectionEditScreenState
           fallbackMessage: 'Failed to update religious background',
         );
       case ProfileEditSection.familyDetails:
+        final familyEconomicCondition = _resolveFamilyEconomicConditionValue(
+          _familyFinancialController.text,
+        );
+        if (_familyFinancialController.text.trim().isNotEmpty &&
+            familyEconomicCondition == null) {
+          await _showError('Please select a valid family financial status.');
+          return false;
+        }
+
         final body = UpdateFamilyRequestBody(
           fatherName: _toTrimmedOrNull(_fatherNameController),
           fatherProfession: _toTrimmedOrNull(_fatherProfessionController),
@@ -611,7 +706,7 @@ class _ProfileSectionEditScreenState
           familyLocation: _toTrimmedOrNull(_familyLocationController),
           brothers: _toIntOrNull(_brothersController),
           sisters: _toIntOrNull(_sistersController),
-          familyEconomicCondition: _toTrimmedOrNull(_familyFinancialController),
+          familyEconomicCondition: familyEconomicCondition,
         );
 
         if (body.toJson().isEmpty) {
@@ -803,7 +898,8 @@ class _ProfileSectionEditScreenState
     _familyLocationController.text = family?.familyLocation ?? '';
     _brothersController.text = family?.brothers?.toString() ?? '';
     _sistersController.text = family?.sisters?.toString() ?? '';
-    _familyFinancialController.text = family?.familyEconomicCondition ?? '';
+    _familyFinancialController.text =
+        _familyEconomicConditionLabel(family?.familyEconomicCondition) ?? '';
 
     _highestQualificationController.text = _firstNonEmpty(
       education?.qualification?.toString(),
@@ -970,5 +1066,49 @@ class _ProfileSectionEditScreenState
       return normalizedFirst;
     }
     return second?.trim() ?? '';
+  }
+
+  String? _resolveFamilyEconomicConditionValue(String? rawValue) {
+    final selected = rawValue?.trim() ?? '';
+    if (selected.isEmpty) {
+      return null;
+    }
+
+    final normalized = selected.toLowerCase();
+    final candidate =
+        _familyEconomicConditionAliases[normalized] ?? _toSnakeCase(selected);
+
+    for (final condition in RegistrationFamilyEconomicCondition.values) {
+      if (condition.apiValue == candidate) {
+        return candidate;
+      }
+    }
+
+    return null;
+  }
+
+  String? _familyEconomicConditionLabel(String? apiValue) {
+    final normalized = apiValue?.trim().toLowerCase();
+    if (normalized == null || normalized.isEmpty) {
+      return null;
+    }
+
+    for (final condition in RegistrationFamilyEconomicCondition.values) {
+      if (condition.apiValue == normalized) {
+        return condition.label;
+      }
+    }
+
+    return null;
+  }
+
+  String _toSnakeCase(String value) {
+    return value
+        .trim()
+        .toLowerCase()
+        .replaceAll('&', 'and')
+        .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
+        .replaceAll(RegExp(r'_+'), '_')
+        .replaceAll(RegExp(r'^_|_$'), '');
   }
 }

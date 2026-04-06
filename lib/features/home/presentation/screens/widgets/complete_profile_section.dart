@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/verification_tile.dart';
+import 'package:flutter_boilerplate/features/profile/data/model/response/get_complete_profile_response.dart';
+import 'package:flutter_boilerplate/features/profile/presentation/screen/profile_edit_section.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -17,8 +18,13 @@ class CompleteProfileSection extends ConsumerWidget {
     final provider = ref.watch(profileProvider);
     final completionPercentage =
         provider.profile?.profileCompletion?.percentage ?? 0;
+    final incompleteItems =
+        (provider.profile?.profileCompletion?.missingSectionItems ??
+                const <ProfileCompletionSection>[])
+            .map(_CompleteProfileTileData.fromSection)
+            .toList();
 
-    if (completionPercentage >= 100) {
+    if (completionPercentage >= 100 || incompleteItems.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -45,59 +51,128 @@ class CompleteProfileSection extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
-          VerificationTile(
-            iconImagePath: AppImages.verifiedBadgeSvgIcon,
-            title: 'Government ID Verify',
-            statusText: 'Unverified',
-            statusColor: AppColors.primary,
-            statusBackgroundColor: AppColors.primaryVariant,
-            onTap: () => context.pushNamed(Routes.governmentIdVerify),
-          ),
-          const SizedBox(height: 10),
-          VerificationTile(
-            iconImagePath: AppImages.verifyContact,
-            title: 'Verify Phone Number',
-            statusText: 'Verified',
-            statusColor: AppColors.success,
-            statusBackgroundColor: AppColors.success.withValues(alpha: 0.1),
-          ),
+          ...List.generate(incompleteItems.length, (index) {
+            final item = incompleteItems[index];
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: index == incompleteItems.length - 1 ? 0 : 10,
+              ),
+              child: VerificationTile(
+                iconImagePath: item.iconImagePath,
+                title: item.title,
+                statusText: 'Incomplete',
+                statusColor: AppColors.primary,
+                statusBackgroundColor: AppColors.primaryVariant,
+                onTap: () => item.open(context),
+              ),
+            );
+          }),
         ],
       ),
     );
   }
-  Widget _headerActions() {
-    return Row(
-      children: [
-        Expanded(
-          child: PrimaryButtons(
-            buttonStyle: ButtonsStyle.iconicDynamicButton,
-            textColor: AppColors.textSecondaryLight,
-            bgColor: AppColors.white,
-            borderColor: AppColors.greyLight,
-            svgIconPath: AppImages.editProfileSvgIcon,
-            svgIconColor: AppColors.textSecondaryLight,
-            iconLeftPosition: false,
-            onTap: () {
-              // context.push(Paths.editProfile);
-            },
-            title: 'Edit Profile',
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: PrimaryButtons(
-            buttonStyle: ButtonsStyle.iconicDynamicButton,
-            textColor: AppColors.white,
-            bgColor: AppColors.primary,
-            svgIconPath: AppImages.premiumSvgIcon,
-            iconLeftPosition: false,
-            onTap: () {
-              // context.push(Paths.upgradePackage);
-            },
-            title: 'Renew Plan',
-          ),
-        ),
-      ],
+}
+
+class _CompleteProfileTileData {
+  const _CompleteProfileTileData({
+    required this.title,
+    required this.iconImagePath,
+    required this.onTap,
+  });
+
+  final String title;
+  final String iconImagePath;
+  final void Function(BuildContext context) onTap;
+
+  void open(BuildContext context) => onTap(context);
+
+  static _CompleteProfileTileData fromSection(
+    ProfileCompletionSection section,
+  ) {
+    switch (section) {
+      case ProfileCompletionSection.basicProfile:
+        return _profileEditTile(
+          title: 'Complete Basic Profile',
+          iconImagePath: AppImages.profileSvgIcon,
+          section: ProfileEditSection.aboutYourself,
+        );
+      case ProfileCompletionSection.appearance:
+        return _profileEditTile(
+          title: 'Complete Appearance',
+          iconImagePath: AppImages.person,
+          section: ProfileEditSection.basicDetails,
+        );
+      case ProfileCompletionSection.location:
+        return _profileEditTile(
+          title: 'Complete Location',
+          iconImagePath: AppImages.locationSvgIcon,
+          section: ProfileEditSection.location,
+        );
+      case ProfileCompletionSection.educationCareer:
+        return _profileEditTile(
+          title: 'Complete Education & Career',
+          iconImagePath: AppImages.educationSvgIcon,
+          section: ProfileEditSection.educationCareer,
+        );
+      case ProfileCompletionSection.religion:
+        return _profileEditTile(
+          title: 'Complete Religious Background',
+          iconImagePath: AppImages.religionSvgIcon,
+          section: ProfileEditSection.religiousBackground,
+        );
+      case ProfileCompletionSection.family:
+        return _profileEditTile(
+          title: 'Complete Family Details',
+          iconImagePath: AppImages.familyDetails,
+          section: ProfileEditSection.familyDetails,
+        );
+      case ProfileCompletionSection.lifestyle:
+        return _profileEditTile(
+          title: 'Complete Lifestyle',
+          iconImagePath: AppImages.lifeStyleSvgIcon,
+          section: ProfileEditSection.basicDetails,
+        );
+      case ProfileCompletionSection.contacts:
+        return const _CompleteProfileTileData(
+          title: 'Verify Phone Number',
+          iconImagePath: AppImages.verifyContact,
+          onTap: _openVerifyNumber,
+        );
+      case ProfileCompletionSection.photos:
+        return const _CompleteProfileTileData(
+          title: 'Add Photos',
+          iconImagePath: AppImages.photoIcon,
+          onTap: _openPhotoUpload,
+        );
+      case ProfileCompletionSection.hobbiesInterests:
+        return _profileEditTile(
+          title: 'Add Hobbies & Interests',
+          iconImagePath: AppImages.favouriteIcon,
+          section: ProfileEditSection.hobbiesInterests,
+        );
+    }
+  }
+
+  static _CompleteProfileTileData _profileEditTile({
+    required String title,
+    required String iconImagePath,
+    required ProfileEditSection section,
+  }) {
+    return _CompleteProfileTileData(
+      title: title,
+      iconImagePath: iconImagePath,
+      onTap: (context) => context.pushNamed(
+        Routes.profileSectionEdit,
+        extra: {'section': section.key},
+      ),
     );
+  }
+
+  static void _openVerifyNumber(BuildContext context) {
+    context.pushNamed(Routes.verifyNumber);
+  }
+
+  static void _openPhotoUpload(BuildContext context) {
+    context.pushNamed(Routes.photoUpload);
   }
 }
