@@ -151,8 +151,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               const CompleteProfileSection(),
               _premiumMatches(),
-              if(provider.recentVisitors.isNotEmpty)
-              _recentVisitors(),
+              if (provider.recentVisitors.isNotEmpty) _recentVisitors(),
               _followUpSection(),
             ],
           ),
@@ -201,33 +200,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10.0,
-                  vertical: 10.0,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(8.0),
-                  border: Border.all(color: AppColors.greyLight),
-                ),
-                child: Row(
-                  children: [
-                    Text(
-                      'View All',
-                      style: TextStyle(
-                        color: AppColors.textSecondaryLight,
-                        fontSize: TextSize.font14(context),
-                        fontWeight: FontWeight.w500,
+              InkWell(
+                borderRadius: BorderRadius.circular(8.0),
+                onTap: () => context.pushNamed(Routes.premiumMatches),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10.0,
+                    vertical: 10.0,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(8.0),
+                    border: Border.all(color: AppColors.greyLight),
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        'View All',
+                        style: TextStyle(
+                          color: AppColors.textSecondaryLight,
+                          fontSize: TextSize.font14(context),
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      color: AppColors.textSecondaryLight,
-                      size: TextSize.font12(context),
-                    ),
-                  ],
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        color: AppColors.textSecondaryLight,
+                        size: TextSize.font12(context),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -297,7 +300,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: SizedBox(
         width: 300,
         child: ProfileComprehensiveCard(
-          imagePath: imagePath ?? (match.gender == 'female' ? AppImages.womenAvatar :AppImages.manAvatar),
+          imagePath: imagePath ??
+              (match.gender == 'female'
+                  ? AppImages.womenAvatar
+                  : AppImages.manAvatar),
           imageHeight: 250,
           isPremiumConnect: match.isPremium ?? true,
           isVerified: match.profilePhoto?.isVerified ?? false,
@@ -318,10 +324,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           leftButtonBorderColor: match.connection?.status == 'none'
               ? AppColors.greenButtonColor
               : AppColors.disableBackground,
-          viewOnAccept: match.profilePhoto?.visibilityStatus == 'visible' ? true : false,
+          viewOnAccept:
+              match.profilePhoto?.visibilityStatus == 'visible' ? true : false,
           religion: match.religion,
           isOnline: match.isOnline ?? false,
-          onTapRightButton: () async{
+          onTapRightButton: () async {
             await BottomSheetUtils.open(
               context: context,
               fullHeight: false,
@@ -347,13 +354,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-
   Widget _contactPremiumBottomSheet(MatchProfile match) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: ContactBottomSheet(
         userName: match.displayName ?? 'Unknown',
-        profileImagePath:  (match.profilePhoto?.url?.isNotEmpty ?? false)
+        profileImagePath: (match.profilePhoto?.url?.isNotEmpty ?? false)
             ? match.profilePhoto!.url!
             : AppImages.demoProfile,
         description: match.connection?.message,
@@ -437,33 +443,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10.0,
-                  vertical: 10.0,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(8.0),
-                  border: Border.all(color: AppColors.greyLight),
-                ),
-                child: Row(
-                  children: [
-                    Text(
-                      'View All',
-                      style: TextStyle(
-                        color: AppColors.textSecondaryLight,
-                        fontSize: TextSize.font14(context),
-                        fontWeight: FontWeight.w500,
+              InkWell(
+                borderRadius: BorderRadius.circular(8.0),
+                onTap: () => context.pushNamed(Routes.recentVisitors),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10.0,
+                    vertical: 10.0,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(8.0),
+                    border: Border.all(color: AppColors.greyLight),
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        'View All',
+                        style: TextStyle(
+                          color: AppColors.textSecondaryLight,
+                          fontSize: TextSize.font14(context),
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      color: AppColors.textSecondaryLight,
-                      size: TextSize.font12(context),
-                    ),
-                  ],
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        color: AppColors.textSecondaryLight,
+                        size: TextSize.font12(context),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -524,7 +534,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildRecentVisitorCard(Data visitor) {
     final location = _formatRecentVisitorLocation(visitor.location);
     final imageUrl = visitor.profilePhoto?.url?.toString();
-    final imagePath = (imageUrl?.isNotEmpty ?? false) ? imageUrl! : (visitor.gender == 'female' ? AppImages.womenAvatar :AppImages.manAvatar);
+    final imagePath = (imageUrl?.isNotEmpty ?? false)
+        ? imageUrl!
+        : (visitor.gender == 'female'
+            ? AppImages.womenAvatar
+            : AppImages.manAvatar);
 
     return Padding(
       padding: const EdgeInsets.only(right: 10.0),
@@ -553,7 +567,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               : AppColors.disableBackground,
           viewOnAccept: visitor.profilePhoto?.visibilityStatus == 'visible',
           activeStatusText: _recentVisitorStatus(visitor),
-          onTapRightButton: () async{
+          onTapRightButton: () async {
             await BottomSheetUtils.open(
               context: context,
               fullHeight: false,
@@ -582,7 +596,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: ContactBottomSheet(
         userName: visitor.displayName ?? 'Unknown',
-        profileImagePath:  (visitor.profilePhoto?.url?.isNotEmpty ?? false)
+        profileImagePath: (visitor.profilePhoto?.url?.isNotEmpty ?? false)
             ? visitor.profilePhoto!.url!
             : AppImages.demoProfile,
         description: visitor.connection?.message,
@@ -592,7 +606,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
     );
   }
-
 
   String? _formatRecentVisitorLocation(Location? location) {
     final parts = [
@@ -678,5 +691,4 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
     );
   }
-
 }

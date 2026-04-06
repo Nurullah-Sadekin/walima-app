@@ -25,6 +25,7 @@ import 'package:flutter_boilerplate/features/recommended_preferences/presentatio
 import 'package:flutter_boilerplate/features/registration/presentation/screens/crop_image.dart';
 import 'package:flutter_boilerplate/features/plans/presentation/screens/plans_screen.dart';
 import 'package:flutter_boilerplate/features/plans/presentation/screens/payment_webview_screen.dart';
+import 'package:flutter_boilerplate/features/home/presentation/screens/home_view_all_screen.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/about_you.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/email_phone.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/family_details.dart';
@@ -217,8 +218,8 @@ GoRouter goRouter(Ref ref) {
         name: Routes.partnerPreferences,
         builder: (context, state) {
           final extra = state.extra;
-          final isFromDrawer = extra is Map<String, dynamic> &&
-              extra['fromDrawer'] == true;
+          final isFromDrawer =
+              extra is Map<String, dynamic> && extra['fromDrawer'] == true;
           return PartnerPreferencesScreen(isFromDrawer: isFromDrawer);
         },
       ),
@@ -329,6 +330,20 @@ GoRouter goRouter(Ref ref) {
         },
       ),
       GoRoute(
+        path: Paths.premiumMatches,
+        name: Routes.premiumMatches,
+        builder: (context, state) => const HomeViewAllScreen(
+          type: HomeViewAllType.premiumMatches,
+        ),
+      ),
+      GoRoute(
+        path: Paths.recentVisitors,
+        name: Routes.recentVisitors,
+        builder: (context, state) => const HomeViewAllScreen(
+          type: HomeViewAllType.recentVisitors,
+        ),
+      ),
+      GoRoute(
         path: Paths.matches,
         name: Routes.matches,
         builder: (context, state) => const MatchesScreen(),
@@ -385,7 +400,8 @@ GoRouter goRouter(Ref ref) {
           final extra = state.extra is Map<String, dynamic>
               ? state.extra as Map<String, dynamic>
               : null;
-          final userName = extra != null ? (extra['displayName'] as String?) : null;
+          final userName =
+              extra != null ? (extra['displayName'] as String?) : null;
           return ReportScreen(userName: userName);
         },
       ),
@@ -398,9 +414,11 @@ GoRouter goRouter(Ref ref) {
               : const <String, dynamic>{};
           return StatusScreen(
             title: extra['title'] as String? ?? 'Report submitted',
-            subtitle: extra['subtitle'] as String? ?? 'Thanks. Your report has been received and will be reviewed.',
+            subtitle: extra['subtitle'] as String? ??
+                'Thanks. Your report has been received and will be reviewed.',
             buttonText: extra['buttonText'] as String? ?? 'Done',
-            onTapButton: extra['onTapButton'] as VoidCallback? ?? () => Navigator.of(context).maybePop(),
+            onTapButton: extra['onTapButton'] as VoidCallback? ??
+                () => Navigator.of(context).maybePop(),
           );
         },
       ),

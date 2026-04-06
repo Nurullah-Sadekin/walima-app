@@ -50,6 +50,8 @@ abstract class Paths {
   static const profileSectionEdit = '/profileSectionEdit';
   static const upgradePackage = '/upgradePackage';
   static const paymentWebView = '/paymentWebView';
+  static const premiumMatches = '/premiumMatches';
+  static const recentVisitors = '/recentVisitors';
 
   //Matches
   static const matches = '/matches';
@@ -121,6 +123,8 @@ abstract class Routes {
   static const profileSectionEdit = 'profileSectionEdit';
   static const upgradePackage = 'upgradePackage';
   static const paymentWebView = 'paymentWebView';
+  static const premiumMatches = 'premiumMatches';
+  static const recentVisitors = 'recentVisitors';
 
   //Matches
   static const matches = 'matches';
