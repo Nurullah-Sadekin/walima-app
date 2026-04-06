@@ -309,16 +309,17 @@ class DialogUtils {
         width: double.infinity,
         color: Colors.black.withOpacity(0.8),
         child: Stack(
+          alignment: Alignment.center,
           children: [
             ShowImage(
               imagePath: imagePath,
               width: double.infinity,
-              height: double.infinity,
+              height: MediaQuery.of(context).size.height * 0.5,
               fit: BoxFit.contain,
               radius: BorderRadius.zero,
             ),
             Positioned(
-              top: 10,
+              top:  MediaQuery.of(context).size.height * 0.25,
               right: 10,
               child: GestureDetector(
                 onTap: () => Navigator.of(context).pop(),

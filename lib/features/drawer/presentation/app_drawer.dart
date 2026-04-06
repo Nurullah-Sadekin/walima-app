@@ -142,9 +142,11 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
       showBottomIcon: true,
       topIconPath: AppImages.verifiedBadgeSvgIcon,
       bottomIconPath: AppImages.cameraSvgIcon,
-      onBottomIconPressed: () async {
+      onTapImage: () async{
         await DialogUtils.showFullScreenImage(context: context,
             imagePath: profileData?.profilePicture?.url ?? AppImages.demoProfile);
+      },
+      onBottomIconPressed: () async {
         final String? imagePath = await PickerDialog().imagePicker(context);
         if (!context.mounted) return;
         if (imagePath != null) {

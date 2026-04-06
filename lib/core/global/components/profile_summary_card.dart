@@ -18,7 +18,7 @@ class ProfileSummaryCard extends StatelessWidget {
     this.bottomIconPath,
     this.imageSize = 97,
     this.iconSize = 20,
-    this.onTopIconPressed,
+    this.onTapImage,
     this.onBottomIconPressed,
   });
 
@@ -33,8 +33,9 @@ class ProfileSummaryCard extends StatelessWidget {
   final String? bottomIconPath;
   final double imageSize;
   final double iconSize;
-  final VoidCallback? onTopIconPressed;
+  final VoidCallback? onTapImage;
   final VoidCallback? onBottomIconPressed;
+
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +52,7 @@ class ProfileSummaryCard extends StatelessWidget {
             showBottomIcon: showBottomIcon,
             topPositionImagePath: topIconPath ?? AppImages.verifiedBadgeSvgIcon,
             bottomPositionImagePath: bottomIconPath ?? AppImages.cameraSvgIcon,
-            onTopPressed: onTopIconPressed,
+            onTopPressed: onTapImage,
             onEdit: onBottomIconPressed,
           ),
           const SizedBox(width: 12),
