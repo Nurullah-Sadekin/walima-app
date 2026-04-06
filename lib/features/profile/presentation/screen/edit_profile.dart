@@ -7,6 +7,7 @@ import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/core/utils/picker_dialog.dart';
 import 'package:flutter_boilerplate/features/home/presentation/widgets/profile_info_card.dart';
@@ -97,6 +98,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             showBottomIcon: true,
             topPositionImagePath: AppImages.verifiedBadgeSvgIcon,
             bottomPositionImagePath: AppImages.cameraSvgIcon,
+            onTopPressed: () async{
+              await DialogUtils.showFullScreenImage(context: context,
+                  imagePath: _resolveProfileImagePath(profile));
+            },
             onEdit: () async {
               final String? imagePath = await PickerDialog().imagePicker(context);
               if (imagePath != null) {

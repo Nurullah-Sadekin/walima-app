@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_summary_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/picker_dialog.dart';
-import 'package:flutter_boilerplate/features/profile/presentation/screen/edit_profile.dart';
 import 'package:flutter_boilerplate/features/profile/presentation/utils/profile_summary_utils.dart';
 import 'package:flutter_boilerplate/features/profile/data/model/response/dashboard_response.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,12 +37,15 @@ class ProfileSummerySection extends ConsumerWidget {
           memberId: memberId,
           planName: planName,
           expiryText: expiryText,
-          profileImagePath:
-              profile?.profilePicture?.url ?? AppImages.demoProfile,
+          profileImagePath: profile?.profilePicture?.url ?? AppImages.demoProfile,
           showTopIcon: profile?.isVerified ?? false,
           showBottomIcon: true,
           topIconPath: AppImages.verifiedBadgeSvgIcon,
           bottomIconPath: AppImages.cameraSvgIcon,
+          onTapImage: () async{
+            await DialogUtils.showFullScreenImage(context: context,
+                imagePath: profile?.profilePicture?.url ?? AppImages.demoProfile);
+          },
           onBottomIconPressed: () async {
             final String? imagePath = await PickerDialog().imagePicker(context);
             if (imagePath != null) {

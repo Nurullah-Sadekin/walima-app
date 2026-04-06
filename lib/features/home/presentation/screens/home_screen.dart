@@ -33,16 +33,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   static const String _facebookUrl = 'https://www.facebook.com/WalimaApp';
   static const String _instagramUrl = 'https://www.instagram.com/walima.app';
-  static const String _linkedInUrl =
-      'https://www.linkedin.com/company/walima-app';
-  static const String _privacyUrl = 'https://dev.walima.app/en/privacy';
   static const String _xUrl = 'https://x.com/WalimaApp';
-  static const String _tikTokUrl = 'https://www.tiktok.com/@walima.app';
-  static const String _helpCenterUrl =
-      'https://dev.walima.app/en/account/help-desk';
-  static const String _beSafeOnlineUrl =
-      'https://dev.walima.app/en/be-safe-online';
-  static const String _termsUrl = 'https://dev.walima.app/en/terms';
 
   final Key profileImageKey = const ValueKey('home_profile_image');
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -540,17 +531,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   visitor.displayName ?? 'Unknown',
                   ConnectionRequestType.match.apiValue,
                 );
-            // print('Left button tapped for ${visitor.displayName}');
           },
         ),
       ),
     );
   }
 
-  String? _formatRecentVisitorHeight(num? height) {
-    if (height == null) return null;
-    return '${height.toInt()} cm';
-  }
 
   String? _formatRecentVisitorLocation(Location? location) {
     final parts = [
@@ -637,32 +623,4 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _followUpIcon({
-    required String label,
-    required String imagePath,
-    required VoidCallback onTap,
-  }) {
-    return SizedBox(
-      width: 72,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SocialMediaIcon(
-            imagePath: imagePath,
-            onTap: onTap,
-          ),
-          const SizedBox(height: 6),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AppColors.textPrimaryLight,
-              fontSize: TextSize.font12(context),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
