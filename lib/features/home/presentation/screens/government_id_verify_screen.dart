@@ -9,10 +9,12 @@ import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/tab_bar_widget.dart';
 import 'package:flutter_boilerplate/features/profile/data/model/response/dashboard_response.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/request/upload_media_request_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/media_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 class GovernmentIdVerifyScreen extends ConsumerStatefulWidget {
@@ -172,45 +174,25 @@ class _GovernmentIdVerifyScreenState
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
+        spacing: 8,
         children: _documentTypes.map((type) {
-          final isSelected = _selectedDocumentType == type;
-          return Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: () {
-                setState(() {
-                  _selectedDocumentType = type;
-                });
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 6,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.primary.withValues(alpha: 0.08)
-                      : const Color(0xFFF7F7F7),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: isSelected
-                        ? AppColors.primary.withValues(alpha: 0.55)
-                        : const Color(0xFFF0F0F0),
-                  ),
-                ),
-                child: Text(
-                  type,
-                  style: TextStyle(
-                    color: isSelected
-                        ? AppColors.primary
-                        : AppColors.textSecondaryLight,
-                    fontSize: TextSize.font12(context),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ),
+          return TabBarWidget(
+            text: type,
+            isSelected: _selectedDocumentType == type,
+            backgroundColor: const Color(0xFFF7F7F7),
+            textColor: AppColors.textSecondaryLight,
+            borderColor: const Color(0xFFF0F0F0),
+            borderRadius: 10,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            fontSize: TextSize.font12(context),
+            selectedBackgroundColor: AppColors.primary.withValues(alpha: 0.08),
+            selectedTextColor: AppColors.primary,
+            selectedBorderColor: AppColors.primary.withValues(alpha: 0.55),
+            onTap: () {
+              setState(() {
+                _selectedDocumentType = type;
+              });
+            },
           );
         }).toList(),
       ),
@@ -225,9 +207,10 @@ class _GovernmentIdVerifyScreenState
       onTap: _isPickingFile ? null : _pickDocument,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 56),
+        padding:
+            EdgeInsets.symmetric(vertical: hasFile ? 16 : 56, horizontal: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Colors.transparent,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: const Color(0xFFE9E9E9)),
         ),
@@ -244,17 +227,18 @@ class _GovernmentIdVerifyScreenState
         mainAxisSize: MainAxisSize.min,
         children: [
           Center(
-              child: _isPickingFile
-                  ? const SizedBox(
-                      width: 28,
-                      height: 28,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const ShowImage(
-                      imagePath: AppImages.photoUpload,
-                      width: 100,
-                      height: 100,
-                    )),
+            child: _isPickingFile
+                ? const SizedBox(
+                    width: 100,
+                    height: 100,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const ShowImage(
+                    imagePath: AppImages.photoUpload,
+                    width: 100,
+                    height: 100,
+                  ),
+          ),
           const SizedBox(height: 16),
           Text(
             _isPickingFile ? 'Picking File...' : 'Upload File',
@@ -271,53 +255,27 @@ class _GovernmentIdVerifyScreenState
 
   Widget _selectedFilePreview(BuildContext context) {
     final filePath = _selectedFilePath!;
-    final fileName = filePath.split(Platform.pathSeparator).last;
-
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: ShowImage(
-            imagePath: 'file://$filePath',
+          child: Image.file(
+            File(filePath),
             width: double.infinity,
             height: 180,
-            fit: BoxFit.cover,
+            fit: BoxFit.fill,
           ),
         ),
         const SizedBox(height: 14),
-        Text(
-          fileName,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: AppColors.textPrimaryLight,
-            fontSize: TextSize.font14(context),
-            fontWeight: FontWeight.w500,
+        TextButton(
+          onPressed: _isPickingFile ? null : _pickDocument,
+          style: TextButton.styleFrom(
+            padding: EdgeInsets.zero,
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          'Document type: $_selectedDocumentType',
-          style: TextStyle(
-            color: AppColors.textSecondaryLight,
-            fontSize: TextSize.font12(context),
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            TextButton(
-              onPressed: _isPickingFile ? null : _pickDocument,
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: const Text('Replace File'),
-            ),
-          ],
+          child: const Text('Replace File'),
         ),
       ],
     );
@@ -372,10 +330,11 @@ class _GovernmentIdVerifyScreenState
         ),
       );
     } finally {
-      if (!mounted) return;
-      setState(() {
-        _isPickingFile = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isPickingFile = false;
+        });
+      }
     }
   }
 
@@ -383,7 +342,10 @@ class _GovernmentIdVerifyScreenState
     final filePath = _selectedFilePath?.trim() ?? '';
     if (filePath.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please upload a document first.'),duration: Duration(seconds: 1),),
+        const SnackBar(
+          content: Text('Please upload a document first.'),
+          duration: Duration(seconds: 1),
+        ),
       );
       return;
     }
@@ -406,11 +368,15 @@ class _GovernmentIdVerifyScreenState
 
       if (response.code == 'SUCCESS' && response.response?.data?.id != null) {
         DialogUtils.showSuccessDialog(
-          context: context,
-          title: 'Verify Done',
-          message: response.message ?? 'Connection request sent successfully.',
-          autoClose: false,
-        );
+            context: context,
+            title: response.code ?? 'Verify Done',
+            message:
+                response.message ?? 'Verification complete! Instant alerts for matches and profile views are now active.',
+            autoClose: false,
+            onButtonPressed: () {
+              Navigator.pop(context);
+              context.pop();
+            });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -429,10 +395,11 @@ class _GovernmentIdVerifyScreenState
         ),
       );
     } finally {
-      if (!mounted) return;
-      setState(() {
-        _isSubmitting = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
     }
   }
 
