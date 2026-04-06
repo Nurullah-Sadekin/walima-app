@@ -26,6 +26,7 @@ import 'package:flutter_boilerplate/features/registration/presentation/screens/c
 import 'package:flutter_boilerplate/features/plans/presentation/screens/plans_screen.dart';
 import 'package:flutter_boilerplate/features/plans/presentation/screens/payment_webview_screen.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/home_view_all_screen.dart';
+import 'package:flutter_boilerplate/features/home/presentation/screens/government_id_verify_screen.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/about_you.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/email_phone.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/family_details.dart';
@@ -342,6 +343,11 @@ GoRouter goRouter(Ref ref) {
         builder: (context, state) => const HomeViewAllScreen(
           type: HomeViewAllType.recentVisitors,
         ),
+      ),
+      GoRoute(
+        path: Paths.governmentIdVerify,
+        name: Routes.governmentIdVerify,
+        builder: (context, state) => const GovernmentIdVerifyScreen(),
       ),
       GoRoute(
         path: Paths.matches,

@@ -52,6 +52,7 @@ abstract class Paths {
   static const paymentWebView = '/paymentWebView';
   static const premiumMatches = '/premiumMatches';
   static const recentVisitors = '/recentVisitors';
+  static const governmentIdVerify = '/governmentIdVerify';
 
   //Matches
   static const matches = '/matches';
@@ -125,6 +126,7 @@ abstract class Routes {
   static const paymentWebView = 'paymentWebView';
   static const premiumMatches = 'premiumMatches';
   static const recentVisitors = 'recentVisitors';
+  static const governmentIdVerify = 'governmentIdVerify';
 
   //Matches
   static const matches = 'matches';

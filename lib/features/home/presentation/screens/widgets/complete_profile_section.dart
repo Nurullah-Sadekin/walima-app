@@ -4,8 +4,10 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/verification_tile.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class CompleteProfileSection extends ConsumerWidget {
   const CompleteProfileSection({super.key});
@@ -43,12 +45,13 @@ class CompleteProfileSection extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
-          const VerificationTile(
+          VerificationTile(
             iconImagePath: AppImages.verifiedBadgeSvgIcon,
             title: 'Government ID Verify',
             statusText: 'Unverified',
             statusColor: AppColors.primary,
             statusBackgroundColor: AppColors.primaryVariant,
+            onTap: () => context.pushNamed(Routes.governmentIdVerify),
           ),
           const SizedBox(height: 10),
           VerificationTile(
