@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/enums/enums.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
@@ -19,6 +20,7 @@ import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/c
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/profile_summery_section.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/social_media_icon.dart';
 import 'package:flutter_boilerplate/features/matches/data/models/response/get_matches_response.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/contact_bottom_sheet.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -319,6 +321,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           viewOnAccept: match.profilePhoto?.visibilityStatus != 'public',
           religion: match.religion,
           isOnline: match.isOnline ?? false,
+          onTapRightButton: () async{
+            await BottomSheetUtils.open(
+              context: context,
+              fullHeight: false,
+              child: Consumer(
+                builder: (context, ref, _) {
+                  return _contactBottomSheet(match);
+                },
+              ),
+            );
+          },
           onTapLeftButton: () {
             ref.read(homeProvider).connect(
                   context,
@@ -330,6 +343,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           },
           activeStatusText: activeStatus,
         ),
+      ),
+    );
+  }
+
+
+  Widget _contactBottomSheet(MatchProfile match) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: ContactBottomSheet(
+        userName: match.displayName ?? 'Unknown',
+        profileImagePath:  (match.profilePhoto?.url?.isNotEmpty ?? false)
+            ? match.profilePhoto!.url!
+            : AppImages.demoProfile,
+        description: match.connection?.message,
+        isDescriptionVisible: false,
+        email: 'test@gmail.com',
+        phone: '+8801234567890',
       ),
     );
   }

@@ -12,31 +12,38 @@ class ContactBottomSheet extends StatelessWidget {
     required this.userName,
     required this.profileImagePath,
     this.profileType,
+    this.email,
+    this.phone,
     this.description,
     this.onWalimaChatPressed,
     this.onWhatsappPressed,
     this.onCallPressed,
-    required this.onConnectionSentPressed,
-    required this.onWalimaChatButtonPressed,
+    this.onConnectionSentPressed,
+    this.onWalimaChatButtonPressed,
     this.chatButtonTitle,
     this.chatButtonIcon,
     this.contactStatus = 'Contact Not Viewed',
     this.isDescriptionVisible = false,
+    this.isShowBottom = false,
   });
 
   final String userName;
   final String profileImagePath;
   final String? profileType;
+  final String? email;
+  final String? phone;
   final String? description;
   final VoidCallback? onWalimaChatPressed;
   final VoidCallback? onWhatsappPressed;
   final VoidCallback? onCallPressed;
-  final VoidCallback onConnectionSentPressed;
-  final VoidCallback onWalimaChatButtonPressed;
+  final VoidCallback? onConnectionSentPressed;
+  final VoidCallback? onWalimaChatButtonPressed;
   final String? chatButtonTitle;
   final String? chatButtonIcon;
   final String contactStatus;
   final bool isDescriptionVisible;
+  final bool isShowBottom;
+
 
   @override
   Widget build(BuildContext context) {
@@ -44,10 +51,15 @@ class ContactBottomSheet extends StatelessWidget {
       children: [
         const SizedBox(height: 10),
         _buildProfileImage(context),
-        const SizedBox(height: 8),
-        _buildUserName(context),
-        const SizedBox(height: 5),
-        _buildProfileTypeBadge(context),
+
+          const SizedBox(height: 8),
+          _buildUserInfo(context),
+
+        if (profileType != null)...[
+          const SizedBox(height: 8),
+          _buildProfileTypeBadge(context),
+        ],
+
         if (isDescriptionVisible)...[
           const SizedBox(height: 16),
           _buildDescription(context),
@@ -56,14 +68,17 @@ class ContactBottomSheet extends StatelessWidget {
           const SizedBox(height: 16),
           _buildActionButtons(context),
         ],
-        const SizedBox(height: 16),
-        _buildBottomButtons(context),
-        const Divider(
-          color: AppColors.greyLight,
-          thickness: 1,
-          height: 30,
-        ),
-        _buildContactStatus(context),
+        if (isShowBottom)...[
+          const SizedBox(height: 16),
+          _buildBottomButtons(context),
+          const Divider(
+            color: AppColors.greyLight,
+            thickness: 1,
+            height: 30,
+          ),
+          _buildContactStatus(context),
+        ],
+
       ],
     );
   }
@@ -77,14 +92,62 @@ class ContactBottomSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildUserName(BuildContext context) {
-    return Text(
-      userName,
-      style: TextStyle(
-        fontSize: TextSize.font18(context),
-        fontWeight: FontWeight.w500,
-        color: AppColors.textPrimaryLight,
-      ),
+  Widget _buildUserInfo(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          userName,
+          style: TextStyle(
+            fontSize: TextSize.font18(context),
+            fontWeight: FontWeight.w500,
+            color: AppColors.textPrimaryLight,
+          ),
+        ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          spacing: 6,
+          children: [
+            ShowImage(
+              imagePath: AppImages.callIcon,
+              height: TextSize.font14(context),
+              width: TextSize.font14(context),
+              color: AppColors.textSecondaryLight,
+            ),
+            Text(
+              phone ?? 'N/A',
+              style: TextStyle(
+                fontSize: TextSize.font14(context),
+                fontWeight: FontWeight.w500,
+                color: AppColors.textSecondaryLight,
+              ),
+            ),
+          ],
+        ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          spacing: 6,
+          children: [
+            ShowImage(
+              imagePath: AppImages.emailSvgIcon,
+              height: TextSize.font14(context),
+              width: TextSize.font14(context),
+              color: AppColors.textSecondaryLight,
+            ),
+            Text(
+              email  ?? 'N/A',
+              style: TextStyle(
+                fontSize: TextSize.font14(context),
+                fontWeight: FontWeight.w500,
+                color: AppColors.textSecondaryLight,
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -126,23 +189,23 @@ class ContactBottomSheet extends StatelessWidget {
           title: 'Walima Chat',
           imagePath: AppImages.chatIcon,
           backgroundColor: AppColors.primary,
-          textColor: AppColors.textSecondaryLight,
+          textColor: AppColors.textPrimaryLight,
           iconColor: AppColors.white,
           onTap: onWalimaChatPressed,
         ),
         IconTitleCard(
           title: 'Whatsapp',
           imagePath: AppImages.whatsappSvgIcon,
-          backgroundColor: AppColors.greenButtonColor,
-          textColor: AppColors.textSecondaryLight,
+          backgroundColor: onWhatsappPressed == null ? AppColors.greenButtonColor.withOpacity(0.5) : AppColors.greenButtonColor,
+          textColor: onWhatsappPressed == null ? AppColors.disableText : AppColors.textPrimaryLight,
           iconColor: AppColors.white,
           onTap: onWhatsappPressed,
         ),
         IconTitleCard(
           title: 'Call',
           imagePath: AppImages.callSvgIcon,
-          backgroundColor: Colors.teal,
-          textColor: AppColors.textSecondaryLight,
+          backgroundColor: onCallPressed == null ? Colors.teal.withOpacity(0.5) : Colors.teal,
+          textColor: onCallPressed == null ? AppColors.disableText : AppColors.textPrimaryLight,
           iconColor: AppColors.white,
           onTap: onCallPressed,
         ),
@@ -161,7 +224,7 @@ class ContactBottomSheet extends StatelessWidget {
             textColor: AppColors.greenButtonColor,
             svgIconPath: AppImages.favouriteIcon,
             svgIconColor: AppColors.greenButtonColor,
-            onTap: onConnectionSentPressed,
+            onTap: onConnectionSentPressed ?? (){},
           ),
         ),
         const SizedBox(width: 10),
@@ -174,7 +237,7 @@ class ContactBottomSheet extends StatelessWidget {
             svgIconPath: chatButtonIcon ?? AppImages.chatIcon,
             svgIconColor: AppColors.white,
             title: chatButtonTitle ?? 'Walima Chat',
-            onTap: onWalimaChatButtonPressed,
+            onTap: onWalimaChatButtonPressed ?? (){},
           ),
         ),
       ],

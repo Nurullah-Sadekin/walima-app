@@ -397,11 +397,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                     description:
                         'She shares her phone number only with connected members.',
                     isDescriptionVisible: false,
-                    onWalimaChatPressed: () {},
-                    onWhatsappPressed: () {},
-                    onCallPressed: () {},
-                    onConnectionSentPressed: () {},
-                    onWalimaChatButtonPressed: () {},
+                    email: 'test@gmail.com',
+                    phone: '+8801234567890',
                   ),
                 ),
               ],
