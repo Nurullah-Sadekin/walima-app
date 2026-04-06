@@ -361,7 +361,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         userName: match.displayName ?? 'Unknown',
         profileImagePath: (match.profilePhoto?.url?.isNotEmpty ?? false)
             ? match.profilePhoto!.url!
-            : AppImages.demoProfile,
+            : match.gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar,
         description: match.connection?.message,
         isDescriptionVisible: false,
         email: 'test@gmail.com',
@@ -598,7 +598,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         userName: visitor.displayName ?? 'Unknown',
         profileImagePath: (visitor.profilePhoto?.url?.isNotEmpty ?? false)
             ? visitor.profilePhoto!.url!
-            : AppImages.demoProfile,
+            : visitor.gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar,
         description: visitor.connection?.message,
         isDescriptionVisible: false,
         email: 'test@gmail.com',
