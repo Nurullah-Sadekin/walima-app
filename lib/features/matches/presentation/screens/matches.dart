@@ -250,9 +250,8 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             height: HeightUtils.formatHeight(match.height.toString()),
             location: _matchLocation(match),
             activeStatusText: _activeStatusText(match),
-            menu: true,
+            menu: false,
             photoRequest: false,
-            photoCount: '1',
             profession:
                 CamelCaseUtils.formatCamelCase(match.maritalStatus ?? ''),
             maritalStatus:
