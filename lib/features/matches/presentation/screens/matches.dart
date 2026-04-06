@@ -241,7 +241,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
         itemBuilder: (context, index) {
           final match = provider.matches[index];
           return ProfileComprehensiveCard(
-            imagePath: match.profilePhoto?.url ?? AppImages.demoProfile,
+            imagePath: match.profilePhoto?.url ?? (match.gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar),
             leftIconPath: AppImages.favouriteIcon,
             isPremiumConnect: match.isPremium ?? false,
             isVerified: match.profilePhoto?.isVerified ?? false,
@@ -289,8 +289,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
               // Handle right button tap
             },
             isOnline: match.isOnline ?? false,
-            viewOnAccept:
-                match.profilePhoto?.visibilityStatus?.toLowerCase() != 'public',
+            viewOnAccept: match.profilePhoto?.visibilityStatus?.toLowerCase() != 'visible',
           );
         },
       ),

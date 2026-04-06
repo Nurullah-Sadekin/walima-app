@@ -142,6 +142,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _bodySection() {
+    final provider = ref.read(homeProvider);
     return Expanded(
       child: NotificationListener<UserScrollNotification>(
         onNotification: _onBodyUserScroll,
@@ -150,6 +151,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               const CompleteProfileSection(),
               _premiumMatches(),
+              if(provider.recentVisitors.isNotEmpty)
               _recentVisitors(),
               _followUpSection(),
             ],
@@ -288,16 +290,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final heightText = _formatMatchHeight(match.height);
     final activeStatus = _activeStatusText(match);
     final profession = match.profession ?? match.education;
-    final imagePath = (match.profilePhoto?.url?.isNotEmpty ?? false)
-        ? match.profilePhoto!.url!
-        : AppImages.demoProfile;
+    final imagePath = match.profilePhoto?.url;
 
     return Padding(
       padding: const EdgeInsets.only(right: 10.0),
       child: SizedBox(
         width: 300,
         child: ProfileComprehensiveCard(
-          imagePath: imagePath,
+          imagePath: imagePath ?? (match.gender == 'female' ? AppImages.womenAvatar :AppImages.manAvatar),
           imageHeight: 250,
           isPremiumConnect: match.isPremium ?? true,
           isVerified: match.profilePhoto?.isVerified ?? false,
@@ -318,7 +318,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           leftButtonBorderColor: match.connection?.status == 'none'
               ? AppColors.greenButtonColor
               : AppColors.disableBackground,
-          viewOnAccept: match.profilePhoto?.visibilityStatus != 'public',
+          viewOnAccept: match.profilePhoto?.visibilityStatus == 'visible' ? true : false,
           religion: match.religion,
           isOnline: match.isOnline ?? false,
           onTapRightButton: () async{
@@ -327,7 +327,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               fullHeight: false,
               child: Consumer(
                 builder: (context, ref, _) {
-                  return _contactBottomSheet(match);
+                  return _contactPremiumBottomSheet(match);
                 },
               ),
             );
@@ -348,7 +348,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
 
-  Widget _contactBottomSheet(MatchProfile match) {
+  Widget _contactPremiumBottomSheet(MatchProfile match) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: ContactBottomSheet(
@@ -524,8 +524,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildRecentVisitorCard(Data visitor) {
     final location = _formatRecentVisitorLocation(visitor.location);
     final imageUrl = visitor.profilePhoto?.url?.toString();
-    final imagePath =
-        (imageUrl?.isNotEmpty ?? false) ? imageUrl! : AppImages.demoProfile;
+    final imagePath = (imageUrl?.isNotEmpty ?? false) ? imageUrl! : (visitor.gender == 'female' ? AppImages.womenAvatar :AppImages.manAvatar);
 
     return Padding(
       padding: const EdgeInsets.only(right: 10.0),
@@ -552,8 +551,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           leftButtonBorderColor: visitor.connection?.status == 'none'
               ? AppColors.greenButtonColor
               : AppColors.disableBackground,
-          viewOnAccept: visitor.profilePhoto?.visibilityStatus != 'public',
+          viewOnAccept: visitor.profilePhoto?.visibilityStatus == 'visible',
           activeStatusText: _recentVisitorStatus(visitor),
+          onTapRightButton: () async{
+            await BottomSheetUtils.open(
+              context: context,
+              fullHeight: false,
+              child: Consumer(
+                builder: (context, ref, _) {
+                  return _contactVisitorBottomSheet(visitor);
+                },
+              ),
+            );
+          },
           onTapLeftButton: () {
             ref.read(homeProvider).connect(
                   context,
@@ -563,6 +573,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 );
           },
         ),
+      ),
+    );
+  }
+
+  Widget _contactVisitorBottomSheet(Data visitor) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: ContactBottomSheet(
+        userName: visitor.displayName ?? 'Unknown',
+        profileImagePath:  (visitor.profilePhoto?.url?.isNotEmpty ?? false)
+            ? visitor.profilePhoto!.url!
+            : AppImages.demoProfile,
+        description: visitor.connection?.message,
+        isDescriptionVisible: false,
+        email: 'test@gmail.com',
+        phone: '+8801234567890',
       ),
     );
   }
