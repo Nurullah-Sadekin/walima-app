@@ -361,10 +361,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
       case MoreMenuAction.report:
         // Navigate to the Report screen and pass participant info as extra
         final extra = <String, dynamic>{
-          'displayName':
-              participant?.displayName ?? participant?['displayName'] ?? 'User',
-          'profilePictureUrl': participant?.profilePhoto?.url ??
-              participant?['profilePictureUrl'],
+          'displayName': participant?.displayName ?? participant?['displayName'] ?? 'User',
+          'profilePictureUrl': participant?.profilePhoto?.url  ?? AppImages.menuSvgIcon,
         };
         context.pushNamed(Routes.report, extra: extra);
         break;
@@ -383,12 +381,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
-          child: SafeArea(
+          child: const SafeArea(
             top: false,
             child: Wrap(
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(
+                  padding: EdgeInsets.symmetric(
                       horizontal: 20.0, vertical: 16),
                   child: ContactBottomSheet(
                     userName: 'Sadia Sultana',
