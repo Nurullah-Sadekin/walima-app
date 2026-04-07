@@ -3,8 +3,8 @@ import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
+import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
-import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/contact_filter/presentation/providers/contact_filter_provider.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
@@ -15,7 +15,8 @@ class ContactFilterScreen extends ConsumerStatefulWidget {
   const ContactFilterScreen({super.key});
 
   @override
-  ConsumerState<ContactFilterScreen> createState() => _ContactFilterScreenState();
+  ConsumerState<ContactFilterScreen> createState() =>
+      _ContactFilterScreenState();
 }
 
 class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
@@ -26,6 +27,9 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
   void initState() {
     super.initState();
     provider = ref.read(contactFilterProvider);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      provider.loadInitialData();
+    });
   }
 
   @override
@@ -45,11 +49,13 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
         appBar: _appBar(),
         body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: _body(provider),
           ),
         ),
-        floatingActionButton: BottomBorderedWidget(widget: bottomAction(provider)),
+        floatingActionButton: _step == ContactFilterStep.contactFilterScreen
+            ? null
+            : BottomBorderedWidget(widget: _bottomAction()),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
@@ -57,7 +63,11 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
 
   PreferredSizeWidget _appBar() {
     return CustomBackAppBar(
-      title: Text(_step == ContactFilterStep.contactFilterScreen ? 'Contact Filter' : _getAppBarTitle(_step)),
+      title: Text(
+        _step == ContactFilterStep.contactFilterScreen
+            ? 'Contact Filter'
+            : _getAppBarTitle(_step),
+      ),
       backgroundColor: Colors.transparent,
       onBackPressed: () {
         if (_step != ContactFilterStep.contactFilterScreen) {
@@ -72,7 +82,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
   String _getAppBarTitle(ContactFilterStep step) {
     switch (step) {
       case ContactFilterStep.contactFilterScreen:
-        return 'Refine';
+        return 'Contact Filter';
       case ContactFilterStep.ageRange:
         return 'Age Range';
       case ContactFilterStep.heightRange:
@@ -90,7 +100,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
       case ContactFilterStep.workingWith:
         return 'Working With';
       case ContactFilterStep.annualIncome:
-      return 'Annual Income';
+        return 'Annual Income';
     }
   }
 
@@ -101,21 +111,73 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
       case ContactFilterStep.ageRange:
         return _ageRange(provider);
       case ContactFilterStep.heightRange:
-       return _heightRange(provider);
+        return _heightRange(provider);
       case ContactFilterStep.maritalStatus:
-        return _maritalStatusBody(provider);
+        return _dropdownQuestion(
+          headLine: 'Marital Status',
+          header: 'Select Marital Status',
+          items: provider.maritalStatusDropdownItems,
+          controller: provider.maritalStatusController,
+          onConfirm: (value) => provider.onMaritalStatusSelected(value?.toString()),
+        );
       case ContactFilterStep.religion:
-         return _religionBody(provider);
+        return _dropdownQuestion(
+          headLine: 'Religion',
+          header: 'Select Religion',
+          items: provider.religionDropdownItems,
+          controller: provider.religionController,
+          onTap: provider.loadInitialData,
+          onConfirm: (value) => provider.onReligionSelected(value?.toString()),
+        );
       case ContactFilterStep.community:
-        return _communityBody(provider);
+        return _dropdownQuestion(
+          headLine: 'Community',
+          header: 'Select Community',
+          items: provider.communityDropdownItems,
+          controller: provider.communityController,
+          enabled: provider.religionController.text.trim().isNotEmpty,
+          helperText: provider.religionController.text.trim().isEmpty
+              ? 'Select religion first to load community options.'
+              : null,
+          onTap: provider.loadCommunityData,
+          onConfirm: (value) => provider.onCommunitySelected(value?.toString()),
+        );
       case ContactFilterStep.motherTongue:
-        return _motherTongueBody(provider);
+        return _dropdownQuestion(
+          headLine: 'Mother Tongue',
+          header: 'Select Mother Tongue',
+          items: provider.motherTongueDropdownItems,
+          controller: provider.motherTongueController,
+          onConfirm: (value) => provider.onMotherTongueSelected(value?.toString()),
+        );
       case ContactFilterStep.countryLivingIn:
-        return _countryBody(provider);
+        return _dropdownQuestion(
+          headLine: 'Country Living In',
+          header: 'Select Country',
+          items: provider.countryDropdownItems,
+          controller: provider.countryLivingInController,
+          onTap: provider.loadLocationData,
+          onConfirm: (value) =>
+              provider.onCountryLivingInSelected(value?.toString()),
+        );
       case ContactFilterStep.workingWith:
-        return _workingWithBody(provider);
+        return _dropdownQuestion(
+          headLine: 'Working With',
+          header: 'Select Profession',
+          items: provider.workingWithDropdownItems,
+          controller: provider.workingWithController,
+          onTap: provider.loadCareerLookupData,
+          onConfirm: (value) => provider.onWorkingWithSelected(value?.toString()),
+        );
       case ContactFilterStep.annualIncome:
-        return _annualIncomeBody(provider);
+        return _dropdownQuestion(
+          headLine: 'Annual Income',
+          header: 'Select Income Range',
+          items: provider.annualIncomeDropdownItems,
+          controller: provider.annualIncomeController,
+          onTap: provider.loadCareerLookupData,
+          onConfirm: (value) => provider.onAnnualIncomeSelected(value?.toString()),
+        );
     }
   }
 
@@ -123,79 +185,143 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 8,
         children: [
           const SizedBox(height: 6),
           InfoTile(
             title: 'Age Range',
-            value: _singleSelectedName(provider.selectedCountries, '20 -26'),
+            value: provider.ageRangeSummary,
             onTap: () => setState(() => _step = ContactFilterStep.ageRange),
-            trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.calendarSvgIcon,
+            showTrailingImage: false,
           ),
+          const SizedBox(height: 8),
           InfoTile(
             title: 'Height Range',
-            value: _singleSelectedName(provider.selectedCountries, '5\'0" - 6\'0" '),
+            value: provider.heightRangeSummary,
             onTap: () => setState(() => _step = ContactFilterStep.heightRange),
-            trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.heightSvgIcon,
+            showTrailingImage: false,
           ),
+          const SizedBox(height: 8),
           InfoTile(
             title: 'Marital Status',
-            value: _multiSelectedNames(provider.selectedMaritalStatus, 'Open to All'),
+            value: _textOrFallback(
+              provider.maritalStatusController.text,
+              'Select',
+            ),
             onTap: () => setState(() => _step = ContactFilterStep.maritalStatus),
-            trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.weddingSvgIcon,
+            showTrailingImage: false,
           ),
+          const SizedBox(height: 8),
           InfoTile(
             title: 'Religion',
-            value: _multiSelectedNames(provider.selectedCommunities, 'Multiple Selected'),
+            value: _textOrFallback(provider.religionController.text, 'Select'),
             onTap: () => setState(() => _step = ContactFilterStep.religion),
-            trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.quranSvgIcon,
+            showTrailingImage: false,
           ),
+          const SizedBox(height: 8),
           InfoTile(
             title: 'Community',
-            value: _multiSelectedNames(provider.selectedCommunities, 'Multiple Selected'),
+            value: _textOrFallback(provider.communityController.text, 'Select'),
             onTap: () => setState(() => _step = ContactFilterStep.community),
-            trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.groupsIcon,
+            showTrailingImage: false,
           ),
-
+          const SizedBox(height: 8),
           InfoTile(
             title: 'Mother Tongue',
-            value: _multiSelectedNames(provider.selectedMotherTongues, 'Multiple Selected'),
+            value: _textOrFallback(
+              provider.motherTongueController.text,
+              'Select',
+            ),
             onTap: () => setState(() => _step = ContactFilterStep.motherTongue),
-            trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.languageSvgIcon,
+            showTrailingImage: false,
           ),
+          const SizedBox(height: 8),
           InfoTile(
             title: 'Country Living In',
-            value: _singleSelectedName(provider.selectedCountries, 'Bangladesh'),
-            onTap: () => setState(() => _step = ContactFilterStep.countryLivingIn),
-            trailingImagePath: AppImages.editWrite,
+            value: _textOrFallback(
+              provider.countryLivingInController.text,
+              'Select',
+            ),
+            onTap: () =>
+                setState(() => _step = ContactFilterStep.countryLivingIn),
             leadingImagePath: AppImages.locationSvgIcon,
+            showTrailingImage: false,
           ),
-
+          const SizedBox(height: 8),
           InfoTile(
             title: 'Working With',
-            value: _multiSelectedNames(provider.selectedCommunities, 'Multiple Selected'),
+            value: _textOrFallback(provider.workingWithController.text, 'Select'),
             onTap: () => setState(() => _step = ContactFilterStep.workingWith),
-            trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.workSvgIcon,
+            showTrailingImage: false,
           ),
-
+          const SizedBox(height: 8),
           InfoTile(
             title: 'Annual Income',
-            value: _multiSelectedNames(provider.selectedCommunities, 'Multiple Selected'),
+            value: _textOrFallback(
+              provider.annualIncomeController.text,
+              'Select',
+            ),
             onTap: () => setState(() => _step = ContactFilterStep.annualIncome),
-            trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.propertySvgIcon,
+            showTrailingImage: false,
           ),
-
-          const SizedBox(height: 80),
+          const SizedBox(height: 20),
         ],
       ),
+    );
+  }
+
+  Widget _dropdownQuestion({
+    required String headLine,
+    required String header,
+    required List<String> items,
+    required TextEditingController controller,
+    Future<void> Function()? onTap,
+    void Function(dynamic)? onConfirm,
+    bool enabled = true,
+    String? helperText,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 12),
+        if (helperText != null) ...[
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.primaryVariant,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              helperText,
+              style: TextStyle(
+                fontSize: TextSize.font12(context),
+                color: AppColors.textSecondaryLight,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+        DropDownField(
+          headLine: headLine,
+          hintText: 'Select',
+          popUpHeader: header,
+          items: items,
+          controller: controller,
+          enabled: enabled,
+          onTap: onTap,
+          onConfirm: onConfirm,
+          isSearch: true,
+        ),
+      ],
     );
   }
 
@@ -204,11 +330,21 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 6),
-        Text('Age Range: ${provider.ageStart} to  ${provider.ageEnd} Years',
-          style:  TextStyle(fontSize: TextSize.font16(context), color: AppColors.textPrimaryLight, fontWeight: FontWeight.w500)
+        Text(
+          'Age Range: ${provider.ageStart} to ${provider.ageEnd} Years',
+          style: TextStyle(
+            fontSize: TextSize.font16(context),
+            color: AppColors.textPrimaryLight,
+            fontWeight: FontWeight.w500,
           ),
-        Text('Select a 2-year minimum age range',
-          style:  TextStyle(fontSize: TextSize.font12(context), color: AppColors.textSecondaryLight, fontWeight: FontWeight.w400)
+        ),
+        Text(
+          'Select a 2-year minimum age range',
+          style: TextStyle(
+            fontSize: TextSize.font12(context),
+            color: AppColors.textSecondaryLight,
+            fontWeight: FontWeight.w400,
+          ),
         ),
         const SizedBox(height: 16),
         _StyledRangeSlider(
@@ -223,7 +359,6 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           endLabel: '${provider.ageEnd}',
           onChanged: provider.setAgeRange,
         ),
-
       ],
     );
   }
@@ -233,11 +368,21 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 6),
-        Text('Height Range: ${provider.heightStart} to  ${provider.heightEnd} cm',
-          style:  TextStyle(fontSize: TextSize.font16(context), color: AppColors.textPrimaryLight, fontWeight: FontWeight.w500)
+        Text(
+          'Height Range: ${ContactFilterProvider.formatHeight(provider.heightStart)} to ${ContactFilterProvider.formatHeight(provider.heightEnd)}',
+          style: TextStyle(
+            fontSize: TextSize.font16(context),
+            color: AppColors.textPrimaryLight,
+            fontWeight: FontWeight.w500,
           ),
-        Text('Select a 4-inch minimum height range',
-          style:  TextStyle(fontSize: TextSize.font12(context), color: AppColors.textSecondaryLight, fontWeight: FontWeight.w400)
+        ),
+        Text(
+          'Select a 4-inch minimum height range',
+          style: TextStyle(
+            fontSize: TextSize.font12(context),
+            color: AppColors.textSecondaryLight,
+            fontWeight: FontWeight.w400,
+          ),
         ),
         const SizedBox(height: 16),
         _StyledRangeSlider(
@@ -248,117 +393,27 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           min: provider.heightMinLimit.toDouble(),
           max: provider.heightMaxLimit.toDouble(),
           divisions: provider.heightMaxLimit - provider.heightMinLimit,
-          startLabel: _formatHeight(provider.heightStart),
-          endLabel: _formatHeight(provider.heightEnd),
+          startLabel: ContactFilterProvider.formatHeight(provider.heightStart),
+          endLabel: ContactFilterProvider.formatHeight(provider.heightEnd),
           onChanged: provider.setHeightRange,
         ),
       ],
     );
   }
 
-  Widget _maritalStatusBody(ContactFilterProvider provider) {
-    return _wrapSelection(
-      provider.maritalStatusList,
-          (index) => _runSectionAction(() => ref.read(contactFilterProvider).toggleMaritalStatus(index)),
-    );
-  }
-
-  Widget _religionBody(ContactFilterProvider provider) {
-    return _wrapSelection(
-      provider.maritalStatusList,
-          (index) => _runSectionAction(() => ref.read(contactFilterProvider).toggleMaritalStatus(index)),
-    );
-  }
-
-  Widget _communityBody(ContactFilterProvider provider) {
-    return _wrapSelection(
-      provider.communities,
-          (index) => _runSectionAction(() => ref.read(contactFilterProvider).toggleCommunity(index)),
-    );
-  }
-
-  Widget _motherTongueBody(ContactFilterProvider provider) {
-    return _wrapSelection(
-      provider.motherTongues,
-          (index) => _runSectionAction(() => ref.read(contactFilterProvider).toggleMotherTongue(index)),
-    );
-  }
-
-  Widget _countryBody(ContactFilterProvider provider) {
-    return _wrapSelection(
-      provider.countries,
-      (index) => _runSectionAction(() => ref.read(contactFilterProvider).toggleCountry(index)),
-    );
-  }
-
-  Widget _workingWithBody(ContactFilterProvider provider) {
-    return _wrapSelection(
-      provider.countries,
-      (index) => _runSectionAction(() => ref.read(contactFilterProvider).toggleCountry(index)),
-    );
-  }
-
-  Widget _annualIncomeBody(ContactFilterProvider provider) {
-    return _wrapSelection(
-      provider.motherTongues,
-          (index) => _runSectionAction(() => ref.read(contactFilterProvider).toggleMotherTongue(index)),
-    );
-  }
-
-  Widget _wrapSelection(List<dynamic> items, void Function(int index) onTap) {
-    return SingleChildScrollView(
-      child: Wrap(
-        spacing: 10,
-        runSpacing: 10,
-        children: List.generate(items.length, (index) {
-          final item = items[index];
-          return SelectionCard(
-            buttonStyle: item.isSelected ? SelectionStyle.selectedCheckbox : SelectionStyle.unSelectedCheckbox,
-            onTap: () => onTap(index),
-            isSelected: item.isSelected,
-            title: item.name,
-            isExpand: true,
-          );
-        }),
-      ),
-    );
-  }
-
-  void _runSectionAction(VoidCallback action) {
-    action();
-    if (mounted) setState(() {});
-  }
-
-  Widget bottomAction(ContactFilterProvider provider) {
-    if (_step == ContactFilterStep.contactFilterScreen) {
-      return PrimaryButtons(
-        buttonStyle: ButtonsStyle.activePrimaryButton,
-        title: 'Show Matches',
-        onTap: () {
-        },
-      );
-    }
-
+  Widget _bottomAction() {
     return PrimaryButtons(
       buttonStyle: ButtonsStyle.activePrimaryButton,
-      title: 'Save Changes',
-      onTap: () => setState(() => _step = ContactFilterStep.contactFilterScreen),
+      title: 'Apply',
+      onTap: () {
+        setState(() => _step = ContactFilterStep.contactFilterScreen);
+      },
     );
   }
 
-  String _singleSelectedName(List<String> items, String fallback) {
-    return items.isEmpty ? fallback : items.first;
-  }
-
-  String _multiSelectedNames(List<String> items, String fallback) {
-    return items.isEmpty ? fallback : items.join(', ');
-  }
-
-  static String _formatHeight(int heightCm) {
-    final totalInches = (heightCm / 2.54).round();
-    final feet = totalInches ~/ 12;
-    final inches = totalInches % 12;
-    return "$feet' $inches\"";
+  String _textOrFallback(String value, String fallback) {
+    final text = value.trim();
+    return text.isEmpty ? fallback : text;
   }
 }
 
@@ -525,18 +580,18 @@ class _RingRangeThumbShape extends RangeSliderThumbShape {
 
   @override
   void paint(
-      PaintingContext context,
-      Offset center, {
-        required Animation<double> activationAnimation,
-        required Animation<double> enableAnimation,
-        bool isDiscrete = false,
-        bool isEnabled = false,
-        bool isOnTop = false,
-        required SliderThemeData sliderTheme,
-        TextDirection textDirection = TextDirection.ltr,
-        Thumb thumb = Thumb.start,
-        bool isPressed = false,
-      }) {
+    PaintingContext context,
+    Offset center, {
+    required Animation<double> activationAnimation,
+    required Animation<double> enableAnimation,
+    bool isDiscrete = false,
+    bool isEnabled = false,
+    bool isOnTop = false,
+    required SliderThemeData sliderTheme,
+    TextDirection textDirection = TextDirection.ltr,
+    Thumb thumb = Thumb.start,
+    bool isPressed = false,
+  }) {
     final canvas = context.canvas;
     final outerPaint = Paint()..color = Colors.white;
     final innerPaint = Paint()..color = AppColors.primary;
@@ -545,4 +600,3 @@ class _RingRangeThumbShape extends RangeSliderThumbShape {
     canvas.drawCircle(center, thumbRadius - 7, innerPaint);
   }
 }
-
