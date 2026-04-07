@@ -108,7 +108,7 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
           final locationText =
               [city, state].where((s) => s.isNotEmpty).join(', ');
           final location =
-              locationText.isNotEmpty ? locationText : 'Unknown location';
+              locationText.isNotEmpty ? locationText : 'Location: Undefine';
           final profilePhotoUrl =
               connection.profilePhoto?.url ?? AppImages.demoProfile;
           final isVerified = connection.profilePhoto?.isVerified ?? false;
@@ -118,11 +118,10 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
             child: ProfileComprehensiveCard(
               imagePath: profilePhotoUrl,
               leftIconPath: AppImages.favouriteIcon,
-              isPremiumConnect: false,
               isVerified: isVerified,
               name: name,
               viewOnAccept:
-                  connection.profilePhoto?.visibilityStatus == 'public'
+                  connection.profilePhoto?.visibilityStatus == 'visible'
                       ? false
                       : true,
               age: '$age Yr',
@@ -134,7 +133,7 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
                 DateTime.tryParse(connection.lastSeenAt ?? ''),
               ),
               isOnline: connection.isOnline ?? false,
-              menu: true,
+              menu: false,
               onTapLeftButton: () async {
                 if (isUpdatingThisCard) return;
 
