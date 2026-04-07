@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
@@ -7,9 +6,7 @@ import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/account_setting/presentation/providers/account_setting_provider.dart';
-import 'package:flutter_boilerplate/features/matches/domain/enums/match_education_level.dart';
-import 'package:flutter_boilerplate/features/matches/domain/enums/match_filter_type.dart';
-import 'package:flutter_boilerplate/features/matches/domain/enums/match_marital_status.dart';
+import 'package:flutter_boilerplate/features/drawer/presentation/screens/widgets/profile_action_tile.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/into_tile.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,12 +15,13 @@ class AccountSettingScreen extends ConsumerStatefulWidget {
   const AccountSettingScreen({super.key});
 
   @override
-  ConsumerState<AccountSettingScreen> createState() => _AccountSettingScreenState();
+  ConsumerState<AccountSettingScreen> createState() =>
+      _AccountSettingScreenState();
 }
 
 class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
   late AccountSettingProvider provider;
-  FilterStep _step = FilterStep.refine;
+  AccountSettingStep _step = AccountSettingStep.accountSetting;
 
   @override
   void initState() {
@@ -36,10 +34,10 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     provider = ref.watch(accountSettingProvider);
 
     return PopScope(
-      canPop: _step == FilterStep.refine,
+      canPop: _step == AccountSettingStep.accountSetting,
       onPopInvokedWithResult: (didPop, result) {
-        if (!didPop && _step != FilterStep.refine) {
-          setState(() => _step = FilterStep.refine);
+        if (!didPop && _step != AccountSettingStep.accountSetting) {
+          setState(() => _step = AccountSettingStep.accountSetting);
         }
       },
       child: Scaffold(
@@ -48,554 +46,242 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
         appBar: _appBar(),
         body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: _body(provider),
           ),
         ),
-        floatingActionButton:
-            BottomBorderedWidget(widget: bottomAction(provider)),
+        floatingActionButton: BottomBorderedWidget(
+          widget: _bottomAction(provider),
+        ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
   }
 
-  String _getAppBarTitle(FilterStep step) {
-    switch (step) {
-      case FilterStep.refine:
-        return 'Refine';
-      case FilterStep.photoSetting:
-        return 'Photo Setting';
-      case FilterStep.recentlyJoined:
-        return 'Recently Joined';
-      case FilterStep.activeMembers:
-        return 'Active Members';
-      case FilterStep.annualIncome:
-        return 'Annual Income';
-      case FilterStep.maritalStatus:
-        return 'Marital Status';
-      case FilterStep.religion:
-        return 'Religion';
-      case FilterStep.motherTongue:
-        return 'Mother Tongue';
-      case FilterStep.countryLivingIn:
-        return 'Country Living In';
-      case FilterStep.stateLivingIn:
-        return 'State Living In';
-      case FilterStep.countryGrewUpIn:
-        return 'Country Grew Up In';
-      case FilterStep.educationLevel:
-        return 'Education Level';
-      case FilterStep.educationArea:
-        return 'Education Area';
-      case FilterStep.workingWith:
-        return 'Working With';
-      case FilterStep.professionArea:
-        return 'Profession Area';
-      case FilterStep.profileManagedBy:
-        return 'Profile Managed By';
-      case FilterStep.eatingHabits:
-        return 'Eating Habits';
-      case FilterStep.community:
-        return 'Community';
-    }
-  }
-
   PreferredSizeWidget _appBar() {
     return CustomBackAppBar(
-      title: Text(_getAppBarTitle(_step)),
+      title: Text(_titleForStep(_step)),
       backgroundColor: Colors.transparent,
-      trailingText: _step == FilterStep.refine ? 'More Matches' : null,
-      isTrailing: _step == FilterStep.refine,
-      trailingWidget: _step == FilterStep.refine
-          ? Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                'ON',
-                style: TextStyle(
-                  fontSize: TextSize.font12(context),
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
-              ),
-            )
-          : null,
-      onTrailingTap: () {
-        if (_step == FilterStep.refine) {
-          Navigator.of(context).maybePop();
-        }
-      },
       onBackPressed: () {
-        if (_step != FilterStep.refine) {
-          setState(() => _step = FilterStep.refine);
-        } else {
+        if (_step == AccountSettingStep.accountSetting) {
           Navigator.of(context).maybePop();
+          return;
         }
+        setState(() => _step = AccountSettingStep.accountSetting);
       },
     );
   }
 
-  Widget _body(AccountSettingProvider provider) {
+  Widget? _body(AccountSettingProvider provider) {
     switch (_step) {
-      case FilterStep.refine:
-        return _refineBody(provider);
-      case FilterStep.countryLivingIn:
-        return _countryBody(provider);
-      case FilterStep.community:
-        return _communityBody(provider);
-      case FilterStep.photoSetting:
-        return _photoSettingBody(provider);
-      case FilterStep.recentlyJoined:
-        return _recentlyJoinedBody(provider);
-      case FilterStep.activeMembers:
-        return _activeMembersBody(provider);
-      case FilterStep.annualIncome:
-        return _annualIncomeBody(provider);
-      case FilterStep.maritalStatus:
-        return _maritalStatusBody(provider);
-      case FilterStep.religion:
-        return _religionBody(provider);
-      case FilterStep.motherTongue:
-        return _motherTongueBody(provider);
-      case FilterStep.stateLivingIn:
-        return _stateLivingInBody(provider);
-      case FilterStep.countryGrewUpIn:
-        return _countryGrewUpInBody(provider);
-      case FilterStep.educationLevel:
-        return _educationLevelBody(provider);
-      case FilterStep.educationArea:
-        return _educationAreaBody(provider);
-      case FilterStep.workingWith:
-        return _workingWithBody(provider);
-      case FilterStep.professionArea:
-        return _professionAreaBody(provider);
-      case FilterStep.profileManagedBy:
-        return _profileManagedByBody(provider);
-      case FilterStep.eatingHabits:
-        return _eatingHabitsBody(provider);
+      case AccountSettingStep.accountSetting:
+        return _overviewBody(provider);
+        case AccountSettingStep.alerts:
+        return null;
+      case AccountSettingStep.premiumMembership:
+        return _detailBody(
+          description:
+              'Choose how your premium membership details and reminders should appear inside the app.',
+          items: provider.premiumMembershipOptions,
+          onTap: provider.togglePremiumMembershipOption,
+        );
+      case AccountSettingStep.contactPrivacy:
+        return _detailBody(
+          description:
+              'Control who can access your contact details and how visible your private information stays.',
+          items: provider.contactPrivacyOptions,
+          onTap: provider.toggleContactPrivacyOption,
+        );
+      case AccountSettingStep.verificationBadge:
+        return _detailBody(
+          description:
+              'Manage badge visibility and verification-related reminders for your profile.',
+          items: provider.verificationBadgeOptions,
+          onTap: provider.toggleVerificationBadgeOption,
+        );
+      case AccountSettingStep.dateOfBirth:
+        return _detailBody(
+          description:
+              'Select how your date of birth should be shown to other members.',
+          items: provider.dateOfBirthOptions,
+          onTap: provider.selectDateOfBirthOption,
+        );
+      case AccountSettingStep.message:
+        return _detailBody(
+          description:
+              'Adjust who can message you and how message-related preferences should work.',
+          items: provider.messageOptions,
+          onTap: provider.toggleMessageOption,
+        );
+      case AccountSettingStep.deleteProfile:
+        return _detailBody(
+          description:
+              'You can temporarily deactivate your profile or permanently remove it from the app.',
+          items: provider.deleteProfileOptions,
+          onTap: provider.selectDeleteProfileOption,
+          isDangerZone: true,
+        );
     }
   }
 
-  Widget _refineBody(AccountSettingProvider provider) {
+  Widget _overviewBody(AccountSettingProvider provider) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 20,
         children: [
-          const SizedBox(height: 12),
-          InfoTile(
-            title: 'Photo Setting',
-            value: _singleSelectedName(provider.photoSettingOptions, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.photoSetting),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.albumSvgIcon,
+          const SizedBox(height: 1,),
+          ProfileActionTile(
+            iconImagePath: AppImages.notificationSvgIcon,
+            title: 'Alerts',
+            onTap: () => setState(() => _step = AccountSettingStep.premiumMembership),
           ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Recently Joined',
-            value: _singleSelectedName(provider.recentlyJoinedOptions, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.recentlyJoined),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.propertySvgIcon,
+          ProfileActionTile(
+            iconImagePath: AppImages.premiumSvgIcon,
+            title: 'Premium Membership',
+            onTap: () => setState(() => _step = AccountSettingStep.premiumMembership),
           ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Active Members',
-            value: _singleSelectedName(provider.activeMembersOptions, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.activeMembers),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.radioactiveSvgIcon,
+          ProfileActionTile(
+            iconImagePath: AppImages.contactPreview,
+            title: 'Contact Privacy',
+            onTap: () => setState(() => _step = AccountSettingStep.contactPrivacy),
           ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Annual Income',
-            value: _multiSelectedNames(provider.incomeRangeList, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.annualIncome),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.walletSvgIcon,
+
+          ProfileActionTile(
+            iconImagePath: AppImages.verifiedBadgeSvgIcon,
+            iconColor: AppColors.disableDark,
+            title: 'Verification Badge',
+            onTap: () => setState(() => _step = AccountSettingStep.verificationBadge),
           ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Marital Status',
-            value: _multiSelectedNames(provider.maritalStatusList, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.maritalStatus),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.weddingSvgIcon,
+
+          ProfileActionTile(
+            iconImagePath: AppImages.calendarSvgIcon,
+            title: 'Date of Birth',
+            onTap: () => setState(() => _step = AccountSettingStep.dateOfBirth),
           ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Religion',
-            value: _singleSelectedName(provider.religionList, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.religion),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.quranSvgIcon,
+
+          ProfileActionTile(
+            iconImagePath: AppImages.bubbleChatSvgIcon,
+            title: 'Message',
+            onTap: () => setState(() => _step = AccountSettingStep.message),
           ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Mother Tongue',
-            value: _multiSelectedNames(provider.motherTongues, 'Multiple Selected'),
-            onTap: () => setState(() => _step = FilterStep.motherTongue),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.languageSvgIcon,
+
+          ProfileActionTile(
+            iconImagePath: AppImages.alertSvgIcon,
+            title: 'Delete Profile',
+            onTap: () => setState(() => _step = AccountSettingStep.deleteProfile),
+            // Note: ProfileActionTile might need custom styling for the delete option
+            // You may need to check if ProfileActionTile supports custom colors
           ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Country Living In',
-            value: _singleSelectedName(provider.countries, 'Bangladesh'),
-            onTap: () => setState(() => _step = FilterStep.countryLivingIn),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.locationSvgIcon,
-          ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'State Living In',
-            value: _singleSelectedName(provider.countries, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.stateLivingIn),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.mapsSvgIcon,
-          ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Country Grew Up In',
-            value: _singleSelectedName(provider.countries, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.countryGrewUpIn),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.userLocationSvgIcon,
-          ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Education Level',
-            value: _singleSelectedName(provider.educationLevelList, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.educationLevel),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.educationSvgIcon,
-          ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Education Area',
-            value: _singleSelectedName(provider.educationLevelList, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.educationArea),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.schoolSvgIcon,
-          ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Working With',
-            value: _multiSelectedNames(provider.yourWorkList, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.workingWith),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.workSvgIcon,
-          ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Profession Area',
-            value: _multiSelectedNames(provider.youWorkAsList, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.professionArea),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.officeSvgIcon,
-          ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Profile Managed By',
-            value: _singleSelectedName(provider.profileManagedByList, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.profileManagedBy),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.userAiSvgIcon,
-          ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Eating Habits',
-            value: _singleSelectedName(provider.eatingHabitsList, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.eatingHabits),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.habitSvgIcon,
-          ),
-          const SizedBox(height: 8),
-          InfoTile(
-            title: 'Community',
-            value: _multiSelectedNames(provider.communities, 'Multiple Selected'),
-            onTap: () => setState(() => _step = FilterStep.community),
-            trailingImagePath: AppImages.editWrite,
-            leadingImagePath: AppImages.groupsIcon,
-          ),
-          const SizedBox(height: 80),
+          const SizedBox(height: 88),
         ],
       ),
     );
   }
 
-  Widget _countryBody(AccountSettingProvider provider) {
+  Widget _detailBody({
+    required String description,
+    required List<dynamic> items,
+    required void Function(int) onTap,
+    bool isDangerZone = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SingleChildScrollView(
-          child: Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: List.generate(provider.countries.length, (index) {
-              final item = provider.countries[index];
-              return SelectionCard(
-                buttonStyle: item.isSelected
-                    ? SelectionStyle.selectedCheckbox
-                    : SelectionStyle.unSelectedCheckbox,
-                onTap: () => ref.read(accountSettingProvider).toggleCountry(index),
-                isSelected: item.isSelected,
-                title: item.name,
-                isExpand: true,
-              );
-            }),
+        const SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: isDangerZone
+                ? AppColors.error.withValues(alpha: 0.06)
+                : AppColors.primaryVariant,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isDangerZone
+                  ? AppColors.error.withValues(alpha: 0.18)
+                  : AppColors.primary.withValues(alpha: 0.12),
+            ),
+          ),
+          child: Text(
+            description,
+            style: TextStyle(
+              color: isDangerZone ? AppColors.error : AppColors.textSecondaryLight,
+              fontSize: 13,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Expanded(
+          child: SingleChildScrollView(
+            child: Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: List.generate(items.length, (index) {
+                final item = items[index];
+                return SelectionCard(
+                  buttonStyle: item.isSelected
+                      ? SelectionStyle.selectedCheckbox
+                      : SelectionStyle.unSelectedCheckbox,
+                  onTap: () => onTap(index),
+                  isSelected: item.isSelected,
+                  title: item.name,
+                  isExpand: true,
+                );
+              }),
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _photoSettingBody(AccountSettingProvider p) {
-    return _wrapSelection(
-      p.photoSettingOptions,
-      (i) => ref.read(accountSettingProvider).selectPhotoSettingOption(i),
-    );
-  }
+  Widget _bottomAction(AccountSettingProvider provider) {
+    final isRoot = _step == AccountSettingStep.accountSetting;
 
-  Widget _communityBody(AccountSettingProvider p) {
-    return _wrapSelection(
-      p.communities,
-      (i) => ref.read(accountSettingProvider).toggleCommunity(i),
-    );
-  }
+    if (isRoot) {
+      return const SizedBox.shrink();
+    }
 
-  Widget _recentlyJoinedBody(AccountSettingProvider p) {
-    return _wrapSelection(
-      p.recentlyJoinedOptions,
-      (i) => ref.read(accountSettingProvider).selectRecentlyJoinedOption(i),
-    );
-  }
-
-  Widget _activeMembersBody(AccountSettingProvider p) {
-    return _wrapSelection(
-      p.activeMembersOptions,
-      (i) => ref.read(accountSettingProvider).selectActiveMembersOption(i),
-    );
-  }
-
-  Widget _annualIncomeBody(AccountSettingProvider p) {
-    return _wrapSelection(
-      p.incomeRangeList,
-      (i) => ref.read(accountSettingProvider).selectIncomeRange(i),
-    );
-  }
-
-  Widget _maritalStatusBody(AccountSettingProvider p) {
-    return _wrapSelection(
-      p.maritalStatusList,
-      (i) => ref.read(accountSettingProvider).toggleMaritalStatus(i),
-    );
-  }
-
-  Widget _religionBody(AccountSettingProvider p) {
-    return _wrapSelection(
-      p.religionList,
-      (i) => ref.read(accountSettingProvider).selectReligion(i),
-    );
-  }
-
-  Widget _motherTongueBody(AccountSettingProvider p) {
-    return _wrapSelection(
-      p.motherTongues,
-      (i) => ref.read(accountSettingProvider).toggleMotherTongue(i),
-    );
-  }
-
-  Widget _stateLivingInBody(AccountSettingProvider p) {
-    return _wrapSelection(
-      p.countries,
-      (i) => ref.read(accountSettingProvider).selectCountry(i),
-    );
-  }
-
-  Widget _countryGrewUpInBody(AccountSettingProvider p) {
-    return _wrapSelection(
-      p.countries,
-      (i) => ref.read(accountSettingProvider).selectCountry(i),
-    );
-  }
-
-  Widget _educationLevelBody(AccountSettingProvider p) {
-    return _wrapSelection(
-      p.educationLevelList,
-      (i) => ref.read(accountSettingProvider).selectEducationLevel(i),
-    );
-  }
-
-  Widget _educationAreaBody(AccountSettingProvider p) {
-    return _wrapSelection(
-      p.educationLevelList,
-      (i) => ref.read(accountSettingProvider).selectEducationLevel(i),
-    );
-  }
-
-  Widget _workingWithBody(AccountSettingProvider p) {
-    return _wrapSelection(
-      p.yourWorkList,
-      (i) => ref.read(accountSettingProvider).toggleYourWork(i),
-    );
-  }
-
-  Widget _professionAreaBody(AccountSettingProvider p) {
-    return _wrapSelection(
-      p.youWorkAsList,
-      (i) => ref.read(accountSettingProvider).toggleYouWorkAs(i),
-    );
-  }
-
-  Widget _profileManagedByBody(AccountSettingProvider p) {
-    return _wrapSelection(
-      p.profileManagedByList,
-      (i) => ref.read(accountSettingProvider).selectProfileManagedBy(i),
-    );
-  }
-
-  Widget _eatingHabitsBody(AccountSettingProvider p) {
-    return _wrapSelection(
-      p.eatingHabitsList,
-      (i) => ref.read(accountSettingProvider).selectEatingHabits(i),
-    );
-  }
-
-  Widget _wrapSelection(List<dynamic> items, void Function(int) onTap) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        const spacing = 10.0;
-
-        return SingleChildScrollView(
-          child: Wrap(
-            spacing: spacing,
-            runSpacing: spacing,
-            children: List.generate(items.length, (index) {
-              final item = items[index];
-              return SelectionCard(
-                buttonStyle: item.isSelected
-                    ? SelectionStyle.selectedCheckbox
-                    : SelectionStyle.unSelectedCheckbox,
-                onTap: () => onTap(index),
-                isSelected: item.isSelected,
-                title: item.name,
-                isExpand: true,
-              );
-            }),
-          ),
-        );
+    return PrimaryButtons(
+      buttonStyle: ButtonsStyle.activePrimaryButton,
+      title: 'Save Changes',
+      onTap: () {
+        Navigator.pop(context, provider.buildResult());
       },
     );
   }
 
-  Widget bottomAction(AccountSettingProvider p) {
-    final isRefine = _step == FilterStep.refine;
-
-    if (isRefine) {
-      return PrimaryButtons(
-        buttonStyle: ButtonsStyle.activePrimaryButton,
-        title: 'Show Matches',
-        onTap: () {
-          final result = {
-            'countryLivingIn': p.selectedCountries,
-            'community': p.selectedCommunities,
-            'maritalStatus': p.selectedMaritalStatus.isEmpty
-                ? null
-                : MatchMaritalStatus.fromLabel(
-                    p.selectedMaritalStatus.first,
-                  )?.apiValue,
-            'annualIncome': p.selectedIncomeRanges.isEmpty
-                ? null
-                : p.selectedIncomeRanges.join(','),
-            'religion': p.selectedReligion.isEmpty ? null : p.selectedReligion.first,
-            'motherTongue': p.selectedMotherTongues.isEmpty
-                ? null
-                : p.selectedMotherTongues.join(','),
-            'stateLivingIn': p.selectedCountries,
-            'countryGrewUpIn': p.selectedCountries.isEmpty ? null : p.selectedCountries.first,
-            'qualification': p.educationLevelList
-                .where((item) => item.isSelected)
-                .map((item) => MatchEducationLevel.fromLabel(item.name)?.apiValue)
-                .whereType<String>()
-                .toList(),
-            'workingWith': p.selectedYourWork.isEmpty ? null : p.selectedYourWork.join(','),
-            'professionArea': p.selectedYouWorkAs.isEmpty ? null : p.selectedYouWorkAs.join(','),
-            'eatingHabits': p.selectedEatingHabits.isEmpty ? null : p.selectedEatingHabits.first,
-            'photoVisibility': _singleSelectedName(p.photoSettingOptions, ''),
-            'recentlyJoined': _singleSelectedName(p.recentlyJoinedOptions, ''),
-            'activeMembers': _singleSelectedName(p.activeMembersOptions, ''),
-            'matchFilterType': MatchFilterType.openToAll.apiValue,
-          };
-          Navigator.pop(context, result);
-        },
-      );
-    }
-
-    return Row(
-      children: [
-        Expanded(
-          child: PrimaryButtons(
-            buttonStyle: ButtonsStyle.cancelButton,
-            title: 'Cancel',
-            onTap: () {
-              setState(() => _step = FilterStep.refine);
-            },
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: PrimaryButtons(
-            buttonStyle: ButtonsStyle.activePrimaryButton,
-            title: 'Apply',
-            onTap: () {
-              setState(() => _step = FilterStep.refine);
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  String _singleSelectedName(List<dynamic> list, String fallback) {
-    try {
-      final sel = list.firstWhere((e) => e.isSelected, orElse: () => null);
-      return sel != null ? sel.name as String : fallback;
-    } catch (_) {
-      return fallback;
-    }
-  }
-
-  String _multiSelectedNames(List<dynamic> list, String fallback) {
-    try {
-      final sel =
-          list.where((e) => e.isSelected).map((e) => e.name as String).toList();
-      return sel.isEmpty ? fallback : sel.join(', ');
-    } catch (_) {
-      return fallback;
+  String _titleForStep(AccountSettingStep step) {
+    switch (step) {
+      case AccountSettingStep.accountSetting:
+        return 'Account Setting';
+        case AccountSettingStep.alerts:
+        return 'Alerts';
+      case AccountSettingStep.premiumMembership:
+        return 'Premium Membership';
+      case AccountSettingStep.contactPrivacy:
+        return 'Contact Privacy';
+      case AccountSettingStep.verificationBadge:
+        return 'Verification Badge';
+      case AccountSettingStep.dateOfBirth:
+        return 'Date of Birth';
+      case AccountSettingStep.message:
+        return 'Message';
+      case AccountSettingStep.deleteProfile:
+        return 'Delete Profile';
     }
   }
 }
 
-enum FilterStep {
-  refine,
-  photoSetting,
-  recentlyJoined,
-  activeMembers,
-  annualIncome,
-  maritalStatus,
-  religion,
-  motherTongue,
-  countryLivingIn,
-  stateLivingIn,
-  countryGrewUpIn,
-  educationLevel,
-  educationArea,
-  workingWith,
-  professionArea,
-  profileManagedBy,
-  eatingHabits,
-  community
+enum AccountSettingStep {
+  accountSetting,
+  alerts,
+  premiumMembership,
+  contactPrivacy,
+  verificationBadge,
+  dateOfBirth,
+  message,
+  deleteProfile,
 }
