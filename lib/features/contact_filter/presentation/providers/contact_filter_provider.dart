@@ -63,19 +63,19 @@ class ContactFilterProvider extends BaseChangeNotifier {
   String get heightRangeSummary =>
       '${formatHeight(heightStart)} - ${formatHeight(heightEnd)}';
   String get maritalStatusSummary =>
-      _selectedSummary(maritalStatusOptions, fallback: 'Select');
+      _selectedSummary(maritalStatusOptions, fallback: 'Not Set');
   String get religionSummary =>
-      _selectedSummary(religionOptions, fallback: 'Select');
+      _selectedSummary(religionOptions, fallback: 'Not Set');
   String get communitySummary =>
-      _selectedSummary(communityOptions, fallback: 'Select');
+      _selectedSummary(communityOptions, fallback: 'Not Set');
   String get motherTongueSummary =>
-      _selectedSummary(motherTongueOptions, fallback: 'Select');
+      _selectedSummary(motherTongueOptions, fallback: 'Not Set');
   String get countryLivingInSummary =>
-      _selectedSummary(countryOptions, fallback: 'Select');
+      _selectedSummary(countryOptions, fallback: 'Not Set');
   String get workingWithSummary =>
-      _selectedSummary(workingWithOptions, fallback: 'Select');
+      _selectedSummary(workingWithOptions, fallback: 'Not Set');
   String get annualIncomeSummary =>
-      _selectedSummary(annualIncomeOptions, fallback: 'Select');
+      _selectedSummary(annualIncomeOptions, fallback: 'Not Set');
 
   List<String> get selectedCommunities => _selectedNames(communityOptions);
 
