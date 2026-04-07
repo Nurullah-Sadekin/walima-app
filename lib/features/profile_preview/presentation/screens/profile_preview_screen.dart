@@ -4,13 +4,10 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/bottom_sheet_widget/widgets/icon_title_card.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
-import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
-import 'package:go_router/go_router.dart';
 
+import 'widgets/preference_match_card.dart';
 import 'widgets/profile_view_card.dart';
 
 class ProfilePreviewScreen extends StatelessWidget {
@@ -31,7 +28,6 @@ class ProfilePreviewScreen extends StatelessWidget {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
-
 
   PreferredSizeWidget _appBar(BuildContext context) {
     return const CustomBackAppBar(
@@ -67,6 +63,8 @@ class ProfilePreviewScreen extends StatelessWidget {
             _familyDetailsSection(context),
             const SizedBox(height: 16),
             _educationCareerSection(context),
+            const SizedBox(height: 16),
+            _preferenceMatchSection(),
             const SizedBox(height: 100),
           ],
         ),
@@ -194,7 +192,7 @@ class ProfilePreviewScreen extends StatelessWidget {
         MapEntry('Siblings', '1 Brother, 1 Sister'),
         MapEntry('Family Type', 'Joint Family'),
         MapEntry('Family Status', 'Middle Class'),
-        MapEntry('Family Location','Dhaka'),
+        MapEntry('Family Location', 'Dhaka'),
       ],
     );
   }
@@ -215,6 +213,9 @@ class ProfilePreviewScreen extends StatelessWidget {
     );
   }
 
+  Widget _preferenceMatchSection() {
+    return const PreferenceMatchCard();
+  }
 
   Widget _actionButtons(BuildContext context) {
     return BottomBorderedWidget(
@@ -227,7 +228,7 @@ class ProfilePreviewScreen extends StatelessWidget {
             backgroundColor: AppColors.primary,
             textColor: AppColors.textSecondaryLight,
             iconColor: AppColors.white,
-            onTap: (){},
+            onTap: () {},
           ),
           IconTitleCard(
             title: 'Connect Now',
@@ -235,7 +236,7 @@ class ProfilePreviewScreen extends StatelessWidget {
             backgroundColor: AppColors.greenButtonColor,
             textColor: AppColors.textSecondaryLight,
             iconColor: AppColors.white,
-            onTap: (){},
+            onTap: () {},
           ),
           IconTitleCard(
             title: 'Contact Now',
@@ -244,7 +245,7 @@ class ProfilePreviewScreen extends StatelessWidget {
             borderColor: AppColors.primary,
             textColor: AppColors.textSecondaryLight,
             iconColor: AppColors.primary,
-            onTap: (){},
+            onTap: () {},
           ),
         ],
       ),
