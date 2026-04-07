@@ -10,7 +10,7 @@ class EmptyStateWidget extends StatelessWidget {
     super.key,
     required this.title,
     required this.subtitle,
-    required this.buttonText,
+    this.buttonText,
     this.onTap,
     this.showButton = true,
     this.horizontalPadding,
@@ -21,7 +21,7 @@ class EmptyStateWidget extends StatelessWidget {
   });
   final String title;
   final String subtitle;
-  final String buttonText;
+  final String? buttonText;
   final VoidCallback? onTap;
   final bool showButton;
   final double? horizontalPadding;
@@ -67,7 +67,7 @@ class EmptyStateWidget extends StatelessWidget {
               fontWeight: FontWeight.w400,
             ),
           ),
-          if (showButton) ...[
+          if (showButton && buttonText != null) ...[
             SizedBox(height: spacing ?? 16),
             PrimaryButtons(
               buttonStyle: ButtonsStyle.activePrimaryButton,

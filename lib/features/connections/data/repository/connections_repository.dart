@@ -108,6 +108,36 @@ class ConnectionsRepository {
     }
   }
 
+  static Future<GetSentConnectionResponse> getDeletedConnections(
+    GetRequestedConnectionsQueryParams params,
+  ) async {
+    try {
+      final response = await DioClient().get(
+        AppUrls.getDeletedConnections,
+        queryParameters: params.toJson(),
+        isTokenRequired: true,
+      );
+
+      final data = response.data;
+      if (data is Map<String, dynamic>) {
+        return GetSentConnectionResponse.fromJson(data);
+      }
+
+      if (data is Map) {
+        return GetSentConnectionResponse.fromJson(
+          Map<String, dynamic>.from(data),
+        );
+      }
+
+      return GetSentConnectionResponse(message: response.message);
+    } catch (e) {
+      final errorMessage = e is DioException
+          ? e.response?.data['message'] ?? e.message
+          : e.toString();
+      return GetSentConnectionResponse(message: errorMessage);
+    }
+  }
+
   static Future<ApiResponse> deleteConnection(String connectionId) async {
     try {
       return await DioClient().delete(

@@ -6,8 +6,13 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
 import 'package:flutter_boilerplate/core/global/components/empty_state.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
+import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:flutter_boilerplate/features/connections/data/models/response/get_sent_connection_response.dart'
+    as sent_models;
 import 'package:flutter_boilerplate/features/inbox/presentation/providers/inbox_providers.dart';
+import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/filter_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/tab_bar_widget.dart';
 
@@ -32,6 +37,15 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab>
 
   void _handleSubTabChange() {
     if (!mounted || _subTabController.indexIsChanging) return;
+
+    if (_subTabController.index == 1) {
+      final provider = ref.read(inboxProvider);
+      if ((provider.deletedConnections?.isEmpty ?? true) &&
+          !provider.isDeletedLoading) {
+        provider.fetchDeletedConnections();
+      }
+    }
+
     setState(() {});
   }
 
@@ -44,26 +58,22 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab>
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(inboxProvider);
+    final provider = ref.watch(inboxProvider);
 
     return Column(
       children: [
-        const SizedBox(height: 10),
-        _header(),
+        _header(provider),
         const SizedBox(height: 10),
         Expanded(
           child: TabBarView(
             controller: _subTabController,
             physics: const NeverScrollableScrollPhysics(),
-            children: const [
-              _MoreTabPlaceholder(
+            children: [
+              const EmptyStateWidget(
                 title: 'No Blocked Requests',
                 subtitle: 'Blocked items will appear here',
               ),
-              _MoreTabPlaceholder(
-                title: 'No Deleted Requests',
-                subtitle: 'Deleted items will appear here',
-              ),
+              _buildDeletedTab(provider),
             ],
           ),
         ),
@@ -71,40 +81,16 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab>
     );
   }
 
-  Widget _buildSubTabs() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        spacing: 8,
-        children: List.generate(_subTabs.length, (index) {
-          final isSelected = _subTabController.index == index;
-          return TabBarWidget(
-            text: _subTabs[index],
-            isSelected: isSelected,
-            backgroundColor: AppColors.transparent,
-            selectedBackgroundColor: AppColors.primaryVariant,
-            selectedTextColor: AppColors.primary,
-            borderColor: isSelected ? AppColors.primary : AppColors.greyLight,
-            selectedBorderColor: AppColors.primary,
-            isBorder: true,
-            padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 4),
-            borderRadius: 8,
-            fontSize: TextSize.font12(context),
-            onTap: () => _subTabController.animateTo(index),
-          );
-        }),
-      ),
-    );
-  }
-
-  Widget _header() {
+  Widget _header(InboxProvider provider) {
     final selectedTab = _subTabs[_subTabController.index];
 
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSubTabs(),
+        const SizedBox(width: 12),
         InkWell(
           onTap: () async {
             await BottomSheetUtils.open(
@@ -136,13 +122,119 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab>
     );
   }
 
+  Widget _buildSubTabs() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        spacing: 8,
+        children: List.generate(_subTabs.length, (index) {
+          final isSelected = _subTabController.index == index;
+          return TabBarWidget(
+            text: _subTabs[index],
+            isSelected: isSelected,
+            selectedBackgroundColor: AppColors.primaryVariant,
+            selectedTextColor: AppColors.primary,
+            selectedBorderColor: AppColors.primary,
+            backgroundColor: isSelected ? AppColors.primaryVariant : AppColors.transparent,
+            isBorder: true,
+            padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 4),
+            borderRadius: 8,
+            fontSize: TextSize.font12(context),
+            onTap: () => _subTabController.animateTo(index),
+          );
+        }),
+      ),
+    );
+  }
+
+  Widget _buildDeletedTab(InboxProvider provider) {
+    if (provider.isDeletedLoading &&
+        (provider.deletedConnections?.isEmpty ?? true)) {
+      return const Padding(
+        padding: EdgeInsets.all(32),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (provider.isDeletedHasError &&
+        (provider.deletedConnections?.isEmpty ?? true)) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+             EmptyStateWidget(
+              title: 'Error Loading Deleted Requests',
+              subtitle: 'Unable to load your deleted connection requests',
+              buttonText: 'Retry',
+              onTap: () => ref.read(inboxProvider).fetchDeletedConnections(),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (provider.deletedConnections?.isEmpty ?? true) {
+      return const Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          EmptyStateWidget(
+            imagePath: AppImages.delete,
+            title: 'No Deleted Requests',
+            subtitle: 'No deleted connection requests were found',
+            buttonText: 'Refresh',
+          ),
+        ],
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => ref.read(inboxProvider).fetchDeletedConnections(),
+      child: ListView.separated(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.only(bottom: 12),
+        itemCount: provider.deletedConnections!.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        itemBuilder: (context, index) {
+          final item = provider.deletedConnections![index];
+          return InboxCard(
+            imagePath: item.profilePhoto?.url ?? AppImages.demoProfile2,
+            name: item.displayName ?? 'Unknown',
+            age: '${item.age ?? ''} Yr',
+            height: CamelCaseUtils.formatCamelCase(item.religion ?? ''),
+            day: DateTimeUtils.onlyDate(
+              DateTime.tryParse(item.connection?.createdAt ?? ''),
+            ),
+            location: _locationText(item),
+            subtitle:
+                CamelCaseUtils.formatCamelCase(item.connection?.status ?? ''),
+            subtitleColor: AppColors.primary,
+            isVerified: item.profilePhoto?.isVerified ?? false,
+          );
+        },
+      ),
+    );
+  }
+
+  String _locationText(sent_models.Data item) {
+    final location = [
+      item.location?.city,
+      item.location?.state,
+      item.location?.country,
+    ].whereType<String>().where((value) => value.trim().isNotEmpty).join(', ');
+
+    return location.isEmpty ? 'N/A' : location;
+  }
+
   Widget _sentFilter(InboxProvider provider) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: FilterWidget(
         title: 'Filter My Sent Requests',
         items: provider.filterList
-            .map((item) => FilterItem(name: item.label, isSelected: item.isSelected))
+            .map(
+              (item) =>
+                  FilterItem(name: item.label, isSelected: item.isSelected),
+            )
             .toList(),
         onItemTap: provider.selectFilterTypeIndex,
       ),
@@ -150,27 +242,3 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab>
   }
 }
 
-class _MoreTabPlaceholder extends StatelessWidget {
-  const _MoreTabPlaceholder({
-    required this.title,
-    required this.subtitle,
-  });
-
-  final String title;
-  final String subtitle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 32),
-        child: EmptyStateWidget(
-          imagePath: AppImages.addTeam,
-          title: title,
-          subtitle: subtitle,
-          buttonText: 'Refresh',
-        ),
-      ),
-    );
-  }
-}

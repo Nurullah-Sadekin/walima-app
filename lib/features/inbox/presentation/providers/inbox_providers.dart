@@ -38,6 +38,12 @@ class InboxProvider extends BaseChangeNotifier {
   bool isDeletingSentConnection = false;
   String? sentErrorMessage;
 
+  List<sent_models.Data>? deletedConnections = [];
+  sent_models.GetSentConnectionResponse? deletedConnectionsResponse;
+  bool isDeletedLoading = false;
+  bool isDeletedHasError = false;
+  String? deletedErrorMessage;
+
   List<Filter> filterList = filterDataList;
   List<Filter> sortList = sortDataList;
 
@@ -367,6 +373,52 @@ class InboxProvider extends BaseChangeNotifier {
     return false;
   }
 
+  Future<void> fetchDeletedConnections({
+    int page = 1,
+    int size = 20,
+    String responseFormat = 'short',
+    String sortBy = 'id',
+    String sortOrder = 'ASC',
+    String search = '',
+  }) async {
+    isDeletedLoading = true;
+    isDeletedHasError = false;
+    deletedErrorMessage = null;
+    notifyListeners();
+
+    try {
+      deletedConnectionsResponse =
+          await ConnectionsRepository.getDeletedConnections(
+        _queryParams(
+          page: page,
+          size: size,
+          responseFormat: responseFormat,
+          sortBy: sortBy,
+          sortOrder: sortOrder,
+          search: search,
+        ),
+      );
+
+      if (deletedConnectionsResponse?.code == 'SUCCESS' ||
+          deletedConnectionsResponse?.code == '1') {
+        deletedConnections = deletedConnectionsResponse?.response?.data ?? [];
+        isDeletedHasError = false;
+      } else {
+        isDeletedHasError = true;
+        deletedErrorMessage = deletedConnectionsResponse?.message ??
+            'Failed to load deleted connections';
+        deletedConnections = [];
+      }
+    } catch (e) {
+      isDeletedHasError = true;
+      deletedErrorMessage = e.toString();
+      deletedConnections = [];
+    }
+
+    isDeletedLoading = false;
+    notifyListeners();
+  }
+
   Future<void> loadPrimaryTab(int tabIndex) async {
     switch (tabIndex) {
       case 0:
@@ -382,6 +434,11 @@ class InboxProvider extends BaseChangeNotifier {
       case 3:
         if ((sentConnections?.isEmpty ?? true) && !isSentLoading) {
           await fetchSentConnections();
+        }
+        break;
+      case 4:
+        if ((deletedConnections?.isEmpty ?? true) && !isDeletedLoading) {
+          await fetchDeletedConnections();
         }
         break;
     }
@@ -422,6 +479,15 @@ class InboxProvider extends BaseChangeNotifier {
     isSentHasError = false;
     isDeletingSentConnection = false;
     sentErrorMessage = null;
+    notifyListeners();
+  }
+
+  void clearDeletedConnections() {
+    deletedConnections = [];
+    deletedConnectionsResponse = null;
+    isDeletedLoading = false;
+    isDeletedHasError = false;
+    deletedErrorMessage = null;
     notifyListeners();
   }
 
