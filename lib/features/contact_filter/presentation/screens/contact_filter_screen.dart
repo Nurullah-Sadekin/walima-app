@@ -20,7 +20,7 @@ class ContactFilterScreen extends ConsumerStatefulWidget {
 
 class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
   late ContactFilterProvider provider;
-  FilterStep _step = FilterStep.contactFilterScreen;
+  ContactFilterStep _step = ContactFilterStep.contactFilterScreen;
 
   @override
   void initState() {
@@ -33,10 +33,10 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
     provider = ref.watch(contactFilterProvider);
 
     return PopScope(
-      canPop: _step == FilterStep.contactFilterScreen,
+      canPop: _step == ContactFilterStep.contactFilterScreen,
       onPopInvokedWithResult: (didPop, result) {
-        if (!didPop && _step != FilterStep.contactFilterScreen) {
-          setState(() => _step = FilterStep.contactFilterScreen);
+        if (!didPop && _step != ContactFilterStep.contactFilterScreen) {
+          setState(() => _step = ContactFilterStep.contactFilterScreen);
         }
       },
       child: Scaffold(
@@ -57,11 +57,11 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
 
   PreferredSizeWidget _appBar() {
     return CustomBackAppBar(
-      title: Text(_step == FilterStep.contactFilterScreen ? 'Contact Filter' : _getAppBarTitle(_step)),
+      title: Text(_step == ContactFilterStep.contactFilterScreen ? 'Contact Filter' : _getAppBarTitle(_step)),
       backgroundColor: Colors.transparent,
       onBackPressed: () {
-        if (_step != FilterStep.contactFilterScreen) {
-          setState(() => _step = FilterStep.contactFilterScreen);
+        if (_step != ContactFilterStep.contactFilterScreen) {
+          setState(() => _step = ContactFilterStep.contactFilterScreen);
         } else {
           Navigator.of(context).maybePop();
         }
@@ -69,52 +69,52 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
     );
   }
 
-  String _getAppBarTitle(FilterStep step) {
+  String _getAppBarTitle(ContactFilterStep step) {
     switch (step) {
-      case FilterStep.contactFilterScreen:
+      case ContactFilterStep.contactFilterScreen:
         return 'Refine';
-      case FilterStep.ageRange:
+      case ContactFilterStep.ageRange:
         return 'Age Range';
-      case FilterStep.heightRange:
+      case ContactFilterStep.heightRange:
         return 'Height Range';
-      case FilterStep.maritalStatus:
+      case ContactFilterStep.maritalStatus:
         return 'Marital Status';
-      case FilterStep.religion:
+      case ContactFilterStep.religion:
         return 'Religion';
-      case FilterStep.community:
+      case ContactFilterStep.community:
         return 'Community';
-      case FilterStep.motherTongue:
+      case ContactFilterStep.motherTongue:
         return 'Mother Tongue';
-      case FilterStep.countryLivingIn:
+      case ContactFilterStep.countryLivingIn:
         return 'Country Living In';
-      case FilterStep.workingWith:
+      case ContactFilterStep.workingWith:
         return 'Working With';
-      case FilterStep.annualIncome:
+      case ContactFilterStep.annualIncome:
       return 'Annual Income';
     }
   }
 
   Widget _body(ContactFilterProvider provider) {
     switch (_step) {
-      case FilterStep.contactFilterScreen:
+      case ContactFilterStep.contactFilterScreen:
         return _contactFilterBody(provider);
-      case FilterStep.ageRange:
+      case ContactFilterStep.ageRange:
         return _ageRange(provider);
-      case FilterStep.heightRange:
+      case ContactFilterStep.heightRange:
        return _heightRange(provider);
-      case FilterStep.maritalStatus:
+      case ContactFilterStep.maritalStatus:
         return _maritalStatusBody(provider);
-      case FilterStep.religion:
+      case ContactFilterStep.religion:
          return _religionBody(provider);
-      case FilterStep.community:
+      case ContactFilterStep.community:
         return _communityBody(provider);
-      case FilterStep.motherTongue:
+      case ContactFilterStep.motherTongue:
         return _motherTongueBody(provider);
-      case FilterStep.countryLivingIn:
+      case ContactFilterStep.countryLivingIn:
         return _countryBody(provider);
-      case FilterStep.workingWith:
+      case ContactFilterStep.workingWith:
         return _workingWithBody(provider);
-      case FilterStep.annualIncome:
+      case ContactFilterStep.annualIncome:
         return _annualIncomeBody(provider);
     }
   }
@@ -129,35 +129,35 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           InfoTile(
             title: 'Age Range',
             value: _singleSelectedName(provider.selectedCountries, '20 -26'),
-            onTap: () => setState(() => _step = FilterStep.ageRange),
+            onTap: () => setState(() => _step = ContactFilterStep.ageRange),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.calendarSvgIcon,
           ),
           InfoTile(
             title: 'Height Range',
             value: _singleSelectedName(provider.selectedCountries, '5\'0" - 6\'0" '),
-            onTap: () => setState(() => _step = FilterStep.heightRange),
+            onTap: () => setState(() => _step = ContactFilterStep.heightRange),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.heightSvgIcon,
           ),
           InfoTile(
             title: 'Marital Status',
             value: _multiSelectedNames(provider.selectedMaritalStatus, 'Open to All'),
-            onTap: () => setState(() => _step = FilterStep.maritalStatus),
+            onTap: () => setState(() => _step = ContactFilterStep.maritalStatus),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.weddingSvgIcon,
           ),
           InfoTile(
             title: 'Religion',
             value: _multiSelectedNames(provider.selectedCommunities, 'Multiple Selected'),
-            onTap: () => setState(() => _step = FilterStep.religion),
+            onTap: () => setState(() => _step = ContactFilterStep.religion),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.quranSvgIcon,
           ),
           InfoTile(
             title: 'Community',
             value: _multiSelectedNames(provider.selectedCommunities, 'Multiple Selected'),
-            onTap: () => setState(() => _step = FilterStep.community),
+            onTap: () => setState(() => _step = ContactFilterStep.community),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.groupsIcon,
           ),
@@ -165,14 +165,14 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           InfoTile(
             title: 'Mother Tongue',
             value: _multiSelectedNames(provider.selectedMotherTongues, 'Multiple Selected'),
-            onTap: () => setState(() => _step = FilterStep.motherTongue),
+            onTap: () => setState(() => _step = ContactFilterStep.motherTongue),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.languageSvgIcon,
           ),
           InfoTile(
             title: 'Country Living In',
             value: _singleSelectedName(provider.selectedCountries, 'Bangladesh'),
-            onTap: () => setState(() => _step = FilterStep.countryLivingIn),
+            onTap: () => setState(() => _step = ContactFilterStep.countryLivingIn),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.locationSvgIcon,
           ),
@@ -180,7 +180,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           InfoTile(
             title: 'Working With',
             value: _multiSelectedNames(provider.selectedCommunities, 'Multiple Selected'),
-            onTap: () => setState(() => _step = FilterStep.workingWith),
+            onTap: () => setState(() => _step = ContactFilterStep.workingWith),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.workSvgIcon,
           ),
@@ -188,7 +188,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           InfoTile(
             title: 'Annual Income',
             value: _multiSelectedNames(provider.selectedCommunities, 'Multiple Selected'),
-            onTap: () => setState(() => _step = FilterStep.annualIncome),
+            onTap: () => setState(() => _step = ContactFilterStep.annualIncome),
             trailingImagePath: AppImages.editWrite,
             leadingImagePath: AppImages.propertySvgIcon,
           ),
@@ -330,7 +330,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
   }
 
   Widget bottomAction(ContactFilterProvider provider) {
-    if (_step == FilterStep.contactFilterScreen) {
+    if (_step == ContactFilterStep.contactFilterScreen) {
       return PrimaryButtons(
         buttonStyle: ButtonsStyle.activePrimaryButton,
         title: 'Show Matches',
@@ -342,7 +342,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
     return PrimaryButtons(
       buttonStyle: ButtonsStyle.activePrimaryButton,
       title: 'Save Changes',
-      onTap: () => setState(() => _step = FilterStep.contactFilterScreen),
+      onTap: () => setState(() => _step = ContactFilterStep.contactFilterScreen),
     );
   }
 
@@ -362,7 +362,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
   }
 }
 
-enum FilterStep {
+enum ContactFilterStep {
   contactFilterScreen,
   ageRange,
   heightRange,
