@@ -6,8 +6,8 @@ import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/lookup_option.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/location_data_repository_impl.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/lookup_repository.dart';
-import 'package:flutter_boilerplate/features/registration/domain/location_data_model.dart';
 import 'package:flutter_boilerplate/features/registration/domain/repository/location_data_repository.dart';
+import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 
 class ContactFilterProvider extends BaseChangeNotifier {
   ContactFilterProvider();
@@ -16,42 +16,34 @@ class ContactFilterProvider extends BaseChangeNotifier {
   final LocationDataRepository _locationDataRepository =
       LocationDataRepositoryImpl();
 
-  final TextEditingController maritalStatusController = TextEditingController();
-  final TextEditingController religionController = TextEditingController();
-  final TextEditingController communityController = TextEditingController();
-  final TextEditingController motherTongueController = TextEditingController();
-  final TextEditingController countryLivingInController =
-      TextEditingController();
-  final TextEditingController workingWithController = TextEditingController();
-  final TextEditingController annualIncomeController = TextEditingController();
-
-  List<LookupOption> religionOptions = const <LookupOption>[
+  final List<SingleStringModel> religionOptions = const <LookupOption>[
     LookupOption(key: 'islam', label: 'Islam'),
     LookupOption(key: 'hinduism', label: 'Hinduism'),
     LookupOption(key: 'christianity', label: 'Christianity'),
     LookupOption(key: 'buddhism', label: 'Buddhism'),
     LookupOption(key: 'others', label: 'Others'),
-  ];
-  List<LookupOption> communityOptions = <LookupOption>[];
-  List<LookupOption> professionOptions = <LookupOption>[];
-  List<LookupOption> incomeRangeOptions = <LookupOption>[];
-  List<CountryLocationModel> countryOptions = <CountryLocationModel>[];
+  ].map(_lookupToItem).toList(growable: false);
 
-  final List<String> maritalStatusDropdownItems = RegistrationMaritalStatus
-      .values
-      .map((status) => status.label)
-      .toList(growable: false);
-  final List<String> motherTongueDropdownItems = const <String>[
-    'Bengali',
-    'English',
-    'Hindi',
+  final List<SingleStringModel> maritalStatusOptions =
+      RegistrationMaritalStatus.values
+          .map(
+            (status) => SingleStringModel(
+              name: status.label,
+              value: status.apiValue,
+            ),
+          )
+          .toList(growable: false);
+
+  final List<SingleStringModel> motherTongueOptions = <SingleStringModel>[
+    SingleStringModel(name: 'Bengali', value: 'bengali'),
+    SingleStringModel(name: 'English', value: 'english'),
+    SingleStringModel(name: 'Hindi', value: 'hindi'),
   ];
 
-  List<String> religionDropdownItems = <String>[];
-  List<String> communityDropdownItems = <String>[];
-  List<String> countryDropdownItems = <String>[];
-  List<String> workingWithDropdownItems = <String>[];
-  List<String> annualIncomeDropdownItems = <String>[];
+  List<SingleStringModel> communityOptions = <SingleStringModel>[];
+  List<SingleStringModel> countryOptions = <SingleStringModel>[];
+  List<SingleStringModel> workingWithOptions = <SingleStringModel>[];
+  List<SingleStringModel> annualIncomeOptions = <SingleStringModel>[];
 
   bool isReligionDataLoading = false;
   bool isCareerLookupLoading = false;
@@ -70,11 +62,24 @@ class ContactFilterProvider extends BaseChangeNotifier {
   String get ageRangeSummary => '$ageStart - $ageEnd';
   String get heightRangeSummary =>
       '${formatHeight(heightStart)} - ${formatHeight(heightEnd)}';
+  String get maritalStatusSummary =>
+      _selectedSummary(maritalStatusOptions, fallback: 'Select');
+  String get religionSummary =>
+      _selectedSummary(religionOptions, fallback: 'Select');
+  String get communitySummary =>
+      _selectedSummary(communityOptions, fallback: 'Select');
+  String get motherTongueSummary =>
+      _selectedSummary(motherTongueOptions, fallback: 'Select');
+  String get countryLivingInSummary =>
+      _selectedSummary(countryOptions, fallback: 'Select');
+  String get workingWithSummary =>
+      _selectedSummary(workingWithOptions, fallback: 'Select');
+  String get annualIncomeSummary =>
+      _selectedSummary(annualIncomeOptions, fallback: 'Select');
+
+  List<String> get selectedCommunities => _selectedNames(communityOptions);
 
   Future<void> loadInitialData() async {
-    religionDropdownItems =
-        religionOptions.map((item) => item.label).toList(growable: false);
-
     await Future.wait<void>([
       loadCommunityData(),
       loadCareerLookupData(),
@@ -84,18 +89,13 @@ class ContactFilterProvider extends BaseChangeNotifier {
   }
 
   Future<void> loadCommunityData() async {
-    final selectedReligion = religionController.text.trim();
-    if (selectedReligion.isEmpty) {
-      communityOptions = <LookupOption>[];
-      communityDropdownItems = <String>[];
-      notifyListeners();
-      return;
-    }
+    final selectedReligions = religionOptions
+        .where((item) => item.isSelected)
+        .map((item) => item.value ?? item.name.toLowerCase())
+        .toList(growable: false);
 
-    final religion = _findLookupOption(religionOptions, selectedReligion);
-    if (religion == null) {
-      communityOptions = <LookupOption>[];
-      communityDropdownItems = <String>[];
+    if (selectedReligions.isEmpty) {
+      communityOptions = <SingleStringModel>[];
       notifyListeners();
       return;
     }
@@ -104,12 +104,31 @@ class ContactFilterProvider extends BaseChangeNotifier {
     notifyListeners();
 
     try {
-      communityOptions = await _lookupRepository.getLookupsBySlug(religion.key);
-      communityDropdownItems =
-          communityOptions.map((item) => item.label).toList(growable: false);
+      final results = await Future.wait<List<LookupOption>>(
+        selectedReligions.map(
+          (slug) => _lookupRepository.getLookupsBySlug(slug),
+        ),
+      );
+
+      final previouslySelected = selectedCommunities;
+      final merged = <String, SingleStringModel>{};
+
+      for (final result in results) {
+        for (final option in result) {
+          final normalized = option.label.trim().toLowerCase();
+          merged[normalized] = SingleStringModel(
+            name: option.label,
+            value: option.key,
+            isSelected: previouslySelected.any(
+              (selected) => selected.toLowerCase() == normalized,
+            ),
+          );
+        }
+      }
+
+      communityOptions = merged.values.toList(growable: false);
     } catch (_) {
-      communityOptions = <LookupOption>[];
-      communityDropdownItems = <String>[];
+      communityOptions = <SingleStringModel>[];
     } finally {
       isReligionDataLoading = false;
       notifyListeners();
@@ -118,7 +137,7 @@ class ContactFilterProvider extends BaseChangeNotifier {
 
   Future<void> loadCareerLookupData() async {
     if (isCareerLookupLoading) return;
-    if (professionOptions.isNotEmpty && incomeRangeOptions.isNotEmpty) return;
+    if (workingWithOptions.isNotEmpty && annualIncomeOptions.isNotEmpty) return;
 
     isCareerLookupLoading = true;
     notifyListeners();
@@ -129,12 +148,12 @@ class ContactFilterProvider extends BaseChangeNotifier {
         _lookupRepository.getLookups(LookupCategory.incomeRange),
       ]);
 
-      professionOptions = results[0];
-      incomeRangeOptions = results[1];
-      workingWithDropdownItems =
-          professionOptions.map((item) => item.label).toList(growable: false);
-      annualIncomeDropdownItems =
-          incomeRangeOptions.map((item) => item.label).toList(growable: false);
+      workingWithOptions = results[0]
+          .map((item) => _lookupToItem(item))
+          .toList(growable: false);
+      annualIncomeOptions = results[1]
+          .map((item) => _lookupToItem(item))
+          .toList(growable: false);
     } finally {
       isCareerLookupLoading = false;
       notifyListeners();
@@ -149,52 +168,48 @@ class ContactFilterProvider extends BaseChangeNotifier {
     notifyListeners();
 
     try {
-      countryOptions = await _locationDataRepository.getCountries();
-      countryDropdownItems =
-          countryOptions.map((item) => item.name).toList(growable: false);
+      final countries = await _locationDataRepository.getCountries();
+      countryOptions = countries
+          .map(
+            (item) => SingleStringModel(
+              name: item.name,
+              value: item.code2,
+            ),
+          )
+          .toList(growable: false);
     } finally {
       isLocationDataLoading = false;
       notifyListeners();
     }
   }
 
-  void onMaritalStatusSelected(String? value) {
-    _setControllerValue(maritalStatusController, value);
+  void toggleMaritalStatus(int index) {
+    _toggleItem(maritalStatusOptions, index);
   }
 
-  void onReligionSelected(String? value) {
-    final selected = value?.trim() ?? '';
-    if (selected.isEmpty) return;
-
-    final changed =
-        religionController.text.trim().toLowerCase() != selected.toLowerCase();
-    religionController.text = selected;
-    if (changed) {
-      communityController.clear();
-      communityDropdownItems = <String>[];
-      unawaited(loadCommunityData());
-    }
-    notifyListeners();
+  void toggleReligion(int index) {
+    _toggleItem(religionOptions, index);
+    unawaited(loadCommunityData());
   }
 
-  void onCommunitySelected(String? value) {
-    _setControllerValue(communityController, value);
+  void toggleCommunity(int index) {
+    _toggleItem(communityOptions, index);
   }
 
-  void onMotherTongueSelected(String? value) {
-    _setControllerValue(motherTongueController, value);
+  void toggleMotherTongue(int index) {
+    _toggleItem(motherTongueOptions, index);
   }
 
-  void onCountryLivingInSelected(String? value) {
-    _setControllerValue(countryLivingInController, value);
+  void toggleCountryLivingIn(int index) {
+    _toggleItem(countryOptions, index);
   }
 
-  void onWorkingWithSelected(String? value) {
-    _setControllerValue(workingWithController, value);
+  void toggleWorkingWith(int index) {
+    _toggleItem(workingWithOptions, index);
   }
 
-  void onAnnualIncomeSelected(String? value) {
-    _setControllerValue(annualIncomeController, value);
+  void toggleAnnualIncome(int index) {
+    _toggleItem(annualIncomeOptions, index);
   }
 
   void setAgeRange(RangeValues values) {
@@ -219,35 +234,50 @@ class ContactFilterProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
+  List<String> get selectedMaritalStatuses => _selectedNames(maritalStatusOptions);
+  List<String> get selectedReligions => _selectedNames(religionOptions);
+  List<String> get selectedMotherTongues => _selectedNames(motherTongueOptions);
+  List<String> get selectedCountries => _selectedNames(countryOptions);
+  List<String> get selectedWorkingWith => _selectedNames(workingWithOptions);
+  List<String> get selectedAnnualIncome => _selectedNames(annualIncomeOptions);
+
   Map<String, dynamic> buildResult() {
     return <String, dynamic>{
       'ageRange': <int>[ageStart, ageEnd],
       'heightRange': <int>[heightStart, heightEnd],
-      'maritalStatus': maritalStatusController.text.trim(),
-      'religion': religionController.text.trim(),
-      'community': communityController.text.trim(),
-      'motherTongue': motherTongueController.text.trim(),
-      'countryLivingIn': countryLivingInController.text.trim(),
-      'workingWith': workingWithController.text.trim(),
-      'annualIncome': annualIncomeController.text.trim(),
+      'maritalStatus': selectedMaritalStatuses,
+      'religion': selectedReligions,
+      'community': selectedCommunities,
+      'motherTongue': selectedMotherTongues,
+      'countryLivingIn': selectedCountries,
+      'workingWith': selectedWorkingWith,
+      'annualIncome': selectedAnnualIncome,
     };
   }
 
-  LookupOption? _findLookupOption(List<LookupOption> options, String raw) {
-    final normalized = raw.trim().toLowerCase();
-    for (final option in options) {
-      if (option.label.trim().toLowerCase() == normalized) {
-        return option;
-      }
-    }
-    return null;
+  void _toggleItem(List<SingleStringModel> items, int index) {
+    if (index < 0 || index >= items.length) return;
+    items[index].isSelected = !items[index].isSelected;
+    notifyListeners();
   }
 
-  void _setControllerValue(TextEditingController controller, String? value) {
-    final selected = value?.trim() ?? '';
-    if (selected.isEmpty) return;
-    controller.text = selected;
-    notifyListeners();
+  List<String> _selectedNames(List<SingleStringModel> items) {
+    return items.where((item) => item.isSelected).map((item) => item.name).toList();
+  }
+
+  String _selectedSummary(
+    List<SingleStringModel> items, {
+    required String fallback,
+  }) {
+    final selected = _selectedNames(items);
+    if (selected.isEmpty) return fallback;
+    if (selected.length == 1) return selected.first;
+    if (selected.length == 2) return selected.join(', ');
+    return '${selected.length} selected';
+  }
+
+  static SingleStringModel _lookupToItem(LookupOption option) {
+    return SingleStringModel(name: option.label, value: option.key);
   }
 
   static String formatHeight(int heightCm) {
@@ -255,17 +285,5 @@ class ContactFilterProvider extends BaseChangeNotifier {
     final feet = totalInches ~/ 12;
     final inches = totalInches % 12;
     return "$feet' $inches\"";
-  }
-
-  @override
-  void dispose() {
-    maritalStatusController.dispose();
-    religionController.dispose();
-    communityController.dispose();
-    motherTongueController.dispose();
-    countryLivingInController.dispose();
-    workingWithController.dispose();
-    annualIncomeController.dispose();
-    super.dispose();
   }
 }

@@ -3,8 +3,8 @@ import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
-import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
+import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/contact_filter/presentation/providers/contact_filter_provider.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
@@ -113,70 +113,42 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
       case ContactFilterStep.heightRange:
         return _heightRange(provider);
       case ContactFilterStep.maritalStatus:
-        return _dropdownQuestion(
-          headLine: 'Marital Status',
-          header: 'Select Marital Status',
-          items: provider.maritalStatusDropdownItems,
-          controller: provider.maritalStatusController,
-          onConfirm: (value) => provider.onMaritalStatusSelected(value?.toString()),
+        return _selectionBody(
+          items: provider.maritalStatusOptions,
+          onTap: provider.toggleMaritalStatus,
         );
       case ContactFilterStep.religion:
-        return _dropdownQuestion(
-          headLine: 'Religion',
-          header: 'Select Religion',
-          items: provider.religionDropdownItems,
-          controller: provider.religionController,
-          onTap: provider.loadInitialData,
-          onConfirm: (value) => provider.onReligionSelected(value?.toString()),
+        return _selectionBody(
+          items: provider.religionOptions,
+          onTap: provider.toggleReligion,
         );
       case ContactFilterStep.community:
-        return _dropdownQuestion(
-          headLine: 'Community',
-          header: 'Select Community',
-          items: provider.communityDropdownItems,
-          controller: provider.communityController,
-          enabled: provider.religionController.text.trim().isNotEmpty,
-          helperText: provider.religionController.text.trim().isEmpty
+        return _selectionBody(
+          items: provider.communityOptions,
+          onTap: provider.toggleCommunity,
+          helperText: provider.religionOptions.every((item) => !item.isSelected)
               ? 'Select religion first to load community options.'
               : null,
-          onTap: provider.loadCommunityData,
-          onConfirm: (value) => provider.onCommunitySelected(value?.toString()),
         );
       case ContactFilterStep.motherTongue:
-        return _dropdownQuestion(
-          headLine: 'Mother Tongue',
-          header: 'Select Mother Tongue',
-          items: provider.motherTongueDropdownItems,
-          controller: provider.motherTongueController,
-          onConfirm: (value) => provider.onMotherTongueSelected(value?.toString()),
+        return _selectionBody(
+          items: provider.motherTongueOptions,
+          onTap: provider.toggleMotherTongue,
         );
       case ContactFilterStep.countryLivingIn:
-        return _dropdownQuestion(
-          headLine: 'Country Living In',
-          header: 'Select Country',
-          items: provider.countryDropdownItems,
-          controller: provider.countryLivingInController,
-          onTap: provider.loadLocationData,
-          onConfirm: (value) =>
-              provider.onCountryLivingInSelected(value?.toString()),
+        return _selectionBody(
+          items: provider.countryOptions,
+          onTap: provider.toggleCountryLivingIn,
         );
       case ContactFilterStep.workingWith:
-        return _dropdownQuestion(
-          headLine: 'Working With',
-          header: 'Select Profession',
-          items: provider.workingWithDropdownItems,
-          controller: provider.workingWithController,
-          onTap: provider.loadCareerLookupData,
-          onConfirm: (value) => provider.onWorkingWithSelected(value?.toString()),
+        return _selectionBody(
+          items: provider.workingWithOptions,
+          onTap: provider.toggleWorkingWith,
         );
       case ContactFilterStep.annualIncome:
-        return _dropdownQuestion(
-          headLine: 'Annual Income',
-          header: 'Select Income Range',
-          items: provider.annualIncomeDropdownItems,
-          controller: provider.annualIncomeController,
-          onTap: provider.loadCareerLookupData,
-          onConfirm: (value) => provider.onAnnualIncomeSelected(value?.toString()),
+        return _selectionBody(
+          items: provider.annualIncomeOptions,
+          onTap: provider.toggleAnnualIncome,
         );
     }
   }
@@ -205,10 +177,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           const SizedBox(height: 8),
           InfoTile(
             title: 'Marital Status',
-            value: _textOrFallback(
-              provider.maritalStatusController.text,
-              'Select',
-            ),
+            value: provider.maritalStatusSummary,
             onTap: () => setState(() => _step = ContactFilterStep.maritalStatus),
             leadingImagePath: AppImages.weddingSvgIcon,
             showTrailingImage: false,
@@ -216,7 +185,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           const SizedBox(height: 8),
           InfoTile(
             title: 'Religion',
-            value: _textOrFallback(provider.religionController.text, 'Select'),
+            value: provider.religionSummary,
             onTap: () => setState(() => _step = ContactFilterStep.religion),
             leadingImagePath: AppImages.quranSvgIcon,
             showTrailingImage: false,
@@ -224,7 +193,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           const SizedBox(height: 8),
           InfoTile(
             title: 'Community',
-            value: _textOrFallback(provider.communityController.text, 'Select'),
+            value: provider.communitySummary,
             onTap: () => setState(() => _step = ContactFilterStep.community),
             leadingImagePath: AppImages.groupsIcon,
             showTrailingImage: false,
@@ -232,10 +201,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           const SizedBox(height: 8),
           InfoTile(
             title: 'Mother Tongue',
-            value: _textOrFallback(
-              provider.motherTongueController.text,
-              'Select',
-            ),
+            value: provider.motherTongueSummary,
             onTap: () => setState(() => _step = ContactFilterStep.motherTongue),
             leadingImagePath: AppImages.languageSvgIcon,
             showTrailingImage: false,
@@ -243,10 +209,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           const SizedBox(height: 8),
           InfoTile(
             title: 'Country Living In',
-            value: _textOrFallback(
-              provider.countryLivingInController.text,
-              'Select',
-            ),
+            value: provider.countryLivingInSummary,
             onTap: () =>
                 setState(() => _step = ContactFilterStep.countryLivingIn),
             leadingImagePath: AppImages.locationSvgIcon,
@@ -255,7 +218,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           const SizedBox(height: 8),
           InfoTile(
             title: 'Working With',
-            value: _textOrFallback(provider.workingWithController.text, 'Select'),
+            value: provider.workingWithSummary,
             onTap: () => setState(() => _step = ContactFilterStep.workingWith),
             leadingImagePath: AppImages.workSvgIcon,
             showTrailingImage: false,
@@ -263,10 +226,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           const SizedBox(height: 8),
           InfoTile(
             title: 'Annual Income',
-            value: _textOrFallback(
-              provider.annualIncomeController.text,
-              'Select',
-            ),
+            value: provider.annualIncomeSummary,
             onTap: () => setState(() => _step = ContactFilterStep.annualIncome),
             leadingImagePath: AppImages.propertySvgIcon,
             showTrailingImage: false,
@@ -277,21 +237,16 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
     );
   }
 
-  Widget _dropdownQuestion({
-    required String headLine,
-    required String header,
-    required List<String> items,
-    required TextEditingController controller,
-    Future<void> Function()? onTap,
-    void Function(dynamic)? onConfirm,
-    bool enabled = true,
+  Widget _selectionBody({
+    required List<dynamic> items,
+    required void Function(int) onTap,
     String? helperText,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 12),
         if (helperText != null) ...[
+          const SizedBox(height: 12),
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(12),
@@ -309,17 +264,27 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
             ),
           ),
           const SizedBox(height: 16),
-        ],
-        DropDownField(
-          headLine: headLine,
-          hintText: 'Select',
-          popUpHeader: header,
-          items: items,
-          controller: controller,
-          enabled: enabled,
-          onTap: onTap,
-          onConfirm: onConfirm,
-          isSearch: true,
+        ] else
+          const SizedBox(height: 12),
+        Expanded(
+          child: SingleChildScrollView(
+            child: Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: List.generate(items.length, (index) {
+                final item = items[index];
+                return SelectionCard(
+                  buttonStyle: item.isSelected
+                      ? SelectionStyle.selectedCheckbox
+                      : SelectionStyle.unSelectedCheckbox,
+                  onTap: () => onTap(index),
+                  isSelected: item.isSelected,
+                  title: item.name,
+                  isExpand: true,
+                );
+              }),
+            ),
+          ),
         ),
       ],
     );
@@ -409,11 +374,6 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
         setState(() => _step = ContactFilterStep.contactFilterScreen);
       },
     );
-  }
-
-  String _textOrFallback(String value, String fallback) {
-    final text = value.trim();
-    return text.isEmpty ? fallback : text;
   }
 }
 
