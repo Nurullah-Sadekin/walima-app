@@ -129,23 +129,29 @@ class RegistrationProvider extends BaseChangeNotifier {
   bool isLookupDataLoading = false;
   String? lookupDataError;
 
-  List<CountryLocationModel> countryOptions = <CountryLocationModel>[];
   List<ResidencyStatusOptionModel> residencyStatusOptions =
       <ResidencyStatusOptionModel>[];
   List<String> countryDropdownItems = <String>[];
   List<String> cityDropdownItems = <String>[];
   List<String> residencyStatusDropdownItems = <String>[];
   bool isLocationDataLoading = false;
+  bool isCountryLoading = false;
+  bool isCountryLoadingMore = false;
   bool isCityLoading = false;
   bool isCityLoadingMore = false;
+  bool hasMoreCountries = false;
   bool hasMoreCities = false;
   String? locationDataError;
+  int _countryPage = 1;
   int _cityPage = 1;
+  String _countrySearchQuery = '';
   String? _selectedCityCountry;
   String _citySearchQuery = '';
 
+  static const int _countryPageSize = 20;
   static const int _cityPageSize = 20;
 
+  String get countrySearchQuery => _countrySearchQuery;
   String get citySearchQuery => _citySearchQuery;
 
   UploadMediaData? uploadedProfileMedia;
@@ -472,7 +478,14 @@ class RegistrationProvider extends BaseChangeNotifier {
       controller.clear();
     }
     communityDropdownItems = <String>[];
+    countryDropdownItems = <String>[];
     cityDropdownItems = <String>[];
+    _countrySearchQuery = '';
+    _citySearchQuery = '';
+    _countryPage = 1;
+    _cityPage = 1;
+    hasMoreCountries = false;
+    hasMoreCities = false;
   }
 
   void _resetAllSelections() {
@@ -781,7 +794,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   Future<void> loadLocationData() async {
     if (isLocationDataLoading) return;
 
-    if (countryOptions.isNotEmpty && residencyStatusOptions.isNotEmpty) {
+    if (residencyStatusOptions.isNotEmpty) {
       await _syncCityOptionsFromSelectedCountry(notify: false, reset: true);
       notifyListeners();
       return;
@@ -792,12 +805,9 @@ class RegistrationProvider extends BaseChangeNotifier {
     notifyListeners();
 
     try {
-      countryOptions = await _locationDataRepository.getCountries();
       residencyStatusOptions =
           await _locationDataRepository.getResidencyStatuses();
 
-      countryDropdownItems =
-          countryOptions.map((item) => item.name).toList(growable: false);
       residencyStatusDropdownItems = residencyStatusOptions
           .map((item) => item.name)
           .toList(growable: false);
@@ -817,6 +827,7 @@ class RegistrationProvider extends BaseChangeNotifier {
 
     final previousValue = livingInController.text;
     livingInController.text = selectedValue;
+    _countrySearchQuery = '';
     _citySearchQuery = '';
 
     if (previousValue.toLowerCase() != selectedValue.toLowerCase()) {
@@ -847,6 +858,20 @@ class RegistrationProvider extends BaseChangeNotifier {
     await _syncCityOptionsFromSelectedCountry(reset: reset);
   }
 
+  Future<void> loadCountryData({bool reset = false}) async {
+    await _syncCountryOptions(reset: reset);
+  }
+
+  Future<void> setCountrySearchQuery(String value) async {
+    final normalized = value.trim();
+    if (_countrySearchQuery == normalized) {
+      return;
+    }
+
+    _countrySearchQuery = normalized;
+    await _syncCountryOptions(reset: true);
+  }
+
   Future<void> setCitySearchQuery(String value) async {
     final normalized = value.trim();
     if (_citySearchQuery == normalized) {
@@ -857,9 +882,70 @@ class RegistrationProvider extends BaseChangeNotifier {
     await _syncCityOptionsFromSelectedCountry(reset: true);
   }
 
+  Future<void> loadMoreCountries() async {
+    if (!hasMoreCountries || isCountryLoading || isCountryLoadingMore) return;
+    await _syncCountryOptions(reset: false);
+  }
+
   Future<void> loadMoreCitiesForSelectedCountry() async {
     if (!hasMoreCities || isCityLoading || isCityLoadingMore) return;
     await _syncCityOptionsFromSelectedCountry(reset: false);
+  }
+
+  Future<void> _syncCountryOptions({
+    bool notify = true,
+    bool reset = true,
+  }) async {
+    try {
+      if (reset) {
+        _countryPage = 1;
+        hasMoreCountries = true;
+        countryDropdownItems = <String>[];
+        isCountryLoading = true;
+        isCountryLoadingMore = false;
+      } else {
+        isCountryLoadingMore = true;
+      }
+
+      if (notify) {
+        notifyListeners();
+      }
+
+      final result = await _locationDataRepository.getCountriesPage(
+        page: _countryPage,
+        size: _countryPageSize,
+        keyword: _countrySearchQuery,
+      );
+
+      final merged =
+          reset ? <String>[] : List<String>.from(countryDropdownItems);
+      for (final country in result.items) {
+        if (!merged.any(
+          (item) => item.toLowerCase() == country.name.toLowerCase(),
+        )) {
+          merged.add(country.name);
+        }
+      }
+
+      countryDropdownItems = merged;
+      hasMoreCountries =
+          result.hasNextPage && result.items.length >= _countryPageSize;
+      if (hasMoreCountries) {
+        _countryPage++;
+      }
+      locationDataError = null;
+    } catch (e) {
+      countryDropdownItems = <String>[];
+      hasMoreCountries = false;
+      locationDataError = e.toString();
+    } finally {
+      isCountryLoading = false;
+      isCountryLoadingMore = false;
+    }
+
+    if (notify) {
+      notifyListeners();
+    }
   }
 
   Future<void> _syncCityOptionsFromSelectedCountry({
@@ -878,33 +964,12 @@ class RegistrationProvider extends BaseChangeNotifier {
       return;
     }
 
-    if (countryOptions.isEmpty) {
-      hasMoreCities = false;
-      if (notify) {
-        notifyListeners();
-      }
-      return;
-    }
-
-    final matchedCountry = _findCountryOption(selectedCountry);
-    if (matchedCountry == null) {
-      cityDropdownItems = <String>[];
-      hasMoreCities = false;
-      _selectedCityCountry = null;
-      _cityPage = 1;
-      if (notify) {
-        notifyListeners();
-      }
-      return;
-    }
-
     try {
       final shouldReset = reset ||
-          _selectedCityCountry?.toLowerCase() !=
-              matchedCountry.name.toLowerCase();
+          _selectedCityCountry?.toLowerCase() != selectedCountry.toLowerCase();
 
       if (shouldReset) {
-        _selectedCityCountry = matchedCountry.name;
+        _selectedCityCountry = selectedCountry;
         _cityPage = 1;
         hasMoreCities = true;
         cityDropdownItems = <String>[];
@@ -919,14 +984,14 @@ class RegistrationProvider extends BaseChangeNotifier {
       }
 
       final result = await _locationDataRepository.getCitiesByCountryPage(
-        country: matchedCountry.name,
+        country: selectedCountry,
         page: _cityPage,
         size: _cityPageSize,
         keyword: _citySearchQuery,
       );
 
       if (_selectedCityCountry?.toLowerCase() !=
-          matchedCountry.name.toLowerCase()) {
+          selectedCountry.toLowerCase()) {
         return;
       }
 
@@ -968,16 +1033,6 @@ class RegistrationProvider extends BaseChangeNotifier {
     if (notify) {
       notifyListeners();
     }
-  }
-
-  CountryLocationModel? _findCountryOption(String country) {
-    final normalized = country.trim().toLowerCase();
-    for (final option in countryOptions) {
-      if (option.name.toLowerCase() == normalized) {
-        return option;
-      }
-    }
-    return null;
   }
 
   void selectedProfileFor(int index) {
@@ -1850,10 +1905,13 @@ class RegistrationProvider extends BaseChangeNotifier {
     final selectedCountry = livingInController.text.trim();
     if (selectedCountry.isEmpty) return '';
 
-    final matchedCountry = _findCountryOption(selectedCountry);
-    if (matchedCountry != null && matchedCountry.code2.trim().isNotEmpty) {
-      return matchedCountry.code2.trim().toUpperCase();
-    }
+    try {
+      final parsedCountry = Country.parse(selectedCountry);
+      final countryCode = parsedCountry.countryCode.trim();
+      if (countryCode.isNotEmpty) {
+        return countryCode.toUpperCase();
+      }
+    } catch (_) {}
 
     return selectedCountry;
   }

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/config/text_responsive.dart';
+import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
+import 'package:flutter_boilerplate/core/global/components/paginated_search_picker_sheet.dart';
+import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
@@ -104,22 +108,26 @@ class _YourRegionState extends ConsumerState<YourReligion> {
                 items: provider.communityDropdownItems,
                 controller: provider.communityController,
                 onTap: provider.loadLocationData,
-                onConfirm: (value) => provider.onCommunitySelected(value?.toString()),
+                onConfirm: (value) =>
+                    provider.onCommunitySelected(value?.toString()),
                 isSearch: true,
               ),
         provider.religionController.text.isEmpty ||
                 provider.communityController.text.isEmpty
             ? const SizedBox.shrink()
-            : DropDownField(
+            : PrimaryTextField(
                 headLine: 'Living In',
                 hintText: 'Select',
-                popUpHeader: 'Select Living In',
-                items: provider.countryDropdownItems,
                 controller: provider.livingInController,
-                onTap: provider.loadLocationData,
-                onConfirm: (value) =>
-                    provider.onLivingInSelected(value?.toString()),
-                isSearch: true,
+                errorText: '',
+                noPrefix: true,
+                readOnly: true,
+                onTap: _openCountryPicker,
+                suffix: Icon(
+                  Icons.keyboard_arrow_down_outlined,
+                  size: TextSize.font20(context),
+                  color: AppColors.grey,
+                ),
               ),
       ],
     );
@@ -142,5 +150,34 @@ class _YourRegionState extends ConsumerState<YourReligion> {
         provider.setSelectedCountryCode(context);
       },
     );
+  }
+
+  Future<void> _openCountryPicker() async {
+    await provider.loadCountryData(
+        reset: provider.countryDropdownItems.isEmpty);
+    if (!mounted) {
+      return;
+    }
+
+    final selectedCountry = await showPaginatedSearchPickerSheet(
+      context: context,
+      title: 'Select Living In',
+      searchHintText: 'Search country',
+      items: provider.countryDropdownItems,
+      isInitialLoading:
+          provider.isCountryLoading && provider.countryDropdownItems.isEmpty,
+      isLoadingMore: provider.isCountryLoadingMore,
+      hasMoreItems: provider.hasMoreCountries,
+      initialQuery: provider.countrySearchQuery,
+      emptyStateText: 'No countries found',
+      onSearchChanged: provider.setCountrySearchQuery,
+      onLoadMore: provider.loadMoreCountries,
+    );
+
+    if (!mounted || selectedCountry == null || selectedCountry.trim().isEmpty) {
+      return;
+    }
+
+    provider.onLivingInSelected(selectedCountry);
   }
 }

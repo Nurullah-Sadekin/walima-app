@@ -116,3 +116,13 @@ class PaginatedCityResult {
   final List<String> items;
   final bool hasNextPage;
 }
+
+class PaginatedCountryResult {
+  const PaginatedCountryResult({
+    required this.items,
+    required this.hasNextPage,
+  });
+
+  final List<CountryLocationModel> items;
+  final bool hasNextPage;
+}

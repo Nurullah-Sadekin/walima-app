@@ -3,6 +3,12 @@ import 'package:flutter_boilerplate/features/registration/domain/location_data_m
 abstract class LocationDataRepository {
   Future<List<CountryLocationModel>> getCountries();
 
+  Future<PaginatedCountryResult> getCountriesPage({
+    required int page,
+    int size = 20,
+    String keyword = '',
+  });
+
   Future<List<String>> getCountryNames();
 
   Future<List<String>> getCitiesByCountry({

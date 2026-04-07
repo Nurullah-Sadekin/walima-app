@@ -9,11 +9,13 @@ import 'package:flutter_boilerplate/features/registration/domain/repository/loca
 class LocationDataRepositoryImpl implements LocationDataRepository {
   static const String _residencyAssetPath =
       'lib/features/registration/domain/json/residency_status_options.json';
-  static const int _pageSize = 1000;
+  static const int _pageSize = 20;
   static const int _cityPageSize = 100;
 
   final DioClient _dioClient = DioClient();
   List<CountryLocationModel>? _cachedCountries;
+  final Map<String, Map<int, PaginatedCountryResult>> _cachedCountryPages =
+      <String, Map<int, PaginatedCountryResult>>{};
   final Map<String, List<String>> _cachedCitiesByCountry =
       <String, List<String>>{};
   final Map<String, Map<int, PaginatedCityResult>> _cachedCityPagesByCountry =
@@ -116,6 +118,58 @@ class LocationDataRepositoryImpl implements LocationDataRepository {
 
     _cachedCountries = countries;
     return _cachedCountries!;
+  }
+
+  @override
+  Future<PaginatedCountryResult> getCountriesPage({
+    required int page,
+    int size = _pageSize,
+    String keyword = '',
+  }) async {
+    final normalizedKeyword = keyword.trim();
+    final cacheKey = normalizedKeyword.toLowerCase();
+    final cachedPages = _cachedCountryPages[cacheKey];
+    final cachedPage = cachedPages?[page];
+    if (cachedPage != null) {
+      return cachedPage;
+    }
+
+    final response = await _dioClient.get(
+      AppUrls.getAllCountry,
+      queryParameters: <String, dynamic>{
+        'page': page,
+        'size': size,
+        'sortBy': 'id',
+        'sortOrder': 'ASC',
+        if (normalizedKeyword.isNotEmpty) 'keyword': normalizedKeyword,
+      },
+      isTokenRequired: true,
+    );
+
+    if (!response.isSuccess) {
+      throw Exception(response.message);
+    }
+
+    final countries = <CountryLocationModel>[];
+    final pageItems = _extractPaginatedData(response.data);
+    for (final item in pageItems) {
+      if (item is Map<String, dynamic>) {
+        countries.add(CountryLocationModel.fromJson(item));
+      } else if (item is Map) {
+        countries.add(
+          CountryLocationModel.fromJson(Map<String, dynamic>.from(item)),
+        );
+      }
+    }
+
+    final result = PaginatedCountryResult(
+      items: countries,
+      hasNextPage: _extractHasNextPage(response.data),
+    );
+
+    _cachedCountryPages[cacheKey] ??= <int, PaginatedCountryResult>{};
+    _cachedCountryPages[cacheKey]![page] = result;
+    return result;
   }
 
   @override
