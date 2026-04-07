@@ -4,11 +4,12 @@ import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
+import 'package:flutter_boilerplate/core/global/components/empty_state.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/providers/inbox_providers.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/filter_widget.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/tab_bar_widget.dart';
 
 class InboxMoreTab extends ConsumerStatefulWidget {
   const InboxMoreTab({super.key});
@@ -17,55 +18,93 @@ class InboxMoreTab extends ConsumerStatefulWidget {
   ConsumerState<InboxMoreTab> createState() => _InboxMoreTabState();
 }
 
-class _InboxMoreTabState extends ConsumerState<InboxMoreTab> {
-  @override
-  Widget build(BuildContext context) {
-    final provider = ref.watch(inboxProvider);
+class _InboxMoreTabState extends ConsumerState<InboxMoreTab>
+    with SingleTickerProviderStateMixin {
+  late final TabController _subTabController;
+  final _subTabs = const ['Blocked', 'Deleted'];
 
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          _header(),
-          const SizedBox(height: 10),
-          _body(provider),
-        ],
-      ),
-    );
+  @override
+  void initState() {
+    super.initState();
+    _subTabController = TabController(length: _subTabs.length, vsync: this)
+      ..addListener(_handleSubTabChange);
   }
 
+  void _handleSubTabChange() {
+    if (!mounted || _subTabController.indexIsChanging) return;
+    setState(() {});
+  }
 
-  Widget _body(InboxProvider provider) {
-    return const Column(
+  @override
+  void dispose() {
+    _subTabController.removeListener(_handleSubTabChange);
+    _subTabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ref.watch(inboxProvider);
+
+    return Column(
       children: [
-        InboxCard(
-          imagePath: AppImages.demoProfile2,
-          name: 'Tasnova Ahmed',
-          age: '28 Yr',
-          height: '5\' 3\'" ',
-          day: 'Today',
-          location: 'Gulshan, Dhaka, BD',
-          subtitle: 'Supper Contact',
-          subtitleColor: AppColors.primary,
-          isVerified: true,
-          infoBottomMessage: 'Your request is accepted. You can chat now.',
-
+        const SizedBox(height: 10),
+        _header(),
+        const SizedBox(height: 10),
+        Expanded(
+          child: TabBarView(
+            controller: _subTabController,
+            physics: const NeverScrollableScrollPhysics(),
+            children: const [
+              _MoreTabPlaceholder(
+                title: 'No Blocked Requests',
+                subtitle: 'Blocked items will appear here',
+              ),
+              _MoreTabPlaceholder(
+                title: 'No Deleted Requests',
+                subtitle: 'Deleted items will appear here',
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
 
-  Widget _header(){
+  Widget _buildSubTabs() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        spacing: 8,
+        children: List.generate(_subTabs.length, (index) {
+          final isSelected = _subTabController.index == index;
+          return TabBarWidget(
+            text: _subTabs[index],
+            isSelected: isSelected,
+            backgroundColor: AppColors.transparent,
+            selectedBackgroundColor: AppColors.primaryVariant,
+            selectedTextColor: AppColors.primary,
+            borderColor: isSelected ? AppColors.primary : AppColors.greyLight,
+            selectedBorderColor: AppColors.primary,
+            isBorder: true,
+            padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 4),
+            borderRadius: 8,
+            fontSize: TextSize.font12(context),
+            onTap: () => _subTabController.animateTo(index),
+          );
+        }),
+      ),
+    );
+  }
+
+  Widget _header() {
+    final selectedTab = _subTabs[_subTabController.index];
+
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          'All Requests (26)',
-          style: TextStyle(
-            color: AppColors.textSecondaryLight,
-            fontSize: TextSize.font12(context),
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        _buildSubTabs(),
         InkWell(
           onTap: () async {
             await BottomSheetUtils.open(
@@ -92,7 +131,7 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab> {
               color: AppColors.textSecondaryLight,
             ),
           ),
-        )
+        ),
       ],
     );
   }
@@ -109,5 +148,29 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab> {
       ),
     );
   }
+}
 
+class _MoreTabPlaceholder extends StatelessWidget {
+  const _MoreTabPlaceholder({
+    required this.title,
+    required this.subtitle,
+  });
+
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 32),
+        child: EmptyStateWidget(
+          imagePath: AppImages.addTeam,
+          title: title,
+          subtitle: subtitle,
+          buttonText: 'Refresh',
+        ),
+      ),
+    );
+  }
 }

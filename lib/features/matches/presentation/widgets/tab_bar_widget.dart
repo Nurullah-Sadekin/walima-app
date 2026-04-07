@@ -4,7 +4,6 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 
 class TabBarWidget extends StatelessWidget {
-
   const TabBarWidget({
     super.key,
     required this.text,
@@ -22,6 +21,7 @@ class TabBarWidget extends StatelessWidget {
     this.selectedBorderColor,
     this.prefixImagePath,
     this.count,
+    this.isBorder = false,
   });
 
   final String text;
@@ -39,6 +39,7 @@ class TabBarWidget extends StatelessWidget {
   final Color? selectedBorderColor;
   final String? prefixImagePath;
   final double? count;
+  final bool isBorder;
 
   @override
   Widget build(BuildContext context) {
@@ -56,9 +57,10 @@ class TabBarWidget extends StatelessWidget {
 
     final effectiveBorderWidth = borderWidth ?? 1.0;
     final effectiveBorderRadius = borderRadius ?? 6.0;
-    final effectivePadding = padding ?? const EdgeInsets.symmetric(horizontal: 10, vertical: 6);
+    final effectivePadding =
+        padding ?? const EdgeInsets.symmetric(horizontal: 10, vertical: 6);
     final effectiveFontSize = fontSize ?? TextSize.font14(context);
-    const effectiveFontWeight =  FontWeight.w500;
+    const effectiveFontWeight = FontWeight.w500;
 
     return GestureDetector(
       onTap: onTap,
@@ -67,10 +69,12 @@ class TabBarWidget extends StatelessWidget {
         decoration: BoxDecoration(
           color: effectiveBackgroundColor,
           borderRadius: BorderRadius.circular(effectiveBorderRadius),
-          border: isSelected ? const Border() :Border.all(
-            color: effectiveBorderColor,
-            width: effectiveBorderWidth,
-          ),
+          border: isSelected
+                  ? isBorder ? Border.all(color: effectiveBorderColor, width: 1) : const Border()
+                  : Border.all(
+                      color: effectiveBorderColor,
+                      width: effectiveBorderWidth,
+                    ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -94,7 +98,7 @@ class TabBarWidget extends StatelessWidget {
               ),
             ),
             if (count != null) ...[
-             Container(
+              Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: isSelected ? AppColors.white : AppColors.primary,
