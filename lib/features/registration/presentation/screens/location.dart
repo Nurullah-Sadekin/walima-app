@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
+import 'package:flutter_boilerplate/core/global/components/paginated_search_picker_sheet.dart';
+import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
@@ -44,12 +47,15 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(locationScreenProvider);
     return TransparentLoading(
-      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor || provider.isLocationDataLoading,
+      isLoading:
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor ||
+              provider.isLocationDataLoading,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: screenProvider.screenStates == RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates ==
+                  RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
@@ -80,21 +86,26 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
   }
 
   Widget dataInsertField() {
-    List<String> cityItems = provider.cityDropdownItems;
     return Column(
       spacing: 20,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        DropDownField(
+        PrimaryTextField(
           headLine: 'City',
-          hintText: provider.livingInController.text.isEmpty ? 'Select Living In first' : 'Select',
-          popUpHeader: 'Select City',
-          items: cityItems,
+          hintText: provider.livingInController.text.isEmpty
+              ? 'Select Living In first'
+              : 'Select',
           controller: provider.cityController,
+          errorText: '',
           enabled: provider.livingInController.text.isNotEmpty,
-          // onTap: provider.loadLocationData,
-          onConfirm: (value) => provider.onCitySelected(value?.toString()),
-          isSearch: true,
+          noPrefix: true,
+          readOnly: true,
+          onTap: _openCityPicker,
+          suffix: Icon(
+            Icons.keyboard_arrow_down_outlined,
+            size: TextSize.font20(context),
+            color: AppColors.grey,
+          ),
         ),
         Column(
           spacing: 10,
@@ -110,7 +121,8 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
             Wrap(
               spacing: 10,
               runSpacing: 10,
-              children: List.generate(provider.isWithFamilyDataList.length, (index) {
+              children:
+                  List.generate(provider.isWithFamilyDataList.length, (index) {
                 final isWithFamily = provider.isWithFamilyDataList[index];
 
                 double screenWidth = MediaQuery.of(context).size.width - 40;
@@ -119,7 +131,9 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
                 return SizedBox(
                   width: itemWidth,
                   child: SelectionCard(
-                    buttonStyle: isWithFamily.isSelected ? SelectionStyle.selectedRadio : SelectionStyle.unSelectedRadio,
+                    buttonStyle: isWithFamily.isSelected
+                        ? SelectionStyle.selectedRadio
+                        : SelectionStyle.unSelectedRadio,
                     onTap: () {
                       provider.selectedIsWithFamily(index);
                     },
@@ -138,7 +152,8 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
           items: provider.residencyStatusDropdownItems,
           controller: provider.residencyStatusController,
           // onTap: provider.loadLocationData,
-          onConfirm: (value) => provider.onResidencyStatusSelected(value?.toString()),
+          onConfirm: (value) =>
+              provider.onResidencyStatusSelected(value?.toString()),
           isSearch: true,
         ),
       ],
@@ -147,17 +162,52 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle:
-          provider.cityController.text.isNotEmpty && provider.residencyStatusController.text.isNotEmpty && provider.selectedIsWithFamilyStatus != null
-              ? ButtonsStyle.activePrimaryButton
-              : ButtonsStyle.disableButton,
+      buttonStyle: provider.cityController.text.isNotEmpty &&
+              provider.residencyStatusController.text.isNotEmpty &&
+              provider.selectedIsWithFamilyStatus != null
+          ? ButtonsStyle.activePrimaryButton
+          : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
-        if (provider.cityController.text.isEmpty || provider.residencyStatusController.text.isEmpty || provider.selectedIsWithFamilyStatus == null) {
+        if (provider.cityController.text.isEmpty ||
+            provider.residencyStatusController.text.isEmpty ||
+            provider.selectedIsWithFamilyStatus == null) {
           return;
         }
         context.push(Paths.maritalStatus);
       },
     );
+  }
+
+  Future<void> _openCityPicker() async {
+    if (provider.livingInController.text.isEmpty) {
+      return;
+    }
+
+    await provider.loadCityData(reset: provider.cityDropdownItems.isEmpty);
+    if (!mounted) {
+      return;
+    }
+
+    final selectedCity = await showPaginatedSearchPickerSheet(
+      context: context,
+      title: 'Select City',
+      searchHintText: 'Search city',
+      items: provider.cityDropdownItems,
+      isInitialLoading:
+          provider.isCityLoading && provider.cityDropdownItems.isEmpty,
+      isLoadingMore: provider.isCityLoadingMore,
+      hasMoreItems: provider.hasMoreCities,
+      initialQuery: provider.citySearchQuery,
+      emptyStateText: 'No cities found',
+      onSearchChanged: provider.setCitySearchQuery,
+      onLoadMore: provider.loadMoreCitiesForSelectedCountry,
+    );
+
+    if (!mounted || selectedCity == null || selectedCity.trim().isEmpty) {
+      return;
+    }
+
+    provider.onCitySelected(selectedCity);
   }
 }

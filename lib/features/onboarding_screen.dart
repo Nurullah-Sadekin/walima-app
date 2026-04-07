@@ -27,14 +27,12 @@ class OnboardingScreen extends StatelessWidget {
             height: double.infinity,
             width: double.infinity,
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 40),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 40),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(
-                        top: MediaQuery.of(context).size.height * 0.15),
+                    padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.15),
                     child: const ShowImage(
                       imagePath: 'assets/svgs/walima.svg',
                       width: 270,
@@ -52,59 +50,40 @@ class OnboardingScreen extends StatelessWidget {
                         onTap: () {
                           context.push(Paths.isProfileFor);
                         },
-                        title: 'Sign Up with Email',
+                        title: 'Create an account',
                       ),
                       const SizedBox(height: 16),
-                      PrimaryButtons(
-                        buttonStyle: ButtonsStyle.authButton,
-                        svgIconPath: AppImages.logoutSvgIcon,
-                        borderColor: Colors.white,
-                        bgColor: Colors.black12,
-                        onTap: () {
-                          // if (kDebugMode) {
-                          //   context.pushNamed(
-                          //     Routes.emailPhone,
-                          //     queryParameters: const {
-                          //       'fromScreen': 'debugOtpSignup',
-                          //     },
-                          //     extra: 'debugOtpSignup',
-                          //   );
-                          //   return;
-                          // }
-                          context.push(Paths.isProfileFor);
-                        },
-                        title: 'Sign Up with OTP',
-                      ),
+                      // PrimaryButtons(
+                      //   buttonStyle: ButtonsStyle.authButton,
+                      //   svgIconPath: AppImages.logoutSvgIcon,
+                      //   borderColor: Colors.white,
+                      //   bgColor: Colors.black12,
+                      //   onTap: () {
+                      //     context.push(Paths.isProfileFor);
+                      //   },
+                      //   title: 'Sign Up',
+                      // ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 20.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text('Already have an account?',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: TextSize.font16(context),
-                                    fontWeight: FontWeight.w500)),
+                                style: TextStyle(color: Colors.white, fontSize: TextSize.font16(context), fontWeight: FontWeight.w500)),
                             Container(
                               margin: const EdgeInsets.only(left: 10),
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 4, horizontal: 8),
+                              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                    color: Colors.white.withOpacity(0.3),
-                                    width: 1),
+                                border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
                               ),
                               child: GestureDetector(
                                 onTap: () {
                                   context.push(Paths.login);
                                 },
                                 child: Text('Login',
-                                    style: TextStyle(
-                                        color: AppColors.white,
-                                        fontSize: TextSize.font16(context),
-                                        fontWeight: FontWeight.w500)),
+                                    style: TextStyle(color: AppColors.white, fontSize: TextSize.font16(context), fontWeight: FontWeight.w500)),
                               ),
                             )
                           ],

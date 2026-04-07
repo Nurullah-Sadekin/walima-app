@@ -93,8 +93,10 @@ class RegistrationProvider extends BaseChangeNotifier {
   List<SingleStringModel> otherInterestsItemList = <SingleStringModel>[];
   List<SingleStringModel> foodCuisineItemList = <SingleStringModel>[];
   List<SingleStringModel> travelLeisureItemList = <SingleStringModel>[];
-  List<SingleStringModel> motherDetailsItemList = motherDetailsItemListDataInserted;
-  List<SingleStringModel> fatherDetailsItemList = fatherDetailsItemListDataInserted;
+  List<SingleStringModel> motherDetailsItemList =
+      motherDetailsItemListDataInserted;
+  List<SingleStringModel> fatherDetailsItemList =
+      fatherDetailsItemListDataInserted;
   List<SingleStringModel> siblingCountList = siblingCountListDataInserted;
   List<SingleStringModel> verificationList = verificationTypeList;
   static const int hobbiesSelectionMax = 5;
@@ -134,7 +136,17 @@ class RegistrationProvider extends BaseChangeNotifier {
   List<String> cityDropdownItems = <String>[];
   List<String> residencyStatusDropdownItems = <String>[];
   bool isLocationDataLoading = false;
+  bool isCityLoading = false;
+  bool isCityLoadingMore = false;
+  bool hasMoreCities = false;
   String? locationDataError;
+  int _cityPage = 1;
+  String? _selectedCityCountry;
+  String _citySearchQuery = '';
+
+  static const int _cityPageSize = 20;
+
+  String get citySearchQuery => _citySearchQuery;
 
   UploadMediaData? uploadedProfileMedia;
   String profileImageUploadErrorMessage = '';
@@ -770,7 +782,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     if (isLocationDataLoading) return;
 
     if (countryOptions.isNotEmpty && residencyStatusOptions.isNotEmpty) {
-      await _syncCityOptionsFromSelectedCountry(notify: false);
+      await _syncCityOptionsFromSelectedCountry(notify: false, reset: true);
       notifyListeners();
       return;
     }
@@ -790,7 +802,7 @@ class RegistrationProvider extends BaseChangeNotifier {
           .map((item) => item.name)
           .toList(growable: false);
 
-      await _syncCityOptionsFromSelectedCountry(notify: false);
+      await _syncCityOptionsFromSelectedCountry(notify: false, reset: true);
     } catch (e) {
       locationDataError = e.toString();
     } finally {
@@ -805,12 +817,13 @@ class RegistrationProvider extends BaseChangeNotifier {
 
     final previousValue = livingInController.text;
     livingInController.text = selectedValue;
+    _citySearchQuery = '';
 
     if (previousValue.toLowerCase() != selectedValue.toLowerCase()) {
       cityController.clear();
     }
 
-    unawaited(_syncCityOptionsFromSelectedCountry());
+    unawaited(_syncCityOptionsFromSelectedCountry(reset: true));
     _notifyAndPersist();
   }
 
@@ -830,10 +843,35 @@ class RegistrationProvider extends BaseChangeNotifier {
     _notifyAndPersist();
   }
 
-  Future<void> _syncCityOptionsFromSelectedCountry({bool notify = true}) async {
+  Future<void> loadCityData({bool reset = false}) async {
+    await _syncCityOptionsFromSelectedCountry(reset: reset);
+  }
+
+  Future<void> setCitySearchQuery(String value) async {
+    final normalized = value.trim();
+    if (_citySearchQuery == normalized) {
+      return;
+    }
+
+    _citySearchQuery = normalized;
+    await _syncCityOptionsFromSelectedCountry(reset: true);
+  }
+
+  Future<void> loadMoreCitiesForSelectedCountry() async {
+    if (!hasMoreCities || isCityLoading || isCityLoadingMore) return;
+    await _syncCityOptionsFromSelectedCountry(reset: false);
+  }
+
+  Future<void> _syncCityOptionsFromSelectedCountry({
+    bool notify = true,
+    bool reset = true,
+  }) async {
     final selectedCountry = livingInController.text.trim();
     if (selectedCountry.isEmpty) {
       cityDropdownItems = <String>[];
+      hasMoreCities = false;
+      _selectedCityCountry = null;
+      _cityPage = 1;
       if (notify) {
         notifyListeners();
       }
@@ -841,6 +879,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     }
 
     if (countryOptions.isEmpty) {
+      hasMoreCities = false;
       if (notify) {
         notifyListeners();
       }
@@ -850,6 +889,9 @@ class RegistrationProvider extends BaseChangeNotifier {
     final matchedCountry = _findCountryOption(selectedCountry);
     if (matchedCountry == null) {
       cityDropdownItems = <String>[];
+      hasMoreCities = false;
+      _selectedCityCountry = null;
+      _cityPage = 1;
       if (notify) {
         notifyListeners();
       }
@@ -857,14 +899,61 @@ class RegistrationProvider extends BaseChangeNotifier {
     }
 
     try {
-      cityDropdownItems = await _locationDataRepository.getCitiesByCountry(
+      final shouldReset = reset ||
+          _selectedCityCountry?.toLowerCase() !=
+              matchedCountry.name.toLowerCase();
+
+      if (shouldReset) {
+        _selectedCityCountry = matchedCountry.name;
+        _cityPage = 1;
+        hasMoreCities = true;
+        cityDropdownItems = <String>[];
+        isCityLoading = true;
+        isCityLoadingMore = false;
+      } else {
+        isCityLoadingMore = true;
+      }
+
+      if (notify) {
+        notifyListeners();
+      }
+
+      final result = await _locationDataRepository.getCitiesByCountryPage(
         country: matchedCountry.name,
+        page: _cityPage,
+        size: _cityPageSize,
+        keyword: _citySearchQuery,
       );
+
+      if (_selectedCityCountry?.toLowerCase() !=
+          matchedCountry.name.toLowerCase()) {
+        return;
+      }
+
+      final merged =
+          shouldReset ? <String>[] : List<String>.from(cityDropdownItems);
+      for (final city in result.items) {
+        if (!merged.any((item) => item.toLowerCase() == city.toLowerCase())) {
+          merged.add(city);
+        }
+      }
+
+      cityDropdownItems = merged;
+      hasMoreCities =
+          result.hasNextPage && result.items.length >= _cityPageSize;
+      if (hasMoreCities) {
+        _cityPage++;
+      }
       locationDataError = null;
     } catch (e) {
       cityDropdownItems = <String>[];
+      hasMoreCities = false;
       locationDataError = e.toString();
+    } finally {
+      isCityLoading = false;
+      isCityLoadingMore = false;
     }
+
     if (cityController.text.isNotEmpty) {
       final selectedCity = cityController.text.trim().toLowerCase();
       final exists = cityDropdownItems.any(

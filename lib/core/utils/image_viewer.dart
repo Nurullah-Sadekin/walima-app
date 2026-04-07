@@ -5,7 +5,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ShowImage extends StatefulWidget {
-
   ///a [ShowImage] it can be used for showing any type of images
   /// it will shows the placeholder image if image is not found on network image
   const ShowImage({
@@ -49,9 +48,9 @@ class _ShowImageState extends State<ShowImage> {
       color: Colors.transparent,
       child: widget.alignment != null
           ? Align(
-        alignment: widget.alignment!,
-        child: _buildWidget(),
-      )
+              alignment: widget.alignment!,
+              child: _buildWidget(),
+            )
           : _buildWidget(),
     );
   }
@@ -123,7 +122,7 @@ class _ShowImageState extends State<ShowImage> {
           return ClipRRect(
             borderRadius: const BorderRadius.all(Radius.circular(2.5)),
             child: Image.network(
-              widget.imagePath??'',
+              widget.imagePath ?? '',
               height: widget.height,
               width: widget.width,
               fit: widget.fit ?? BoxFit.cover,
@@ -149,14 +148,14 @@ class _ShowImageState extends State<ShowImage> {
                 return Center(
                   child: widget.errorImagePath != null
                       ? Image.asset(
-                    widget.errorImagePath!,
-                    height: widget.height,
-                    width: widget.width,
-                    fit: widget.fit ?? BoxFit.cover,
-                    // use color + colorBlendMode for tinting
-                    color: widget.color,
-                    colorBlendMode: widget.color != null ? BlendMode.srcIn : BlendMode.srcIn,
-                  )
+                          widget.errorImagePath!,
+                          height: widget.height,
+                          width: widget.width,
+                          fit: widget.fit ?? BoxFit.cover,
+                          // use color + colorBlendMode for tinting
+                          color: widget.color,
+                          colorBlendMode: widget.color != null ? BlendMode.srcIn : BlendMode.srcIn,
+                        )
                       : const Icon(Icons.production_quantity_limits),
                 );
               },
@@ -177,17 +176,17 @@ class _ShowImageState extends State<ShowImage> {
     } else {
       return widget.placeHolderWidget == null
           ? Image.asset(
-        widget.placeHolder,
-        height: widget.height,
-        width: widget.width,
-        fit: widget.fit ?? BoxFit.cover,
-        // use color + colorBlendMode for tinting
-        color: widget.color,
-        colorBlendMode: widget.color != null ? BlendMode.srcIn : BlendMode.srcIn,
-        errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-          return ShowImage(imagePath: widget.placeHolder, fit: BoxFit.contain, height: 16, width: 16);
-        },
-      )
+              widget.placeHolder,
+              height: widget.height,
+              width: widget.width,
+              fit: widget.fit ?? BoxFit.cover,
+              // use color + colorBlendMode for tinting
+              color: widget.color,
+              colorBlendMode: widget.color != null ? BlendMode.srcIn : BlendMode.srcIn,
+              errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                return ShowImage(imagePath: widget.placeHolder, fit: BoxFit.contain, height: 16, width: 16);
+              },
+            )
           : widget.placeHolderWidget!;
     }
   }

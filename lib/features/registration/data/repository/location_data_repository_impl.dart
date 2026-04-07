@@ -43,11 +43,30 @@ class LocationDataRepositoryImpl implements LocationDataRepository {
     return _asList(response?['data']);
   }
 
-  bool _extractHasNextPage(dynamic payload) {
+  Map<String, dynamic>? _extractPagination(dynamic payload) {
     final root = _asMap(payload);
     final response = _asMap(root?['response']);
-    final pagination = _asMap(response?['pagination']);
-    return pagination?['hasNextPage'] == true;
+
+    return _asMap(response?['pagination']) ??
+        _asMap(response?['meta']) ??
+        _asMap(root?['pagination']) ??
+        _asMap(root?['meta']);
+  }
+
+  bool _extractHasNextPage(dynamic payload) {
+    final pagination = _extractPagination(payload);
+    final rawHasNextPage = pagination?['hasNextPage'];
+    if (rawHasNextPage is bool) {
+      return rawHasNextPage;
+    }
+
+    final currentPage = pagination?['page'] ?? pagination?['currentPage'];
+    final totalPages = pagination?['totalPages'] ?? pagination?['pageCount'];
+    if (currentPage is num && totalPages is num) {
+      return currentPage < totalPages;
+    }
+
+    return false;
   }
 
   @override
@@ -122,6 +141,7 @@ class LocationDataRepositoryImpl implements LocationDataRepository {
     }
 
     final cities = <String>[];
+    final seenCities = <String>{};
     var page = 1;
 
     while (true) {
@@ -131,15 +151,21 @@ class LocationDataRepositoryImpl implements LocationDataRepository {
         size: _cityPageSize,
       );
 
+      var addedNewCity = false;
       for (final cityName in pageResult.items) {
-        if (!cities.any(
-          (item) => item.toLowerCase() == cityName.toLowerCase(),
-        )) {
+        final marker = cityName.toLowerCase();
+        if (seenCities.add(marker)) {
           cities.add(cityName);
+          addedNewCity = true;
         }
       }
 
-      if (!pageResult.hasNextPage || pageResult.items.isEmpty) {
+      final reachedLastPageBySize = pageResult.items.length < _cityPageSize;
+      final shouldStop = pageResult.items.isEmpty ||
+          reachedLastPageBySize ||
+          !pageResult.hasNextPage ||
+          !addedNewCity;
+      if (shouldStop) {
         break;
       }
 
@@ -155,13 +181,16 @@ class LocationDataRepositoryImpl implements LocationDataRepository {
     required String country,
     required int page,
     int size = _cityPageSize,
+    String keyword = '',
   }) async {
     final normalized = country.trim();
     if (normalized.isEmpty) {
       return const PaginatedCityResult(items: <String>[], hasNextPage: false);
     }
 
-    final cacheKey = normalized.toLowerCase();
+    final normalizedKeyword = keyword.trim();
+    final cacheKey =
+        '${normalized.toLowerCase()}|${normalizedKeyword.toLowerCase()}';
     final cachedPages = _cachedCityPagesByCountry[cacheKey];
     final cachedPage = cachedPages?[page];
     if (cachedPage != null) {
@@ -173,7 +202,10 @@ class LocationDataRepositoryImpl implements LocationDataRepository {
       queryParameters: <String, dynamic>{
         'page': page,
         'size': size,
+        'sortBy': 'id',
+        'sortOrder': 'ASC',
         'countries': normalized,
+        if (normalizedKeyword.isNotEmpty) 'keyword': normalizedKeyword,
       },
       isTokenRequired: true,
     );

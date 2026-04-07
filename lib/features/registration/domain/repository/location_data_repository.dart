@@ -14,6 +14,7 @@ abstract class LocationDataRepository {
     required String country,
     required int page,
     int size = 100,
+    String keyword = '',
   });
 
   Future<List<ResidencyStatusOptionModel>> getResidencyStatuses();
