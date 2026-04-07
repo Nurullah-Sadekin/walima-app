@@ -148,26 +148,26 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           ),
 
           ProfileActionTile(
-            iconImagePath: AppImages.verifiedBadgeSvgIcon,
+            iconImagePath: AppImages.verifyIcon,
             iconColor: AppColors.disableDark,
             title: 'Verification Badge',
             onTap: () => setState(() => _step = AccountSettingStep.verificationBadge),
           ),
 
           ProfileActionTile(
-            iconImagePath: AppImages.calendarSvgIcon,
+            iconImagePath: AppImages.calenderTimer,
             title: 'Date of Birth',
             onTap: () => setState(() => _step = AccountSettingStep.dateOfBirth),
           ),
 
           ProfileActionTile(
-            iconImagePath: AppImages.bubbleChatSvgIcon,
+            iconImagePath: AppImages.messages,
             title: 'Message',
             onTap: () => setState(() => _step = AccountSettingStep.message),
           ),
 
           ProfileActionTile(
-            iconImagePath: AppImages.alertSvgIcon,
+            iconImagePath: AppImages.delete,
             title: 'Delete Profile',
             onTap: () => setState(() => _step = AccountSettingStep.deleteProfile),
             // Note: ProfileActionTile might need custom styling for the delete option

@@ -43,6 +43,10 @@ class AppImages {
   static const String unselectedCheckbox = 'assets/svgIcons/unselectedCheckbox.svg';
   static const String selectedCheckbox = 'assets/svgIcons/selectedCheckbox.svg';
   static const String copy = 'assets/svgIcons/copy.svg';
+  static const String delete = 'assets/svgIcons/delete.svg';
+  static const String verifyIcon = 'assets/svgIcons/verifyIcon.svg';
+  static const String calenderTimer = 'assets/svgIcons/calender_timer.svg';
+  static const String messages = 'assets/svgIcons/messages.svg';
 
   // Social media icons
   static const String facebookIcon = 'assets/svgIcons/facebook.svg';
