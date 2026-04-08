@@ -8,11 +8,13 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/inbox/domain/models/menu_item_model.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/providers/inbox_providers.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_card.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/filter_widget.dart';
+import 'package:go_router/go_router.dart';
 
 class InboxSentTab extends ConsumerStatefulWidget {
   const InboxSentTab({super.key});
@@ -29,7 +31,9 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          _header(provider),
+          if (provider.sentConnections != null &&
+              provider.sentConnections!.isNotEmpty)
+            _header(provider),
           const SizedBox(height: 10),
           _body(provider),
         ],
@@ -87,6 +91,7 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
             .where((value) => value.trim().isNotEmpty)
             .join(', ');
         final connectionId = item.connection?.id;
+        final conversationId = item.connection?.conversationId?.toString();
 
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
@@ -132,6 +137,22 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
                 CamelCaseUtils.formatCamelCase(item.connection?.status ?? ''),
             subtitleColor: AppColors.primary,
             isVerified: item.profilePhoto?.isVerified ?? false,
+            onTapWalimaChat: item.id == null
+                ? null
+                : () {
+                    context.pushNamed(
+                      Routes.chatScreen,
+                      extra: {
+                        'conversationId': conversationId,
+                        'participant': {
+                          'userId': item.id,
+                          'displayName': item.displayName,
+                          'profilePictureUrl': item.profilePhoto?.url,
+                          'isOnline': item.isOnline,
+                        },
+                      },
+                    );
+                  },
             middleBottomItemIBgColor: AppColors.warning,
             middleBottomItemIcon: AppImages.notificationSvgIcon,
             middleBottomItemText: 'Remind',
