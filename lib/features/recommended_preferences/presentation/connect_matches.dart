@@ -53,6 +53,7 @@ class _ConnectMatchesState extends ConsumerState<ConnectMatches> {
                   );
                 },
               ),
+              const SizedBox(height: 8),
               Expanded(
                 child: _body(),
               ),

@@ -44,9 +44,7 @@ class RegistrationRepository {
       SignUpRequestBody body,
       {bool skipOtp = false}) async {
     try {
-      // final url = skipOtp ? AppUrls.createProfile : AppUrls.signUpCreateUserProfile;
-      final response = await DioClient()
-          .post(AppUrls.signUpCreateUserProfile, data: body.toJson());
+      final response = await DioClient().post(AppUrls.signUpCreateUserProfile, data: body.toJson());
       return OnboardingResponse.fromJson(response.data);
     } catch (e) {
       final errorMessage = e is DioException

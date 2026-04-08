@@ -2003,6 +2003,12 @@ class RegistrationProvider extends BaseChangeNotifier {
       await _clearRegistrationDraftCacheOnSuccess();
       return true;
     } else {
+      if(context.mounted) {
+        DialogUtils.showErrorDialog(
+          context: context,
+          message: response.message ?? 'Registration failed. Please try again.',
+        );
+      }
       return false;
     }
   }

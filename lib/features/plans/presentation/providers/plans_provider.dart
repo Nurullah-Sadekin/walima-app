@@ -32,7 +32,7 @@ class PlansProvider extends BaseChangeNotifier {
 
   int? get currentPlanRanking => currentSubscription?.plan?.ranking;
 
-  bool get hasCurrentSubscription => currentPlanId?.isNotEmpty == true;
+  bool get hasCurrentSubscription => currentPlanId?.isNotEmpty == true && currentSubscription?.plan?.slug != 'free';
 
   bool get hasResolvedCurrentSubscription => _subscriptionResolved;
 
