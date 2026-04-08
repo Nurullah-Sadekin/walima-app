@@ -130,12 +130,12 @@ class HomeProvider extends BaseChangeNotifier {
       await updateConnectionStatus(context, id ?? '');
     } else {
       if(response.message?.contains('daily_connect')??false){
-        return await DialogUtils.show(
+         await DialogUtils.show(
             context: context,
             child: LimitOver(
               onExtendPlan: (){
-                context.pushNamed(Routes.upgradePackage);
                 context.pop();
+                context.pushNamed(Routes.upgradePackage);
               },
             ),
         );

@@ -66,9 +66,11 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
           onTap: () {
             Navigator.pop(context);
           },
-          child: Icon(Icons.arrow_back_ios,
-              size: TextSize.font16(context),
-              color: AppColors.textSecondaryLight),
+          child: Icon(
+            Icons.arrow_back_ios,
+            size: TextSize.font16(context),
+            color: AppColors.textSecondaryLight,
+          ),
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -111,8 +113,8 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
               controller: provider.profileIdController,
               cursorColor: AppColors.primary, // Optional: set cursor color
             ),
-          )
-        )
+          ),
+        ),
       ],
     );
   }
@@ -145,8 +147,10 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          headLineText('Personalize Your Search',
-              fontSize: TextSize.font16(context)),
+          headLineText(
+            'Personalize Your Search',
+            fontSize: TextSize.font16(context),
+          ),
           SizedBox(height: TextSize.font16(context)),
           headLineText('Age'),
           Row(
@@ -183,7 +187,7 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
                 child: DropDownField(
                   hintText: 'From',
                   popUpHeader: 'Height From',
-                  items: provider.ageRangeDropdownItems,
+                  items: provider.heightRangeDropdownItems,
                   controller: provider.heightFromController,
                   isSearch: true,
                 ),
@@ -192,7 +196,7 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
                 child: DropDownField(
                   hintText: 'To',
                   popUpHeader: 'Height To',
-                  items: provider.ageRangeDropdownItems,
+                  items: provider.heightRangeDropdownItems,
                   controller: provider.heightToController,
                   isSearch: true,
                 ),
@@ -204,7 +208,7 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
           DropDownField(
             hintText: 'Select',
             popUpHeader: 'Marital Status',
-            items: provider.ageRangeDropdownItems,
+            items: provider.maritalStatusDropdownItems,
             controller: provider.maritalStatusController,
             isSearch: true,
           ),
@@ -235,7 +239,7 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
           DropDownField(
             hintText: 'Select',
             popUpHeader: 'Your Religion',
-            items: provider.ageRangeDropdownItems,
+            items: provider.religionDropdownItems,
             controller: provider.religionController,
             isSearch: true,
           ),
@@ -244,7 +248,7 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
           DropDownField(
             hintText: 'Select',
             popUpHeader: 'Community',
-            items: provider.ageRangeDropdownItems,
+            items: provider.communityDropdownItems,
             controller: provider.communityController,
             isSearch: true,
           ),
@@ -253,7 +257,7 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
           DropDownField(
             hintText: 'Select',
             popUpHeader: 'Mother Tongue',
-            items: provider.ageRangeDropdownItems,
+            items: provider.motherTongueDropdownItems,
             controller: provider.motherTongueController,
             isSearch: true,
           ),
@@ -262,7 +266,7 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
           DropDownField(
             hintText: 'Select',
             popUpHeader: 'Country Living In',
-            items: provider.ageRangeDropdownItems,
+            items: provider.countryDropdownItems,
             controller: provider.countryLivingController,
             isSearch: true,
           ),
@@ -280,7 +284,7 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
           DropDownField(
             hintText: 'Select',
             popUpHeader: 'Country Grew Up In',
-            items: provider.ageRangeDropdownItems,
+            items: provider.countryDropdownItems,
             controller: provider.grewUpController,
             isSearch: true,
           ),
@@ -289,7 +293,7 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
           DropDownField(
             hintText: 'Select',
             popUpHeader: 'Residency Status',
-            items: provider.ageRangeDropdownItems,
+            items: provider.residencyStatusDropdownItems,
             controller: provider.residencyStatusController,
             isSearch: true,
           ),
@@ -298,7 +302,7 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
           DropDownField(
             hintText: 'Select',
             popUpHeader: 'Photo Setting',
-            items: provider.ageRangeDropdownItems,
+            items: provider.photoVisibilityDropdownItems,
             controller: provider.photoSettingController,
             isSearch: true,
           ),
@@ -319,14 +323,16 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          headLineText('Education & Profession Details',
-              fontSize: TextSize.font16(context)),
+          headLineText(
+            'Education & Profession Details',
+            fontSize: TextSize.font16(context),
+          ),
           SizedBox(height: TextSize.font16(context)),
           headLineText('Qualification'),
           DropDownField(
             hintText: 'Select',
             popUpHeader: 'Qualification',
-            items: provider.ageRangeDropdownItems,
+            items: provider.qualificationDropdownItems,
             controller: provider.qualificationController,
             isSearch: true,
           ),
@@ -344,7 +350,7 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
           DropDownField(
             hintText: 'Select',
             popUpHeader: 'Working With',
-            items: provider.ageRangeDropdownItems,
+            items: provider.workingWithDropdownItems,
             controller: provider.workingWithController,
             isSearch: true,
           ),
@@ -436,14 +442,16 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          headLineText('Other Details Style',
-              fontSize: TextSize.font16(context)),
+          headLineText(
+            'Other Details Style',
+            fontSize: TextSize.font16(context),
+          ),
           SizedBox(height: TextSize.font16(context)),
           headLineText('Profile Managed By'),
           DropDownField(
             hintText: 'Select',
             popUpHeader: 'Profile Managed By',
-            items: provider.ageRangeDropdownItems,
+            items: provider.profileManagedByDropdownItems,
             controller: provider.profileManageByController,
             isSearch: true,
           ),

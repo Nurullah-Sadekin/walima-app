@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/global/enums/enums.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 
@@ -31,6 +31,46 @@ class SearchFilterProvider extends BaseChangeNotifier {
 
 
     List<SingleStringModel> ageRangeDropdownItems = ageListDataInserted;
+    List<SingleStringModel> heightRangeDropdownItems = List.generate(
+      121,
+      (index) => SingleStringModel(name: '${100 + index}'),
+    );
+    List<SingleStringModel> maritalStatusDropdownItems = maritalStatusListDataInserted;
+    List<SingleStringModel> religionDropdownItems = [
+      ...Religion.values.map(
+        (item) => SingleStringModel(name: item.label, value: item.apiValue),
+      ),
+    ];
+    List<SingleStringModel> communityDropdownItems = communityListDataInserted;
+    List<SingleStringModel> motherTongueDropdownItems = [
+      SingleStringModel(name: 'Bengali'),
+      SingleStringModel(name: 'English'),
+      SingleStringModel(name: 'Hindi'),
+      SingleStringModel(name: 'Urdu'),
+      SingleStringModel(name: 'Arabic'),
+    ];
+    List<SingleStringModel> countryDropdownItems = countryListDataInserted;
+    List<SingleStringModel> residencyStatusDropdownItems = [
+      ...ResidencyStatus.values.map(
+        (item) => SingleStringModel(name: item.label, value: item.apiValue),
+      ),
+    ];
+    List<SingleStringModel> photoVisibilityDropdownItems = [
+      ...PhotoVisibilityFilter.values.map(
+        (item) => SingleStringModel(name: item.label, value: item.apiValue),
+      ),
+    ];
+    List<SingleStringModel> qualificationDropdownItems = [
+      ...EducationLevel.values.map(
+        (item) => SingleStringModel(name: item.label, value: item.apiValue),
+      ),
+    ];
+    List<SingleStringModel> workingWithDropdownItems = yourWorkListInserted;
+    List<SingleStringModel> profileManagedByDropdownItems = [
+      ...RegistrationProfileManagedBy.values.map(
+        (item) => SingleStringModel(name: item.label, value: item.apiValue),
+      ),
+    ];
     List<SingleStringModel> haveChildren = haveChildrenDataListInserted;
     List<SingleStringModel> annualIncomeRange = incomeRangeListInserted;
     List<SingleStringModel> dietData = dietDataListInserted;
@@ -62,7 +102,8 @@ class SearchFilterProvider extends BaseChangeNotifier {
         index,
         (item, selected) => item.isSelected = selected,
       );
-      selectedHaveChildrenStatus = haveChildren[index].name;
+      selectedHaveChildrenStatus =
+          haveChildren[index].value ?? haveChildren[index].name;
       notifyListeners();
     }
 
@@ -73,7 +114,8 @@ class SearchFilterProvider extends BaseChangeNotifier {
         index,
         (item, selected) => item.isSelected = selected,
       );
-      selectedAnnualIncomeRangeStatus = annualIncomeRange[index].name;
+      selectedAnnualIncomeRangeStatus =
+          annualIncomeRange[index].value ?? annualIncomeRange[index].name;
       notifyListeners();
     }
 
@@ -84,13 +126,15 @@ class SearchFilterProvider extends BaseChangeNotifier {
         index,
         (item, selected) => item.isSelected = selected,
       );
-      selectedDietStatus = dietData[index].name;
+      selectedDietStatus = dietData[index].value ?? dietData[index].name;
       notifyListeners();
     }
 
 
-    void updateViewState({SearchFilterScreenStates? screenStates,
-      SearchFilterScreenStates? loadingState}) {
+    void updateViewState({
+      SearchFilterScreenStates? screenStates,
+      SearchFilterScreenStates? loadingState,
+    }) {
       if (screenStates != null) {
         this.screenStates = screenStates;
         loaderState = SearchFilterScreenStates.defaultLoading;

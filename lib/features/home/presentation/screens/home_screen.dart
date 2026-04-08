@@ -77,8 +77,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return TransparentLoading(
-      isLoading: ref.watch(homeProvider).screenStates ==
-          HomeScreenStates.transparentLoading,
+      isLoading: ref.watch(homeProvider).screenStates == HomeScreenStates.transparentLoading,
       child: Scaffold(
         key: _scaffoldKey,
         drawer: const AppDrawer(),

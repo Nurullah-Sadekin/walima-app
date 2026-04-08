@@ -5,7 +5,7 @@ class SingleStringModel {
   SingleStringModel({
     required this.name,
     this.value,
-    this.isSelected = false
+    this.isSelected = false,
   });
 
   final String name;
@@ -35,11 +35,11 @@ List<SingleStringModel> dietDataListInserted = [
 ];
 
 List<SingleStringModel> incomeRangeListInserted = [
-  SingleStringModel(name: 'Less than 10k'),
-  SingleStringModel(name: '10k - 20k'),
-  SingleStringModel(name: '20k - 50k'),
-  SingleStringModel(name: '50k - 100k'),
-  SingleStringModel(name: 'More than 100k'),
+  SingleStringModel(name: 'Less than 10k', value: 'less_than_10k'),
+  SingleStringModel(name: '10k - 20k', value: '10k_20k'),
+  SingleStringModel(name: '20k - 50k', value: '20k_50k'),
+  SingleStringModel(name: '50k - 100k', value: '50k_100k'),
+  SingleStringModel(name: 'More than 100k', value: 'more_than_100k'),
 ];
 
 List<SingleStringModel> yourWorkListInserted = [
@@ -230,7 +230,10 @@ List<SingleStringModel> ageListDataInserted = [
 ];
 
 List<SingleStringModel> haveChildrenDataListInserted = [
-  SingleStringModel(name: 'No',),
-  SingleStringModel(name: 'Yes'),
-  SingleStringModel(name: 'Okay, If we\'re not staying together',),
+  SingleStringModel(name: 'No', value: 'no'),
+  SingleStringModel(name: 'Yes', value: 'yes'),
+  SingleStringModel(
+    name: 'Okay, If we\'re not staying together',
+    value: 'okay_if_not_staying_together',
+  ),
 ];
