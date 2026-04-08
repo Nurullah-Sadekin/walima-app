@@ -174,16 +174,11 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab>
     }
 
     if (provider.deletedConnections?.isEmpty ?? true) {
-      return const Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          EmptyStateWidget(
-            imagePath: AppImages.delete,
-            title: 'No Deleted Requests',
-            subtitle: 'No deleted connection requests were found',
-            buttonText: 'Refresh',
-          ),
-        ],
+      return const EmptyStateWidget(
+        imagePath: AppImages.delete,
+        title: 'No Deleted Requests',
+        subtitle: 'No deleted connection requests were found',
+        buttonText: 'Refresh',
       );
     }
 

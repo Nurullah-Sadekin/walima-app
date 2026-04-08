@@ -478,7 +478,7 @@ class InboxCard extends StatelessWidget {
         IconTitleCard(
           title: middleBottomItemText ?? 'Phone Call',
           imagePath: middleBottomItemIcon ?? AppImages.callSvgIcon,
-          backgroundColor: middleBottomItemIBgColor ?? (onTapMiddleBottomItem == null ? AppColors.blue.withOpacity(0.5) : AppColors.blue),
+          backgroundColor: (onTapMiddleBottomItem == null ? middleBottomItemIBgColor?.withOpacity(0.5) : middleBottomItemIBgColor) ?? (onTapMiddleBottomItem == null ? AppColors.blue.withOpacity(0.5) : AppColors.blue),
           textColor: onTapMiddleBottomItem == null ? AppColors.disableText : AppColors.textSecondaryLight,
           iconColor: AppColors.white,
           onTap: onTapMiddleBottomItem,
@@ -487,7 +487,7 @@ class InboxCard extends StatelessWidget {
         IconTitleCard(
           title: rightBottomItemText ?? 'Whatsapp',
           imagePath: rightBottomItemIcon ?? AppImages.whatsappSvgIcon,
-          backgroundColor: rightBottomItemBgColor ?? (onTapRightBottomItem == null ? AppColors.greenButtonColor.withOpacity(0.5) : AppColors.greenButtonColor),
+          backgroundColor: (onTapRightBottomItem == null ? rightBottomItemBgColor?.withOpacity(0.5) : rightBottomItemBgColor) ?? (onTapRightBottomItem == null ? AppColors.greenButtonColor.withOpacity(0.5) : AppColors.greenButtonColor),
           textColor: onTapRightBottomItem == null ? AppColors.disableText : AppColors.textSecondaryLight,
           iconColor: AppColors.white,
           onTap: onTapRightBottomItem,
