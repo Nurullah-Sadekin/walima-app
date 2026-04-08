@@ -4,14 +4,12 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
 import 'package:flutter_boilerplate/core/global/components/empty_state.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
 import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/providers/inbox_providers.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/filter_widget.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/setting_switcher_title.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -34,8 +32,9 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          if (provider.receivedConnections != null && provider.receivedConnections!.isNotEmpty)
-          _header(provider),
+          if (provider.receivedConnections != null &&
+              provider.receivedConnections!.isNotEmpty)
+            _header(provider),
           if (provider.screenStates == InboxScreenStates.loading ||
               provider.loaderState == InboxScreenStates.transparentLoading)
             const Padding(
@@ -198,11 +197,12 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
     final count = provider.totalItems! > 0
         ? provider.totalItems
         : provider.receivedConnections?.length ?? 0;
+    final headerTitle = provider.receivedFilterHeaderTitle();
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          'All Requests ($count)',
+          '$headerTitle ($count)',
           style: TextStyle(
             color: AppColors.textSecondaryLight,
             fontSize: TextSize.font12(context),
@@ -243,74 +243,21 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
   Widget _receivedFilter(InboxProvider provider) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SettingsSwitchTile(
-            title: 'Enable Card View',
-            value: provider.switcherValue ?? false,
-            trailingImage: AppImages.cardView,
-            showTrailingImage: true,
-            onChanged: (newValue) {
-              provider.switcherValue = newValue;
-              provider.switcherStatusUpdate();
-            },
-          ),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(0, 8.0, 0, 16.0),
-            child: Divider(color: AppColors.greyLight, thickness: 1),
-          ),
-          FilterWidget(
-            title: 'Sort by',
-            iconPath: AppImages.sortIcon,
-            items: provider.sortList
-                .map(
-                  (item) => FilterItem(
-                    name: item.label,
-                    isSelected: item.isSelected,
-                  ),
-                )
-                .toList(),
-            onItemTap: provider.selectSortOrderIndex,
-          ),
-          const Padding(
-            padding: EdgeInsets.only(bottom: 16.0),
-            child: Divider(color: AppColors.greyLight, thickness: 1),
-          ),
-          FilterWidget(
-            title: 'Filter by',
-            iconPath: AppImages.filterSvgIcon,
-            items: provider.filterList
-                .map(
-                  (item) => FilterItem(
-                    name: item.label,
-                    isSelected: item.isSelected,
-                  ),
-                )
-                .toList(),
-            onItemTap: provider.selectFilterTypeIndex,
-          ),
-          Row(
-            spacing: 10,
-            children: [
-              Expanded(
-                child: PrimaryButtons(
-                  buttonStyle: ButtonsStyle.cancelButton,
-                  onTap: () {},
-                  title: 'Reset',
-                ),
-              ),
-              Expanded(
-                child: PrimaryButtons(
-                  buttonStyle: ButtonsStyle.activePrimaryButton,
-                  onTap: () {},
-                  title: 'Apply',
-                ),
-              ),
-            ],
-          ),
-        ],
+      child: FilterWidget(
+        title: 'Filter Requests',
+        iconPath: AppImages.filterSvgIcon,
+        items: provider.receivedFilterList
+            .map(
+              (item) => FilterItem(name: item.label, isSelected: false),
+            )
+            .toList(),
+        onItemTap: (index) async {
+          final filterValue = provider.receivedFilterValueAt(index);
+          if (filterValue == null) return;
+
+          Navigator.of(context).pop();
+          await ref.read(inboxProvider).applyReceivedFilter(filterValue);
+        },
       ),
     );
   }

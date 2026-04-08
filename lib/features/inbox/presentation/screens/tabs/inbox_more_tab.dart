@@ -91,33 +91,33 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab>
       children: [
         _buildSubTabs(),
         const SizedBox(width: 12),
-        InkWell(
-          onTap: () async {
-            await BottomSheetUtils.open(
-              context: context,
-              fullHeight: false,
-              child: Consumer(
-                builder: (context, ref, _) {
-                  return _sentFilter(ref.watch(inboxProvider));
-                },
-              ),
-            );
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.transparent,
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: AppColors.greyLight, width: 1),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
-            child: ShowImage(
-              imagePath: AppImages.filterSvgIcon,
-              width: TextSize.font16(context),
-              height: TextSize.font16(context),
-              color: AppColors.textSecondaryLight,
-            ),
-          ),
-        ),
+        // InkWell(
+        //   onTap: () async {
+        //     await BottomSheetUtils.open(
+        //       context: context,
+        //       fullHeight: false,
+        //       child: Consumer(
+        //         builder: (context, ref, _) {
+        //           return _sentFilter(ref.watch(inboxProvider));
+        //         },
+        //       ),
+        //     );
+        //   },
+        //   child: Container(
+        //     decoration: BoxDecoration(
+        //       color: AppColors.transparent,
+        //       borderRadius: BorderRadius.circular(4),
+        //       border: Border.all(color: AppColors.greyLight, width: 1),
+        //     ),
+        //     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+        //     child: ShowImage(
+        //       imagePath: AppImages.filterSvgIcon,
+        //       width: TextSize.font16(context),
+        //       height: TextSize.font16(context),
+        //       color: AppColors.textSecondaryLight,
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }
@@ -219,20 +219,20 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab>
     return location.isEmpty ? 'N/A' : location;
   }
 
-  Widget _sentFilter(InboxProvider provider) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: FilterWidget(
-        title: 'Filter My Sent Requests',
-        items: provider.filterList
-            .map(
-              (item) =>
-                  FilterItem(name: item.label, isSelected: item.isSelected),
-            )
-            .toList(),
-        onItemTap: provider.selectFilterTypeIndex,
-      ),
-    );
-  }
+  // Widget _sentFilter(InboxProvider provider) {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(horizontal: 20.0),
+  //     child: FilterWidget(
+  //       title: 'Filter My Sent Requests',
+  //       items: provider.filterList
+  //           .map(
+  //             (item) =>
+  //                 FilterItem(name: item.label, isSelected: item.isSelected),
+  //           )
+  //           .toList(),
+  //       onItemTap: provider.selectFilterTypeIndex,
+  //     ),
+  //   );
+  // }
 }
 

@@ -241,13 +241,13 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: FilterWidget(
         title: 'Filter My Sent Requests',
-        items: provider.filterList
+        items: provider.sentFilterList
             .map(
               (item) => FilterItem(name: item.label, isSelected: false),
             )
             .toList(),
         onItemTap: (index) async {
-          final filterValue = provider.filterValueAt(index);
+          final filterValue = provider.sentFilterValueAt(index);
           if (filterValue == null) return;
 
           Navigator.of(context).pop();

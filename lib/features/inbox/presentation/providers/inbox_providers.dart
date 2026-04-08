@@ -45,7 +45,8 @@ class InboxProvider extends BaseChangeNotifier {
   bool isDeletedHasError = false;
   String? deletedErrorMessage;
 
-  List<Filter> filterList = buildInboxFilterDataList();
+  List<Filter> receivedFilterList = buildInboxFilterDataList();
+  List<Filter> sentFilterList = buildInboxFilterDataList();
   List<Filter> sortList = sortDataList;
 
   int? currentPage;
@@ -54,7 +55,8 @@ class InboxProvider extends BaseChangeNotifier {
   String? sortBy = 'id';
   String? sortOrder = 'ASC';
   String? searchQuery = '';
-  String? filterType = InboxConnectionFilter.mostRelevant.apiValue;
+  String? receivedFilterType = InboxConnectionFilter.mostRelevant.apiValue;
+  String? sentFilterType = InboxConnectionFilter.mostRelevant.apiValue;
   String? responseFormat = 'short';
 
   void switcherStatusUpdate({bool? switcherValue}) {
@@ -88,28 +90,33 @@ class InboxProvider extends BaseChangeNotifier {
   }
 
   void selectFilterTypeIndex(int index) {
-    if (!_isValidIndex(index, filterList.length)) return;
+    if (!_isValidIndex(index, receivedFilterList.length)) return;
     _setSingleSelection(
-      filterList,
+      receivedFilterList,
       index,
       (item, selected) => item.isSelected = selected,
     );
-    filterType = filterList[index].value;
+    receivedFilterType = receivedFilterList[index].value;
     notifyListeners();
   }
 
-  String? filterValueAt(int index) {
-    if (!_isValidIndex(index, filterList.length)) return null;
-    return filterList[index].value;
+  String? receivedFilterValueAt(int index) {
+    if (!_isValidIndex(index, receivedFilterList.length)) return null;
+    return receivedFilterList[index].value;
   }
 
-  String sentFilterHeaderTitle() {
-    final currentFilter = filterType?.trim();
+  String? sentFilterValueAt(int index) {
+    if (!_isValidIndex(index, sentFilterList.length)) return null;
+    return sentFilterList[index].value;
+  }
+
+  String _filterHeaderTitle(String? activeFilter, List<Filter> filters) {
+    final currentFilter = activeFilter?.trim();
     if (currentFilter == null || currentFilter.isEmpty) {
       return 'All Requests';
     }
 
-    final matchedFilter = filterList.cast<Filter?>().firstWhere(
+    final matchedFilter = filters.cast<Filter?>().firstWhere(
           (item) => item?.value == currentFilter,
           orElse: () => null,
         );
@@ -117,8 +124,25 @@ class InboxProvider extends BaseChangeNotifier {
     return matchedFilter?.label ?? 'All Requests';
   }
 
-  void clearFilterSelection({bool notify = true}) {
-    for (final item in filterList) {
+  String sentFilterHeaderTitle() {
+    return _filterHeaderTitle(sentFilterType, sentFilterList);
+  }
+
+  String receivedFilterHeaderTitle() {
+    return _filterHeaderTitle(receivedFilterType, receivedFilterList);
+  }
+
+  void clearReceivedFilterSelection({bool notify = true}) {
+    for (final item in receivedFilterList) {
+      item.isSelected = false;
+    }
+    if (notify) {
+      notifyListeners();
+    }
+  }
+
+  void clearSentFilterSelection({bool notify = true}) {
+    for (final item in sentFilterList) {
       item.isSelected = false;
     }
     if (notify) {
@@ -171,7 +195,7 @@ class InboxProvider extends BaseChangeNotifier {
           sortBy: sortBy,
           sortOrder: sortOrder,
           search: searchQuery,
-          filter: filterType,
+          filter: receivedFilterType,
         ),
       );
 
@@ -350,7 +374,9 @@ class InboxProvider extends BaseChangeNotifier {
           sortBy: sortBy,
           sortOrder: sortOrder,
           search: search,
-          filter: filter ?? InboxConnectionFilter.mostRelevant.apiValue,
+          filter: filter ??
+              sentFilterType ??
+              InboxConnectionFilter.mostRelevant.apiValue,
         ),
       );
 
@@ -375,10 +401,17 @@ class InboxProvider extends BaseChangeNotifier {
   }
 
   Future<void> applySentFilter(String filterValue) async {
-    filterType = filterValue;
-    clearFilterSelection(notify: false);
+    sentFilterType = filterValue;
+    clearSentFilterSelection(notify: false);
     await fetchSentConnections(filter: filterValue);
-    clearFilterSelection();
+    clearSentFilterSelection();
+  }
+
+  Future<void> applyReceivedFilter(String filterValue) async {
+    receivedFilterType = filterValue;
+    clearReceivedFilterSelection(notify: false);
+    await fetchRequestedConnections();
+    clearReceivedFilterSelection();
   }
 
   Future<bool> deleteSentConnection(String connectionId) async {
@@ -535,8 +568,8 @@ class InboxProvider extends BaseChangeNotifier {
     sortBy = 'id';
     sortOrder = 'ASC';
     searchQuery = '';
-    filterList = buildInboxFilterDataList();
-    filterType = InboxConnectionFilter.mostRelevant.apiValue;
+    receivedFilterList = buildInboxFilterDataList();
+    receivedFilterType = InboxConnectionFilter.mostRelevant.apiValue;
     responseFormat = 'short';
     notifyListeners();
   }
@@ -556,6 +589,8 @@ class InboxProvider extends BaseChangeNotifier {
     isSentLoading = false;
     isSentHasError = false;
     isDeletingSentConnection = false;
+    sentFilterList = buildInboxFilterDataList();
+    sentFilterType = InboxConnectionFilter.mostRelevant.apiValue;
     sentNotifyMessage = null;
     notifyListeners();
   }
