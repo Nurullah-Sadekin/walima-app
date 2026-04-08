@@ -23,13 +23,20 @@ class InboxScreen extends ConsumerStatefulWidget {
 class _InboxScreenState extends ConsumerState<InboxScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _primaryTabController;
-  final _primaryTabs = const ['Received', 'Accepted', 'Contacts', 'Sent', 'More'];
+  final _primaryTabs = const [
+    'Received',
+    'Accepted',
+    'Contacts',
+    'Sent',
+    'More',
+  ];
 
   @override
   void initState() {
     super.initState();
-    _primaryTabController = TabController(initialIndex: 0, length: 5, vsync: this)
-      ..addListener(_handlePrimaryTabChange);
+    _primaryTabController =
+        TabController(initialIndex: 0, length: 5, vsync: this)
+          ..addListener(_handlePrimaryTabChange);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       ref.read(inboxProvider).loadPrimaryTab(_primaryTabController.index);
@@ -85,12 +92,14 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
           child: TabBarView(
             controller: _primaryTabController,
             physics: const NeverScrollableScrollPhysics(),
-            children: const [
-              InboxReceivedTab(),
-              InboxAcceptedTab(),
-              InboxContactsTab(),
-              InboxSentTab(),
-              InboxMoreTab(),
+            children: [
+              InboxReceivedTab(
+                onExploreAcceptedTap: () => _primaryTabController.animateTo(1),
+              ),
+              const InboxAcceptedTab(),
+              const InboxContactsTab(),
+              const InboxSentTab(),
+              const InboxMoreTab(),
             ],
           ),
         ),

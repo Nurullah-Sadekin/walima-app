@@ -16,7 +16,12 @@ import 'package:flutter_boilerplate/features/matches/presentation/widgets/profil
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class InboxReceivedTab extends ConsumerStatefulWidget {
-  const InboxReceivedTab({super.key});
+  const InboxReceivedTab({
+    super.key,
+    this.onExploreAcceptedTap,
+  });
+
+  final VoidCallback? onExploreAcceptedTap;
 
   @override
   ConsumerState<InboxReceivedTab> createState() => _InboxReceivedTabState();
@@ -85,13 +90,14 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
 
     // Show empty state
     if (provider.receivedConnections?.isEmpty ?? true) {
-      return const Center(
+      return Center(
         child: EmptyStateWidget(
           imagePath: AppImages.addTeam,
           title: 'No Pending Requests!',
           subtitle:
               'Take the next step view your accepted matches for better connections',
           buttonText: 'Explore Accepted Matches',
+          onTap: widget.onExploreAcceptedTap,
         ),
       );
     }
@@ -139,12 +145,11 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
               onTapLeftButton: () async {
                 if (isUpdatingThisCard) return;
 
-                final success = await ref
-                    .read(inboxProvider)
-                    .respondToRequestedConnection(
-                      connection: connection,
-                      status: 'accept',
-                    );
+                final success =
+                    await ref.read(inboxProvider).respondToRequestedConnection(
+                          connection: connection,
+                          status: 'accept',
+                        );
 
                 if (!mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -161,12 +166,11 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
               onTapRightButton: () async {
                 if (isUpdatingThisCard) return;
 
-                final success = await ref
-                    .read(inboxProvider)
-                    .respondToRequestedConnection(
-                      connection: connection,
-                      status: 'reject',
-                    );
+                final success =
+                    await ref.read(inboxProvider).respondToRequestedConnection(
+                          connection: connection,
+                          status: 'reject',
+                        );
 
                 if (!mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -181,8 +185,7 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
                 );
               },
               leftButtonText: 'Accept',
-              rightButtonText:
-                  isUpdatingThisCard ? 'Please wait...' : 'Reject',
+              rightButtonText: isUpdatingThisCard ? 'Please wait...' : 'Reject',
               rightIconPath: AppImages.cancelSvgIcon,
             ),
           );
