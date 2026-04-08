@@ -63,7 +63,7 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab>
     return Column(
       children: [
         _header(provider),
-        const SizedBox(height: 10),
+        const SizedBox(height: 16),
         Expanded(
           child: TabBarView(
             controller: _subTabController,
