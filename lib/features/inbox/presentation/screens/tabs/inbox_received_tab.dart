@@ -35,6 +35,7 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
     return SingleChildScrollView(
       child: Column(
         children: [
+          if (provider.receivedConnections != null && provider.receivedConnections!.isNotEmpty)
           _header(provider),
           if (provider.screenStates == InboxScreenStates.loading ||
               provider.loaderState == InboxScreenStates.transparentLoading)
