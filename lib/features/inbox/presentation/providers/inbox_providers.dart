@@ -103,6 +103,20 @@ class InboxProvider extends BaseChangeNotifier {
     return filterList[index].value;
   }
 
+  String sentFilterHeaderTitle() {
+    final currentFilter = filterType?.trim();
+    if (currentFilter == null || currentFilter.isEmpty) {
+      return 'All Requests';
+    }
+
+    final matchedFilter = filterList.cast<Filter?>().firstWhere(
+          (item) => item?.value == currentFilter,
+          orElse: () => null,
+        );
+
+    return matchedFilter?.label ?? 'All Requests';
+  }
+
   void clearFilterSelection({bool notify = true}) {
     for (final item in filterList) {
       item.isSelected = false;

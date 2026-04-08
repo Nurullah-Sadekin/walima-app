@@ -192,12 +192,13 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
 
   Widget _header(InboxProvider provider) {
     final count = provider.sentConnections?.length ?? 0;
+    final headerTitle = provider.sentFilterHeaderTitle();
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          'All Requests ($count)',
+          '$headerTitle ($count)',
           style: TextStyle(
             color: AppColors.textSecondaryLight,
             fontSize: TextSize.font12(context),
