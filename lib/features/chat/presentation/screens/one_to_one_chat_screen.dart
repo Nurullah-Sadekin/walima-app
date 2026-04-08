@@ -123,13 +123,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
     final isOnline = liveParticipant?.isOnline as bool? ??
         (_participant != null ? (_participant!['isOnline'] as bool?) : null);
 
+    final isVerified = liveParticipant?.profilePhoto?.isVerified;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
       body: SafeArea(
         child: Column(
           children: [
             _headerSection(name ?? 'Unknown', imagePath, isOnline ?? false,
-                liveParticipant),
+                liveParticipant,isVerified),
             Expanded(
               child: _conversationBody(
                 provider,
@@ -147,7 +149,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
   }
 
   Widget _headerSection(String displayName, String? imagePath, bool isOnline,
-      dynamic participant) {
+      dynamic participant, bool? isVerified) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 8, 8, 6),
       child: Row(
@@ -170,31 +172,51 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                   showOnlineIndicator: true,
                 ),
                 const SizedBox(width: 8),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      displayName,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        color: Color(0xFF1F1F1F),
-                        fontWeight: FontWeight.w600,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min, // Change to min
+                    children: [
+                      // Remove Expanded wrapper from this Row
+                      Row(
+                        spacing: 4,
+                        children: [
+                          Flexible( // Use Flexible instead of Expanded
+                            child: Text(
+                              displayName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                color: Color(0xFF1F1F1F),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          if (isVerified == true)
+                            ShowImage(
+                              height: TextSize.font16(context),
+                              width: TextSize.font16(context),
+                              imagePath: AppImages.verifiedBadgeSvgIcon,
+                            ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      providerStatusText(ref.read(chatProvider), isOnline),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF787878),
-                        fontWeight: FontWeight.w400,
+                      const SizedBox(height: 2),
+                      Text(
+                        providerStatusText(ref.read(chatProvider), isOnline),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF787878),
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
+          const SizedBox(width: 10,),
           Row(
             spacing: 12,
             children: [
@@ -204,7 +226,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                 height: TextSize.font20(context),
                 color: const Color(0xFF666666),
               ),
-              // Replace the simple InkWell icon with a PopupMenuButton for actions
               PopupMenuButton<MoreMenuAction>(
                 onSelected: (action) =>
                     _handleMoreMenuAction(action, participant),
@@ -222,46 +243,58 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                     value: MoreMenuAction.viewProfile,
                     height: 32.0,
                     padding: const EdgeInsets.fromLTRB(16, 10, 35, 10),
-                    child: Text('View Profile',
-                        style: TextStyle(
-                            fontSize: TextSize.font12(context),
-                            color: AppColors.textPrimaryLight,
-                            fontWeight: FontWeight.w400)),
+                    child: Text(
+                      'View Profile',
+                      style: TextStyle(
+                        fontSize: TextSize.font12(context),
+                        color: AppColors.textPrimaryLight,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                   ),
                   PopupMenuItem(
                     value: MoreMenuAction.viewContact,
                     height: 32.0,
                     padding: const EdgeInsets.fromLTRB(16, 10, 35, 10),
-                    child: Text('View Contact',
-                        style: TextStyle(
-                            fontSize: TextSize.font12(context),
-                            color: AppColors.textPrimaryLight,
-                            fontWeight: FontWeight.w400)),
+                    child: Text(
+                      'View Contact',
+                      style: TextStyle(
+                        fontSize: TextSize.font12(context),
+                        color: AppColors.textPrimaryLight,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                   ),
                   PopupMenuItem(
                     value: MoreMenuAction.block,
                     height: 32.0,
                     padding: const EdgeInsets.fromLTRB(16, 10, 35, 10),
-                    child: Text('Block',
-                        style: TextStyle(
-                            fontSize: TextSize.font12(context),
-                            color: AppColors.textPrimaryLight,
-                            fontWeight: FontWeight.w400)),
+                    child: Text(
+                      'Block',
+                      style: TextStyle(
+                        fontSize: TextSize.font12(context),
+                        color: AppColors.textPrimaryLight,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                   ),
                   PopupMenuItem(
                     value: MoreMenuAction.report,
                     height: 32.0,
                     padding: const EdgeInsets.fromLTRB(16, 10, 35, 10),
-                    child: Text('Report',
-                        style: TextStyle(
-                            fontSize: TextSize.font12(context),
-                            color: AppColors.textPrimaryLight,
-                            fontWeight: FontWeight.w400)),
+                    child: Text(
+                      'Report',
+                      style: TextStyle(
+                        fontSize: TextSize.font12(context),
+                        color: AppColors.textPrimaryLight,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ],
-          )
+          ),
         ],
       ),
     );
