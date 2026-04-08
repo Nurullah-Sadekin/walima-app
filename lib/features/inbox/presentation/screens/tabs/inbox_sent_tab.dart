@@ -145,10 +145,16 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
+                        backgroundColor: Colors.black.withOpacity(0.8),
+                        duration: const Duration(milliseconds: 1000),
                         content: Text(
                           message.trim().isNotEmpty
                               ? message
                               : 'Reminder request processed.',
+                          style: TextStyle(
+                            color: AppColors.warning,
+                            fontSize: TextSize.font12(context),
+                          ),
                         ),
                       ),
                     );

@@ -380,6 +380,11 @@ class InboxProvider extends BaseChangeNotifier {
 
     try {
       final response = await ConnectionsRepository.sendReminder(connectionId);
+      final responseData = response.data;
+      final backendMessage =
+          responseData is Map && responseData['message'] is String
+              ? responseData['message'] as String
+              : response.message;
 
       if (response.isSuccess) {
         final items = sentConnections;
@@ -395,12 +400,12 @@ class InboxProvider extends BaseChangeNotifier {
             }
           }
         }
-        sentNotifyMessage = response.data;
+        sentNotifyMessage = backendMessage;
       } else {
-        sentNotifyMessage = response.message;
+        sentNotifyMessage = backendMessage;
       }
       notifyListeners();
-      return  response.message;
+      return backendMessage;
     } catch (e) {
       final message = e.toString();
       sentNotifyMessage = message;
