@@ -1,10 +1,7 @@
+import 'package:flutter_boilerplate/core/global/enums/enums.dart';
 
 class Filter {
-  Filter({
-    required this.value,
-    required this.label,
-    this.isSelected = false
-  });
+  Filter({required this.value, required this.label, this.isSelected = false});
 
   final String value;
   final String label;
@@ -23,17 +20,20 @@ class Filter {
   }
 }
 
-List<Filter> filterDataList = [
-  Filter(value: 'most_relevant', label: 'Most Relevant'),
-  Filter(value: 'newest_first', label: 'Newest First'),
-  Filter(value: 'oldest_first', label: 'Oldest First'),
-  Filter(value: 'all_requests', label: 'All Requests'),
-  Filter(value: 'premium_members', label: 'Premium Members'),
-  Filter(value: 'phone_verified_members', label: 'Phone Verified Members'),
-];
+List<Filter> buildInboxFilterDataList() {
+  return InboxConnectionFilter.values.keyPairs
+      .map(
+        (item) => Filter(
+          value: item.apiValue,
+          label: item.uiValue,
+        ),
+      )
+      .toList(growable: false);
+}
+
+List<Filter> filterDataList = buildInboxFilterDataList();
 
 List<Filter> sortDataList = [
   Filter(value: 'ASC', label: 'Ascending'),
   Filter(value: 'DESC', label: 'Descending'),
 ];
-

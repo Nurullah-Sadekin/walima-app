@@ -1646,6 +1646,24 @@ enum ActiveMembersFilter implements ApiUiEnum {
   String get label => _label ?? EnumMapper.labelFromValue(apiValue);
 }
 
+enum InboxConnectionFilter implements ApiUiEnum {
+  mostRelevant('most_relevant'),
+  newestFirst('newest_first'),
+  oldestFirst('oldest_first'),
+  allRequests('all_requests'),
+  premiumMembers('premium_members'),
+  phoneVerifiedMembers('phone_verified_members', 'Phone Verified Members');
+
+  const InboxConnectionFilter(this.apiValue, [this._label]);
+
+  @override
+  final String apiValue;
+  final String? _label;
+
+  @override
+  String get label => _label ?? EnumMapper.labelFromValue(apiValue);
+}
+
 enum MatchSortByServer implements ApiUiEnum {
   relevance('relevance'),
   newest('newest'),

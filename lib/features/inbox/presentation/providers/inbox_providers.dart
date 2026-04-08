@@ -1,3 +1,4 @@
+import 'package:flutter_boilerplate/core/global/enums/enums.dart';
 import 'package:flutter_boilerplate/core/global/models/filter_model.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/features/connections/data/models/request/get_requested_connections_query_params.dart';
@@ -44,7 +45,7 @@ class InboxProvider extends BaseChangeNotifier {
   bool isDeletedHasError = false;
   String? deletedErrorMessage;
 
-  List<Filter> filterList = filterDataList;
+  List<Filter> filterList = buildInboxFilterDataList();
   List<Filter> sortList = sortDataList;
 
   int? currentPage;
@@ -53,7 +54,7 @@ class InboxProvider extends BaseChangeNotifier {
   String? sortBy = 'id';
   String? sortOrder = 'ASC';
   String? searchQuery = '';
-  String? filterType = 'most_relevant';
+  String? filterType = InboxConnectionFilter.mostRelevant.apiValue;
   String? responseFormat = 'short';
 
   void switcherStatusUpdate({bool? switcherValue}) {
@@ -95,6 +96,20 @@ class InboxProvider extends BaseChangeNotifier {
     );
     filterType = filterList[index].value;
     notifyListeners();
+  }
+
+  String? filterValueAt(int index) {
+    if (!_isValidIndex(index, filterList.length)) return null;
+    return filterList[index].value;
+  }
+
+  void clearFilterSelection({bool notify = true}) {
+    for (final item in filterList) {
+      item.isSelected = false;
+    }
+    if (notify) {
+      notifyListeners();
+    }
   }
 
   void selectSortByIndex(int index) {
@@ -305,7 +320,7 @@ class InboxProvider extends BaseChangeNotifier {
     String sortBy = 'id',
     String sortOrder = 'ASC',
     String search = '',
-    String filter = 'most_relevant',
+    String? filter,
   }) async {
     isSentLoading = true;
     isSentHasError = false;
@@ -321,7 +336,7 @@ class InboxProvider extends BaseChangeNotifier {
           sortBy: sortBy,
           sortOrder: sortOrder,
           search: search,
-          filter: filter,
+          filter: filter ?? InboxConnectionFilter.mostRelevant.apiValue,
         ),
       );
 
@@ -343,6 +358,13 @@ class InboxProvider extends BaseChangeNotifier {
 
     isSentLoading = false;
     notifyListeners();
+  }
+
+  Future<void> applySentFilter(String filterValue) async {
+    filterType = filterValue;
+    clearFilterSelection(notify: false);
+    await fetchSentConnections(filter: filterValue);
+    clearFilterSelection();
   }
 
   Future<bool> deleteSentConnection(String connectionId) async {
@@ -499,7 +521,8 @@ class InboxProvider extends BaseChangeNotifier {
     sortBy = 'id';
     sortOrder = 'ASC';
     searchQuery = '';
-    filterType = 'most_relevant';
+    filterList = buildInboxFilterDataList();
+    filterType = InboxConnectionFilter.mostRelevant.apiValue;
     responseFormat = 'short';
     notifyListeners();
   }

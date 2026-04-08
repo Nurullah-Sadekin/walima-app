@@ -108,7 +108,7 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
                   if (!mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      duration: const Duration(milliseconds:1500),
+                      duration: const Duration(milliseconds: 1500),
                       content: Text(
                         success
                             ? 'Request cancelled successfully'
@@ -146,8 +146,8 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        backgroundColor: Colors.black.withOpacity(0.8),
-                        duration: const Duration(milliseconds:1500),
+                        backgroundColor: Colors.black.withValues(alpha: 0.8),
+                        duration: const Duration(milliseconds: 1500),
                         content: Text(
                           message.trim().isNotEmpty
                               ? message
@@ -221,11 +221,16 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
         title: 'Filter My Sent Requests',
         items: provider.filterList
             .map(
-              (item) =>
-                  FilterItem(name: item.label, isSelected: item.isSelected),
+              (item) => FilterItem(name: item.label, isSelected: false),
             )
             .toList(),
-        onItemTap: provider.selectFilterTypeIndex,
+        onItemTap: (index) async {
+          final filterValue = provider.filterValueAt(index);
+          if (filterValue == null) return;
+
+          Navigator.of(context).pop();
+          await ref.read(inboxProvider).applySentFilter(filterValue);
+        },
       ),
     );
   }

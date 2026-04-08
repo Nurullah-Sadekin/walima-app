@@ -178,7 +178,6 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab>
         imagePath: AppImages.delete,
         title: 'No Deleted Requests',
         subtitle: 'No deleted connection requests were found',
-        buttonText: 'Refresh',
       );
     }
 
