@@ -85,12 +85,14 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
 
     // Show empty state
     if (provider.receivedConnections?.isEmpty ?? true) {
-      return const EmptyStateWidget(
-        imagePath: AppImages.addTeam,
-        title: 'No Pending Requests!',
-        subtitle:
-            'Take the next step view your accepted matches for better connections',
-        buttonText: 'Explore Accepted Matches',
+      return const Center(
+        child: EmptyStateWidget(
+          imagePath: AppImages.addTeam,
+          title: 'No Pending Requests!',
+          subtitle:
+              'Take the next step view your accepted matches for better connections',
+          buttonText: 'Explore Accepted Matches',
+        ),
       );
     }
 

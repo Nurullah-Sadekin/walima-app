@@ -478,8 +478,8 @@ class InboxCard extends StatelessWidget {
         IconTitleCard(
           title: middleBottomItemText ?? 'Phone Call',
           imagePath: middleBottomItemIcon ?? AppImages.callSvgIcon,
-          backgroundColor: middleBottomItemIBgColor ?? AppColors.blue,
-          textColor: AppColors.textSecondaryLight,
+          backgroundColor: middleBottomItemIBgColor ?? (onTapMiddleBottomItem == null ? AppColors.blue.withOpacity(0.5) : AppColors.blue),
+          textColor: onTapMiddleBottomItem == null ? AppColors.disableText : AppColors.textSecondaryLight,
           iconColor: AppColors.white,
           onTap: onTapMiddleBottomItem,
           mood: IconTitleCardMood.horizontal,
@@ -487,8 +487,8 @@ class InboxCard extends StatelessWidget {
         IconTitleCard(
           title: rightBottomItemText ?? 'Whatsapp',
           imagePath: rightBottomItemIcon ?? AppImages.whatsappSvgIcon,
-          backgroundColor: rightBottomItemBgColor ?? AppColors.greenButtonColor,
-          textColor: AppColors.textSecondaryLight,
+          backgroundColor: rightBottomItemBgColor ?? (onTapRightBottomItem == null ? AppColors.greenButtonColor.withOpacity(0.5) : AppColors.greenButtonColor),
+          textColor: onTapRightBottomItem == null ? AppColors.disableText : AppColors.textSecondaryLight,
           iconColor: AppColors.white,
           onTap: onTapRightBottomItem,
           mood: IconTitleCardMood.horizontal,
