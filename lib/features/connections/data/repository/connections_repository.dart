@@ -159,6 +159,27 @@ class ConnectionsRepository {
     }
   }
 
+  static Future<ApiResponse> sendReminder(String connectionId) async {
+    try {
+      return await DioClient().post(
+        AppUrls.sendReminder.replaceFirst('{id}', connectionId),
+        isTokenRequired: true,
+      );
+    } catch (e) {
+      if (e is DioException) {
+        return ApiResponse.error(
+          message: e.response?.data['message'] ?? e.message ?? 'Request failed',
+          statusCode: e.response?.statusCode ?? 0,
+        );
+      }
+
+      return ApiResponse.error(
+        message: e.toString(),
+        statusCode: 0,
+      );
+    }
+  }
+
   static Future<ApiResponse> performConnectionAction(
     String connectionId,
     PerformConnectionActionRequestBody body,

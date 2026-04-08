@@ -45,7 +45,8 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
       );
     }
 
-    if (provider.isSentHasError && (provider.sentConnections?.isEmpty ?? true)) {
+    if (provider.isSentHasError &&
+        (provider.sentConnections?.isEmpty ?? true)) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -81,7 +82,11 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
           item.location?.city,
           item.location?.state,
           item.location?.country,
-        ].whereType<String>().where((value) => value.trim().isNotEmpty).join(', ');
+        ]
+            .whereType<String>()
+            .where((value) => value.trim().isNotEmpty)
+            .join(', ');
+        final connectionId = item.connection?.id;
 
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
@@ -91,7 +96,8 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
                 name: 'Cancel Request',
                 onTap: () async {
                   final connectionId = item.connection?.id;
-                  if (connectionId == null || provider.isDeletingSentConnection) {
+                  if (connectionId == null ||
+                      provider.isDeletingSentConnection) {
                     return;
                   }
 
@@ -105,7 +111,7 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
                       content: Text(
                         success
                             ? 'Request cancelled successfully'
-                            : provider.sentErrorMessage ??
+                            : provider.sentNotifyMessage ??
                                 'Failed to cancel request',
                       ),
                     ),
@@ -121,12 +127,32 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
               DateTime.tryParse(item.connection?.createdAt ?? ''),
             ),
             location: location.isEmpty ? 'N/A' : location,
-            subtitle: CamelCaseUtils.formatCamelCase(item.connection?.status ?? ''),
+            subtitle:
+                CamelCaseUtils.formatCamelCase(item.connection?.status ?? ''),
             subtitleColor: AppColors.primary,
             isVerified: item.profilePhoto?.isVerified ?? false,
             middleBottomItemIBgColor: AppColors.warning,
             middleBottomItemIcon: AppImages.notificationSvgIcon,
             middleBottomItemText: 'Remind',
+            onTapMiddleBottomItem: connectionId == null
+                ? null
+                : () async {
+                    final message = await ref
+                        .read(inboxProvider)
+                        .sendSentConnectionReminder(connectionId);
+
+                    if (!mounted) return;
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          message.trim().isNotEmpty
+                              ? message
+                              : 'Reminder request processed.',
+                        ),
+                      ),
+                    );
+                  },
             rightBottomItemIcon: AppImages.callIcon,
             rightBottomItemText: 'Contact',
             rightBottomItemBgColor: AppColors.blue,
@@ -187,7 +213,10 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
       child: FilterWidget(
         title: 'Filter My Sent Requests',
         items: provider.filterList
-            .map((item) => FilterItem(name: item.label, isSelected: item.isSelected))
+            .map(
+              (item) =>
+                  FilterItem(name: item.label, isSelected: item.isSelected),
+            )
             .toList(),
         onItemTap: provider.selectFilterTypeIndex,
       ),

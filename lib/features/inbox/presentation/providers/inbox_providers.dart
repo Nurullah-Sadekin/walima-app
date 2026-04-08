@@ -36,7 +36,7 @@ class InboxProvider extends BaseChangeNotifier {
   bool isSentLoading = false;
   bool isSentHasError = false;
   bool isDeletingSentConnection = false;
-  String? sentErrorMessage;
+  String? sentNotifyMessage;
 
   List<sent_models.Data>? deletedConnections = [];
   sent_models.GetSentConnectionResponse? deletedConnectionsResponse;
@@ -309,7 +309,7 @@ class InboxProvider extends BaseChangeNotifier {
   }) async {
     isSentLoading = true;
     isSentHasError = false;
-    sentErrorMessage = null;
+    sentNotifyMessage = null;
     notifyListeners();
 
     try {
@@ -331,13 +331,13 @@ class InboxProvider extends BaseChangeNotifier {
         isSentHasError = false;
       } else {
         isSentHasError = true;
-        sentErrorMessage =
-            sentConnectionsResponse?.message ?? 'Failed to load sent connections';
+        sentNotifyMessage = sentConnectionsResponse?.message ??
+            'Failed to load sent connections';
         sentConnections = [];
       }
     } catch (e) {
       isSentHasError = true;
-      sentErrorMessage = e.toString();
+      sentNotifyMessage = e.toString();
       sentConnections = [];
     }
 
@@ -350,7 +350,8 @@ class InboxProvider extends BaseChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await ConnectionsRepository.deleteConnection(connectionId);
+      final response =
+          await ConnectionsRepository.deleteConnection(connectionId);
       if (response.isSuccess) {
         sentConnections = (sentConnections ?? [])
             .where((item) => item.connection?.id != connectionId)
@@ -363,14 +364,49 @@ class InboxProvider extends BaseChangeNotifier {
         return true;
       }
 
-      sentErrorMessage = response.message;
+      sentNotifyMessage = response.message;
     } catch (e) {
-      sentErrorMessage = e.toString();
+      sentNotifyMessage = e.toString();
     }
 
     isDeletingSentConnection = false;
     notifyListeners();
     return false;
+  }
+
+  Future<String> sendSentConnectionReminder(String connectionId) async {
+    sentNotifyMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await ConnectionsRepository.sendReminder(connectionId);
+
+      if (response.isSuccess) {
+        final items = sentConnections;
+        if (items != null) {
+          final index =
+              items.indexWhere((item) => item.connection?.id == connectionId);
+          if (index != -1) {
+            final connection = items[index].connection;
+            if (connection != null) {
+              final currentCount = connection.reminderCount?.toInt() ?? 0;
+              connection.reminderCount = currentCount + 1;
+              connection.lastReminderAt = DateTime.now().toIso8601String();
+            }
+          }
+        }
+        sentNotifyMessage = response.data;
+      } else {
+        sentNotifyMessage = response.message;
+      }
+      notifyListeners();
+      return  response.message;
+    } catch (e) {
+      final message = e.toString();
+      sentNotifyMessage = message;
+      notifyListeners();
+      return message;
+    }
   }
 
   Future<void> fetchDeletedConnections({
@@ -478,7 +514,7 @@ class InboxProvider extends BaseChangeNotifier {
     isSentLoading = false;
     isSentHasError = false;
     isDeletingSentConnection = false;
-    sentErrorMessage = null;
+    sentNotifyMessage = null;
     notifyListeners();
   }
 
