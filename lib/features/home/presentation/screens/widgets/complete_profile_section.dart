@@ -81,9 +81,9 @@ class _CompleteProfileTileData {
 
   final String title;
   final String iconImagePath;
-  final void Function(BuildContext context) onTap;
+  final Future<void> Function(BuildContext context) onTap;
 
-  void open(BuildContext context) => onTap(context);
+  Future<void> open(BuildContext context) => onTap(context);
 
   static _CompleteProfileTileData fromSection(
     ProfileCompletionSection section,
@@ -167,17 +167,27 @@ class _CompleteProfileTileData {
     );
   }
 
-  static void _openVerifyNumber(BuildContext context) async {
+  static Future<void> _openVerifyNumber(BuildContext context) async {
     await context.pushNamed(
       Routes.verifyNumber,
       extra: {'fromScreen': completeProfileSource},
     );
+    if (!context.mounted) return;
+    await ProviderScope.containerOf(
+      context,
+      listen: false,
+    ).read(profileProvider).getProfile(context);
   }
 
-  static void _openPhotoUpload(BuildContext context) async {
+  static Future<void> _openPhotoUpload(BuildContext context) async {
     await context.pushNamed(
       Routes.photoUpload,
       extra: {'fromScreen': completeProfileSource},
     );
+    if (!context.mounted) return;
+    await ProviderScope.containerOf(
+      context,
+      listen: false,
+    ).read(profileProvider).getProfile(context);
   }
 }
