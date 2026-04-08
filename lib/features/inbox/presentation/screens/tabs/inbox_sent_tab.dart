@@ -108,6 +108,7 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
                   if (!mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
+                      duration: const Duration(milliseconds:1500),
                       content: Text(
                         success
                             ? 'Request cancelled successfully'
@@ -146,7 +147,7 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         backgroundColor: Colors.black.withOpacity(0.8),
-                        duration: const Duration(milliseconds: 1000),
+                        duration: const Duration(milliseconds:1500),
                         content: Text(
                           message.trim().isNotEmpty
                               ? message
