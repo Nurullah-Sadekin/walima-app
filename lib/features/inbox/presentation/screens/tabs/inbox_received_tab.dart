@@ -31,7 +31,6 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
   @override
   Widget build(BuildContext context) {
     final provider = ref.watch(inboxProvider);
-
     return SingleChildScrollView(
       child: Column(
         children: [
