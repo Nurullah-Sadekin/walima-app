@@ -42,9 +42,8 @@ class ProfileSummerySection extends ConsumerWidget {
           showBottomIcon: true,
           topIconPath: AppImages.verifiedBadgeSvgIcon,
           bottomIconPath: AppImages.cameraSvgIcon,
-          onTapImage: () async{
-            await DialogUtils.showFullScreenImage(context: context,
-                imagePath: profile?.profilePicture?.url ?? AppImages.demoProfile);
+          onTapImage: () async {
+            await DialogUtils.showFullScreenImage(context: context, imagePath: profile?.profilePicture?.url ?? AppImages.demoProfile);
           },
           onBottomIconPressed: () async {
             final String? imagePath = await PickerDialog().imagePicker(context);

@@ -16,13 +16,10 @@ class CompleteProfileSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final provider = ref.watch(profileProvider);
-    final completionPercentage =
-        provider.profile?.profileCompletion?.percentage ?? 0;
-    final incompleteItems =
-        (provider.profile?.profileCompletion?.missingSectionItems ??
-                const <ProfileCompletionSection>[])
-            .map(_CompleteProfileTileData.fromSection)
-            .toList();
+    final completionPercentage = provider.profile?.profileCompletion?.percentage ?? 0;
+    final incompleteItems = (provider.profile?.profileCompletion?.missingSectionItems ?? const <ProfileCompletionSection>[])
+        .map(_CompleteProfileTileData.fromSection)
+        .toList();
 
     if (completionPercentage >= 100 || incompleteItems.isEmpty) {
       return const SizedBox.shrink();
@@ -79,6 +76,8 @@ class _CompleteProfileTileData {
     required this.iconImagePath,
     required this.onTap,
   });
+
+  static const String completeProfileSource = 'completeProfile';
 
   final String title;
   final String iconImagePath;
@@ -168,11 +167,17 @@ class _CompleteProfileTileData {
     );
   }
 
-  static void _openVerifyNumber(BuildContext context) {
-    context.pushNamed(Routes.verifyNumber);
+  static void _openVerifyNumber(BuildContext context) async {
+    await context.pushNamed(
+      Routes.verifyNumber,
+      extra: {'fromScreen': completeProfileSource},
+    );
   }
 
-  static void _openPhotoUpload(BuildContext context) {
-    context.pushNamed(Routes.photoUpload);
+  static void _openPhotoUpload(BuildContext context) async {
+    await context.pushNamed(
+      Routes.photoUpload,
+      extra: {'fromScreen': completeProfileSource},
+    );
   }
 }

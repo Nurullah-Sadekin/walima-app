@@ -36,7 +36,6 @@ class ProfileSummaryCard extends StatelessWidget {
   final VoidCallback? onTapImage;
   final VoidCallback? onBottomIconPressed;
 
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -81,6 +80,7 @@ class ProfileSummaryCard extends StatelessWidget {
             ),
           ),
           _memberIdChip(context),
+          const SizedBox(height: 4),
           _subscriptionRow(context),
         ],
       ),
@@ -139,14 +139,16 @@ class ProfileSummaryCard extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        Text(
-          expiryText,
-          style: TextStyle(
-            color: AppColors.textSecondaryLight,
-            fontSize: TextSize.font14(context),
-            fontWeight: FontWeight.w400,
-          ),
-        ),
+        planName.toLowerCase() == 'free'
+            ? const SizedBox.shrink()
+            : Text(
+                expiryText,
+                style: TextStyle(
+                  color: AppColors.textSecondaryLight,
+                  fontSize: TextSize.font14(context),
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
       ],
     );
   }

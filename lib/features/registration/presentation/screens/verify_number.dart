@@ -14,13 +14,22 @@ import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:go_router/go_router.dart';
 
 class VerifyNumberScreen extends ConsumerStatefulWidget {
-  const VerifyNumberScreen({super.key});
+  const VerifyNumberScreen({super.key, this.fromScreen});
+
+  static const String completeProfileSource = 'completeProfile';
+
+  final String? fromScreen;
+
   @override
   ConsumerState<VerifyNumberScreen> createState() => _VerifyNumberScreenState();
 }
 
 class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
   late RegistrationProvider provider;
+
+  bool get _isFromCompleteProfile {
+    return widget.fromScreen?.trim() == VerifyNumberScreen.completeProfileSource;
+  }
 
   final List<TextEditingController> _otpControllers = List.generate(
     5,
@@ -86,9 +95,10 @@ class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
             Text(
               'Verify Number',
               style: TextStyle(
-                  fontSize: TextSize.font18(context),
-                  color: AppColors.textPrimaryLight,
-                  fontWeight: FontWeight.w500),
+                fontSize: TextSize.font18(context),
+                color: AppColors.textPrimaryLight,
+                fontWeight: FontWeight.w500,
+              ),
             ),
             Row(
               spacing: 8,
@@ -97,28 +107,32 @@ class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
                 Text(
                   'We\'ve sent a code to ' '+${provider.phoneController.text}',
                   style: TextStyle(
-                      fontSize: TextSize.font14(context),
-                      color: AppColors.textSecondaryLight,
-                      fontWeight: FontWeight.w400),
+                    fontSize: TextSize.font14(context),
+                    color: AppColors.textSecondaryLight,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
                 InkWell(
                   onTap: () {},
                   child: Row(
                     spacing: 2,
                     children: [
-                      Icon(Icons.edit_outlined,
-                          size: TextSize.font14(context),
-                          color: AppColors.primary),
+                      Icon(
+                        Icons.edit_outlined,
+                        size: TextSize.font14(context),
+                        color: AppColors.primary,
+                      ),
                       Text(
                         'Edit',
                         style: TextStyle(
-                            fontSize: TextSize.font14(context),
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w600),
+                          fontSize: TextSize.font14(context),
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
             Padding(
@@ -128,9 +142,10 @@ class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
             Text(
               'Experiencing issues receiving the code?',
               style: TextStyle(
-                  fontSize: TextSize.font14(context),
-                  color: AppColors.textSecondaryLight,
-                  fontWeight: FontWeight.w400),
+                fontSize: TextSize.font14(context),
+                color: AppColors.textSecondaryLight,
+                fontWeight: FontWeight.w400,
+              ),
             ),
             Text(
               'Resend Code',
@@ -245,7 +260,11 @@ class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
           onTap: otpCode.length != 5
               ? () {}
               : () {
-                  context.push(Paths.photoUpload);
+                  if (_isFromCompleteProfile) {
+                    context.pop();
+                    return;
+                  }
+                  context.pushNamed(Routes.photoUpload);
                 },
         ),
       ],

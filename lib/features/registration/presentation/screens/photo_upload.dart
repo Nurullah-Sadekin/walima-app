@@ -21,7 +21,12 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 class PhotoUploadScreen extends ConsumerStatefulWidget {
-  const PhotoUploadScreen({super.key});
+  const PhotoUploadScreen({super.key, this.fromScreen});
+
+  static const String completeProfileSource = 'completeProfile';
+
+  final String? fromScreen;
+
   @override
   ConsumerState<PhotoUploadScreen> createState() => _PhotoUploadScreenState();
 }
@@ -31,6 +36,10 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
   final ImagePicker _imagePicker = ImagePicker();
   String? _selectedImagePath;
   bool _isPickingImage = false;
+
+  bool get _isFromCompleteProfile {
+    return widget.fromScreen?.trim() == PhotoUploadScreen.completeProfileSource;
+  }
 
   @override
   void initState() {
@@ -68,6 +77,10 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
                       trailingText: 'Add Photos Later',
                       isTrailing: true,
                       onTrailingTap: () {
+                        if (_isFromCompleteProfile) {
+                          context.pop();
+                          return;
+                        }
                         context.push(Paths.hobbiesInterests);
                       },
                     ),
@@ -122,7 +135,19 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
       });
 
       if (!mounted) return;
-      context.push(Paths.cropImage, extra: croppedPath);
+      final normalizedFromScreen = widget.fromScreen?.trim();
+      if (normalizedFromScreen != null && normalizedFromScreen.isNotEmpty) {
+        context.pushNamed(
+          Routes.cropImage,
+          queryParameters: {'fromScreen': normalizedFromScreen},
+          extra: croppedPath,
+        );
+      } else {
+        context.pushNamed(
+          Routes.cropImage,
+          extra: croppedPath,
+        );
+      }
     } on PlatformException catch (e) {
       if (!mounted) return;
 
@@ -150,11 +175,11 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
         ),
       );
     } finally {
-      if (!mounted) return;
-
-      setState(() {
-        _isPickingImage = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isPickingImage = false;
+        });
+      }
     }
   }
 
@@ -167,7 +192,19 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
       return;
     }
 
-    context.push(Paths.cropImage, extra: imagePath);
+    final normalizedFromScreen = widget.fromScreen?.trim();
+    if (normalizedFromScreen != null && normalizedFromScreen.isNotEmpty) {
+      context.pushNamed(
+        Routes.cropImage,
+        queryParameters: {'fromScreen': normalizedFromScreen},
+        extra: imagePath,
+      );
+    } else {
+      context.pushNamed(
+        Routes.cropImage,
+        extra: imagePath,
+      );
+    }
   }
 
   Widget body(BuildContext context) {

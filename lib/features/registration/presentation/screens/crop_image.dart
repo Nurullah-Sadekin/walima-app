@@ -15,17 +15,24 @@ import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:go_router/go_router.dart';
 
 class CropImageScreen extends ConsumerStatefulWidget {
-  const CropImageScreen({super.key, this.imagePath});
+  const CropImageScreen({super.key, this.imagePath, this.fromScreen});
 
   final String? imagePath;
+  final String? fromScreen;
 
   @override
   ConsumerState<CropImageScreen> createState() => _CropImageScreenState();
 }
 
 class _CropImageScreenState extends ConsumerState<CropImageScreen> {
+  static const String _completeProfileSource = 'completeProfile';
+
   late RegistrationProvider provider;
   String? _selectedImagePath;
+
+  bool get _isFromCompleteProfile {
+    return widget.fromScreen?.trim() == _completeProfileSource;
+  }
 
   @override
   void initState() {
@@ -129,6 +136,11 @@ class _CropImageScreenState extends ConsumerState<CropImageScreen> {
     );
 
     if (isUploaded) {
+      if (_isFromCompleteProfile) {
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+        return;
+      }
       context.push(Paths.hobbiesInterests);
       return;
     }

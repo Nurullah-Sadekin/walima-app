@@ -35,6 +35,7 @@ import 'package:flutter_boilerplate/features/registration/presentation/screens/h
 import 'package:flutter_boilerplate/features/registration/presentation/screens/photo_upload.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/profile_created_status.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/profile_is_for.dart';
+import 'package:flutter_boilerplate/features/registration/presentation/screens/verify_number.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/verify_otp_for_sign_up.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/screens/your_religion.dart';
 import 'package:flutter_boilerplate/features/settings/presentation/screens/settings_screen.dart';
@@ -183,15 +184,45 @@ GoRouter goRouter(Ref ref) {
         name: Routes.aboutYourself,
         builder: (context, state) => const AboutYourselfScreen(),
       ),
-      // GoRoute(
-      //   path: Paths.verifyNumber,
-      //   name: Routes.verifyNumber,
-      //   builder: (context, state) => const VerifyNumberScreen(),
-      // ),
+      GoRoute(
+        path: Paths.verifyNumber,
+        name: Routes.verifyNumber,
+        builder: (context, state) {
+          final extra = state.extra;
+          String? fromScreen;
+
+          if (extra is String) {
+            fromScreen = extra.trim();
+          } else if (extra is Map) {
+            final map = Map<String, dynamic>.from(extra);
+            final rawFromScreen = map['fromScreen'];
+            if (rawFromScreen is String) {
+              fromScreen = rawFromScreen.trim();
+            }
+          }
+
+          return VerifyNumberScreen(fromScreen: fromScreen);
+        },
+      ),
       GoRoute(
         path: Paths.photoUpload,
         name: Routes.photoUpload,
-        builder: (context, state) => const PhotoUploadScreen(),
+        builder: (context, state) {
+          final extra = state.extra;
+          String? fromScreen;
+
+          if (extra is String) {
+            fromScreen = extra.trim();
+          } else if (extra is Map) {
+            final map = Map<String, dynamic>.from(extra);
+            final rawFromScreen = map['fromScreen'];
+            if (rawFromScreen is String) {
+              fromScreen = rawFromScreen.trim();
+            }
+          }
+
+          return PhotoUploadScreen(fromScreen: fromScreen);
+        },
       ),
       GoRoute(
         path: Paths.hobbiesInterests,
@@ -383,9 +414,32 @@ GoRouter goRouter(Ref ref) {
         path: Paths.cropImage,
         name: Routes.cropImage,
         builder: (context, state) {
-          final imagePath =
-              state.extra is String ? state.extra as String : null;
-          return CropImageScreen(imagePath: imagePath);
+          final extra = state.extra;
+          String? imagePath;
+          final fromScreenFromQuery =
+              state.uri.queryParameters['fromScreen']?.trim();
+          String? fromScreen = fromScreenFromQuery?.isNotEmpty == true
+              ? fromScreenFromQuery
+              : null;
+
+          if (extra is String) {
+            imagePath = extra;
+          } else if (extra is Map) {
+            final map = Map<String, dynamic>.from(extra);
+            final rawImagePath = map['imagePath'];
+            final rawFromScreen = map['fromScreen'];
+            if (rawImagePath is String) {
+              imagePath = rawImagePath;
+            }
+            if (fromScreen == null && rawFromScreen is String) {
+              fromScreen = rawFromScreen.trim();
+            }
+          }
+
+          return CropImageScreen(
+            imagePath: imagePath,
+            fromScreen: fromScreen,
+          );
         },
       ),
 
