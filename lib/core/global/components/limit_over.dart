@@ -38,36 +38,34 @@ class LimitOver extends StatefulWidget {
 class _LimitOverState extends State<LimitOver> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 640),
-          margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
-          decoration: const BoxDecoration(
-            color: AppColors.greenButtonColor,
-            borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 640),
+        margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+        decoration: const BoxDecoration(
+          color: AppColors.transparent,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _header(),
-                const SizedBox(height: 14),
-                _titleSection(),
-                const SizedBox(height: 18),
-                _memberCard(),
-                const SizedBox(height: 16),
-                _statsCard(),
-                const SizedBox(height: 20),
-                _promoPill(),
-                const SizedBox(height: 16),
-                _extendButton(),
-                const SizedBox(height: 10),
-                _maybeLaterButton(),
-              ],
-            ),
-          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _titleSection(),
+            const SizedBox(height: 18),
+            _memberCard(),
+            const SizedBox(height: 16),
+            _statsCard(),
+            const SizedBox(height: 20),
+            _promoPill(),
+            const SizedBox(height: 16),
+            _extendButton(),
+            const SizedBox(height: 10),
+            _maybeLaterButton(),
+          ],
         ),
       ),
     );
@@ -250,7 +248,7 @@ class _LimitOverState extends State<LimitOver> {
     required String value,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 6,horizontal: 6),
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(14),
@@ -304,7 +302,8 @@ class _LimitOverState extends State<LimitOver> {
               size: TextSize.font14(context),
             ),
             const SizedBox(width: 8),
-            Text('Save upto 55% on Premium Plans!',
+            Text(
+              'Save upto 55% on Premium Plans!',
               style: TextStyle(
                 color: AppColors.primary,
                 fontSize: TextSize.font14(context),
@@ -320,9 +319,9 @@ class _LimitOverState extends State<LimitOver> {
   Widget _extendButton() {
     return PrimaryButtons(
       buttonStyle: ButtonsStyle.iconicDynamicButton,
-      onTap:  widget.onExtendPlan ?? (){},
+      onTap: widget.onExtendPlan ?? () {},
       title: 'Extend Plan',
-        svgIconPath : AppImages.premiumSvgIcon,
+      svgIconPath: AppImages.premiumSvgIcon,
       svgIconColor: AppColors.white,
       titleSize: TextSize.font14(context),
       textColor: AppColors.white,

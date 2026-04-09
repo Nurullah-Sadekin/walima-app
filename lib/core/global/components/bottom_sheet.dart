@@ -21,9 +21,11 @@ class BottomSheetUtils {
     // Calculate dynamic height based on number of items
     double itemHeight = 70.0; // Approximate height per item
     double headerHeight = 60.0; // Height of header section
-    double maxHeight = MediaQuery.of(context).size.height * 0.9; // Max 60% of screen
+    double maxHeight =
+        MediaQuery.of(context).size.height * 0.9; // Max 60% of screen
     double calculatedHeight = (items.length * itemHeight) + headerHeight;
-    double bottomSheetHeight = calculatedHeight > maxHeight ? maxHeight : calculatedHeight;
+    double bottomSheetHeight =
+        calculatedHeight > maxHeight ? maxHeight : calculatedHeight;
 
     return showModalBottomSheet(
       context: context,
@@ -87,117 +89,94 @@ class BottomSheetUtils {
     );
   }
 
-
   static Future<dynamic> open({
     required BuildContext context,
     required Widget child,
     bool? fullHeight,
     bool showHeader = true,
   }) async {
-    final maxHeightFactor = fullHeight == true ? 0.88 : 0.5;
+    final mediaQuery = MediaQuery.of(context);
+    final maxHeightFactor = fullHeight == true ? 0.88 : 0.75;
 
     return showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // Always true to allow custom sizing
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
       useSafeArea: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return Container(
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * maxHeightFactor,
-              ),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
+        final maxHeight = mediaQuery.size.height * maxHeightFactor;
+
+        return AnimatedPadding(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+          padding: EdgeInsets.only(bottom: mediaQuery.viewInsets.bottom),
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxHeight: maxHeight),
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
                 ),
-              ),
-              child: SafeArea(
-                top: false,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (showHeader) ...[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 4,
-                            margin: const EdgeInsets.symmetric(vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.black26,
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
+                child: SafeArea(
+                  top: false,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (showHeader) ...[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            InkWell(
-                              onTap: () => Navigator.pop(context),
-                              child: ShowImage(
-                                imagePath: AppImages.cancelSvgIcon,
-                                width: TextSize.font20(context),
-                                height: TextSize.font20(context),
-                                color: AppColors.textSecondaryLight,
+                            Container(
+                              width: 40,
+                              height: 4,
+                              margin: const EdgeInsets.symmetric(vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.black26,
+                                borderRadius: BorderRadius.circular(2),
                               ),
                             ),
                           ],
                         ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              InkWell(
+                                onTap: () => Navigator.pop(context),
+                                child: ShowImage(
+                                  imagePath: AppImages.cancelSvgIcon,
+                                  width: TextSize.font20(context),
+                                  height: TextSize.font20(context),
+                                  color: AppColors.textSecondaryLight,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                      Flexible(
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          child: child,
+                        ),
                       ),
                     ],
-                    Flexible(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: _wrapChildForReturn(context, child),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            );
-          },
+            ),
+          ),
         );
       },
-    );
-  }
-  /// Wraps the provided child in a nested [Navigator] which intercepts any
-  /// pop from the child's navigator (via [onPopPage]) and forwards the
-  /// popped `result` to the modal bottom sheet by calling
-  /// `Navigator.of(modalContext).pop(result)`. This makes
-  /// `Navigator.pop(childContext, data)` behave as if it returned `data`
-  /// from the `showModalBottomSheet` Future.
-  static Widget _wrapChildForReturn(BuildContext modalContext, Widget child) {
-    final navigator = Navigator.of(modalContext);
-
-    return Navigator(
-      onPopPage: (Route<dynamic> route, dynamic result) {
-        final bool didPop = route.didPop(result);
-        if (didPop) {
-          // Forward the result to the modal bottom sheet. Use a microtask
-          // to avoid calling pop synchronously while the nested route is
-          // finishing its own pop handling.
-          Future.microtask(() {
-            if (navigator.canPop()) {
-              navigator.pop(result);
-            }
-          });
-        }
-        return didPop;
-      },
-      pages: [
-        MaterialPage(child: child),
-      ],
     );
   }
 
@@ -246,7 +225,9 @@ class BottomSheetUtils {
       try {
         if (item == null) return '';
         if (item is String) return item;
-        if (item is Map) return (item['name'] ?? item['title'] ?? item.toString()).toString();
+        if (item is Map) {
+          return (item['name'] ?? item['title'] ?? item.toString()).toString();
+        }
         final dynamic name = item.name ?? item.title;
         return (name ?? item.toString()).toString();
       } catch (_) {
@@ -278,9 +259,12 @@ class BottomSheetUtils {
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.only(bottom: 10), // Remove padding to eliminate extra space
+      padding: const EdgeInsets.only(
+        bottom: 10,
+      ), // Remove padding to eliminate extra space
       shrinkWrap: true, // Important: makes ListView take only needed space
-      physics: const AlwaysScrollableScrollPhysics(), // Enable scrolling if needed
+      physics:
+          const AlwaysScrollableScrollPhysics(), // Enable scrolling if needed
       itemCount: items.length,
       separatorBuilder: (context, index) => const Padding(
         padding: EdgeInsets.symmetric(horizontal: 16),
@@ -288,7 +272,8 @@ class BottomSheetUtils {
       itemBuilder: (context, index) {
         final item = items[index];
         final displayText = display(item);
-        final selectedText = selectedValue != null ? selectedValue.toString() : '';
+        final selectedText =
+            selectedValue != null ? selectedValue.toString() : '';
         final isSelected = displayText == selectedText;
 
         return Container(
