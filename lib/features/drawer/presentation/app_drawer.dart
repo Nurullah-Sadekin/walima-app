@@ -27,8 +27,12 @@ class AppDrawer extends ConsumerStatefulWidget {
 }
 
 class _AppDrawerState extends ConsumerState<AppDrawer> {
-  static const String _helpCenterUrl = 'https://dev.walima.app/en/account/help-desk';
-  static const String _beSafeOnlineUrl = 'https://dev.walima.app/en/be-safe-online';
+  static const String _helpCenterUrl =
+      'https://dev.walima.app/en/account/help-desk';
+  static const String _beSafeOnlineUrl =
+      'https://dev.walima.app/en/be-safe-online';
+  static const String _privacyPolicyUrl = 'https://dev.walima.app/en/privacy';
+  static const String _safetyUrl = 'https://dev.walima.app/en/safety';
   static const String _termsUrl = 'https://dev.walima.app/en/terms';
 
   Future<void> _openLink(String title, String url) {
@@ -46,7 +50,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
     return Drawer(
       width: MediaQuery.of(context).size.width,
       child: TransparentLoading(
-        isLoading: provider.loaderState == DrawerScreenStates.transparentLoading,
+        isLoading:
+            provider.loaderState == DrawerScreenStates.transparentLoading,
         child: Scaffold(
           body: SafeArea(
             child: Padding(
@@ -78,7 +83,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
               svgIconPath: AppImages.logOutSvgIcon,
               svgIconColor: AppColors.white,
               onTap: () async {
-                await provider.logout(() {
+                await provider.logout(
+                  () {
                     router.go(Paths.login);
                   },
                   onBeforeLogout: () {
@@ -96,7 +102,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
               buttonStyle: ButtonsStyle.iconicDynamicButton,
             ),
           ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
         ),
       ),
     );
@@ -131,20 +138,24 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
     final displayName = resolveDisplayName(profileData);
     final memberId = resolveMemberId(profileData);
     final planName = resolvePlanName(profileData?.membership);
-    final expiryText = formatExpiry(profileData?.membership?.membershipExpiresAt);
+    final expiryText =
+        formatExpiry(profileData?.membership?.membershipExpiresAt);
     return ProfileSummaryCard(
       displayName: displayName,
       memberId: memberId,
       planName: planName,
       expiryText: expiryText,
-      profileImagePath: profileData?.profilePicture?.url ?? AppImages.demoProfile,
+      profileImagePath:
+          profileData?.profilePicture?.url ?? AppImages.demoProfile,
       showTopIcon: profileData?.isVerified ?? true,
       showBottomIcon: true,
       topIconPath: AppImages.verifiedBadgeSvgIcon,
       bottomIconPath: AppImages.cameraSvgIcon,
-      onTapImage: () async{
-        await DialogUtils.showFullScreenImage(context: context,
-            imagePath: profileData?.profilePicture?.url ?? AppImages.demoProfile);
+      onTapImage: () async {
+        await DialogUtils.showFullScreenImage(
+          context: context,
+          imagePath: profileData?.profilePicture?.url ?? AppImages.demoProfile,
+        );
       },
       onBottomIconPressed: () async {
         final String? imagePath = await PickerDialog().imagePicker(context);
@@ -300,6 +311,16 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
           onTap: () => _openLink('Be Safe Online', _beSafeOnlineUrl),
         ),
         ProfileActionTile(
+          iconImagePath: AppImages.documentValidationSvgIcon,
+          title: 'Privacy Policy',
+          onTap: () => _openLink('Privacy Policy', _privacyPolicyUrl),
+        ),
+        ProfileActionTile(
+          iconImagePath: AppImages.safetySvgIcon,
+          title: 'Safety',
+          onTap: () => _openLink('Safety', _safetyUrl),
+        ),
+        ProfileActionTile(
           iconImagePath: AppImages.starSvgIcon,
           title: 'Rate The App',
           onTap: () {},
@@ -341,7 +362,11 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
           FutureBuilder<String>(
             future: GlobalRepository().getAppVersion(),
             builder: (context, snapshot) {
-              final versionLabel = snapshot.connectionState == ConnectionState.done && snapshot.hasData ? 'Version ${snapshot.data}' : 'Version';
+              final versionLabel =
+                  snapshot.connectionState == ConnectionState.done &&
+                          snapshot.hasData
+                      ? 'Version ${snapshot.data}'
+                      : 'Version';
               return Text(
                 versionLabel,
                 textAlign: TextAlign.center,

@@ -1,7 +1,7 @@
 name: flutter_boilerplate
 description: A Flutter boilerplate with clean architecture, GoRouter, Riverpod, and more.
 publish_to: 'none'
-version: 0.0.1+1
+version: 0.0.1+2
 
 environment:
   sdk: '>=3.0.0 <4.0.0'

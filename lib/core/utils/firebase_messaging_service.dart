@@ -53,8 +53,7 @@ class FirebaseMessagingService {
     final token = await messaging.getToken();
     await _persistToken(token);
 
-    _tokenRefreshSubscription =
-        FirebaseMessaging.instance.onTokenRefresh.listen(
+    _tokenRefreshSubscription = FirebaseMessaging.instance.onTokenRefresh.listen(
       (token) async {
         await _persistToken(token);
         final accessToken = await PrefsHelper.getAccessToken();
@@ -130,8 +129,7 @@ class FirebaseMessagingService {
     try {
       await _ensureFirebaseInitialized();
       final messaging = FirebaseMessaging.instance;
-      final token = (await messaging.getToken())?.trim() ??
-          (await PrefsHelper.getFcmToken()).trim();
+      final token = (await messaging.getToken())?.trim() ?? (await PrefsHelper.getFcmToken()).trim();
       if (token.isEmpty) {
         debugPrint(
           '[FirebaseMessagingService] skipping device token registration: no FCM token',
@@ -213,10 +211,8 @@ class FirebaseMessagingService {
 
   Future<void> _showForegroundNotification(RemoteMessage message) async {
     final remoteNotification = message.notification;
-    final title =
-        remoteNotification?.title ?? message.data['title']?.toString() ?? '';
-    final body =
-        remoteNotification?.body ?? message.data['body']?.toString() ?? '';
+    final title = remoteNotification?.title ?? message.data['title']?.toString() ?? '';
+    final body = remoteNotification?.body ?? message.data['body']?.toString() ?? '';
 
     if (title.trim().isEmpty && body.trim().isEmpty) return;
 
