@@ -44,6 +44,21 @@ class PrefsHelper {
     await prefs.setString(StorageKeys.quotaSnapshot, json);
   }
 
+  static Future<void> setFcmToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(StorageKeys.fcmToken, token);
+  }
+
+  static Future<String> getFcmToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(StorageKeys.fcmToken) ?? '';
+  }
+
+  static Future<void> clearFcmToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(StorageKeys.fcmToken);
+  }
+
   static Future<String> getQuotaSnapshot() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(StorageKeys.quotaSnapshot) ?? '';
@@ -58,6 +73,7 @@ class PrefsHelper {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(StorageKeys.accessToken);
     await prefs.remove(StorageKeys.refreshToken);
+    await prefs.remove(StorageKeys.fcmToken);
   }
 
   static Future<void> setRegistrationDraft(String draftJson) async {

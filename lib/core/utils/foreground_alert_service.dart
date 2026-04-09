@@ -84,6 +84,20 @@ class ForegroundAlertService {
     );
   }
 
+  Future<void> notifyRemoteNotification({
+    required String title,
+    required String body,
+  }) async {
+    if (!_initialized) return;
+    if (!_isAppInForeground) return;
+    if (title.trim().isEmpty && body.trim().isEmpty) return;
+
+    await _showLocalNotification(
+      title: title.trim().isEmpty ? 'Walima' : title,
+      body: body.trim(),
+    );
+  }
+
   String _resolveSenderName(chat_message.Message msg) {
     final fromSender = [
       msg.sender?.firstName,

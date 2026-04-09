@@ -1,0 +1,34 @@
+{
+  "project_info": {
+    "project_number": "249586231317",
+    "project_id": "walima-a779e",
+    "storage_bucket": "walima-a779e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:249586231317:android:f3db0f06856e9e354bc61c",
+        "android_client_info": {
+          "package_name": "com.walima.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDi6Er5j6PzrRduzrDitVZrIJJFnaqbU08"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "249586231317-sftd9fqeoam50fs9t8cblmji32fpihik.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

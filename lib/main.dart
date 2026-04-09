@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_boilerplate/generated/l10n/app_localizations.dart';
+import 'package:flutter_boilerplate/core/firebase/firebase_options.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
 import 'package:flutter_boilerplate/core/router/app_router.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
@@ -12,10 +15,19 @@ import 'package:flutter_boilerplate/core/connectivity/connectivity_keys.dart';
 import 'package:flutter_boilerplate/core/connectivity/connectivity_monitor.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
+import 'package:flutter_boilerplate/core/utils/firebase_messaging_service.dart';
 import 'package:flutter_boilerplate/core/utils/foreground_alert_service.dart';
 import 'package:flutter_boilerplate/features/chat/data/socket/socket_service.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  if (!kIsWeb &&
+      defaultTargetPlatform == TargetPlatform.android &&
+      Firebase.apps.isEmpty) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
   runApp(
     const ProviderScope(
       child: SafeArea(
@@ -94,6 +106,11 @@ class _AppRealtimeBootstrapState extends ConsumerState<AppRealtimeBootstrap>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ForegroundAlertService.instance.initialize();
       ForegroundAlertService.instance.setAppForeground(true);
+      FirebaseMessagingService.instance.initialize(
+        onNotificationSyncNeeded: () async {
+          await ref.read(notiProvider).getNotificationCount();
+        },
+      );
       ref.read(globalProvider).initialize().then((_) async {
         final accessToken = await PrefsHelper.getAccessToken();
         if (accessToken.trim().isNotEmpty) {
