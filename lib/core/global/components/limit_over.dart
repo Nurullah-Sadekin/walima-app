@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 
 class LimitOver extends StatefulWidget {
   const LimitOver({
     super.key,
     this.memberName = 'Member',
-    this.memberLocation = 'Barisal',
+    this.memberLocation = 'Barista',
     this.memberImagePath = AppImages.demoProfile,
     this.usedCount = 1,
     this.limitCount = 1,
@@ -37,36 +38,34 @@ class LimitOver extends StatefulWidget {
 class _LimitOverState extends State<LimitOver> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 640),
-          margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(28),
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 640),
+        margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+        decoration: const BoxDecoration(
+          color: AppColors.transparent,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _header(),
-                const SizedBox(height: 14),
-                _titleSection(),
-                const SizedBox(height: 18),
-                _memberCard(),
-                const SizedBox(height: 16),
-                _statsCard(),
-                const SizedBox(height: 20),
-                _promoPill(),
-                const SizedBox(height: 16),
-                _extendButton(),
-                const SizedBox(height: 10),
-                _maybeLaterButton(),
-              ],
-            ),
-          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _titleSection(),
+            const SizedBox(height: 18),
+            _memberCard(),
+            const SizedBox(height: 16),
+            _statsCard(),
+            const SizedBox(height: 20),
+            _promoPill(),
+            const SizedBox(height: 16),
+            _extendButton(),
+            const SizedBox(height: 10),
+            _maybeLaterButton(),
+          ],
         ),
       ),
     );
@@ -96,27 +95,27 @@ class _LimitOverState extends State<LimitOver> {
     return Column(
       children: [
         Container(
-          width: 88,
-          height: 88,
+          width: 60,
+          height: 60,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [Color(0xFFFF4FA1), AppColors.primary],
             ),
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(12),
             boxShadow: const [
               BoxShadow(
                 color: Color(0x33FD297B),
-                blurRadius: 18,
+                blurRadius: 8,
                 offset: Offset(0, 8),
               ),
             ],
           ),
-          child: const Icon(
+          child: Icon(
             Icons.workspace_premium_outlined,
             color: AppColors.white,
-            size: 40,
+            size: TextSize.font30(context),
           ),
         ),
         const SizedBox(height: 18),
@@ -125,7 +124,7 @@ class _LimitOverState extends State<LimitOver> {
           textAlign: TextAlign.center,
           style: TextStyle(
             color: AppColors.textPrimaryLight,
-            fontSize: TextSize.font30(context),
+            fontSize: TextSize.font22(context),
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -135,7 +134,7 @@ class _LimitOverState extends State<LimitOver> {
           textAlign: TextAlign.center,
           style: TextStyle(
             color: AppColors.textSecondaryLight,
-            fontSize: TextSize.font16(context),
+            fontSize: TextSize.font12(context),
             fontWeight: FontWeight.w400,
           ),
         ),
@@ -144,55 +143,47 @@ class _LimitOverState extends State<LimitOver> {
   }
 
   Widget _memberCard() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF3F4F6),
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Row(
-        children: [
-          ClipOval(
-            child: ShowImage(
-              imagePath: widget.memberImagePath,
-              width: 62,
-              height: 62,
-              fit: BoxFit.cover,
-            ),
+    return Column(
+      children: [
+        ClipOval(
+          child: ShowImage(
+            imagePath: widget.memberImagePath,
+            width: TextSize.font36(context) * 2,
+            height: TextSize.font36(context) * 2,
+            fit: BoxFit.cover,
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.memberName,
-                  style: TextStyle(
-                    color: AppColors.textPrimaryLight,
-                    fontSize: TextSize.font20(context),
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  widget.memberLocation,
-                  style: TextStyle(
-                    color: AppColors.textSecondaryLight,
-                    fontSize: TextSize.font16(context),
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ],
+        ),
+        const SizedBox(width: 14),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              widget.memberName,
+              style: TextStyle(
+                color: AppColors.textPrimaryLight,
+                fontSize: TextSize.font16(context),
+                fontWeight: FontWeight.w700,
+              ),
             ),
-          ),
-        ],
-      ),
+            const SizedBox(height: 4),
+            Text(
+              widget.memberLocation,
+              style: TextStyle(
+                color: AppColors.textSecondaryLight,
+                fontSize: TextSize.font13(context),
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
   Widget _statsCard() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
       decoration: BoxDecoration(
         color: const Color(0xFFF3F4F6),
         borderRadius: BorderRadius.circular(18),
@@ -200,6 +191,7 @@ class _LimitOverState extends State<LimitOver> {
       child: Column(
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
                 child: _metricTile(
@@ -231,16 +223,16 @@ class _LimitOverState extends State<LimitOver> {
                   text: 'Resets on ',
                   style: TextStyle(
                     color: AppColors.textSecondaryLight,
-                    fontSize: TextSize.font16(context),
+                    fontSize: TextSize.font14(context),
                     fontWeight: FontWeight.w400,
                   ),
                 ),
                 TextSpan(
                   text: widget.resetOnText,
                   style: TextStyle(
-                    color: AppColors.textPrimaryLight,
-                    fontSize: TextSize.font16(context),
-                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                    fontSize: TextSize.font14(context),
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
@@ -256,7 +248,7 @@ class _LimitOverState extends State<LimitOver> {
     required String value,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(14),
@@ -278,7 +270,7 @@ class _LimitOverState extends State<LimitOver> {
               fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Text(
             value,
             style: TextStyle(
@@ -304,17 +296,17 @@ class _LimitOverState extends State<LimitOver> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.auto_awesome_outlined,
               color: AppColors.primary,
-              size: 18,
+              size: TextSize.font14(context),
             ),
             const SizedBox(width: 8),
             Text(
               'Save upto 55% on Premium Plans!',
               style: TextStyle(
                 color: AppColors.primary,
-                fontSize: TextSize.font16(context),
+                fontSize: TextSize.font14(context),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -325,49 +317,34 @@ class _LimitOverState extends State<LimitOver> {
   }
 
   Widget _extendButton() {
-    return InkWell(
-      onTap: widget.onExtendPlan,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        height: 56,
-        decoration: BoxDecoration(
-          color: AppColors.primary,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.workspace_premium_outlined,
-              color: AppColors.white,
-              size: 24,
-            ),
-            const SizedBox(width: 10),
-            Text(
-              'Extend Plan',
-              style: TextStyle(
-                color: AppColors.white,
-                fontSize: TextSize.font18(context),
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      ),
+    return PrimaryButtons(
+      buttonStyle: ButtonsStyle.iconicDynamicButton,
+      onTap: widget.onExtendPlan ?? () {},
+      title: 'Extend Plan',
+      svgIconPath: AppImages.premiumSvgIcon,
+      svgIconColor: AppColors.white,
+      titleSize: TextSize.font14(context),
+      textColor: AppColors.white,
+      bgColor: AppColors.primary,
     );
   }
 
   Widget _maybeLaterButton() {
-    return TextButton(
-      onPressed: widget.onMaybeLater ?? () => Navigator.of(context).pop(),
-      child: Text(
-        'Maybe later',
-        style: TextStyle(
-          color: AppColors.hintTextColor,
-          fontSize: TextSize.font20(context),
-          fontWeight: FontWeight.w500,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        InkWell(
+          onTap: widget.onMaybeLater ?? () => Navigator.of(context).pop(),
+          child: Text(
+            'Maybe later',
+            style: TextStyle(
+              color: AppColors.hintTextColor,
+              fontSize: TextSize.font14(context),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 }

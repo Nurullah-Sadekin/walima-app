@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
 import 'package:flutter_boilerplate/core/global/components/limit_over.dart';
 import 'package:flutter_boilerplate/core/global/enums/enums.dart' show ConnectionRequestType;
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_boilerplate/features/matches/data/models/request/get_mat
 import 'package:flutter_boilerplate/features/matches/data/models/response/get_matches_response.dart';
 import 'package:flutter_boilerplate/features/matches/data/repository/matches_repository.dart';
 import 'package:flutter_boilerplate/features/matches/domain/request/create_connection_request_body.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeProvider extends BaseChangeNotifier {
@@ -130,14 +132,19 @@ class HomeProvider extends BaseChangeNotifier {
       await updateConnectionStatus(context, id ?? '');
     } else {
       if(response.message?.contains('daily_connect')??false){
-         await DialogUtils.show(
-            context: context,
-            child: LimitOver(
-              onExtendPlan: (){
-                context.pop();
-                context.pushNamed(Routes.upgradePackage);
-              },
-            ),
+        await BottomSheetUtils.open(
+          context: context,
+          fullHeight: false,
+          child: Consumer(
+            builder: (context, ref, _) {
+              return LimitOver(
+                onExtendPlan: (){
+                  context.pop();
+                  context.pushNamed(Routes.upgradePackage);
+                },
+              );
+            },
+          ),
         );
       }
       else{
