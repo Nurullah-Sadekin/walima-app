@@ -188,8 +188,7 @@ class FirebaseMessagingService {
     final deviceId = await _resolveDeviceId();
     final manufacturer = androidInfo.manufacturer.trim();
     final model = androidInfo.model.trim();
-    final deviceName =
-        [manufacturer, model].where((value) => value.isNotEmpty).join(' ');
+    final deviceName = [manufacturer, model].where((value) => value.isNotEmpty).join(' ');
 
     return {
       'token': token,

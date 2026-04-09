@@ -5,6 +5,7 @@ import 'package:flutter_boilerplate/core/global/models/limit_info.dart';
 import 'package:flutter_boilerplate/core/global/enums/enums.dart';
 import 'package:flutter_boilerplate/core/global/repositorys/global_repository.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
+import 'package:flutter_boilerplate/core/utils/app_error_reporting_service.dart';
 import 'package:flutter_boilerplate/features/login/data/models/get_me_response_body.dart'
     as me_response;
 
@@ -56,7 +57,7 @@ class GlobalProvider extends BaseChangeNotifier {
       _setStatus(GlobalStatus.failure);
     }
   }
- 
+
   Future<void> hydrateSessionFromCache() async {
     try {
       final cachedMe = await _repository.getCachedMeSnapshot();
@@ -165,6 +166,7 @@ class GlobalProvider extends BaseChangeNotifier {
     lastQuotaSyncAt = null;
     _quotaByKey.clear();
     await _repository.clearCachedSessionState();
+    await AppErrorReportingService.instance.clearUserContext();
     notifyListeners();
   }
 
@@ -190,6 +192,13 @@ class GlobalProvider extends BaseChangeNotifier {
   }) {
     currentUser = response.response?.user;
     currentUserId = currentUser?.id ?? '';
+    unawaited(
+      AppErrorReportingService.instance.setUserContext(
+        userId: currentUser?.id,
+        email: currentUser?.email,
+        phone: currentUser?.phoneNumber,
+      ),
+    );
     lastQuotaSyncAt = DateTime.now();
     _replaceQuota(
       _repository.extractLimits(response),

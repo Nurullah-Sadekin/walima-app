@@ -8,7 +8,9 @@ import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/global/enums/enums.dart';
+import 'package:flutter_boilerplate/core/utils/app_error_reporting_service.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
+import 'package:flutter_boilerplate/core/utils/firebase_messaging_service.dart';
 import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
 import 'package:flutter_boilerplate/features/login/data/models/resend_otp_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_otp_body.dart';
@@ -2000,10 +2002,17 @@ class RegistrationProvider extends BaseChangeNotifier {
     );
     if (response.code == 'SUCCESS') {
       await _persistAuthTokens(response);
+      await AppErrorReportingService.instance.setUserContext(
+        userId: response.response?.user?.id,
+        email: response.response?.user?.email ?? emailController.text,
+        phone: response.response?.user?.phoneNumber ??
+            _resolveSubmissionPhoneNumber(),
+      );
+      unawaited(FirebaseMessagingService.instance.registerDeviceToken());
       await _clearRegistrationDraftCacheOnSuccess();
       return true;
     } else {
-      if(context.mounted) {
+      if (context.mounted) {
         DialogUtils.showErrorDialog(
           context: context,
           message: response.message ?? 'Registration failed. Please try again.',

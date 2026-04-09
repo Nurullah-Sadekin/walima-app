@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +17,7 @@ import 'package:flutter_boilerplate/core/providers/locale_provider.dart';
 import 'package:flutter_boilerplate/core/connectivity/connectivity_keys.dart';
 import 'package:flutter_boilerplate/core/connectivity/connectivity_monitor.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/utils/app_error_reporting_service.dart';
 import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
 import 'package:flutter_boilerplate/core/utils/firebase_messaging_service.dart';
 import 'package:flutter_boilerplate/core/utils/foreground_alert_service.dart';
@@ -28,16 +32,52 @@ Future<void> main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
   }
-  runApp(
-    const ProviderScope(
-      child: SafeArea(
-        bottom: true,
-        top: false,
-        left: false,
-        right: false,
-        child: MyApp(),
+
+  await AppErrorReportingService.instance.initialize();
+
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    unawaited(
+      AppErrorReportingService.instance.recordFlutterFatalError(details),
+    );
+  };
+
+  PlatformDispatcher.instance.onError = (error, stackTrace) {
+    unawaited(
+      AppErrorReportingService.instance.recordError(
+        error,
+        stackTrace,
+        fatal: true,
+        reason: 'Uncaught platform error',
       ),
-    ),
+    );
+    return true;
+  };
+
+  runZonedGuarded(
+    () {
+      runApp(
+        const ProviderScope(
+          child: SafeArea(
+            bottom: true,
+            top: false,
+            left: false,
+            right: false,
+            child: MyApp(),
+          ),
+        ),
+      );
+    },
+    (error, stackTrace) {
+      unawaited(
+        AppErrorReportingService.instance.recordError(
+          error,
+          stackTrace,
+          fatal: true,
+          reason: 'Uncaught zone error',
+        ),
+      );
+    },
   );
 }
 

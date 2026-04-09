@@ -8,6 +8,7 @@ import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:flutter_boilerplate/core/constants/app_texts.dart';
 import 'package:flutter_boilerplate/core/global/repositorys/global_repository.dart';
 import 'package:flutter_boilerplate/core/network/app_urls.dart';
+import 'package:flutter_boilerplate/core/utils/app_error_reporting_service.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
 
@@ -59,7 +60,9 @@ class DioClient {
           options.extra[_requestStartAtKey] = DateTime.now().toIso8601String();
 
           if (isTokenRequired) {
-            final accessToken = (_authToken?.isNotEmpty ?? false) ? _authToken! : await PrefsHelper.getAccessToken();
+            final accessToken = (_authToken?.isNotEmpty ?? false)
+                ? _authToken!
+                : await PrefsHelper.getAccessToken();
 
             if (accessToken.isNotEmpty) {
               options.headers['Authorization'] = 'Bearer $accessToken';
@@ -83,9 +86,13 @@ class DioClient {
           final requestPath = error.requestOptions.path;
           final isRefreshRequest = requestPath == AppUrls.getAccessToken;
           final isRetried = error.requestOptions.extra[_retryKey] == true;
-          final isTokenRequired = error.requestOptions.extra[_isTokenKey] == true;
+          final isTokenRequired =
+              error.requestOptions.extra[_isTokenKey] == true;
 
-          if ((statusCode == 403 || statusCode == 401) && isTokenRequired && !isRefreshRequest && !isRetried) {
+          if ((statusCode == 403 || statusCode == 401) &&
+              isTokenRequired &&
+              !isRefreshRequest &&
+              !isRetried) {
             _logRetryStart(error.requestOptions, statusCode: statusCode);
             final refreshSuccess = await _refreshAccessTokenWithLock();
 
@@ -102,6 +109,7 @@ class DioClient {
           }
 
           _logError(error);
+          unawaited(AppErrorReportingService.instance.reportApiError(error));
           handler.next(error);
         },
       ),
@@ -151,7 +159,10 @@ class DioClient {
     _onLogout = onLogout;
   }
 
-  Options _optionsWithTokenFlag(Options? options, {required bool isTokenRequired}) {
+  Options _optionsWithTokenFlag(
+    Options? options, {
+    required bool isTokenRequired,
+  }) {
     return Options(
       method: options?.method,
       sendTimeout: options?.sendTimeout,
@@ -210,7 +221,9 @@ class DioClient {
   }
 
   Future<Response<dynamic>> _retryRequest(RequestOptions requestOptions) async {
-    final accessToken = (_authToken?.isNotEmpty ?? false) ? _authToken! : await PrefsHelper.getAccessToken();
+    final accessToken = (_authToken?.isNotEmpty ?? false)
+        ? _authToken!
+        : await PrefsHelper.getAccessToken();
     final updatedHeaders = Map<String, dynamic>.from(requestOptions.headers);
     if (accessToken.isNotEmpty) {
       updatedHeaders['Authorization'] = 'Bearer $accessToken';
@@ -324,6 +337,7 @@ class DioClient {
   Future<void> _logoutUser() async {
     await PrefsHelper.clearTokens();
     removeAuthToken();
+    await AppErrorReportingService.instance.clearUserContext();
     _onLogout?.call();
   }
 
@@ -427,7 +441,8 @@ class DioClient {
       case DioExceptionType.receiveTimeout:
         unawaited(_showGlobalTimeoutDialog());
         return ApiResponse.error(
-          message: 'The API is not responding. The request timed out after 60 seconds.',
+          message:
+              'The API is not responding. The request timed out after 60 seconds.',
           statusCode: 0,
         );
       case DioExceptionType.badResponse:
@@ -479,13 +494,21 @@ class DioClient {
       final response = await _dio.get(
         endpoint,
         queryParameters: queryParameters,
-        options: _optionsWithTokenFlag(options, isTokenRequired: isTokenRequired),
+        options:
+            _optionsWithTokenFlag(options, isTokenRequired: isTokenRequired),
         cancelToken: cancelToken,
       );
       return _handleResponse(response);
     } on DioException catch (e) {
       return _handleError(e);
     } catch (e) {
+      unawaited(
+        AppErrorReportingService.instance.recordError(
+          e,
+          StackTrace.current,
+          reason: 'GET request error for $endpoint',
+        ),
+      );
       return ApiResponse.error(
         message: e.toString(),
         statusCode: 0,
@@ -509,7 +532,8 @@ class DioClient {
         endpoint,
         data: data,
         queryParameters: queryParameters,
-        options: _optionsWithTokenFlag(options, isTokenRequired: isTokenRequired),
+        options:
+            _optionsWithTokenFlag(options, isTokenRequired: isTokenRequired),
         cancelToken: cancelToken,
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
@@ -518,6 +542,13 @@ class DioClient {
     } on DioException catch (e) {
       return _handleError(e);
     } catch (e) {
+      unawaited(
+        AppErrorReportingService.instance.recordError(
+          e,
+          StackTrace.current,
+          reason: 'POST request error for $endpoint',
+        ),
+      );
       return ApiResponse.error(
         message: e.toString(),
         statusCode: 0,
@@ -541,7 +572,8 @@ class DioClient {
         endpoint,
         data: data,
         queryParameters: queryParameters,
-        options: _optionsWithTokenFlag(options, isTokenRequired: isTokenRequired),
+        options:
+            _optionsWithTokenFlag(options, isTokenRequired: isTokenRequired),
         cancelToken: cancelToken,
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
@@ -550,6 +582,13 @@ class DioClient {
     } on DioException catch (e) {
       return _handleError(e);
     } catch (e) {
+      unawaited(
+        AppErrorReportingService.instance.recordError(
+          e,
+          StackTrace.current,
+          reason: 'PUT request error for $endpoint',
+        ),
+      );
       return ApiResponse.error(
         message: e.toString(),
         statusCode: 0,
@@ -573,7 +612,8 @@ class DioClient {
         endpoint,
         data: data,
         queryParameters: queryParameters,
-        options: _optionsWithTokenFlag(options, isTokenRequired: isTokenRequired),
+        options:
+            _optionsWithTokenFlag(options, isTokenRequired: isTokenRequired),
         cancelToken: cancelToken,
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
@@ -582,6 +622,13 @@ class DioClient {
     } on DioException catch (e) {
       return _handleError(e);
     } catch (e) {
+      unawaited(
+        AppErrorReportingService.instance.recordError(
+          e,
+          StackTrace.current,
+          reason: 'PATCH request error for $endpoint',
+        ),
+      );
       return ApiResponse.error(
         message: e.toString(),
         statusCode: 0,
@@ -603,13 +650,21 @@ class DioClient {
         endpoint,
         data: data,
         queryParameters: queryParameters,
-        options: _optionsWithTokenFlag(options, isTokenRequired: isTokenRequired),
+        options:
+            _optionsWithTokenFlag(options, isTokenRequired: isTokenRequired),
         cancelToken: cancelToken,
       );
       return _handleResponse(response);
     } on DioException catch (e) {
       return _handleError(e);
     } catch (e) {
+      unawaited(
+        AppErrorReportingService.instance.recordError(
+          e,
+          StackTrace.current,
+          reason: 'DELETE request error for $endpoint',
+        ),
+      );
       return ApiResponse.error(
         message: e.toString(),
         statusCode: 0,
@@ -634,12 +689,20 @@ class DioClient {
         onReceiveProgress: onReceiveProgress,
         queryParameters: queryParameters,
         cancelToken: cancelToken,
-        options: _optionsWithTokenFlag(options, isTokenRequired: isTokenRequired),
+        options:
+            _optionsWithTokenFlag(options, isTokenRequired: isTokenRequired),
       );
       return _handleResponse(response);
     } on DioException catch (e) {
       return _handleError(e);
     } catch (e) {
+      unawaited(
+        AppErrorReportingService.instance.recordError(
+          e,
+          StackTrace.current,
+          reason: 'DOWNLOAD request error for $urlPath',
+        ),
+      );
       return ApiResponse.error(
         message: e.toString(),
         statusCode: 0,

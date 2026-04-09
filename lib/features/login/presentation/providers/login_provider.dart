@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/core/utils/app_error_reporting_service.dart';
 import 'package:flutter_boilerplate/core/utils/firebase_messaging_service.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/validators.dart';
@@ -283,6 +284,11 @@ class LoginProvider extends BaseChangeNotifier {
   ) async {
     if (response.code == 'SUCCESS') {
       await _persistAuthTokens(response);
+      await AppErrorReportingService.instance.setUserContext(
+        userId: response.response?.user?.id,
+        email: response.response?.user?.email,
+        phone: response.response?.user?.phoneNumber?.toString(),
+      );
       if (!context.mounted) return;
       unawaited(FirebaseMessagingService.instance.registerDeviceToken());
       _handleLoginSuccess(context);
