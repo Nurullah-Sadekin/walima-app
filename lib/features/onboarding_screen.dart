@@ -1,15 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/core/utils/firebase_messaging_service.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:go_router/go_router.dart';
 
-class OnboardingScreen extends StatelessWidget {
+class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
+
+  @override
+  State<OnboardingScreen> createState() => _OnboardingScreenState();
+}
+
+class _OnboardingScreenState extends State<OnboardingScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FirebaseMessagingService.instance.requestPermissionOnce();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,12 +40,15 @@ class OnboardingScreen extends StatelessWidget {
             height: double.infinity,
             width: double.infinity,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 40),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 40),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.15),
+                    padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).size.height * 0.15,
+                    ),
                     child: const ShowImage(
                       imagePath: 'assets/svgs/walima.svg',
                       width: 270,
@@ -68,27 +84,45 @@ class OnboardingScreen extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('Already have an account?',
-                                style: TextStyle(color: Colors.white, fontSize: TextSize.font16(context), fontWeight: FontWeight.w500)),
+                            Text(
+                              'Already have an account?',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: TextSize.font16(context),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                             Container(
                               margin: const EdgeInsets.only(left: 10),
-                              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 4,
+                                horizontal: 8,
+                              ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.1),
+                                color: Colors.white.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.3),
+                                  width: 1,
+                                ),
                               ),
                               child: GestureDetector(
                                 onTap: () {
                                   context.push(Paths.login);
                                 },
-                                child: Text('Login',
-                                    style: TextStyle(color: AppColors.white, fontSize: TextSize.font16(context), fontWeight: FontWeight.w500)),
+                                child: Text(
+                                  'Login',
+                                  style: TextStyle(
+                                    color: AppColors.white,
+                                    fontSize: TextSize.font16(context),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                               ),
-                            )
+                            ),
                           ],
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ],

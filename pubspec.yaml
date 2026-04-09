@@ -1,7 +1,7 @@
 name: flutter_boilerplate
 description: A Flutter boilerplate with clean architecture, GoRouter, Riverpod, and more.
 publish_to: 'none'
-version: 1.0.0+1
+version: 0.0.1+1
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -40,6 +40,9 @@ dependencies:
   flutter_local_notifications: ^17.2.2
   firebase_core: ^3.8.1
   firebase_messaging: ^15.1.6
+  device_info_plus: ^11.2.1
+  package_info_plus: ^8.1.2
+  uuid: ^4.5.1
   audioplayers: ^6.1.0
   url_launcher: ^6.3.1
 

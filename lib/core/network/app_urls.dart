@@ -185,7 +185,7 @@ class AppUrls {
   static const String getConnectionStats = '$baseUrl/connections/stats'; //GET
   static const String viewContact =
       '$baseUrl/connections/view-contact/{userId}'; //GET
-  static  String performConnectionAction(String id)=>
+  static String performConnectionAction(String id) =>
       '$baseUrl/connections/$id/action'; //PATCH
   static const String createConnection = '$baseUrl/connections'; //POST
   static const String bulkSendConnectionRequests =
@@ -255,6 +255,8 @@ class AppUrls {
       '$baseUrl/notifications/{id}/read'; //PATCH
   static const String markAllNotificationsAsRead =
       '$baseUrl/notifications/read-all'; //POST
+  static const String registerDeviceToken =
+      '$baseUrl/notifications/device-tokens/register'; //PATCH
   static const String deleteNotification =
       '$baseUrl/notifications/{id}'; //DELETE
 

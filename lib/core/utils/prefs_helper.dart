@@ -49,9 +49,29 @@ class PrefsHelper {
     await prefs.setString(StorageKeys.fcmToken, token);
   }
 
+  static Future<void> setDeviceId(String deviceId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(StorageKeys.deviceId, deviceId);
+  }
+
+  static Future<String> getDeviceId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(StorageKeys.deviceId) ?? '';
+  }
+
   static Future<String> getFcmToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(StorageKeys.fcmToken) ?? '';
+  }
+
+  static Future<void> setNotificationPermissionAsked(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(StorageKeys.notificationPermissionAsked, value);
+  }
+
+  static Future<bool> getNotificationPermissionAsked() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(StorageKeys.notificationPermissionAsked) ?? false;
   }
 
   static Future<void> clearFcmToken() async {

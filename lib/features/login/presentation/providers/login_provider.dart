@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/core/utils/firebase_messaging_service.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/validators.dart';
 import 'package:flutter_boilerplate/features/login/data/models/login_body.dart';
@@ -17,7 +20,8 @@ import 'package:flutter_boilerplate/core/network/dio_client.dart';
 import 'package:flutter_boilerplate/features/chat/data/socket/socket_service.dart';
 
 class LoginProvider extends BaseChangeNotifier {
-  static const String _mobileOrEmailRequiredMessage = 'Please enter your mobile number or email ID';
+  static const String _mobileOrEmailRequiredMessage =
+      'Please enter your mobile number or email ID';
   static const String _passwordRequiredMessage = 'Please enter your password';
   static const String _otpIncompleteMessage = 'Please enter the complete OTP';
 
@@ -29,11 +33,14 @@ class LoginProvider extends BaseChangeNotifier {
   bool keepMeLoggedIn = false;
   bool forgotPassword = false;
 
-  final TextEditingController mobileNoOrEmailController = TextEditingController();
+  final TextEditingController mobileNoOrEmailController =
+      TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController otpController = TextEditingController();
-  final TextEditingController createPasswordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController createPasswordController =
+      TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   String mobileOrEmailError = '';
   String passwordError = '';
   List<TextEditingController> otpControllers = [];
@@ -104,7 +111,10 @@ class LoginProvider extends BaseChangeNotifier {
     _controllersListener = null;
   }
 
-  void updateViewState({LoginScreenStates? screenStates, LoginScreenStates? loadingState}) {
+  void updateViewState({
+    LoginScreenStates? screenStates,
+    LoginScreenStates? loadingState,
+  }) {
     if (screenStates != null) {
       this.screenStates = screenStates;
       loaderState = LoginScreenStates.defaultState;
@@ -123,6 +133,7 @@ class LoginProvider extends BaseChangeNotifier {
 
     _showLoading();
     final response = await _performLoginRequest();
+    if (!context.mounted) return;
     await _handleLoginResult(context, response);
   }
 
@@ -143,6 +154,7 @@ class LoginProvider extends BaseChangeNotifier {
       purpose: _authPurpose,
     );
     final response = await LoginRepository.verifyOtp(body);
+    if (!context.mounted) return;
     if (response.code != 'SUCCESS') {
       _handleLoginFailure(context, response.message);
       return;
@@ -165,11 +177,13 @@ class LoginProvider extends BaseChangeNotifier {
       return;
     }
     final body = SetPasswordBody(
-        identifier: mobileNoOrEmailController.text,
-        otpCode: otpCode,
-        newPassword: createPasswordController.text,
-        confirmPassword: confirmPasswordController.text);
+      identifier: mobileNoOrEmailController.text,
+      otpCode: otpCode,
+      newPassword: createPasswordController.text,
+      confirmPassword: confirmPasswordController.text,
+    );
     final response = await LoginRepository.setNewPassword(body);
+    if (!context.mounted) return;
     _handleLoginResult(context, response);
   }
 
@@ -185,18 +199,26 @@ class LoginProvider extends BaseChangeNotifier {
       purpose: _authPurpose,
     );
     final response = await LoginRepository.resendOtp(body);
+    if (!context.mounted) return;
     if (response.code != 'SUCCESS') {
       _handleLoginFailure(context, response.message);
       return;
     }
     _hideLoading();
-    await DialogUtils.showSuccessDialog(context: context, message: response.message, autoClose: true, autoCloseDuration: const Duration(seconds: 2));
+    await DialogUtils.showSuccessDialog(
+      context: context,
+      message: response.message,
+      autoClose: true,
+      autoCloseDuration: const Duration(seconds: 2),
+    );
   }
 
   Future<void> loginWithOtp(BuildContext context) async {
     _showLoading();
     final body = LoginWithOtpBody(identifier: mobileNoOrEmailController.text);
-    final response = await LoginRepository.loginWithOtp(body, isForgotPass: forgotPassword);
+    final response =
+        await LoginRepository.loginWithOtp(body, isForgotPass: forgotPassword);
+    if (!context.mounted) return;
     if (response.code != 'SUCCESS') {
       mobileOrEmailError = '';
       _handleLoginFailure(context, response.message);
@@ -219,7 +241,8 @@ class LoginProvider extends BaseChangeNotifier {
       return false;
     }
 
-    final mobileOrEmailValidation = Validators.validateMobileOrEmail(mobileNoOrEmailController.text);
+    final mobileOrEmailValidation =
+        Validators.validateMobileOrEmail(mobileNoOrEmailController.text);
     if (mobileOrEmailValidation != null) {
       mobileOrEmailError = mobileOrEmailValidation;
       updateViewState();
@@ -254,9 +277,14 @@ class LoginProvider extends BaseChangeNotifier {
     return LoginRepository.login(body);
   }
 
-  Future<void> _handleLoginResult(BuildContext context, LoginResponse response) async {
+  Future<void> _handleLoginResult(
+    BuildContext context,
+    LoginResponse response,
+  ) async {
     if (response.code == 'SUCCESS') {
       await _persistAuthTokens(response);
+      if (!context.mounted) return;
+      unawaited(FirebaseMessagingService.instance.registerDeviceToken());
       _handleLoginSuccess(context);
       return;
     }
@@ -278,7 +306,10 @@ class LoginProvider extends BaseChangeNotifier {
     }
   }
 
-  Future<void> _saveAccessToken(SharedPreferences prefs, String accessToken) async {
+  Future<void> _saveAccessToken(
+    SharedPreferences prefs,
+    String accessToken,
+  ) async {
     await prefs.setString(StorageKeys.accessToken, accessToken);
     try {
       DioClient().setAuthToken(accessToken);
@@ -286,7 +317,10 @@ class LoginProvider extends BaseChangeNotifier {
     await SocketService.instance.connect(token: accessToken);
   }
 
-  Future<void> _saveRefreshToken(SharedPreferences prefs, String refreshToken) async {
+  Future<void> _saveRefreshToken(
+    SharedPreferences prefs,
+    String refreshToken,
+  ) async {
     await prefs.setString(StorageKeys.refreshToken, refreshToken);
   }
 
@@ -333,7 +367,8 @@ class LoginProvider extends BaseChangeNotifier {
   }
 
   bool _validateMobileOrEmail() {
-    final mobileOrEmailValidation = Validators.validateMobileOrEmail(mobileNoOrEmailController.text);
+    final mobileOrEmailValidation =
+        Validators.validateMobileOrEmail(mobileNoOrEmailController.text);
     if (mobileOrEmailValidation != null) {
       mobileOrEmailError = mobileOrEmailValidation;
       updateViewState();
@@ -347,7 +382,8 @@ class LoginProvider extends BaseChangeNotifier {
   }
 
   bool _validatePassword() {
-    final passwordValidation = Validators.validatePassword(passwordController.text);
+    final passwordValidation =
+        Validators.validatePassword(passwordController.text);
     if (passwordValidation != null) {
       passwordError = passwordValidation;
       updateViewState();
@@ -371,13 +407,19 @@ class LoginProvider extends BaseChangeNotifier {
     updateViewState(loadingState: LoginScreenStates.defaultState);
   }
 
-  void _addListenerSafely(TextEditingController controller, VoidCallback listener) {
+  void _addListenerSafely(
+    TextEditingController controller,
+    VoidCallback listener,
+  ) {
     try {
       controller.addListener(listener);
     } catch (_) {}
   }
 
-  void _removeListenerSafely(TextEditingController controller, VoidCallback listener) {
+  void _removeListenerSafely(
+    TextEditingController controller,
+    VoidCallback listener,
+  ) {
     try {
       controller.removeListener(listener);
     } catch (_) {}
@@ -390,7 +432,8 @@ class LoginProvider extends BaseChangeNotifier {
   }
 
   bool validateNewPassword() {
-    final createPasswordValidation = Validators.validatePassword(createPasswordController.text);
+    final createPasswordValidation =
+        Validators.validatePassword(createPasswordController.text);
     if (createPasswordValidation != null) {
       createPasswordError = createPasswordValidation;
       updateViewState();

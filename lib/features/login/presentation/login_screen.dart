@@ -9,6 +9,7 @@ import 'package:flutter_boilerplate/core/global/components/primary_textField.dar
 import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/core/utils/firebase_messaging_service.dart';
 import 'package:flutter_boilerplate/core/utils/validators.dart';
 import 'package:flutter_boilerplate/features/login/presentation/providers/login_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,6 +32,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider.getInitialData();
       provider.initControllersListener();
+      FirebaseMessagingService.instance.requestPermissionOnce();
     });
   }
 
@@ -56,7 +58,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                         UpperLayer(
+                        UpperLayer(
                           imagePath: AppImages.login,
                           onBackPressed: () {
                             context.pushNamed(Routes.onboarding);
@@ -100,7 +102,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   context.pushNamed(Routes.onboarding);
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: AppColors.greyLight,
@@ -117,7 +120,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ),
                 ),
-              )
+              ),
             ],
           ),
           // SizedBox(height: MediaQuery.sizeOf(context).height * 0.03),
@@ -165,11 +168,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       height: TextSize.font16(context),
                       width: TextSize.font16(context),
                       decoration: BoxDecoration(
-                        color: provider.keepMeLoggedIn ? AppColors.primary : Colors.white,
+                        color: provider.keepMeLoggedIn
+                            ? AppColors.primary
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: provider.keepMeLoggedIn ? AppColors.primary : AppColors.greyLight, width: 1),
+                        border: Border.all(
+                          color: provider.keepMeLoggedIn
+                              ? AppColors.primary
+                              : AppColors.greyLight,
+                          width: 1,
+                        ),
                       ),
-                      child: provider.keepMeLoggedIn ? Icon(Icons.check, size: TextSize.font12(context), color: Colors.white) : null,
+                      child: provider.keepMeLoggedIn
+                          ? Icon(
+                              Icons.check,
+                              size: TextSize.font12(context),
+                              color: Colors.white,
+                            )
+                          : null,
                     ),
                   ),
                   Text(
@@ -201,7 +217,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
             ],
           ),
-        )
+        ),
       ],
     );
   }
