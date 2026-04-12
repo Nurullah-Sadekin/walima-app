@@ -18,7 +18,9 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "com.walima.app"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    // Flutter 3.41 defaults to NDK 28.2.x, but that local install is incomplete on this machine.
+    // Pin to a healthy installed NDK version so Gradle can configure the Android project.
+    ndkVersion = "29.0.14033849"
 
     compileOptions {
         // Enable core library desugaring required by some dependencies (e.g. flutter_local_notifications)
