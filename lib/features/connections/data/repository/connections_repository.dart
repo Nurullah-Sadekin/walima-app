@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/core/network/dio_client.dart';
 import 'package:flutter_boilerplate/features/connections/data/models/request/get_requested_connections_query_params.dart';
 import 'package:flutter_boilerplate/features/connections/data/models/request/perform_connection_action_request_body.dart';
 import 'package:flutter_boilerplate/features/connections/data/models/response/get_accepted_connection_response.dart';
+import 'package:flutter_boilerplate/features/connections/data/models/response/get_blocked_connection_response.dart';
 import 'package:flutter_boilerplate/features/connections/data/models/response/get_requested_connections_response.dart';
 import 'package:flutter_boilerplate/features/connections/data/models/response/get_sent_connection_response.dart';
 
@@ -135,6 +136,36 @@ class ConnectionsRepository {
           ? e.response?.data['message'] ?? e.message
           : e.toString();
       return GetSentConnectionResponse(message: errorMessage);
+    }
+  }
+
+  static Future<GetBlockedConnectionResponse> getBlockedConnections(
+    GetRequestedConnectionsQueryParams params,
+  ) async {
+    try {
+      final response = await DioClient().get(
+        AppUrls.getBlockedConnections,
+        queryParameters: params.toJson(),
+        isTokenRequired: true,
+      );
+
+      final data = response.data;
+      if (data is Map<String, dynamic>) {
+        return GetBlockedConnectionResponse.fromJson(data);
+      }
+
+      if (data is Map) {
+        return GetBlockedConnectionResponse.fromJson(
+          Map<String, dynamic>.from(data),
+        );
+      }
+
+      return GetBlockedConnectionResponse(message: response.message);
+    } catch (e) {
+      final errorMessage = e is DioException
+          ? e.response?.data['message'] ?? e.message
+          : e.toString();
+      return GetBlockedConnectionResponse(message: errorMessage);
     }
   }
 

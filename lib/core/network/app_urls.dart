@@ -179,6 +179,8 @@ class AppUrls {
   static const String getAcceptedConnections =
       '$baseUrl/connections/accepted'; //GET
   static const String getSentConnections = '$baseUrl/connections/sent'; //GET
+  static const String getBlockedConnections =
+      '$baseUrl/connections/blocked'; //GET
   static const String getDeletedConnections =
       '$baseUrl/connections/deleted'; //GET
   static const String getConnectionById = '$baseUrl/connections/{id}'; //GET

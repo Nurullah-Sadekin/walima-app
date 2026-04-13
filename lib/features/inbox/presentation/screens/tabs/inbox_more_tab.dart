@@ -3,17 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
 import 'package:flutter_boilerplate/core/global/components/empty_state.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
 import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:flutter_boilerplate/features/connections/data/models/response/get_blocked_connection_response.dart'
+    as blocked_models;
 import 'package:flutter_boilerplate/features/connections/data/models/response/get_sent_connection_response.dart'
     as sent_models;
 import 'package:flutter_boilerplate/features/inbox/presentation/providers/inbox_providers.dart';
 import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_card.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/filter_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/tab_bar_widget.dart';
 
 class InboxMoreTab extends ConsumerStatefulWidget {
@@ -33,13 +32,29 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab>
     super.initState();
     _subTabController = TabController(length: _subTabs.length, vsync: this)
       ..addListener(_handleSubTabChange);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final provider = ref.read(inboxProvider);
+      if ((provider.blockedConnections?.isEmpty ?? true) &&
+          !provider.isBlockedLoading) {
+        provider.fetchBlockedConnections();
+      }
+    });
   }
 
   void _handleSubTabChange() {
     if (!mounted || _subTabController.indexIsChanging) return;
 
+    final provider = ref.read(inboxProvider);
+
+    if (_subTabController.index == 0) {
+      if ((provider.blockedConnections?.isEmpty ?? true) &&
+          !provider.isBlockedLoading) {
+        provider.fetchBlockedConnections();
+      }
+    }
+
     if (_subTabController.index == 1) {
-      final provider = ref.read(inboxProvider);
       if ((provider.deletedConnections?.isEmpty ?? true) &&
           !provider.isDeletedLoading) {
         provider.fetchDeletedConnections();
@@ -69,10 +84,7 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab>
             controller: _subTabController,
             physics: const NeverScrollableScrollPhysics(),
             children: [
-              const EmptyStateWidget(
-                title: 'No Blocked Requests',
-                subtitle: 'Blocked items will appear here',
-              ),
+              _buildBlockedTab(provider),
               _buildDeletedTab(provider),
             ],
           ),
@@ -82,9 +94,6 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab>
   }
 
   Widget _header(InboxProvider provider) {
-    final selectedTab = _subTabs[_subTabController.index];
-
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,9 +144,10 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab>
             selectedBackgroundColor: AppColors.primaryVariant,
             selectedTextColor: AppColors.primary,
             selectedBorderColor: AppColors.primary,
-            backgroundColor: isSelected ? AppColors.primaryVariant : AppColors.transparent,
+            backgroundColor:
+                isSelected ? AppColors.primaryVariant : AppColors.transparent,
             isBorder: true,
-            padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             borderRadius: 8,
             fontSize: TextSize.font12(context),
             onTap: () => _subTabController.animateTo(index),
@@ -162,7 +172,7 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-             EmptyStateWidget(
+            EmptyStateWidget(
               title: 'Error Loading Deleted Requests',
               subtitle: 'Unable to load your deleted connection requests',
               buttonText: 'Retry',
@@ -193,11 +203,14 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab>
           return InboxCard(
             imagePath: item.profilePhoto?.url ?? AppImages.demoProfile2,
             name: item.displayName ?? 'Unknown',
-            age: '${item.age ?? ''} Yr',
+            age: '${item.age ?? ''} Yrs',
             height: CamelCaseUtils.formatCamelCase(item.religion ?? ''),
             day: DateTimeUtils.onlyDate(
               DateTime.tryParse(item.connection?.createdAt ?? ''),
             ),
+            isBottomSection: false,
+            infoBottomMessage: 'Okay',
+            mood: InboxCardMood.small,
             location: _locationText(item),
             subtitle:
                 CamelCaseUtils.formatCamelCase(item.connection?.status ?? ''),
@@ -209,7 +222,79 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab>
     );
   }
 
+  Widget _buildBlockedTab(InboxProvider provider) {
+    if (provider.isBlockedLoading &&
+        (provider.blockedConnections?.isEmpty ?? true)) {
+      return const Padding(
+        padding: EdgeInsets.all(32),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (provider.isBlockedHasError &&
+        (provider.blockedConnections?.isEmpty ?? true)) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            EmptyStateWidget(
+              title: 'Error Loading Blocked Users',
+              subtitle: 'Unable to load your blocked users right now',
+              buttonText: 'Retry',
+              onTap: () => ref.read(inboxProvider).fetchBlockedConnections(),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (provider.blockedConnections?.isEmpty ?? true) {
+      return const EmptyStateWidget(
+        title: 'No Blocked Users',
+        subtitle: 'Blocked users will appear here',
+        showButton: false,
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => ref.read(inboxProvider).fetchBlockedConnections(),
+      child: ListView.separated(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.only(bottom: 12),
+        itemCount: provider.blockedConnections!.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        itemBuilder: (context, index) {
+          final item = provider.blockedConnections![index];
+          return InboxCard(
+            imagePath: item.profilePhoto?.url ?? AppImages.manAvatar,
+            name: item.displayName ?? 'Unknown',
+            age: '${item.age ?? ''} Yr',
+            height: CamelCaseUtils.formatCamelCase(item.religion ?? ''),
+            day: DateTimeUtils.onlyDate(
+              DateTime.tryParse(item.connection?.createdAt ?? ''),
+            ),
+            location: _blockedLocationText(item),
+            infoBottomMessage: item.connection?.message ?? '',
+            mood: InboxCardMood.small,
+            subtitleColor: AppColors.primary,
+            isVerified: item.profilePhoto?.isVerified ?? false,
+          );
+        },
+      ),
+    );
+  }
+
   String _locationText(sent_models.Data item) {
+    final location = [
+      item.location?.city,
+      item.location?.state,
+      item.location?.country,
+    ].whereType<String>().where((value) => value.trim().isNotEmpty).join(', ');
+
+    return location.isEmpty ? 'N/A' : location;
+  }
+
+  String _blockedLocationText(blocked_models.BlockedConnectionData item) {
     final location = [
       item.location?.city,
       item.location?.state,
@@ -235,4 +320,3 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab>
   //   );
   // }
 }
-

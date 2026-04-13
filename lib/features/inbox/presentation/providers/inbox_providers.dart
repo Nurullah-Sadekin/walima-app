@@ -5,6 +5,8 @@ import 'package:flutter_boilerplate/features/connections/data/models/request/get
 import 'package:flutter_boilerplate/features/connections/data/models/request/perform_connection_action_request_body.dart';
 import 'package:flutter_boilerplate/features/connections/data/models/response/get_accepted_connection_response.dart'
     as accepted_models;
+import 'package:flutter_boilerplate/features/connections/data/models/response/get_blocked_connection_response.dart'
+    as blocked_models;
 import 'package:flutter_boilerplate/features/connections/data/models/response/get_requested_connections_response.dart'
     as requested_models;
 import 'package:flutter_boilerplate/features/connections/data/models/response/get_sent_connection_response.dart'
@@ -44,6 +46,12 @@ class InboxProvider extends BaseChangeNotifier {
   bool isDeletedLoading = false;
   bool isDeletedHasError = false;
   String? deletedErrorMessage;
+
+  List<blocked_models.BlockedConnectionData>? blockedConnections = [];
+  blocked_models.GetBlockedConnectionResponse? blockedConnectionsResponse;
+  bool isBlockedLoading = false;
+  bool isBlockedHasError = false;
+  String? blockedErrorMessage;
 
   List<Filter> receivedFilterList = buildInboxFilterDataList();
   List<Filter> sentFilterList = buildInboxFilterDataList();
@@ -529,6 +537,52 @@ class InboxProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> fetchBlockedConnections({
+    int page = 1,
+    int size = 20,
+    String responseFormat = 'short',
+    String sortBy = 'id',
+    String sortOrder = 'ASC',
+    String search = '',
+  }) async {
+    isBlockedLoading = true;
+    isBlockedHasError = false;
+    blockedErrorMessage = null;
+    notifyListeners();
+
+    try {
+      blockedConnectionsResponse =
+          await ConnectionsRepository.getBlockedConnections(
+        _queryParams(
+          page: page,
+          size: size,
+          responseFormat: responseFormat,
+          sortBy: sortBy,
+          sortOrder: sortOrder,
+          search: search,
+        ),
+      );
+
+      if (blockedConnectionsResponse?.code == 'SUCCESS' ||
+          blockedConnectionsResponse?.code == '1') {
+        blockedConnections = blockedConnectionsResponse?.response?.data ?? [];
+        isBlockedHasError = false;
+      } else {
+        isBlockedHasError = true;
+        blockedErrorMessage = blockedConnectionsResponse?.message ??
+            'Failed to load blocked connections';
+        blockedConnections = [];
+      }
+    } catch (e) {
+      isBlockedHasError = true;
+      blockedErrorMessage = e.toString();
+      blockedConnections = [];
+    }
+
+    isBlockedLoading = false;
+    notifyListeners();
+  }
+
   Future<void> loadPrimaryTab(int tabIndex) async {
     switch (tabIndex) {
       case 0:
@@ -601,6 +655,15 @@ class InboxProvider extends BaseChangeNotifier {
     isDeletedLoading = false;
     isDeletedHasError = false;
     deletedErrorMessage = null;
+    notifyListeners();
+  }
+
+  void clearBlockedConnections() {
+    blockedConnections = [];
+    blockedConnectionsResponse = null;
+    isBlockedLoading = false;
+    isBlockedHasError = false;
+    blockedErrorMessage = null;
     notifyListeners();
   }
 
