@@ -57,10 +57,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
         }
         unawaited(provider.openConversation(conversationId));
       } else if (receiverId != null && receiverId.isNotEmpty) {
-        unawaited(provider.openDirectChat(
-          receiverId: receiverId,
-          conversationId: conversationId,
-        ));
+        unawaited(
+          provider.openDirectChat(
+            receiverId: receiverId,
+            conversationId: conversationId,
+          ),
+        );
       }
     });
   }
@@ -95,6 +97,34 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
     }
   }
 
+  _ResolvedParticipant _resolveParticipant(dynamic liveParticipant) {
+    final fallbackUserId = _participant?['userId'] as String?;
+    final fallbackDisplayName = _participant?['displayName'] as String?;
+    final fallbackImagePath = _participant?['profilePictureUrl'] as String?;
+    final fallbackIsOnline = _participant?['isOnline'] as bool?;
+
+    final liveDisplayName = liveParticipant?.displayName as String?;
+    final resolvedDisplayName = (liveDisplayName?.trim().isNotEmpty ?? false)
+        ? liveDisplayName!.trim()
+        : (fallbackDisplayName?.trim().isNotEmpty ?? false)
+            ? fallbackDisplayName!.trim()
+            : 'Unknown User';
+
+    final liveImagePath = liveParticipant?.profilePhoto?.url as String?;
+    final liveUserId =
+        (liveParticipant?.userId ?? liveParticipant?.id) as String?;
+
+    return _ResolvedParticipant(
+      userId: (liveUserId?.isNotEmpty ?? false) ? liveUserId : fallbackUserId,
+      displayName: resolvedDisplayName,
+      imagePath: (liveImagePath?.isNotEmpty ?? false)
+          ? liveImagePath
+          : fallbackImagePath,
+      isOnline: liveParticipant?.isOnline as bool? ?? fallbackIsOnline ?? false,
+      isVerified: liveParticipant?.profilePhoto?.isVerified as bool?,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = ref.watch(chatProvider);
@@ -110,28 +140,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
         break;
       }
     }
-    final name = liveParticipant?.displayName as String? ??
-        (_participant != null
-            ? (_participant!['displayName'] as String?)
-            : null);
-    // Participants model uses `profilePhoto?.url` for the image. Keep the
-    // existing map-based fallback (from navigation payload) too.
-    final imagePath = (liveParticipant?.profilePhoto?.url as String?) ??
-        (_participant != null
-            ? (_participant!['profilePictureUrl'] as String?)
-            : null);
-    final isOnline = liveParticipant?.isOnline as bool? ??
-        (_participant != null ? (_participant!['isOnline'] as bool?) : null);
-
-    final isVerified = liveParticipant?.profilePhoto?.isVerified;
+    final resolvedParticipant = _resolveParticipant(liveParticipant);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
       body: SafeArea(
         child: Column(
           children: [
-            _headerSection(name ?? 'Unknown', imagePath, isOnline ?? false,
-                liveParticipant,isVerified),
+            _headerSection(resolvedParticipant),
             Expanded(
               child: _conversationBody(
                 provider,
@@ -148,8 +164,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
     );
   }
 
-  Widget _headerSection(String displayName, String? imagePath, bool isOnline,
-      dynamic participant, bool? isVerified) {
+  Widget _headerSection(_ResolvedParticipant participant) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 8, 8, 6),
       child: Row(
@@ -166,9 +181,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
             child: Row(
               children: [
                 _profileAvatar(
-                  imagePath: imagePath ?? AppImages.demoProfile,
+                  imagePath: participant.imagePath ?? AppImages.demoProfile,
                   size: 48,
-                  isOnline: isOnline,
+                  isOnline: participant.isOnline,
                   showOnlineIndicator: true,
                 ),
                 const SizedBox(width: 8),
@@ -181,9 +196,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                       Row(
                         spacing: 4,
                         children: [
-                          Flexible( // Use Flexible instead of Expanded
+                          Flexible(
+                            // Use Flexible instead of Expanded
                             child: Text(
-                              displayName,
+                              participant.displayName,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -193,7 +209,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                               ),
                             ),
                           ),
-                          if (isVerified == true)
+                          if (participant.isVerified == true)
                             ShowImage(
                               height: TextSize.font16(context),
                               width: TextSize.font16(context),
@@ -203,7 +219,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        providerStatusText(ref.read(chatProvider), isOnline),
+                        providerStatusText(
+                          ref.read(chatProvider),
+                          participant.isOnline,
+                        ),
                         style: const TextStyle(
                           fontSize: 14,
                           color: Color(0xFF787878),
@@ -216,7 +235,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
               ],
             ),
           ),
-          const SizedBox(width: 10,),
+          const SizedBox(
+            width: 10,
+          ),
           Row(
             spacing: 12,
             children: [
@@ -227,7 +248,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                 color: const Color(0xFF666666),
               ),
               PopupMenuButton<MoreMenuAction>(
-                onSelected: (action) => _handleMoreMenuAction(action, participant),
+                onSelected: (action) =>
+                    _handleMoreMenuAction(action, participant),
                 padding: EdgeInsets.zero,
                 position: PopupMenuPosition.under,
                 color: Colors.white,
@@ -300,11 +322,21 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
   }
 
   // Handler for the popup menu actions. For now show a simple dialog to confirm the action.
-  void _handleMoreMenuAction(MoreMenuAction action, dynamic participant) async {
+  void _handleMoreMenuAction(
+    MoreMenuAction action,
+    _ResolvedParticipant participant,
+  ) async {
     switch (action) {
       case MoreMenuAction.viewProfile:
         context.pushNamed(
           Routes.profilePreview,
+          extra: {
+            'displayName': participant.displayName,
+            'firstName': participant.displayName,
+            'lastName': '',
+            'userId': participant.userId,
+            'profilePictureUrl': participant.imagePath,
+          },
         );
         break;
       case MoreMenuAction.viewContact:
@@ -315,9 +347,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
         await showDialog(
           context: context,
           builder: (_) => AlertDialog(
-            title: Text('Block ${participant?.id}? Are you sure?'),
+            title: Text('Block ${participant.displayName}? Are you sure?'),
             content: const Text(
-                'Blocked members cannot view your profile or contact you on walima.com.'),
+              'Blocked members cannot view your profile or contact you on walima.com.',
+            ),
             shape: RoundedRectangleBorder(
               borderRadius:
                   BorderRadius.circular(16.0), // Minimized border radius
@@ -327,38 +360,41 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                 spacing: 8,
                 children: [
                   Expanded(
-                      child: PrimaryButtons(
-                          buttonStyle: ButtonsStyle.cancelButton,
-                          onTap: () => Navigator.pop(context),
-                          title: 'Cancel',
-                          bgColor: Colors.transparent)),
+                    child: PrimaryButtons(
+                      buttonStyle: ButtonsStyle.cancelButton,
+                      onTap: () => Navigator.pop(context),
+                      title: 'Cancel',
+                      bgColor: Colors.transparent,
+                    ),
+                  ),
                   Expanded(
                     child: PrimaryButtons(
-                        buttonStyle: ButtonsStyle.activePrimaryButton,
-                        onTap: () {
-                          context.pop();
-                          context.pushNamed(
-                            Routes.reportStatus,
-                            extra: {
-                              'title': 'Blocked Successfully!',
-                              'subtitle':
-                                  'You have blocked Nusrat Jahan. Nusrat Jahan can no longer view your profile or send you messages.',
-                              'buttonText': 'Done',
-                              'onTapButton': () {
-                                if (context.canPop()) {
-                                  context.pop();
-                                }
-                                if (context.canPop()) {
-                                  context.pop();
-                                }
-                              },
+                      buttonStyle: ButtonsStyle.activePrimaryButton,
+                      onTap: () {
+                        context.pop();
+                        context.pushNamed(
+                          Routes.reportStatus,
+                          extra: {
+                            'title': 'Blocked Successfully!',
+                            'subtitle':
+                                'You have blocked ${participant.displayName}. ${participant.displayName} can no longer view your profile or send you messages.',
+                            'buttonText': 'Done',
+                            'onTapButton': () {
+                              if (context.canPop()) {
+                                context.pop();
+                              }
+                              if (context.canPop()) {
+                                context.pop();
+                              }
                             },
-                          );
-                        },
-                        title: 'Block'),
+                          },
+                        );
+                      },
+                      title: 'Block',
+                    ),
                   ),
                 ],
-              )
+              ),
             ],
           ),
         );
@@ -366,8 +402,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
       case MoreMenuAction.report:
         // Navigate to the Report screen and pass participant info as extra
         final extra = <String, dynamic>{
-          'displayName': participant?.displayName ?? participant?['displayName'] ?? 'User',
-          'profilePictureUrl': participant?.profilePhoto?.url  ?? AppImages.menuSvgIcon,
+          'displayName': participant.displayName,
+          'profilePictureUrl': participant.imagePath ?? AppImages.menuSvgIcon,
         };
         context.pushNamed(Routes.report, extra: extra);
         break;
@@ -391,8 +427,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
             child: Wrap(
               children: [
                 Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 20.0, vertical: 16),
+                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 16),
                   child: ContactBottomSheet(
                     userName: 'Sadia Sultana',
                     profileImagePath: AppImages.demoProfile,
@@ -419,8 +454,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
     bool freeUser = false;
     final quotaProvider = ref.watch(globalProvider);
     final messageQuota = quotaProvider.quotaFor(_sendMessageQuotaKey);
-    final shouldShowLimitOverSection =
-        messageQuota != null && !canSendMessage;
+    final shouldShowLimitOverSection = messageQuota != null && !canSendMessage;
 
     if (provider.messagesLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -472,7 +506,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                     }
                     final msg = message[index];
                     final isMe = msg.senderId == provider.currentUserId;
-                    return _textMessageRow(isMe: isMe, message: msg.content ?? '', msg: msg);
+                    return _textMessageRow(
+                      isMe: isMe,
+                      message: msg.content ?? '',
+                      msg: msg,
+                    );
                   },
                 ),
               ),
@@ -536,7 +574,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                   width: TextSize.font16(context),
                   height: TextSize.font16(context),
                   color: AppColors.primary,
-                )
+                ),
               ],
             ),
           ),
@@ -601,7 +639,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                   width: TextSize.font16(context),
                   height: TextSize.font16(context),
                   color: AppColors.primary,
-                )
+                ),
               ],
             ),
           ),
@@ -610,9 +648,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
     );
   }
 
-  Widget _textMessageRow(
-      {required bool isMe, required String message, required Message msg}) {
-    final bubbleColor = isMe ? const Color(0xFFF4E8EE) : const Color(0xFFEFEFEF);
+  Widget _textMessageRow({
+    required bool isMe,
+    required String message,
+    required Message msg,
+  }) {
+    final bubbleColor =
+        isMe ? const Color(0xFFF4E8EE) : const Color(0xFFEFEFEF);
     String? avatarPath;
     if (isMe) {
       avatarPath = msg.sender?.profilePhoto?.url ?? AppImages.demoProfile2;
@@ -636,11 +678,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
           if (!isMe) const SizedBox(width: 10),
           ConstrainedBox(
             constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.72),
+              maxWidth: MediaQuery.of(context).size.width * 0.72,
+            ),
             child: MessageBubble(
-                message: message,
-                backgroundColor: bubbleColor,
-                senderMessage: !isMe),
+              message: message,
+              backgroundColor: bubbleColor,
+              senderMessage: !isMe,
+            ),
           ),
           if (isMe) const SizedBox(width: 10),
           if (isMe) _profileAvatar(imagePath: avatarPath, size: 30),
@@ -674,18 +718,20 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                 );
               },
               decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  errorBorder: InputBorder.none,
-                  focusedErrorBorder: InputBorder.none,
-                  hintText: 'Type a message',
-                  filled: true,
-                  fillColor: Colors.transparent,
-                  hintStyle: TextStyle(
-                      color: Color(0xFF8F8F8F),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400)),
+                border: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                focusedErrorBorder: InputBorder.none,
+                hintText: 'Type a message',
+                filled: true,
+                fillColor: Colors.transparent,
+                hintStyle: TextStyle(
+                  color: Color(0xFF8F8F8F),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
               style: const TextStyle(fontSize: 16),
             ),
           ),
@@ -708,8 +754,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
             child: Container(
               padding: const EdgeInsets.all(5),
               decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(4)),
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(4),
+              ),
               child: ShowImage(
                 imagePath: AppImages.sentMessage,
                 width: TextSize.font20(context),
@@ -780,4 +827,20 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
       avatarSize: size,
     );
   }
+}
+
+class _ResolvedParticipant {
+  const _ResolvedParticipant({
+    required this.displayName,
+    required this.isOnline,
+    this.userId,
+    this.imagePath,
+    this.isVerified,
+  });
+
+  final String? userId;
+  final String displayName;
+  final String? imagePath;
+  final bool isOnline;
+  final bool? isVerified;
 }
