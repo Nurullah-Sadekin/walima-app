@@ -269,7 +269,7 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab>
             imagePath: item.profilePhoto?.url ?? AppImages.manAvatar,
             name: item.displayName ?? 'Unknown',
             age: '${item.age ?? ''} Yr',
-            height: CamelCaseUtils.formatCamelCase(item.religion ?? ''),
+            height: CamelCaseUtils.formatCamelCase(item.maritalStatus ?? ''),
             day: DateTimeUtils.onlyDate(
               DateTime.tryParse(item.connection?.createdAt ?? ''),
             ),
