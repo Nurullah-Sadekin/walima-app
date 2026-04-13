@@ -227,8 +227,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                 color: const Color(0xFF666666),
               ),
               PopupMenuButton<MoreMenuAction>(
-                onSelected: (action) =>
-                    _handleMoreMenuAction(action, participant),
+                onSelected: (action) => _handleMoreMenuAction(action, participant),
                 padding: EdgeInsets.zero,
                 position: PopupMenuPosition.under,
                 color: Colors.white,
@@ -306,33 +305,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
       case MoreMenuAction.viewProfile:
         context.pushNamed(
           Routes.profilePreview,
-          extra: {
-            'displayName': participant?.displayName ?? 'User',
-            'profilePictureUrl': participant?.profilePhoto?.url,
-            'profileType': 'Profile Created by Self',
-            'age': '28',
-            'dateOfBirth': '23 Aug 1996',
-            'height': '5\'8"(165cm)',
-            'grewUpIn': 'Dhaka',
-            'maritalStatus': 'Never Married',
-            'occupation': 'Software Engineer',
-            'qualification': 'Bachelor\'s Degree',
-            'income': 'Not Mentioned',
-            'familyStatus': 'Middle Class',
-            'hobbies': 'Reading, Gaming',
-            'interests': 'Technology, Traveling',
-            'diet': 'Non-Vegetarian',
-            'smoking': 'None',
-            'fatherStatus': 'Service',
-            'motherStatus': 'Homemaker',
-            'brothers': '1',
-            'sisters': '2',
-            'familyClass': 'Middle Class',
-            'highestQualification': 'MBA - Management',
-            'qualificationIn': 'Technology',
-            'workingWith': 'Software Company',
-            'workingAs': 'Senior Developer',
-          },
         );
         break;
       case MoreMenuAction.viewContact:
@@ -343,7 +315,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
         await showDialog(
           context: context,
           builder: (_) => AlertDialog(
-            title: Text('Block ${participant?.displayName}? Are you sure?'),
+            title: Text('Block ${participant?.id}? Are you sure?'),
             content: const Text(
                 'Blocked members cannot view your profile or contact you on walima.com.'),
             shape: RoundedRectangleBorder(

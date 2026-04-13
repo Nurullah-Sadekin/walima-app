@@ -78,16 +78,22 @@ class ProfileAvatarWithName extends StatelessWidget {
   }
 
   Widget _buildNameText(BuildContext context) {
-    return Text(
-      name ?? '',
-      textHeightBehavior: const TextHeightBehavior(
-        applyHeightToFirstAscent: false,
-        applyHeightToLastDescent: false,
-      ),
-      style: TextStyle(
-        fontSize: TextSize.font10(context),
-        color: AppColors.textPrimaryLight,
-        fontWeight: FontWeight.w400,
+    return SizedBox(
+      width: avatarSize,
+      child: Text(
+        name ?? '',
+        textHeightBehavior: const TextHeightBehavior(
+          applyHeightToFirstAscent: false,
+          applyHeightToLastDescent: false,
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: TextSize.font10(context),
+          color: AppColors.textPrimaryLight,
+          fontWeight: FontWeight.w400,
+        ),
       ),
     );
   }
