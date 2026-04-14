@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_boilerplate/core/constants/app_colors.dart';
+import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
+import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:flutter_boilerplate/features/chat/presentation/screens/chat_home.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/home_screen.dart';
+import 'package:flutter_boilerplate/features/inbox/presentation/screens/inbox_screen.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/screens/matches.dart';
+import 'package:flutter_boilerplate/features/plans/presentation/screens/plans_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Current tab provider
@@ -14,57 +23,60 @@ class AnchorPointScreen extends ConsumerWidget {
 
     final screens = [
       const HomeScreen(),
-      // const CoursesScreen(),
-      // const TestScreen(),
-      // const RankScreen(),
-      // const ProfileScreen(),
+      const MatchesScreen(),
+      const InboxScreen(),
+      const ChatScreen(),
+      const UpgradePackageScreen(showAppBar: false,),
     ];
-
-    return Scaffold(
-      body: IndexedStack(index: currentTab, children: screens),
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Color(0xFFE5E7EB), width: 0.5)),
-        ),
-        child: SafeArea(
-          top: false,
-          child: SizedBox(
-            height: 64,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildNavItem(
-                  icon: Icons.home_rounded,
-                  label: 'Home',
-                  isActive: currentTab == 0,
-                  onTap: () => ref.read(currentTabProvider.notifier).state = 0,
-                ),
-                // _buildNavItem(
-                //   icon: Icons.menu_book_rounded,
-                //   label: 'Courses',
-                //   isActive: currentTab == 1,
-                //   onTap: () => ref.read(currentTabProvider.notifier).state = 1,
-                // ),
-                // _buildNavItem(
-                //   icon: Icons.fact_check_rounded,
-                //   label: 'Test',
-                //   isActive: currentTab == 2,
-                //   onTap: () => ref.read(currentTabProvider.notifier).state = 2,
-                // ),
-                // _buildNavItem(
-                //   icon: Icons.emoji_events_rounded,
-                //   label: 'Rank',
-                //   isActive: currentTab == 3,
-                //   onTap: () => ref.read(currentTabProvider.notifier).state = 3,
-                // ),
-                // _buildNavItem(
-                //   icon: Icons.more_horiz_rounded,
-                //   label: 'More',
-                //   isActive: currentTab == 4,
-                //   onTap: () => ref.read(currentTabProvider.notifier).state = 4,
-                // ),
-              ],
+    return WillPopScope(
+      onWillPop: () async {
+        final shouldClose = await DialogUtils.showAppCloseDiaLog(context);
+        if (shouldClose) {
+          SystemNavigator.pop();
+        }
+        return false;
+      },
+      child: Scaffold(
+        body: IndexedStack(index: currentTab, children: screens),
+        bottomNavigationBar: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            border: Border(top: BorderSide(color: Color(0xFFE5E7EB), width: 0.5)),
+          ),
+          child: SafeArea(
+            top: false,
+            child: SizedBox(
+              height: 64,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildNavItem(
+                    icon: AppImages.home,
+                    isActive: currentTab == 0,
+                    onTap: () => ref.read(currentTabProvider.notifier).state = 0,
+                  ),
+                  _buildNavItem(
+                    icon: AppImages.matches,
+                    isActive: currentTab == 1,
+                    onTap: () => ref.read(currentTabProvider.notifier).state = 1,
+                  ),
+                  _buildNavItem(
+                    icon: AppImages.inbox,
+                    isActive: currentTab == 2,
+                    onTap: () => ref.read(currentTabProvider.notifier).state = 2,
+                  ),
+                  _buildNavItem(
+                    icon: AppImages.chat,
+                    isActive: currentTab == 3,
+                    onTap: () => ref.read(currentTabProvider.notifier).state = 3,
+                  ),
+                  _buildNavItem(
+                    icon: AppImages.premium,
+                    isActive: currentTab == 4,
+                    onTap: () => ref.read(currentTabProvider.notifier).state = 4,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -73,8 +85,7 @@ class AnchorPointScreen extends ConsumerWidget {
   }
 
   Widget _buildNavItem({
-    required IconData icon,
-    required String label,
+    required String icon,
     required bool isActive,
     required VoidCallback onTap,
   }) {
@@ -82,40 +93,11 @@ class AnchorPointScreen extends ConsumerWidget {
       onTap: onTap,
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (isActive)
-            Container(
-              width: 32,
-              height: 3,
-              decoration: BoxDecoration(
-                color: const Color(0xFF1A8FE3),
-                borderRadius: BorderRadius.circular(10),
-              ),
-            )
-          else
-            const SizedBox(height: 3),
-          const SizedBox(height: 6),
-          Icon(
-            icon,
-            color: isActive
-                ? const Color(0xFF1A8FE3)
-                : const Color(0xFF9CA3AF),
-            size: 24,
-          ),
-          if (isActive && label.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF1A8FE3),
-              ),
-            ),
-          ],
-        ],
+      child: ShowImage(
+        imagePath: icon,
+        width: 45,
+        height: 45,
+        color: isActive ? AppColors.primary: AppColors.textSub600,
       ),
     );
   }

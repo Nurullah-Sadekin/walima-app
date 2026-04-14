@@ -1,0 +1,285 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DEFAULT_JOSN_FILE="$SCRIPT_DIR/../api_services/curls.josn"
+DEFAULT_JSON_FILE="$SCRIPT_DIR/../api_services/curls.json"
+
+if [[ -f "$DEFAULT_JOSN_FILE" ]]; then
+  REQUESTS_FILE="${CURLS_FILE:-$DEFAULT_JOSN_FILE}"
+else
+  REQUESTS_FILE="${CURLS_FILE:-$DEFAULT_JSON_FILE}"
+fi
+
+REQUEST_ID=""
+RAW_CURL=""
+
+usage() {
+  cat <<'EOF'
+Usage:
+  ./scripts/add_curl_into_list [--id request_id] [--curl "raw curl command"]
+  cat raw_curl.txt | ./scripts/add_curl_into_list [--id request_id]
+
+Examples:
+  ./scripts/add_curl_into_list --id subscription --curl "curl -X 'GET' 'https://example.com' -H 'accept: */*'"
+  cat <<'EOF_CURL' | ./scripts/add_curl_into_list --id plans
+curl -X 'GET' \
+  'https://dev.walima.app/api/v1/plans' \
+  -H 'accept: application/json' \
+  -H 'Authorization: Bearer my-token'
+EOF_CURL
+EOF
+}
+
+require_cmd() {
+  local name="$1"
+  if ! command -v "$name" >/dev/null 2>&1; then
+    echo "Error: required command not found: $name" >&2
+    exit 1
+  fi
+}
+
+trim() {
+  local value="$1"
+  value="${value#"${value%%[![:space:]]*}"}"
+  value="${value%"${value##*[![:space:]]}"}"
+  printf '%s' "$value"
+}
+
+slugify() {
+  local value="$1"
+  value="$(printf '%s' "$value" | tr '[:upper:]' '[:lower:]')"
+  value="$(printf '%s' "$value" | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//')"
+  if [[ -z "$value" ]]; then
+    value="request"
+  fi
+  printf '%s' "$value"
+}
+
+ensure_requests_file() {
+  if [[ ! -f "$REQUESTS_FILE" ]]; then
+    printf '{\n  "requests": []\n}\n' > "$REQUESTS_FILE"
+  fi
+
+  if ! jq -e '.requests and (.requests | type == "array")' "$REQUESTS_FILE" >/dev/null 2>&1; then
+    echo "Error: invalid requests file format in $REQUESTS_FILE" >&2
+    exit 1
+  fi
+}
+
+extract_quoted_value() {
+  local token="$1"
+  token="$(trim "$token")"
+
+  if [[ "$token" == \"*\" ]]; then
+    token="${token#\"}"
+    token="${token%\"}"
+  elif [[ "$token" == \'*\' ]]; then
+    token="${token#\'}"
+    token="${token%\'}"
+  fi
+
+  printf '%s' "$token"
+}
+
+read_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --id)
+        if [[ $# -lt 2 || -z "${2:-}" ]]; then
+          echo "Error: --id requires a value" >&2
+          exit 1
+        fi
+        REQUEST_ID="${2:-}"
+        shift 2
+        ;;
+      --curl)
+        if [[ $# -lt 2 || -z "${2:-}" ]]; then
+          echo "Error: --curl requires a value" >&2
+          exit 1
+        fi
+        RAW_CURL="${2:-}"
+        shift 2
+        ;;
+      -h|--help)
+        usage
+        exit 0
+        ;;
+      *)
+        echo "Error: unknown option $1" >&2
+        usage
+        exit 1
+        ;;
+    esac
+  done
+}
+
+read_input() {
+  if [[ -n "$RAW_CURL" ]]; then
+    printf '%s' "$RAW_CURL"
+    return
+  fi
+
+  if [[ ! -t 0 ]]; then
+    cat
+    return
+  fi
+
+  echo "Error: no curl input found. Pass --curl or pipe raw curl text through stdin." >&2
+  usage
+  exit 1
+}
+
+parse_and_add_request() {
+  local input="$1"
+  local normalized=""
+  local method="GET"
+  local url=""
+  local body=""
+  local body_is_json="false"
+  local generated_id=""
+  local unique_id=""
+  local path_part=""
+  local base_id=""
+  local suffix=2
+
+  local headers_tmp
+  headers_tmp="$(mktemp)"
+  trap '[[ -n "${headers_tmp:-}" ]] && rm -f "$headers_tmp"' EXIT
+
+  normalized="${input//$'\\\n'/ }"
+  normalized="${normalized//$'\n'/ }"
+  normalized="$(printf '%s' "$normalized" | sed -E 's/[[:space:]]+/ /g; s/^ //; s/ $//')"
+
+  method="$(printf '%s' "$normalized" | sed -nE "s/.*-[Xx][[:space:]]*'([^']+)'.*/\1/p")"
+  if [[ -z "$method" ]]; then
+    method="$(printf '%s' "$normalized" | sed -nE 's/.*-[Xx][[:space:]]*([A-Za-z]+).*/\1/p')"
+  fi
+  if [[ -z "$method" ]]; then
+    method="GET"
+  fi
+  method="$(printf '%s' "$method" | tr '[:lower:]' '[:upper:]')"
+
+  url="$(printf '%s\n' "$normalized" | grep -oE "'https?://[^']+'" | head -n 1 | sed -E "s/^'//; s/'$//")"
+  if [[ -z "$url" ]]; then
+    url="$(printf '%s\n' "$normalized" | grep -oE '"https?://[^"]+"' | head -n 1 | sed -E 's/^"//; s/"$//')"
+  fi
+  if [[ -z "$url" ]]; then
+    url="$(printf '%s\n' "$normalized" | grep -oE 'https?://[^[:space:]"'"'"'\\]+' | head -n 1)"
+  fi
+
+  if [[ -z "$url" ]]; then
+    echo "Error: unable to parse URL from provided curl" >&2
+    exit 1
+  fi
+
+  while IFS= read -r token; do
+    local header_line=""
+    local key=""
+    local value=""
+    local key_lc=""
+
+    header_line="${token#-H }"
+    header_line="${header_line#--header }"
+    header_line="$(extract_quoted_value "$header_line")"
+
+    key="$(trim "${header_line%%:*}")"
+    value="$(trim "${header_line#*:}")"
+
+    if [[ "$header_line" != *:* || -z "$key" ]]; then
+      continue
+    fi
+
+    key_lc="$(printf '%s' "$key" | tr '[:upper:]' '[:lower:]')"
+    if [[ "$key_lc" == "authorization" && "$value" =~ ^[Bb]earer[[:space:]]+.+$ ]]; then
+      value="Bearer {{WALIMA_API_TOKEN}}"
+    fi
+
+    printf '%s\t%s\n' "$key" "$value" >> "$headers_tmp"
+  done < <(printf '%s\n' "$normalized" | grep -oE "(-H|--header)[[:space:]]+'[^']*'|(-H|--header)[[:space:]]+\"[^\"]*\"" || true)
+
+  body="$(printf '%s\n' "$normalized" | grep -oE "(-d|--data|--data-raw)[[:space:]]+'[^']*'|(-d|--data|--data-raw)[[:space:]]+\"[^\"]*\"" | head -n 1 || true)"
+  if [[ -n "$body" ]]; then
+    body="${body#-d }"
+    body="${body#--data }"
+    body="${body#--data-raw }"
+    body="$(extract_quoted_value "$body")"
+    if jq -e . >/dev/null 2>&1 <<<"$body"; then
+      body_is_json="true"
+    fi
+  fi
+
+  if [[ -n "$REQUEST_ID" ]]; then
+    generated_id="$(slugify "$REQUEST_ID")"
+  else
+    path_part="$(printf '%s' "$url" | sed -E 's#https?://[^/]+/?##; s/\?.*$//')"
+    base_id="$(printf '%s' "$path_part" | awk -F'/' '{print $NF}')"
+    generated_id="$(slugify "$base_id")"
+  fi
+
+  unique_id="$generated_id"
+  while jq -e --arg id "$unique_id" '.requests[] | select(.id == $id)' "$REQUESTS_FILE" >/dev/null 2>&1; do
+    unique_id="${generated_id}-${suffix}"
+    suffix=$((suffix + 1))
+  done
+
+  local headers_json='{}'
+  if [[ -s "$headers_tmp" ]]; then
+    headers_json="$(jq -Rn '
+      reduce inputs as $line (
+        {};
+        ($line | split("\t")) as $parts |
+        if ($parts | length) >= 2 then
+          . + { ($parts[0]): ($parts[1:] | join("\t")) }
+        else
+          .
+        end
+      )
+    ' < "$headers_tmp")"
+  fi
+
+  local request_json=""
+  if [[ -n "$body" ]]; then
+    if [[ "$body_is_json" == "true" ]]; then
+      request_json="$(jq -n \
+        --arg id "$unique_id" \
+        --arg method "$method" \
+        --arg url "$url" \
+        --argjson headers "$headers_json" \
+        --argjson body "$body" \
+        '{id: $id, method: $method, url: $url, headers: $headers, body: $body}')"
+    else
+      request_json="$(jq -n \
+        --arg id "$unique_id" \
+        --arg method "$method" \
+        --arg url "$url" \
+        --argjson headers "$headers_json" \
+        --arg body "$body" \
+        '{id: $id, method: $method, url: $url, headers: $headers, body: $body}')"
+    fi
+  else
+    request_json="$(jq -n \
+      --arg id "$unique_id" \
+      --arg method "$method" \
+      --arg url "$url" \
+      --argjson headers "$headers_json" \
+      '{id: $id, method: $method, url: $url, headers: $headers}')"
+  fi
+
+  local tmp_out
+  tmp_out="$(mktemp)"
+  jq --argjson req "$request_json" '.requests += [$req]' "$REQUESTS_FILE" > "$tmp_out"
+  mv "$tmp_out" "$REQUESTS_FILE"
+
+  echo "Added request: $unique_id"
+  echo "Method: $method"
+  echo "URL: $url"
+  echo "Updated file: $REQUESTS_FILE"
+}
+
+require_cmd jq
+read_args "$@"
+ensure_requests_file
+raw_input="$(read_input)"
+parse_and_add_request "$raw_input"

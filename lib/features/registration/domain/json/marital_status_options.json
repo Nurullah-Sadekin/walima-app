@@ -1,0 +1,10 @@
+[
+  { "name": "Open To All", "value": "open_to_all" },
+  { "name": "Never Married", "value": "never_married" },
+  { "name": "Married", "value": "married" },
+  { "name": "Divorced", "value": "divorced" },
+  { "name": "Widowed", "value": "widowed" },
+  { "name": "Separated", "value": "separated" },
+  { "name": "Awaiting Divorce", "value": "awaiting_divorce" },
+  { "name": "Annulled", "value": "annulled" }
+]

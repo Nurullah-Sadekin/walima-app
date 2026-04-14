@@ -117,7 +117,7 @@ class AppTheme {
         borderSide: const BorderSide(color: AppColors.error, width: 2),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      hintStyle: const TextStyle(color: AppColors.textSecondaryLight),
+      hintStyle: const TextStyle(color: AppColors.textPrimaryLight),
     ),
 
     // Icon Theme
@@ -178,7 +178,7 @@ class AppTheme {
       bodySmall: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.normal,
-        color: AppColors.textSecondaryLight,
+        color: AppColors.textPrimaryLight,
       ),
       labelLarge: TextStyle(
         fontSize: 14,
@@ -193,7 +193,7 @@ class AppTheme {
       labelSmall: TextStyle(
         fontSize: 10,
         fontWeight: FontWeight.w600,
-        color: AppColors.textSecondaryLight,
+        color: AppColors.textPrimaryLight,
       ),
     ),
   );
