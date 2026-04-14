@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
@@ -8,7 +9,7 @@ import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/account_setting/presentation/providers/account_setting_provider.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/screens/widgets/profile_action_tile.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/into_tile.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/setting_switcher_title.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AccountSettingScreen extends ConsumerStatefulWidget {
@@ -76,15 +77,10 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     switch (_step) {
       case AccountSettingStep.accountSetting:
         return _overviewBody(provider);
-        case AccountSettingStep.alerts:
+      case AccountSettingStep.alerts:
         return null;
       case AccountSettingStep.premiumMembership:
-        return _detailBody(
-          description:
-              'Choose how your premium membership details and reminders should appear inside the app.',
-          items: provider.premiumMembershipOptions,
-          onTap: provider.togglePremiumMembershipOption,
-        );
+        return _premiumMembership();
       case AccountSettingStep.contactPrivacy:
         return _detailBody(
           description:
@@ -130,46 +126,49 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 20,
         children: [
-          const SizedBox(height: 1,),
+          const SizedBox(
+            height: 1,
+          ),
           ProfileActionTile(
             iconImagePath: AppImages.notificationSvgIcon,
             title: 'Alerts',
-            onTap: () => setState(() => _step = AccountSettingStep.premiumMembership),
+            onTap: () =>
+                setState(() => _step = AccountSettingStep.premiumMembership),
           ),
           ProfileActionTile(
             iconImagePath: AppImages.premiumSvgIcon,
             title: 'Premium Membership',
-            onTap: () => setState(() => _step = AccountSettingStep.premiumMembership),
+            onTap: () =>
+                setState(() => _step = AccountSettingStep.premiumMembership),
           ),
           ProfileActionTile(
             iconImagePath: AppImages.contactPreview,
             title: 'Contact Privacy',
-            onTap: () => setState(() => _step = AccountSettingStep.contactPrivacy),
+            onTap: () =>
+                setState(() => _step = AccountSettingStep.contactPrivacy),
           ),
-
           ProfileActionTile(
             iconImagePath: AppImages.verifyIcon,
             iconColor: AppColors.disableDark,
             title: 'Verification Badge',
-            onTap: () => setState(() => _step = AccountSettingStep.verificationBadge),
+            onTap: () =>
+                setState(() => _step = AccountSettingStep.verificationBadge),
           ),
-
           ProfileActionTile(
             iconImagePath: AppImages.calenderTimer,
             title: 'Date of Birth',
             onTap: () => setState(() => _step = AccountSettingStep.dateOfBirth),
           ),
-
           ProfileActionTile(
             iconImagePath: AppImages.messages,
             title: 'Message',
             onTap: () => setState(() => _step = AccountSettingStep.message),
           ),
-
           ProfileActionTile(
             iconImagePath: AppImages.delete,
             title: 'Delete Profile',
-            onTap: () => setState(() => _step = AccountSettingStep.deleteProfile),
+            onTap: () =>
+                setState(() => _step = AccountSettingStep.deleteProfile),
             // Note: ProfileActionTile might need custom styling for the delete option
             // You may need to check if ProfileActionTile supports custom colors
           ),
@@ -206,7 +205,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           child: Text(
             description,
             style: TextStyle(
-              color: isDangerZone ? AppColors.error : AppColors.textSecondaryLight,
+              color:
+                  isDangerZone ? AppColors.error : AppColors.textSecondaryLight,
               fontSize: 13,
               fontWeight: FontWeight.w400,
             ),
@@ -237,6 +237,39 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     );
   }
 
+  Widget _premiumMembership() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 16,
+      children: [
+        SettingsSwitchTile(
+          title: 'Auto-renew my Plan',
+          subtitle: 'Auto-renewal for your Membership',
+          value: provider.autoRenew ?? false,
+          onChanged: (value) {
+            provider.autoRenew = value;
+            provider.notifyListeners();
+          },
+        ),
+        SettingsSwitchTile(
+          title: 'What is auto-renewal?',
+          subtitle:
+              '"Auto-renewal" automatically renews your plan before its expiry, from your registered Credit/Debit Card, so you can continue to enjoy your premium benefits.',
+          value: true,
+          onChanged: (value) {},
+          isVisibleSwitcher: false,
+        ),
+        Text('Current Plan:',
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimaryLight,
+              fontSize: TextSize.font12(context,)
+            )
+        )
+      ],
+    );
+  }
+
   Widget _bottomAction(AccountSettingProvider provider) {
     final isRoot = _step == AccountSettingStep.accountSetting;
 
@@ -257,7 +290,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     switch (step) {
       case AccountSettingStep.accountSetting:
         return 'Account Setting';
-        case AccountSettingStep.alerts:
+      case AccountSettingStep.alerts:
         return 'Alerts';
       case AccountSettingStep.premiumMembership:
         return 'Premium Membership';

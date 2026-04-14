@@ -53,9 +53,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
             child: _body(provider),
           ),
         ),
-        floatingActionButton: _step == ContactFilterStep.contactFilterScreen
-            ? null
-            : BottomBorderedWidget(widget: _bottomAction()),
+        floatingActionButton:  BottomBorderedWidget(widget: _bottomAction()),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );

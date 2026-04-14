@@ -4,6 +4,8 @@ import 'package:flutter_boilerplate/features/registration/domain/single_string_m
 class AccountSettingProvider extends BaseChangeNotifier {
   AccountSettingProvider();
 
+  bool? autoRenew = false;
+
   final List<SingleStringModel> premiumMembershipOptions = [
     SingleStringModel(
       name: 'Show premium badge on profile',

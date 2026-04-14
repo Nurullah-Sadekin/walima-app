@@ -16,6 +16,7 @@ class SettingsSwitchTile extends StatelessWidget { // Control switch size
     this.switchScale = 0.6,
     this.trailingImageSize,
     this.trailingImageColor,
+    this.isVisibleSwitcher,
   });
   final String title;
   final String? subtitle;
@@ -26,6 +27,8 @@ class SettingsSwitchTile extends StatelessWidget { // Control switch size
   final double switchScale;
   final double? trailingImageSize;
   final Color? trailingImageColor;
+  final bool? isVisibleSwitcher;
+
 
 
   @override
@@ -45,42 +48,48 @@ class SettingsSwitchTile extends StatelessWidget { // Control switch size
                   color: trailingImageColor ?? AppColors.textPrimaryLight,
                 ),
               if (showTrailingImage) const SizedBox(width: 8), // Spacing between image and text
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 4,
-                children: [
-                  Text(
-                    title,
-                    textHeightBehavior: const TextHeightBehavior(
-                      applyHeightToFirstAscent: false,
-                      applyHeightToLastDescent: false,
-                    ),
-                    style: TextStyle(
-                      color: AppColors.textPrimaryLight,
-                      fontSize: TextSize.font14(context),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  if (subtitle != null)
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 4,
+                  children: [
                     Text(
-                      subtitle!,
+                      title,
                       textHeightBehavior: const TextHeightBehavior(
                         applyHeightToFirstAscent: false,
                         applyHeightToLastDescent: false,
                       ),
                       style: TextStyle(
-                        color: AppColors.textSecondaryLight,
-                        fontSize: TextSize.font12(context),
-                        fontWeight: FontWeight.w400,
+                        color: AppColors.textPrimaryLight,
+                        fontSize: TextSize.font14(context),
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                ],
+                    if (subtitle != null)
+                      Text(
+                        subtitle!,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.start,
+                        textHeightBehavior: const TextHeightBehavior(
+                          applyHeightToFirstAscent: false,
+                          applyHeightToLastDescent: false,
+                        ),
+                        style: TextStyle(
+                          color: AppColors.textSecondaryLight,
+                          fontSize: TextSize.font12(context),
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ],
           ),
         ),
 
         // Right side - Switch and optional trailing image
+        if (isVisibleSwitcher ?? true)
         Transform.scale(
           scale: switchScale,
           alignment: Alignment.centerRight,
