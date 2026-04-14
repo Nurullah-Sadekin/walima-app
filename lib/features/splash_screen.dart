@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_boilerplate/core/constants/storage_keys.dart';
+import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -12,15 +16,29 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  static const Color _splashPink = Color(0xFFFF2E86);
+  String _versionLabel = 'Version';
 
   @override
   void initState() {
     super.initState();
+    _loadVersion();
     _checkAuth();
+  }
+
+  Future<void> _loadVersion() async {
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      if (!mounted) return;
+      setState(() {
+        _versionLabel = 'Version: ${packageInfo.version}.${packageInfo.buildNumber}';
+      });
+    } catch (_) {}
   }
 
   Future<void> _checkAuth() async {
     try {
+      await Future.delayed(const Duration(milliseconds: 1400));
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString(StorageKeys.accessToken);
       debugPrint('SplashScreen: AccessToken : $token');
@@ -48,18 +66,37 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        alignment: Alignment.center,
-        child: const Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            FlutterLogo(size: 88),
-            SizedBox(height: 16),
-            Text(
-              'Walima',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-            ),
-          ],
+        width: double.infinity,
+        height: double.infinity,
+        color: _splashPink,
+        child: SafeArea(
+          child: Stack(
+            children: [
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
+                  child: SvgPicture.asset(
+                    AppImages.walimaSvg,
+                    width: 270,
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 72,
+                child: Text(
+                  _versionLabel,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

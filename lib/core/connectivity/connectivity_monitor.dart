@@ -17,6 +17,8 @@ class ConnectivityMonitor extends StatefulWidget {
 
 class _ConnectivityMonitorState extends State<ConnectivityMonitor> {
   late final StreamSubscription<InternetConnectionStatus> _subscription;
+  bool _hasSeenOfflineState = false;
+  bool _isOfflineSnackBarVisible = false;
 
   @override
   void initState() {
@@ -27,18 +29,22 @@ class _ConnectivityMonitorState extends State<ConnectivityMonitor> {
       final hasConnection = status == InternetConnectionStatus.connected;
       if (!hasConnection) {
         _showNoInternet();
-      } else {
+      } else if (_hasSeenOfflineState) {
         _hideNoInternet();
       }
     });
 
     // Initial check
     InternetConnectionChecker().hasConnection.then((has) {
-      if (!has) _showNoInternet();
+      if (!has) {
+        _showNoInternet();
+      }
     });
   }
 
   void _showNoInternet() {
+    _hasSeenOfflineState = true;
+    _isOfflineSnackBarVisible = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final messenger = rootScaffoldMessengerKey.currentState;
       if (messenger == null) return;
@@ -54,6 +60,8 @@ class _ConnectivityMonitorState extends State<ConnectivityMonitor> {
   }
 
   void _hideNoInternet() {
+    if (!_isOfflineSnackBarVisible) return;
+    _isOfflineSnackBarVisible = false;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final messenger = rootScaffoldMessengerKey.currentState;
       if (messenger == null) return;

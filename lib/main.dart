@@ -24,38 +24,38 @@ import 'package:flutter_boilerplate/core/utils/foreground_alert_service.dart';
 import 'package:flutter_boilerplate/features/chat/data/socket/socket_service.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  if (!kIsWeb &&
-      defaultTargetPlatform == TargetPlatform.android &&
-      Firebase.apps.isEmpty) {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-  }
-
-  await AppErrorReportingService.instance.initialize();
-
-  FlutterError.onError = (details) {
-    FlutterError.presentError(details);
-    unawaited(
-      AppErrorReportingService.instance.recordFlutterFatalError(details),
-    );
-  };
-
-  PlatformDispatcher.instance.onError = (error, stackTrace) {
-    unawaited(
-      AppErrorReportingService.instance.recordError(
-        error,
-        stackTrace,
-        fatal: true,
-        reason: 'Uncaught platform error',
-      ),
-    );
-    return true;
-  };
-
   runZonedGuarded(
-    () {
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
+      if (!kIsWeb &&
+          defaultTargetPlatform == TargetPlatform.android &&
+          Firebase.apps.isEmpty) {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+      }
+
+      await AppErrorReportingService.instance.initialize();
+
+      FlutterError.onError = (details) {
+        FlutterError.presentError(details);
+        unawaited(
+          AppErrorReportingService.instance.recordFlutterFatalError(details),
+        );
+      };
+
+      PlatformDispatcher.instance.onError = (error, stackTrace) {
+        unawaited(
+          AppErrorReportingService.instance.recordError(
+            error,
+            stackTrace,
+            fatal: true,
+            reason: 'Uncaught platform error',
+          ),
+        );
+        return true;
+      };
+
       runApp(
         const ProviderScope(
           child: SafeArea(
