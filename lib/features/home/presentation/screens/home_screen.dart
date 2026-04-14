@@ -339,12 +339,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             );
           },
           onTapLeftButton: () {
-            ref.read(homeProvider).connect(
-                  context,
-                  match.id ?? '',
-                  match.displayName ?? 'Unknown',
-                  ConnectionRequestType.match.apiValue,
-                );
+            if(match.connection?.status == 'none'){
+              ref.read(homeProvider).connect(
+                context,
+                match.id ?? '',
+                match.displayName ?? 'Unknown',
+                ConnectionRequestType.match.apiValue,
+              );
+            }
             // print('Left button tapped for ${match.displayName}');
           },
           activeStatusText: activeStatus,
@@ -578,12 +580,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             );
           },
           onTapLeftButton: () {
-            ref.read(homeProvider).connect(
-                  context,
-                  visitor.id ?? '',
-                  visitor.displayName ?? 'Unknown',
-                  ConnectionRequestType.match.apiValue,
-                );
+            if(visitor.connection?.status == 'none'){
+              ref.read(homeProvider).connect(
+                context,
+                visitor.id ?? '',
+                visitor.displayName ?? 'Unknown',
+                ConnectionRequestType.match.apiValue,
+              );
+            }
           },
         ),
       ),
