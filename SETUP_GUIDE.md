@@ -4,7 +4,7 @@
 
 ### 1. Install Dependencies
 ```bash
-cd /Users/nurullahsadekeen/Desktop/boilerplate
+cd walima
 flutter pub get
 ```
 
