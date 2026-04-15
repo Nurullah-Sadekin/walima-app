@@ -10,6 +10,7 @@ import 'package:flutter_boilerplate/features/account_setting/presentation/provid
 import 'package:flutter_boilerplate/features/account_setting/presentation/screens/widgets/card_border.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/screens/widgets/profile_action_tile.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/filter_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/setting_switcher_title.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -276,36 +277,107 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
         mainAxisSize: MainAxisSize.min,
         spacing: 16,
         children: [
-
-          SettingsSwitchTile(
-            title: 'Hide Profile',
-            subtitle: 'Hiding your profile makes you invisible and disables messages and invitations',
-            value: provider.autoRenew ?? false,
-            onChanged: (value) {
-              provider.autoRenew = value;
-              provider.notifyListeners();
-            },
+          Column(
+            children: [
+              SettingsSwitchTile(
+                title: 'Hide Profile',
+                subtitle: 'Hiding your profile makes you invisible and disables messages and invitations',
+                value: provider.hideProfile ?? false,
+                onChanged: (value) {
+                  provider.hideProfile = value;
+                  provider.notifyListeners();
+                },
+              ),
+              const SizedBox(height: 16,),
+              FilterWidget(
+                items: provider.timelineDataList.map((item) => FilterItem(name: item.label, isSelected: false),).toList(),
+                onItemTap: (index) async {
+                  final setTimelineValue = provider.setTimelineValue(index);
+                  if (setTimelineValue == null) return;
+                },
+              ),
+            ],
           ),
 
-          Divider(
-            color: AppColors.greyLight,
-            thickness: 1,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Divider(
+                color: AppColors.greyLight,
+                thickness: 1,
+              ),
+              const SizedBox(height: 16,),
+              Text('Visibility Preferences',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textPrimaryLight,
+                      fontSize: TextSize.font16(context,)
+                  )
+              ),
+              Text('Manage how others discover and connect with you',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.textSecondaryLight,
+                      fontSize: TextSize.font12(context,)
+                  )
+              ),
+              const SizedBox(height: 12,),
+              SettingsSwitchTile(
+                title: 'Shortlist Alerts',
+                subtitle:
+                'Notify me when someone shortlists my profile',
+                value: provider.shortlistAlerts ?? false,
+                onChanged: (value) {
+                  provider.shortlistAlerts = value;
+                  provider.notifyListeners();
+                },
+              ),
+              SettingsSwitchTile(
+                title: 'Premium Calls',
+                subtitle:
+                'Allow premium members to call me directly',
+                value: provider.premiumCalls ?? false,
+                onChanged: (value) {
+                  provider.premiumCalls = value;
+                  provider.notifyListeners();
+                },
+              ),
+            ],
           ),
-          SettingsSwitchTile(
-            title: 'What is auto-renewal?',
-            subtitle:
-            '"Auto-renewal" automatically renews your plan before its expiry, from your registered Credit/Debit Card, so you can continue to enjoy your premium benefits.',
-            value: true,
-            onChanged: (value) {},
-            isVisibleSwitcher: false,
+
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+               const Divider(
+                color: AppColors.greyLight,
+                thickness: 1,
+              ),
+              const SizedBox(height: 16,),
+              Text('Delete Profile',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textPrimaryLight,
+                      fontSize: TextSize.font16(context,)
+                  )
+              ),
+              Text('You\'ll permanently lose all profile data, matches, and memberships',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.textSecondaryLight,
+                      fontSize: TextSize.font12(context,)
+                  )
+              ),
+              const SizedBox(height: 16,),
+              FilterWidget(
+                items: provider.deleteProfileStatus.map((item) => FilterItem(name: item.label, isSelected: false),).toList(),
+                onItemTap: (index) async {
+                  final deleteProfileStatus = provider.setDeleteProfileStatus(index);
+                  if (deleteProfileStatus == null) return;
+                },
+              ),
+            ],
           ),
-          Text('Current Plan:',
-              style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimaryLight,
-                  fontSize: TextSize.font12(context,)
-              )
-          )
+
         ],
       ),
     );
