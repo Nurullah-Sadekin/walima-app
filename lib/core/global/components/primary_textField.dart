@@ -34,7 +34,8 @@ class PrimaryTextField extends StatefulWidget {
     this.contentPadding,
     this.enabled,
     this.hideHeadline,
-    this.length
+    this.length,
+    this.isRequired = false,
   });
 
   final TextEditingController? controller;
@@ -65,6 +66,8 @@ class PrimaryTextField extends StatefulWidget {
   final bool? showPassIcon;
   final bool? headLineInfoIcon;
   final int? length;
+  final bool? isRequired;
+
 
   @override
   State<PrimaryTextField> createState() => _PrimaryTextFieldState();
@@ -266,6 +269,13 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
             if (widget.headLineInfoIcon == true && widget.headLine != null)
               Icon(Icons.info,
                   size: TextSize.font13(context), color: AppColors.disableText),
+            if (widget.isRequired == true && widget.headLine != null)
+           Text('*',
+                style: TextStyle(
+                    fontSize: TextSize.font14(context),
+                    fontWeight: FontWeight.w600,
+                  color: Colors.redAccent
+                ))
           ],
         ),
         const SizedBox(height: 6),

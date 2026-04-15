@@ -9,7 +9,8 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
   const InfoTile({
     super.key,
     required this.title,
-    required this.value,
+    this.value,
+    this.subtitle,
     this.leadingImagePath,
     this.trailingImagePath = AppImages.editWrite,
     this.leadingImageColor,
@@ -21,12 +22,14 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
     this.leadingImageSize = 16,
     this.trailingImageSize = 16,
     this.leadingRadius = 14,
+    this.borderRadius,
     this.padding,
     this.showTrailingImage = true,
     this.showLeadingImage = true,
   });
   final String title;
-  final String value;
+  final String? value;
+  final String? subtitle;
   final String? leadingImagePath ; // Optional leading image
   final String? trailingImagePath; // Optional trailing image
   final Color? leadingImageColor;
@@ -38,6 +41,7 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
   final double? leadingImageSize;
   final double? trailingImageSize;
   final double? leadingRadius;
+  final double? borderRadius;
   final EdgeInsetsGeometry? padding;
   final bool showTrailingImage ; // Control trailing image visibility
   final bool showLeadingImage ;
@@ -51,11 +55,12 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
         padding: padding ?? const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
           color: AppColors.white,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular( borderRadius ?? 4),
           border: Border.all(color: AppColors.greyLight, width: 1),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          spacing: 8,
           children: [
             // Left side - Leading image and title
             Expanded(
@@ -73,47 +78,67 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
                         color: leadingImageColor ?? AppColors.primary,
                       ),
                     ),
-                  Text(
-                    title,
-                    style: titleStyle ??
-                        TextStyle(
-                          color: AppColors.textSecondaryLight,
-                          fontSize: TextSize.font12(context),
-                          fontWeight: FontWeight.w400,
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: titleStyle ??
+                              TextStyle(
+                                color: subtitle != null ?  AppColors.textPrimaryLight : AppColors.textSecondaryLight,
+                                fontSize:  subtitle != null ? TextSize.font14(context) : TextSize.font12(context),
+                                fontWeight: subtitle != null ?  FontWeight.w500: FontWeight.w400,
+                              ),
                         ),
+                        if(subtitle != null)...[
+                          const SizedBox(height: 4,),
+                          Text(
+                            subtitle!,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: titleStyle ??
+                                TextStyle(
+                                  color: AppColors.textSecondaryLight,
+                                  fontSize: TextSize.font12(context),
+                                  fontWeight: FontWeight.w400,
+                                ),
+                          ),
+                        ]
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
 
-            // Right side - Value and trailing image
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                spacing: 8,
-                children: [
-                  Flexible(
-                    child: Text(
-                      value,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: valueStyle ??
-                          TextStyle(
-                            color: AppColors.textPrimaryLight,
-                            fontSize: TextSize.font12(context),
-                            fontWeight: FontWeight.w500,
-                          ),
-                    ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              spacing: 8,
+              children: [
+                if (value != null)
+                Flexible(
+                  child: Text(
+                    value!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: valueStyle ??
+                        TextStyle(
+                          color: AppColors.textPrimaryLight,
+                          fontSize: TextSize.font12(context),
+                          fontWeight: FontWeight.w500,
+                        ),
                   ),
-                  if (showTrailingImage)
-                    ShowImage(
-                      imagePath: trailingImagePath!,
-                      width: trailingImageSize,
-                      height: trailingImageSize,
-                      color: trailingImageColor ?? AppColors.primary,
-                    ),
-                ],
-              ),
+                ),
+                if (showTrailingImage)
+                  ShowImage(
+                    imagePath: trailingImagePath!,
+                    width: trailingImageSize,
+                    height: trailingImageSize,
+                    color: trailingImageColor ?? AppColors.primary,
+                  ),
+              ],
             ),
           ],
         ),

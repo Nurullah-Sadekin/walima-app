@@ -1,14 +1,20 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/global/models/filter_model.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 
 class AccountSettingProvider extends BaseChangeNotifier {
   AccountSettingProvider();
+  final TextEditingController newPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
 
+  String newPasswordError = '';
+  String confirmPasswordError = '';
   bool? autoRenew = false;
   bool? hideProfile = false;
   bool? shortlistAlerts = false;
   bool? premiumCalls = false;
+  bool? autoMessageConnect = false;
+
 
   List<Filter> timelineDataList = [
     Filter(label: '1 Week', value: '1_week'),

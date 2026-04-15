@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
+import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/account_setting/presentation/providers/account_setting_provider.dart';
 import 'package:flutter_boilerplate/features/account_setting/presentation/screens/widgets/card_border.dart';
@@ -90,9 +91,11 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
       case AccountSettingStep.dateOfBirth:
         return null;
       case AccountSettingStep.message:
-        return null;
+        return _messages();
       case AccountSettingStep.deleteProfile:
         return _hideOrDeleteProfile();
+      case AccountSettingStep.setPassword:
+        return _setPassword();
     }
   }
 
@@ -137,7 +140,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           ),
           ProfileActionTile(
             iconImagePath: AppImages.messages,
-            title: 'Message',
+            title: 'Messages',
             onTap: () => setState(() => _step = AccountSettingStep.message),
           ),
           ProfileActionTile(
@@ -145,6 +148,13 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             title: 'Hide/Delete Profile',
             onTap: () =>
                 setState(() => _step = AccountSettingStep.deleteProfile),
+            // Note: ProfileActionTile might need custom styling for the delete option
+            // You may need to check if ProfileActionTile supports custom colors
+          ),
+          ProfileActionTile(
+            iconImagePath: AppImages.lockPasswordSvgIcon,
+            title: 'Set Password',
+            onTap: () => setState(() => _step = AccountSettingStep.setPassword),
             // Note: ProfileActionTile might need custom styling for the delete option
             // You may need to check if ProfileActionTile supports custom colors
           ),
@@ -180,11 +190,11 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           ),
           Text('Current Plan:',
               style: TextStyle(
-                fontWeight: FontWeight.w500,
-                color: AppColors.textPrimaryLight,
-                fontSize: TextSize.font12(context,)
-              )
-          )
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textPrimaryLight,
+                  fontSize: TextSize.font12(
+                    context,
+                  )))
         ],
       ),
     );
@@ -201,18 +211,25 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             children: [
               SettingsSwitchTile(
                 title: 'Hide Profile',
-                subtitle: 'Hiding your profile makes you invisible and disables messages and invitations',
+                subtitle:
+                    'Hiding your profile makes you invisible and disables messages and invitations',
                 value: provider.hideProfile ?? false,
                 onChanged: (value) {
                   provider.hideProfile = value;
                   provider.notifyListeners();
                 },
               ),
-              const SizedBox(height: 16,),
+              const SizedBox(
+                height: 16,
+              ),
               FilterWidget(
-                items: provider.timelineDataList.map((item) => FilterItem(name: item.label, isSelected: false),).toList(),
+                items: provider.timelineDataList
+                    .map(
+                      (item) => FilterItem(name: item.label, isSelected: false),
+                    )
+                    .toList(),
                 spacing: 0,
-                itemSpacing: 8,
+                itemSpacing: 10,
                 onItemTap: (index) async {
                   final setTimelineValue = provider.setTimelineValue(index);
                   if (setTimelineValue == null) return;
@@ -220,7 +237,6 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               ),
             ],
           ),
-
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -228,37 +244,41 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
                 color: AppColors.greyLight,
                 thickness: 1,
               ),
-              const SizedBox(height: 16,),
+              const SizedBox(
+                height: 16,
+              ),
               Text('Visibility Preferences',
                   style: TextStyle(
                       fontWeight: FontWeight.w500,
                       color: AppColors.textPrimaryLight,
-                      fontSize: TextSize.font16(context,)
-                  )
-              ),
+                      fontSize: TextSize.font16(
+                        context,
+                      ))),
               Text('Manage how others discover and connect with you',
                   style: TextStyle(
                       fontWeight: FontWeight.w400,
                       color: AppColors.textSecondaryLight,
-                      fontSize: TextSize.font12(context,)
-                  )
+                      fontSize: TextSize.font12(
+                        context,
+                      ))),
+              const SizedBox(
+                height: 16,
               ),
-              const SizedBox(height: 12,),
               SettingsSwitchTile(
                 title: 'Shortlist Alerts',
-                subtitle:
-                'Notify me when someone shortlists my profile',
+                subtitle: 'Notify me when someone shortlists my profile',
                 value: provider.shortlistAlerts ?? false,
                 onChanged: (value) {
                   provider.shortlistAlerts = value;
                   provider.notifyListeners();
                 },
               ),
-              const SizedBox(height: 8,),
+              const SizedBox(
+                height: 10,
+              ),
               SettingsSwitchTile(
                 title: 'Premium Calls',
-                subtitle:
-                'Allow premium members to call me directly',
+                subtitle: 'Allow premium members to call me directly',
                 value: provider.premiumCalls ?? false,
                 onChanged: (value) {
                   provider.premiumCalls = value;
@@ -267,42 +287,50 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               ),
             ],
           ),
-
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-               const Divider(
+              const Divider(
                 color: AppColors.greyLight,
                 thickness: 1,
               ),
-              const SizedBox(height: 16,),
+              const SizedBox(
+                height: 16,
+              ),
               Text('Delete Profile',
                   style: TextStyle(
                       fontWeight: FontWeight.w500,
                       color: AppColors.textPrimaryLight,
-                      fontSize: TextSize.font16(context,)
-                  )
-              ),
-              Text('You\'ll permanently lose all profile data, matches, and memberships',
+                      fontSize: TextSize.font16(
+                        context,
+                      ))),
+              Text(
+                  'You\'ll permanently lose all profile data, matches, and memberships',
                   style: TextStyle(
                       fontWeight: FontWeight.w400,
                       color: AppColors.textSecondaryLight,
-                      fontSize: TextSize.font12(context,)
-                  )
+                      fontSize: TextSize.font12(
+                        context,
+                      ))),
+              const SizedBox(
+                height: 16,
               ),
-              const SizedBox(height: 16,),
               FilterWidget(
-                items: provider.deleteProfileStatus.map((item) => FilterItem(name: item.label, isSelected: false),).toList(),
+                items: provider.deleteProfileStatus
+                    .map(
+                      (item) => FilterItem(name: item.label, isSelected: false),
+                    )
+                    .toList(),
                 spacing: 0,
-                itemSpacing: 8,
+                itemSpacing: 10,
                 onItemTap: (index) async {
-                  final deleteProfileStatus = provider.setDeleteProfileStatus(index);
+                  final deleteProfileStatus =
+                      provider.setDeleteProfileStatus(index);
                   if (deleteProfileStatus == null) return;
                 },
               ),
             ],
           ),
-
         ],
       ),
     );
@@ -346,7 +374,6 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           showTrailingImage: true,
           showLeadingImage: true,
         ),
-
         InfoTile(
           title: 'Date of Birth',
           value: 'Hide',
@@ -387,7 +414,164 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           showTrailingImage: true,
           showLeadingImage: true,
         ),
+      ],
+    );
+  }
 
+  Widget _messages() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      spacing: 16,
+      children: [
+        CardBorder(
+          widget: SettingsSwitchTile(
+            title: 'Auto-Message on Connect',
+            subtitle:
+            'Your saved message will auto-send with each Connect Request',
+            value: provider.autoMessageConnect ?? false,
+            onChanged: (value) {
+              provider.autoMessageConnect = value;
+              provider.notifyListeners();
+            },
+          ),
+        ),
+        const InfoTile(
+          title: 'Message on Connect',
+          subtitle: 'This message is sent with your Connect Request when auto-message is enable',
+          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          leadingImagePath: AppImages.contactPreview,
+          showTrailingImage: true,
+          showLeadingImage: false,
+          borderRadius: 8,
+          padding: EdgeInsets.all(16),
+        ),
+        const InfoTile(
+          title: 'Message on Accept',
+          subtitle: 'This message is sent to members upon accepting their Connect request',
+          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          leadingImagePath: AppImages.contactPreview,
+          showTrailingImage: true,
+          showLeadingImage: false,
+          borderRadius: 8,
+          padding: EdgeInsets.all(16),
+        ),
+        const InfoTile(
+          title: 'Message on Remind',
+          subtitle: 'This message is sent to members when you send them a reminder',
+          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          leadingImagePath: AppImages.contactPreview,
+          showTrailingImage: true,
+          showLeadingImage: false,
+          borderRadius: 8,
+          padding: EdgeInsets.all(16),
+        ),
+      ],
+    );
+  }
+
+  Widget _setPassword() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      spacing: 16,
+      children: [
+        PrimaryTextField(
+          controller: provider.newPasswordController,
+          headLine: 'New Password',
+          hintText: 'Enter new password',
+          noPrefix: true,
+          errorText: provider.newPasswordError,
+          showPassIcon: true,
+          onTap: () {},
+          isRequired: true,
+        ),
+        PrimaryTextField(
+          controller: provider.confirmPasswordController,
+          headLine: 'Confirm Password',
+          hintText: 'Enter confirm password',
+          noPrefix: true,
+          errorText: provider.confirmPasswordError,
+          showPassIcon: true,
+          onTap: () {},
+          isRequired: true,
+        ),
+         Row(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Expanded(
+              child: CardBorder(
+                backgroundColor: AppColors.disableBackground,
+                borderColor: AppColors.transparent,
+                widget: Column(
+                  spacing: 6,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Password Must contain:',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textPrimaryLight,
+                            fontSize: TextSize.font14(context),
+                        ),
+                    ),
+                    Row(
+                      spacing: 6,
+                      children: [
+                        const Icon(Icons.circle,size: 5,color: AppColors.textSecondaryLight,),
+                        Text('At least 8 characters',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.textSecondaryLight,
+                                fontSize: TextSize.font12(context),
+                            ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      spacing: 6,
+                      children: [
+                        const Icon(Icons.circle,size: 5,color: AppColors.textSecondaryLight,),
+                        Text('Uppercase and lowercase letters',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.textSecondaryLight,
+                                fontSize: TextSize.font12(context),
+                            ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      spacing: 6,
+                      children: [
+                        const Icon(Icons.circle,size: 5,color: AppColors.textSecondaryLight,),
+                        Text('At least one number',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.textSecondaryLight,
+                                fontSize: TextSize.font12(context),
+                            ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      spacing: 6,
+                      children: [
+                        const Icon(Icons.circle,size: 5,color: AppColors.textSecondaryLight,),
+                        Text('At least one special character',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.textSecondaryLight,
+                                fontSize: TextSize.font12(context),
+                            ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        )
       ],
     );
   }
@@ -402,8 +586,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     return PrimaryButtons(
       buttonStyle: ButtonsStyle.activePrimaryButton,
       title: 'Save Changes',
-      onTap: () {
-      },
+      onTap: () {},
     );
   }
 
@@ -422,9 +605,11 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
       case AccountSettingStep.dateOfBirth:
         return 'Date of Birth';
       case AccountSettingStep.message:
-        return 'Message';
+        return 'Manage Messages';
       case AccountSettingStep.deleteProfile:
         return 'Hide/Delete Profile';
+      case AccountSettingStep.setPassword:
+        return 'Set Password';
     }
   }
 }
@@ -438,4 +623,5 @@ enum AccountSettingStep {
   dateOfBirth,
   message,
   deleteProfile,
+  setPassword
 }
