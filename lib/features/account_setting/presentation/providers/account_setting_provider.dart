@@ -27,6 +27,12 @@ class AccountSettingProvider extends BaseChangeNotifier {
     Filter(label: 'Unsatisfactory experience', value: 'test'),
     Filter(label: 'Reason not mentioned here', value: 'test'),
   ];
+  List<Filter> contactDisplayStatus = [
+    Filter(label: 'Only Premium Members', value: 'test'),
+    Filter(label: 'Only Premium Members you like', value: 'test'),
+    Filter(label: 'No one (Matches won\'t be able to cal you)', value: 'test'),
+    Filter(label: 'Only visible to all you Matches (Expires with Membership)', value: 'test'),
+  ];
 
 
 

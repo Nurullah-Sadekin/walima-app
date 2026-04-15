@@ -5,8 +5,11 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
+import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/account_setting/presentation/providers/account_setting_provider.dart';
+import 'package:flutter_boilerplate/features/account_setting/presentation/screens/widgets/alert_status.dart';
 import 'package:flutter_boilerplate/features/account_setting/presentation/screens/widgets/card_border.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/screens/widgets/profile_action_tile.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
@@ -80,16 +83,14 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     switch (_step) {
       case AccountSettingStep.accountSetting:
         return _overviewBody(provider);
-      case AccountSettingStep.alerts:
-        return null;
+      case AccountSettingStep.smsOrEmailAlerts:
+        return _emailOrSmsAlerts();
       case AccountSettingStep.premiumMembership:
         return _premiumMembership();
       case AccountSettingStep.privacyOptions:
         return _privacyOptions();
-      case AccountSettingStep.verificationBadge:
-        return null;
-      case AccountSettingStep.dateOfBirth:
-        return null;
+      case AccountSettingStep.myContactSettings:
+        return _myContactSettings();
       case AccountSettingStep.message:
         return _messages();
       case AccountSettingStep.deleteProfile:
@@ -110,9 +111,9 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           ),
           ProfileActionTile(
             iconImagePath: AppImages.notificationSvgIcon,
-            title: 'Alerts',
+            title: 'Email/SMS Alerts',
             onTap: () =>
-                setState(() => _step = AccountSettingStep.premiumMembership),
+                setState(() => _step = AccountSettingStep.smsOrEmailAlerts),
           ),
           ProfileActionTile(
             iconImagePath: AppImages.premiumSvgIcon,
@@ -120,23 +121,12 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             onTap: () =>
                 setState(() => _step = AccountSettingStep.premiumMembership),
           ),
+
+
           ProfileActionTile(
             iconImagePath: AppImages.contactPreview,
-            title: 'Privacy Options',
-            onTap: () =>
-                setState(() => _step = AccountSettingStep.privacyOptions),
-          ),
-          ProfileActionTile(
-            iconImagePath: AppImages.verifyIcon,
-            iconColor: AppColors.disableDark,
-            title: 'Verification Badge',
-            onTap: () =>
-                setState(() => _step = AccountSettingStep.verificationBadge),
-          ),
-          ProfileActionTile(
-            iconImagePath: AppImages.calenderTimer,
-            title: 'Date of Birth',
-            onTap: () => setState(() => _step = AccountSettingStep.dateOfBirth),
+            title: 'My Contact Settings',
+            onTap: () => setState(() => _step = AccountSettingStep.myContactSettings),
           ),
           ProfileActionTile(
             iconImagePath: AppImages.messages,
@@ -144,17 +134,23 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             onTap: () => setState(() => _step = AccountSettingStep.message),
           ),
           ProfileActionTile(
-            iconImagePath: AppImages.delete,
-            title: 'Hide/Delete Profile',
-            onTap: () =>
-                setState(() => _step = AccountSettingStep.deleteProfile),
+            iconImagePath: AppImages.lockPasswordSvgIcon,
+            title: 'Set Password',
+            onTap: () => setState(() => _step = AccountSettingStep.setPassword),
             // Note: ProfileActionTile might need custom styling for the delete option
             // You may need to check if ProfileActionTile supports custom colors
           ),
           ProfileActionTile(
-            iconImagePath: AppImages.lockPasswordSvgIcon,
-            title: 'Set Password',
-            onTap: () => setState(() => _step = AccountSettingStep.setPassword),
+            iconImagePath: AppImages.safetySvgIcon,
+            title: 'Privacy Options',
+            onTap: () =>
+                setState(() => _step = AccountSettingStep.privacyOptions),
+          ),
+          ProfileActionTile(
+            iconImagePath: AppImages.delete,
+            title: 'Hide/Delete Profile',
+            onTap: () =>
+                setState(() => _step = AccountSettingStep.deleteProfile),
             // Note: ProfileActionTile might need custom styling for the delete option
             // You may need to check if ProfileActionTile supports custom colors
           ),
@@ -336,6 +332,52 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     );
   }
 
+  Widget _myContactSettings() {
+    return Column(
+      spacing: 10,
+      children: [
+        const InfoTile(
+          title: 'Phone Number',value: '=8801645144777',
+          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          leadingImagePath: AppImages.contactPreview,
+          showTrailingImage: true,
+          showLeadingImage: true,
+          borderRadius: 8,
+          padding: EdgeInsets.all(16),
+        ),
+        CardBorder(
+          widget: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Contact Display Status',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: TextSize.font16(context),
+                      color: AppColors.textPrimaryLight,)
+              ),
+              const SizedBox(
+                height: 16,
+              ),
+              FilterWidget(
+                items: provider.contactDisplayStatus
+                    .map(
+                      (item) => FilterItem(name: item.label, isSelected: false),
+                    )
+                    .toList(),
+                spacing: 0,
+                itemSpacing: 10,
+                onItemTap: (index) async {
+                  final setTimelineValue = provider.setTimelineValue(index);
+                  if (setTimelineValue == null) return;
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _privacyOptions() {
     return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -470,6 +512,95 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     );
   }
 
+  Widget _emailOrSmsAlerts() {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        spacing: 8,
+        children: [
+          AlertStatus(
+            title: 'Match Mail & Photo Match Mail',
+            alertStatusList: [
+              AlertStatusItem(label: 'Daily', isSelected: true),
+              AlertStatusItem(label: 'Tri-Weekly', isSelected: false),
+              AlertStatusItem(label: 'Weekly', isSelected: false),
+              AlertStatusItem(label: 'Unsubscribe', isSelected: false),
+            ],
+            onStatusTap: (index) {},
+          ),
+          AlertStatus(
+            alertStatusList: [
+              AlertStatusItem(label: 'Weekly', isSelected: true),
+              AlertStatusItem(label: 'Unsubscribe', isSelected: false),
+            ],
+            onStatusTap: (index) {},
+          ),
+          AlertStatus(
+            title: 'Recent Visitors Email',
+            alertStatusList: [
+              AlertStatusItem(label: 'Weekly', isSelected: true),
+              AlertStatusItem(label: 'Unsubscribe', isSelected: false),
+            ],
+            onStatusTap: (index) {},
+          ),
+          AlertStatus(
+            title: 'Members Who Shortlisted You Email',
+            alertStatusList: [
+              AlertStatusItem(label: 'Weekly', isSelected: true),
+              AlertStatusItem(label: 'Unsubscribe', isSelected: false),
+            ],
+            onStatusTap: (index) {},
+          ),
+          AlertStatus(
+            title: 'Viewed Profile Email',
+            alertStatusList: [
+              AlertStatusItem(label: 'Weekly', isSelected: true),
+              AlertStatusItem(label: 'Unsubscribe', isSelected: false),
+            ],
+            onStatusTap: (index) {},
+          ),
+          AlertStatus(
+            title: 'Similar Profiles Email',
+            alertStatusList: [
+              AlertStatusItem(label: 'Weekly', isSelected: true),
+              AlertStatusItem(label: 'Unsubscribe', isSelected: false),
+            ],
+            onStatusTap: (index) {},
+          ),
+          AlertStatus(
+            title: 'Contact Alert',
+            alertStatusList: [
+              AlertStatusItem(label: 'Instant-Email for every reply', isSelected: true),
+              AlertStatusItem(label: 'Daily - All responses', isSelected: false),
+              AlertStatusItem(label: 'Unsubscribe', isSelected: false),
+            ],
+            onStatusTap: (index) {},
+          ),
+          AlertStatus(
+            title: 'Walima.com Profile Blaster',
+            alertStatusList: [
+              AlertStatusItem(label: 'Subscribe', isSelected: true),
+              AlertStatusItem(label: 'Unsubscribe', isSelected: false),
+            ],
+            onStatusTap: (index) {},
+          ),
+          AlertStatus(
+            title: 'Walima Specials',
+            alertStatusList: [
+              AlertStatusItem(label: 'Occasionally - Max twice a month', isSelected: true),
+              AlertStatusItem(label: 'Unsubscribe', isSelected: false),
+            ],
+            onStatusTap: (index) {},
+          ),
+
+          const SizedBox(height: 60,)
+      
+        ],
+      ),
+    );
+  }
+
   Widget _setPassword() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -594,16 +725,14 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     switch (step) {
       case AccountSettingStep.accountSetting:
         return 'Account Setting';
-      case AccountSettingStep.alerts:
-        return 'Alerts';
+      case AccountSettingStep.smsOrEmailAlerts:
+        return 'Email/SMS Alerts';
       case AccountSettingStep.premiumMembership:
         return 'Premium Membership';
       case AccountSettingStep.privacyOptions:
         return 'Privacy Settings';
-      case AccountSettingStep.verificationBadge:
-        return 'Verification Badge';
-      case AccountSettingStep.dateOfBirth:
-        return 'Date of Birth';
+      case AccountSettingStep.myContactSettings:
+        return 'My Contact Settings';
       case AccountSettingStep.message:
         return 'Manage Messages';
       case AccountSettingStep.deleteProfile:
@@ -616,11 +745,10 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
 
 enum AccountSettingStep {
   accountSetting,
-  alerts,
+  smsOrEmailAlerts,
   premiumMembership,
   privacyOptions,
-  verificationBadge,
-  dateOfBirth,
+  myContactSettings,
   message,
   deleteProfile,
   setPassword
