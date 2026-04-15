@@ -4,13 +4,13 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
-import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/account_setting/presentation/providers/account_setting_provider.dart';
 import 'package:flutter_boilerplate/features/account_setting/presentation/screens/widgets/card_border.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/screens/widgets/profile_action_tile.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/filter_widget.dart';
+import 'package:flutter_boilerplate/features/matches/presentation/widgets/into_tile.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/setting_switcher_title.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -83,34 +83,14 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
         return null;
       case AccountSettingStep.premiumMembership:
         return _premiumMembership();
-      case AccountSettingStep.contactPrivacy:
-        return _detailBody(
-          description:
-              'Control who can access your contact details and how visible your private information stays.',
-          items: provider.contactPrivacyOptions,
-          onTap: provider.toggleContactPrivacyOption,
-        );
+      case AccountSettingStep.privacyOptions:
+        return _privacyOptions();
       case AccountSettingStep.verificationBadge:
-        return _detailBody(
-          description:
-              'Manage badge visibility and verification-related reminders for your profile.',
-          items: provider.verificationBadgeOptions,
-          onTap: provider.toggleVerificationBadgeOption,
-        );
+        return null;
       case AccountSettingStep.dateOfBirth:
-        return _detailBody(
-          description:
-              'Select how your date of birth should be shown to other members.',
-          items: provider.dateOfBirthOptions,
-          onTap: provider.selectDateOfBirthOption,
-        );
+        return null;
       case AccountSettingStep.message:
-        return _detailBody(
-          description:
-              'Adjust who can message you and how message-related preferences should work.',
-          items: provider.messageOptions,
-          onTap: provider.toggleMessageOption,
-        );
+        return null;
       case AccountSettingStep.deleteProfile:
         return _hideOrDeleteProfile();
     }
@@ -139,9 +119,9 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           ),
           ProfileActionTile(
             iconImagePath: AppImages.contactPreview,
-            title: 'Contact Privacy',
+            title: 'Privacy Options',
             onTap: () =>
-                setState(() => _step = AccountSettingStep.contactPrivacy),
+                setState(() => _step = AccountSettingStep.privacyOptions),
           ),
           ProfileActionTile(
             iconImagePath: AppImages.verifyIcon,
@@ -173,66 +153,6 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
       ),
     );
   }
-
-  Widget _detailBody({
-    required String description,
-    required List<dynamic> items,
-    required void Function(int) onTap,
-    bool isDangerZone = false,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 12),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: isDangerZone
-                ? AppColors.error.withValues(alpha: 0.06)
-                : AppColors.primaryVariant,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: isDangerZone
-                  ? AppColors.error.withValues(alpha: 0.18)
-                  : AppColors.primary.withValues(alpha: 0.12),
-            ),
-          ),
-          child: Text(
-            description,
-            style: TextStyle(
-              color:
-                  isDangerZone ? AppColors.error : AppColors.textSecondaryLight,
-              fontSize: 13,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Expanded(
-          child: SingleChildScrollView(
-            child: Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: List.generate(items.length, (index) {
-                final item = items[index];
-                return SelectionCard(
-                  buttonStyle: item.isSelected
-                      ? SelectionStyle.selectedCheckbox
-                      : SelectionStyle.unSelectedCheckbox,
-                  onTap: () => onTap(index),
-                  isSelected: item.isSelected,
-                  title: item.name,
-                  isExpand: true,
-                );
-              }),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
 
   Widget _premiumMembership() {
     return CardBorder(
@@ -388,6 +308,89 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     );
   }
 
+  Widget _privacyOptions() {
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      spacing: 16,
+      children: [
+        InfoTile(
+          title: 'Display Name',
+          value: 'Hide Full Name',
+          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          leadingImagePath: AppImages.contactPreview,
+          showTrailingImage: true,
+          showLeadingImage: true,
+        ),
+        InfoTile(
+          title: 'Photo',
+          value: 'Visible To Liked Only',
+          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          leadingImagePath: AppImages.photoIcon,
+          showTrailingImage: true,
+          showLeadingImage: true,
+        ),
+        InfoTile(
+          title: 'Phone Number',
+          value: 'Only Premium Members',
+          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          leadingImagePath: AppImages.callIcon,
+          showTrailingImage: true,
+          showLeadingImage: true,
+        ),
+        InfoTile(
+          title: 'Email',
+          value: 'Hide',
+          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          leadingImagePath: AppImages.emailSvgIcon,
+          showTrailingImage: true,
+          showLeadingImage: true,
+        ),
+
+        InfoTile(
+          title: 'Date of Birth',
+          value: 'Hide',
+          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          leadingImagePath: AppImages.calenderTimer,
+          showTrailingImage: true,
+          showLeadingImage: true,
+        ),
+        InfoTile(
+          title: 'Annual Income',
+          value: 'Hide',
+          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          leadingImagePath: AppImages.walletSvgIcon,
+          showTrailingImage: true,
+          showLeadingImage: true,
+        ),
+        InfoTile(
+          title: 'Shortlist Settings',
+          value: 'Enable',
+          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          leadingImagePath: AppImages.sortFilter,
+          showTrailingImage: true,
+          showLeadingImage: true,
+        ),
+        InfoTile(
+          title: 'Do Not Disturb',
+          value: 'Enable',
+          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          leadingImagePath: AppImages.cancelSvgIcon,
+          showTrailingImage: true,
+          showLeadingImage: true,
+        ),
+        InfoTile(
+          title: 'Profile Policy',
+          value: 'Enable',
+          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          leadingImagePath: AppImages.safetySvgIcon,
+          showTrailingImage: true,
+          showLeadingImage: true,
+        ),
+
+      ],
+    );
+  }
 
   Widget _bottomAction(AccountSettingProvider provider) {
     final isRoot = _step == AccountSettingStep.accountSetting;
@@ -400,7 +403,6 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
       buttonStyle: ButtonsStyle.activePrimaryButton,
       title: 'Save Changes',
       onTap: () {
-        Navigator.pop(context, provider.buildResult());
       },
     );
   }
@@ -413,8 +415,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
         return 'Alerts';
       case AccountSettingStep.premiumMembership:
         return 'Premium Membership';
-      case AccountSettingStep.contactPrivacy:
-        return 'Contact Privacy';
+      case AccountSettingStep.privacyOptions:
+        return 'Privacy Settings';
       case AccountSettingStep.verificationBadge:
         return 'Verification Badge';
       case AccountSettingStep.dateOfBirth:
@@ -431,7 +433,7 @@ enum AccountSettingStep {
   accountSetting,
   alerts,
   premiumMembership,
-  contactPrivacy,
+  privacyOptions,
   verificationBadge,
   dateOfBirth,
   message,

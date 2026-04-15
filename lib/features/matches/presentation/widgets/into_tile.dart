@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
+import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 
 class InfoTile extends StatelessWidget { // Control leading image visibility
@@ -10,7 +11,7 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
     required this.title,
     required this.value,
     this.leadingImagePath,
-    this.trailingImagePath,
+    this.trailingImagePath = AppImages.editWrite,
     this.leadingImageColor,
     this.trailingImageColor,
     this.leadingBackgroundColor,
@@ -104,7 +105,7 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
                           ),
                     ),
                   ),
-                  if (showTrailingImage && trailingImagePath != null)
+                  if (showTrailingImage)
                     ShowImage(
                       imagePath: trailingImagePath!,
                       width: trailingImageSize,
