@@ -7,6 +7,7 @@ import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/features/account_setting/presentation/providers/account_setting_provider.dart';
+import 'package:flutter_boilerplate/features/account_setting/presentation/screens/widgets/card_border.dart';
 import 'package:flutter_boilerplate/features/drawer/presentation/screens/widgets/profile_action_tile.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/setting_switcher_title.dart';
@@ -110,13 +111,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           onTap: provider.toggleMessageOption,
         );
       case AccountSettingStep.deleteProfile:
-        return _detailBody(
-          description:
-              'You can temporarily deactivate your profile or permanently remove it from the app.',
-          items: provider.deleteProfileOptions,
-          onTap: provider.selectDeleteProfileOption,
-          isDangerZone: true,
-        );
+        return _hideOrDeleteProfile();
     }
   }
 
@@ -237,38 +232,85 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     );
   }
 
+
   Widget _premiumMembership() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 16,
-      children: [
-        SettingsSwitchTile(
-          title: 'Auto-renew my Plan',
-          subtitle: 'Auto-renewal for your Membership',
-          value: provider.autoRenew ?? false,
-          onChanged: (value) {
-            provider.autoRenew = value;
-            provider.notifyListeners();
-          },
-        ),
-        SettingsSwitchTile(
-          title: 'What is auto-renewal?',
-          subtitle:
-              '"Auto-renewal" automatically renews your plan before its expiry, from your registered Credit/Debit Card, so you can continue to enjoy your premium benefits.',
-          value: true,
-          onChanged: (value) {},
-          isVisibleSwitcher: false,
-        ),
-        Text('Current Plan:',
-            style: TextStyle(
-              fontWeight: FontWeight.w500,
-              color: AppColors.textPrimaryLight,
-              fontSize: TextSize.font12(context,)
-            )
-        )
-      ],
+    return CardBorder(
+      widget: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        spacing: 16,
+        children: [
+          SettingsSwitchTile(
+            title: 'Auto-renew my Plan',
+            subtitle: 'Auto-renewal for your Membership',
+            value: provider.autoRenew ?? false,
+            onChanged: (value) {
+              provider.autoRenew = value;
+              provider.notifyListeners();
+            },
+          ),
+          SettingsSwitchTile(
+            title: 'What is auto-renewal?',
+            subtitle:
+                '"Auto-renewal" automatically renews your plan before its expiry, from your registered Credit/Debit Card, so you can continue to enjoy your premium benefits.',
+            value: true,
+            onChanged: (value) {},
+            isVisibleSwitcher: false,
+          ),
+          Text('Current Plan:',
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: AppColors.textPrimaryLight,
+                fontSize: TextSize.font12(context,)
+              )
+          )
+        ],
+      ),
     );
   }
+
+  Widget _hideOrDeleteProfile() {
+    return CardBorder(
+      widget: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        spacing: 16,
+        children: [
+
+          SettingsSwitchTile(
+            title: 'Hide Profile',
+            subtitle: 'Hiding your profile makes you invisible and disables messages and invitations',
+            value: provider.autoRenew ?? false,
+            onChanged: (value) {
+              provider.autoRenew = value;
+              provider.notifyListeners();
+            },
+          ),
+
+          Divider(
+            color: AppColors.greyLight,
+            thickness: 1,
+          ),
+          SettingsSwitchTile(
+            title: 'What is auto-renewal?',
+            subtitle:
+            '"Auto-renewal" automatically renews your plan before its expiry, from your registered Credit/Debit Card, so you can continue to enjoy your premium benefits.',
+            value: true,
+            onChanged: (value) {},
+            isVisibleSwitcher: false,
+          ),
+          Text('Current Plan:',
+              style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textPrimaryLight,
+                  fontSize: TextSize.font12(context,)
+              )
+          )
+        ],
+      ),
+    );
+  }
+
 
   Widget _bottomAction(AccountSettingProvider provider) {
     final isRoot = _step == AccountSettingStep.accountSetting;
