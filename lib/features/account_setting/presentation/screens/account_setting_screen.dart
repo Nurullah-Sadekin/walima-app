@@ -162,7 +162,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           ),
           ProfileActionTile(
             iconImagePath: AppImages.delete,
-            title: 'Delete Profile',
+            title: 'Hide/Delete Profile',
             onTap: () =>
                 setState(() => _step = AccountSettingStep.deleteProfile),
             // Note: ProfileActionTile might need custom styling for the delete option
@@ -291,6 +291,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               const SizedBox(height: 16,),
               FilterWidget(
                 items: provider.timelineDataList.map((item) => FilterItem(name: item.label, isSelected: false),).toList(),
+                spacing: 0,
+                itemSpacing: 8,
                 onItemTap: (index) async {
                   final setTimelineValue = provider.setTimelineValue(index);
                   if (setTimelineValue == null) return;
@@ -332,6 +334,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
                   provider.notifyListeners();
                 },
               ),
+              const SizedBox(height: 8,),
               SettingsSwitchTile(
                 title: 'Premium Calls',
                 subtitle:
@@ -370,6 +373,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               const SizedBox(height: 16,),
               FilterWidget(
                 items: provider.deleteProfileStatus.map((item) => FilterItem(name: item.label, isSelected: false),).toList(),
+                spacing: 0,
+                itemSpacing: 8,
                 onItemTap: (index) async {
                   final deleteProfileStatus = provider.setDeleteProfileStatus(index);
                   if (deleteProfileStatus == null) return;
@@ -417,7 +422,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
       case AccountSettingStep.message:
         return 'Message';
       case AccountSettingStep.deleteProfile:
-        return 'Delete Profile';
+        return 'Hide/Delete Profile';
     }
   }
 }
