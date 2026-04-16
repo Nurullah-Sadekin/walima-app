@@ -25,7 +25,8 @@ class PartnerPreferencesScreen extends ConsumerStatefulWidget {
       _PartnerPreferencesScreenState();
 }
 
-class _PartnerPreferencesScreenState extends ConsumerState<PartnerPreferencesScreen> {
+class _PartnerPreferencesScreenState
+    extends ConsumerState<PartnerPreferencesScreen> {
   late RecommendedPreferencesProvider provider;
 
   @override
@@ -49,27 +50,34 @@ class _PartnerPreferencesScreenState extends ConsumerState<PartnerPreferencesScr
   Widget build(BuildContext context) {
     provider = ref.watch(recommendedPreferencesProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == RecommendedPreferencesScreenStates.preferences,
+      isLoading: provider.loaderState ==
+          RecommendedPreferencesScreenStates.preferences,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == RecommendedPreferencesScreenStates.preferences
+          child: provider.screenStates ==
+                  RecommendedPreferencesScreenStates.preferences
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(
-                        imagePath: AppImages.recommendedPreferences,
-                        isShowAppbar: true,
-                        isBackButton: true,
-                        isTrailing: true,
-                        trailingText: 'Skip',
-                        onTrailingTap: null),
+                    UpperLayer(
+                      imagePath: AppImages.recommendedPreferences,
+                      isShowAppbar: true,
+                      isBackButton: true,
+                      isTrailing: true,
+                      trailingText: 'Skip',
+                      onTrailingTap: _onSkipTap,
+                    ),
                     body(),
                   ],
                 ),
         ),
       ),
     );
+  }
+
+  void _onSkipTap() {
+    context.goNamed(Routes.anchor);
   }
 
   Widget body() {
@@ -123,7 +131,7 @@ class _PartnerPreferencesScreenState extends ConsumerState<PartnerPreferencesScr
       buttonStyle: ButtonsStyle.activePrimaryButton,
       title: 'Continue',
       onTap: () {
-         context.push(Paths.basicDetails);
+        context.push(Paths.basicDetails);
       },
     );
   }
