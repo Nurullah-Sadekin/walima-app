@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/empty_state.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
+import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/enums/enums.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
@@ -13,6 +14,7 @@ import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
 import 'package:flutter_boilerplate/core/utils/height_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
+import 'package:flutter_boilerplate/features/connections/presentation/widgets/view_contact_bottom_sheet.dart';
 import 'package:flutter_boilerplate/features/matches/data/models/response/get_matches_response.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/provider/matcher_provider.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/screens/filters/more_matches.dart';
@@ -240,8 +242,12 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
         separatorBuilder: (_, __) => const SizedBox(height: 10),
         itemBuilder: (context, index) {
           final match = provider.matches[index];
+          final imagePath = match.profilePhoto?.url ??
+              (match.gender == 'female'
+                  ? AppImages.womenAvatar
+                  : AppImages.manAvatar);
           return ProfileComprehensiveCard(
-            imagePath: match.profilePhoto?.url ?? (match.gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar),
+            imagePath: imagePath,
             leftIconPath: AppImages.favouriteIcon,
             isPremiumConnect: match.isPremium ?? false,
             isVerified: match.profilePhoto?.isVerified ?? false,
@@ -284,8 +290,29 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             leftButtonBorderColor: match.connection?.status == 'none'
                 ? AppColors.greenButtonColor
                 : AppColors.disableBackground,
-            onTapRightButton: () {
-              // Handle right button tap
+            onTapRightButton: () async {
+              final userId = match.id?.trim();
+              if (userId == null || userId.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('User id not found')),
+                );
+                return;
+              }
+
+              await BottomSheetUtils.open(
+                context: context,
+                fullHeight: false,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: ViewContactBottomSheet(
+                    userId: userId,
+                    userName: match.displayName ?? 'Walima Member',
+                    profileImagePath: imagePath,
+                    description: match.connection?.message,
+                    isDescriptionVisible: false,
+                  ),
+                ),
+              );
             },
             isOnline: match.isOnline ?? false,
             viewOnAccept: match.profilePhoto?.visibilityStatus?.toLowerCase() != 'visible',
