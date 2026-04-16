@@ -55,6 +55,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(profileProvider).getProfile(context);
       ref.read(profileProvider).getDashboard();
+      ref.read(homeProvider).ensureHomeDataLoaded();
     });
   }
 
@@ -77,7 +78,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return TransparentLoading(
-      isLoading: ref.watch(homeProvider).screenStates == HomeScreenStates.transparentLoading,
+      isLoading: ref.watch(homeProvider).screenStates ==
+          HomeScreenStates.transparentLoading,
       child: Scaffold(
         key: _scaffoldKey,
         drawer: const AppDrawer(),
@@ -157,6 +159,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(homeProvider).ensureHomeDataLoaded();
+    });
   }
 
   Widget _premiumMatches() {
@@ -339,13 +350,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             );
           },
           onTapLeftButton: () {
-            if(match.connection?.status == 'none'){
+            if (match.connection?.status == 'none') {
               ref.read(homeProvider).connect(
-                context,
-                match.id ?? '',
-                match.displayName ?? 'Unknown',
-                ConnectionRequestType.match.apiValue,
-              );
+                    context,
+                    match.id ?? '',
+                    match.displayName ?? 'Unknown',
+                    ConnectionRequestType.match.apiValue,
+                  );
             }
             // print('Left button tapped for ${match.displayName}');
           },
@@ -362,7 +373,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         userName: match.displayName ?? 'Unknown',
         profileImagePath: (match.profilePhoto?.url?.isNotEmpty ?? false)
             ? match.profilePhoto!.url!
-            : match.gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar,
+            : match.gender == 'female'
+                ? AppImages.womenAvatar
+                : AppImages.manAvatar,
         description: match.connection?.message,
         isDescriptionVisible: false,
         email: 'test@gmail.com',
@@ -580,13 +593,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             );
           },
           onTapLeftButton: () {
-            if(visitor.connection?.status == 'none'){
+            if (visitor.connection?.status == 'none') {
               ref.read(homeProvider).connect(
-                context,
-                visitor.id ?? '',
-                visitor.displayName ?? 'Unknown',
-                ConnectionRequestType.match.apiValue,
-              );
+                    context,
+                    visitor.id ?? '',
+                    visitor.displayName ?? 'Unknown',
+                    ConnectionRequestType.match.apiValue,
+                  );
             }
           },
         ),
@@ -601,7 +614,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         userName: visitor.displayName ?? 'Unknown',
         profileImagePath: (visitor.profilePhoto?.url?.isNotEmpty ?? false)
             ? visitor.profilePhoto!.url!
-            : visitor.gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar,
+            : visitor.gender == 'female'
+                ? AppImages.womenAvatar
+                : AppImages.manAvatar,
         description: visitor.connection?.message,
         isDescriptionVisible: false,
         email: 'test@gmail.com',

@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/core/global/components/gradient_background.d
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/providers/recommended_preferences_provider.dart';
 import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
+import 'package:flutter_boilerplate/features/anchor_point/anchor_point.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
@@ -77,6 +78,10 @@ class _PartnerPreferencesScreenState
   }
 
   void _onSkipTap() {
+    ref.read(currentTabProvider.notifier).state = 0;
+    final homeState = ref.read(homeProvider);
+    homeState.loadPremiumMatches(force: true);
+    homeState.loadRecentVisitors(force: true);
     context.goNamed(Routes.anchor);
   }
 

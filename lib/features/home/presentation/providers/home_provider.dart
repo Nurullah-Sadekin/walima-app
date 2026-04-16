@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
 import 'package:flutter_boilerplate/core/global/components/limit_over.dart';
-import 'package:flutter_boilerplate/core/global/enums/enums.dart' show ConnectionRequestType;
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
@@ -55,17 +54,22 @@ class HomeProvider extends BaseChangeNotifier {
 
     isLoadingPremiumMatches = false;
 
-    final isSuccess = response.statusCode != null && response.statusCode! >= 200 && response.statusCode! < 300;
+    final isSuccess = response.statusCode != null &&
+        response.statusCode! >= 200 &&
+        response.statusCode! < 300;
 
     if (isSuccess) {
       premiumMatches
         ..clear()
         ..addAll(response.data ?? []);
       _hasLoadedPremiumMatches = true;
-      premiumMatchesError = premiumMatches.isEmpty ? 'No premium matches available at the moment.' : null;
+      premiumMatchesError = premiumMatches.isEmpty
+          ? 'No premium matches available at the moment.'
+          : null;
     } else {
       premiumMatches.clear();
-      premiumMatchesError = response.message ?? 'Unable to load premium matches.';
+      premiumMatchesError =
+          response.message ?? 'Unable to load premium matches.';
     }
 
     notifyListeners();
@@ -87,16 +91,30 @@ class HomeProvider extends BaseChangeNotifier {
         ..clear()
         ..addAll(visitors);
       _hasLoadedRecentVisitors = true;
-      recentVisitorsError = visitors.isEmpty ? 'No recent visitors found yet.' : null;
+      recentVisitorsError =
+          visitors.isEmpty ? 'No recent visitors found yet.' : null;
     } else if (response.code == 'FAILED') {
       recentVisitors.clear();
-      recentVisitorsError = response.message ?? 'Unable to load recent visitors.';
+      recentVisitorsError =
+          response.message ?? 'Unable to load recent visitors.';
     } else {
       recentVisitors.clear();
       recentVisitorsError = 'No recent visitors available right now.';
     }
 
     notifyListeners();
+  }
+
+  Future<void> ensureHomeDataLoaded() async {
+    if (!isLoadingPremiumMatches &&
+        (!_hasLoadedPremiumMatches || premiumMatches.isEmpty)) {
+      await loadPremiumMatches(force: true);
+    }
+
+    if (!isLoadingRecentVisitors &&
+        (!_hasLoadedRecentVisitors || recentVisitors.isEmpty)) {
+      await loadRecentVisitors(force: true);
+    }
   }
 
   void updateViewState({
@@ -111,7 +129,12 @@ class HomeProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> connect(BuildContext context, String id, String userName, String connectionRequestType) async {
+  Future<void> connect(
+    BuildContext context,
+    String id,
+    String userName,
+    String connectionRequestType,
+  ) async {
     updateViewState(screenStates: HomeScreenStates.transparentLoading);
     final body = CreateConnectionRequestBody(
       receiverId: id,
@@ -124,21 +147,21 @@ class HomeProvider extends BaseChangeNotifier {
     final response = await matchesRepository.createConnectionRequest(body);
     if (!context.mounted) return;
     if (response.isSuccess) {
-       DialogUtils.showSuccessDialog(
+      DialogUtils.showSuccessDialog(
         context: context,
         message: response.message ?? 'Connection request sent successfully.',
-         autoClose: false,
+        autoClose: false,
       );
-      await updateConnectionStatus(context, id ?? '');
+      await updateConnectionStatus(context, id);
     } else {
-      if(response.message?.contains('daily_connect')??false){
+      if (response.message?.contains('daily_connect') ?? false) {
         await BottomSheetUtils.open(
           context: context,
           fullHeight: false,
           child: Consumer(
             builder: (context, ref, _) {
               return LimitOver(
-                onExtendPlan: (){
+                onExtendPlan: () {
                   context.pop();
                   context.pushNamed(Routes.upgradePackage);
                 },
@@ -146,13 +169,13 @@ class HomeProvider extends BaseChangeNotifier {
             },
           ),
         );
-      }
-      else{
+      } else {
         await DialogUtils.showErrorDialog(
           context: context,
           title: 'Connection Failed',
           buttonText: 'OK',
-          message: response.message ?? 'Unable to send connection request. Please try again later.',
+          message: response.message ??
+              'Unable to send connection request. Please try again later.',
         );
       }
     }
@@ -161,8 +184,8 @@ class HomeProvider extends BaseChangeNotifier {
   }
 
   Future<void> updateConnectionStatus(BuildContext context, String s) async {
-      await loadPremiumMatches(force: true);
-      await loadRecentVisitors(force: true);
+    await loadPremiumMatches(force: true);
+    await loadRecentVisitors(force: true);
   }
 }
 
