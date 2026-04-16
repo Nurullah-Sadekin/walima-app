@@ -157,6 +157,29 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 6),
+          if (provider.isRemoteFilterLoading) ...[
+            const LinearProgressIndicator(minHeight: 2),
+            const SizedBox(height: 12),
+          ],
+          if (provider.remoteFilterError != null) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.primaryVariant,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                provider.remoteFilterError!,
+                style: TextStyle(
+                  fontSize: TextSize.font12(context),
+                  color: AppColors.textSecondaryLight,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
           InfoTile(
             title: 'Age Range',
             value: provider.ageRangeSummary,
@@ -366,10 +389,32 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
 
   Widget _bottomAction() {
     return PrimaryButtons(
-      buttonStyle: ButtonsStyle.activePrimaryButton,
+      buttonStyle: (provider.isApplying || provider.isRemoteFilterLoading)
+          ? ButtonsStyle.disableButton
+          : ButtonsStyle.activePrimaryButton,
       title: 'Apply',
-      onTap: () {
-        setState(() => _step = ContactFilterStep.contactFilterScreen);
+      onTap: () async {
+        if (provider.isApplying || provider.isRemoteFilterLoading) return;
+        if (_step != ContactFilterStep.contactFilterScreen) {
+          setState(() => _step = ContactFilterStep.contactFilterScreen);
+          return;
+        }
+
+        final response = await provider.applyContactFilters();
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              response.isSuccess
+                  ? (response.message.isNotEmpty
+                      ? response.message
+                      : 'Contact filter updated')
+                  : (response.message.isNotEmpty
+                      ? response.message
+                      : 'Unable to update contact filter'),
+            ),
+          ),
+        );
       },
     );
   }

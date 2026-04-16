@@ -228,6 +228,10 @@ class AppUrls {
 
   // --- Activities & Interactions ---
   static const String getProfileVisitors = '$baseUrl/activities/visitors'; //GET
+
+  // --- Settings ---
+  static const String contactFilters =
+      '$baseUrl/settings/contact-filters'; //GET,PUT
   static const String getShortlistedUsers =
       '$baseUrl/activities/shortlist'; //GET
   static const String addToShortlist = '$baseUrl/activities/shortlist'; //POST

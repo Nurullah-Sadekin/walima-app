@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/global/enums/enums.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
+import 'package:flutter_boilerplate/core/network/dio_client.dart';
+import 'package:flutter_boilerplate/features/contact_filter/data/models/contact_filters_settings.dart';
+import 'package:flutter_boilerplate/features/contact_filter/data/repository/contact_filters_repository.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/lookup_option.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/location_data_repository_impl.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/lookup_repository.dart';
@@ -48,6 +51,9 @@ class ContactFilterProvider extends BaseChangeNotifier {
   bool isReligionDataLoading = false;
   bool isCareerLookupLoading = false;
   bool isLocationDataLoading = false;
+  bool isRemoteFilterLoading = false;
+  bool isApplying = false;
+  String? remoteFilterError;
 
   final int ageMinLimit = 18;
   final int ageMaxLimit = 70;
@@ -70,21 +76,50 @@ class ContactFilterProvider extends BaseChangeNotifier {
       _selectedSummary(communityOptions, fallback: 'Not Set');
   String get motherTongueSummary =>
       _selectedSummary(motherTongueOptions, fallback: 'Not Set');
-  String get countryLivingInSummary =>
-      _selectedSummary(countryOptions, fallback: 'Not Set');
+  String get countryLivingInSummary => _selectedSummary(countryOptions, fallback: 'Not Set');
   String get workingWithSummary =>
       _selectedSummary(workingWithOptions, fallback: 'Not Set');
   String get annualIncomeSummary =>
       _selectedSummary(annualIncomeOptions, fallback: 'Not Set');
 
-  List<String> get selectedCommunities => _selectedNames(communityOptions);
+  List<String> get selectedCommunities => _selectedValues(communityOptions);
 
   Future<void> loadInitialData() async {
+    if (isRemoteFilterLoading) return;
+    isRemoteFilterLoading = true;
+    remoteFilterError = null;
+    notifyListeners();
+
+    ContactFiltersSettings? remote;
+    final remoteResponse = await ContactFiltersRepository.getContactFilters();
+    if (remoteResponse.isSuccess) {
+      remote = remoteResponse.data;
+    } else {
+      remoteFilterError = remoteResponse.message;
+    }
+
     await Future.wait<void>([
-      loadCommunityData(),
       loadCareerLookupData(),
       loadLocationData(),
     ]);
+
+    if (remote != null) {
+      _applyRanges(remote);
+      _applySelection(religionOptions, remote.religion);
+    }
+
+    await loadCommunityData();
+
+    if (remote != null) {
+      _applySelection(maritalStatusOptions, remote.maritalStatus);
+      _applySelection(communityOptions, remote.community);
+      _applySelection(motherTongueOptions, remote.motherTongue);
+      _applySelection(countryOptions, remote.countryLivingIn);
+      _applySelection(workingWithOptions, remote.workingWith);
+      _applySelection(annualIncomeOptions, remote.annualIncome);
+    }
+
+    isRemoteFilterLoading = false;
     notifyListeners();
   }
 
@@ -241,18 +276,62 @@ class ContactFilterProvider extends BaseChangeNotifier {
   List<String> get selectedWorkingWith => _selectedNames(workingWithOptions);
   List<String> get selectedAnnualIncome => _selectedNames(annualIncomeOptions);
 
+  List<String> get selectedMaritalStatusValues =>
+      _selectedValues(maritalStatusOptions);
+  List<String> get selectedReligionValues => _selectedValues(religionOptions);
+  List<String> get selectedMotherTongueValues =>
+      _selectedValues(motherTongueOptions);
+  List<String> get selectedCountryValues => _selectedValues(countryOptions);
+  List<String> get selectedWorkingWithValues =>
+      _selectedValues(workingWithOptions);
+  List<String> get selectedAnnualIncomeValues =>
+      _selectedValues(annualIncomeOptions);
+
   Map<String, dynamic> buildResult() {
     return <String, dynamic>{
       'ageRange': <int>[ageStart, ageEnd],
       'heightRange': <int>[heightStart, heightEnd],
-      'maritalStatus': selectedMaritalStatuses,
-      'religion': selectedReligions,
+      'maritalStatus': selectedMaritalStatusValues,
+      'religion': selectedReligionValues,
       'community': selectedCommunities,
-      'motherTongue': selectedMotherTongues,
-      'countryLivingIn': selectedCountries,
-      'workingWith': selectedWorkingWith,
-      'annualIncome': selectedAnnualIncome,
+      'motherTongue': selectedMotherTongueValues,
+      'countryLivingIn': selectedCountryValues,
+      'workingWith': selectedWorkingWithValues,
+      'annualIncome': selectedAnnualIncomeValues,
     };
+  }
+
+  ContactFiltersSettings buildSettings() {
+    return ContactFiltersSettings(
+      ageStart: ageStart,
+      ageEnd: ageEnd,
+      heightStart: heightStart,
+      heightEnd: heightEnd,
+      maritalStatus: selectedMaritalStatusValues,
+      religion: selectedReligionValues,
+      community: selectedCommunities,
+      motherTongue: selectedMotherTongueValues,
+      countryLivingIn: selectedCountryValues,
+      workingWith: selectedWorkingWithValues,
+      annualIncome: selectedAnnualIncomeValues,
+    );
+  }
+
+  Future<ApiResponse> applyContactFilters() async {
+    if (isApplying) {
+      return ApiResponse.error(message: 'Already applying', statusCode: 0);
+    }
+    isApplying = true;
+    notifyListeners();
+
+    final settings = buildSettings();
+    final response = await ContactFiltersRepository.updateContactFilters(
+      settings,
+    );
+
+    isApplying = false;
+    notifyListeners();
+    return response;
   }
 
   void _toggleItem(List<SingleStringModel> items, int index) {
@@ -262,7 +341,18 @@ class ContactFilterProvider extends BaseChangeNotifier {
   }
 
   List<String> _selectedNames(List<SingleStringModel> items) {
-    return items.where((item) => item.isSelected).map((item) => item.name).toList();
+    return items
+        .where((item) => item.isSelected)
+        .map((item) => item.name)
+        .toList(growable: false);
+  }
+
+  List<String> _selectedValues(List<SingleStringModel> items) {
+    return items
+        .where((item) => item.isSelected)
+        .map((item) => (item.value ?? item.name))
+        .where((value) => value.trim().isNotEmpty)
+        .toList(growable: false);
   }
 
   String _selectedSummary(
@@ -285,5 +375,35 @@ class ContactFilterProvider extends BaseChangeNotifier {
     final feet = totalInches ~/ 12;
     final inches = totalInches % 12;
     return "$feet' $inches\"";
+  }
+
+  void _applyRanges(ContactFiltersSettings remote) {
+    final remoteAgeStart = remote.ageStart;
+    final remoteAgeEnd = remote.ageEnd;
+    if (remoteAgeStart != null && remoteAgeEnd != null) {
+      ageStart = remoteAgeStart.clamp(ageMinLimit, ageMaxLimit);
+      ageEnd = remoteAgeEnd.clamp(ageMinLimit, ageMaxLimit);
+    }
+
+    final remoteHeightStart = remote.heightStart;
+    final remoteHeightEnd = remote.heightEnd;
+    if (remoteHeightStart != null && remoteHeightEnd != null) {
+      heightStart = remoteHeightStart.clamp(heightMinLimit, heightMaxLimit);
+      heightEnd = remoteHeightEnd.clamp(heightMinLimit, heightMaxLimit);
+    }
+  }
+
+  void _applySelection(List<SingleStringModel> options, List<String>? selected) {
+    if (selected == null) return;
+    final normalizedSelected = selected
+        .map((e) => e.trim().toLowerCase())
+        .where((e) => e.isNotEmpty)
+        .toSet();
+    for (final option in options) {
+      final value = (option.value ?? '').trim().toLowerCase();
+      final name = option.name.trim().toLowerCase();
+      option.isSelected =
+          normalizedSelected.contains(value) || normalizedSelected.contains(name);
+    }
   }
 }
