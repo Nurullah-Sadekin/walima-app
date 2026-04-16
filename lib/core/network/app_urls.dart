@@ -185,8 +185,7 @@ class AppUrls {
       '$baseUrl/connections/deleted'; //GET
   static const String getConnectionById = '$baseUrl/connections/{id}'; //GET
   static const String getConnectionStats = '$baseUrl/connections/stats'; //GET
-  static const String viewContact =
-      '$baseUrl/connections/view-contact/{userId}'; //GET
+  static const String viewContact = '$baseUrl/connections/view-contact/'; //GET
   static String performConnectionAction(String id) =>
       '$baseUrl/connections/$id/action'; //PATCH
   static const String createConnection = '$baseUrl/connections'; //POST

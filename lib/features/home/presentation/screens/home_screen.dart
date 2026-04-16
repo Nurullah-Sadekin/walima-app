@@ -20,7 +20,7 @@ import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/c
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/profile_summery_section.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/social_media_icon.dart';
 import 'package:flutter_boilerplate/features/matches/data/models/response/get_matches_response.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/contact_bottom_sheet.dart';
+import 'package:flutter_boilerplate/features/connections/presentation/widgets/view_contact_bottom_sheet.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -369,7 +369,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _contactPremiumBottomSheet(MatchProfile match) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: ContactBottomSheet(
+      child: ViewContactBottomSheet(
+        userId: match.id ?? '',
         userName: match.displayName ?? 'Unknown',
         profileImagePath: (match.profilePhoto?.url?.isNotEmpty ?? false)
             ? match.profilePhoto!.url!
@@ -378,8 +379,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 : AppImages.manAvatar,
         description: match.connection?.message,
         isDescriptionVisible: false,
-        email: 'test@gmail.com',
-        phone: '+8801234567890',
       ),
     );
   }
@@ -610,7 +609,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _contactVisitorBottomSheet(Data visitor) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: ContactBottomSheet(
+      child: ViewContactBottomSheet(
+        userId: visitor.id ?? '',
         userName: visitor.displayName ?? 'Unknown',
         profileImagePath: (visitor.profilePhoto?.url?.isNotEmpty ?? false)
             ? visitor.profilePhoto!.url!
@@ -619,8 +619,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 : AppImages.manAvatar,
         description: visitor.connection?.message,
         isDescriptionVisible: false,
-        email: 'test@gmail.com',
-        phone: '+8801234567890',
       ),
     );
   }

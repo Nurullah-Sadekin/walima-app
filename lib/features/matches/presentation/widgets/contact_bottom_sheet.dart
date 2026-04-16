@@ -14,6 +14,7 @@ class ContactBottomSheet extends StatelessWidget {
     this.profileType,
     this.email,
     this.phone,
+    this.isVerified = false,
     this.description,
     this.onWalimaChatPressed,
     this.onWhatsappPressed,
@@ -32,6 +33,7 @@ class ContactBottomSheet extends StatelessWidget {
   final String? profileType;
   final String? email;
   final String? phone;
+  final bool isVerified;
   final String? description;
   final VoidCallback? onWalimaChatPressed;
   final VoidCallback? onWhatsappPressed;
@@ -97,13 +99,31 @@ class ContactBottomSheet extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          userName,
-          style: TextStyle(
-            fontSize: TextSize.font18(context),
-            fontWeight: FontWeight.w500,
-            color: AppColors.textPrimaryLight,
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Flexible(
+              child: Text(
+                userName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: TextSize.font18(context),
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textPrimaryLight,
+                ),
+              ),
+            ),
+            if (isVerified) ...[
+              const SizedBox(width: 6),
+              ShowImage(
+                imagePath: AppImages.verifiedBadgeSvgIcon,
+                height: TextSize.font18(context),
+                width: TextSize.font18(context),
+              ),
+            ],
+          ],
         ),
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
