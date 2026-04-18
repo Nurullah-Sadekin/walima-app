@@ -26,7 +26,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
   final _primaryTabs = const [
     'Received',
     'Accepted',
-    'Contacts',
+    // 'Contacts',
     'Sent',
     'More',
   ];
@@ -35,7 +35,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
   void initState() {
     super.initState();
     _primaryTabController =
-        TabController(initialIndex: 0, length: 5, vsync: this)
+        TabController(initialIndex: 0, length: 4, vsync: this)
           ..addListener(_handlePrimaryTabChange);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -97,7 +97,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
                 onExploreAcceptedTap: () => _primaryTabController.animateTo(1),
               ),
               const InboxAcceptedTab(),
-              const InboxContactsTab(),
+              // const InboxContactsTab(),
               const InboxSentTab(),
               const InboxMoreTab(),
             ],
