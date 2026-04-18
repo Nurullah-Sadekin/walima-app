@@ -5,7 +5,7 @@ class AppUrls {
   static const String login = '$baseUrl/auth/signin-with-password';
   static const String getMe = '$baseUrl/auth/me';
   static const String register = '$baseUrl/auth/register';
-  static const String signinWithPassword = '$baseUrl/auth/signin-with-password';
+  // static const String signinWithPassword = '$baseUrl/auth/signin-with-password';
   static const String loginWithOTP = '$baseUrl/auth/signin-with-otp';
   static const String signUpWithOTP = '$baseUrl/auth/sign-up-with-otp';
   static const String verifyOTP = '$baseUrl/auth/verify-otp';

@@ -282,7 +282,9 @@ class LoginProvider extends BaseChangeNotifier {
     BuildContext context,
     LoginResponse response,
   ) async {
-    if (response.code == 'SUCCESS') {
+    final hasAuthTokens = _hasAuthTokens(response);
+
+    if (response.code == 'SUCCESS' && hasAuthTokens) {
       await _persistAuthTokens(response);
       await AppErrorReportingService.instance.setUserContext(
         userId: response.response?.user?.id,
@@ -295,21 +297,25 @@ class LoginProvider extends BaseChangeNotifier {
       return;
     }
 
-    _handleLoginFailure(context, response.message);
+    _handleLoginFailure(
+      context,
+      response.message ?? 'Login failed. Please try again.',
+    );
+  }
+
+  bool _hasAuthTokens(LoginResponse response) {
+    final accessToken = response.response?.accessToken?.trim() ?? '';
+    final refreshToken = response.response?.refreshToken?.trim() ?? '';
+    return accessToken.isNotEmpty && refreshToken.isNotEmpty;
   }
 
   Future<void> _persistAuthTokens(LoginResponse response) async {
     final prefs = await SharedPreferences.getInstance();
-    final accessToken = response.response?.accessToken;
-    final refreshToken = response.response?.refreshToken;
+    final accessToken = response.response?.accessToken?.trim() ?? '';
+    final refreshToken = response.response?.refreshToken?.trim() ?? '';
 
-    if (accessToken != null && accessToken.isNotEmpty) {
-      await _saveAccessToken(prefs, accessToken);
-    }
-
-    if (refreshToken != null && refreshToken.isNotEmpty) {
-      await _saveRefreshToken(prefs, refreshToken);
-    }
+    await _saveAccessToken(prefs, accessToken);
+    await _saveRefreshToken(prefs, refreshToken);
   }
 
   Future<void> _saveAccessToken(
