@@ -38,6 +38,8 @@ class AppUrls {
 
   // User Profile Endpoints
   static const String getCompleteProfile = '$baseUrl/users/profile'; //GET
+  static const String getProfileStrength =
+      '$baseUrl/users/profile/strength'; //GET
   static const String getProfilePreview =
       '$baseUrl/users/profile/preview'; //GET
   static const String getBasicProfile = '$baseUrl/users/profile/basic'; //GET

@@ -73,6 +73,7 @@ class _ProfileSectionEditScreenState
   final TextEditingController _communityController = TextEditingController();
   final TextEditingController _subCommunityController = TextEditingController();
   final TextEditingController _motherTongueController = TextEditingController();
+  final TextEditingController _languagesController = TextEditingController();
 
   final TextEditingController _fatherNameController = TextEditingController();
   final TextEditingController _fatherProfessionController =
@@ -183,6 +184,7 @@ class _ProfileSectionEditScreenState
         _communityController,
         _subCommunityController,
         _motherTongueController,
+        _languagesController,
         _fatherNameController,
         _fatherProfessionController,
         _motherNameController,
@@ -293,6 +295,10 @@ class _ProfileSectionEditScreenState
             ),
             _field(label: 'Diet', controller: _dietController),
             _field(label: 'Blood Group', controller: _bloodGroupController),
+            _field(
+              label: 'Languages (comma separated)',
+              controller: _languagesController,
+            ),
             _field(
               label: 'Health Information',
               controller: _healthInfoController,
@@ -655,7 +661,8 @@ class _ProfileSectionEditScreenState
           fallbackMessage: 'Failed to update about section',
         );
       case ProfileEditSection.basicDetails:
-        return _updateWithUniversal(
+        return _updateByEndpoint(
+          endpoint: AppUrls.updateBasicProfile,
           fields: {
             'profileManagedBy': _toTrimmedOrNull(_managedByController),
             'gender': _toTrimmedOrNull(_genderController),
@@ -664,6 +671,7 @@ class _ProfileSectionEditScreenState
             'height': _toIntOrNull(_heightController),
             'diet': _toTrimmedOrNull(_dietController),
             'bloodGroup': _toTrimmedOrNull(_bloodGroupController),
+            'languages': _toCsvListOrNull(_languagesController),
             'healthDetails': _toTrimmedOrNull(_healthInfoController),
             'specialCases': _toTrimmedOrNull(_disabilityController),
           },
@@ -837,6 +845,24 @@ class _ProfileSectionEditScreenState
     return false;
   }
 
+  Future<bool> _updateByEndpoint({
+    required String endpoint,
+    required Map<String, dynamic> fields,
+    required String fallbackMessage,
+  }) async {
+    final response = await ProfileRepository.updateProfileByEndpoint(
+      endpoint: endpoint,
+      body: UpdateProfileSectionRequestBody(fields: fields),
+    );
+
+    if (response.isSuccess) {
+      return true;
+    }
+
+    await _showError(response.message ?? fallbackMessage);
+    return false;
+  }
+
   Future<void> _showError(String message) async {
     await DialogUtils.showErrorDialog(
       context: context,
@@ -881,6 +907,7 @@ class _ProfileSectionEditScreenState
     _communityController.text = religion?.community ?? '';
     _subCommunityController.text = religion?.religiousBackground ?? '';
     _motherTongueController.text = profileData?.motherTongue ?? '';
+    _languagesController.text = _toDynamicCsv(profileData?.languages);
 
     _fatherNameController.text = family?.fatherName ?? '';
     _fatherProfessionController.text = family?.fatherProfession ?? '';
@@ -1036,6 +1063,16 @@ class _ProfileSectionEditScreenState
       return '';
     }
     return values.join(', ');
+  }
+
+  String _toDynamicCsv(List<dynamic>? values) {
+    if (values == null || values.isEmpty) {
+      return '';
+    }
+    return values
+        .map((value) => value.toString().trim())
+        .where((value) => value.isNotEmpty)
+        .join(', ');
   }
 
   String _normalizeDate(String? value) {

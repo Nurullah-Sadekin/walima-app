@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/core/global/components/limit_over.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
+import 'package:flutter_boilerplate/features/home/data/model/response/profile_strength_response.dart';
 import 'package:flutter_boilerplate/features/home/data/model/response/recent_visitors_response.dart';
 import 'package:flutter_boilerplate/features/home/data/repository/home_repository.dart';
 import 'package:flutter_boilerplate/features/matches/data/models/request/get_matches_query_params.dart';
@@ -23,6 +24,7 @@ class HomeProvider extends BaseChangeNotifier {
 
   void _loadInitialData() {
     Future.microtask(() async {
+      await loadProfileStrength();
       await loadPremiumMatches();
       await loadRecentVisitors();
     });
@@ -37,6 +39,33 @@ class HomeProvider extends BaseChangeNotifier {
   bool isLoadingRecentVisitors = false;
   String? recentVisitorsError;
   bool _hasLoadedRecentVisitors = false;
+
+  ProfileStrengthData? profileStrength;
+  bool isLoadingProfileStrength = false;
+  String? profileStrengthError;
+  bool _hasLoadedProfileStrength = false;
+
+  Future<void> loadProfileStrength({bool force = false}) async {
+    if (_hasLoadedProfileStrength && !force) return;
+    isLoadingProfileStrength = true;
+    profileStrengthError = null;
+    notifyListeners();
+
+    final response = await HomeRepository.getProfileStrength();
+
+    isLoadingProfileStrength = false;
+
+    if (response.isSuccess) {
+      profileStrength = response.response;
+      _hasLoadedProfileStrength = true;
+    } else {
+      profileStrength = null;
+      profileStrengthError =
+          response.message ?? 'Unable to load profile completion details.';
+    }
+
+    notifyListeners();
+  }
 
   Future<void> loadPremiumMatches({bool force = false}) async {
     if (_hasLoadedPremiumMatches && !force) return;
@@ -106,6 +135,10 @@ class HomeProvider extends BaseChangeNotifier {
   }
 
   Future<void> ensureHomeDataLoaded() async {
+    if (!isLoadingProfileStrength && !_hasLoadedProfileStrength) {
+      await loadProfileStrength(force: true);
+    }
+
     if (!isLoadingPremiumMatches &&
         (!_hasLoadedPremiumMatches || premiumMatches.isEmpty)) {
       await loadPremiumMatches(force: true);

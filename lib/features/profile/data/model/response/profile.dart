@@ -43,7 +43,7 @@ class Profile {
     if (json['languages'] != null) {
       languages = [];
       json['languages'].forEach((v) {
-        // languages?.add(Dynamic.fromJson(v));
+        languages?.add(v);
       });
     }
     religionName = json['religionName'];
@@ -88,7 +88,7 @@ class Profile {
     }
     map['motherTongue'] = motherTongue;
     if (languages != null) {
-      map['languages'] = languages?.map((v) => v.toJson()).toList();
+      map['languages'] = languages;
     }
     map['religionName'] = religionName;
     map['countryCode'] = countryCode;
@@ -98,4 +98,3 @@ class Profile {
     return map;
   }
 }
-

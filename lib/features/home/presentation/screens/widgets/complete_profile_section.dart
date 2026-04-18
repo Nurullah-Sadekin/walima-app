@@ -4,8 +4,8 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/features/home/data/model/response/profile_strength_response.dart';
 import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/verification_tile.dart';
-import 'package:flutter_boilerplate/features/profile/data/model/response/get_complete_profile_response.dart';
 import 'package:flutter_boilerplate/features/profile/presentation/screen/profile_edit_section.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,13 +15,26 @@ class CompleteProfileSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = ref.watch(profileProvider);
-    final completionPercentage = provider.profile?.profileCompletion?.percentage ?? 0;
-    final incompleteItems = (provider.profile?.profileCompletion?.missingSectionItems ?? const <ProfileCompletionSection>[])
-        .map(_CompleteProfileTileData.fromSection)
+    final provider = ref.watch(homeProvider);
+    final profileStrength = provider.profileStrength;
+    final completionPercentage = profileStrength?.overallScore ?? 0;
+    final incompleteItems = (profileStrength?.incompleteSections ??
+            const <ProfileStrengthSection>[])
+        .map(_CompleteProfileTileData.fromStrengthSection)
         .toList();
 
-    if (completionPercentage >= 100 || incompleteItems.isEmpty) {
+    if (provider.isLoadingProfileStrength && profileStrength == null) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20),
+        child: Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
+      );
+    }
+
+    if (completionPercentage >= 100 ||
+        incompleteItems.isEmpty ||
+        provider.profileStrengthError != null) {
       return const SizedBox.shrink();
     }
 
@@ -40,7 +53,7 @@ class CompleteProfileSection extends ConsumerWidget {
             ),
           ),
           Text(
-            'Complete profiles get 2x more matches',
+            'Your profile is $completionPercentage% complete',
             style: TextStyle(
               color: AppColors.textSecondaryLight,
               fontSize: TextSize.font14(context),
@@ -57,7 +70,7 @@ class CompleteProfileSection extends ConsumerWidget {
               child: VerificationTile(
                 iconImagePath: item.iconImagePath,
                 title: item.title,
-                statusText: 'Incomplete',
+                statusText: item.statusText,
                 statusColor: AppColors.primary,
                 statusBackgroundColor: AppColors.primaryVariant,
                 onTap: () => item.open(context),
@@ -74,6 +87,7 @@ class _CompleteProfileTileData {
   const _CompleteProfileTileData({
     required this.title,
     required this.iconImagePath,
+    required this.statusText,
     required this.onTap,
   });
 
@@ -81,90 +95,171 @@ class _CompleteProfileTileData {
 
   final String title;
   final String iconImagePath;
+  final String statusText;
   final Future<void> Function(BuildContext context) onTap;
 
   Future<void> open(BuildContext context) => onTap(context);
 
-  static _CompleteProfileTileData fromSection(
-    ProfileCompletionSection section,
+  static _CompleteProfileTileData fromStrengthSection(
+    ProfileStrengthSection section,
   ) {
-    switch (section) {
-      case ProfileCompletionSection.basicProfile:
+    final sectionKey = section.key?.trim().toLowerCase();
+    final fieldKey = section.firstIncompleteFieldKey;
+    final title = 'Complete ${section.label ?? 'Profile Section'}';
+    final statusText = '${section.completionPercentage ?? 0}%';
+
+    switch (sectionKey) {
+      case 'preferences':
         return _profileEditTile(
-          title: 'Complete Basic Profile',
-          iconImagePath: AppImages.profileSvgIcon,
-          section: ProfileEditSection.aboutYourself,
+          title: title,
+          statusText: statusText,
+          iconImagePath: AppImages.premiumSvgIcon,
+          section: _preferenceSectionForField(fieldKey),
         );
-      case ProfileCompletionSection.appearance:
+      case 'basic_profile':
         return _profileEditTile(
-          title: 'Complete Appearance',
+          title: title,
+          statusText: statusText,
+          iconImagePath: AppImages.profileSvgIcon,
+          section: _basicProfileSectionForField(fieldKey),
+        );
+      case 'appearance':
+        return _profileEditTile(
+          title: title,
+          statusText: statusText,
           iconImagePath: AppImages.person,
           section: ProfileEditSection.basicDetails,
         );
-      case ProfileCompletionSection.location:
+      case 'location':
         return _profileEditTile(
-          title: 'Complete Location',
+          title: title,
+          statusText: statusText,
           iconImagePath: AppImages.locationSvgIcon,
           section: ProfileEditSection.location,
         );
-      case ProfileCompletionSection.educationCareer:
+      case 'education':
         return _profileEditTile(
-          title: 'Complete Education & Career',
+          title: title,
+          statusText: statusText,
           iconImagePath: AppImages.educationSvgIcon,
           section: ProfileEditSection.educationCareer,
         );
-      case ProfileCompletionSection.religion:
+      case 'profession':
         return _profileEditTile(
-          title: 'Complete Religious Background',
+          title: title,
+          statusText: statusText,
+          iconImagePath: AppImages.workSvgIcon,
+          section: ProfileEditSection.educationCareer,
+        );
+      case 'religion':
+        return _profileEditTile(
+          title: title,
+          statusText: statusText,
           iconImagePath: AppImages.religionSvgIcon,
           section: ProfileEditSection.religiousBackground,
         );
-      case ProfileCompletionSection.family:
+      case 'family':
         return _profileEditTile(
-          title: 'Complete Family Details',
+          title: title,
+          statusText: statusText,
           iconImagePath: AppImages.familyDetails,
           section: ProfileEditSection.familyDetails,
         );
-      case ProfileCompletionSection.lifestyle:
+      case 'lifestyle':
         return _profileEditTile(
-          title: 'Complete Lifestyle',
+          title: title,
+          statusText: statusText,
           iconImagePath: AppImages.lifeStyleSvgIcon,
           section: ProfileEditSection.basicDetails,
         );
-      case ProfileCompletionSection.contacts:
-        return const _CompleteProfileTileData(
-          title: 'Verify Phone Number',
+      case 'contact':
+      case 'contacts':
+        return _CompleteProfileTileData(
+          title: title,
+          statusText: statusText,
           iconImagePath: AppImages.verifyContact,
           onTap: _openVerifyNumber,
         );
-      case ProfileCompletionSection.photos:
-        return const _CompleteProfileTileData(
-          title: 'Add Photos',
+      case 'photos':
+        return _CompleteProfileTileData(
+          title: title,
+          statusText: statusText,
           iconImagePath: AppImages.photoIcon,
           onTap: _openPhotoUpload,
         );
-      case ProfileCompletionSection.hobbiesInterests:
+      case 'interests':
         return _profileEditTile(
-          title: 'Add Hobbies & Interests',
+          title: title,
+          statusText: statusText,
           iconImagePath: AppImages.favouriteIcon,
           section: ProfileEditSection.hobbiesInterests,
+        );
+      default:
+        return _profileEditTile(
+          title: title,
+          statusText: statusText,
+          iconImagePath: AppImages.profileSvgIcon,
+          section: ProfileEditSection.aboutYourself,
         );
     }
   }
 
   static _CompleteProfileTileData _profileEditTile({
     required String title,
+    required String statusText,
     required String iconImagePath,
     required ProfileEditSection section,
   }) {
     return _CompleteProfileTileData(
       title: title,
+      statusText: statusText,
       iconImagePath: iconImagePath,
-      onTap: (context) => context.pushNamed(
-        Routes.profileSectionEdit,
-        extra: {'section': section.key},
-      ),
+      onTap: (context) async {
+        await context.pushNamed(
+          Routes.profileSectionEdit,
+          extra: {'section': section.key},
+        );
+        if (!context.mounted) return;
+        await ProviderScope.containerOf(
+          context,
+          listen: false,
+        ).read(homeProvider).loadProfileStrength(force: true);
+      },
     );
+  }
+
+  static ProfileEditSection _basicProfileSectionForField(String? fieldKey) {
+    switch (fieldKey) {
+      case 'bio':
+        return ProfileEditSection.aboutYourself;
+      case 'languages':
+      case 'dateOfBirth':
+      case 'maritalStatus':
+      case 'displayName':
+        return ProfileEditSection.basicDetails;
+      case 'motherTongue':
+        return ProfileEditSection.religiousBackground;
+      default:
+        return ProfileEditSection.basicDetails;
+    }
+  }
+
+  static ProfileEditSection _preferenceSectionForField(String? fieldKey) {
+    switch (fieldKey) {
+      case 'locationPreference':
+        return ProfileEditSection.preferenceLocationDetails;
+      case 'educationPreference':
+        return ProfileEditSection.preferenceEducationCareer;
+      case 'partnerExpectations':
+      case 'dietPreference':
+        return ProfileEditSection.preferenceOtherDetails;
+      case 'ageRange':
+      case 'heightRange':
+      case 'maritalStatusPreference':
+      case 'religionPreference':
+      default:
+        return ProfileEditSection.preferenceBasicInfo;
+    }
   }
 
   static Future<void> _openVerifyNumber(BuildContext context) async {
@@ -176,7 +271,7 @@ class _CompleteProfileTileData {
     await ProviderScope.containerOf(
       context,
       listen: false,
-    ).read(profileProvider).getProfile(context);
+    ).read(homeProvider).loadProfileStrength(force: true);
   }
 
   static Future<void> _openPhotoUpload(BuildContext context) async {
@@ -188,6 +283,6 @@ class _CompleteProfileTileData {
     await ProviderScope.containerOf(
       context,
       listen: false,
-    ).read(profileProvider).getProfile(context);
+    ).read(homeProvider).loadProfileStrength(force: true);
   }
 }
