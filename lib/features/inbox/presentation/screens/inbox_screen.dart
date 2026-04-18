@@ -108,45 +108,42 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
   }
 
   Widget _buildPrimaryTabs() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        spacing: 8,
-        children: [
-          TabBarWidget(
-            text: _primaryTabs[0],
-            isSelected: _primaryTabController.index == 0,
-            onTap: () => _primaryTabController.animateTo(0),
-          ),
-          TabBarWidget(
-            text: _primaryTabs[1],
-            isSelected: _primaryTabController.index == 1,
-            onTap: () => _primaryTabController.animateTo(1),
-          ),
-          // TabBarWidget(
-          //   text: _primaryTabs[2],
-          //   isSelected: _primaryTabController.index == 2,
-          //   onTap: () => _primaryTabController.animateTo(2),
-          // ),
-          TabBarWidget(
-            text: _primaryTabs[2],
-            isSelected: _primaryTabController.index == 2,
-            selectedBackgroundColor: AppColors.primary,
-            selectedTextColor: AppColors.white,
-            selectedBorderColor: AppColors.primary,
-            onTap: () => _primaryTabController.animateTo(2),
-          ),
-          TabBarWidget(
-            text: _primaryTabs[3],
-            isSelected: _primaryTabController.index == 3,
-            selectedBackgroundColor: AppColors.primary,
-            selectedTextColor: AppColors.white,
-            selectedBorderColor: AppColors.primary,
-            onTap: () => _primaryTabController.animateTo(3),
-          ),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      spacing: 8,
+      children: [
+        TabBarWidget(
+          text: _primaryTabs[0],
+          isSelected: _primaryTabController.index == 0,
+          onTap: () => _primaryTabController.animateTo(0),
+        ),
+        TabBarWidget(
+          text: _primaryTabs[1],
+          isSelected: _primaryTabController.index == 1,
+          onTap: () => _primaryTabController.animateTo(1),
+        ),
+        // TabBarWidget(
+        //   text: _primaryTabs[2],
+        //   isSelected: _primaryTabController.index == 2,
+        //   onTap: () => _primaryTabController.animateTo(2),
+        // ),
+        TabBarWidget(
+          text: _primaryTabs[2],
+          isSelected: _primaryTabController.index == 2,
+          selectedBackgroundColor: AppColors.primary,
+          selectedTextColor: AppColors.white,
+          selectedBorderColor: AppColors.primary,
+          onTap: () => _primaryTabController.animateTo(2),
+        ),
+        TabBarWidget(
+          text: _primaryTabs[3],
+          isSelected: _primaryTabController.index == 3,
+          selectedBackgroundColor: AppColors.primary,
+          selectedTextColor: AppColors.white,
+          selectedBorderColor: AppColors.primary,
+          onTap: () => _primaryTabController.animateTo(3),
+        ),
+      ],
     );
   }
 }

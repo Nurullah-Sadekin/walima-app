@@ -22,8 +22,7 @@ class AccountSettingScreen extends ConsumerStatefulWidget {
   const AccountSettingScreen({super.key});
 
   @override
-  ConsumerState<AccountSettingScreen> createState() =>
-      _AccountSettingScreenState();
+  ConsumerState<AccountSettingScreen> createState() => _AccountSettingScreenState();
 }
 
 class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
@@ -112,17 +111,13 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           ProfileActionTile(
             iconImagePath: AppImages.notificationSvgIcon,
             title: 'Email/SMS Alerts',
-            onTap: () =>
-                setState(() => _step = AccountSettingStep.smsOrEmailAlerts),
+            onTap: () => setState(() => _step = AccountSettingStep.smsOrEmailAlerts),
           ),
           ProfileActionTile(
             iconImagePath: AppImages.premiumSvgIcon,
             title: 'Premium Membership',
-            onTap: () =>
-                setState(() => _step = AccountSettingStep.premiumMembership),
+            onTap: () => setState(() => _step = AccountSettingStep.premiumMembership),
           ),
-
-
           ProfileActionTile(
             iconImagePath: AppImages.contactPreview,
             title: 'My Contact Settings',
@@ -143,14 +138,12 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           ProfileActionTile(
             iconImagePath: AppImages.safetySvgIcon,
             title: 'Privacy Options',
-            onTap: () =>
-                setState(() => _step = AccountSettingStep.privacyOptions),
+            onTap: () => setState(() => _step = AccountSettingStep.privacyOptions),
           ),
           ProfileActionTile(
             iconImagePath: AppImages.delete,
             title: 'Hide/Delete Profile',
-            onTap: () =>
-                setState(() => _step = AccountSettingStep.deleteProfile),
+            onTap: () => setState(() => _step = AccountSettingStep.deleteProfile),
             // Note: ProfileActionTile might need custom styling for the delete option
             // You may need to check if ProfileActionTile supports custom colors
           ),
@@ -167,6 +160,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
         mainAxisSize: MainAxisSize.min,
         spacing: 16,
         children: [
+          // api /api/v1/settings/premium get and put both
           SettingsSwitchTile(
             title: 'Auto-renew my Plan',
             subtitle: 'Auto-renewal for your Membership',
@@ -190,7 +184,9 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
                   color: AppColors.textPrimaryLight,
                   fontSize: TextSize.font12(
                     context,
-                  )))
+                  ),
+              ),
+          ),
         ],
       ),
     );
@@ -207,8 +203,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             children: [
               SettingsSwitchTile(
                 title: 'Hide Profile',
-                subtitle:
-                    'Hiding your profile makes you invisible and disables messages and invitations',
+                subtitle: 'Hiding your profile makes you invisible and disables messages and invitations',
                 value: provider.hideProfile ?? false,
                 onChanged: (value) {
                   provider.hideProfile = value;
@@ -300,8 +295,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
                       fontSize: TextSize.font16(
                         context,
                       ))),
-              Text(
-                  'You\'ll permanently lose all profile data, matches, and memberships',
+              Text('You\'ll permanently lose all profile data, matches, and memberships',
                   style: TextStyle(
                       fontWeight: FontWeight.w400,
                       color: AppColors.textSecondaryLight,
@@ -320,8 +314,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
                 spacing: 0,
                 itemSpacing: 10,
                 onItemTap: (index) async {
-                  final deleteProfileStatus =
-                      provider.setDeleteProfileStatus(index);
+                  final deleteProfileStatus = provider.setDeleteProfileStatus(index);
                   if (deleteProfileStatus == null) return;
                 },
               ),
@@ -337,7 +330,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
       spacing: 10,
       children: [
         const InfoTile(
-          title: 'Phone Number',value: '=8801645144777',
+          title: 'Phone Number', value: '=8801645144777',
           //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
           leadingImagePath: AppImages.contactPreview,
           showTrailingImage: true,
@@ -351,10 +344,10 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             children: [
               Text('Contact Display Status',
                   style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: TextSize.font16(context),
-                      color: AppColors.textPrimaryLight,)
-              ),
+                    fontWeight: FontWeight.w500,
+                    fontSize: TextSize.font16(context),
+                    color: AppColors.textPrimaryLight,
+                  )),
               const SizedBox(
                 height: 16,
               ),
@@ -469,8 +462,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
         CardBorder(
           widget: SettingsSwitchTile(
             title: 'Auto-Message on Connect',
-            subtitle:
-            'Your saved message will auto-send with each Connect Request',
+            subtitle: 'Your saved message will auto-send with each Connect Request',
             value: provider.autoMessageConnect ?? false,
             onChanged: (value) {
               provider.autoMessageConnect = value;
@@ -593,9 +585,9 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             ],
             onStatusTap: (index) {},
           ),
-
-          const SizedBox(height: 60,)
-      
+          const SizedBox(
+            height: 60,
+          )
         ],
       ),
     );
@@ -627,7 +619,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           onTap: () {},
           isRequired: true,
         ),
-         Row(
+        Row(
           mainAxisSize: MainAxisSize.max,
           children: [
             Expanded(
@@ -638,62 +630,83 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
                   spacing: 6,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Password Must contain:',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textPrimaryLight,
-                            fontSize: TextSize.font14(context),
-                        ),
+                    Text(
+                      'Password Must contain:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textPrimaryLight,
+                        fontSize: TextSize.font14(context),
+                      ),
                     ),
                     Row(
                       spacing: 6,
                       children: [
-                        const Icon(Icons.circle,size: 5,color: AppColors.textSecondaryLight,),
-                        Text('At least 8 characters',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                color: AppColors.textSecondaryLight,
-                                fontSize: TextSize.font12(context),
-                            ),
+                        const Icon(
+                          Icons.circle,
+                          size: 5,
+                          color: AppColors.textSecondaryLight,
                         ),
-                      ],
-                    ),
-                    Row(
-                      spacing: 6,
-                      children: [
-                        const Icon(Icons.circle,size: 5,color: AppColors.textSecondaryLight,),
-                        Text('Uppercase and lowercase letters',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                color: AppColors.textSecondaryLight,
-                                fontSize: TextSize.font12(context),
-                            ),
+                        Text(
+                          'At least 8 characters',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.textSecondaryLight,
+                            fontSize: TextSize.font12(context),
+                          ),
                         ),
                       ],
                     ),
                     Row(
                       spacing: 6,
                       children: [
-                        const Icon(Icons.circle,size: 5,color: AppColors.textSecondaryLight,),
-                        Text('At least one number',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                color: AppColors.textSecondaryLight,
-                                fontSize: TextSize.font12(context),
-                            ),
+                        const Icon(
+                          Icons.circle,
+                          size: 5,
+                          color: AppColors.textSecondaryLight,
+                        ),
+                        Text(
+                          'Uppercase and lowercase letters',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.textSecondaryLight,
+                            fontSize: TextSize.font12(context),
+                          ),
                         ),
                       ],
                     ),
                     Row(
                       spacing: 6,
                       children: [
-                        const Icon(Icons.circle,size: 5,color: AppColors.textSecondaryLight,),
-                        Text('At least one special character',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                color: AppColors.textSecondaryLight,
-                                fontSize: TextSize.font12(context),
-                            ),
+                        const Icon(
+                          Icons.circle,
+                          size: 5,
+                          color: AppColors.textSecondaryLight,
+                        ),
+                        Text(
+                          'At least one number',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.textSecondaryLight,
+                            fontSize: TextSize.font12(context),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      spacing: 6,
+                      children: [
+                        const Icon(
+                          Icons.circle,
+                          size: 5,
+                          color: AppColors.textSecondaryLight,
+                        ),
+                        Text(
+                          'At least one special character',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.textSecondaryLight,
+                            fontSize: TextSize.font12(context),
+                          ),
                         ),
                       ],
                     ),
