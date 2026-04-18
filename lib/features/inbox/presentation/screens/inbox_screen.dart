@@ -124,9 +124,17 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
             isSelected: _primaryTabController.index == 1,
             onTap: () => _primaryTabController.animateTo(1),
           ),
+          // TabBarWidget(
+          //   text: _primaryTabs[2],
+          //   isSelected: _primaryTabController.index == 2,
+          //   onTap: () => _primaryTabController.animateTo(2),
+          // ),
           TabBarWidget(
             text: _primaryTabs[2],
             isSelected: _primaryTabController.index == 2,
+            selectedBackgroundColor: AppColors.primary,
+            selectedTextColor: AppColors.white,
+            selectedBorderColor: AppColors.primary,
             onTap: () => _primaryTabController.animateTo(2),
           ),
           TabBarWidget(
@@ -136,14 +144,6 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
             selectedTextColor: AppColors.white,
             selectedBorderColor: AppColors.primary,
             onTap: () => _primaryTabController.animateTo(3),
-          ),
-          TabBarWidget(
-            text: _primaryTabs[4],
-            isSelected: _primaryTabController.index == 4,
-            selectedBackgroundColor: AppColors.primary,
-            selectedTextColor: AppColors.white,
-            selectedBorderColor: AppColors.primary,
-            onTap: () => _primaryTabController.animateTo(4),
           ),
         ],
       ),
