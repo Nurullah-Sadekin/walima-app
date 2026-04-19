@@ -7,17 +7,19 @@ class CardBorder extends StatelessWidget {
     this.widget,
     this.backgroundColor,
     this.borderColor,
+    this.verticalPadding,
   });
 
   final Widget? widget;
   final Color? backgroundColor;
   final Color? borderColor;
+  final double? verticalPadding;
 
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding:  EdgeInsets.symmetric(vertical: verticalPadding ?? 16, horizontal: 16),
       decoration: BoxDecoration(
         color: backgroundColor ?? Colors.transparent,
         borderRadius: BorderRadius.circular(8),

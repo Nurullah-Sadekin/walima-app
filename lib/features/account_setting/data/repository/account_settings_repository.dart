@@ -204,6 +204,24 @@ class AccountSettingsRepository {
     }
   }
 
+  static Future<ApiResponse> updateNotificationSetting(
+    String key,
+    dynamic value,
+  ) async {
+    try {
+      final response = await DioClient().put(
+        AppUrls.updateNotificationSettings,
+        isTokenRequired: true,
+        data: <String, dynamic>{
+          key: value,
+        },
+      );
+      return _withApiMessage(response);
+    } catch (e) {
+      return _mapError(e);
+    }
+  }
+
   static ApiResponse _withApiMessage(ApiResponse response) {
     final apiMessage = _extractMessage(response.data);
     if (apiMessage == null || apiMessage.isEmpty) return response;

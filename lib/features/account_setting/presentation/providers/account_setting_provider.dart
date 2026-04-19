@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/models/filter_model.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
@@ -18,11 +19,13 @@ class NotificationAlertOption {
 class NotificationAlertCategory {
   const NotificationAlertCategory({
     this.title,
+    this.imagePath,
     required this.apiKeys,
     required this.options,
   });
   final String? title;
-  final List<String> apiKeys;
+  final String? imagePath;
+  final String apiKeys;
   final List<NotificationAlertOption> options;
 }
 
@@ -42,6 +45,11 @@ class AccountSettingProvider extends BaseChangeNotifier {
   bool? shortlistAlerts = false;
   bool? premiumCalls = false;
   bool? autoMessageConnect = false;
+  
+  // SMS Alert Settings
+  bool? profileBlaster = false;
+  bool? smsAlertInvitations = false;
+  bool? smsAlertAccepts = false;
 
   bool isAccountLoading = false;
   bool isAccountSaving = false;
@@ -73,12 +81,8 @@ class AccountSettingProvider extends BaseChangeNotifier {
   final List<NotificationAlertCategory> notificationCategories = const [
     NotificationAlertCategory(
       title: 'Match Mail & Photo Match Mail',
-      apiKeys: [
-        'matchMailFrequency',
-        'match_mail_frequency',
-        'matchMail',
-        'match_mail',
-      ],
+      imagePath: AppImages.emailSvgIcon,
+      apiKeys: 'matchMailFrequency',
       options: [
         NotificationAlertOption(label: 'Daily', value: 'daily'),
         NotificationAlertOption(label: 'Tri-Weekly', value: 'tri_weekly'),
@@ -87,12 +91,9 @@ class AccountSettingProvider extends BaseChangeNotifier {
       ],
     ),
     NotificationAlertCategory(
-      apiKeys: [
-        'photoMatchMailFrequency',
-        'photo_match_mail_frequency',
-        'photoMatchMail',
-        'photo_match_mail',
-      ],
+      title: 'Premium Match Mail',
+      imagePath: AppImages.matchSvgIcon,
+      apiKeys: 'premiumMatchMail',
       options: [
         NotificationAlertOption(label: 'Weekly', value: 'weekly'),
         NotificationAlertOption(label: 'Unsubscribe', value: 'unsubscribe'),
@@ -100,12 +101,8 @@ class AccountSettingProvider extends BaseChangeNotifier {
     ),
     NotificationAlertCategory(
       title: 'Recent Visitors Email',
-      apiKeys: [
-        'recentVisitorsFrequency',
-        'recent_visitors_frequency',
-        'recentVisitors',
-        'recent_visitors',
-      ],
+      imagePath: AppImages.languageSvgIcon,
+      apiKeys: 'recentVisitorsEmail',
       options: [
         NotificationAlertOption(label: 'Weekly', value: 'weekly'),
         NotificationAlertOption(label: 'Unsubscribe', value: 'unsubscribe'),
@@ -113,16 +110,8 @@ class AccountSettingProvider extends BaseChangeNotifier {
     ),
     NotificationAlertCategory(
       title: 'Members Who Shortlisted You Email',
-      apiKeys: [
-        'shortlistedYouFrequency',
-        'shortlisted_you_frequency',
-        'membersWhoShortlistedFrequency',
-        'members_who_shortlisted_frequency',
-        'shortlistedYou',
-        'shortlisted_you',
-        'membersWhoShortlisted',
-        'members_who_shortlisted',
-      ],
+      imagePath: AppImages.sortIcon,
+      apiKeys: 'shortlistedEmail',
       options: [
         NotificationAlertOption(label: 'Weekly', value: 'weekly'),
         NotificationAlertOption(label: 'Unsubscribe', value: 'unsubscribe'),
@@ -130,12 +119,8 @@ class AccountSettingProvider extends BaseChangeNotifier {
     ),
     NotificationAlertCategory(
       title: 'Viewed Profile Email',
-      apiKeys: [
-        'viewedProfileFrequency',
-        'viewed_profile_frequency',
-        'viewedProfile',
-        'viewed_profile',
-      ],
+      imagePath: AppImages.profileSvgIcon,
+      apiKeys: 'viewedProfilesEmail',
       options: [
         NotificationAlertOption(label: 'Weekly', value: 'weekly'),
         NotificationAlertOption(label: 'Unsubscribe', value: 'unsubscribe'),
@@ -143,12 +128,8 @@ class AccountSettingProvider extends BaseChangeNotifier {
     ),
     NotificationAlertCategory(
       title: 'Similar Profiles Email',
-      apiKeys: [
-        'similarProfilesFrequency',
-        'similar_profiles_frequency',
-        'similarProfiles',
-        'similar_profiles',
-      ],
+      imagePath: AppImages.weddingSvgIcon,
+      apiKeys: 'similarProfilesEmail',
       options: [
         NotificationAlertOption(label: 'Weekly', value: 'weekly'),
         NotificationAlertOption(label: 'Unsubscribe', value: 'unsubscribe'),
@@ -156,46 +137,39 @@ class AccountSettingProvider extends BaseChangeNotifier {
     ),
     NotificationAlertCategory(
       title: 'Contact Alert',
-      apiKeys: [
-        'contactAlertFrequency',
-        'contact_alert_frequency',
-        'contactAlert',
-        'contact_alert',
-      ],
+      imagePath: AppImages.contactSvgIcon,
+      apiKeys: 'contactAlert',
       options: [
-        NotificationAlertOption(
-            label: 'Instant-Email for every reply', value: 'instant'),
+        NotificationAlertOption(label: 'Instant-Email for every reply', value: 'instant'),
         NotificationAlertOption(label: 'Daily - All responses', value: 'daily'),
         NotificationAlertOption(label: 'Unsubscribe', value: 'unsubscribe'),
       ],
     ),
     NotificationAlertCategory(
-      title: 'Walima.com Profile Blaster',
-      apiKeys: [
-        'profileBlasterFrequency',
-        'profile_blaster_frequency',
-        'profileBlaster',
-        'profile_blaster',
-      ],
+      title: 'Message Alert',
+      imagePath: AppImages.notificationSvgIcon,
+      apiKeys: 'messageAlert',
       options: [
-        NotificationAlertOption(label: 'Subscribe', value: 'subscribe'),
+        NotificationAlertOption(label: 'Daily Digest', value: 'daily_digest'),
         NotificationAlertOption(label: 'Unsubscribe', value: 'unsubscribe'),
       ],
     ),
     NotificationAlertCategory(
       title: 'Walima Specials',
-      apiKeys: [
-        'walimaSpecialsFrequency',
-        'walima_specials_frequency',
-        'specialsFrequency',
-        'specials_frequency',
-        'walimaSpecials',
-        'walima_specials',
-        'specials',
-      ],
+      imagePath: AppImages.walimaSvg,
+      apiKeys: 'walimaSpecials',
       options: [
         NotificationAlertOption(
-            label: 'Occasionally - Max twice a month', value: 'occasionally'),
+            label: 'Occasionally - Max twice a month', value: 'twice_monthly'),
+        NotificationAlertOption(label: 'Unsubscribe', value: 'unsubscribe'),
+      ],
+    ),
+    NotificationAlertCategory(
+      title: 'Walima Insite',
+      imagePath: AppImages.walimaSvg,
+      apiKeys: 'walimaInsite',
+      options: [
+        NotificationAlertOption(label: 'Monthly', value: 'monthly'),
         NotificationAlertOption(label: 'Unsubscribe', value: 'unsubscribe'),
       ],
     ),
@@ -218,14 +192,10 @@ class AccountSettingProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
-  /// Returns the currently-selected option value for [category] from the
-  /// loaded API response (lower-cased), or null if not set.
   String? selectedValueFor(NotificationAlertCategory category) {
-    return notificationSettings?.valueOf(category.apiKeys);
+    return notificationSettings?.valueOf([category.apiKeys]);
   }
 
-  /// Whether [option] is the selected one for [category] based on the API
-  /// response (compares option.value case-insensitively).
   bool isOptionSelected(
     NotificationAlertCategory category,
     NotificationAlertOption option,
@@ -233,6 +203,30 @@ class AccountSettingProvider extends BaseChangeNotifier {
     final current = selectedValueFor(category);
     if (current == null) return false;
     return current == option.value.trim().toLowerCase();
+  }
+
+  Future<ApiResponse> selectOptionForCategory(NotificationAlertCategory category, int optionIndex) async {
+    if (optionIndex < 0 || optionIndex >= category.options.length) return ApiResponse.error(message: 'Invalid option', statusCode: 0);
+    final option = category.options[optionIndex];
+    final key = category.apiKeys;
+    final newRaw = Map<String, dynamic>.from(notificationSettings?.raw ?? {});
+    newRaw[key] = option.value;
+    notificationSettings = NotificationSettings(raw: newRaw);
+    notifyListeners();
+    // Immediately save to API
+    return _saveNotificationSetting(key, option.value);
+  }
+
+  Future<ApiResponse> _saveNotificationSetting(String key, dynamic value) async {
+    final response = await AccountSettingsRepository.updateNotificationSetting(
+      key,
+      value,
+    );
+    if (!response.isSuccess) {
+      // Revert local change on error
+      notifyListeners();
+    }
+    return response;
   }
 
   Future<ApiResponse> saveMessagesSettings() async {

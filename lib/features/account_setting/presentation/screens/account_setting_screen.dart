@@ -8,6 +8,7 @@ import 'package:flutter_boilerplate/core/global/components/primary_textField.dar
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
+import 'package:flutter_boilerplate/features/account_setting/data/repository/account_settings_repository.dart';
 import 'package:flutter_boilerplate/features/account_setting/presentation/providers/account_setting_provider.dart';
 import 'package:flutter_boilerplate/features/account_setting/presentation/screens/widgets/alert_status.dart';
 import 'package:flutter_boilerplate/features/account_setting/presentation/screens/widgets/card_border.dart';
@@ -621,18 +622,67 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           for (final category in provider.notificationCategories)
             AlertStatus(
               title: category.title,
+              imagePath: category.imagePath,
               alertStatusList: category.options
+                  .asMap()
+                  .entries
                   .map(
-                    (option) => AlertStatusItem(
-                      label: option.label,
-                      isSelected:
-                          provider.isOptionSelected(category, option),
+                    (entry) => AlertStatusItem(
+                      label: entry.value.label,
+                      isSelected: provider.isOptionSelected(category, entry.value),
                     ),
                   )
                   .toList(),
-              onStatusTap: (index) {},
+              onStatusTap: (index) async {
+                final response = await provider.selectOptionForCategory(category, index);
+                if (!mounted) return;
+                _showResponseSnackBar(response);
+              },
             ),
-          const SizedBox(height: 60),
+
+          CardBorder(
+            verticalPadding: 8,
+            widget: SettingsSwitchTile(
+              title: 'Profile Blaster',
+              value: provider.profileBlaster ?? false,
+              onChanged: (value) async {
+                provider.profileBlaster = value;
+                provider.notifyListeners();
+                final response = await AccountSettingsRepository.updateNotificationSetting('profileBlaster', value);
+                if (!mounted) return;
+                _showResponseSnackBar(response);
+              },
+            ),
+          ),
+          CardBorder(
+            verticalPadding: 8,
+            widget: SettingsSwitchTile(
+              title: 'SMS Alert Invitations',
+              value: provider.smsAlertInvitations ?? false,
+              onChanged: (value) async {
+                provider.smsAlertInvitations = value;
+                provider.notifyListeners();
+                final response = await AccountSettingsRepository.updateNotificationSetting('smsAlertInvitations', value);
+                if (!mounted) return;
+                _showResponseSnackBar(response);
+              },
+            ),
+          ),
+          CardBorder(
+            verticalPadding: 8,
+            widget: SettingsSwitchTile(
+              title: 'SMS Alert Accepts',
+              value: provider.smsAlertAccepts ?? false,
+              onChanged: (value) async {
+                provider.smsAlertAccepts = value;
+                provider.notifyListeners();
+                final response = await AccountSettingsRepository.updateNotificationSetting('smsAlertAccepts', value);
+                if (!mounted) return;
+                _showResponseSnackBar(response);
+              },
+            ),
+          ),
+          const SizedBox(height: 20),
         ],
       ),
     );
@@ -803,8 +853,9 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     final isRoot = _step == AccountSettingStep.accountSetting;
     final isPremium = _step == AccountSettingStep.premiumMembership;
     final isContact = _step == AccountSettingStep.myContactSettings;
+    final isSmsAlerts = _step == AccountSettingStep.smsOrEmailAlerts;
 
-    if (isRoot || isPremium || isContact) {
+    if (isRoot || isPremium || isContact || isSmsAlerts) {
       return const SizedBox.shrink();
     }
 
