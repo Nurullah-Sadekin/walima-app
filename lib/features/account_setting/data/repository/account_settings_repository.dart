@@ -3,6 +3,7 @@ import 'package:flutter_boilerplate/core/network/app_urls.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/account_settings.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/contact_settings.dart';
+import 'package:flutter_boilerplate/features/account_setting/data/models/premium_settings.dart';
 
 class AccountSettingsRepository {
   static Future<ApiResponse<AccountSettings>> getAccountSettings() async {
@@ -78,6 +79,58 @@ class AccountSettingsRepository {
         data: <String, dynamic>{
           'contactDisplayStatus': contactDisplayStatus,
         },
+      );
+      return _withApiMessage(response);
+    } catch (e) {
+      return _mapError(e);
+    }
+  }
+
+  static Future<ApiResponse<PremiumSettings>> getPremiumSettings() async {
+    try {
+      final response = await DioClient().get(
+        AppUrls.premiumSettings,
+        isTokenRequired: true,
+      );
+
+      if (!response.isSuccess) {
+        return ApiResponse.error(
+          message: response.message,
+          statusCode: response.statusCode,
+        );
+      }
+
+      return ApiResponse.success(
+        data: PremiumSettings.fromAny(response.data),
+        message: response.message,
+        statusCode: response.statusCode,
+      );
+    } catch (e) {
+      return _mapError(e);
+    }
+  }
+
+  static Future<ApiResponse> updatePremiumSettings(
+    PremiumSettings settings,
+  ) async {
+    try {
+      final response = await DioClient().put(
+        AppUrls.premiumSettings,
+        isTokenRequired: true,
+        data: settings.toRequestJson(),
+      );
+      return _withApiMessage(response);
+    } catch (e) {
+      return _mapError(e);
+    }
+  }
+
+  static Future<ApiResponse> updatePremiumAutoRenew(bool autoRenew) async {
+    try {
+      final response = await DioClient().put(
+        AppUrls.premiumSettings,
+        isTokenRequired: true,
+        data: <String, dynamic>{'autoRenew': autoRenew},
       );
       return _withApiMessage(response);
     } catch (e) {

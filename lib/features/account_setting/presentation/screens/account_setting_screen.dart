@@ -7,6 +7,7 @@ import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
+import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
 import 'package:flutter_boilerplate/features/account_setting/presentation/providers/account_setting_provider.dart';
 import 'package:flutter_boilerplate/features/account_setting/presentation/screens/widgets/alert_status.dart';
 import 'package:flutter_boilerplate/features/account_setting/presentation/screens/widgets/card_border.dart';
@@ -125,15 +126,20 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               provider.loadContactSettings();
             },
           ),
+
+          ProfileActionTile(
+            iconImagePath: AppImages.premiumSvgIcon,
+            title: 'Premium Membership',
+            onTap: () {
+              setState(() => _step = AccountSettingStep.premiumMembership);
+              provider.loadPremiumSettings();
+            },
+          ),
+
           ProfileActionTile(
             iconImagePath: AppImages.notificationSvgIcon,
             title: 'Email/SMS Alerts',
             onTap: () => setState(() => _step = AccountSettingStep.smsOrEmailAlerts),
-          ),
-          ProfileActionTile(
-            iconImagePath: AppImages.premiumSvgIcon,
-            title: 'Premium Membership',
-            onTap: () => setState(() => _step = AccountSettingStep.premiumMembership),
           ),
 
           ProfileActionTile(
@@ -167,21 +173,31 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
   }
 
   Widget _premiumMembership() {
+    if (provider.isPremiumLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final currentPlan = provider.premiumSettings?.currentPlan;
+
     return CardBorder(
       widget: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         spacing: 16,
         children: [
-          // api /api/v1/settings/premium get and put both
           SettingsSwitchTile(
             title: 'Auto-renew my Plan',
-            subtitle: 'Auto-renewal for your Membership',
-            value: provider.autoRenew ?? false,
-            onChanged: (value) {
-              provider.autoRenew = value;
-              provider.notifyListeners();
+            subtitle: 'Auto-renewal for your ${CamelCaseUtils.formatCamelCase(currentPlan)} Membership is ${provider.premiumSettings?.autoRenew == true ? 'ON' : 'OFF'}.',
+            value: provider.premiumSettings?.autoRenew ?? false,
+            onChanged: (value) async {
+              final response = await provider.togglePremiumAutoRenew(value);
+              if (!mounted) return;
+             _showResponseSnackBar(response);
             },
+          ),
+          const Divider(
+            color: AppColors.greyLight,
+            thickness: 1,
           ),
           SettingsSwitchTile(
             title: 'What is auto-renewal?',
@@ -191,14 +207,39 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             onChanged: (value) {},
             isVisibleSwitcher: false,
           ),
-          Text('Current Plan:',
-              style: TextStyle(
+          const Divider(
+            color: AppColors.greyLight,
+            thickness: 1,
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                'Current Plan: ',
+                style: TextStyle(
                   fontWeight: FontWeight.w500,
                   color: AppColors.textPrimaryLight,
-                  fontSize: TextSize.font12(
-                    context,
-                  ),
+                  fontSize: TextSize.font12(context),
+                ),
               ),
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryVariant,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  (currentPlan != null && currentPlan.isNotEmpty)
+                      ? CamelCaseUtils.formatCamelCase(currentPlan)
+                  : '-',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                    fontSize: TextSize.font12(context),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -786,8 +827,9 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
 
   Widget _bottomAction(AccountSettingProvider provider) {
     final isRoot = _step == AccountSettingStep.accountSetting;
+    final isPremium = _step == AccountSettingStep.premiumMembership;
 
-    if (isRoot) {
+    if (isRoot || isPremium) {
       return const SizedBox.shrink();
     }
 
@@ -866,6 +908,24 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
       case AccountSettingStep.setPassword:
         return 'Set Password';
     }
+  }
+
+  void _showResponseSnackBar(ApiResponse response) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: const Duration(seconds: 1),
+        backgroundColor: response.isSuccess ? AppColors.greenButtonColor : AppColors.errorBorderColor,
+        content: Text(
+          response.isSuccess
+              ? (response.message.isNotEmpty
+              ? response.message
+              : 'Status updated')
+              : (response.message.isNotEmpty
+              ? response.message
+              : 'Unable to update'),
+        ),
+      ),
+    );
   }
 }
 

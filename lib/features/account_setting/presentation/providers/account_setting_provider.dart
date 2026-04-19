@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/core/network/dio_client.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/account_settings.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/contact_settings.dart';
+import 'package:flutter_boilerplate/features/account_setting/data/models/premium_settings.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/repository/account_settings_repository.dart';
 
 class AccountSettingProvider extends BaseChangeNotifier {
@@ -32,6 +33,10 @@ class AccountSettingProvider extends BaseChangeNotifier {
   String? contactError;
   ContactSettings? contactSettings;
   String? selectedContactDisplayStatus;
+
+  bool isPremiumLoading = false;
+  String? premiumError;
+  PremiumSettings? premiumSettings;
 
 
   List<Filter> timelineDataList = [
@@ -135,6 +140,44 @@ class AccountSettingProvider extends BaseChangeNotifier {
 
     isContactSaving = false;
     notifyListeners();
+
+    return response;
+  }
+
+  Future<void> loadPremiumSettings() async {
+    isPremiumLoading = true;
+    premiumError = null;
+    notifyListeners();
+
+    final response = await AccountSettingsRepository.getPremiumSettings();
+
+    if (response.isSuccess && response.data != null) {
+      premiumSettings = response.data;
+      autoRenew = response.data?.autoRenew ?? autoRenew;
+    } else {
+      premiumError = response.message;
+    }
+
+    isPremiumLoading = false;
+    notifyListeners();
+  }
+
+  Future<ApiResponse> togglePremiumAutoRenew(bool value) async {
+    final previous = premiumSettings;
+    final optimistic = previous?.copyWith(autoRenew: value) ??
+        PremiumSettings(autoRenew: value);
+    premiumSettings = optimistic;
+    autoRenew = value;
+    notifyListeners();
+
+    final response =
+        await AccountSettingsRepository.updatePremiumAutoRenew(value);
+
+    if (!response.isSuccess) {
+      premiumSettings = previous;
+      autoRenew = previous?.autoRenew ?? !value;
+      notifyListeners();
+    }
 
     return response;
   }
