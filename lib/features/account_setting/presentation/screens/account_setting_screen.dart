@@ -22,7 +22,8 @@ class AccountSettingScreen extends ConsumerStatefulWidget {
   const AccountSettingScreen({super.key});
 
   @override
-  ConsumerState<AccountSettingScreen> createState() => _AccountSettingScreenState();
+  ConsumerState<AccountSettingScreen> createState() =>
+      _AccountSettingScreenState();
 }
 
 class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
@@ -82,7 +83,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     switch (_step) {
       case AccountSettingStep.accountSetting:
         return _overviewBody(provider);
-     case AccountSettingStep.nameAndEmail:
+      case AccountSettingStep.nameAndEmail:
         return _nameAndEmail();
       case AccountSettingStep.smsOrEmailAlerts:
         return _emailOrSmsAlerts();
@@ -126,7 +127,6 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               provider.loadContactSettings();
             },
           ),
-
           ProfileActionTile(
             iconImagePath: AppImages.premiumSvgIcon,
             title: 'Premium Membership',
@@ -135,13 +135,12 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               provider.loadPremiumSettings();
             },
           ),
-
           ProfileActionTile(
             iconImagePath: AppImages.notificationSvgIcon,
             title: 'Email/SMS Alerts',
-            onTap: () => setState(() => _step = AccountSettingStep.smsOrEmailAlerts),
+            onTap: () =>
+                setState(() => _step = AccountSettingStep.smsOrEmailAlerts),
           ),
-
           ProfileActionTile(
             iconImagePath: AppImages.messages,
             title: 'Messages',
@@ -157,12 +156,14 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           ProfileActionTile(
             iconImagePath: AppImages.safetySvgIcon,
             title: 'Privacy Options',
-            onTap: () => setState(() => _step = AccountSettingStep.privacyOptions),
+            onTap: () =>
+                setState(() => _step = AccountSettingStep.privacyOptions),
           ),
           ProfileActionTile(
             iconImagePath: AppImages.delete,
             title: 'Hide/Delete Profile',
-            onTap: () => setState(() => _step = AccountSettingStep.deleteProfile),
+            onTap: () =>
+                setState(() => _step = AccountSettingStep.deleteProfile),
             // Note: ProfileActionTile might need custom styling for the delete option
             // You may need to check if ProfileActionTile supports custom colors
           ),
@@ -187,12 +188,13 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
         children: [
           SettingsSwitchTile(
             title: 'Auto-renew my Plan',
-            subtitle: 'Auto-renewal for your ${CamelCaseUtils.formatCamelCase(currentPlan)} Membership is ${provider.premiumSettings?.autoRenew == true ? 'ON' : 'OFF'}.',
+            subtitle:
+                'Auto-renewal for your ${CamelCaseUtils.formatCamelCase(currentPlan)} Membership is ${provider.premiumSettings?.autoRenew == true ? 'ON' : 'OFF'}.',
             value: provider.premiumSettings?.autoRenew ?? false,
             onChanged: (value) async {
               final response = await provider.togglePremiumAutoRenew(value);
               if (!mounted) return;
-             _showResponseSnackBar(response);
+              _showResponseSnackBar(response);
             },
           ),
           const Divider(
@@ -231,7 +233,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
                 child: Text(
                   (currentPlan != null && currentPlan.isNotEmpty)
                       ? CamelCaseUtils.formatCamelCase(currentPlan)
-                  : '-',
+                      : '-',
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     color: AppColors.primary,
@@ -257,7 +259,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             children: [
               SettingsSwitchTile(
                 title: 'Hide Profile',
-                subtitle: 'Hiding your profile makes you invisible and disables messages and invitations',
+                subtitle:
+                    'Hiding your profile makes you invisible and disables messages and invitations',
                 value: provider.hideProfile ?? false,
                 onChanged: (value) {
                   provider.hideProfile = value;
@@ -349,7 +352,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
                       fontSize: TextSize.font16(
                         context,
                       ))),
-              Text('You\'ll permanently lose all profile data, matches, and memberships',
+              Text(
+                  'You\'ll permanently lose all profile data, matches, and memberships',
                   style: TextStyle(
                       fontWeight: FontWeight.w400,
                       color: AppColors.textSecondaryLight,
@@ -368,7 +372,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
                 spacing: 0,
                 itemSpacing: 10,
                 onItemTap: (index) async {
-                  final deleteProfileStatus = provider.setDeleteProfileStatus(index);
+                  final deleteProfileStatus =
+                      provider.setDeleteProfileStatus(index);
                   if (deleteProfileStatus == null) return;
                 },
               ),
@@ -387,8 +392,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     final contact = provider.contactSettings?.primaryContact;
     final isEmail = contact?.isEmail ?? false;
     final contactTitle = isEmail ? 'Email Address' : 'Phone Number';
-    final contactIcon =
-        isEmail ? AppImages.emailSvgIcon : AppImages.callIcon;
+    final contactIcon = isEmail ? AppImages.emailSvgIcon : AppImages.callIcon;
     final contactValue = contact?.value ?? '-';
     final selectedIndex = provider.selectedContactDisplayStatusIndex;
 
@@ -537,7 +541,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
         CardBorder(
           widget: SettingsSwitchTile(
             title: 'Auto-Message on Connect',
-            subtitle: 'Your saved message will auto-send with each Connect Request',
+            subtitle:
+                'Your saved message will auto-send with each Connect Request',
             value: provider.autoMessageConnect ?? false,
             onChanged: (value) {
               provider.autoMessageConnect = value;
@@ -545,35 +550,53 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             },
           ),
         ),
-        const InfoTile(
+        InfoTile(
           title: 'Message on Connect',
-          subtitle: 'This message is sent with your Connect Request when auto-message is enable',
-          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          subtitle: provider.messageOnConnect.isNotEmpty
+              ? provider.messageOnConnect
+              : 'This message is sent with your Connect Request when auto-message is enable',
           leadingImagePath: AppImages.contactPreview,
           showTrailingImage: true,
           showLeadingImage: false,
           borderRadius: 8,
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
+          onTap: () => _openMessageEditor(
+            title: 'Message on Connect',
+            initialValue: provider.messageOnConnect,
+            onSave: provider.setMessageOnConnect,
+          ),
         ),
-        const InfoTile(
+        InfoTile(
           title: 'Message on Accept',
-          subtitle: 'This message is sent to members upon accepting their Connect request',
-          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          subtitle: provider.messageOnAccept.isNotEmpty
+              ? provider.messageOnAccept
+              : 'This message is sent to members upon accepting their Connect request',
           leadingImagePath: AppImages.contactPreview,
           showTrailingImage: true,
           showLeadingImage: false,
           borderRadius: 8,
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
+          onTap: () => _openMessageEditor(
+            title: 'Message on Accept',
+            initialValue: provider.messageOnAccept,
+            onSave: provider.setMessageOnAccept,
+          ),
         ),
-        const InfoTile(
+        InfoTile(
           title: 'Message on Remind',
-          subtitle: 'This message is sent to members when you send them a reminder',
-          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          subtitle: provider.messageOnRemind.isNotEmpty
+              ? provider.messageOnRemind
+              : 'This message is sent to members when you send them a reminder',
           leadingImagePath: AppImages.contactPreview,
           showTrailingImage: true,
           showLeadingImage: false,
           borderRadius: 8,
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
+          onTap: () => _openMessageEditor(
+            title: 'Message on Remind',
+            initialValue: provider.messageOnRemind,
+            onSave: provider.setMessageOnRemind,
+          ),
         ),
       ],
     );
@@ -638,8 +661,10 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           AlertStatus(
             title: 'Contact Alert',
             alertStatusList: [
-              AlertStatusItem(label: 'Instant-Email for every reply', isSelected: true),
-              AlertStatusItem(label: 'Daily - All responses', isSelected: false),
+              AlertStatusItem(
+                  label: 'Instant-Email for every reply', isSelected: true),
+              AlertStatusItem(
+                  label: 'Daily - All responses', isSelected: false),
               AlertStatusItem(label: 'Unsubscribe', isSelected: false),
             ],
             onStatusTap: (index) {},
@@ -655,7 +680,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           AlertStatus(
             title: 'Walima Specials',
             alertStatusList: [
-              AlertStatusItem(label: 'Occasionally - Max twice a month', isSelected: true),
+              AlertStatusItem(
+                  label: 'Occasionally - Max twice a month', isSelected: true),
               AlertStatusItem(label: 'Unsubscribe', isSelected: false),
             ],
             onStatusTap: (index) {},
@@ -882,24 +908,40 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     }
   }
 
+  Future<void> _openMessageEditor({
+    required String title,
+    required String initialValue,
+    required ValueChanged<String> onSave,
+  }) async {
+    final result = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => _MessageEditDialog(
+        title: title,
+        initialValue: initialValue,
+      ),
+    );
+    if (result != null) onSave(result);
+  }
+
   void _showResponseSnackBar(ApiResponse response) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         duration: const Duration(seconds: 1),
-        backgroundColor: response.isSuccess ? AppColors.success : AppColors.error,
+        backgroundColor:
+            response.isSuccess ? AppColors.success : AppColors.error,
         content: Text(
           response.isSuccess
               ? (response.message.isNotEmpty
-              ? response.message
-              : 'Status updated')
+                  ? response.message
+                  : 'Status updated')
               : (response.message.isNotEmpty
-              ? response.message
-              : 'Unable to update'),
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: TextSize.font14(context),
-              fontWeight: FontWeight.w500,
-            ),
+                  ? response.message
+                  : 'Unable to update'),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: TextSize.font14(context),
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
     );
@@ -916,4 +958,102 @@ enum AccountSettingStep {
   message,
   deleteProfile,
   setPassword
+}
+
+class _MessageEditDialog extends StatefulWidget {
+  const _MessageEditDialog({
+    required this.title,
+    this.subtitle,
+    this.textController,
+    required this.initialValue,
+  });
+
+  final String title;
+  final String? subtitle;
+  final TextEditingController? textController;
+  final String initialValue;
+
+  @override
+  State<_MessageEditDialog> createState() => _MessageEditDialogState();
+}
+
+class _MessageEditDialogState extends State<_MessageEditDialog> {
+  late final TextEditingController _controller =
+      TextEditingController(text: widget.initialValue);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        child: AlertDialog(
+          title: Text(widget.title),
+          titlePadding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                widget.subtitle ?? 'Customize the message sent to members.',
+                style: TextStyle(
+                  color: AppColors.textSecondaryLight,
+                  fontSize: TextSize.font14(context),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 8,),
+              PrimaryTextField(
+                controller: _controller,
+                hintText: 'Enter your message',
+                noPrefix: true,
+                maxLine: 5,
+                minLine: 4,
+                onTap: () {  },
+              ),
+              const SizedBox(height: 8,),
+            ],
+          ),
+          actions: [
+            InkWell(
+                onTap: () => Navigator.of(context).pop(),
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(
+                    color: AppColors.textSecondaryLight,
+                    fontSize: TextSize.font14(context),
+                    fontWeight: FontWeight.w500,
+                  ),
+                )),
+            InkWell(
+                onTap: () => Navigator.of(context).pop(_controller.text.trim()),
+                child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      'Set',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: TextSize.font14(context),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ))),
+          ],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      ),
+    );
+  }
 }

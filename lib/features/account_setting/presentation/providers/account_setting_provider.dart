@@ -38,6 +38,25 @@ class AccountSettingProvider extends BaseChangeNotifier {
   String? premiumError;
   PremiumSettings? premiumSettings;
 
+  String messageOnConnect = '';
+  String messageOnAccept = '';
+  String messageOnRemind = '';
+
+  void setMessageOnConnect(String value) {
+    messageOnConnect = value;
+    notifyListeners();
+  }
+
+  void setMessageOnAccept(String value) {
+    messageOnAccept = value;
+    notifyListeners();
+  }
+
+  void setMessageOnRemind(String value) {
+    messageOnRemind = value;
+    notifyListeners();
+  }
+
 
   List<Filter> timelineDataList = [
     Filter(label: '1 Week', value: '1_week'),
