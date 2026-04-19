@@ -7,7 +7,9 @@ import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
+import 'package:flutter_boilerplate/core/utils/height_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/core/utils/picker_dialog.dart';
 import 'package:flutter_boilerplate/features/home/presentation/widgets/profile_info_card.dart';
@@ -242,21 +244,21 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         MapEntry('Date of Birth', _formatDate(profile?.profile?.dateOfBirth)),
         MapEntry(
           'Marital Status',
-          _valueOrDefault(profile?.profile?.maritalStatus),
+          _valueOrDefault(CamelCaseUtils.formatCamelCase(profile?.profile?.maritalStatus)),
         ),
         MapEntry('Height', _formatHeightCm(appearance?.height)),
-        MapEntry('Grew up in', _valueOrDefault(location?.grewUpIn)),
-        MapEntry('Diet', _valueOrDefault(profile?.lifestyle?.dietType)),
+        MapEntry('Grew up in', _valueOrDefault(CamelCaseUtils.formatCamelCase(location?.grewUpIn))),
+        MapEntry('Diet', _valueOrDefault(CamelCaseUtils.formatCamelCase(profile?.lifestyle?.dietType))),
         MapEntry('Blood Group', _valueOrDefault(appearance?.bloodGroup)),
         MapEntry(
           'Health Information',
-          _valueOrDefault(
-            appearance?.healthDetails ?? appearance?.healthCondition,
+          _valueOrDefault(CamelCaseUtils.formatCamelCase(
+            appearance?.healthDetails ?? appearance?.healthCondition,)
           ),
         ),
         MapEntry(
           'Disability',
-          _valueOrDefault(appearance?.specialCases, 'None'),
+          _valueOrDefault(CamelCaseUtils.formatCamelCase(appearance?.specialCases), 'None'),
         ),
       ],
     );
@@ -272,16 +274,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       infoList: [
         MapEntry(
           'Religion',
-          _valueOrDefault(religion?.religion ?? profile?.profile?.religionName),
+          _valueOrDefault(CamelCaseUtils.formatCamelCase(religion?.religion ?? profile?.profile?.religionName)),
         ),
-        MapEntry('Community', _valueOrDefault(religion?.community)),
+        MapEntry('Community', _valueOrDefault(CamelCaseUtils.formatCamelCase(religion?.community))),
         MapEntry(
           'Sub community',
-          _valueOrDefault(religion?.religiousBackground),
+          _valueOrDefault(CamelCaseUtils.formatCamelCase(religion?.religiousBackground)),
         ),
         MapEntry(
           'Mother Tongue',
-          _valueOrDefault(profile?.profile?.motherTongue),
+          _valueOrDefault(CamelCaseUtils.formatCamelCase(profile?.profile?.motherTongue)),
         ),
       ],
     );
@@ -622,7 +624,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (heightCm == null || heightCm <= 0) {
       return 'Not Specified';
     }
-    return '$heightCm cm';
+    return HeightUtils.formatHeight(heightCm.toString());
   }
 
   String _composeLocation(dynamic city, dynamic country) {
