@@ -431,8 +431,12 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
                     .toList(),
                 spacing: 0,
                 itemSpacing: 10,
-                onItemTap: (index) {
-                  provider.selectContactDisplayStatusByIndex(index);
+                onItemTap: (index) async {
+                  if (provider.isContactSaving) return;
+                  final response =
+                      await provider.saveContactDisplayStatusByIndex(index);
+                  if (!mounted || response == null) return;
+                  _showResponseSnackBar(response);
                 },
               ),
             ],
@@ -828,15 +832,14 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
   Widget _bottomAction(AccountSettingProvider provider) {
     final isRoot = _step == AccountSettingStep.accountSetting;
     final isPremium = _step == AccountSettingStep.premiumMembership;
+    final isContact = _step == AccountSettingStep.myContactSettings;
 
-    if (isRoot || isPremium) {
+    if (isRoot || isPremium || isContact) {
       return const SizedBox.shrink();
     }
 
     final isNameAndEmail = _step == AccountSettingStep.nameAndEmail;
-    final isContact = _step == AccountSettingStep.myContactSettings;
-    final isSaving = (isNameAndEmail && provider.isAccountSaving) ||
-        (isContact && provider.isContactSaving);
+    final isSaving = isNameAndEmail && provider.isAccountSaving;
 
     return PrimaryButtons(
       buttonStyle: isSaving
@@ -849,38 +852,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
         if (isNameAndEmail) {
           final response = await provider.saveAccountSettings();
           if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                response.isSuccess
-                    ? (response.message.isNotEmpty
-                        ? response.message
-                        : 'Account updated')
-                    : (response.message.isNotEmpty
-                        ? response.message
-                        : 'Unable to update account'),
-              ),
-            ),
-          );
-          return;
-        }
-
-        if (isContact) {
-          final response = await provider.saveContactSettings();
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                response.isSuccess
-                    ? (response.message.isNotEmpty
-                        ? response.message
-                        : 'Contact display status updated')
-                    : (response.message.isNotEmpty
-                        ? response.message
-                        : 'Unable to update contact display status'),
-              ),
-            ),
-          );
+          _showResponseSnackBar(response);
           return;
         }
       },
@@ -914,7 +886,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         duration: const Duration(seconds: 1),
-        backgroundColor: response.isSuccess ? AppColors.greenButtonColor : AppColors.errorBorderColor,
+        backgroundColor: response.isSuccess ? AppColors.success : AppColors.error,
         content: Text(
           response.isSuccess
               ? (response.message.isNotEmpty
@@ -923,6 +895,11 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               : (response.message.isNotEmpty
               ? response.message
               : 'Unable to update'),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: TextSize.font14(context),
+              fontWeight: FontWeight.w500,
+            ),
         ),
       ),
     );

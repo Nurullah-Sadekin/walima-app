@@ -123,6 +123,28 @@ class AccountSettingProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
+  Future<ApiResponse?> saveContactDisplayStatusByIndex(int index) async {
+    if (!_isValidIndex(index, contactDisplayStatus.length)) return null;
+    final previous = selectedContactDisplayStatus;
+    final newStatus = contactDisplayStatus[index].value;
+    if (newStatus == null || newStatus.isEmpty) return null;
+
+    selectedContactDisplayStatus = newStatus;
+    isContactSaving = true;
+    notifyListeners();
+
+    final response =
+        await AccountSettingsRepository.updateContactDisplayStatus(newStatus);
+
+    if (!response.isSuccess) {
+      selectedContactDisplayStatus = previous;
+    }
+    isContactSaving = false;
+    notifyListeners();
+
+    return response;
+  }
+
   Future<ApiResponse> saveContactSettings() async {
     final status = selectedContactDisplayStatus;
     if (status == null || status.isEmpty) {
