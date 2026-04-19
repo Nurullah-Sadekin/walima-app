@@ -25,6 +25,7 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
     this.borderRadius,
     this.padding,
     this.showTrailingImage = true,
+    this.trailingText,
     this.showLeadingImage = true,
   });
   final String title;
@@ -44,6 +45,7 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
   final double? borderRadius;
   final EdgeInsetsGeometry? padding;
   final bool showTrailingImage ; // Control trailing image visibility
+  final String? trailingText; // Optional trailing text
   final bool showLeadingImage ;
 
   @override
@@ -138,6 +140,22 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
                     height: trailingImageSize,
                     color: trailingImageColor ?? AppColors.primary,
                   ),
+                if (!showTrailingImage && trailingText != null)
+                 Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryShade200,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    trailingText!,
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: TextSize.font8(context),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                 )
               ],
             ),
           ],
