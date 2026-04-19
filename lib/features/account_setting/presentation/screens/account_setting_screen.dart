@@ -58,9 +58,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             child: _body(provider),
           ),
         ),
-        floatingActionButton: BottomBorderedWidget(
-          widget: _bottomAction(provider),
-        ),
+        floatingActionButton:_bottomAction(provider),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
@@ -864,28 +862,30 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     final isSaving = (isNameAndEmail && provider.isAccountSaving) ||
         (isMessages && provider.isMessagesSaving);
 
-    return PrimaryButtons(
-      buttonStyle: isSaving
-          ? ButtonsStyle.disableButton
-          : ButtonsStyle.activePrimaryButton,
-      title: 'Save Changes',
-      onTap: () async {
-        if (isSaving) return;
+    return BottomBorderedWidget(
+      widget : PrimaryButtons(
+        buttonStyle: isSaving
+            ? ButtonsStyle.disableButton
+            : ButtonsStyle.activePrimaryButton,
+        title: 'Save Changes',
+        onTap: () async {
+          if (isSaving) return;
 
-        if (isNameAndEmail) {
-          final response = await provider.saveAccountSettings();
-          if (!mounted) return;
-          _showResponseSnackBar(response);
-          return;
-        }
+          if (isNameAndEmail) {
+            final response = await provider.saveAccountSettings();
+            if (!mounted) return;
+            _showResponseSnackBar(response);
+            return;
+          }
 
-        if (isMessages) {
-          final response = await provider.saveMessagesSettings();
-          if (!mounted) return;
-          _showResponseSnackBar(response);
-          return;
-        }
-      },
+          if (isMessages) {
+            final response = await provider.saveMessagesSettings();
+            if (!mounted) return;
+            _showResponseSnackBar(response);
+            return;
+          }
+        },
+      ),
     );
   }
 
