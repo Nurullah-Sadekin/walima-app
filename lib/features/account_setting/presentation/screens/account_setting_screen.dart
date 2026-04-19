@@ -358,9 +358,10 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           title: contactTitle,
           value: contactValue,
           leadingImagePath: contactIcon,
-          showTrailingImage: true,
+          showTrailingImage: false,
           showLeadingImage: true,
           borderRadius: 8,
+          trailingText: 'Primary',
           padding: const EdgeInsets.all(16),
         ),
         CardBorder(
