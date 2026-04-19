@@ -73,7 +73,7 @@ class SelectionCard extends StatelessWidget {
                 style: TextStyle(
                   color: AppColors.textPrimaryLight,
                   fontSize: TextSize.font14(context),
-                  fontWeight: FontWeight.w400,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
@@ -112,7 +112,7 @@ class SelectionCard extends StatelessWidget {
                 style: TextStyle(
                   color: AppColors.textSecondaryLight,
                   fontSize: TextSize.font14(context),
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w400,
                 ),
               ),
             ),
