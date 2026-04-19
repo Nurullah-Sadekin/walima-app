@@ -54,6 +54,7 @@ class ContactFilterProvider extends BaseChangeNotifier {
   bool isRemoteFilterLoading = false;
   bool isApplying = false;
   String? remoteFilterError;
+  ContactFiltersSettings? _remoteSnapshot;
 
   final int ageMinLimit = 18;
   final int ageMaxLimit = 70;
@@ -90,37 +91,60 @@ class ContactFilterProvider extends BaseChangeNotifier {
     remoteFilterError = null;
     notifyListeners();
 
-    ContactFiltersSettings? remote;
-    final remoteResponse = await ContactFiltersRepository.getContactFilters();
-    if (remoteResponse.isSuccess) {
-      remote = remoteResponse.data;
-    } else {
-      remoteFilterError = remoteResponse.message;
+    try {
+      // Fetch remote settings and lookup data in parallel.
+      final remoteFuture = ContactFiltersRepository.getContactFilters();
+      await Future.wait<void>([
+        loadCareerLookupData(),
+        loadLocationData(),
+      ]);
+      final remoteResponse = await remoteFuture;
+
+      ContactFiltersSettings? remote;
+      if (remoteResponse.isSuccess) {
+        remote = remoteResponse.data;
+        _remoteSnapshot = remote;
+      } else {
+        remoteFilterError = remoteResponse.message;
+      }
+
+      // Clear existing selections so stale state from a previous session
+      // doesn't leak into the new view.
+      _clearSelections(maritalStatusOptions);
+      _clearSelections(religionOptions);
+      _clearSelections(motherTongueOptions);
+      _clearSelections(countryOptions);
+      _clearSelections(workingWithOptions);
+      _clearSelections(annualIncomeOptions);
+      _clearSelections(communityOptions);
+
+      if (remote != null) {
+        _applyRanges(remote);
+        _applySelection(religionOptions, remote.religion);
+      }
+
+      // Community options depend on the selected religions — load them now
+      // that religion selection is applied.
+      await loadCommunityData();
+
+      if (remote != null) {
+        _applySelection(maritalStatusOptions, remote.maritalStatus);
+        _applySelection(communityOptions, remote.community);
+        _applySelection(motherTongueOptions, remote.motherTongue);
+        _applySelection(countryOptions, remote.countryLivingIn);
+        _applySelection(workingWithOptions, remote.workingWith);
+        _applySelection(annualIncomeOptions, remote.annualIncome);
+      }
+    } finally {
+      isRemoteFilterLoading = false;
+      notifyListeners();
     }
+  }
 
-    await Future.wait<void>([
-      loadCareerLookupData(),
-      loadLocationData(),
-    ]);
-
-    if (remote != null) {
-      _applyRanges(remote);
-      _applySelection(religionOptions, remote.religion);
+  void _clearSelections(List<SingleStringModel> items) {
+    for (final item in items) {
+      item.isSelected = false;
     }
-
-    await loadCommunityData();
-
-    if (remote != null) {
-      _applySelection(maritalStatusOptions, remote.maritalStatus);
-      _applySelection(communityOptions, remote.community);
-      _applySelection(motherTongueOptions, remote.motherTongue);
-      _applySelection(countryOptions, remote.countryLivingIn);
-      _applySelection(workingWithOptions, remote.workingWith);
-      _applySelection(annualIncomeOptions, remote.annualIncome);
-    }
-
-    isRemoteFilterLoading = false;
-    notifyListeners();
   }
 
   Future<void> loadCommunityData() async {
@@ -327,7 +351,12 @@ class ContactFilterProvider extends BaseChangeNotifier {
     final settings = buildSettings();
     final response = await ContactFiltersRepository.updateContactFilters(
       settings,
+      previous: _remoteSnapshot,
     );
+
+    if (response.isSuccess) {
+      _remoteSnapshot = settings;
+    }
 
     isApplying = false;
     notifyListeners();

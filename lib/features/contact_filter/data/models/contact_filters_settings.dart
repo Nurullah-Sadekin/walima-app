@@ -28,27 +28,85 @@ class ContactFiltersSettings {
 
   Map<String, dynamic> toRequestJson() {
     return <String, dynamic>{
-      'ageRange': (ageStart != null && ageEnd != null) ? <int>[ageStart!, ageEnd!] : null,
-      'heightRange':
-          (heightStart != null && heightEnd != null) ? <int>[heightStart!, heightEnd!] : null,
-      'maritalStatus': maritalStatus ?? const <String>[],
-      'religion': religion ?? const <String>[],
-      'community': community ?? const <String>[],
-      'motherTongue': motherTongue ?? const <String>[],
-      'countryLivingIn': countryLivingIn ?? const <String>[],
-      'workingWith': workingWith ?? const <String>[],
-      'annualIncome': annualIncome ?? const <String>[],
-    }..removeWhere((key, value) => value == null);
+      if (ageStart != null) 'ageMin': ageStart,
+      if (ageEnd != null) 'ageMax': ageEnd,
+      if (heightStart != null) 'heightMin': heightStart,
+      if (heightEnd != null) 'heightMax': heightEnd,
+      if (maritalStatus != null) 'maritalStatuses': maritalStatus,
+      if (religion != null) 'religions': religion,
+      if (community != null) 'communities': community,
+      if (motherTongue != null) 'motherTongues': motherTongue,
+      if (countryLivingIn != null) 'countriesLivingIn': countryLivingIn,
+      if (workingWith != null) 'workingWiths': workingWith,
+      if (annualIncome != null) 'annualIncomes': annualIncome,
+    };
+  }
+
+  /// Build a PUT body containing only the fields that differ from [previous].
+  /// If [previous] is null, returns all non-null fields.
+  Map<String, dynamic> diffRequestJson(ContactFiltersSettings? previous) {
+    if (previous == null) return toRequestJson();
+
+    final body = <String, dynamic>{};
+
+    if (ageStart != null && ageStart != previous.ageStart) {
+      body['ageMin'] = ageStart;
+    }
+    if (ageEnd != null && ageEnd != previous.ageEnd) {
+      body['ageMax'] = ageEnd;
+    }
+    if (heightStart != null && heightStart != previous.heightStart) {
+      body['heightMin'] = heightStart;
+    }
+    if (heightEnd != null && heightEnd != previous.heightEnd) {
+      body['heightMax'] = heightEnd;
+    }
+    if (!_listEq(maritalStatus, previous.maritalStatus)) {
+      body['maritalStatuses'] = maritalStatus ?? const <String>[];
+    }
+    if (!_listEq(religion, previous.religion)) {
+      body['religions'] = religion ?? const <String>[];
+    }
+    if (!_listEq(community, previous.community)) {
+      body['communities'] = community ?? const <String>[];
+    }
+    if (!_listEq(motherTongue, previous.motherTongue)) {
+      body['motherTongues'] = motherTongue ?? const <String>[];
+    }
+    if (!_listEq(countryLivingIn, previous.countryLivingIn)) {
+      body['countriesLivingIn'] = countryLivingIn ?? const <String>[];
+    }
+    if (!_listEq(workingWith, previous.workingWith)) {
+      body['workingWiths'] = workingWith ?? const <String>[];
+    }
+    if (!_listEq(annualIncome, previous.annualIncome)) {
+      body['annualIncomes'] = annualIncome ?? const <String>[];
+    }
+    return body;
+  }
+
+  static bool _listEq(List<String>? a, List<String>? b) {
+    final sa = {...?a};
+    final sb = {...?b};
+    if (sa.length != sb.length) return false;
+    return sa.containsAll(sb);
   }
 
   static ContactFiltersSettings fromAny(dynamic data) {
     final payload = _unwrapPayload(data);
 
-    final ageRange = _readAny(payload, const ['ageRange', 'age_range']);
-    final heightRange = _readAny(payload, const ['heightRange', 'height_range']);
-
-    final age = _parseIntRange(ageRange);
-    final height = _parseIntRange(heightRange);
+    final age = _parseFlexibleRange(
+      payload,
+      rangeKeys: const ['ageRange', 'age_range'],
+      minKeys: const ['ageMin', 'age_min', 'minAge', 'min_age'],
+      maxKeys: const ['ageMax', 'age_max', 'maxAge', 'max_age'],
+    );
+    final height = _parseFlexibleRange(
+      payload,
+      rangeKeys: const ['heightRange', 'height_range'],
+      minKeys: const ['heightMin', 'height_min', 'minHeight', 'min_height'],
+      maxKeys: const ['heightMax', 'height_max', 'maxHeight', 'max_height'],
+    );
 
     return ContactFiltersSettings(
       ageStart: age?.$1,
@@ -56,25 +114,50 @@ class ContactFiltersSettings {
       heightStart: height?.$1,
       heightEnd: height?.$2,
       maritalStatus: _parseStringList(
-        _readAny(payload, const ['maritalStatus', 'marital_status']),
+        _readAny(payload, const [
+          'maritalStatuses',
+          'marital_statuses',
+          'maritalStatus',
+          'marital_status',
+        ]),
       ),
       religion: _parseStringList(
-        _readAny(payload, const ['religion', 'religions']),
+        _readAny(payload, const ['religions', 'religion']),
       ),
       community: _parseStringList(
-        _readAny(payload, const ['community', 'communities']),
+        _readAny(payload, const ['communities', 'community']),
       ),
       motherTongue: _parseStringList(
-        _readAny(payload, const ['motherTongue', 'mother_tongue']),
+        _readAny(payload, const [
+          'motherTongues',
+          'mother_tongues',
+          'motherTongue',
+          'mother_tongue',
+        ]),
       ),
       countryLivingIn: _parseStringList(
-        _readAny(payload, const ['countryLivingIn', 'country_living_in']),
+        _readAny(payload, const [
+          'countriesLivingIn',
+          'countries_living_in',
+          'countryLivingIn',
+          'country_living_in',
+        ]),
       ),
       workingWith: _parseStringList(
-        _readAny(payload, const ['workingWith', 'working_with']),
+        _readAny(payload, const [
+          'workingWiths',
+          'working_withs',
+          'workingWith',
+          'working_with',
+        ]),
       ),
       annualIncome: _parseStringList(
-        _readAny(payload, const ['annualIncome', 'annual_income']),
+        _readAny(payload, const [
+          'annualIncomes',
+          'annual_incomes',
+          'annualIncome',
+          'annual_income',
+        ]),
       ),
     );
   }
@@ -104,6 +187,24 @@ class ContactFiltersSettings {
     for (final key in keys) {
       if (map.containsKey(key)) return map[key];
     }
+    return null;
+  }
+
+  static (int, int)? _parseFlexibleRange(
+    Map<String, dynamic>? payload, {
+    required List<String> rangeKeys,
+    required List<String> minKeys,
+    required List<String> maxKeys,
+  }) {
+    if (payload == null) return null;
+
+    final rangeValue = _readAny(payload, rangeKeys);
+    final rangeResult = _parseIntRange(rangeValue);
+    if (rangeResult != null) return rangeResult;
+
+    final min = _toInt(_readAny(payload, minKeys));
+    final max = _toInt(_readAny(payload, maxKeys));
+    if (min != null && max != null) return (min, max);
     return null;
   }
 

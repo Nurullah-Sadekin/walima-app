@@ -39,13 +39,22 @@ class ContactFiltersRepository {
   }
 
   static Future<ApiResponse> updateContactFilters(
-    ContactFiltersSettings settings,
-  ) async {
+    ContactFiltersSettings settings, {
+    ContactFiltersSettings? previous,
+  }) async {
     try {
+      final body = settings.diffRequestJson(previous);
+      if (body.isEmpty) {
+        return ApiResponse.success(
+          data: null,
+          message: 'No changes to save',
+          statusCode: 200,
+        );
+      }
       final response = await DioClient().put(
         AppUrls.contactFilters,
         isTokenRequired: true,
-        data: settings.toRequestJson(),
+        data: body,
       );
       return response;
     } catch (e) {

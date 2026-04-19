@@ -152,15 +152,14 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
   }
 
   Widget _contactFilterBody(ContactFilterProvider provider) {
+    if (provider.isRemoteFilterLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 6),
-          if (provider.isRemoteFilterLoading) ...[
-            const LinearProgressIndicator(minHeight: 2),
-            const SizedBox(height: 12),
-          ],
           if (provider.remoteFilterError != null) ...[
             Container(
               width: double.infinity,
