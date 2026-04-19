@@ -113,7 +113,10 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           ProfileActionTile(
             iconImagePath: AppImages.editSvgIcon,
             title: 'Name And Email Update',
-            onTap: () => setState(() => _step = AccountSettingStep.nameAndEmail),
+            onTap: () {
+              setState(() => _step = AccountSettingStep.nameAndEmail);
+              provider.loadAccountSettings();
+            },
           ),
           ProfileActionTile(
             iconImagePath: AppImages.notificationSvgIcon,
@@ -601,33 +604,33 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
   }
 
   Widget _nameAndEmail() {
+    if (provider.isAccountLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       spacing: 16,
       children: [
         PrimaryTextField(
-          controller: provider.newPasswordController,
+          controller: provider.firstNameController,
           headLine: 'First Name',
-          hintText: 'Enter new password',
+          hintText: 'Enter first name',
           noPrefix: true,
-          errorText: provider.newPasswordError,
           onTap: () {},
         ),
         PrimaryTextField(
-          controller: provider.confirmPasswordController,
+          controller: provider.lastNameController,
           headLine: 'Last Name',
-          hintText: 'Enter confirm password',
+          hintText: 'Enter last name',
           noPrefix: true,
-          errorText: provider.confirmPasswordError,
           onTap: () {},
         ),
         PrimaryTextField(
-          controller: provider.confirmPasswordController,
+          controller: provider.emailController,
           headLine: 'Email Address',
-          hintText: 'Enter confirm password',
+          hintText: 'Enter email address',
           noPrefix: true,
-          errorText: provider.confirmPasswordError,
           onTap: () {},
         ),
       ],
@@ -768,10 +771,34 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
       return const SizedBox.shrink();
     }
 
+    final isNameAndEmail = _step == AccountSettingStep.nameAndEmail;
+    final isSaving = isNameAndEmail && provider.isAccountSaving;
+
     return PrimaryButtons(
-      buttonStyle: ButtonsStyle.activePrimaryButton,
+      buttonStyle: isSaving
+          ? ButtonsStyle.disableButton
+          : ButtonsStyle.activePrimaryButton,
       title: 'Save Changes',
-      onTap: () {},
+      onTap: () async {
+        if (!isNameAndEmail) return;
+        if (provider.isAccountSaving) return;
+
+        final response = await provider.saveAccountSettings();
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              response.isSuccess
+                  ? (response.message.isNotEmpty
+                      ? response.message
+                      : 'Account updated')
+                  : (response.message.isNotEmpty
+                      ? response.message
+                      : 'Unable to update account'),
+            ),
+          ),
+        );
+      },
     );
   }
 
