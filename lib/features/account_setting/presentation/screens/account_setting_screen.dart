@@ -5,9 +5,8 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
-import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
+import 'package:flutter_boilerplate/core/network/dio_client.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/account_setting/presentation/providers/account_setting_provider.dart';
 import 'package:flutter_boilerplate/features/account_setting/presentation/screens/widgets/alert_status.dart';
 import 'package:flutter_boilerplate/features/account_setting/presentation/screens/widgets/card_border.dart';
@@ -119,6 +118,14 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             },
           ),
           ProfileActionTile(
+            iconImagePath: AppImages.contactPreview,
+            title: 'My Contact Settings',
+            onTap: () {
+              setState(() => _step = AccountSettingStep.myContactSettings);
+              provider.loadContactSettings();
+            },
+          ),
+          ProfileActionTile(
             iconImagePath: AppImages.notificationSvgIcon,
             title: 'Email/SMS Alerts',
             onTap: () => setState(() => _step = AccountSettingStep.smsOrEmailAlerts),
@@ -128,11 +135,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             title: 'Premium Membership',
             onTap: () => setState(() => _step = AccountSettingStep.premiumMembership),
           ),
-          ProfileActionTile(
-            iconImagePath: AppImages.contactPreview,
-            title: 'My Contact Settings',
-            onTap: () => setState(() => _step = AccountSettingStep.myContactSettings),
-          ),
+
           ProfileActionTile(
             iconImagePath: AppImages.messages,
             title: 'Messages',
@@ -336,17 +339,29 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
   }
 
   Widget _myContactSettings() {
+    if (provider.isContactLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final contact = provider.contactSettings?.primaryContact;
+    final isEmail = contact?.isEmail ?? false;
+    final contactTitle = isEmail ? 'Email Address' : 'Phone Number';
+    final contactIcon =
+        isEmail ? AppImages.emailSvgIcon : AppImages.callIcon;
+    final contactValue = contact?.value ?? '-';
+    final selectedIndex = provider.selectedContactDisplayStatusIndex;
+
     return Column(
       spacing: 10,
       children: [
-        const InfoTile(
-          title: 'Phone Number', value: '=8801645144777',
-          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
-          leadingImagePath: AppImages.contactPreview,
+        InfoTile(
+          title: contactTitle,
+          value: contactValue,
+          leadingImagePath: contactIcon,
           showTrailingImage: true,
           showLeadingImage: true,
           borderRadius: 8,
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
         ),
         CardBorder(
           widget: Column(
@@ -363,15 +378,19 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               ),
               FilterWidget(
                 items: provider.contactDisplayStatus
+                    .asMap()
+                    .entries
                     .map(
-                      (item) => FilterItem(name: item.label, isSelected: false),
+                      (entry) => FilterItem(
+                        name: entry.value.label,
+                        isSelected: entry.key == selectedIndex,
+                      ),
                     )
                     .toList(),
                 spacing: 0,
                 itemSpacing: 10,
-                onItemTap: (index) async {
-                  final setTimelineValue = provider.setTimelineValue(index);
-                  if (setTimelineValue == null) return;
+                onItemTap: (index) {
+                  provider.selectContactDisplayStatusByIndex(index);
                 },
               ),
             ],
@@ -772,7 +791,9 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     }
 
     final isNameAndEmail = _step == AccountSettingStep.nameAndEmail;
-    final isSaving = isNameAndEmail && provider.isAccountSaving;
+    final isContact = _step == AccountSettingStep.myContactSettings;
+    final isSaving = (isNameAndEmail && provider.isAccountSaving) ||
+        (isContact && provider.isContactSaving);
 
     return PrimaryButtons(
       buttonStyle: isSaving
@@ -780,24 +801,45 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           : ButtonsStyle.activePrimaryButton,
       title: 'Save Changes',
       onTap: () async {
-        if (!isNameAndEmail) return;
-        if (provider.isAccountSaving) return;
+        if (isSaving) return;
 
-        final response = await provider.saveAccountSettings();
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              response.isSuccess
-                  ? (response.message.isNotEmpty
-                      ? response.message
-                      : 'Account updated')
-                  : (response.message.isNotEmpty
-                      ? response.message
-                      : 'Unable to update account'),
+        if (isNameAndEmail) {
+          final response = await provider.saveAccountSettings();
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                response.isSuccess
+                    ? (response.message.isNotEmpty
+                        ? response.message
+                        : 'Account updated')
+                    : (response.message.isNotEmpty
+                        ? response.message
+                        : 'Unable to update account'),
+              ),
             ),
-          ),
-        );
+          );
+          return;
+        }
+
+        if (isContact) {
+          final response = await provider.saveContactSettings();
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                response.isSuccess
+                    ? (response.message.isNotEmpty
+                        ? response.message
+                        : 'Contact display status updated')
+                    : (response.message.isNotEmpty
+                        ? response.message
+                        : 'Unable to update contact display status'),
+              ),
+            ),
+          );
+          return;
+        }
       },
     );
   }

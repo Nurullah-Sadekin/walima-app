@@ -3,6 +3,7 @@ import 'package:flutter_boilerplate/core/global/models/filter_model.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/account_settings.dart';
+import 'package:flutter_boilerplate/features/account_setting/data/models/contact_settings.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/repository/account_settings_repository.dart';
 
 class AccountSettingProvider extends BaseChangeNotifier {
@@ -26,6 +27,12 @@ class AccountSettingProvider extends BaseChangeNotifier {
   bool isAccountSaving = false;
   String? accountError;
 
+  bool isContactLoading = false;
+  bool isContactSaving = false;
+  String? contactError;
+  ContactSettings? contactSettings;
+  String? selectedContactDisplayStatus;
+
 
   List<Filter> timelineDataList = [
     Filter(label: '1 Week', value: '1_week'),
@@ -39,10 +46,10 @@ class AccountSettingProvider extends BaseChangeNotifier {
     Filter(label: 'Reason not mentioned here', value: 'test'),
   ];
   List<Filter> contactDisplayStatus = [
-    Filter(label: 'Only Premium Members', value: 'test'),
-    Filter(label: 'Only Premium Members you like', value: 'test'),
-    Filter(label: 'No one (Matches won\'t be able to cal you)', value: 'test'),
-    Filter(label: 'Only visible to all you Matches (Expires with Membership)', value: 'test'),
+    Filter(label: 'Only Premium Members', value: 'only_premium_members'),
+    Filter(label: 'Only Premium Members you like', value: 'only_premium_members_i_like'),
+    Filter(label: 'No one (Matches won\'t be able to cal you)', value: 'no_one'),
+    Filter(label: 'Only visible to all you Matches (Expires with Membership)', value: 'all_matches'),
   ];
 
 
@@ -79,6 +86,59 @@ class AccountSettingProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> loadContactSettings() async {
+    isContactLoading = true;
+    contactError = null;
+    notifyListeners();
+
+    final response = await AccountSettingsRepository.getContactSettings();
+
+    if (response.isSuccess && response.data != null) {
+      contactSettings = response.data;
+      selectedContactDisplayStatus = response.data?.contactDisplayStatus;
+    } else {
+      contactError = response.message;
+    }
+
+    isContactLoading = false;
+    notifyListeners();
+  }
+
+  int? get selectedContactDisplayStatusIndex {
+    final status = selectedContactDisplayStatus;
+    if (status == null || status.isEmpty) return null;
+    final idx =
+        contactDisplayStatus.indexWhere((item) => item.value == status);
+    return idx >= 0 ? idx : null;
+  }
+
+  void selectContactDisplayStatusByIndex(int index) {
+    if (!_isValidIndex(index, contactDisplayStatus.length)) return;
+    selectedContactDisplayStatus = contactDisplayStatus[index].value;
+    notifyListeners();
+  }
+
+  Future<ApiResponse> saveContactSettings() async {
+    final status = selectedContactDisplayStatus;
+    if (status == null || status.isEmpty) {
+      return ApiResponse.error(
+        message: 'Please select a contact display status',
+        statusCode: 0,
+      );
+    }
+
+    isContactSaving = true;
+    notifyListeners();
+
+    final response =
+        await AccountSettingsRepository.updateContactDisplayStatus(status);
+
+    isContactSaving = false;
+    notifyListeners();
+
+    return response;
+  }
+
   Future<ApiResponse> saveAccountSettings() async {
     isAccountSaving = true;
     notifyListeners();
@@ -89,8 +149,7 @@ class AccountSettingProvider extends BaseChangeNotifier {
       email: emailController.text.trim(),
     );
 
-    final response =
-        await AccountSettingsRepository.updateAccountSettings(settings);
+    final response = await AccountSettingsRepository.updateAccountSettings(settings);
 
     isAccountSaving = false;
     notifyListeners();
