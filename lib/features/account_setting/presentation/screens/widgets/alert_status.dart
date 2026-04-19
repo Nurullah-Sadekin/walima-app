@@ -36,8 +36,8 @@ class AlertStatus extends StatelessWidget {
                   backgroundColor: AppColors.primaryVariant,
                   child: ShowImage(
                     imagePath: imagePath ?? AppImages.emailSvgIcon,
-                    width: 18,
-                    height: 18,
+                    width: TextSize.font18(context),
+                    height: TextSize.font18(context),
                     color: AppColors.primary,
                   ),
                 ),

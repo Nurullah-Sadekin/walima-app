@@ -156,6 +156,7 @@ class AppImages {
   static const String photoGuidelinesSvg = 'assets/svgs/photo_guidelines.svg';
   static const String loginBgSvg = 'assets/svgs/login_bg.svg';
   static const String walimaSvg = 'assets/svgs/walima.svg';
+  static const String walimaIcon = 'assets/svgs/walima_icon.svg';
 
   // Navigation icons
   static const String home = 'assets/nav_icons/home.svg';

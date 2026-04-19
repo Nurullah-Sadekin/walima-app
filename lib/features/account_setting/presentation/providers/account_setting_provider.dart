@@ -156,7 +156,7 @@ class AccountSettingProvider extends BaseChangeNotifier {
     ),
     NotificationAlertCategory(
       title: 'Walima Specials',
-      imagePath: AppImages.walimaSvg,
+      imagePath: AppImages.walimaIcon,
       apiKeys: 'walimaSpecials',
       options: [
         NotificationAlertOption(
@@ -166,7 +166,7 @@ class AccountSettingProvider extends BaseChangeNotifier {
     ),
     NotificationAlertCategory(
       title: 'Walima Insite',
-      imagePath: AppImages.walimaSvg,
+      imagePath: AppImages.walimaIcon,
       apiKeys: 'walimaInsite',
       options: [
         NotificationAlertOption(label: 'Monthly', value: 'monthly'),
