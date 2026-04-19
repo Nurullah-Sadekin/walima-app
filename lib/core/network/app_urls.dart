@@ -280,4 +280,8 @@ class AppUrls {
   static const String getAllPlans = '$baseUrl/plans'; //POST
 
   static const String getPlanById = '$baseUrl/plans/{planId}'; //GET
+
+
+  //------  Account Settings ------
+  static const String updateNameAndEmail = '$baseUrl/settings/account'; //GET
 }

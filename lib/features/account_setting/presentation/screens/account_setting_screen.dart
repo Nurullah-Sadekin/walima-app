@@ -82,6 +82,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     switch (_step) {
       case AccountSettingStep.accountSetting:
         return _overviewBody(provider);
+     case AccountSettingStep.nameAndEmail:
+        return _nameAndEmail();
       case AccountSettingStep.smsOrEmailAlerts:
         return _emailOrSmsAlerts();
       case AccountSettingStep.premiumMembership:
@@ -107,6 +109,11 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
         children: [
           const SizedBox(
             height: 1,
+          ),
+          ProfileActionTile(
+            iconImagePath: AppImages.editSvgIcon,
+            title: 'Name And Email Update',
+            onTap: () => setState(() => _step = AccountSettingStep.nameAndEmail),
           ),
           ProfileActionTile(
             iconImagePath: AppImages.notificationSvgIcon,
@@ -593,6 +600,40 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     );
   }
 
+  Widget _nameAndEmail() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      spacing: 16,
+      children: [
+        PrimaryTextField(
+          controller: provider.newPasswordController,
+          headLine: 'First Name',
+          hintText: 'Enter new password',
+          noPrefix: true,
+          errorText: provider.newPasswordError,
+          onTap: () {},
+        ),
+        PrimaryTextField(
+          controller: provider.confirmPasswordController,
+          headLine: 'Last Name',
+          hintText: 'Enter confirm password',
+          noPrefix: true,
+          errorText: provider.confirmPasswordError,
+          onTap: () {},
+        ),
+        PrimaryTextField(
+          controller: provider.confirmPasswordController,
+          headLine: 'Email Address',
+          hintText: 'Enter confirm password',
+          noPrefix: true,
+          errorText: provider.confirmPasswordError,
+          onTap: () {},
+        ),
+      ],
+    );
+  }
+
   Widget _setPassword() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -738,6 +779,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     switch (step) {
       case AccountSettingStep.accountSetting:
         return 'Account Setting';
+      case AccountSettingStep.nameAndEmail:
+        return 'Name And Email Update';
       case AccountSettingStep.smsOrEmailAlerts:
         return 'Email/SMS Alerts';
       case AccountSettingStep.premiumMembership:
@@ -758,6 +801,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
 
 enum AccountSettingStep {
   accountSetting,
+  nameAndEmail,
   smsOrEmailAlerts,
   premiumMembership,
   privacyOptions,
