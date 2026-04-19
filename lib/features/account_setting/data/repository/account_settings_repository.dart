@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/core/network/dio_client.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/account_settings.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/contact_settings.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/messages_settings.dart';
+import 'package:flutter_boilerplate/features/account_setting/data/models/notification_settings.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/premium_settings.dart';
 
 class AccountSettingsRepository {
@@ -170,6 +171,31 @@ class AccountSettingsRepository {
 
       return ApiResponse.success(
         data: MessagesSettings.fromAny(response.data),
+        message: response.message,
+        statusCode: response.statusCode,
+      );
+    } catch (e) {
+      return _mapError(e);
+    }
+  }
+
+  static Future<ApiResponse<NotificationSettings>>
+      getNotificationSettings() async {
+    try {
+      final response = await DioClient().get(
+        AppUrls.getNotificationSettings,
+        isTokenRequired: true,
+      );
+
+      if (!response.isSuccess) {
+        return ApiResponse.error(
+          message: response.message,
+          statusCode: response.statusCode,
+        );
+      }
+
+      return ApiResponse.success(
+        data: NotificationSettings.fromAny(response.data),
         message: response.message,
         statusCode: response.statusCode,
       );

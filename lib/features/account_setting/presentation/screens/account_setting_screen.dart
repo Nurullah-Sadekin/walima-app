@@ -138,8 +138,10 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           ProfileActionTile(
             iconImagePath: AppImages.notificationSvgIcon,
             title: 'Email/SMS Alerts',
-            onTap: () =>
-                setState(() => _step = AccountSettingStep.smsOrEmailAlerts),
+            onTap: () {
+              setState(() => _step = AccountSettingStep.smsOrEmailAlerts);
+              provider.loadNotificationSettings();
+            },
           ),
           ProfileActionTile(
             iconImagePath: AppImages.messages,
@@ -606,92 +608,31 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
   }
 
   Widget _emailOrSmsAlerts() {
+    if (provider.isNotificationsLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         spacing: 8,
         children: [
-          AlertStatus(
-            title: 'Match Mail & Photo Match Mail',
-            alertStatusList: [
-              AlertStatusItem(label: 'Daily', isSelected: true),
-              AlertStatusItem(label: 'Tri-Weekly', isSelected: false),
-              AlertStatusItem(label: 'Weekly', isSelected: false),
-              AlertStatusItem(label: 'Unsubscribe', isSelected: false),
-            ],
-            onStatusTap: (index) {},
-          ),
-          AlertStatus(
-            alertStatusList: [
-              AlertStatusItem(label: 'Weekly', isSelected: true),
-              AlertStatusItem(label: 'Unsubscribe', isSelected: false),
-            ],
-            onStatusTap: (index) {},
-          ),
-          AlertStatus(
-            title: 'Recent Visitors Email',
-            alertStatusList: [
-              AlertStatusItem(label: 'Weekly', isSelected: true),
-              AlertStatusItem(label: 'Unsubscribe', isSelected: false),
-            ],
-            onStatusTap: (index) {},
-          ),
-          AlertStatus(
-            title: 'Members Who Shortlisted You Email',
-            alertStatusList: [
-              AlertStatusItem(label: 'Weekly', isSelected: true),
-              AlertStatusItem(label: 'Unsubscribe', isSelected: false),
-            ],
-            onStatusTap: (index) {},
-          ),
-          AlertStatus(
-            title: 'Viewed Profile Email',
-            alertStatusList: [
-              AlertStatusItem(label: 'Weekly', isSelected: true),
-              AlertStatusItem(label: 'Unsubscribe', isSelected: false),
-            ],
-            onStatusTap: (index) {},
-          ),
-          AlertStatus(
-            title: 'Similar Profiles Email',
-            alertStatusList: [
-              AlertStatusItem(label: 'Weekly', isSelected: true),
-              AlertStatusItem(label: 'Unsubscribe', isSelected: false),
-            ],
-            onStatusTap: (index) {},
-          ),
-          AlertStatus(
-            title: 'Contact Alert',
-            alertStatusList: [
-              AlertStatusItem(
-                  label: 'Instant-Email for every reply', isSelected: true),
-              AlertStatusItem(
-                  label: 'Daily - All responses', isSelected: false),
-              AlertStatusItem(label: 'Unsubscribe', isSelected: false),
-            ],
-            onStatusTap: (index) {},
-          ),
-          AlertStatus(
-            title: 'Walima.com Profile Blaster',
-            alertStatusList: [
-              AlertStatusItem(label: 'Subscribe', isSelected: true),
-              AlertStatusItem(label: 'Unsubscribe', isSelected: false),
-            ],
-            onStatusTap: (index) {},
-          ),
-          AlertStatus(
-            title: 'Walima Specials',
-            alertStatusList: [
-              AlertStatusItem(
-                  label: 'Occasionally - Max twice a month', isSelected: true),
-              AlertStatusItem(label: 'Unsubscribe', isSelected: false),
-            ],
-            onStatusTap: (index) {},
-          ),
-          const SizedBox(
-            height: 60,
-          )
+          for (final category in provider.notificationCategories)
+            AlertStatus(
+              title: category.title,
+              alertStatusList: category.options
+                  .map(
+                    (option) => AlertStatusItem(
+                      label: option.label,
+                      isSelected:
+                          provider.isOptionSelected(category, option),
+                    ),
+                  )
+                  .toList(),
+              onStatusTap: (index) {},
+            ),
+          const SizedBox(height: 60),
         ],
       ),
     );

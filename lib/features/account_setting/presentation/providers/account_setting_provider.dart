@@ -5,8 +5,26 @@ import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/account_settings.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/contact_settings.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/messages_settings.dart';
+import 'package:flutter_boilerplate/features/account_setting/data/models/notification_settings.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/premium_settings.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/repository/account_settings_repository.dart';
+
+class NotificationAlertOption {
+  const NotificationAlertOption({required this.label, required this.value});
+  final String label;
+  final String value;
+}
+
+class NotificationAlertCategory {
+  const NotificationAlertCategory({
+    this.title,
+    required this.apiKeys,
+    required this.options,
+  });
+  final String? title;
+  final List<String> apiKeys;
+  final List<NotificationAlertOption> options;
+}
 
 class AccountSettingProvider extends BaseChangeNotifier {
   AccountSettingProvider();
@@ -47,6 +65,175 @@ class AccountSettingProvider extends BaseChangeNotifier {
   bool isMessagesSaving = false;
   String? messagesError;
   MessagesSettings? messagesSettings;
+
+  bool isNotificationsLoading = false;
+  String? notificationsError;
+  NotificationSettings? notificationSettings;
+
+  final List<NotificationAlertCategory> notificationCategories = const [
+    NotificationAlertCategory(
+      title: 'Match Mail & Photo Match Mail',
+      apiKeys: [
+        'matchMailFrequency',
+        'match_mail_frequency',
+        'matchMail',
+        'match_mail',
+      ],
+      options: [
+        NotificationAlertOption(label: 'Daily', value: 'daily'),
+        NotificationAlertOption(label: 'Tri-Weekly', value: 'tri_weekly'),
+        NotificationAlertOption(label: 'Weekly', value: 'weekly'),
+        NotificationAlertOption(label: 'Unsubscribe', value: 'unsubscribe'),
+      ],
+    ),
+    NotificationAlertCategory(
+      apiKeys: [
+        'photoMatchMailFrequency',
+        'photo_match_mail_frequency',
+        'photoMatchMail',
+        'photo_match_mail',
+      ],
+      options: [
+        NotificationAlertOption(label: 'Weekly', value: 'weekly'),
+        NotificationAlertOption(label: 'Unsubscribe', value: 'unsubscribe'),
+      ],
+    ),
+    NotificationAlertCategory(
+      title: 'Recent Visitors Email',
+      apiKeys: [
+        'recentVisitorsFrequency',
+        'recent_visitors_frequency',
+        'recentVisitors',
+        'recent_visitors',
+      ],
+      options: [
+        NotificationAlertOption(label: 'Weekly', value: 'weekly'),
+        NotificationAlertOption(label: 'Unsubscribe', value: 'unsubscribe'),
+      ],
+    ),
+    NotificationAlertCategory(
+      title: 'Members Who Shortlisted You Email',
+      apiKeys: [
+        'shortlistedYouFrequency',
+        'shortlisted_you_frequency',
+        'membersWhoShortlistedFrequency',
+        'members_who_shortlisted_frequency',
+        'shortlistedYou',
+        'shortlisted_you',
+        'membersWhoShortlisted',
+        'members_who_shortlisted',
+      ],
+      options: [
+        NotificationAlertOption(label: 'Weekly', value: 'weekly'),
+        NotificationAlertOption(label: 'Unsubscribe', value: 'unsubscribe'),
+      ],
+    ),
+    NotificationAlertCategory(
+      title: 'Viewed Profile Email',
+      apiKeys: [
+        'viewedProfileFrequency',
+        'viewed_profile_frequency',
+        'viewedProfile',
+        'viewed_profile',
+      ],
+      options: [
+        NotificationAlertOption(label: 'Weekly', value: 'weekly'),
+        NotificationAlertOption(label: 'Unsubscribe', value: 'unsubscribe'),
+      ],
+    ),
+    NotificationAlertCategory(
+      title: 'Similar Profiles Email',
+      apiKeys: [
+        'similarProfilesFrequency',
+        'similar_profiles_frequency',
+        'similarProfiles',
+        'similar_profiles',
+      ],
+      options: [
+        NotificationAlertOption(label: 'Weekly', value: 'weekly'),
+        NotificationAlertOption(label: 'Unsubscribe', value: 'unsubscribe'),
+      ],
+    ),
+    NotificationAlertCategory(
+      title: 'Contact Alert',
+      apiKeys: [
+        'contactAlertFrequency',
+        'contact_alert_frequency',
+        'contactAlert',
+        'contact_alert',
+      ],
+      options: [
+        NotificationAlertOption(
+            label: 'Instant-Email for every reply', value: 'instant'),
+        NotificationAlertOption(label: 'Daily - All responses', value: 'daily'),
+        NotificationAlertOption(label: 'Unsubscribe', value: 'unsubscribe'),
+      ],
+    ),
+    NotificationAlertCategory(
+      title: 'Walima.com Profile Blaster',
+      apiKeys: [
+        'profileBlasterFrequency',
+        'profile_blaster_frequency',
+        'profileBlaster',
+        'profile_blaster',
+      ],
+      options: [
+        NotificationAlertOption(label: 'Subscribe', value: 'subscribe'),
+        NotificationAlertOption(label: 'Unsubscribe', value: 'unsubscribe'),
+      ],
+    ),
+    NotificationAlertCategory(
+      title: 'Walima Specials',
+      apiKeys: [
+        'walimaSpecialsFrequency',
+        'walima_specials_frequency',
+        'specialsFrequency',
+        'specials_frequency',
+        'walimaSpecials',
+        'walima_specials',
+        'specials',
+      ],
+      options: [
+        NotificationAlertOption(
+            label: 'Occasionally - Max twice a month', value: 'occasionally'),
+        NotificationAlertOption(label: 'Unsubscribe', value: 'unsubscribe'),
+      ],
+    ),
+  ];
+
+  Future<void> loadNotificationSettings() async {
+    isNotificationsLoading = true;
+    notificationsError = null;
+    notifyListeners();
+
+    final response = await AccountSettingsRepository.getNotificationSettings();
+
+    if (response.isSuccess && response.data != null) {
+      notificationSettings = response.data;
+    } else {
+      notificationsError = response.message;
+    }
+
+    isNotificationsLoading = false;
+    notifyListeners();
+  }
+
+  /// Returns the currently-selected option value for [category] from the
+  /// loaded API response (lower-cased), or null if not set.
+  String? selectedValueFor(NotificationAlertCategory category) {
+    return notificationSettings?.valueOf(category.apiKeys);
+  }
+
+  /// Whether [option] is the selected one for [category] based on the API
+  /// response (compares option.value case-insensitively).
+  bool isOptionSelected(
+    NotificationAlertCategory category,
+    NotificationAlertOption option,
+  ) {
+    final current = selectedValueFor(category);
+    if (current == null) return false;
+    return current == option.value.trim().toLowerCase();
+  }
 
   Future<ApiResponse> saveMessagesSettings() async {
     isMessagesSaving = true;
@@ -127,7 +314,6 @@ class AccountSettingProvider extends BaseChangeNotifier {
     Filter(label: 'No one (Matches won\'t be able to cal you)', value: 'no_one'),
     Filter(label: 'Only visible to all you Matches (Expires with Membership)', value: 'all_matches'),
   ];
-
 
 
   bool _isValidIndex(int index, int length) => index >= 0 && index < length;
