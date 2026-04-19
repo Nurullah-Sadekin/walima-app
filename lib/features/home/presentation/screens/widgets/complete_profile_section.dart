@@ -113,7 +113,7 @@ class _CompleteProfileTileData {
         return _profileEditTile(
           title: title,
           statusText: statusText,
-          iconImagePath: AppImages.premiumSvgIcon,
+          iconImagePath: AppImages.userLoveSvgIcon,
           section: _preferenceSectionForField(fieldKey),
         );
       case 'basic_profile':
@@ -162,7 +162,7 @@ class _CompleteProfileTileData {
         return _profileEditTile(
           title: title,
           statusText: statusText,
-          iconImagePath: AppImages.familyDetails,
+          iconImagePath: AppImages.groupsIcon,
           section: ProfileEditSection.familyDetails,
         );
       case 'lifestyle':
@@ -191,7 +191,7 @@ class _CompleteProfileTileData {
         return _profileEditTile(
           title: title,
           statusText: statusText,
-          iconImagePath: AppImages.favouriteIcon,
+          iconImagePath: AppImages.habitsSvgIcon,
           section: ProfileEditSection.hobbiesInterests,
         );
       default:

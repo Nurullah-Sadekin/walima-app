@@ -13,7 +13,7 @@ class VerificationTile extends StatelessWidget {
     required this.statusColor,
     required this.statusBackgroundColor,
     this.onTap,
-    this.iconSize = 30,
+    this.iconSize = 26,
     this.statusFontSize = 10,
     this.padding = const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
     this.backgroundColor = AppColors.white,
@@ -68,6 +68,7 @@ class VerificationTile extends StatelessWidget {
                   imagePath: iconImagePath,
                   width: iconSize,
                   height: iconSize,
+                  color: AppColors.primary,
                 ),
                 // Title
                 Text(
