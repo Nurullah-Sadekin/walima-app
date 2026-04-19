@@ -275,7 +275,7 @@ class _LimitOverState extends State<LimitOver> {
             value,
             style: TextStyle(
               color: AppColors.textPrimaryLight,
-              fontSize: TextSize.font28(context),
+              fontSize: TextSize.font20(context),
               fontWeight: FontWeight.w700,
             ),
           ),
