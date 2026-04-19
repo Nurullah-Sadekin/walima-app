@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/core/network/dio_client.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/account_settings.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/contact_settings.dart';
+import 'package:flutter_boilerplate/features/account_setting/data/models/messages_settings.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/premium_settings.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/repository/account_settings_repository.dart';
 
@@ -41,6 +42,57 @@ class AccountSettingProvider extends BaseChangeNotifier {
   String messageOnConnect = '';
   String messageOnAccept = '';
   String messageOnRemind = '';
+
+  bool isMessagesLoading = false;
+  bool isMessagesSaving = false;
+  String? messagesError;
+  MessagesSettings? messagesSettings;
+
+  Future<ApiResponse> saveMessagesSettings() async {
+    isMessagesSaving = true;
+    notifyListeners();
+
+    final payload = MessagesSettings(
+      autoMessageOnConnect: autoMessageConnect ?? false,
+      messageOnConnect: messageOnConnect,
+      messageOnAccept: messageOnAccept,
+      messageOnRemind: messageOnRemind,
+    );
+
+    final response =
+        await AccountSettingsRepository.updateMessagesSettings(payload);
+
+    if (response.isSuccess) {
+      messagesSettings = payload;
+    }
+
+    isMessagesSaving = false;
+    notifyListeners();
+
+    return response;
+  }
+
+  Future<void> loadMessagesSettings() async {
+    isMessagesLoading = true;
+    messagesError = null;
+    notifyListeners();
+
+    final response = await AccountSettingsRepository.getMessagesSettings();
+
+    if (response.isSuccess && response.data != null) {
+      final data = response.data!;
+      messagesSettings = data;
+      autoMessageConnect = data.autoMessageOnConnect ?? autoMessageConnect;
+      messageOnConnect = data.messageOnConnect ?? messageOnConnect;
+      messageOnAccept = data.messageOnAccept ?? messageOnAccept;
+      messageOnRemind = data.messageOnRemind ?? messageOnRemind;
+    } else {
+      messagesError = response.message;
+    }
+
+    isMessagesLoading = false;
+    notifyListeners();
+  }
 
   void setMessageOnConnect(String value) {
     messageOnConnect = value;

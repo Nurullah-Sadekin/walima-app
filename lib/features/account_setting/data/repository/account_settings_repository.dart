@@ -3,6 +3,7 @@ import 'package:flutter_boilerplate/core/network/app_urls.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/account_settings.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/contact_settings.dart';
+import 'package:flutter_boilerplate/features/account_setting/data/models/messages_settings.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/premium_settings.dart';
 
 class AccountSettingsRepository {
@@ -133,6 +134,45 @@ class AccountSettingsRepository {
         data: <String, dynamic>{'autoRenew': autoRenew},
       );
       return _withApiMessage(response);
+    } catch (e) {
+      return _mapError(e);
+    }
+  }
+
+  static Future<ApiResponse> updateMessagesSettings(
+    MessagesSettings settings,
+  ) async {
+    try {
+      final response = await DioClient().put(
+        AppUrls.messagesSettings,
+        isTokenRequired: true,
+        data: settings.toRequestJson(),
+      );
+      return _withApiMessage(response);
+    } catch (e) {
+      return _mapError(e);
+    }
+  }
+
+  static Future<ApiResponse<MessagesSettings>> getMessagesSettings() async {
+    try {
+      final response = await DioClient().get(
+        AppUrls.messagesSettings,
+        isTokenRequired: true,
+      );
+
+      if (!response.isSuccess) {
+        return ApiResponse.error(
+          message: response.message,
+          statusCode: response.statusCode,
+        );
+      }
+
+      return ApiResponse.success(
+        data: MessagesSettings.fromAny(response.data),
+        message: response.message,
+        statusCode: response.statusCode,
+      );
     } catch (e) {
       return _mapError(e);
     }

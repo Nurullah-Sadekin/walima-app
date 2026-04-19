@@ -285,5 +285,6 @@ class AppUrls {
   //------  Account Settings ------
   static const String updateNameAndEmail = '$baseUrl/settings/account'; //GET
   static const String contactSettings = '$baseUrl/settings/contact'; //GET, PUT
-  static const String premiumSettings = '$baseUrl/settings/premium'; //GET
+  static const String premiumSettings = '$baseUrl/settings/premium'; //GET, PUT
+  static const String messagesSettings = '$baseUrl/settings/messages'; //GET
 }

@@ -144,7 +144,10 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           ProfileActionTile(
             iconImagePath: AppImages.messages,
             title: 'Messages',
-            onTap: () => setState(() => _step = AccountSettingStep.message),
+            onTap: () {
+              setState(() => _step = AccountSettingStep.message);
+              provider.loadMessagesSettings();
+            },
           ),
           ProfileActionTile(
             iconImagePath: AppImages.lockPasswordSvgIcon,
@@ -533,6 +536,9 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
   }
 
   Widget _messages() {
+    if (provider.isMessagesLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -552,48 +558,45 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
         ),
         InfoTile(
           title: 'Message on Connect',
-          subtitle: provider.messageOnConnect.isNotEmpty
-              ? provider.messageOnConnect
-              : 'This message is sent with your Connect Request when auto-message is enable',
+          subtitle:  'This message is sent with your Connect Request when auto-message is enable',
           leadingImagePath: AppImages.contactPreview,
           showTrailingImage: true,
           showLeadingImage: false,
           borderRadius: 8,
           padding: const EdgeInsets.all(16),
           onTap: () => _openMessageEditor(
-            title: 'Message on Connect',
+            title: 'Edit Connect Message',
+            subtitle: 'Customize the sent to other members automatically',
             initialValue: provider.messageOnConnect,
             onSave: provider.setMessageOnConnect,
           ),
         ),
         InfoTile(
           title: 'Message on Accept',
-          subtitle: provider.messageOnAccept.isNotEmpty
-              ? provider.messageOnAccept
-              : 'This message is sent to members upon accepting their Connect request',
+          subtitle:'This message is sent to members upon accepting their Connect request',
           leadingImagePath: AppImages.contactPreview,
           showTrailingImage: true,
           showLeadingImage: false,
           borderRadius: 8,
           padding: const EdgeInsets.all(16),
           onTap: () => _openMessageEditor(
-            title: 'Message on Accept',
+            title: 'Edit Accept Message',
+            subtitle: 'Customize the sent to other members automatically',
             initialValue: provider.messageOnAccept,
             onSave: provider.setMessageOnAccept,
           ),
         ),
         InfoTile(
           title: 'Message on Remind',
-          subtitle: provider.messageOnRemind.isNotEmpty
-              ? provider.messageOnRemind
-              : 'This message is sent to members when you send them a reminder',
+          subtitle:  'This message is sent to members when you send them a reminder',
           leadingImagePath: AppImages.contactPreview,
           showTrailingImage: true,
           showLeadingImage: false,
           borderRadius: 8,
           padding: const EdgeInsets.all(16),
           onTap: () => _openMessageEditor(
-            title: 'Message on Remind',
+            title: 'Edit Remind Message',
+            subtitle: 'Customize the sent to other members automatically',
             initialValue: provider.messageOnRemind,
             onSave: provider.setMessageOnRemind,
           ),
@@ -865,7 +868,9 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     }
 
     final isNameAndEmail = _step == AccountSettingStep.nameAndEmail;
-    final isSaving = isNameAndEmail && provider.isAccountSaving;
+    final isMessages = _step == AccountSettingStep.message;
+    final isSaving = (isNameAndEmail && provider.isAccountSaving) ||
+        (isMessages && provider.isMessagesSaving);
 
     return PrimaryButtons(
       buttonStyle: isSaving
@@ -877,6 +882,13 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
 
         if (isNameAndEmail) {
           final response = await provider.saveAccountSettings();
+          if (!mounted) return;
+          _showResponseSnackBar(response);
+          return;
+        }
+
+        if (isMessages) {
+          final response = await provider.saveMessagesSettings();
           if (!mounted) return;
           _showResponseSnackBar(response);
           return;
@@ -910,6 +922,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
 
   Future<void> _openMessageEditor({
     required String title,
+    String? subtitle,
     required String initialValue,
     required ValueChanged<String> onSave,
   }) async {
@@ -917,6 +930,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
       context: context,
       builder: (dialogContext) => _MessageEditDialog(
         title: title,
+        subtitle: subtitle,
         initialValue: initialValue,
       ),
     );
@@ -1011,7 +1025,7 @@ class _MessageEditDialogState extends State<_MessageEditDialog> {
               const SizedBox(height: 8,),
               PrimaryTextField(
                 controller: _controller,
-                hintText: 'Enter your message',
+                hintText: 'Type your message here...',
                 noPrefix: true,
                 maxLine: 5,
                 minLine: 4,
