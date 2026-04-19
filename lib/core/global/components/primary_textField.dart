@@ -18,7 +18,7 @@ class PrimaryTextField extends StatefulWidget {
     this.headLine,
     this.keyboardType,
     this.obscureText,
-    required this.errorText,
+    this.errorText,
     this.onChanged,
     this.minLine,
     this.isCountryDropdown = false,
@@ -39,7 +39,7 @@ class PrimaryTextField extends StatefulWidget {
   });
 
   final TextEditingController? controller;
-  final dynamic errorText;
+  final String? errorText;
   final bool isCountryDropdown;
   final VoidCallback? onTap;
   final EdgeInsetsGeometry? contentPadding;
