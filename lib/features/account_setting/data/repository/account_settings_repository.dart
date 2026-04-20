@@ -243,6 +243,25 @@ class AccountSettingsRepository {
     }
   }
 
+  static Future<ApiResponse> createPassword(
+    String newPassword,
+    String confirmPassword,
+  ) async {
+    try {
+      final response = await DioClient().post(
+        AppUrls.createPassword,
+        isTokenRequired: true,
+        data: <String, dynamic>{
+          'newPassword': newPassword,
+          'confirmPassword': confirmPassword,
+        },
+      );
+      return _withApiMessage(response);
+    } catch (e) {
+      return _mapError(e);
+    }
+  }
+
   static ApiResponse _withApiMessage(ApiResponse response) {
     final apiMessage = _extractMessage(response.data);
     if (apiMessage == null || apiMessage.isEmpty) return response;

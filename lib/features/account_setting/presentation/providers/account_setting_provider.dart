@@ -30,7 +30,9 @@ class NotificationAlertCategory {
 }
 
 class AccountSettingProvider extends BaseChangeNotifier {
-  AccountSettingProvider();
+  AccountSettingProvider() {
+    _setupListeners();
+  }
   final TextEditingController currentPasswordController = TextEditingController();
   final TextEditingController newPasswordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
@@ -478,7 +480,7 @@ class AccountSettingProvider extends BaseChangeNotifier {
     return response;
   }
 
-  Future<ApiResponse> changePassword() async {
+  Future<ApiResponse> changePassword(bool hasPassword) async {
     final currentPassword = currentPasswordController.text.trim();
     final newPassword = newPasswordController.text.trim();
     final confirmPassword = confirmPasswordController.text.trim();
@@ -491,16 +493,34 @@ class AccountSettingProvider extends BaseChangeNotifier {
 
     // Validation
     bool hasError = false;
-    if (currentPassword.isEmpty) {
+    if (hasPassword && currentPassword.isEmpty) {
       currentPasswordError = 'Current password is required';
       hasError = true;
     }
     if (newPassword.isEmpty) {
       newPasswordError = 'New password is required';
       hasError = true;
-    } else if (newPassword.length < 8) {
-      newPasswordError = 'Password must be at least 8 characters';
-      hasError = true;
+    } else {
+      final errors = <String>[];
+      if (newPassword.length < 8) {
+        errors.add('At least 8 characters');
+      }
+      if (!RegExp(r'[A-Z]').hasMatch(newPassword)) {
+        errors.add('Uppercase letter');
+      }
+      if (!RegExp(r'[a-z]').hasMatch(newPassword)) {
+        errors.add('Lowercase letter');
+      }
+      if (!RegExp(r'[0-9]').hasMatch(newPassword)) {
+        errors.add('At least one number');
+      }
+      if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(newPassword)) {
+        errors.add('At least one special character');
+      }
+      if (errors.isNotEmpty) {
+        newPasswordError = 'Missing: ${errors.join(', ')}';
+        hasError = true;
+      }
     }
     if (confirmPassword.isEmpty) {
       confirmPasswordError = 'Confirm password is required';
@@ -518,11 +538,16 @@ class AccountSettingProvider extends BaseChangeNotifier {
     isPasswordChanging = true;
     notifyListeners();
 
-    final response = await AccountSettingsRepository.changePassword(
-      currentPassword,
-      newPassword,
-      confirmPassword,
-    );
+    final response = hasPassword
+        ? await AccountSettingsRepository.changePassword(
+            currentPassword,
+            newPassword,
+            confirmPassword,
+          )
+        : await AccountSettingsRepository.createPassword(
+            newPassword,
+            confirmPassword,
+          );
 
     if (response.isSuccess) {
       // Clear controllers on success
@@ -539,6 +564,73 @@ class AccountSettingProvider extends BaseChangeNotifier {
     return response;
   }
 
+  void _setupListeners() {
+    // Add listeners for real-time validation or other purposes
+    currentPasswordController.addListener(() {
+      if (currentPasswordController.text.isNotEmpty) {
+        currentPasswordError = '';
+        notifyListeners();
+      }
+    });
+    newPasswordController.addListener(() {
+      _validateNewPassword();
+      _validateConfirmPassword();
+    });
+    confirmPasswordController.addListener(() {
+      _validateConfirmPassword();
+    });
+
+    firstNameController.addListener(() {
+      // Handle first name changes
+    });
+    lastNameController.addListener(() {
+      // Handle last name changes
+    });
+    emailController.addListener(() {
+      // Handle email changes
+    });
+  }
+
+  void _validateNewPassword() {
+    final password = newPasswordController.text;
+    if (password.isEmpty) {
+      newPasswordError = '';
+      return;
+    }
+    final errors = <String>[];
+    if (password.length < 8) {
+      errors.add('At least 8 characters');
+    }
+    if (!RegExp(r'[A-Z]').hasMatch(password)) {
+      errors.add('Uppercase letter');
+    }
+    if (!RegExp(r'[a-z]').hasMatch(password)) {
+      errors.add('Lowercase letter');
+    }
+    if (!RegExp(r'[0-9]').hasMatch(password)) {
+      errors.add('At least one number');
+    }
+    if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password)) {
+      errors.add('At least one special character');
+    }
+    newPasswordError = errors.isNotEmpty ? 'Missing: ${errors.join(', ')}' : '';
+    notifyListeners();
+  }
+
+  void _validateConfirmPassword() {
+    final confirm = confirmPasswordController.text;
+    final newPass = newPasswordController.text;
+    if (confirm.isEmpty) {
+      confirmPasswordError = '';
+      return;
+    }
+    if (confirm != newPass) {
+      confirmPasswordError = 'Passwords do not match';
+    } else {
+      confirmPasswordError = '';
+    }
+    notifyListeners();
+  }
   @override
   void dispose() {
     currentPasswordController.dispose();

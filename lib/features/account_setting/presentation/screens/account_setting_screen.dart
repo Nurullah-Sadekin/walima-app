@@ -32,7 +32,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
   late AccountSettingProvider provider;
   AccountSettingStep _step = AccountSettingStep.accountSetting;
 
-  final bool hasPassword = GlobalProvider().currentUser?.hasPassword ?? false;
+  late final bool hasPassword = ref.read(globalProvider).currentUser?.hasPassword ?? false;
 
   @override
   void initState() {
@@ -969,9 +969,11 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           }
 
           if (isSetPassword) {
-            final response = await provider.changePassword();
+            final response = await provider.changePassword(hasPassword);
             if (!mounted) return;
-            _showResponseSnackBar(response);
+            if (response.isSuccess) {
+              _showResponseSnackBar(response);
+            }
             return;
           }
         },
