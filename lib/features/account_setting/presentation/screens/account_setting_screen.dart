@@ -5,6 +5,7 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
+import 'package:flutter_boilerplate/core/global/providers/global_provider.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
@@ -31,8 +32,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
   late AccountSettingProvider provider;
   AccountSettingStep _step = AccountSettingStep.accountSetting;
 
-
-  final bool hasPassword = true; // This should ideally come from user data
+  final bool hasPassword = GlobalProvider().currentUser?.hasPassword ?? false;
 
   @override
   void initState() {
