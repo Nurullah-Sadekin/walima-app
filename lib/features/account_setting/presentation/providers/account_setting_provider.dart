@@ -564,6 +564,14 @@ class AccountSettingProvider extends BaseChangeNotifier {
     return response;
   }
 
+  void clearPasswordErrors() {
+    currentPasswordError = '';
+    newPasswordError = '';
+    confirmPasswordError = '';
+    passwordChangeError = null;
+    notifyListeners();
+  }
+
   void _setupListeners() {
     // Add listeners for real-time validation or other purposes
     currentPasswordController.addListener(() {

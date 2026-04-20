@@ -156,7 +156,10 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           ProfileActionTile(
             iconImagePath: hasPassword ?  AppImages.editSvgIcon : AppImages.lockPasswordSvgIcon,
             title: hasPassword ? 'Change Password' : 'Set Password',
-            onTap: () => setState(() => _step = AccountSettingStep.setPassword),
+            onTap: () {
+              provider.clearPasswordErrors();
+              setState(() => _step = AccountSettingStep.setPassword);
+            },
             // Note: ProfileActionTile might need custom styling for the delete option
             // You may need to check if ProfileActionTile supports custom colors
           ),
