@@ -668,7 +668,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
         InfoTile(
           title: 'Show Activity Status',
           value: _formatPrivacyValue(settings.showActivityStatus == true ? 'enable' : 'disable'),
-          leadingImagePath: AppImages.contactPreview,
+          leadingImagePath: AppImages.cardView,
           showTrailingImage: true,
           showLeadingImage: true,
           onTap: () => _showPrivacyOptionDialog(
