@@ -10,11 +10,19 @@ import 'package:flutter_boilerplate/features/profile/presentation/screen/profile
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class CompleteProfileSection extends ConsumerWidget {
+class CompleteProfileSection extends ConsumerStatefulWidget {
   const CompleteProfileSection({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CompleteProfileSection> createState() =>
+      _CompleteProfileSectionState();
+}
+
+class _CompleteProfileSectionState extends ConsumerState<CompleteProfileSection> {
+  bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
     final provider = ref.watch(homeProvider);
     final profileStrength = provider.profileStrength;
     final completionPercentage = profileStrength?.overallScore ?? 0;
@@ -25,7 +33,7 @@ class CompleteProfileSection extends ConsumerWidget {
 
     if (provider.isLoadingProfileStrength && profileStrength == null) {
       return const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20),
+        padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
         child: Center(
           child: CircularProgressIndicator(color: AppColors.primary),
         ),
@@ -38,8 +46,11 @@ class CompleteProfileSection extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
+    final itemsToShow = _isExpanded ? incompleteItems : incompleteItems.take(2).toList();
+    final hasMoreItems = incompleteItems.length > 2;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -61,11 +72,12 @@ class CompleteProfileSection extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
-          ...List.generate(incompleteItems.length, (index) {
-            final item = incompleteItems[index];
+          if (incompleteItems.isNotEmpty)
+          ...List.generate(itemsToShow.length, (index) {
+            final item = itemsToShow[index];
             return Padding(
               padding: EdgeInsets.only(
-                bottom: index == incompleteItems.length - 1 ? 0 : 10,
+                bottom: index == itemsToShow.length - 1 ? 0 : 10,
               ),
               child: VerificationTile(
                 iconImagePath: item.iconImagePath,
@@ -77,6 +89,61 @@ class CompleteProfileSection extends ConsumerWidget {
               ),
             );
           }),
+
+          if (hasMoreItems && !_isExpanded)
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: InkWell(
+                onTap: () => setState(() => _isExpanded = true),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'See More',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontSize: TextSize.font14(context),
+                        fontWeight: FontWeight.w600,
+
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.expand_more,
+                      color: AppColors.primary,
+                      size: TextSize.font18(context),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          // Show "See Less" button if expanded
+          if (hasMoreItems && _isExpanded)
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: InkWell(
+                onTap: () => setState(() => _isExpanded = false),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'See Less',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontSize: TextSize.font14(context),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.expand_less,
+                      color: AppColors.primary,
+                      size: TextSize.font18(context),
+                    ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
     );
