@@ -5,7 +5,6 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
-import 'package:flutter_boilerplate/core/global/providers/global_provider.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
@@ -471,7 +470,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
       return Center(
         child: Text(
           'Error loading privacy settings: ${provider.privacyError}',
-          style: TextStyle(color: AppColors.error),
+          style: const TextStyle(color: AppColors.error),
         ),
       );
     }
@@ -497,8 +496,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             'Display Name',
             'displayNameFormat',
             settings.displayNameFormat ?? 'hide_first_name',
-            ['show_full_name', 'hide_first_name'],
-            ['Show Full Name', 'Hide First Name'],
+            ['show_full_name', 'hide_first_name', 'hide_last_name','hide_full_name'],
+            ['Show Full Name', 'Hide First Name', 'Hide Last Name','Hide Full Name'],
           ),
         ),
         InfoTile(
@@ -512,8 +511,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             'Photo Visibility',
             'photoVisibility',
             settings.photoVisibility ?? 'visible_to_liked_only',
-            ['visible_to_all', 'visible_to_liked_only', 'visible_to_premium'],
-            ['Visible to All', 'Visible to Liked Only', 'Visible to Premium'],
+            ['visible_to_all', 'visible_to_liked_only','visible_on_connect','visible_to_premium_and_liked'],
+            ['Visible to All', 'Visible to Liked Only','Visible on Connect','Visible to Premium and Liked'],
           ),
         ),
         InfoTile(
@@ -527,8 +526,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             'Album Photo Visibility',
             'albumPhotoVisibility',
             settings.albumPhotoVisibility ?? 'visible_to_liked_only',
-            ['visible_to_all', 'visible_to_liked_only', 'visible_to_premium'],
-            ['Visible to All', 'Visible to Liked Only', 'Visible to Premium'],
+            ['visible_to_all', 'visible_to_liked_only','visible_on_connect','visible_to_premium_and_liked'],
+            ['Visible to All', 'Visible to Liked Only','Visible on Connect','Visible to Premium and Liked'],
           ),
         ),
         InfoTile(
@@ -542,8 +541,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             'Phone Number Visibility',
             'phoneVisibility',
             settings.phoneVisibility ?? 'only_premium_members',
-            ['visible_to_all', 'only_premium_members', 'hide'],
-            ['Visible to All', 'Only Premium Members', 'Hide'],
+            ['only_premium_members', 'only_premium_members_i_like', 'no_one','all_matches'],
+            ['Only Premium Members', 'Only Premium Members I Like', 'No One','All Matches'],
           ),
         ),
         InfoTile(
@@ -557,8 +556,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             'Email Visibility',
             'emailVisibility',
             settings.emailVisibility ?? 'visible_to_all_premium_members',
-            ['visible_to_all', 'visible_to_all_premium_members', 'hide'],
-            ['Visible to All', 'Visible to Premium Members', 'Hide'],
+            ['visible_to_premium_and_wish_to_connect', 'visible_to_all_premium_members', 'hide_email_address','visible_to_all_matches'],
+            ['Visible to Premium and Wish to Connect', 'Visible to All Premium Members', 'Hide Email Address','Visible to All Matches'],
           ),
         ),
         InfoTile(
@@ -572,8 +571,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             'Date of Birth Display',
             'dobDisplay',
             settings.dobDisplay ?? 'full_dob',
-            ['show_age', 'full_dob', 'hide'],
-            ['Show Age', 'Show Full DOB', 'Hide'],
+            ['month_and_year_only', 'full_dob'],
+            ['Month and Year Only', 'Full Date of Birth'],
           ),
         ),
         InfoTile(
@@ -587,8 +586,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             'Income Visibility',
             'incomeVisibility',
             settings.incomeVisibility ?? 'visible_to_all',
-            ['visible_to_all', 'only_premium_members', 'hide'],
-            ['Visible to All', 'Only Premium Members', 'Hide'],
+            ['visible_to_all', 'hidden'],
+            ['Visible to All', 'Hidden'],
           ),
         ),
         InfoTile(
@@ -632,8 +631,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             'Profile Privacy',
             'profilePrivacy',
             settings.profilePrivacy ?? 'for_registered_members',
-            ['for_registered_members', 'for_premium_members', 'for_all'],
-            ['For Registered Members', 'For Premium Members', 'For All'],
+            ['visible_to_all_visitors', 'visible_to_registered_members'],
+            ['For All Visitors', 'For Registered Members'],
           ),
         ),
         InfoTile(
@@ -1167,7 +1166,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
       case 'for_all':
         return 'For All';
       default:
-        return value.replaceAll('_', ' ').toUpperCase();
+        return CamelCaseUtils.formatCamelCase(value);
     }
   }
 
@@ -1182,6 +1181,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     final selectedValue = await showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        backgroundColor: AppColors.white,
         title: Text(title),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1200,11 +1200,10 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           }).toList(),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancel'),
-          ),
+          PrimaryButtons(buttonStyle: ButtonsStyle.activeSecondaryButton, onTap: () => Navigator.of(dialogContext).pop(), title: 'Cancel'),
         ],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),)
       ),
     );
 
