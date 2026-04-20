@@ -6,6 +6,7 @@ import 'package:flutter_boilerplate/features/account_setting/data/models/contact
 import 'package:flutter_boilerplate/features/account_setting/data/models/messages_settings.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/notification_settings.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/premium_settings.dart';
+import 'package:flutter_boilerplate/features/account_setting/data/models/privacy_settings.dart';
 
 class AccountSettingsRepository {
   static Future<ApiResponse<AccountSettings>> getAccountSettings() async {
@@ -255,6 +256,45 @@ class AccountSettingsRepository {
           'newPassword': newPassword,
           'confirmPassword': confirmPassword,
         },
+      );
+      return _withApiMessage(response);
+    } catch (e) {
+      return _mapError(e);
+    }
+  }
+
+  static Future<ApiResponse<PrivacySettings>> getPrivacySettings() async {
+    try {
+      final response = await DioClient().get(
+        AppUrls.getPrivacySettings,
+        isTokenRequired: true,
+      );
+
+      if (!response.isSuccess) {
+        return ApiResponse.error(
+          message: response.message,
+          statusCode: response.statusCode,
+        );
+      }
+
+      return ApiResponse.success(
+        data: PrivacySettings.fromAny(response.data),
+        message: response.message,
+        statusCode: response.statusCode,
+      );
+    } catch (e) {
+      return _mapError(e);
+    }
+  }
+
+  static Future<ApiResponse> updatePrivacySettings(
+    PrivacySettings settings,
+  ) async {
+    try {
+      final response = await DioClient().put(
+        AppUrls.updatePrivacySettings,
+        isTokenRequired: true,
+        data: settings.toRequestJson(),
       );
       return _withApiMessage(response);
     } catch (e) {

@@ -166,8 +166,10 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           ProfileActionTile(
             iconImagePath: AppImages.safetySvgIcon,
             title: 'Privacy Options',
-            onTap: () =>
-                setState(() => _step = AccountSettingStep.privacyOptions),
+            onTap: () {
+              setState(() => _step = AccountSettingStep.privacyOptions);
+              provider.loadPrivacySettings();
+            },
           ),
           ProfileActionTile(
             iconImagePath: AppImages.delete,
@@ -461,82 +463,223 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
   }
 
   Widget _privacyOptions() {
-    return const Column(
+    if (provider.isPrivacyLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (provider.privacyError != null) {
+      return Center(
+        child: Text(
+          'Error loading privacy settings: ${provider.privacyError}',
+          style: TextStyle(color: AppColors.error),
+        ),
+      );
+    }
+
+    final settings = provider.privacySettings;
+    if (settings == null) {
+      return const Center(child: Text('No privacy settings available'));
+    }
+
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       spacing: 16,
       children: [
         InfoTile(
           title: 'Display Name',
-          value: 'Hide Full Name',
-          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          value: _formatPrivacyValue(settings.displayNameFormat),
           leadingImagePath: AppImages.contactPreview,
           showTrailingImage: true,
           showLeadingImage: true,
+          onTap: () => _showPrivacyOptionDialog(
+            context,
+            'Display Name',
+            'displayNameFormat',
+            settings.displayNameFormat ?? 'hide_first_name',
+            ['show_full_name', 'hide_first_name'],
+            ['Show Full Name', 'Hide First Name'],
+          ),
         ),
         InfoTile(
           title: 'Photo',
-          value: 'Visible To Liked Only',
-          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          value: _formatPrivacyValue(settings.photoVisibility),
           leadingImagePath: AppImages.photoIcon,
           showTrailingImage: true,
           showLeadingImage: true,
+          onTap: () => _showPrivacyOptionDialog(
+            context,
+            'Photo Visibility',
+            'photoVisibility',
+            settings.photoVisibility ?? 'visible_to_liked_only',
+            ['visible_to_all', 'visible_to_liked_only', 'visible_to_premium'],
+            ['Visible to All', 'Visible to Liked Only', 'Visible to Premium'],
+          ),
+        ),
+        InfoTile(
+          title: 'Album Photo',
+          value: _formatPrivacyValue(settings.albumPhotoVisibility),
+          leadingImagePath: AppImages.photoIcon,
+          showTrailingImage: true,
+          showLeadingImage: true,
+          onTap: () => _showPrivacyOptionDialog(
+            context,
+            'Album Photo Visibility',
+            'albumPhotoVisibility',
+            settings.albumPhotoVisibility ?? 'visible_to_liked_only',
+            ['visible_to_all', 'visible_to_liked_only', 'visible_to_premium'],
+            ['Visible to All', 'Visible to Liked Only', 'Visible to Premium'],
+          ),
         ),
         InfoTile(
           title: 'Phone Number',
-          value: 'Only Premium Members',
-          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          value: _formatPrivacyValue(settings.phoneVisibility),
           leadingImagePath: AppImages.callIcon,
           showTrailingImage: true,
           showLeadingImage: true,
+          onTap: () => _showPrivacyOptionDialog(
+            context,
+            'Phone Number Visibility',
+            'phoneVisibility',
+            settings.phoneVisibility ?? 'only_premium_members',
+            ['visible_to_all', 'only_premium_members', 'hide'],
+            ['Visible to All', 'Only Premium Members', 'Hide'],
+          ),
         ),
         InfoTile(
           title: 'Email',
-          value: 'Hide',
-          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          value: _formatPrivacyValue(settings.emailVisibility),
           leadingImagePath: AppImages.emailSvgIcon,
           showTrailingImage: true,
           showLeadingImage: true,
+          onTap: () => _showPrivacyOptionDialog(
+            context,
+            'Email Visibility',
+            'emailVisibility',
+            settings.emailVisibility ?? 'visible_to_all_premium_members',
+            ['visible_to_all', 'visible_to_all_premium_members', 'hide'],
+            ['Visible to All', 'Visible to Premium Members', 'Hide'],
+          ),
         ),
         InfoTile(
           title: 'Date of Birth',
-          value: 'Hide',
-          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          value: _formatPrivacyValue(settings.dobDisplay),
           leadingImagePath: AppImages.calenderTimer,
           showTrailingImage: true,
           showLeadingImage: true,
+          onTap: () => _showPrivacyOptionDialog(
+            context,
+            'Date of Birth Display',
+            'dobDisplay',
+            settings.dobDisplay ?? 'full_dob',
+            ['show_age', 'full_dob', 'hide'],
+            ['Show Age', 'Show Full DOB', 'Hide'],
+          ),
         ),
         InfoTile(
           title: 'Annual Income',
-          value: 'Hide',
-          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          value: _formatPrivacyValue(settings.incomeVisibility),
           leadingImagePath: AppImages.walletSvgIcon,
           showTrailingImage: true,
           showLeadingImage: true,
+          onTap: () => _showPrivacyOptionDialog(
+            context,
+            'Income Visibility',
+            'incomeVisibility',
+            settings.incomeVisibility ?? 'visible_to_all',
+            ['visible_to_all', 'only_premium_members', 'hide'],
+            ['Visible to All', 'Only Premium Members', 'Hide'],
+          ),
         ),
         InfoTile(
-          title: 'Shortlist Settings',
-          value: 'Enable',
-          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          title: 'Shortlist Alerts',
+          value: _formatPrivacyValue(settings.shortlistAlert == true ? 'enable' : 'disable'),
           leadingImagePath: AppImages.sortFilter,
           showTrailingImage: true,
           showLeadingImage: true,
+          onTap: () => _showPrivacyOptionDialog(
+            context,
+            'Shortlist Alerts',
+            'shortlistAlert',
+            settings.shortlistAlert == true ? 'enable' : 'disable',
+            ['enable', 'disable'],
+            ['Enable', 'Disable'],
+          ),
         ),
         InfoTile(
-          title: 'Do Not Disturb',
-          value: 'Enable',
-          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
-          leadingImagePath: AppImages.cancelSvgIcon,
+          title: 'Allow Premium Calls',
+          value: _formatPrivacyValue(settings.allowPremiumCalls == true ? 'enable' : 'disable'),
+          leadingImagePath: AppImages.callIcon,
           showTrailingImage: true,
           showLeadingImage: true,
+          onTap: () => _showPrivacyOptionDialog(
+            context,
+            'Allow Premium Calls',
+            'allowPremiumCalls',
+            settings.allowPremiumCalls == true ? 'enable' : 'disable',
+            ['enable', 'disable'],
+            ['Enable', 'Disable'],
+          ),
         ),
         InfoTile(
-          title: 'Profile Policy',
-          value: 'Enable',
-          //   onTap: () => setState(() => _step = ContactFilterStep.ageRange),
+          title: 'Profile Privacy',
+          value: _formatPrivacyValue(settings.profilePrivacy),
           leadingImagePath: AppImages.safetySvgIcon,
           showTrailingImage: true,
           showLeadingImage: true,
+          onTap: () => _showPrivacyOptionDialog(
+            context,
+            'Profile Privacy',
+            'profilePrivacy',
+            settings.profilePrivacy ?? 'for_registered_members',
+            ['for_registered_members', 'for_premium_members', 'for_all'],
+            ['For Registered Members', 'For Premium Members', 'For All'],
+          ),
+        ),
+        InfoTile(
+          title: 'Show Online Status',
+          value: _formatPrivacyValue(settings.showOnlineStatus == true ? 'enable' : 'disable'),
+          leadingImagePath: AppImages.contactPreview,
+          showTrailingImage: true,
+          showLeadingImage: true,
+          onTap: () => _showPrivacyOptionDialog(
+            context,
+            'Show Online Status',
+            'showOnlineStatus',
+            settings.showOnlineStatus == true ? 'enable' : 'disable',
+            ['enable', 'disable'],
+            ['Enable', 'Disable'],
+          ),
+        ),
+        InfoTile(
+          title: 'Show Last Seen',
+          value: _formatPrivacyValue(settings.showLastSeen == true ? 'enable' : 'disable'),
+          leadingImagePath: AppImages.contactPreview,
+          showTrailingImage: true,
+          showLeadingImage: true,
+          onTap: () => _showPrivacyOptionDialog(
+            context,
+            'Show Last Seen',
+            'showLastSeen',
+            settings.showLastSeen == true ? 'enable' : 'disable',
+            ['enable', 'disable'],
+            ['Enable', 'Disable'],
+          ),
+        ),
+        InfoTile(
+          title: 'Show Activity Status',
+          value: _formatPrivacyValue(settings.showActivityStatus == true ? 'enable' : 'disable'),
+          leadingImagePath: AppImages.contactPreview,
+          showTrailingImage: true,
+          showLeadingImage: true,
+          onTap: () => _showPrivacyOptionDialog(
+            context,
+            'Show Activity Status',
+            'showActivityStatus',
+            settings.showActivityStatus == true ? 'enable' : 'disable',
+            ['enable', 'disable'],
+            ['Enable', 'Disable'],
+          ),
         ),
       ],
     );
@@ -984,6 +1127,93 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     );
   }
 
+  String _formatPrivacyValue(String? value) {
+    if (value == null || value.isEmpty) return 'Not Set';
+
+    switch (value) {
+      case 'show_full_name':
+        return 'Show Full Name';
+      case 'hide_first_name':
+        return 'Hide First Name';
+      case 'hide_full_name':
+        return 'Hide Full Name';
+      case 'visible_to_all':
+        return 'Visible to All';
+      case 'visible_to_liked_only':
+        return 'Visible to Liked Only';
+      case 'visible_to_premium':
+        return 'Visible to Premium';
+      case 'visible_to_all_premium_members':
+        return 'Visible to Premium Members';
+      case 'only_premium_members':
+        return 'Only Premium Members';
+      case 'show_age':
+        return 'Show Age';
+      case 'show_date':
+        return 'Show Date';
+      case 'full_dob':
+        return 'Show Full DOB';
+      case 'hide':
+        return 'Hide';
+      case 'enable':
+        return 'Enable';
+      case 'disable':
+        return 'Disable';
+      case 'for_registered_members':
+        return 'For Registered Members';
+      case 'for_premium_members':
+        return 'For Premium Members';
+      case 'for_all':
+        return 'For All';
+      default:
+        return value.replaceAll('_', ' ').toUpperCase();
+    }
+  }
+
+  Future<void> _showPrivacyOptionDialog(
+    BuildContext context,
+    String title,
+    String key,
+    String currentValue,
+    List<String> options,
+    List<String> displayOptions,
+  ) async {
+    final selectedValue = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(title),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: options.asMap().entries.map((entry) {
+            final index = entry.key;
+            final option = entry.value;
+            final displayOption = displayOptions[index];
+            return RadioListTile<String>(
+              title: Text(displayOption),
+              value: option,
+              groupValue: currentValue,
+              onChanged: (value) {
+                Navigator.of(dialogContext).pop(value);
+              },
+            );
+          }).toList(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+
+    if (selectedValue != null && selectedValue != currentValue) {
+      provider.updatePrivacySetting(key, selectedValue);
+      final response = await provider.savePrivacySettings();
+      if (!mounted) return;
+      _showResponseSnackBar(response);
+    }
+  }
 }
 
 enum AccountSettingStep {
@@ -1095,3 +1325,7 @@ class _MessageEditDialogState extends State<_MessageEditDialog> {
     );
   }
 }
+
+
+
+

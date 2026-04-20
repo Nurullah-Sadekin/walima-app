@@ -8,6 +8,7 @@ import 'package:flutter_boilerplate/features/account_setting/data/models/contact
 import 'package:flutter_boilerplate/features/account_setting/data/models/messages_settings.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/notification_settings.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/models/premium_settings.dart';
+import 'package:flutter_boilerplate/features/account_setting/data/models/privacy_settings.dart';
 import 'package:flutter_boilerplate/features/account_setting/data/repository/account_settings_repository.dart';
 
 class NotificationAlertOption {
@@ -84,6 +85,11 @@ class AccountSettingProvider extends BaseChangeNotifier {
 
   bool isPasswordChanging = false;
   String? passwordChangeError;
+
+  bool isPrivacyLoading = false;
+  bool isPrivacySaving = false;
+  String? privacyError;
+  PrivacySettings? privacySettings;
 
   final List<NotificationAlertCategory> notificationCategories = const [
     NotificationAlertCategory(
@@ -569,6 +575,88 @@ class AccountSettingProvider extends BaseChangeNotifier {
     newPasswordError = '';
     confirmPasswordError = '';
     passwordChangeError = null;
+    notifyListeners();
+  }
+
+  Future<void> loadPrivacySettings() async {
+    isPrivacyLoading = true;
+    privacyError = null;
+    notifyListeners();
+
+    final response = await AccountSettingsRepository.getPrivacySettings();
+
+    if (response.isSuccess && response.data != null) {
+      privacySettings = response.data;
+    } else {
+      privacyError = response.message;
+    }
+
+    isPrivacyLoading = false;
+    notifyListeners();
+  }
+
+  Future<ApiResponse> savePrivacySettings() async {
+    if (privacySettings == null) {
+      return ApiResponse.error(
+        message: 'No privacy settings to save',
+        statusCode: 0,
+      );
+    }
+
+    isPrivacySaving = true;
+    notifyListeners();
+
+    final response = await AccountSettingsRepository.updatePrivacySettings(privacySettings!);
+
+    isPrivacySaving = false;
+    notifyListeners();
+
+    return response;
+  }
+
+  void updatePrivacySetting(String key, String value) {
+    if (privacySettings == null) return;
+
+    late PrivacySettings updatedSettings;
+
+    // Handle string values
+    if (key == 'displayNameFormat' ||
+        key == 'photoVisibility' ||
+        key == 'albumPhotoVisibility' ||
+        key == 'phoneVisibility' ||
+        key == 'emailVisibility' ||
+        key == 'dobDisplay' ||
+        key == 'incomeVisibility' ||
+        key == 'profilePrivacy') {
+      updatedSettings = privacySettings!.copyWith(
+        displayNameFormat: key == 'displayNameFormat' ? value : privacySettings!.displayNameFormat,
+        photoVisibility: key == 'photoVisibility' ? value : privacySettings!.photoVisibility,
+        albumPhotoVisibility: key == 'albumPhotoVisibility' ? value : privacySettings!.albumPhotoVisibility,
+        phoneVisibility: key == 'phoneVisibility' ? value : privacySettings!.phoneVisibility,
+        emailVisibility: key == 'emailVisibility' ? value : privacySettings!.emailVisibility,
+        dobDisplay: key == 'dobDisplay' ? value : privacySettings!.dobDisplay,
+        incomeVisibility: key == 'incomeVisibility' ? value : privacySettings!.incomeVisibility,
+        profilePrivacy: key == 'profilePrivacy' ? value : privacySettings!.profilePrivacy,
+      );
+    } else if (key == 'shortlistAlert' ||
+               key == 'allowPremiumCalls' ||
+               key == 'showOnlineStatus' ||
+               key == 'showLastSeen' ||
+               key == 'showActivityStatus') {
+      // Handle boolean values
+      final boolValue = value == 'enable';
+      updatedSettings = privacySettings!.copyWith(
+        shortlistAlert: key == 'shortlistAlert' ? boolValue : privacySettings!.shortlistAlert,
+        allowPremiumCalls: key == 'allowPremiumCalls' ? boolValue : privacySettings!.allowPremiumCalls,
+        showOnlineStatus: key == 'showOnlineStatus' ? boolValue : privacySettings!.showOnlineStatus,
+        showLastSeen: key == 'showLastSeen' ? boolValue : privacySettings!.showLastSeen,
+        showActivityStatus: key == 'showActivityStatus' ? boolValue : privacySettings!.showActivityStatus,
+      );
+    } else {
+      return;
+    }
+
+    privacySettings = updatedSettings;
     notifyListeners();
   }
 
