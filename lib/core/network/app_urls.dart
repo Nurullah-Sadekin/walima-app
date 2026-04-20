@@ -289,10 +289,13 @@ class AppUrls {
   static const String messagesSettings = '$baseUrl/settings/messages'; //GET
 
 
-
+  // ---- External Links ----
   static const String helpCenterUrl = 'https://dev.walima.app/en/account/help-desk';
   static const String beSafeOnlineUrl = 'https://dev.walima.app/en/be-safe-online';
   static const String privacyPolicyUrl = 'https://dev.walima.app/en/privacy';
   static const String safetyUrl = 'https://dev.walima.app/en/safety';
   static const String termsUrl = 'https://dev.walima.app/en/terms';
+  static const String facebookUrl = 'https://www.facebook.com/WalimaApp';
+  static const String instagramUrl = 'https://www.instagram.com/walima.app';
+  static const String xUrl = 'https://x.com/WalimaApp';
 }

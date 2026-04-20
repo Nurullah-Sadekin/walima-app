@@ -6,6 +6,7 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/enums/enums.dart';
+import 'package:flutter_boilerplate/core/network/app_urls.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
@@ -33,9 +34,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  static const String _facebookUrl = 'https://www.facebook.com/WalimaApp';
-  static const String _instagramUrl = 'https://www.instagram.com/walima.app';
-  static const String _xUrl = 'https://x.com/WalimaApp';
+
 
   final Key profileImageKey = const ValueKey('home_profile_image');
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -172,6 +171,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _premiumMatches() {
     final provider = ref.watch(homeProvider);
+    final currentPlan = ref.watch(profileProvider).dashboard?.profile?.membership?.plan?.name;
     final matches = provider.premiumMatches;
     final isLoading = provider.isLoadingPremiumMatches;
     final errorText = provider.premiumMatchesError;
@@ -210,6 +210,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
               ),
+              if (currentPlan != 'Free')
               InkWell(
                 borderRadius: BorderRadius.circular(8.0),
                 onTap: () => context.pushNamed(Routes.premiumMatches),
@@ -288,13 +289,69 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               return SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: matches.map(_buildPremiumMatchCard).toList(),
+                  children: [
+                    ...matches.take(2).map(_buildPremiumMatchCard),
+
+                    if (currentPlan == 'Free')
+                      _buildUpgradeWidget(matches.length - 2),
+
+                    if (currentPlan != 'Free')
+                      ...matches.skip(2).map(_buildPremiumMatchCard),
+                  ],
                 ),
               );
             },
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildUpgradeWidget(int remainingCount, {bool? isForVisitors}) {
+    String subText = isForVisitors == true ? 'recent visitors' : 'premium matches';
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const ShowImage(
+            imagePath: AppImages.premiumSvgIcon,
+            width: 80,
+            height: 80,
+            color: AppColors.primary,
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'Upgrade Your Plan',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'See $remainingCount more $subText',
+            style: TextStyle(fontSize: TextSize.font14(context), color: AppColors.textSecondaryLight),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+
+          InkWell(
+            onTap: () => context.pushNamed(
+              Routes.upgradePackage,
+              extra: Routes.anchor,
+            ),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Text(
+                'Upgrade Now',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -419,6 +476,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _recentVisitors() {
     final provider = ref.watch(homeProvider);
     final visitors = provider.recentVisitors;
+    final currentPlan = ref.watch(profileProvider).dashboard?.profile?.membership?.plan?.name;
     final isLoading = provider.isLoadingRecentVisitors;
     final errorText = provider.recentVisitorsError;
     final subtitleText = isLoading
@@ -456,6 +514,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
               ),
+              if (currentPlan != 'Free')
               InkWell(
                 borderRadius: BorderRadius.circular(8.0),
                 onTap: () => context.pushNamed(Routes.recentVisitors),
@@ -534,7 +593,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               return SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: visitors.map(_buildRecentVisitorCard).toList(),
+                  children: [
+                    ...visitors.take(2).map(_buildRecentVisitorCard),
+
+                    if (currentPlan == 'Free')
+                      _buildUpgradeWidget(visitors.length - 2, isForVisitors: true),
+
+                    if (currentPlan != 'Free')
+                      ...visitors.skip(2).map(_buildRecentVisitorCard),
+                  ],
                 ),
               );
             },
@@ -679,15 +746,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 children: [
                   SocialMediaIcon(
                     imagePath: AppImages.instagramIcon,
-                    onTap: () => _openLink('Instagram', _instagramUrl),
+                    onTap: () => _openLink('Instagram', AppUrls.instagramUrl),
                   ),
                   SocialMediaIcon(
                     imagePath: AppImages.facebookIcon,
-                    onTap: () => _openLink('Facebook', _facebookUrl),
+                    onTap: () => _openLink('Facebook', AppUrls.facebookUrl),
                   ),
                   SocialMediaIcon(
                     imagePath: AppImages.twitterIcon,
-                    onTap: () => _openLink('X', _xUrl),
+                    onTap: () => _openLink('X', AppUrls.xUrl),
                   ),
                   SocialMediaIcon(
                     imagePath: AppImages.whatsappSvgIcon,
