@@ -98,6 +98,46 @@ class PrivacySettings {
     };
   }
 
+  /// Returns only the specified field for single field updates
+  Map<String, dynamic> toRequestJsonForKey(String key) {
+    switch (key) {
+      case 'displayNameFormat':
+        return {'displayNameFormat': displayNameFormat};
+      case 'photoVisibility':
+        return {'photoVisibility': photoVisibility};
+      case 'albumPhotoVisibility':
+        return {'albumPhotoVisibility': albumPhotoVisibility};
+      case 'phoneVisibility':
+        return {'phoneVisibility': phoneVisibility};
+      case 'emailVisibility':
+        return {'emailVisibility': emailVisibility};
+      case 'dobDisplay':
+        return {'dobDisplay': dobDisplay};
+      case 'incomeVisibility':
+        return {'incomeVisibility': incomeVisibility};
+      case 'shortlistAlert':
+        return {'shortlistAlert': shortlistAlert};
+      case 'allowPremiumCalls':
+        return {'allowPremiumCalls': allowPremiumCalls};
+      case 'profilePrivacy':
+        return {'profilePrivacy': profilePrivacy};
+      case 'profileHidden':
+        return {'profileHidden': profileHidden};
+      case 'hideDuration':
+        return {'hideDuration': hideDuration};
+      case 'deleteReason':
+        return {'deleteReason': deleteReason};
+      case 'showOnlineStatus':
+        return {'showOnlineStatus': showOnlineStatus};
+      case 'showLastSeen':
+        return {'showLastSeen': showLastSeen};
+      case 'showActivityStatus':
+        return {'showActivityStatus': showActivityStatus};
+      default:
+        return toRequestJson();
+    }
+  }
+
   PrivacySettings copyWith({
     String? id,
     String? userId,

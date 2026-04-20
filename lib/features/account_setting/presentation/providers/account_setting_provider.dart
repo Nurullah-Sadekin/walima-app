@@ -90,6 +90,7 @@ class AccountSettingProvider extends BaseChangeNotifier {
   bool isPrivacySaving = false;
   String? privacyError;
   PrivacySettings? privacySettings;
+  String? _lastChangedPrivacyKey; // Track which privacy setting was last changed
 
   final List<NotificationAlertCategory> notificationCategories = const [
     NotificationAlertCategory(
@@ -606,8 +607,12 @@ class AccountSettingProvider extends BaseChangeNotifier {
     isPrivacySaving = true;
     notifyListeners();
 
-    final response = await AccountSettingsRepository.updatePrivacySettings(privacySettings!);
+    final response = await AccountSettingsRepository.updatePrivacySettings(
+      privacySettings!,
+      changedKey: _lastChangedPrivacyKey,
+    );
 
+    _lastChangedPrivacyKey = null; // Reset after saving
     isPrivacySaving = false;
     notifyListeners();
 
@@ -616,6 +621,8 @@ class AccountSettingProvider extends BaseChangeNotifier {
 
   void updatePrivacySetting(String key, String value) {
     if (privacySettings == null) return;
+
+    _lastChangedPrivacyKey = key; // Track which field was changed
 
     late PrivacySettings updatedSettings;
 

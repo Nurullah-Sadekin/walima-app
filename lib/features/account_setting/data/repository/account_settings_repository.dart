@@ -23,8 +23,11 @@ class AccountSettingsRepository {
         );
       }
 
+      // Extract the nested 'response' object if it exists
+      final data = response.data is Map ? (response.data['response'] ?? response.data) : response.data;
+
       return ApiResponse.success(
-        data: AccountSettings.fromAny(response.data),
+        data: AccountSettings.fromAny(data),
         message: response.message,
         statusCode: response.statusCode,
       );
@@ -62,8 +65,11 @@ class AccountSettingsRepository {
         );
       }
 
+      // Extract the nested 'response' object if it exists
+      final data = response.data is Map ? (response.data['response'] ?? response.data) : response.data;
+
       return ApiResponse.success(
-        data: ContactSettings.fromAny(response.data),
+        data: ContactSettings.fromAny(data),
         message: response.message,
         statusCode: response.statusCode,
       );
@@ -103,8 +109,11 @@ class AccountSettingsRepository {
         );
       }
 
+      // Extract the nested 'response' object if it exists
+      final data = response.data is Map ? (response.data['response'] ?? response.data) : response.data;
+
       return ApiResponse.success(
-        data: PremiumSettings.fromAny(response.data),
+        data: PremiumSettings.fromAny(data),
         message: response.message,
         statusCode: response.statusCode,
       );
@@ -170,8 +179,11 @@ class AccountSettingsRepository {
         );
       }
 
+      // Extract the nested 'response' object if it exists
+      final data = response.data is Map ? (response.data['response'] ?? response.data) : response.data;
+
       return ApiResponse.success(
-        data: MessagesSettings.fromAny(response.data),
+        data: MessagesSettings.fromAny(data),
         message: response.message,
         statusCode: response.statusCode,
       );
@@ -195,8 +207,11 @@ class AccountSettingsRepository {
         );
       }
 
+      // Extract the nested 'response' object if it exists
+      final data = response.data is Map ? (response.data['response'] ?? response.data) : response.data;
+
       return ApiResponse.success(
-        data: NotificationSettings.fromAny(response.data),
+        data: NotificationSettings.fromAny(data),
         message: response.message,
         statusCode: response.statusCode,
       );
@@ -277,8 +292,11 @@ class AccountSettingsRepository {
         );
       }
 
+      // Extract the nested 'response' object from the API response
+      final data = response.data is Map ? response.data['response'] : response.data;
+
       return ApiResponse.success(
-        data: PrivacySettings.fromAny(response.data),
+        data: PrivacySettings.fromAny(data),
         message: response.message,
         statusCode: response.statusCode,
       );
@@ -288,13 +306,16 @@ class AccountSettingsRepository {
   }
 
   static Future<ApiResponse> updatePrivacySettings(
-    PrivacySettings settings,
-  ) async {
+    PrivacySettings settings, {
+    String? changedKey,
+  }) async {
     try {
       final response = await DioClient().put(
         AppUrls.updatePrivacySettings,
         isTokenRequired: true,
-        data: settings.toRequestJson(),
+        data: changedKey != null 
+            ? settings.toRequestJsonForKey(changedKey)
+            : settings.toRequestJson(),
       );
       return _withApiMessage(response);
     } catch (e) {
