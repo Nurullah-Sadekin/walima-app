@@ -518,7 +518,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
         InfoTile(
           title: 'Album Photo',
           value: _formatPrivacyValue(settings.albumPhotoVisibility),
-          leadingImagePath: AppImages.photoIcon,
+          leadingImagePath: AppImages.albumSvgIcon,
           showTrailingImage: true,
           showLeadingImage: true,
           onTap: () => _showPrivacyOptionDialog(
