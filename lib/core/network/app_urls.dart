@@ -287,4 +287,12 @@ class AppUrls {
   static const String contactSettings = '$baseUrl/settings/contact'; //GET, PUT
   static const String premiumSettings = '$baseUrl/settings/premium'; //GET, PUT
   static const String messagesSettings = '$baseUrl/settings/messages'; //GET
+
+
+
+  static const String helpCenterUrl = 'https://dev.walima.app/en/account/help-desk';
+  static const String beSafeOnlineUrl = 'https://dev.walima.app/en/be-safe-online';
+  static const String privacyPolicyUrl = 'https://dev.walima.app/en/privacy';
+  static const String safetyUrl = 'https://dev.walima.app/en/safety';
+  static const String termsUrl = 'https://dev.walima.app/en/terms';
 }

@@ -31,6 +31,9 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
   late AccountSettingProvider provider;
   AccountSettingStep _step = AccountSettingStep.accountSetting;
 
+
+  final bool hasPassword = true; // This should ideally come from user data
+
   @override
   void initState() {
     super.initState();
@@ -151,8 +154,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             },
           ),
           ProfileActionTile(
-            iconImagePath: AppImages.lockPasswordSvgIcon,
-            title: 'Set Password',
+            iconImagePath: hasPassword ?  AppImages.editSvgIcon : AppImages.lockPasswordSvgIcon,
+            title: hasPassword ? 'Change Password' : 'Set Password',
             onTap: () => setState(() => _step = AccountSettingStep.setPassword),
             // Note: ProfileActionTile might need custom styling for the delete option
             // You may need to check if ProfileActionTile supports custom colors
@@ -726,6 +729,18 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
       mainAxisSize: MainAxisSize.min,
       spacing: 16,
       children: [
+        if (hasPassword)
+        PrimaryTextField(
+          controller: provider.currentPasswordController,
+          headLine: 'Current Password',
+          hintText: 'Enter new password',
+          noPrefix: true,
+          errorText: provider.currentPasswordError,
+          showPassIcon: true,
+          onTap: () {},
+          isRequired: true,
+        ),
+
         PrimaryTextField(
           controller: provider.newPasswordController,
           headLine: 'New Password',
@@ -847,47 +862,6 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     );
   }
 
-  Widget _bottomAction(AccountSettingProvider provider) {
-    final isRoot = _step == AccountSettingStep.accountSetting;
-    final isPremium = _step == AccountSettingStep.premiumMembership;
-    final isContact = _step == AccountSettingStep.myContactSettings;
-    final isSmsAlerts = _step == AccountSettingStep.smsOrEmailAlerts;
-
-    if (isRoot || isPremium || isContact || isSmsAlerts) {
-      return const SizedBox.shrink();
-    }
-
-    final isNameAndEmail = _step == AccountSettingStep.nameAndEmail;
-    final isMessages = _step == AccountSettingStep.message;
-    final isSaving = (isNameAndEmail && provider.isAccountSaving) ||
-        (isMessages && provider.isMessagesSaving);
-
-    return BottomBorderedWidget(
-      widget : PrimaryButtons(
-        buttonStyle: isSaving
-            ? ButtonsStyle.disableButton
-            : ButtonsStyle.activePrimaryButton,
-        title: 'Save Changes',
-        onTap: () async {
-          if (isSaving) return;
-
-          if (isNameAndEmail) {
-            final response = await provider.saveAccountSettings();
-            if (!mounted) return;
-            _showResponseSnackBar(response);
-            return;
-          }
-
-          if (isMessages) {
-            final response = await provider.saveMessagesSettings();
-            if (!mounted) return;
-            _showResponseSnackBar(response);
-            return;
-          }
-        },
-      ),
-    );
-  }
 
   String _titleForStep(AccountSettingStep step) {
     switch (step) {
@@ -908,7 +882,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
       case AccountSettingStep.deleteProfile:
         return 'Hide/Delete Profile';
       case AccountSettingStep.setPassword:
-        return 'Set Password';
+        return hasPassword ? 'Change Password' : 'Set Password';
     }
   }
 
@@ -952,6 +926,59 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
       ),
     );
   }
+
+
+  Widget _bottomAction(AccountSettingProvider provider) {
+    final isRoot = _step == AccountSettingStep.accountSetting;
+    final isPremium = _step == AccountSettingStep.premiumMembership;
+    final isContact = _step == AccountSettingStep.myContactSettings;
+    final isSmsAlerts = _step == AccountSettingStep.smsOrEmailAlerts;
+
+    if (isRoot || isPremium || isContact || isSmsAlerts) {
+      return const SizedBox.shrink();
+    }
+
+    final isNameAndEmail = _step == AccountSettingStep.nameAndEmail;
+    final isMessages = _step == AccountSettingStep.message;
+    final isSetPassword = _step == AccountSettingStep.setPassword;
+    final isSaving = (isNameAndEmail && provider.isAccountSaving) ||
+        (isMessages && provider.isMessagesSaving) ||
+        (isSetPassword && provider.isPasswordChanging);
+
+    return BottomBorderedWidget(
+      widget : PrimaryButtons(
+        buttonStyle: isSaving
+            ? ButtonsStyle.disableButton
+            : ButtonsStyle.activePrimaryButton,
+        title: 'Save Changes',
+        onTap: () async {
+          if (isSaving) return;
+
+          if (isNameAndEmail) {
+            final response = await provider.saveAccountSettings();
+            if (!mounted) return;
+            _showResponseSnackBar(response);
+            return;
+          }
+
+          if (isMessages) {
+            final response = await provider.saveMessagesSettings();
+            if (!mounted) return;
+            _showResponseSnackBar(response);
+            return;
+          }
+
+          if (isSetPassword) {
+            final response = await provider.changePassword();
+            if (!mounted) return;
+            _showResponseSnackBar(response);
+            return;
+          }
+        },
+      ),
+    );
+  }
+
 }
 
 enum AccountSettingStep {

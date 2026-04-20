@@ -6,6 +6,7 @@ import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/profile_summary_card.dart';
 import 'package:flutter_boilerplate/core/global/repositorys/global_repository.dart';
+import 'package:flutter_boilerplate/core/network/app_urls.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/app_router.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
@@ -27,13 +28,6 @@ class AppDrawer extends ConsumerStatefulWidget {
 }
 
 class _AppDrawerState extends ConsumerState<AppDrawer> {
-  static const String _helpCenterUrl =
-      'https://dev.walima.app/en/account/help-desk';
-  static const String _beSafeOnlineUrl =
-      'https://dev.walima.app/en/be-safe-online';
-  static const String _privacyPolicyUrl = 'https://dev.walima.app/en/privacy';
-  static const String _safetyUrl = 'https://dev.walima.app/en/safety';
-  static const String _termsUrl = 'https://dev.walima.app/en/terms';
 
   Future<void> _openLink(String title, String url) {
     return LinkOpener.open(
@@ -303,22 +297,22 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         ProfileActionTile(
           iconImagePath: AppImages.customerSupportSvgIcon,
           title: 'Help & Support',
-          onTap: () => _openLink('Help Center', _helpCenterUrl),
+          onTap: () => _openLink('Help Center', AppUrls.helpCenterUrl),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.bubbleChatSvgIcon,
           title: 'Be Safe Online',
-          onTap: () => _openLink('Be Safe Online', _beSafeOnlineUrl),
+          onTap: () => _openLink('Be Safe Online', AppUrls.beSafeOnlineUrl),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.documentValidationSvgIcon,
           title: 'Privacy Policy',
-          onTap: () => _openLink('Privacy Policy', _privacyPolicyUrl),
+          onTap: () => _openLink('Privacy Policy', AppUrls.privacyPolicyUrl),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.safetySvgIcon,
           title: 'Safety',
-          onTap: () => _openLink('Safety', _safetyUrl),
+          onTap: () => _openLink('Safety', AppUrls.safetyUrl),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.starSvgIcon,
@@ -328,7 +322,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         ProfileActionTile(
           iconImagePath: AppImages.documentValidationSvgIcon,
           title: 'Terms & Conditions',
-          onTap: () => _openLink('Terms & Conditions', _termsUrl),
+          onTap: () => _openLink('Terms & Conditions', AppUrls.termsUrl),
         ),
       ],
     );

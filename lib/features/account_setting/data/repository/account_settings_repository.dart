@@ -222,6 +222,27 @@ class AccountSettingsRepository {
     }
   }
 
+  static Future<ApiResponse> changePassword(
+    String currentPassword,
+    String newPassword,
+    String confirmPassword,
+  ) async {
+    try {
+      final response = await DioClient().post(
+        AppUrls.changePassword,
+        isTokenRequired: true,
+        data: <String, dynamic>{
+          'currentPassword': currentPassword,
+          'newPassword': newPassword,
+          'confirmPassword': confirmPassword,
+        },
+      );
+      return _withApiMessage(response);
+    } catch (e) {
+      return _mapError(e);
+    }
+  }
+
   static ApiResponse _withApiMessage(ApiResponse response) {
     final apiMessage = _extractMessage(response.data);
     if (apiMessage == null || apiMessage.isEmpty) return response;

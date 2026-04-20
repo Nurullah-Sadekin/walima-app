@@ -31,6 +31,7 @@ class NotificationAlertCategory {
 
 class AccountSettingProvider extends BaseChangeNotifier {
   AccountSettingProvider();
+  final TextEditingController currentPasswordController = TextEditingController();
   final TextEditingController newPasswordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
 
@@ -38,6 +39,7 @@ class AccountSettingProvider extends BaseChangeNotifier {
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
 
+  String currentPasswordError = '';
   String newPasswordError = '';
   String confirmPasswordError = '';
   bool? autoRenew = false;
@@ -77,6 +79,9 @@ class AccountSettingProvider extends BaseChangeNotifier {
   bool isNotificationsLoading = false;
   String? notificationsError;
   NotificationSettings? notificationSettings;
+
+  bool isPasswordChanging = false;
+  String? passwordChangeError;
 
   final List<NotificationAlertCategory> notificationCategories = const [
     NotificationAlertCategory(
@@ -473,8 +478,70 @@ class AccountSettingProvider extends BaseChangeNotifier {
     return response;
   }
 
+  Future<ApiResponse> changePassword() async {
+    final currentPassword = currentPasswordController.text.trim();
+    final newPassword = newPasswordController.text.trim();
+    final confirmPassword = confirmPasswordController.text.trim();
+
+    // Reset errors
+    currentPasswordError = '';
+    newPasswordError = '';
+    confirmPasswordError = '';
+    passwordChangeError = null;
+
+    // Validation
+    bool hasError = false;
+    if (currentPassword.isEmpty) {
+      currentPasswordError = 'Current password is required';
+      hasError = true;
+    }
+    if (newPassword.isEmpty) {
+      newPasswordError = 'New password is required';
+      hasError = true;
+    } else if (newPassword.length < 8) {
+      newPasswordError = 'Password must be at least 8 characters';
+      hasError = true;
+    }
+    if (confirmPassword.isEmpty) {
+      confirmPasswordError = 'Confirm password is required';
+      hasError = true;
+    } else if (newPassword != confirmPassword) {
+      confirmPasswordError = 'Passwords do not match';
+      hasError = true;
+    }
+
+    if (hasError) {
+      notifyListeners();
+      return ApiResponse.error(message: 'Please fix the errors', statusCode: 0);
+    }
+
+    isPasswordChanging = true;
+    notifyListeners();
+
+    final response = await AccountSettingsRepository.changePassword(
+      currentPassword,
+      newPassword,
+      confirmPassword,
+    );
+
+    if (response.isSuccess) {
+      // Clear controllers on success
+      currentPasswordController.clear();
+      newPasswordController.clear();
+      confirmPasswordController.clear();
+    } else {
+      passwordChangeError = response.message;
+    }
+
+    isPasswordChanging = false;
+    notifyListeners();
+
+    return response;
+  }
+
   @override
   void dispose() {
+    currentPasswordController.dispose();
     newPasswordController.dispose();
     confirmPasswordController.dispose();
     firstNameController.dispose();

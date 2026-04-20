@@ -167,6 +167,6 @@ class AppImages {
   
   
   static const String homeProfileBg = 'assets/svgs/home_profile_bg.svg';
-  
-  
+
+
 }
