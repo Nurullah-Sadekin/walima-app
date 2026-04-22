@@ -160,6 +160,7 @@ class _ProfilePreviewScreenState extends ConsumerState<ProfilePreviewScreen> {
         ? '${profile!.profilePictures.length}'
         : null;
 
+
     return ProfileComprehensiveCard(
       imagePath: (photoUrl != null && photoUrl.isNotEmpty) ? photoUrl : fallback,
       name: displayName,
