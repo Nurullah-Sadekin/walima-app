@@ -338,20 +338,20 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         MapEntry(
           'Highest Qualification',
           _valueOrDefault(
-            education?.qualification ?? education?.educationLevel,
+            CamelCaseUtils.formatCamelCase(education?.qualification ?? education?.educationLevel,)
           ),
         ),
         MapEntry(
           'College(s) Attended',
-          _valueOrDefault(education?.institutionName),
+          _valueOrDefault(CamelCaseUtils.formatCamelCase(education?.institutionName)),
         ),
         MapEntry('Annual Income', _valueOrDefault(profession?.incomeRange)),
-        MapEntry('Working with', _valueOrDefault(profession?.employmentType)),
+        MapEntry('Working with', _valueOrDefault(CamelCaseUtils.formatCamelCase(profession?.employmentType))),
         MapEntry(
           'Working as',
-          _valueOrDefault(profession?.designation ?? profession?.profession),
+          _valueOrDefault(CamelCaseUtils.formatCamelCase(profession?.designation ?? profession?.profession)),
         ),
-        MapEntry('Employer Name', _valueOrDefault(profession?.employer)),
+        MapEntry('Employer Name', _valueOrDefault(CamelCaseUtils.formatCamelCase((profession?.employer)))),
       ],
     );
   }
@@ -371,10 +371,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             location?.country,
           ),
         ),
-        MapEntry('State of Residence', _valueOrDefault(location?.state)),
+        MapEntry('State of Residence', _valueOrDefault(CamelCaseUtils.formatCamelCase(location?.state))),
         MapEntry(
           'Residency Status',
-          _valueOrDefault(location?.residencyStatus),
+          _valueOrDefault(CamelCaseUtils.formatCamelCase(location?.residencyStatus)),
         ),
         MapEntry('ZIP/Pin code', _valueOrDefault(location?.zipCode)),
       ],
@@ -685,7 +685,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     }
     if (firstText.isEmpty) return secondText;
     if (secondText.isEmpty) return firstText;
-    return '$firstText, $secondText';
+    return CamelCaseUtils.formatCamelCase('$firstText $secondText');
   }
 
   String _valueOrDefault(dynamic value, [String fallback = 'Not Specified']) {

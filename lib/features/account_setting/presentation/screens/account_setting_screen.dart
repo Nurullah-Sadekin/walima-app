@@ -1072,7 +1072,6 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     );
   }
 
-
   Widget _bottomAction(AccountSettingProvider provider) {
     final isRoot = _step == AccountSettingStep.accountSetting;
     final isPremium = _step == AccountSettingStep.premiumMembership;
