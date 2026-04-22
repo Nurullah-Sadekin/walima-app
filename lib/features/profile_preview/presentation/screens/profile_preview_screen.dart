@@ -171,7 +171,7 @@ class _ProfilePreviewScreenState extends ConsumerState<ProfilePreviewScreen> {
       noButton: true,
       activeStatusText: activeStatus,
       photoCount: photoCount,
-      menu: true,
+      menu: false,
       isVerified: user?.isVerified ?? false,
       isOnline: user?.isOnline ?? false,
     );
