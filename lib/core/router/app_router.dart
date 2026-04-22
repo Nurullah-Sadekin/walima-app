@@ -486,10 +486,11 @@ GoRouter goRouter(Ref ref) {
         path: Paths.profilePreview,
         name: Routes.profilePreview,
         builder: (context, state) {
-          final userData = state.extra is Map<String, dynamic>
+          final extra = state.extra is Map<String, dynamic>
               ? state.extra as Map<String, dynamic>
-              : null;
-          return ProfilePreviewScreen(userData: userData);
+              : const <String, dynamic>{};
+          final userId = extra['userId']?.toString() ?? '';
+          return ProfilePreviewScreen(userId: userId);
         },
       ),
     ],

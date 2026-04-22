@@ -10,6 +10,7 @@ import 'package:flutter_boilerplate/features/matches/presentation/provider/new_f
 import 'package:flutter_boilerplate/features/matches/presentation/provider/my_match_filter_provider.dart';
 import 'package:flutter_boilerplate/features/notification/presentation/providers/notificaiton_provider.dart';
 import 'package:flutter_boilerplate/features/profile/presentation/providers/profile_provider.dart';
+import 'package:flutter_boilerplate/features/profile_preview/presentation/providers/profile_preview_provider.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/presentation/providers/recommended_preferences_provider.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_screen_state_provider.dart';
@@ -130,6 +131,11 @@ final matchesProvider = ChangeNotifierProvider<MatchesProvider>((ref) {
 });
 final profileProvider = ChangeNotifierProvider<ProfileProvider>((ref) {
   return ProfileProvider();
+});
+
+final profilePreviewProvider =
+    ChangeNotifierProvider<ProfilePreviewProvider>((ref) {
+  return ProfilePreviewProvider();
 });
 
 final searchFilterProvider =
