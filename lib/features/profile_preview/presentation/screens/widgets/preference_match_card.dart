@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/profile_preview/data/models/profile_compare_response.dart';
 
@@ -39,7 +40,7 @@ class PreferenceMatchCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _Header(
-            title: '$titleSubject Preferences',
+            title: 'Preferences Analysis',
             subtitle: data.verdict ?? 'Seeking a genuine connection',
           ),
           const SizedBox(height: 20),
@@ -300,31 +301,33 @@ class _PreferenceInfoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color statusColor =
-        item.isMatched ? AppColors.primary : AppColors.textSecondaryLight;
-    final IconData statusIcon =
-        item.isMatched ? Icons.check_rounded : Icons.close_rounded;
+    final String statusImage = item.isMatched ? AppImages.successCircle : AppImages.cancelCircle ;
+    final Color statusColor = item.isMatched ? AppColors.greenButtonColor.withOpacity(0.1) : AppColors.error.withOpacity(0.1);
     final label = item.field ?? '-';
-    final value = (item.preferredValue ?? '').trim().isNotEmpty
+    final preferredValue = (item.preferredValue ?? '').trim().isNotEmpty
         ? item.preferredValue!
-        : (item.actualValue ?? '-');
+        :  '-';
+    final actualValue = (item.actualValue ?? '').trim().isNotEmpty
+        ? item.actualValue!
+        :  '-';
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: statusColor,
         borderRadius: BorderRadius.circular(6),
         border: Border.all(color: AppColors.greyLight),
       ),
       child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '$label:',
+                  label,
                   style: TextStyle(
                     fontSize: TextSize.font12(context),
                     fontWeight: FontWeight.w400,
@@ -333,7 +336,7 @@ class _PreferenceInfoTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  value,
+                    CamelCaseUtils.formatCamelCase(actualValue),
                   style: TextStyle(
                     fontSize: TextSize.font12(context),
                     fontWeight: FontWeight.w500,
@@ -343,11 +346,39 @@ class _PreferenceInfoTile extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 12),
-          Icon(
-            statusIcon,
-            color: statusColor,
-            size: 18,
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: ShowImage(
+              imagePath: statusImage,
+              height: TextSize.font18(context),
+              width: TextSize.font18(context),
+            )
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: TextSize.font12(context),
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  CamelCaseUtils.formatCamelCase(preferredValue),
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    fontSize: TextSize.font12(context),
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textPrimaryLight,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
