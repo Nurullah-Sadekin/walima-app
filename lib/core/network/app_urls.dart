@@ -208,6 +208,8 @@ class AppUrls {
       '$baseUrl/matches/compatibility/{userId}'; //GET
   static const String getMatchPreview =
       '$baseUrl/matches/preview/{userId}'; //GET
+  static const String getMatchCompare =
+      '$baseUrl/matches/compare/{userId}'; //GET
 
   // --- Plans & Subscriptions ---
   static const String getActivePlan = '$baseUrl/plans/active-plan'; //GET

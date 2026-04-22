@@ -628,6 +628,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: SizedBox(
         width: 300,
         child: ProfileComprehensiveCard(
+          onTapCard: () {
+            context.pushNamed(Routes.profilePreview, extra: {'userId': visitor.id});
+          },
           imagePath: imagePath,
           imageHeight: 250,
           isPremiumConnect: visitor.isPremium ?? false,

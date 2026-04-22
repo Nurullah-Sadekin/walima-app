@@ -125,7 +125,7 @@ class _ProfilePreviewScreenState extends ConsumerState<ProfilePreviewScreen> {
               _educationCareerSection(context, preview),
               const SizedBox(height: 16),
             ],
-            _preferenceMatchSection(),
+            _preferenceMatchSection(context, provider, preview),
             const SizedBox(height: 100),
           ],
         ),
@@ -368,8 +368,48 @@ class _ProfilePreviewScreenState extends ConsumerState<ProfilePreviewScreen> {
     );
   }
 
-  Widget _preferenceMatchSection() {
-    return const PreferenceMatchCard();
+  Widget _preferenceMatchSection(
+    BuildContext context,
+    ProfilePreviewProvider provider,
+    ProfilePreviewData preview,
+  ) {
+    if (provider.isCompareLoading && provider.compare == null) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 24),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(12.0),
+          border: Border.all(color: AppColors.greyLight),
+        ),
+        child: const Center(child: CircularProgressIndicator()),
+      );
+    }
+    final compare = provider.compare;
+    if (compare == null) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(12.0),
+          border: Border.all(color: AppColors.greyLight),
+        ),
+        child: Text(
+          provider.compareError ?? 'Compatibility data unavailable.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: TextSize.font12(context),
+            color: AppColors.textSecondaryLight,
+          ),
+        ),
+      );
+    }
+    return PreferenceMatchCard(
+      data: compare,
+      ownerGender: preview.profile?.gender,
+      otherImage: preview.profile?.primaryPhoto?.url,
+    );
   }
 
   Widget _actionButtons(BuildContext context) {
