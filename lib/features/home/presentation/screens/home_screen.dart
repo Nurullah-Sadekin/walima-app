@@ -367,6 +367,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: SizedBox(
         width: 300,
         child: ProfileComprehensiveCard(
+          onTapCard: () {
+            context.pushNamed(Routes.profilePreview,);
+          },
           imagePath: imagePath ??
               (match.gender == 'female'
                   ? AppImages.womenAvatar
