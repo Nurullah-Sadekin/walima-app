@@ -1108,8 +1108,9 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     final isContact = _step == AccountSettingStep.myContactSettings;
     final isSmsAlerts = _step == AccountSettingStep.smsOrEmailAlerts;
     final isPrivacySetting = _step == AccountSettingStep.privacyOptions;
+    final isHIdeOrDeleteProfile = _step == AccountSettingStep.deleteProfile;
 
-    if (isRoot || isPremium || isContact || isSmsAlerts || isPrivacySetting) {
+    if (isRoot || isPremium || isContact || isSmsAlerts || isPrivacySetting || isHIdeOrDeleteProfile) {
       return const SizedBox.shrink();
     }
 
