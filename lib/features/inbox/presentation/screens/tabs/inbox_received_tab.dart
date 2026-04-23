@@ -69,19 +69,16 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const EmptyStateWidget(
+             EmptyStateWidget(
               imagePath: AppImages.addTeam,
               title: 'Error Loading Requests',
               subtitle: 'Unable to load your connection requests',
               buttonText: 'Retry',
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
+              onTap:  () {
                 provider.fetchRequestedConnections();
               },
-              child: const Text('Retry'),
             ),
+
           ],
         ),
       );
