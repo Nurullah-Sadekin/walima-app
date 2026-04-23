@@ -47,10 +47,10 @@ class _ProfilePreviewScreenState extends ConsumerState<ProfilePreviewScreen> {
       backgroundColor: Colors.white,
       appBar: _appBar(context),
       body: _body(context, provider),
-      floatingActionButton: provider.preview != null
-          ? _actionButtons(context)
-          : null,
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // floatingActionButton: provider.preview != null
+      //     ? _actionButtons(context)
+      //     : null,
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
@@ -126,7 +126,7 @@ class _ProfilePreviewScreenState extends ConsumerState<ProfilePreviewScreen> {
               const SizedBox(height: 16),
             ],
             _preferenceMatchSection(context, provider, preview),
-            const SizedBox(height: 100),
+            const SizedBox(height: 20),
           ],
         ),
       ),
