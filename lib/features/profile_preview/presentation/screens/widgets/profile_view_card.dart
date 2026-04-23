@@ -64,6 +64,7 @@ class ProfileViewCard extends StatelessWidget {
                         ),
                         child: ShowImage(
                           imagePath: iconPath ?? AppImages.profileSvgIcon,
+                          color: AppColors.primary,
                           fit: BoxFit.cover,
                         ),
                       ),

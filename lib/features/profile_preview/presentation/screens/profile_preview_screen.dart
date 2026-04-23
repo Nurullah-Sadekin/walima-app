@@ -2,12 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
 import 'package:flutter_boilerplate/core/global/components/bottom_sheet_widget/widgets/icon_title_card.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
+import 'package:flutter_boilerplate/core/global/enums/enums.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
 import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
 import 'package:flutter_boilerplate/core/utils/height_utils.dart';
+import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:flutter_boilerplate/features/connections/presentation/widgets/view_contact_bottom_sheet.dart';
+import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/verification_tile.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
 import 'package:flutter_boilerplate/features/profile_preview/data/models/profile_preview_response.dart';
@@ -47,10 +52,10 @@ class _ProfilePreviewScreenState extends ConsumerState<ProfilePreviewScreen> {
       backgroundColor: Colors.white,
       appBar: _appBar(context),
       body: _body(context, provider),
-      // floatingActionButton: provider.preview != null
-      //     ? _actionButtons(context)
-      //     : null,
-      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: provider.preview != null
+          ? _actionButtons(context,provider)
+          : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
@@ -97,7 +102,9 @@ class _ProfilePreviewScreenState extends ConsumerState<ProfilePreviewScreen> {
         child: Column(
           children: [
             _profileHeader(context, preview),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
+            _verifiedBadge(context, preview),
+            const SizedBox(height: 16),
             _basicDetailsSection(context, preview),
             const SizedBox(height: 16),
             if ((preview.about ?? '').trim().isNotEmpty) ...[
@@ -126,11 +133,147 @@ class _ProfilePreviewScreenState extends ConsumerState<ProfilePreviewScreen> {
               const SizedBox(height: 16),
             ],
             _preferenceMatchSection(context, provider, preview),
-            const SizedBox(height: 20),
+            const SizedBox(height: 100),
           ],
         ),
       ),
     );
+  }
+
+  Widget _verifiedBadge(BuildContext context, ProfilePreviewData preview) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(12.0),
+          border: Border.all(color: AppColors.greyLight),
+        ),
+        child: Column(
+          spacing: 8,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              spacing: 10,
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  padding: const EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.rectangle,
+                    color: AppColors.greenButtonColor,
+                    border: Border.all(
+                        color: AppColors.greenButtonColor, width: 1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const ShowImage(
+                    imagePath: AppImages.safetySvgIcon,
+                    color: AppColors.white,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Trust Badge',
+                      style: TextStyle(
+                        color: AppColors.textPrimaryLight,
+                        fontSize: TextSize.font14(context),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      _percentage(preview.user) ?? '',
+                      style: TextStyle(
+                        color: AppColors.textSecondaryLight,
+                        fontSize: TextSize.font12(context),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Row(
+              spacing: 6,
+              children: [
+                Expanded(
+                  child: VerificationTile(
+                    iconImagePath: AppImages.callIcon,
+                    iconColor: preview.user?.isPhoneVerified ?? false ? AppColors.greenButtonColor : AppColors.error,
+                    iconSize: TextSize.font16(context),
+                    titleSize: TextSize.font12(context),
+                    title: 'Phone Verified',
+                    statusColor: AppColors.primary,
+                    statusBackgroundColor: AppColors.primaryVariant,
+                      trailing: ShowImage(
+                        imagePath:  preview.user?.isPhoneVerified ?? false ? AppImages.successCircle : AppImages.cancelCircle,
+                        width: TextSize.font18(context),
+                        height: TextSize.font18(context),
+                      )
+                  ),
+                ),
+                Expanded(
+                  child: VerificationTile(
+                      iconImagePath: AppImages.emailSvgIcon,
+                      iconColor: preview.user?.isEmailVerified ?? false ? AppColors.greenButtonColor : AppColors.error,
+                      iconSize: TextSize.font16(context),
+                      titleSize: TextSize.font12(context),
+                      title: 'Email Verified',
+                      statusColor: AppColors.primary,
+                      statusBackgroundColor: AppColors.primaryVariant,
+                      trailing: ShowImage(
+                        imagePath:  preview.user?.isEmailVerified ?? false ? AppImages.successCircle : AppImages.cancelCircle,
+                        width: TextSize.font18(context),
+                        height: TextSize.font18(context),
+                      )
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              spacing: 6,
+              children: [
+                Expanded(
+                  child: VerificationTile(
+                    iconImagePath: AppImages.photoIcon,
+                    iconColor: preview.user?.isPhotoVerified ?? false ? AppColors.greenButtonColor : AppColors.error,
+                    iconSize: TextSize.font16(context),
+                    titleSize: TextSize.font12(context),
+                    title: 'Photo Verified',
+                    statusColor: AppColors.primary,
+                    statusBackgroundColor: AppColors.primaryVariant,
+                      trailing: ShowImage(
+                        imagePath:  preview.user?.isPhotoVerified ?? false ? AppImages.successCircle : AppImages.cancelCircle,
+                        width: TextSize.font18(context),
+                        height: TextSize.font18(context),
+                      )
+                  ),
+                ),
+                Expanded(
+                  child: VerificationTile(
+                      iconImagePath: AppImages.cardView,
+                      iconColor: preview.user?.isIdVerified ?? false ? AppColors.greenButtonColor : AppColors.error,
+                      iconSize: TextSize.font16(context),
+                      titleSize: TextSize.font12(context),
+                      title: 'ID Verified',
+                      statusColor: AppColors.primary,
+                      statusBackgroundColor: AppColors.primaryVariant,
+                      trailing: ShowImage(
+                        imagePath:  preview.user?.isIdVerified ?? false ? AppImages.successCircle : AppImages.cancelCircle,
+                        width: TextSize.font18(context),
+                        height: TextSize.font18(context),
+                      )
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
   }
 
   Widget _profileHeader(BuildContext context, ProfilePreviewData preview) {
@@ -164,11 +307,11 @@ class _ProfilePreviewScreenState extends ConsumerState<ProfilePreviewScreen> {
     return ProfileComprehensiveCard(
       imagePath: (photoUrl != null && photoUrl.isNotEmpty) ? photoUrl : fallback,
       name: displayName,
-      age: ageText,
-      height: heightText,
-      location: location,
-      religion: religionText,
-      maritalStatus: CamelCaseUtils.formatCamelCase(profile?.maritalStatus),
+      // age: ageText,
+      // height: heightText,
+      // location: location,
+      // religion: religionText,
+      // maritalStatus: CamelCaseUtils.formatCamelCase(profile?.maritalStatus),
       noButton: true,
       activeStatusText: activeStatus,
       photoCount: photoCount,
@@ -184,7 +327,7 @@ class _ProfilePreviewScreenState extends ConsumerState<ProfilePreviewScreen> {
     final location = preview.presentLocation;
     final lifestyle = preview.lifestyle;
     final dobFormatted = _formatDob(profile?.dateOfBirth);
-    final heightText = profile?.height != null ? '${profile!.height} cm' : '-';
+    final heightText = profile?.height != null ?  HeightUtils.formatHeight(profile?.height.toString()) : '-';
 
     final entries = <MapEntry<String, String>>[
       if (profile?.age != null) MapEntry('Age', '${profile!.age}'),
@@ -413,7 +556,7 @@ class _ProfilePreviewScreenState extends ConsumerState<ProfilePreviewScreen> {
     );
   }
 
-  Widget _actionButtons(BuildContext context) {
+  Widget _actionButtons(BuildContext context, ProfilePreviewProvider provider) {
     return BottomBorderedWidget(
       widget: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -432,7 +575,21 @@ class _ProfilePreviewScreenState extends ConsumerState<ProfilePreviewScreen> {
             backgroundColor: AppColors.greenButtonColor,
             textColor: AppColors.textSecondaryLight,
             iconColor: AppColors.white,
-            onTap: () {},
+            onTap: () {
+              if (provider.preview?.user?.id != null) {
+                ref.read(homeProvider).connect(
+                  context,
+                  provider.preview?.user?.id ?? '',
+                  provider.preview?.profile?.displayName ?? provider.preview?.user?.fullName ?? 'Walima Member',
+                  ConnectionRequestType.match.apiValue,
+                );
+              }
+              else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('User information unavailable. Cannot initiate contact.')),
+                );
+              }
+            },
           ),
           IconTitleCard(
             title: 'Contact Now',
@@ -441,9 +598,43 @@ class _ProfilePreviewScreenState extends ConsumerState<ProfilePreviewScreen> {
             borderColor: AppColors.primary,
             textColor: AppColors.textSecondaryLight,
             iconColor: AppColors.primary,
-            onTap: () {},
+            onTap: () async {
+              if (provider.preview != null) {
+                await BottomSheetUtils.open(
+                  context: context,
+                  fullHeight: false,
+                  child: _contactBottomSheet(provider.preview!),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('User information unavailable.')),
+                );
+              }
+            },
           ),
         ],
+      ),
+    );
+  }
+
+
+  Widget _contactBottomSheet(ProfilePreviewData preview) {
+    final user = preview.user;
+    final profile = preview.profile;
+    final profileImagePath = (profile?.primaryPhoto?.url?.isNotEmpty ?? false)
+        ? profile!.primaryPhoto!.url!
+        : (profile?.gender ?? '').toLowerCase() == 'female'
+            ? AppImages.womenAvatar
+            : AppImages.manAvatar;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: ViewContactBottomSheet(
+        userId: user?.id ?? '',
+        userName: profile?.displayName ?? user?.fullName ?? 'Unknown',
+        profileImagePath: profileImagePath,
+        description: null,
+        isDescriptionVisible: false,
       ),
     );
   }
@@ -465,6 +656,22 @@ class _ProfilePreviewScreenState extends ConsumerState<ProfilePreviewScreen> {
       return DateTimeUtils.formatDate(DateTime.tryParse(user.lastSeenAt!));
     }
     return 'Offline';
+  }
+
+  String _percentage(PreviewUser? user) {
+    if (user == null) return '0% Verified';
+
+    int verifiedCount = 0;
+    const int totalFields = 4;
+
+    if (user.isPhoneVerified == true) verifiedCount++;
+    if (user.isEmailVerified == true) verifiedCount++;
+    if (user.isPhotoVerified == true) verifiedCount++;
+    if (user.isIdVerified == true) verifiedCount++;
+
+    int percentage = ((verifiedCount / totalFields) * 100).toInt();
+
+    return '$percentage% Verified';
   }
 
   String? _formatDob(String? raw) {

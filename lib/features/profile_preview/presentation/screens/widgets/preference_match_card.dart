@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/profile_preview/data/models/profile_compare_response.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class PreferenceMatchCard extends StatelessWidget {
+class PreferenceMatchCard extends ConsumerWidget {
   const PreferenceMatchCard({
     super.key,
     required this.data,
@@ -21,12 +23,12 @@ class PreferenceMatchCard extends StatelessWidget {
   final String? otherImage;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userImage = ref.watch(globalProvider).currentUser?.profilePicture ?? matchImage;
     final items = data.audit;
     final matchedCount = data.matchedCount ?? 0;
     final totalCount = data.totalCriteria ?? items.length;
     final percentage = data.matchPercentage ?? 0;
-    final titleSubject = _subjectForGender(ownerGender);
 
     return Container(
       width: double.infinity,
@@ -48,7 +50,7 @@ class PreferenceMatchCard extends StatelessWidget {
             percentage: percentage,
             matchedCount: matchedCount,
             totalCount: totalCount,
-            matchImage: matchImage,
+            matchImage: userImage,
             otherImage: otherImage,
             ownerGender: ownerGender,
           ),
@@ -69,17 +71,24 @@ class PreferenceMatchCard extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 8),
                   child: _PreferenceInfoTile(item: item),
                 )),
+          Center(
+            child: Text(
+              data.compatibilityLevel != null
+                  ? ' ${CamelCaseUtils.formatCamelCase(data.compatibilityLevel)} Compatibility'
+                  : 'Compatibility level not available.',
+              style: TextStyle(
+                fontSize: TextSize.font14(context),
+                color: AppColors.primary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  static String _subjectForGender(String? gender) {
-    final g = (gender ?? '').toLowerCase();
-    if (g == 'female') return 'Her';
-    if (g == 'male') return 'His';
-    return 'Their';
-  }
+
 }
 
 class _Header extends StatelessWidget {
