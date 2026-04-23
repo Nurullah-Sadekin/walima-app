@@ -179,7 +179,7 @@ class PrimaryButtons extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding:  EdgeInsets.symmetric(vertical: verticalPadding ?? 10),
         decoration: BoxDecoration(
           color: bgColor,
           border:
