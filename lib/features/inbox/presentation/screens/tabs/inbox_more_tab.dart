@@ -209,11 +209,8 @@ class _InboxMoreTabState extends ConsumerState<InboxMoreTab>
               DateTime.tryParse(item.connection?.createdAt ?? ''),
             ),
             isBottomSection: false,
-            infoBottomMessage: 'Okay',
             mood: InboxCardMood.small,
             location: _locationText(item),
-            subtitle:
-                CamelCaseUtils.formatCamelCase(item.connection?.status ?? ''),
             subtitleColor: AppColors.primary,
             isVerified: item.profilePhoto?.isVerified ?? false,
           );
