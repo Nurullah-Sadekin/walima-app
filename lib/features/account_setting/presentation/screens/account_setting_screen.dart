@@ -173,8 +173,10 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           ProfileActionTile(
             iconImagePath: AppImages.delete,
             title: 'Hide/Delete Profile',
-            onTap: () =>
-                setState(() => _step = AccountSettingStep.deleteProfile),
+            onTap: () {
+              setState(() => _step = AccountSettingStep.deleteProfile);
+              provider.loadPrivacySettings();
+            },
             // Note: ProfileActionTile might need custom styling for the delete option
             // You may need to check if ProfileActionTile supports custom colors
           ),
@@ -260,6 +262,26 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
   }
 
   Widget _hideOrDeleteProfile() {
+    if (provider.isPrivacyLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (provider.privacyError != null && provider.privacySettings == null) {
+      return Center(
+        child: Text(
+          'Error loading settings: ${provider.privacyError}',
+          style: const TextStyle(color: AppColors.error),
+        ),
+      );
+    }
+
+    final settings = provider.privacySettings;
+    final profileHidden = settings?.profileHidden ?? false;
+    final shortlistAlerts = settings?.shortlistAlert ?? false;
+    final premiumCalls = settings?.allowPremiumCalls ?? false;
+    final hideDuration = settings?.hideDuration;
+    final deleteReason = settings?.deleteReason;
+
     return CardBorder(
       widget: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -272,11 +294,9 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
                 title: 'Hide Profile',
                 subtitle:
                     'Hiding your profile makes you invisible and disables messages and invitations',
-                value: provider.hideProfile ?? false,
-                onChanged: (value) {
-                  provider.hideProfile = value;
-                  provider.notifyListeners();
-                },
+                value: profileHidden,
+                onChanged: (value) =>
+                    _applyPrivacyUpdate('profileHidden', value ? 'enable' : 'disable'),
               ),
               const SizedBox(
                 height: 16,
@@ -284,14 +304,18 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               FilterWidget(
                 items: provider.timelineDataList
                     .map(
-                      (item) => FilterItem(name: item.label, isSelected: false),
+                      (item) => FilterItem(
+                        name: item.label,
+                        isSelected: item.value == hideDuration,
+                      ),
                     )
                     .toList(),
                 spacing: 0,
                 itemSpacing: 10,
                 onItemTap: (index) async {
-                  final setTimelineValue = provider.setTimelineValue(index);
-                  if (setTimelineValue == null) return;
+                  final value = provider.setTimelineValue(index);
+                  if (value == null) return;
+                  _applyPrivacyUpdate('hideDuration', value);
                 },
               ),
             ],
@@ -326,11 +350,9 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               SettingsSwitchTile(
                 title: 'Shortlist Alerts',
                 subtitle: 'Notify me when someone shortlists my profile',
-                value: provider.shortlistAlerts ?? false,
-                onChanged: (value) {
-                  provider.shortlistAlerts = value;
-                  provider.notifyListeners();
-                },
+                value: shortlistAlerts,
+                onChanged: (value) =>
+                    _applyPrivacyUpdate('shortlistAlert', value ? 'enable' : 'disable'),
               ),
               const SizedBox(
                 height: 10,
@@ -338,11 +360,9 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               SettingsSwitchTile(
                 title: 'Premium Calls',
                 subtitle: 'Allow premium members to call me directly',
-                value: provider.premiumCalls ?? false,
-                onChanged: (value) {
-                  provider.premiumCalls = value;
-                  provider.notifyListeners();
-                },
+                value: premiumCalls,
+                onChanged: (value) =>
+                    _applyPrivacyUpdate('allowPremiumCalls', value ? 'enable' : 'disable'),
               ),
             ],
           ),
@@ -377,15 +397,18 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               FilterWidget(
                 items: provider.deleteProfileStatus
                     .map(
-                      (item) => FilterItem(name: item.label, isSelected: false),
+                      (item) => FilterItem(
+                        name: item.label,
+                        isSelected: item.value == deleteReason,
+                      ),
                     )
                     .toList(),
                 spacing: 0,
                 itemSpacing: 10,
                 onItemTap: (index) async {
-                  final deleteProfileStatus =
-                      provider.setDeleteProfileStatus(index);
-                  if (deleteProfileStatus == null) return;
+                  final value = provider.setDeleteProfileStatus(index);
+                  if (value == null) return;
+                  _applyPrivacyUpdate('deleteReason', value);
                 },
               ),
             ],
@@ -393,6 +416,13 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _applyPrivacyUpdate(String key, String value) async {
+    provider.updatePrivacySetting(key, value);
+    final response = await provider.savePrivacySettings();
+    if (!mounted) return;
+    _showResponseSnackBar(response);
   }
 
   Widget _myContactSettings() {

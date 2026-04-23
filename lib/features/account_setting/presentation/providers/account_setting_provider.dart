@@ -649,7 +649,8 @@ class AccountSettingProvider extends BaseChangeNotifier {
                key == 'allowPremiumCalls' ||
                key == 'showOnlineStatus' ||
                key == 'showLastSeen' ||
-               key == 'showActivityStatus') {
+               key == 'showActivityStatus' ||
+               key == 'profileHidden') {
       // Handle boolean values
       final boolValue = value == 'enable';
       updatedSettings = privacySettings!.copyWith(
@@ -658,6 +659,12 @@ class AccountSettingProvider extends BaseChangeNotifier {
         showOnlineStatus: key == 'showOnlineStatus' ? boolValue : privacySettings!.showOnlineStatus,
         showLastSeen: key == 'showLastSeen' ? boolValue : privacySettings!.showLastSeen,
         showActivityStatus: key == 'showActivityStatus' ? boolValue : privacySettings!.showActivityStatus,
+        profileHidden: key == 'profileHidden' ? boolValue : privacySettings!.profileHidden,
+      );
+    } else if (key == 'hideDuration' || key == 'deleteReason') {
+      updatedSettings = privacySettings!.copyWith(
+        hideDuration: key == 'hideDuration' ? value : privacySettings!.hideDuration,
+        deleteReason: key == 'deleteReason' ? value : privacySettings!.deleteReason,
       );
     } else {
       return;
