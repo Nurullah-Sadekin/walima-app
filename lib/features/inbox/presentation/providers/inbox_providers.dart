@@ -595,14 +595,14 @@ class InboxProvider extends BaseChangeNotifier {
           await fetchAcceptedConnections();
         }
         break;
-      case 3:
+      case 2:
         if ((sentConnections?.isEmpty ?? true) && !isSentLoading) {
           await fetchSentConnections();
         }
         break;
-      case 4:
-        if ((deletedConnections?.isEmpty ?? true) && !isDeletedLoading) {
-          await fetchDeletedConnections();
+      case 3:
+        if ((blockedConnections?.isEmpty ?? true) && !isBlockedLoading) {
+          await fetchBlockedConnections();
         }
         break;
     }
