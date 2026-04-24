@@ -92,10 +92,12 @@ class _PaginatedSearchPickerSheetState
 
   @override
   Widget build(BuildContext context) {
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    final isKeyboardVisible = keyboardHeight > 0;
     return DraggableScrollableSheet(
-      initialChildSize: 0.65,
-      minChildSize: 0.5,
-      maxChildSize: 0.92,
+      initialChildSize: isKeyboardVisible ? 0.9 : 0.65,
+      minChildSize: isKeyboardVisible ? 0.8 : 0.5,
+      maxChildSize: isKeyboardVisible ? 1.0 : 0.92,
       expand: false,
       builder: (context, scrollController) {
         return Container(
@@ -105,76 +107,79 @@ class _PaginatedSearchPickerSheetState
           ),
           child: SafeArea(
             top: false,
-            child: Column(
-              children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.black26,
-                    borderRadius: BorderRadius.circular(2),
+            child: Padding(
+              padding: EdgeInsets.only(bottom: keyboardHeight),
+              child: Column(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.black26,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          widget.title,
-                          style: TextStyle(
-                            fontSize: TextSize.font18(context),
-                            fontWeight: FontWeight.w600,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            widget.title,
+                            style: TextStyle(
+                              fontSize: TextSize.font18(context),
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                      ),
-                      IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.close, size: 20),
-                      ),
-                    ],
+                        IconButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: const Icon(Icons.close, size: 20),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: TextField(
-                    controller: _searchController,
-                    onChanged: _onSearchChanged,
-                    decoration: InputDecoration(
-                      hintText: widget.searchHintText,
-                      prefixIcon: const Icon(Icons.search),
-                      suffixIcon: _searchController.text.isEmpty
-                          ? null
-                          : IconButton(
-                              onPressed: () {
-                                _searchController.clear();
-                                _onSearchChanged('');
-                              },
-                              icon: const Icon(Icons.close),
-                            ),
-                      filled: true,
-                      fillColor: const Color(0xFFF7F7F7),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: _onSearchChanged,
+                      decoration: InputDecoration(
+                        hintText: widget.searchHintText,
+                        prefixIcon: const Icon(Icons.search),
+                        suffixIcon: _searchController.text.isEmpty
+                            ? null
+                            : IconButton(
+                                onPressed: () {
+                                  _searchController.clear();
+                                  _onSearchChanged('');
+                                },
+                                icon: const Icon(Icons.close),
+                              ),
+                        filled: true,
+                        fillColor: const Color(0xFFF7F7F7),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                Expanded(
-                  child: _PaginatedSearchPickerList(
-                    scrollController: scrollController,
-                    items: widget.items,
-                    isInitialLoading: widget.isInitialLoading,
-                    isLoadingMore: widget.isLoadingMore,
-                    hasMoreItems: widget.hasMoreItems,
-                    onLoadMore: widget.onLoadMore,
-                    emptyStateText: widget.emptyStateText,
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: _PaginatedSearchPickerList(
+                      scrollController: scrollController,
+                      items: widget.items,
+                      isInitialLoading: widget.isInitialLoading,
+                      isLoadingMore: widget.isLoadingMore,
+                      hasMoreItems: widget.hasMoreItems,
+                      onLoadMore: widget.onLoadMore,
+                      emptyStateText: widget.emptyStateText,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
