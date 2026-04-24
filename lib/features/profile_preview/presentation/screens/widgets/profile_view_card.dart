@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:flutter_boilerplate/core/utils/clipboard_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 
 /// Reusable profile info card used in EditProfileScreen.
@@ -106,7 +107,11 @@ class ProfileViewCard extends StatelessWidget {
                       Row(
                         children: [
                           InkWell(
-                            onTap: copyUserIdOnTap,
+                            onTap: copyUserIdOnTap ??
+                                ((userId == null || userId!.isEmpty)
+                                    ? null
+                                    : () => ClipboardUtils.copyWithSnack(
+                                        context, userId)),
                             child: Container(
                               decoration: BoxDecoration(
                                 border: Border.all(

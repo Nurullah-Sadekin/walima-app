@@ -8,6 +8,7 @@ import 'package:flutter_boilerplate/core/global/components/profile_image_card.da
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
+import 'package:flutter_boilerplate/core/utils/clipboard_utils.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/core/utils/height_utils.dart';
 import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
@@ -145,33 +146,40 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   Widget _memberIdChip(BuildContext context, CompleteProfile? profile) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(6.0),
-        border: Border.all(color: AppColors.greyLight),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text(
-            'ID : ${_valueOrDefault(profile?.user?.userReference, '--')}',
-            style: TextStyle(
-              color: AppColors.textSecondaryLight,
-              fontSize: TextSize.font12(context),
-              fontWeight: FontWeight.w400,
+    final memberId = profile?.user?.userReference ?? '';
+    return InkWell(
+      borderRadius: BorderRadius.circular(6.0),
+      onTap: memberId.isEmpty
+          ? null
+          : () => ClipboardUtils.copyWithSnack(context, memberId),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(6.0),
+          border: Border.all(color: AppColors.greyLight),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              'ID : ${_valueOrDefault(memberId.isEmpty ? null : memberId, '--')}',
+              style: TextStyle(
+                color: AppColors.textSecondaryLight,
+                fontSize: TextSize.font12(context),
+                fontWeight: FontWeight.w400,
+              ),
             ),
-          ),
-          const SizedBox(width: 4),
-          ShowImage(
-            imagePath: AppImages.copy,
-            width: TextSize.font12(context),
-            height: TextSize.font12(context),
-            color: AppColors.textSecondaryLight,
-          )
-        ],
+            const SizedBox(width: 4),
+            ShowImage(
+              imagePath: AppImages.copy,
+              width: TextSize.font12(context),
+              height: TextSize.font12(context),
+              color: AppColors.textSecondaryLight,
+            )
+          ],
+        ),
       ),
     );
   }
