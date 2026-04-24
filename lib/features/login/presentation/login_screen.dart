@@ -156,17 +156,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                spacing: 8,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      provider.keepMeLoggedIn = !provider.keepMeLoggedIn;
-                      provider.notifyListeners();
-                    },
-                    child: Container(
+              InkWell(
+                onTap: () {
+                  provider.keepMeLoggedIn = !provider.keepMeLoggedIn;
+                  provider.notifyListeners();
+                },
+                child: Row(
+                  children: [
+                    Container(
                       height: TextSize.font16(context),
                       width: TextSize.font16(context),
+                      margin: const EdgeInsets.only(right: 6),
                       decoration: BoxDecoration(
                         color: provider.keepMeLoggedIn
                             ? AppColors.primary
@@ -175,28 +175,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         border: Border.all(
                           color: provider.keepMeLoggedIn
                               ? AppColors.primary
-                              : AppColors.greyLight,
+                              : AppColors.textSecondaryLight,
                           width: 1,
                         ),
                       ),
                       child: provider.keepMeLoggedIn
                           ? Icon(
-                              Icons.check,
-                              size: TextSize.font12(context),
-                              color: Colors.white,
-                            )
+                        Icons.check,
+                        size: TextSize.font12(context),
+                        color: Colors.white,
+                      )
                           : null,
                     ),
-                  ),
-                  Text(
-                    'Keep me logged in',
-                    style: TextStyle(
-                      color: AppColors.textPrimaryLight,
-                      fontWeight: FontWeight.w400,
-                      fontSize: TextSize.font12(context),
+                    Text(
+                      'Keep me logged in',
+                      style: TextStyle(
+                        color: AppColors.textPrimaryLight,
+                        fontWeight: FontWeight.w400,
+                        fontSize: TextSize.font12(context),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               InkWell(
                 onTap: () {
@@ -204,16 +204,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   provider.updateViewState();
                   context.push(Paths.sendOtp);
                 },
-                child: Text(
-                  'Forgot password?',
-                  style: TextStyle(
-                    color: AppColors.textSecondaryLight,
-                    fontWeight: FontWeight.w400,
-                    fontSize: TextSize.font12(context),
-                    decoration: TextDecoration.underline,
-                    decorationColor: AppColors.textSecondaryLight,
+                child: Container(
+                  padding: const EdgeInsets.only(bottom: 1), // controls space
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: AppColors.primary,
+                        width: 1,
+                      ),
+                    ),
                   ),
-                ),
+                  child: Text(
+                    'Forgot password?',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w500,
+                      fontSize: TextSize.font13(context),
+                    ),
+                  ),
+                )
               ),
             ],
           ),
