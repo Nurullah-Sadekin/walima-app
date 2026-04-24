@@ -178,12 +178,12 @@ enum RegistrationMaritalStatus implements ApiUiEnum {
 }
 
 enum RegistrationDiet implements ApiUiEnum {
-  vegetarian('vegetarian'),
-  nonVegetarian('non_vegetarian', 'Non-Vegetarian'),
   halalOnly('halal_only', 'Halal Only'),
-  vegan('vegan'),
+  vegetarian('vegetarian'),
+  occasionallyNonVeg('occasionally_non_veg', 'Occasionally Non-Veg'),
   jainVegetarian('jain_vegetarian', 'Jain Vegetarian'),
-  occasionallyNonVeg('occasionally_non_veg', 'Occasionally Non-Veg');
+  nonVegetarian('non_vegetarian', 'Non-Vegetarian'),
+  vegan('vegan');
 
   const RegistrationDiet(this.apiValue, [this._label]);
 
