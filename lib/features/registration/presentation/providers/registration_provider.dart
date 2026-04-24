@@ -1237,7 +1237,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       years--;
     }
     if (years < 0) years = 0;
-    return '$years Years Age'.replaceFirst('\u007f', '');
+    return '$years years old'.replaceFirst('\u007f', '');
   }
 
   int selectedHobbiesCount() {
