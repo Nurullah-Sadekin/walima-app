@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
 import 'package:flutter_boilerplate/core/utils/app_error_reporting_service.dart';
@@ -200,6 +201,7 @@ class LoginProvider extends BaseChangeNotifier {
       purpose: _authPurpose,
     );
     final response = await LoginRepository.resendOtp(body);
+    _hideLoading();
     if (!context.mounted) return;
     final isSuccess = response.code == 'SUCCESS';
     _showResendSnackBar(
