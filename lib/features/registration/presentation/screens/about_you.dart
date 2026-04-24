@@ -27,6 +27,7 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
   void initState() {
     super.initState();
     provider = ref.read(registrationProvider);
+    provider.dateOfBirthController.addListener(_onDobChanged);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider.getInitialData();
@@ -34,8 +35,13 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
     });
   }
 
+  void _onDobChanged() {
+    if (mounted) setState(() {});
+  }
+
   @override
   void dispose() {
+    provider.dateOfBirthController.removeListener(_onDobChanged);
     provider.disposeControllersListener();
     super.dispose();
   }
