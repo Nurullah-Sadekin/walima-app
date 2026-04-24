@@ -201,16 +201,33 @@ class LoginProvider extends BaseChangeNotifier {
     );
     final response = await LoginRepository.resendOtp(body);
     if (!context.mounted) return;
-    if (response.code != 'SUCCESS') {
-      _handleLoginFailure(context, response.message);
-      return;
-    }
-    _hideLoading();
-    await DialogUtils.showSuccessDialog(
-      message: response.message,
-      autoClose: true,
-      autoCloseDuration: const Duration(seconds: 2),
+    final isSuccess = response.code == 'SUCCESS';
+    _showResendSnackBar(
+      context,
+      message: response.message ??
+          (isSuccess ? 'OTP sent' : 'Failed to resend OTP'),
+      isSuccess: isSuccess,
     );
+  }
+
+  void _showResendSnackBar(
+    BuildContext context, {
+    required String message,
+    required bool isSuccess,
+  }) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: isSuccess ? AppColors.success : AppColors.error,
+          duration: const Duration(seconds: 2),
+          content: Text(
+            message,
+            style: const TextStyle(color: Colors.white),
+          ),
+        ),
+      );
   }
 
   Future<void> loginWithOtp(BuildContext context) async {

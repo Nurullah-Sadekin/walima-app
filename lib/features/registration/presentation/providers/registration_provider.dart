@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/core/network/dio_client.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
@@ -408,15 +409,35 @@ class RegistrationProvider extends BaseChangeNotifier {
       purpose: 'signup',
     );
     final response = await RegistrationRepository.resendOtp(body);
-    if (response.code != 'SUCCESS') {
-      DialogUtils.showErrorDialog(
-        context: context,
-        message: response.message ?? 'Failed to resend OTP',
+    if (!context.mounted) return response.code == 'SUCCESS';
+    final isSuccess = response.code == 'SUCCESS';
+    _showResendSnackBar(
+      context,
+      message: response.message ??
+          (isSuccess ? 'OTP sent' : 'Failed to resend OTP'),
+      isSuccess: isSuccess,
+    );
+    return isSuccess;
+  }
+
+  void _showResendSnackBar(
+    BuildContext context, {
+    required String message,
+    required bool isSuccess,
+  }) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: isSuccess ? AppColors.success : AppColors.error,
+          duration: const Duration(seconds: 2),
+          content: Text(
+            message,
+            style: const TextStyle(color: Colors.white),
+          ),
+        ),
       );
-      return false;
-    } else {
-      return true;
-    }
   }
 
   void initControllersListener() {
