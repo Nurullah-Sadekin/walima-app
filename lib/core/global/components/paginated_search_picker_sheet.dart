@@ -76,6 +76,11 @@ class _PaginatedSearchPickerSheetState
     extends State<_PaginatedSearchPickerSheet> {
   late final TextEditingController _searchController;
   Timer? _searchDebounce;
+  final DraggableScrollableController _sheetController =
+      DraggableScrollableController();
+  static const double _collapsedSize = 0.65;
+  static const double _expandedSize = 0.95;
+  bool _wasKeyboardVisible = false;
 
   @override
   void initState() {
@@ -87,17 +92,35 @@ class _PaginatedSearchPickerSheetState
   void dispose() {
     _searchDebounce?.cancel();
     _searchController.dispose();
+    _sheetController.dispose();
     super.dispose();
+  }
+
+  void _syncSheetToKeyboard(bool isKeyboardVisible) {
+    if (isKeyboardVisible == _wasKeyboardVisible) return;
+    _wasKeyboardVisible = isKeyboardVisible;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_sheetController.isAttached) return;
+      final target = isKeyboardVisible ? _expandedSize : _collapsedSize;
+      if ((_sheetController.size - target).abs() < 0.01) return;
+      _sheetController.animateTo(
+        target,
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOut,
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     final isKeyboardVisible = keyboardHeight > 0;
+    _syncSheetToKeyboard(isKeyboardVisible);
     return DraggableScrollableSheet(
-      initialChildSize: isKeyboardVisible ? 0.9 : 0.65,
-      minChildSize: isKeyboardVisible ? 0.8 : 0.5,
-      maxChildSize: isKeyboardVisible ? 1.0 : 0.92,
+      controller: _sheetController,
+      initialChildSize: _collapsedSize,
+      minChildSize: 0.5,
+      maxChildSize: _expandedSize,
       expand: false,
       builder: (context, scrollController) {
         return Container(
