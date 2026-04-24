@@ -2222,15 +2222,19 @@ class RegistrationProvider extends BaseChangeNotifier {
       return true;
     } else {
       if (emailRes.response?.isAvailable != true) {
-        emailAvailabilityErrorMessage =
-            emailRes.message ?? 'Email already exists';
-        // DialogUtils.showErrorDialog(ctx: context, message: emailRes.message ?? 'Email already exists');
+        emailAvailabilityErrorMessage = emailRes.message ?? 'Email already exists';
+        notifyListeners();
+      }
+      if (emailRes.response?.isAvailable == true) {
+        emailAvailabilityErrorMessage = '';
         notifyListeners();
       }
       if (phoneRes.response?.isAvailable != true) {
         phoneAvailabilityErrorMessage =
             phoneRes.message ?? 'Phone number already exists';
-        // DialogUtils.showErrorDialog(ctx: context, message: phoneRes.message ?? 'Phone number already exists');
+      }
+      if (phoneRes.response?.isAvailable == true) {
+        phoneAvailabilityErrorMessage = '';
       }
       _notifyAndPersist();
       return false;
