@@ -7,6 +7,7 @@ import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
+import 'package:flutter_boilerplate/core/global/components/resend_code_timer.dart';
 import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/router/route_name.dart';
@@ -152,26 +153,16 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                 fontWeight: FontWeight.w400,
               ),
             ),
-            InkWell(
-              onTap: () async {
+            ResendCodeTimer(
+              onResend: () async {
                 final screenProvider = ref.read(verifyOtpForSignUp);
-                screenProvider.updateViewState(loadingState: RegistrationScreenStates.isProfileFor);
+                screenProvider.updateViewState(
+                    loadingState: RegistrationScreenStates.isProfileFor);
                 await provider.resendOtp(context);
                 screenProvider.updateViewState(
                   loadingState: RegistrationScreenStates.loadingComplete,
                 );
               },
-              child: Text(
-                'Resend Code',
-                style: TextStyle(
-                  fontSize: TextSize.font14(context),
-                  color: AppColors.textPrimaryLight,
-                  fontWeight: FontWeight.w500,
-                  decoration: TextDecoration.underline,
-                  decorationColor: AppColors.textPrimaryLight,
-                  decorationThickness: 1,
-                ),
-              ),
             ),
             const Spacer(),
             bottomAction(),
@@ -261,26 +252,36 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
   }
 
   Widget bottomAction() {
+    final otpCode = provider.otpControllers.map((c) => c.text).join();
+    final isComplete = otpCode.length == provider.otpControllers.length &&
+        provider.otpControllers.isNotEmpty;
     return PrimaryButtons(
-      buttonStyle: ButtonsStyle.activePrimaryButton,
+      buttonStyle: isComplete
+          ? ButtonsStyle.activePrimaryButton
+          : ButtonsStyle.disableButton,
       title: 'Done',
-      onTap: () async {
-        final screenProvider = ref.read(verifyOtpForSignUp);
-        screenProvider.updateViewState(loadingState: RegistrationScreenStates.isProfileFor);
-        final validate = await provider.submitRegistration(
-          context,
-          useDebugTemplate: _isDebugOtpFlow,
-        );
-        if (!validate) {
-          screenProvider.updateViewState(loadingState: RegistrationScreenStates.loadingComplete);
-          return;
-        } else {
-          screenProvider.updateViewState(screenStates: RegistrationScreenStates.loadingComplete);
-          if (mounted) {
-            _navigateAfterRegistrationSuccess();
-          }
-        }
-      },
+      onTap: isComplete
+          ? () async {
+              final screenProvider = ref.read(verifyOtpForSignUp);
+              screenProvider.updateViewState(
+                  loadingState: RegistrationScreenStates.isProfileFor);
+              final validate = await provider.submitRegistration(
+                context,
+                useDebugTemplate: _isDebugOtpFlow,
+              );
+              if (!validate) {
+                screenProvider.updateViewState(
+                    loadingState: RegistrationScreenStates.loadingComplete);
+                return;
+              } else {
+                screenProvider.updateViewState(
+                    screenStates: RegistrationScreenStates.loadingComplete);
+                if (mounted) {
+                  _navigateAfterRegistrationSuccess();
+                }
+              }
+            }
+          : () {},
     );
   }
 

@@ -11,6 +11,7 @@ import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
+import 'package:flutter_boilerplate/core/global/components/resend_code_timer.dart';
 import 'package:go_router/go_router.dart';
 
 class VerifyNumberScreen extends ConsumerStatefulWidget {
@@ -147,16 +148,10 @@ class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
                 fontWeight: FontWeight.w400,
               ),
             ),
-            Text(
-              'Resend Code',
-              style: TextStyle(
-                fontSize: TextSize.font14(context),
-                color: AppColors.textPrimaryLight,
-                fontWeight: FontWeight.w500,
-                decoration: TextDecoration.underline,
-                decorationColor: AppColors.textPrimaryLight,
-                decorationThickness: 2,
-              ),
+            ResendCodeTimer(
+              onResend: () async {
+                await provider.resendOtp(context);
+              },
             ),
             const Spacer(),
             bottomAction(),
