@@ -207,7 +207,6 @@ class LoginProvider extends BaseChangeNotifier {
     }
     _hideLoading();
     await DialogUtils.showSuccessDialog(
-      context: context,
       message: response.message,
       autoClose: true,
       autoCloseDuration: const Duration(seconds: 2),
