@@ -2326,8 +2326,10 @@ class RegistrationProvider extends BaseChangeNotifier {
   }
 
   List<String> _getSelectedHobbiesFromList(List<SingleStringModel> list) {
+     final selectedSet = selectedHobbies.map((e) => e.toLowerCase()).toSet();
     return list
-        .where((item) => item.isSelected)
+        .where((item) =>
+            item.isSelected || selectedSet.contains(item.name.toLowerCase()))
         .map((item) => item.value ?? item.name)
         .toList();
   }
