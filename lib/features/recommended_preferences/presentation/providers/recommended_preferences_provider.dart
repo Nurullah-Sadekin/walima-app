@@ -380,6 +380,10 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
       educationLookupOptions = await _lookupRepository.getLookups(
         LookupCategory.educationLevels,
       );
+      // if(educationLevelOptions.isEmpty) {
+      //   educationLevelOptions = EducationLevel.values.map((e) => LookupOption(key: e.apiValue, label: e.label)).toList(growable: false);
+      // }
+
       educationDataList = educationLookupOptions
           .map(
             (item) => SingleStringModel(
@@ -388,6 +392,10 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
             ),
           )
           .toList(growable: false);
+
+       if(educationLookupOptions.isEmpty){
+        educationDataList =  EducationLevel.values.map((e) => SingleStringModel(value: e.apiValue, name: e.label)).toList(growable: false);
+       }
     } catch (e) {
       educationLookupError = e.toString();
     } finally {
