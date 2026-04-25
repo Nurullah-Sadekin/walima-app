@@ -6,8 +6,10 @@ import 'package:flutter_boilerplate/core/global/enums/enums.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
+import 'package:flutter_boilerplate/core/global/components/paginated_search_picker_sheet.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
+import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/network/app_urls.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
@@ -74,7 +76,6 @@ class _ProfileSectionEditScreenState
   List<LookupOption> _professionOptions = <LookupOption>[];
   List<LookupOption> _incomeRangeOptions = <LookupOption>[];
   List<LookupOption> _communityOptions = <LookupOption>[];
-  List<LookupOption> _grewUpOptions = <LookupOption>[];
   List<LookupOption> _healthInfoOptions = <LookupOption>[];
 
   static final List<int> _heightInchOptions = List<int>.generate(
@@ -232,14 +233,11 @@ class _ProfileSectionEditScreenState
   }
 
   Future<void> _loadBasicDetailsLookups() async {
-    if (_grewUpOptions.isNotEmpty && _healthInfoOptions.isNotEmpty) return;
-    final results = await Future.wait<List<LookupOption>>([
-      _lookupRepository.getLookups(LookupCategory.languages),
-      _lookupRepository.getLookups(LookupCategory.healthInformation),
-    ]);
+    if (_healthInfoOptions.isNotEmpty) return;
+    final options =
+        await _lookupRepository.getLookups(LookupCategory.healthInformation);
     if (!mounted) return;
-    _grewUpOptions = results[0];
-    _healthInfoOptions = results[1];
+    _healthInfoOptions = options;
   }
 
   Future<void> _loadEducationLevelLookup() async {
@@ -475,13 +473,19 @@ class _ProfileSectionEditScreenState
               isSearch: true,
               onConfirm: (value) => _selectHeight(value?.toString()),
             ),
-            _lookupDropdown(
-              label: 'Grew up in',
+            PrimaryTextField(
+              headLine: 'Grew up in',
+              hintText: 'Select',
               controller: _grewUpInController,
-              options: _grewUpOptions,
-              popupHeader: 'Select',
-              fieldKey: 'grewUpIn',
-              onTap: _loadBasicDetailsLookups,
+              errorText: '',
+              noPrefix: true,
+              readOnly: true,
+              onTap: _openGrewUpInCountryPicker,
+              suffix: Icon(
+                Icons.keyboard_arrow_down_outlined,
+                size: TextSize.font20(context),
+                color: AppColors.grey,
+              ),
             ),
             _enumDropdown<RegistrationDiet>(
               label: 'Diet',
@@ -911,6 +915,40 @@ class _ProfileSectionEditScreenState
     return null;
   }
 
+  Future<void> _openGrewUpInCountryPicker() async {
+    final registration = ref.read(registrationProvider);
+    await registration.loadCountryData(
+      reset: registration.countryDropdownItems.isEmpty,
+    );
+    if (!mounted) return;
+
+    final selectedCountry = await showPaginatedSearchPickerSheet(
+      context: context,
+      title: 'Select Grew Up In',
+      searchHintText: 'Search country',
+      items: registration.countryDropdownItems,
+      isInitialLoading: registration.isCountryLoading &&
+          registration.countryDropdownItems.isEmpty,
+      isLoadingMore: registration.isCountryLoadingMore,
+      hasMoreItems: registration.hasMoreCountries,
+      initialQuery: registration.countrySearchQuery,
+      emptyStateText: 'No countries found',
+      onSearchChanged: registration.setCountrySearchQuery,
+      onLoadMore: registration.loadMoreCountries,
+    );
+
+    if (!mounted ||
+        selectedCountry == null ||
+        selectedCountry.trim().isEmpty) {
+      return;
+    }
+
+    setState(() {
+      _grewUpInController.text = selectedCountry.trim();
+      _selectedApiValues['grewUpIn'] = selectedCountry.trim();
+    });
+  }
+
   Future<void> _pickFamilyEconomicCondition() async {
     final currentValue = _resolveFamilyEconomicConditionValue(
       _familyFinancialController.text,
@@ -1038,8 +1076,7 @@ class _ProfileSectionEditScreenState
           fallbackMessage: 'Failed to update about section',
         );
       case ProfileEditSection.basicDetails:
-        return _updateByEndpoint(
-          endpoint: AppUrls.updateBasicProfile,
+        return _updateWithUniversal(
           fields: {
             'profileManagedBy':
                 _apiValueOrText('managedBy', _managedByController),
@@ -1050,7 +1087,7 @@ class _ProfileSectionEditScreenState
             'height': _toIntOrNull(_heightController),
             'diet': _apiValueOrText('diet', _dietController),
             'bloodGroup': _apiValueOrText('bloodGroup', _bloodGroupController),
-            'languages': _selectedLanguagesForApi(),
+            'grewUpIn': _apiValueOrText('grewUpIn', _grewUpInController),
             'healthDetails':
                 _apiValueOrText('healthDetails', _healthInfoController),
             'specialCases': _toTrimmedOrNull(_disabilityController),
@@ -1233,24 +1270,6 @@ class _ProfileSectionEditScreenState
     return false;
   }
 
-  Future<bool> _updateByEndpoint({
-    required String endpoint,
-    required Map<String, dynamic> fields,
-    required String fallbackMessage,
-  }) async {
-    final response = await ProfileRepository.updateProfileByEndpoint(
-      endpoint: endpoint,
-      body: UpdateProfileSectionRequestBody(fields: fields),
-    );
-
-    if (response.isSuccess) {
-      return true;
-    }
-
-    await _showError(response.message ?? fallbackMessage);
-    return false;
-  }
-
   Future<void> _showError(String message) async {
     await DialogUtils.showErrorDialog(
       context: context,
@@ -1337,12 +1356,13 @@ class _ProfileSectionEditScreenState
     }
     _subCommunityController.text = religion?.religiousBackground ?? '';
     _motherTongueController.text = profileData?.motherTongue ?? '';
-    _prefillLookup(
-      controller: _grewUpInController,
-      raw: _firstLanguage(profileData?.languages),
-      options: _grewUpOptions,
-      fieldKey: 'languages',
-    );
+    final grewUpInValue = location?.grewUpIn?.toString().trim() ?? '';
+    _grewUpInController.text = grewUpInValue;
+    if (grewUpInValue.isEmpty) {
+      _selectedApiValues.remove('grewUpIn');
+    } else {
+      _selectedApiValues['grewUpIn'] = grewUpInValue;
+    }
 
     _fatherNameController.text = family?.fatherName ?? '';
     _prefillSingleString(
@@ -1603,31 +1623,6 @@ class _ProfileSectionEditScreenState
       return '';
     }
     return values.join(', ');
-  }
-
-  String? _firstLanguage(List<dynamic>? values) {
-    if (values == null || values.isEmpty) {
-      return null;
-    }
-    for (final value in values) {
-      final normalized = value?.toString().trim();
-      if (normalized != null && normalized.isNotEmpty) {
-        return normalized;
-      }
-    }
-    return null;
-  }
-
-  List<String>? _selectedLanguagesForApi() {
-    final apiValue = _selectedApiValues['languages']?.trim();
-    if (apiValue != null && apiValue.isNotEmpty) {
-      return <String>[apiValue];
-    }
-    final fallback = _grewUpInController.text.trim();
-    if (fallback.isEmpty) {
-      return null;
-    }
-    return <String>[fallback];
   }
 
   List<String> get _heightDropdownItems => _heightInchOptions
