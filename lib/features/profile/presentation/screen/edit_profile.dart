@@ -242,31 +242,61 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   Widget _basicDetails(CompleteProfile? profile) {
     final appearance = profile?.appearance;
     final location = _firstLocation(profile);
+    final basic = profile?.profile;
 
     return ProfileInfoCard(
       title: 'Basic Details',
       showEdit: true,
       onEdit: () => _openSectionEditor(ProfileEditSection.basicDetails),
       infoList: [
-        MapEntry('Age', _valueOrDefault(profile?.profile?.age)),
-        MapEntry('Date of Birth', _formatDate(profile?.profile?.dateOfBirth)),
+        MapEntry(
+          'Profile Managed By',
+          _valueOrDefault(CamelCaseUtils.formatCamelCase(basic?.profileManagedBy)),
+        ),
+        MapEntry(
+          'Gender',
+          _valueOrDefault(CamelCaseUtils.formatCamelCase(basic?.gender)),
+        ),
+        MapEntry('Age', _valueOrDefault(basic?.age)),
+        MapEntry('Date of Birth', _formatDate(basic?.dateOfBirth)),
         MapEntry(
           'Marital Status',
-          _valueOrDefault(CamelCaseUtils.formatCamelCase(profile?.profile?.maritalStatus)),
+          _valueOrDefault(CamelCaseUtils.formatCamelCase(basic?.maritalStatus)),
         ),
         MapEntry('Height', _formatHeightCm(appearance?.height)),
-        MapEntry('Grew up in', _valueOrDefault(CamelCaseUtils.formatCamelCase(location?.grewUpIn))),
-        MapEntry('Diet', _valueOrDefault(CamelCaseUtils.formatCamelCase(profile?.lifestyle?.dietType))),
-        MapEntry('Blood Group', _valueOrDefault(appearance?.bloodGroup)),
+        MapEntry(
+          'Grew up in',
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(location?.grewUpIn?.toString()),
+          ),
+        ),
+        MapEntry(
+          'Diet',
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(profile?.lifestyle?.dietType),
+          ),
+        ),
+        MapEntry(
+          'Blood Group',
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(appearance?.bloodGroup?.toString()),
+          ),
+        ),
         MapEntry(
           'Health Information',
-          _valueOrDefault(CamelCaseUtils.formatCamelCase(
-            appearance?.healthDetails ?? appearance?.healthCondition,)
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(
+              (appearance?.healthDetails ?? appearance?.healthCondition)
+                  ?.toString(),
+            ),
           ),
         ),
         MapEntry(
           'Disability',
-          _valueOrDefault(CamelCaseUtils.formatCamelCase(appearance?.specialCases), 'None'),
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(appearance?.specialCases?.toString()),
+            'None',
+          ),
         ),
       ],
     );
@@ -324,11 +354,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
         ),
         MapEntry('Family Location', _valueOrDefault(family?.familyLocation)),
-        MapEntry('No. of Sisters', _valueOrDefault(family?.sisters)),
-        MapEntry('No. of Brothers', _valueOrDefault(family?.brothers)),
+        MapEntry(
+          'No. of Sisters',
+          _valueOrDefault(family?.sisters?.toString()),
+        ),
+        MapEntry(
+          'No. of Brothers',
+          _valueOrDefault(family?.brothers?.toString()),
+        ),
         MapEntry(
           'Family Financial Status',
-          _valueOrDefault(family?.familyEconomicCondition),
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(family?.familyEconomicCondition),
+          ),
         ),
       ],
     );
@@ -353,13 +391,32 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           'College(s) Attended',
           _valueOrDefault(CamelCaseUtils.formatCamelCase(education?.institutionName)),
         ),
-        MapEntry('Annual Income', _valueOrDefault(profession?.incomeRange)),
-        MapEntry('Working with', _valueOrDefault(CamelCaseUtils.formatCamelCase(profession?.employmentType))),
+        MapEntry(
+          'Annual Income',
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(profession?.incomeRange),
+          ),
+        ),
+        MapEntry(
+          'Working with',
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(
+              profession?.employmentType?.toString(),
+            ),
+          ),
+        ),
         MapEntry(
           'Working as',
-          _valueOrDefault(CamelCaseUtils.formatCamelCase(profession?.designation ?? profession?.profession)),
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(
+              (profession?.designation ?? profession?.profession)?.toString(),
+            ),
+          ),
         ),
-        MapEntry('Employer Name', _valueOrDefault(CamelCaseUtils.formatCamelCase((profession?.employer)))),
+        MapEntry(
+          'Employer Name',
+          _valueOrDefault(CamelCaseUtils.formatCamelCase(profession?.employer)),
+        ),
       ],
     );
   }
@@ -379,12 +436,22 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             location?.country,
           ),
         ),
-        MapEntry('State of Residence', _valueOrDefault(CamelCaseUtils.formatCamelCase(location?.state))),
+        MapEntry(
+          'State of Residence',
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(location?.state?.toString()),
+          ),
+        ),
         MapEntry(
           'Residency Status',
-          _valueOrDefault(CamelCaseUtils.formatCamelCase(location?.residencyStatus)),
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(location?.residencyStatus),
+          ),
         ),
-        MapEntry('ZIP/Pin code', _valueOrDefault(location?.zipCode)),
+        MapEntry(
+          'ZIP/Pin code',
+          _valueOrDefault(location?.zipCode?.toString()),
+        ),
       ],
     );
   }
@@ -399,20 +466,20 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       infoList: [
         MapEntry(
           'Creative',
-          _valueOrDefault(_joinList(interest?.creativePursuits)),
+          _valueOrDefault(_joinPrettyList(interest?.creativePursuits)),
         ),
         MapEntry(
           'Fun',
-          _valueOrDefault(_joinList(interest?.outdoorActivities)),
+          _valueOrDefault(_joinPrettyList(interest?.outdoorActivities)),
         ),
         MapEntry(
           'Fitness',
-          _valueOrDefault(_joinList(interest?.fitnessAndSports)),
+          _valueOrDefault(_joinPrettyList(interest?.fitnessAndSports)),
         ),
         MapEntry(
           'Other',
           _valueOrDefault(
-            _joinList([
+            _joinPrettyList([
               ...?interest?.mediaAndLearning,
               ...?interest?.foodAndCuisine,
               ...?interest?.travelAndLeisure,
@@ -462,15 +529,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         ),
         MapEntry(
           'Religion',
-          _valueOrDefault(_joinList(preference?.religionPreference)),
+          _valueOrDefault(_joinPrettyList(preference?.religionPreference)),
         ),
         MapEntry(
           'Community',
-          _valueOrDefault(_joinList(preference?.communityPreference)),
+          _valueOrDefault(_joinPrettyList(preference?.communityPreference)),
         ),
         MapEntry(
           'Mother Tongue',
-          _valueOrDefault(_joinList(preference?.motherTonguePreference)),
+          _valueOrDefault(_joinPrettyList(preference?.motherTonguePreference)),
+        ),
+        MapEntry(
+          'Marital Status',
+          _valueOrDefault(_joinPrettyList(preference?.maritalStatusPreference)),
         ),
       ],
     );
@@ -487,15 +558,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       infoList: [
         MapEntry(
           'Countries',
-          _valueOrDefault(_joinList(preference?.preferredCountries)),
+          _valueOrDefault(_joinPrettyList(preference?.preferredCountries)),
         ),
         MapEntry(
           'States',
-          _valueOrDefault(_joinList(preference?.preferredStates)),
+          _valueOrDefault(_joinPrettyList(preference?.preferredStates)),
         ),
         MapEntry(
           'Cities',
-          _valueOrDefault(_joinList(preference?.preferredCities)),
+          _valueOrDefault(_joinPrettyList(preference?.preferredCities)),
         ),
       ],
     );
@@ -512,19 +583,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       infoList: [
         MapEntry(
           'Education',
-          _valueOrDefault(_joinList(preference?.educationPreference)),
+          _valueOrDefault(_joinPrettyList(preference?.educationPreference)),
         ),
         MapEntry(
           'Profession',
-          _valueOrDefault(_joinList(preference?.professionPreference)),
+          _valueOrDefault(_joinPrettyList(preference?.professionPreference)),
         ),
         MapEntry(
           'Working As',
-          _valueOrDefault(_joinList(preference?.workingAsPreference)),
+          _valueOrDefault(_joinPrettyList(preference?.workingAsPreference)),
         ),
         MapEntry(
           'Annual Income',
-          _valueOrDefault(_joinList(preference?.annualIncomePreference)),
+          _valueOrDefault(_joinPrettyList(preference?.annualIncomePreference)),
         ),
       ],
     );
@@ -541,11 +612,21 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       infoList: [
         MapEntry(
           'Profile Managed By',
-          _valueOrDefault(_joinList(preference?.profileManagedByPreference)),
+          _valueOrDefault(
+            _joinPrettyList(preference?.profileManagedByPreference),
+          ),
         ),
         MapEntry(
           'Diet',
-          _valueOrDefault(_joinList(preference?.dietPreference)),
+          _valueOrDefault(_joinPrettyList(preference?.dietPreference)),
+        ),
+        MapEntry(
+          'Drinking',
+          _valueOrDefault(_joinPrettyList(preference?.drinkingPreference)),
+        ),
+        MapEntry(
+          'Smoking',
+          _valueOrDefault(_joinPrettyList(preference?.smokingPreference)),
         ),
       ],
     );
@@ -653,13 +734,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return '$cityText, $countryText';
   }
 
-  String _joinList(List<String>? values) {
+  String _joinPrettyList(List<String>? values) {
     if (values == null || values.isEmpty) {
       return '';
     }
 
     final normalized = values
-        .map((item) => item.trim())
+        .map((item) => CamelCaseUtils.formatCamelCase(item).trim())
         .where((item) => item.isNotEmpty)
         .toList(growable: false);
 
