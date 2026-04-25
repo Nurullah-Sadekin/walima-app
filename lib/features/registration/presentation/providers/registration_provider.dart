@@ -667,6 +667,9 @@ class RegistrationProvider extends BaseChangeNotifier {
       educationLevelOptions = await _lookupRepository.getLookups(
         LookupCategory.educationLevels,
       );
+      if(educationLevelOptions.isEmpty) {
+        educationLevelOptions = EducationLevel.values.map((e) => LookupOption(key: e.apiValue, label: e.label)).toList(growable: false);
+      }
     } catch (e) {
       lookupDataError = e.toString();
     } finally {
