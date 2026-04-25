@@ -551,11 +551,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     );
   }
 
-  void _openSectionEditor(ProfileEditSection section) {
-    context.pushNamed(
+  Future<void> _openSectionEditor(ProfileEditSection section) async {
+    final result = await context.pushNamed(
       Routes.profileSectionEdit,
       extra: section.key,
     );
+    if (!mounted) return;
+    if (result == true) {
+      await ref.read(profileProvider).getProfile(context);
+      if (!mounted) return;
+      setState(() {});
+    }
   }
 
   String _resolveDisplayName(CompleteProfile? profile) {

@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
 import 'package:flutter_boilerplate/core/global/enums/enums.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
+import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
 import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
@@ -15,8 +18,10 @@ import 'package:flutter_boilerplate/features/profile/data/repository/profile_rep
 import 'package:flutter_boilerplate/features/profile/presentation/screen/profile_edit_section.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/data/models/request/update_preferences_request_body.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/data/repository/preferences_repository.dart';
+import 'package:flutter_boilerplate/features/registration/data/models/lookup_option.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/request/update_family_request_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/family_repository.dart';
+import 'package:flutter_boilerplate/features/registration/data/repository/lookup_repository.dart';
 import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/hobbies_interests_custom_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -53,8 +58,24 @@ class _ProfileSectionEditScreenState
         RegistrationFamilyEconomicCondition.lowerMiddleClass.apiValue,
   };
 
+  static const List<LookupOption> _religionOptions = <LookupOption>[
+    LookupOption(key: 'islam', label: 'Islam'),
+    LookupOption(key: 'hinduism', label: 'Hinduism'),
+    LookupOption(key: 'christianity', label: 'Christianity'),
+    LookupOption(key: 'buddhism', label: 'Buddhism'),
+    LookupOption(key: 'others', label: 'Others'),
+  ];
+
   final PreferencesRepository _preferencesRepository = PreferencesRepository();
   final FamilyRepository _familyRepository = FamilyRepository();
+  final LookupRepository _lookupRepository = LookupRepository();
+
+  List<LookupOption> _educationLevelOptions = <LookupOption>[];
+  List<LookupOption> _professionOptions = <LookupOption>[];
+  List<LookupOption> _incomeRangeOptions = <LookupOption>[];
+  List<LookupOption> _communityOptions = <LookupOption>[];
+
+  final Map<String, String> _selectedApiValues = <String, String>{};
 
   final TextEditingController _aboutController = TextEditingController();
 
@@ -136,10 +157,12 @@ class _ProfileSectionEditScreenState
   bool _isSaving = false;
   bool _didPrefill = false;
 
-  late final List<SingleStringModel> _creativeOptions;
-  late final List<SingleStringModel> _funOptions;
-  late final List<SingleStringModel> _fitnessOptions;
-  late final List<SingleStringModel> _otherOptions;
+  List<SingleStringModel> _creativeOptions = <SingleStringModel>[];
+  List<SingleStringModel> _funOptions = <SingleStringModel>[];
+  List<SingleStringModel> _fitnessOptions = <SingleStringModel>[];
+  List<SingleStringModel> _otherOptions = <SingleStringModel>[];
+
+  bool _isLookupLoading = false;
 
   @override
   void initState() {
@@ -157,8 +180,127 @@ class _ProfileSectionEditScreenState
       if (!mounted) {
         return;
       }
+      await _loadLookupsForSection();
+      if (!mounted) {
+        return;
+      }
       _prefill(provider.profile);
     });
+  }
+
+  Future<void> _loadLookupsForSection() async {
+    final futures = <Future<void>>[];
+
+    switch (widget.section) {
+      case ProfileEditSection.educationCareer:
+        futures.add(_loadEducationLevelLookup());
+        futures.add(_loadProfessionAndIncomeLookup());
+        break;
+      case ProfileEditSection.hobbiesInterests:
+        futures.add(_loadHobbyLookups());
+        break;
+      default:
+        break;
+    }
+
+    if (futures.isEmpty) {
+      return;
+    }
+
+    setState(() => _isLookupLoading = true);
+    try {
+      await Future.wait(futures);
+    } catch (_) {
+      // Silent fallback: dropdowns will show whatever data was loaded successfully.
+    } finally {
+      if (mounted) {
+        setState(() => _isLookupLoading = false);
+      }
+    }
+  }
+
+  Future<void> _loadEducationLevelLookup() async {
+    if (_educationLevelOptions.isNotEmpty) return;
+    final options =
+        await _lookupRepository.getLookups(LookupCategory.educationLevels);
+    if (!mounted) return;
+    _educationLevelOptions = options;
+  }
+
+  Future<void> _loadProfessionAndIncomeLookup() async {
+    if (_professionOptions.isNotEmpty && _incomeRangeOptions.isNotEmpty) return;
+    final results = await Future.wait<List<LookupOption>>([
+      _lookupRepository.getLookups(LookupCategory.professions),
+      _lookupRepository.getLookups(LookupCategory.incomeRange),
+    ]);
+    if (!mounted) return;
+    _professionOptions = results[0];
+    _incomeRangeOptions = results[1];
+  }
+
+  Future<void> _loadHobbyLookups() async {
+    final results = await Future.wait<List<LookupOption>>([
+      _lookupRepository.getLookups(LookupCategory.creativePursuits),
+      _lookupRepository.getLookups(LookupCategory.outdoorActivities),
+      _lookupRepository.getLookups(LookupCategory.fitnessAndSports),
+      _lookupRepository.getLookups(LookupCategory.mediaAndLearning),
+      _lookupRepository.getLookups(LookupCategory.foodAndCuisine),
+      _lookupRepository.getLookups(LookupCategory.travelAndLeisure),
+    ]);
+    if (!mounted) return;
+
+    final creative = _lookupToSingleStrings(results[0]);
+    final fun = _lookupToSingleStrings(results[1]);
+    final fitness = _lookupToSingleStrings(results[2]);
+    final other = <SingleStringModel>[
+      ..._lookupToSingleStrings(results[3]),
+      ..._lookupToSingleStrings(results[4]),
+      ..._lookupToSingleStrings(results[5]),
+    ];
+
+    if (creative.isNotEmpty) _creativeOptions = creative;
+    if (fun.isNotEmpty) _funOptions = fun;
+    if (fitness.isNotEmpty) _fitnessOptions = fitness;
+    if (other.isNotEmpty) _otherOptions = other;
+  }
+
+  List<SingleStringModel> _lookupToSingleStrings(List<LookupOption> options) {
+    return options
+        .map(
+          (option) => SingleStringModel(
+            name: option.label,
+            value: option.key,
+          ),
+        )
+        .toList(growable: false);
+  }
+
+  Future<void> _loadCommunityOptionsForReligion(String? religionInput) async {
+    final religionKey = _resolveLookupKey(
+      _religionOptions,
+      religionInput,
+    );
+    if (religionKey == null) {
+      if (!mounted) return;
+      setState(() {
+        _communityOptions = <LookupOption>[];
+      });
+      return;
+    }
+
+    setState(() => _isLookupLoading = true);
+    try {
+      final options = await _lookupRepository.getLookupsBySlug(religionKey);
+      if (!mounted) return;
+      _communityOptions = options;
+    } catch (_) {
+      if (!mounted) return;
+      _communityOptions = <LookupOption>[];
+    } finally {
+      if (mounted) {
+        setState(() => _isLookupLoading = false);
+      }
+    }
   }
 
   @override
@@ -227,7 +369,7 @@ class _ProfileSectionEditScreenState
   @override
   Widget build(BuildContext context) {
     return TransparentLoading(
-      isLoading: _isSaving,
+      isLoading: _isSaving || _isLookupLoading,
       child: Scaffold(
         body: SafeArea(
           child: Column(
@@ -274,27 +416,51 @@ class _ProfileSectionEditScreenState
       case ProfileEditSection.basicDetails:
         return _buildCard(
           children: [
-            _field(
+            _enumDropdown<RegistrationProfileManagedBy>(
               label: 'Profile Managed by',
               controller: _managedByController,
+              values: RegistrationProfileManagedBy.values,
+              popupHeader: 'Select Profile Managed By',
+              fieldKey: 'managedBy',
             ),
-            _field(label: 'Gender', controller: _genderController),
+            _enumDropdown<Gender>(
+              label: 'Gender',
+              controller: _genderController,
+              values: Gender.values,
+              popupHeader: 'Select Gender',
+              fieldKey: 'gender',
+            ),
             _field(
               label: 'Date of Birth',
               controller: _dobController,
               datePicker: true,
             ),
-            _field(
+            _enumDropdown<RegistrationMaritalStatus>(
               label: 'Marital Status',
               controller: _maritalStatusController,
+              values: RegistrationMaritalStatus.values,
+              popupHeader: 'Select Marital Status',
+              fieldKey: 'maritalStatus',
             ),
             _field(
               label: 'Height (cm)',
               controller: _heightController,
               keyboardType: TextInputType.number,
             ),
-            _field(label: 'Diet', controller: _dietController),
-            _field(label: 'Blood Group', controller: _bloodGroupController),
+            _enumDropdown<RegistrationDiet>(
+              label: 'Diet',
+              controller: _dietController,
+              values: RegistrationDiet.values,
+              popupHeader: 'Select Diet',
+              fieldKey: 'diet',
+            ),
+            _enumDropdown<BloodGroup>(
+              label: 'Blood Group',
+              controller: _bloodGroupController,
+              values: BloodGroup.values,
+              popupHeader: 'Select Blood Group',
+              fieldKey: 'bloodGroup',
+            ),
             _field(
               label: 'Languages (comma separated)',
               controller: _languagesController,
@@ -309,8 +475,29 @@ class _ProfileSectionEditScreenState
       case ProfileEditSection.religiousBackground:
         return _buildCard(
           children: [
-            _field(label: 'Religion', controller: _religionController),
-            _field(label: 'Community', controller: _communityController),
+            _lookupDropdown(
+              label: 'Religion',
+              controller: _religionController,
+              options: _religionOptions,
+              popupHeader: 'Select Religion',
+              fieldKey: 'religion',
+              onSelected: (_) {
+                _communityController.clear();
+                _selectedApiValues.remove('community');
+                unawaited(
+                  _loadCommunityOptionsForReligion(_religionController.text),
+                );
+              },
+            ),
+            _lookupDropdown(
+              label: 'Community',
+              controller: _communityController,
+              options: _communityOptions,
+              popupHeader: 'Select Community',
+              fieldKey: 'community',
+              onTap: () =>
+                  _loadCommunityOptionsForReligion(_religionController.text),
+            ),
             _field(label: 'Sub Community', controller: _subCommunityController),
             _field(label: 'Mother Tongue', controller: _motherTongueController),
           ],
@@ -319,14 +506,20 @@ class _ProfileSectionEditScreenState
         return _buildCard(
           children: [
             _field(label: 'Father Name', controller: _fatherNameController),
-            _field(
+            _singleStringDropdown(
               label: 'Father Profession',
               controller: _fatherProfessionController,
+              options: fatherDetailsItemListDataInserted,
+              popupHeader: 'Select Father Profession',
+              fieldKey: 'fatherProfession',
             ),
             _field(label: 'Mother Name', controller: _motherNameController),
-            _field(
+            _singleStringDropdown(
               label: 'Mother Profession',
               controller: _motherProfessionController,
+              options: motherDetailsItemListDataInserted,
+              popupHeader: 'Select Mother Profession',
+              fieldKey: 'motherProfession',
             ),
             _field(
               label: 'Family Location',
@@ -354,14 +547,38 @@ class _ProfileSectionEditScreenState
       case ProfileEditSection.educationCareer:
         return _buildCard(
           children: [
-            _field(
+            _lookupDropdown(
               label: 'Highest Qualification',
               controller: _highestQualificationController,
+              options: _educationLevelOptions,
+              popupHeader: 'Select Highest Qualification',
+              fieldKey: 'highestQualification',
+              onTap: _loadEducationLevelLookup,
             ),
             _field(label: 'College', controller: _collegeController),
-            _field(label: 'Annual Income', controller: _annualIncomeController),
-            _field(label: 'Working With', controller: _workingWithController),
-            _field(label: 'Working As', controller: _workingAsController),
+            _lookupDropdown(
+              label: 'Annual Income',
+              controller: _annualIncomeController,
+              options: _incomeRangeOptions,
+              popupHeader: 'Select Annual Income',
+              fieldKey: 'annualIncome',
+              onTap: _loadProfessionAndIncomeLookup,
+            ),
+            _singleStringDropdown(
+              label: 'Working With',
+              controller: _workingWithController,
+              options: yourWorkListInserted,
+              popupHeader: 'Select Working With',
+              fieldKey: 'workingWith',
+            ),
+            _lookupDropdown(
+              label: 'Working As',
+              controller: _workingAsController,
+              options: _professionOptions,
+              popupHeader: 'Select Working As',
+              fieldKey: 'workingAs',
+              onTap: _loadProfessionAndIncomeLookup,
+            ),
             _field(label: 'Employer Name', controller: _employerController),
           ],
         );
@@ -371,9 +588,12 @@ class _ProfileSectionEditScreenState
             _field(label: 'Current Country', controller: _countryController),
             _field(label: 'State of Residence', controller: _stateController),
             _field(label: 'Current City', controller: _cityController),
-            _field(
+            _enumDropdown<ResidencyStatus>(
               label: 'Residency Status',
               controller: _residencyStatusController,
+              values: ResidencyStatus.values,
+              popupHeader: 'Select Residency Status',
+              fieldKey: 'residencyStatus',
             ),
             _field(label: 'Zip/Pin code', controller: _zipController),
             _field(label: 'Grew up in', controller: _grewUpController),
@@ -534,6 +754,127 @@ class _ProfileSectionEditScreenState
     );
   }
 
+  Widget _enumDropdown<T extends ApiUiEnum>({
+    required String label,
+    required TextEditingController controller,
+    required List<T> values,
+    required String popupHeader,
+    required String fieldKey,
+  }) {
+    final items = values.map((value) => value.label).toList(growable: false);
+    return DropDownField(
+      headLine: label,
+      hintText: 'Select $label',
+      popUpHeader: popupHeader,
+      items: items,
+      controller: controller,
+      isSearch: false,
+      onConfirm: (value) {
+        final selected = value?.toString() ?? '';
+        final match = _findEnumByLabelOrValue(values, selected);
+        if (match != null) {
+          _selectedApiValues[fieldKey] = match.apiValue;
+        } else {
+          _selectedApiValues.remove(fieldKey);
+        }
+      },
+    );
+  }
+
+  Widget _lookupDropdown({
+    required String label,
+    required TextEditingController controller,
+    required List<LookupOption> options,
+    required String popupHeader,
+    required String fieldKey,
+    FutureOr<void> Function()? onTap,
+    ValueChanged<LookupOption?>? onSelected,
+  }) {
+    final items = options.map((o) => o.label).toList(growable: false);
+    return DropDownField(
+      headLine: label,
+      hintText: 'Select $label',
+      popUpHeader: popupHeader,
+      items: items,
+      controller: controller,
+      isSearch: true,
+      onTap: onTap,
+      onConfirm: (value) {
+        final selected = value?.toString() ?? '';
+        final match = _findLookupOption(options, selected);
+        if (match != null) {
+          _selectedApiValues[fieldKey] = match.key;
+        } else {
+          _selectedApiValues.remove(fieldKey);
+        }
+        onSelected?.call(match);
+      },
+    );
+  }
+
+  Widget _singleStringDropdown({
+    required String label,
+    required TextEditingController controller,
+    required List<SingleStringModel> options,
+    required String popupHeader,
+    required String fieldKey,
+  }) {
+    final items = options.map((o) => o.name).toList(growable: false);
+    return DropDownField(
+      headLine: label,
+      hintText: 'Select $label',
+      popUpHeader: popupHeader,
+      items: items,
+      controller: controller,
+      isSearch: false,
+      onConfirm: (value) {
+        final selected = value?.toString() ?? '';
+        final match = options.firstWhere(
+          (o) => o.name.toLowerCase() == selected.toLowerCase(),
+          orElse: () => SingleStringModel(name: selected),
+        );
+        final apiValue = match.value;
+        if (apiValue != null && apiValue.isNotEmpty) {
+          _selectedApiValues[fieldKey] = apiValue;
+        } else {
+          _selectedApiValues.remove(fieldKey);
+        }
+      },
+    );
+  }
+
+  LookupOption? _findLookupOption(List<LookupOption> options, String input) {
+    final normalized = input.trim().toLowerCase();
+    if (normalized.isEmpty) return null;
+    for (final option in options) {
+      if (option.label.toLowerCase() == normalized ||
+          option.key.toLowerCase() == normalized) {
+        return option;
+      }
+    }
+    return null;
+  }
+
+  String? _resolveLookupKey(List<LookupOption> options, String? input) {
+    if (input == null) return null;
+    return _findLookupOption(options, input)?.key;
+  }
+
+  T? _findEnumByLabelOrValue<T extends ApiUiEnum>(
+    List<T> values,
+    String? input,
+  ) {
+    final normalized = input?.trim().toLowerCase();
+    if (normalized == null || normalized.isEmpty) return null;
+    for (final value in values) {
+      if (value.apiValue.toLowerCase() == normalized ||
+          value.label.toLowerCase() == normalized) {
+        return value;
+      }
+    }
+    return null;
+  }
+
   Future<void> _pickFamilyEconomicCondition() async {
     final currentValue = _resolveFamilyEconomicConditionValue(
       _familyFinancialController.text,
@@ -664,13 +1005,15 @@ class _ProfileSectionEditScreenState
         return _updateByEndpoint(
           endpoint: AppUrls.updateBasicProfile,
           fields: {
-            'profileManagedBy': _toTrimmedOrNull(_managedByController),
-            'gender': _toTrimmedOrNull(_genderController),
+            'profileManagedBy':
+                _apiValueOrText('managedBy', _managedByController),
+            'gender': _apiValueOrText('gender', _genderController),
             'dateOfBirth': _toTrimmedOrNull(_dobController),
-            'maritalStatus': _toTrimmedOrNull(_maritalStatusController),
+            'maritalStatus':
+                _apiValueOrText('maritalStatus', _maritalStatusController),
             'height': _toIntOrNull(_heightController),
-            'diet': _toTrimmedOrNull(_dietController),
-            'bloodGroup': _toTrimmedOrNull(_bloodGroupController),
+            'diet': _apiValueOrText('diet', _dietController),
+            'bloodGroup': _apiValueOrText('bloodGroup', _bloodGroupController),
             'languages': _toCsvListOrNull(_languagesController),
             'healthDetails': _toTrimmedOrNull(_healthInfoController),
             'specialCases': _toTrimmedOrNull(_disabilityController),
@@ -680,8 +1023,8 @@ class _ProfileSectionEditScreenState
       case ProfileEditSection.religiousBackground:
         return _updateWithUniversal(
           fields: {
-            'religionName': _toTrimmedOrNull(_religionController),
-            'community': _toTrimmedOrNull(_communityController),
+            'religionName': _apiValueOrText('religion', _religionController),
+            'community': _apiValueOrText('community', _communityController),
             'religiousBackground': _toTrimmedOrNull(_subCommunityController),
             'motherTongue': _toTrimmedOrNull(_motherTongueController),
           },
@@ -699,9 +1042,11 @@ class _ProfileSectionEditScreenState
 
         final body = UpdateFamilyRequestBody(
           fatherName: _toTrimmedOrNull(_fatherNameController),
-          fatherProfession: _toTrimmedOrNull(_fatherProfessionController),
+          fatherProfession:
+              _apiValueOrText('fatherProfession', _fatherProfessionController),
           motherName: _toTrimmedOrNull(_motherNameController),
-          motherProfession: _toTrimmedOrNull(_motherProfessionController),
+          motherProfession:
+              _apiValueOrText('motherProfession', _motherProfessionController),
           familyLocation: _toTrimmedOrNull(_familyLocationController),
           brothers: _toIntOrNull(_brothersController),
           sisters: _toIntOrNull(_sistersController),
@@ -724,12 +1069,15 @@ class _ProfileSectionEditScreenState
       case ProfileEditSection.educationCareer:
         return _updateWithUniversal(
           fields: {
-            'highestLevelOfEducation':
-                _toTrimmedOrNull(_highestQualificationController),
+            'highestLevelOfEducation': _apiValueOrText(
+              'highestQualification',
+              _highestQualificationController,
+            ),
             'institutionName': _toTrimmedOrNull(_collegeController),
-            'incomeRange': _toTrimmedOrNull(_annualIncomeController),
-            'workWith': _toTrimmedOrNull(_workingWithController),
-            'workingAs': _toTrimmedOrNull(_workingAsController),
+            'incomeRange':
+                _apiValueOrText('annualIncome', _annualIncomeController),
+            'workWith': _apiValueOrText('workingWith', _workingWithController),
+            'workingAs': _apiValueOrText('workingAs', _workingAsController),
             'currentCompany': _toTrimmedOrNull(_employerController),
           },
           fallbackMessage: 'Failed to update education and career details',
@@ -740,7 +1088,10 @@ class _ProfileSectionEditScreenState
             'livingIn': _toTrimmedOrNull(_countryController),
             'state': _toTrimmedOrNull(_stateController),
             'cityName': _toTrimmedOrNull(_cityController),
-            'residencyStatus': _toTrimmedOrNull(_residencyStatusController),
+            'residencyStatus': _apiValueOrText(
+              'residencyStatus',
+              _residencyStatusController,
+            ),
             'zipCode': _toTrimmedOrNull(_zipController),
             'grewUpIn': _toTrimmedOrNull(_grewUpController),
           },
@@ -889,53 +1240,125 @@ class _ProfileSectionEditScreenState
 
     _aboutController.text = profileData?.bio ?? '';
 
-    _managedByController.text = profileData?.profileManagedBy ?? '';
-    _genderController.text = profileData?.gender ?? '';
+    _prefillEnum<RegistrationProfileManagedBy>(
+      controller: _managedByController,
+      raw: profileData?.profileManagedBy,
+      values: RegistrationProfileManagedBy.values,
+      fieldKey: 'managedBy',
+    );
+    _prefillEnum<Gender>(
+      controller: _genderController,
+      raw: profileData?.gender,
+      values: Gender.values,
+      fieldKey: 'gender',
+    );
     _dobController.text = _normalizeDate(profileData?.dateOfBirth);
-    _maritalStatusController.text = profileData?.maritalStatus ?? '';
+    _prefillEnum<RegistrationMaritalStatus>(
+      controller: _maritalStatusController,
+      raw: profileData?.maritalStatus,
+      values: RegistrationMaritalStatus.values,
+      fieldKey: 'maritalStatus',
+    );
     _heightController.text = appearance?.height?.toString() ?? '';
-    _dietController.text = lifestyle?.dietType ?? '';
-    _bloodGroupController.text = appearance?.bloodGroup?.toString() ?? '';
+    _prefillEnum<RegistrationDiet>(
+      controller: _dietController,
+      raw: lifestyle?.dietType,
+      values: RegistrationDiet.values,
+      fieldKey: 'diet',
+    );
+    _prefillEnum<BloodGroup>(
+      controller: _bloodGroupController,
+      raw: appearance?.bloodGroup?.toString(),
+      values: BloodGroup.values,
+      fieldKey: 'bloodGroup',
+    );
     _healthInfoController.text = _firstNonEmpty(
       appearance?.healthDetails?.toString(),
       appearance?.healthCondition?.toString(),
     );
     _disabilityController.text = appearance?.specialCases?.toString() ?? '';
 
-    _religionController.text =
-        _firstNonEmpty(religion?.religion, profileData?.religionName);
-    _communityController.text = religion?.community ?? '';
+    _prefillLookup(
+      controller: _religionController,
+      raw: _firstNonEmpty(religion?.religion, profileData?.religionName),
+      options: _religionOptions,
+      fieldKey: 'religion',
+    );
+    _prefillLookup(
+      controller: _communityController,
+      raw: religion?.community,
+      options: _communityOptions,
+      fieldKey: 'community',
+    );
+    if (_religionController.text.isNotEmpty) {
+      unawaited(_loadCommunityOptionsForReligion(_religionController.text));
+    }
     _subCommunityController.text = religion?.religiousBackground ?? '';
     _motherTongueController.text = profileData?.motherTongue ?? '';
     _languagesController.text = _toDynamicCsv(profileData?.languages);
 
     _fatherNameController.text = family?.fatherName ?? '';
-    _fatherProfessionController.text = family?.fatherProfession ?? '';
+    _prefillSingleString(
+      controller: _fatherProfessionController,
+      raw: family?.fatherProfession,
+      options: fatherDetailsItemListDataInserted,
+      fieldKey: 'fatherProfession',
+    );
     _motherNameController.text = family?.motherName ?? '';
-    _motherProfessionController.text = family?.motherProfession ?? '';
+    _prefillSingleString(
+      controller: _motherProfessionController,
+      raw: family?.motherProfession,
+      options: motherDetailsItemListDataInserted,
+      fieldKey: 'motherProfession',
+    );
     _familyLocationController.text = family?.familyLocation ?? '';
     _brothersController.text = family?.brothers?.toString() ?? '';
     _sistersController.text = family?.sisters?.toString() ?? '';
     _familyFinancialController.text =
         _familyEconomicConditionLabel(family?.familyEconomicCondition) ?? '';
 
-    _highestQualificationController.text = _firstNonEmpty(
-      education?.qualification?.toString(),
-      education?.educationLevel?.toString(),
+    _prefillLookup(
+      controller: _highestQualificationController,
+      raw: _firstNonEmpty(
+        education?.qualification?.toString(),
+        education?.educationLevel?.toString(),
+      ),
+      options: _educationLevelOptions,
+      fieldKey: 'highestQualification',
     );
     _collegeController.text = education?.institutionName?.toString() ?? '';
-    _annualIncomeController.text = profession?.incomeRange ?? '';
-    _workingWithController.text = profession?.employmentType?.toString() ?? '';
-    _workingAsController.text = _firstNonEmpty(
-      profession?.designation,
-      profession?.profession?.toString(),
+    _prefillLookup(
+      controller: _annualIncomeController,
+      raw: profession?.incomeRange,
+      options: _incomeRangeOptions,
+      fieldKey: 'annualIncome',
+    );
+    _prefillSingleString(
+      controller: _workingWithController,
+      raw: profession?.employmentType?.toString(),
+      options: yourWorkListInserted,
+      fieldKey: 'workingWith',
+    );
+    _prefillLookup(
+      controller: _workingAsController,
+      raw: _firstNonEmpty(
+        profession?.designation,
+        profession?.profession?.toString(),
+      ),
+      options: _professionOptions,
+      fieldKey: 'workingAs',
     );
     _employerController.text = profession?.employer ?? '';
 
     _countryController.text = location?.country ?? '';
     _stateController.text = location?.state?.toString() ?? '';
     _cityController.text = location?.city ?? '';
-    _residencyStatusController.text = location?.residencyStatus ?? '';
+    _prefillEnum<ResidencyStatus>(
+      controller: _residencyStatusController,
+      raw: location?.residencyStatus,
+      values: ResidencyStatus.values,
+      fieldKey: 'residencyStatus',
+    );
     _zipController.text = location?.zipCode?.toString() ?? '';
     _grewUpController.text = location?.grewUpIn?.toString() ?? '';
 
@@ -977,6 +1400,68 @@ class _ProfileSectionEditScreenState
     setState(() {});
   }
 
+  void _prefillEnum<T extends ApiUiEnum>({
+    required TextEditingController controller,
+    required String? raw,
+    required List<T> values,
+    required String fieldKey,
+  }) {
+    final match = _findEnumByLabelOrValue(values, raw);
+    if (match != null) {
+      controller.text = match.label;
+      _selectedApiValues[fieldKey] = match.apiValue;
+    } else {
+      controller.text = raw?.trim() ?? '';
+      _selectedApiValues.remove(fieldKey);
+    }
+  }
+
+  void _prefillLookup({
+    required TextEditingController controller,
+    required String? raw,
+    required List<LookupOption> options,
+    required String fieldKey,
+  }) {
+    final match = _findLookupOption(options, raw ?? '');
+    if (match != null) {
+      controller.text = match.label;
+      _selectedApiValues[fieldKey] = match.key;
+    } else {
+      controller.text = raw?.trim() ?? '';
+      _selectedApiValues.remove(fieldKey);
+    }
+  }
+
+  void _prefillSingleString({
+    required TextEditingController controller,
+    required String? raw,
+    required List<SingleStringModel> options,
+    required String fieldKey,
+  }) {
+    final normalized = raw?.trim().toLowerCase();
+    if (normalized == null || normalized.isEmpty) {
+      controller.text = '';
+      _selectedApiValues.remove(fieldKey);
+      return;
+    }
+    for (final option in options) {
+      final matchesName = option.name.toLowerCase() == normalized;
+      final matchesValue = option.value?.toLowerCase() == normalized;
+      if (matchesName || matchesValue) {
+        controller.text = option.name;
+        final apiValue = option.value;
+        if (apiValue != null && apiValue.isNotEmpty) {
+          _selectedApiValues[fieldKey] = apiValue;
+        } else {
+          _selectedApiValues.remove(fieldKey);
+        }
+        return;
+      }
+    }
+    controller.text = raw?.trim() ?? '';
+    _selectedApiValues.remove(fieldKey);
+  }
+
   void _toggleOption(List<SingleStringModel> list, int index) {
     setState(() {
       list[index].isSelected = !list[index].isSelected;
@@ -1015,6 +1500,14 @@ class _ProfileSectionEditScreenState
       return null;
     }
     return values;
+  }
+
+  String? _apiValueOrText(String fieldKey, TextEditingController controller) {
+    final tracked = _selectedApiValues[fieldKey]?.trim();
+    if (tracked != null && tracked.isNotEmpty) {
+      return tracked;
+    }
+    return _toTrimmedOrNull(controller);
   }
 
   String? _toTrimmedOrNull(TextEditingController controller) {
