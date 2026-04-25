@@ -90,11 +90,9 @@ class _ProfileSectionEditScreenState
   final TextEditingController _managedByController = TextEditingController();
   final TextEditingController _genderController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
-  final TextEditingController _maritalStatusController =
-      TextEditingController();
+  final TextEditingController _maritalStatusController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
-  final TextEditingController _heightDisplayController =
-      TextEditingController();
+  final TextEditingController _heightDisplayController = TextEditingController();
   final TextEditingController _dietController = TextEditingController();
   final TextEditingController _bloodGroupController = TextEditingController();
   final TextEditingController _healthInfoController = TextEditingController();
@@ -1076,24 +1074,7 @@ class _ProfileSectionEditScreenState
           fallbackMessage: 'Failed to update about section',
         );
       case ProfileEditSection.basicDetails:
-        return _updateWithUniversal(
-          fields: {
-            'profileManagedBy':
-                _apiValueOrText('managedBy', _managedByController),
-            'gender': _apiValueOrText('gender', _genderController),
-            'dateOfBirth': _toTrimmedOrNull(_dobController),
-            'maritalStatus':
-                _apiValueOrText('maritalStatus', _maritalStatusController),
-            'height': _toIntOrNull(_heightController),
-            'diet': _apiValueOrText('diet', _dietController),
-            'bloodGroup': _apiValueOrText('bloodGroup', _bloodGroupController),
-            'grewUpIn': _apiValueOrText('grewUpIn', _grewUpInController),
-            'healthDetails':
-                _apiValueOrText('healthDetails', _healthInfoController),
-            'specialCases': _toTrimmedOrNull(_disabilityController),
-          },
-          fallbackMessage: 'Failed to update basic details',
-        );
+        return _saveBasicDetails();
       case ProfileEditSection.religiousBackground:
         return _updateWithUniversal(
           fields: {
@@ -1235,6 +1216,49 @@ class _ProfileSectionEditScreenState
           fallbackMessage: 'Failed to update preference other details',
         );
     }
+  }
+
+  Future<bool> _saveBasicDetails() async {
+    final universalSuccess = await _updateWithUniversal(
+      fields: {
+        'profileManagedBy': _apiValueOrText('managedBy', _managedByController),
+        'gender': _apiValueOrText('gender', _genderController),
+        'dateOfBirth': _toTrimmedOrNull(_dobController),
+        'maritalStatus': _apiValueOrText('maritalStatus', _maritalStatusController),
+        'height': _toIntOrNull(_heightController),
+        'grewUpIn': _apiValueOrText('grewUpIn', _grewUpInController),
+        'diet': _apiValueOrText('diet', _dietController),
+        'bloodGroup': _apiValueOrText('bloodGroup', _bloodGroupController),
+        'healthDetails': _apiValueOrText('healthDetails', _healthInfoController),
+        'specialCases': _toTrimmedOrNull(_disabilityController),
+      },
+      fallbackMessage: 'Failed to update basic details',
+    );
+
+    if (!universalSuccess) {
+      return false;
+    }
+
+    final grewUpInValue = _apiValueOrText('grewUpIn', _grewUpInController);
+    if (grewUpInValue == null || grewUpInValue.isEmpty) {
+      return true;
+    }
+
+    final response = await ProfileRepository.updateProfileByEndpoint(
+      endpoint: AppUrls.updateProfileLocations,
+      body: UpdateProfileSectionRequestBody(
+        fields: {
+          'grewUpIn': grewUpInValue,
+        },
+      ),
+    );
+
+    if (response.isSuccess) {
+      return true;
+    }
+
+    await _showError(response.message ?? 'Failed to update grew up in');
+    return false;
   }
 
   Future<bool> _updatePreferences({
