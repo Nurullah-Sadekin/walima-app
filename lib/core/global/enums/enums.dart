@@ -1935,7 +1935,9 @@ enum LookupCategory implements ApiUiEnum {
   fitnessAndSports('fitness-and-sports'),
   mediaAndLearning('media-and-learning'),
   foodAndCuisine('food-and-cuisine'),
-  travelAndLeisure('travel-and-leisure');
+  travelAndLeisure('travel-and-leisure'),
+  languages('languages'),
+  healthInformation('health-information');
 
   const LookupCategory(this.apiValue, [this._label]);
 

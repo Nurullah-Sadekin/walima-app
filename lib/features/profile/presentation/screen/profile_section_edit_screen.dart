@@ -74,6 +74,13 @@ class _ProfileSectionEditScreenState
   List<LookupOption> _professionOptions = <LookupOption>[];
   List<LookupOption> _incomeRangeOptions = <LookupOption>[];
   List<LookupOption> _communityOptions = <LookupOption>[];
+  List<LookupOption> _grewUpOptions = <LookupOption>[];
+  List<LookupOption> _healthInfoOptions = <LookupOption>[];
+
+  static final List<int> _heightInchOptions = List<int>.generate(
+    33,
+    (index) => 51 + index,
+  );
 
   final Map<String, String> _selectedApiValues = <String, String>{};
 
@@ -85,6 +92,8 @@ class _ProfileSectionEditScreenState
   final TextEditingController _maritalStatusController =
       TextEditingController();
   final TextEditingController _heightController = TextEditingController();
+  final TextEditingController _heightDisplayController =
+      TextEditingController();
   final TextEditingController _dietController = TextEditingController();
   final TextEditingController _bloodGroupController = TextEditingController();
   final TextEditingController _healthInfoController = TextEditingController();
@@ -94,7 +103,7 @@ class _ProfileSectionEditScreenState
   final TextEditingController _communityController = TextEditingController();
   final TextEditingController _subCommunityController = TextEditingController();
   final TextEditingController _motherTongueController = TextEditingController();
-  final TextEditingController _languagesController = TextEditingController();
+  final TextEditingController _grewUpInController = TextEditingController();
 
   final TextEditingController _fatherNameController = TextEditingController();
   final TextEditingController _fatherProfessionController =
@@ -192,6 +201,9 @@ class _ProfileSectionEditScreenState
     final futures = <Future<void>>[];
 
     switch (widget.section) {
+      case ProfileEditSection.basicDetails:
+        futures.add(_loadBasicDetailsLookups());
+        break;
       case ProfileEditSection.educationCareer:
         futures.add(_loadEducationLevelLookup());
         futures.add(_loadProfessionAndIncomeLookup());
@@ -217,6 +229,17 @@ class _ProfileSectionEditScreenState
         setState(() => _isLookupLoading = false);
       }
     }
+  }
+
+  Future<void> _loadBasicDetailsLookups() async {
+    if (_grewUpOptions.isNotEmpty && _healthInfoOptions.isNotEmpty) return;
+    final results = await Future.wait<List<LookupOption>>([
+      _lookupRepository.getLookups(LookupCategory.languages),
+      _lookupRepository.getLookups(LookupCategory.healthInformation),
+    ]);
+    if (!mounted) return;
+    _grewUpOptions = results[0];
+    _healthInfoOptions = results[1];
   }
 
   Future<void> _loadEducationLevelLookup() async {
@@ -318,6 +341,7 @@ class _ProfileSectionEditScreenState
         _dobController,
         _maritalStatusController,
         _heightController,
+        _heightDisplayController,
         _dietController,
         _bloodGroupController,
         _healthInfoController,
@@ -326,7 +350,7 @@ class _ProfileSectionEditScreenState
         _communityController,
         _subCommunityController,
         _motherTongueController,
-        _languagesController,
+        _grewUpInController,
         _fatherNameController,
         _fatherProfessionController,
         _motherNameController,
@@ -442,10 +466,22 @@ class _ProfileSectionEditScreenState
               popupHeader: 'Select Marital Status',
               fieldKey: 'maritalStatus',
             ),
-            _field(
-              label: 'Height (cm)',
-              controller: _heightController,
-              keyboardType: TextInputType.number,
+            DropDownField(
+              headLine: 'Height',
+              hintText: 'Select Height',
+              popUpHeader: 'Select Height',
+              items: _heightDropdownItems,
+              controller: _heightDisplayController,
+              isSearch: true,
+              onConfirm: (value) => _selectHeight(value?.toString()),
+            ),
+            _lookupDropdown(
+              label: 'Grew up in',
+              controller: _grewUpInController,
+              options: _grewUpOptions,
+              popupHeader: 'Select',
+              fieldKey: 'grewUpIn',
+              onTap: _loadBasicDetailsLookups,
             ),
             _enumDropdown<RegistrationDiet>(
               label: 'Diet',
@@ -461,13 +497,13 @@ class _ProfileSectionEditScreenState
               popupHeader: 'Select Blood Group',
               fieldKey: 'bloodGroup',
             ),
-            _field(
-              label: 'Languages (comma separated)',
-              controller: _languagesController,
-            ),
-            _field(
+            _lookupDropdown(
               label: 'Health Information',
               controller: _healthInfoController,
+              options: _healthInfoOptions,
+              popupHeader: 'Select Health Information',
+              fieldKey: 'healthDetails',
+              onTap: _loadBasicDetailsLookups,
             ),
             _field(label: 'Any Disability', controller: _disabilityController),
           ],
@@ -1014,8 +1050,9 @@ class _ProfileSectionEditScreenState
             'height': _toIntOrNull(_heightController),
             'diet': _apiValueOrText('diet', _dietController),
             'bloodGroup': _apiValueOrText('bloodGroup', _bloodGroupController),
-            'languages': _toCsvListOrNull(_languagesController),
-            'healthDetails': _toTrimmedOrNull(_healthInfoController),
+            'languages': _selectedLanguagesForApi(),
+            'healthDetails':
+                _apiValueOrText('healthDetails', _healthInfoController),
             'specialCases': _toTrimmedOrNull(_disabilityController),
           },
           fallbackMessage: 'Failed to update basic details',
@@ -1259,7 +1296,7 @@ class _ProfileSectionEditScreenState
       values: RegistrationMaritalStatus.values,
       fieldKey: 'maritalStatus',
     );
-    _heightController.text = appearance?.height?.toString() ?? '';
+    _prefillHeight(appearance?.height);
     _prefillEnum<RegistrationDiet>(
       controller: _dietController,
       raw: lifestyle?.dietType,
@@ -1272,9 +1309,14 @@ class _ProfileSectionEditScreenState
       values: BloodGroup.values,
       fieldKey: 'bloodGroup',
     );
-    _healthInfoController.text = _firstNonEmpty(
-      appearance?.healthDetails?.toString(),
-      appearance?.healthCondition?.toString(),
+    _prefillLookup(
+      controller: _healthInfoController,
+      raw: _firstNonEmpty(
+        appearance?.healthDetails?.toString(),
+        appearance?.healthCondition?.toString(),
+      ),
+      options: _healthInfoOptions,
+      fieldKey: 'healthDetails',
     );
     _disabilityController.text = appearance?.specialCases?.toString() ?? '';
 
@@ -1295,7 +1337,12 @@ class _ProfileSectionEditScreenState
     }
     _subCommunityController.text = religion?.religiousBackground ?? '';
     _motherTongueController.text = profileData?.motherTongue ?? '';
-    _languagesController.text = _toDynamicCsv(profileData?.languages);
+    _prefillLookup(
+      controller: _grewUpInController,
+      raw: _firstLanguage(profileData?.languages),
+      options: _grewUpOptions,
+      fieldKey: 'languages',
+    );
 
     _fatherNameController.text = family?.fatherName ?? '';
     _prefillSingleString(
@@ -1558,14 +1605,76 @@ class _ProfileSectionEditScreenState
     return values.join(', ');
   }
 
-  String _toDynamicCsv(List<dynamic>? values) {
+  String? _firstLanguage(List<dynamic>? values) {
     if (values == null || values.isEmpty) {
-      return '';
+      return null;
     }
-    return values
-        .map((value) => value.toString().trim())
-        .where((value) => value.isNotEmpty)
-        .join(', ');
+    for (final value in values) {
+      final normalized = value?.toString().trim();
+      if (normalized != null && normalized.isNotEmpty) {
+        return normalized;
+      }
+    }
+    return null;
+  }
+
+  List<String>? _selectedLanguagesForApi() {
+    final apiValue = _selectedApiValues['languages']?.trim();
+    if (apiValue != null && apiValue.isNotEmpty) {
+      return <String>[apiValue];
+    }
+    final fallback = _grewUpInController.text.trim();
+    if (fallback.isEmpty) {
+      return null;
+    }
+    return <String>[fallback];
+  }
+
+  List<String> get _heightDropdownItems => _heightInchOptions
+      .map((heightInches) => _formatHeightDisplay(heightInches))
+      .toList(growable: false);
+
+  void _selectHeight(String? displayValue) {
+    final selectedValue = displayValue?.trim() ?? '';
+    if (selectedValue.isEmpty) return;
+
+    final heightInCm = _heightCmFromDisplay(selectedValue);
+    if (heightInCm == null) return;
+
+    _heightController.text = heightInCm.toString();
+    _heightDisplayController.text = selectedValue;
+  }
+
+  void _prefillHeight(num? heightInCm) {
+    if (heightInCm == null) {
+      _heightController.text = '';
+      _heightDisplayController.text = '';
+      return;
+    }
+    final cmValue = heightInCm.round();
+    _heightController.text = cmValue.toString();
+    _heightDisplayController.text = _formatHeightDisplayFromCm(cmValue);
+  }
+
+  String _formatHeightDisplay(int totalInches) {
+    final feet = totalInches ~/ 12;
+    final inches = totalInches % 12;
+    return '$feet ft $inches in';
+  }
+
+  String _formatHeightDisplayFromCm(int cm) {
+    final totalInches = (cm / 2.54).round();
+    return _formatHeightDisplay(totalInches);
+  }
+
+  int? _heightCmFromDisplay(String displayValue) {
+    final normalized = displayValue.trim().toLowerCase();
+    final match = RegExp(r'^(\d+)\s*ft\s*(\d+)\s*in$').firstMatch(normalized);
+    if (match == null) return null;
+    final feet = int.tryParse(match.group(1)!);
+    final inches = int.tryParse(match.group(2)!);
+    if (feet == null || inches == null) return null;
+    return (((feet * 12) + inches) * 2.54).round();
   }
 
   String _normalizeDate(String? value) {
