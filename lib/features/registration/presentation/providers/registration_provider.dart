@@ -2268,6 +2268,8 @@ class RegistrationProvider extends BaseChangeNotifier {
   Future<bool> signUpViaOtp(BuildContext context) async {
     final body = SignUpOtpBody(
       registrationSource: 'referral',
+      firstName: firstNameController.text,
+      lastName: lastNameController.text,
       identifier: selectedVerificationType.toLowerCase() == 'email'
           ? emailController.text
           : phoneController.text,
