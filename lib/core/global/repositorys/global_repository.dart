@@ -8,11 +8,17 @@ import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
 import 'package:flutter_boilerplate/features/login/data/models/get_me_response_body.dart';
 import 'package:flutter_boilerplate/features/login/data/models/login_response.dart';
 import 'package:flutter_boilerplate/features/login/data/repository/login_repository.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class GlobalRepository {
+
+
   Future<String> getAppVersion() async {
     await Future.delayed(const Duration(seconds: 1));
-    return '1.0.0';
+      final packageInfo = await PackageInfo.fromPlatform();
+      final versionText = 'Version: ${packageInfo.version}.${packageInfo.buildNumber}';
+      return versionText;
+
   }
 
   Future<GetMeResponseBody> fetchMe() async {

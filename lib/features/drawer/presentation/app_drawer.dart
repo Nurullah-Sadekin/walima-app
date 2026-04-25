@@ -359,8 +359,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
               final versionLabel =
                   snapshot.connectionState == ConnectionState.done &&
                           snapshot.hasData
-                      ? 'Version ${snapshot.data}'
-                      : 'Version';
+                      ? '${snapshot.data}'
+                      : '';
               return Text(
                 versionLabel,
                 textAlign: TextAlign.center,
