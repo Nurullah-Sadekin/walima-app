@@ -27,9 +27,7 @@ Future<void> main() async {
   runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
-      if (!kIsWeb &&
-          defaultTargetPlatform == TargetPlatform.android &&
-          Firebase.apps.isEmpty) {
+      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android && Firebase.apps.isEmpty) {
         await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform,
         );
@@ -112,8 +110,8 @@ class MyApp extends ConsumerWidget {
           // Localization
           locale: locale,
           supportedLocales: const [
-            Locale('en'), // English
-            Locale('bn'), // Bangla
+            Locale('en'),
+            Locale('bn'),
           ],
           localizationsDelegates: const [
             AppLocalizations.delegate,
@@ -133,12 +131,10 @@ class AppRealtimeBootstrap extends ConsumerStatefulWidget {
   final Widget child;
 
   @override
-  ConsumerState<AppRealtimeBootstrap> createState() =>
-      _AppRealtimeBootstrapState();
+  ConsumerState<AppRealtimeBootstrap> createState() => _AppRealtimeBootstrapState();
 }
 
-class _AppRealtimeBootstrapState extends ConsumerState<AppRealtimeBootstrap>
-    with WidgetsBindingObserver {
+class _AppRealtimeBootstrapState extends ConsumerState<AppRealtimeBootstrap> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
@@ -169,8 +165,7 @@ class _AppRealtimeBootstrapState extends ConsumerState<AppRealtimeBootstrap>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    ForegroundAlertService.instance
-        .setAppForeground(state == AppLifecycleState.resumed);
+    ForegroundAlertService.instance.setAppForeground(state == AppLifecycleState.resumed);
     if (state == AppLifecycleState.resumed) {
       ref.read(chatProvider).initializeRealtime();
     }

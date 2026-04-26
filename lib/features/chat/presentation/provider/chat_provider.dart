@@ -9,7 +9,6 @@ import 'package:flutter_boilerplate/features/chat/data/model/response/conversati
     hide ProfilePhoto;
 import 'package:flutter_boilerplate/features/chat/data/repository/chat_repository.dart';
 import 'package:flutter_boilerplate/features/chat/data/socket/socket_service.dart';
-import 'package:flutter_boilerplate/features/connections/data/repository/connections_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ChatProvider extends BaseChangeNotifier {
@@ -820,7 +819,7 @@ class ChatProvider extends BaseChangeNotifier {
       notifyListeners();
     }
   }
-   
+
   // Future<void> blockConnection() async {
   //   final response = await ConnectionsRepository.performConnectionAction(
   //     connectionId,

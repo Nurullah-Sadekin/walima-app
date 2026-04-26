@@ -158,8 +158,7 @@ class AppUrls {
   static const String downloadBlogFile = '$baseUrl/blogs/{slug}/file'; //GET
 
   //Chat & Connections
-  static const String getConnectableUsers =
-      '$baseUrl/chat/connectable-users'; //GET
+  static const String getConnectableUsers = '$baseUrl/chat/conversations'; //GET
   static const String getUserConversations =
       '$baseUrl/chat/conversations'; //GET
   static const String getConversationMessages =
@@ -285,17 +284,17 @@ class AppUrls {
 
   static const String getPlanById = '$baseUrl/plans/{planId}'; //GET
 
-
   //------  Account Settings ------
   static const String updateNameAndEmail = '$baseUrl/settings/account'; //GET
   static const String contactSettings = '$baseUrl/settings/contact'; //GET, PUT
   static const String premiumSettings = '$baseUrl/settings/premium'; //GET, PUT
   static const String messagesSettings = '$baseUrl/settings/messages'; //GET
 
-
   // ---- External Links ----
-  static const String helpCenterUrl = 'https://dev.walima.app/en/account/help-desk';
-  static const String beSafeOnlineUrl = 'https://dev.walima.app/en/be-safe-online';
+  static const String helpCenterUrl =
+      'https://dev.walima.app/en/account/help-desk';
+  static const String beSafeOnlineUrl =
+      'https://dev.walima.app/en/be-safe-online';
   static const String privacyPolicyUrl = 'https://dev.walima.app/en/privacy';
   static const String safetyUrl = 'https://dev.walima.app/en/safety';
   static const String termsUrl = 'https://dev.walima.app/en/terms';

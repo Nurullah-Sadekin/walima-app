@@ -51,9 +51,78 @@ class Response {
       json['conversations'].forEach((v) {
         conversations?.add(Conversations.fromJson(v));
       });
+      return;
+    }
+
+    if (json['users'] != null) {
+      conversations = [];
+      json['users'].forEach((v) {
+        final mappedConversation = _conversationFromUser(v);
+        if (mappedConversation != null) {
+          conversations?.add(mappedConversation);
+        }
+      });
     }
   }
   List<Conversations>? conversations;
+
+  Conversations? _conversationFromUser(dynamic rawUser) {
+    if (rawUser is! Map) return null;
+    final user = Map<String, dynamic>.from(rawUser);
+    final conversationId = user['conversationId']?.toString();
+    if (conversationId == null || conversationId.isEmpty) {
+      return null;
+    }
+
+    final profilePhotoPayload = user['profilePhoto'];
+    final profilePhoto = profilePhotoPayload is Map
+        ? ProfilePhoto.fromJson(profilePhotoPayload)
+        : null;
+    final lastMessagePreview = user['lastMessagePreview']?.toString();
+
+    return Conversations(
+      id: conversationId,
+      type: 'direct',
+      status: user['isConnected'] == true ? 'active' : 'pending',
+      lastMessage: lastMessagePreview,
+      lastMessageAt: user['lastMessageAt']?.toString(),
+      unreadCount: _resolveUnreadCount(
+        status: user['lastMessageStatus']?.toString(),
+        isRead: user['lastMessageIsRead'] == true,
+        hasMessage: (lastMessagePreview?.isNotEmpty ?? false),
+      ),
+      participants: [
+        Participants(
+          userId: user['id']?.toString(),
+          displayName: user['displayName']?.toString(),
+          firstName: user['firstName']?.toString(),
+          lastName: user['lastName']?.toString(),
+          username: user['username']?.toString(),
+          userReference: user['userReference']?.toString(),
+          profilePhoto: profilePhoto,
+          isOnline: user['isOnline'] == true,
+          lastSeenAt: user['lastSeenAt']?.toString(),
+        ),
+      ],
+      createdAt: user['lastMessageAt']?.toString(),
+      updatedAt: user['lastMessageAt']?.toString(),
+    );
+  }
+
+  int _resolveUnreadCount({
+    required String? status,
+    required bool isRead,
+    required bool hasMessage,
+  }) {
+    if (!hasMessage) return 0;
+    if (isRead) return 0;
+
+    final normalizedStatus = status?.trim().toLowerCase();
+    if (normalizedStatus == 'read') {
+      return 0;
+    }
+    return 1;
+  }
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
