@@ -90,9 +90,11 @@ class _ProfileSectionEditScreenState
   final TextEditingController _managedByController = TextEditingController();
   final TextEditingController _genderController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
-  final TextEditingController _maritalStatusController = TextEditingController();
+  final TextEditingController _maritalStatusController =
+      TextEditingController();
   final TextEditingController _heightController = TextEditingController();
-  final TextEditingController _heightDisplayController = TextEditingController();
+  final TextEditingController _heightDisplayController =
+      TextEditingController();
   final TextEditingController _dietController = TextEditingController();
   final TextEditingController _bloodGroupController = TextEditingController();
   final TextEditingController _healthInfoController = TextEditingController();
@@ -100,8 +102,8 @@ class _ProfileSectionEditScreenState
 
   final TextEditingController _religionController = TextEditingController();
   final TextEditingController _communityController = TextEditingController();
-  final TextEditingController _subCommunityController = TextEditingController();
-  final TextEditingController _motherTongueController = TextEditingController();
+  final TextEditingController _religiousBackgroundController =
+      TextEditingController();
   final TextEditingController _grewUpInController = TextEditingController();
 
   final TextEditingController _fatherNameController = TextEditingController();
@@ -344,8 +346,7 @@ class _ProfileSectionEditScreenState
         _disabilityController,
         _religionController,
         _communityController,
-        _subCommunityController,
-        _motherTongueController,
+        _religiousBackgroundController,
         _grewUpInController,
         _fatherNameController,
         _fatherProfessionController,
@@ -536,8 +537,13 @@ class _ProfileSectionEditScreenState
               onTap: () =>
                   _loadCommunityOptionsForReligion(_religionController.text),
             ),
-            _field(label: 'Sub Community', controller: _subCommunityController),
-            _field(label: 'Mother Tongue', controller: _motherTongueController),
+            _enumDropdown<ReligiousBackground>(
+              label: 'Religious Background',
+              controller: _religiousBackgroundController,
+              values: ReligiousBackground.values,
+              popupHeader: 'Select Religious Background',
+              fieldKey: 'religiousBackground',
+            ),
           ],
         );
       case ProfileEditSection.familyDetails:
@@ -935,9 +941,7 @@ class _ProfileSectionEditScreenState
       onLoadMore: registration.loadMoreCountries,
     );
 
-    if (!mounted ||
-        selectedCountry == null ||
-        selectedCountry.trim().isEmpty) {
+    if (!mounted || selectedCountry == null || selectedCountry.trim().isEmpty) {
       return;
     }
 
@@ -1069,7 +1073,9 @@ class _ProfileSectionEditScreenState
       case ProfileEditSection.aboutYourself:
         return _updateWithUniversal(
           fields: {
-            'bio': _toTrimmedOrNull(_aboutController),
+            'profile': <String, dynamic>{
+              'bio': _toTrimmedOrNull(_aboutController),
+            },
           },
           fallbackMessage: 'Failed to update about section',
         );
@@ -1080,8 +1086,10 @@ class _ProfileSectionEditScreenState
           fields: {
             'religionName': _apiValueOrText('religion', _religionController),
             'community': _apiValueOrText('community', _communityController),
-            'religiousBackground': _toTrimmedOrNull(_subCommunityController),
-            'motherTongue': _toTrimmedOrNull(_motherTongueController),
+            'religiousBackground': _apiValueOrText(
+              'religiousBackground',
+              _religiousBackgroundController,
+            ),
           },
           fallbackMessage: 'Failed to update religious background',
         );
@@ -1224,12 +1232,14 @@ class _ProfileSectionEditScreenState
         'profileManagedBy': _apiValueOrText('managedBy', _managedByController),
         'gender': _apiValueOrText('gender', _genderController),
         'dateOfBirth': _toTrimmedOrNull(_dobController),
-        'maritalStatus': _apiValueOrText('maritalStatus', _maritalStatusController),
+        'maritalStatus':
+            _apiValueOrText('maritalStatus', _maritalStatusController),
         'height': _toIntOrNull(_heightController),
         'grewUpIn': _apiValueOrText('grewUpIn', _grewUpInController),
         'diet': _apiValueOrText('diet', _dietController),
         'bloodGroup': _apiValueOrText('bloodGroup', _bloodGroupController),
-        'healthDetails': _apiValueOrText('healthDetails', _healthInfoController),
+        'healthDetails':
+            _apiValueOrText('healthDetails', _healthInfoController),
         'specialCases': _toTrimmedOrNull(_disabilityController),
       },
       fallbackMessage: 'Failed to update basic details',
@@ -1378,8 +1388,12 @@ class _ProfileSectionEditScreenState
     if (_religionController.text.isNotEmpty) {
       unawaited(_loadCommunityOptionsForReligion(_religionController.text));
     }
-    _subCommunityController.text = religion?.religiousBackground ?? '';
-    _motherTongueController.text = profileData?.motherTongue ?? '';
+    _prefillEnum<ReligiousBackground>(
+      controller: _religiousBackgroundController,
+      raw: religion?.religiousBackground,
+      values: ReligiousBackground.values,
+      fieldKey: 'religiousBackground',
+    );
     final grewUpInValue = location?.grewUpIn?.toString().trim() ?? '';
     _grewUpInController.text = grewUpInValue;
     if (grewUpInValue.isEmpty) {

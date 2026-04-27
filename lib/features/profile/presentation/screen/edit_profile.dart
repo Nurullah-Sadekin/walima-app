@@ -43,7 +43,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             _topBar(context),
             _headerSection(context, profile),
             _bodySection(profile),
-             const SizedBox(height: 50,)
+            const SizedBox(
+              height: 50,
+            )
           ],
         ),
       ),
@@ -101,17 +103,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             showBottomIcon: true,
             topPositionImagePath: AppImages.verifiedBadgeSvgIcon,
             bottomPositionImagePath: AppImages.cameraSvgIcon,
-            onTopPressed: () async{
-              await DialogUtils.showFullScreenImage(context: context,
+            onTopPressed: () async {
+              await DialogUtils.showFullScreenImage(
+                  context: context,
                   imagePath: _resolveProfileImagePath(profile));
             },
             onEdit: () async {
-              final String? imagePath = await PickerDialog().imagePicker(context);
+              final String? imagePath =
+                  await PickerDialog().imagePicker(context);
               if (imagePath != null) {
                 await ref.watch(profileProvider).updateProfileImage(
-                  context: context,
-                  filePath: imagePath,
-                );
+                      context: context,
+                      filePath: imagePath,
+                    );
               }
             },
           ),
@@ -251,7 +255,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       infoList: [
         MapEntry(
           'Profile Managed By',
-          _valueOrDefault(CamelCaseUtils.formatCamelCase(basic?.profileManagedBy)),
+          _valueOrDefault(
+              CamelCaseUtils.formatCamelCase(basic?.profileManagedBy)),
         ),
         MapEntry(
           'Gender',
@@ -294,7 +299,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         MapEntry(
           'Disability',
           _valueOrDefault(
-            CamelCaseUtils.formatCamelCase(appearance?.specialCases?.toString()),
+            CamelCaseUtils.formatCamelCase(
+                appearance?.specialCases?.toString()),
             'None',
           ),
         ),
@@ -312,16 +318,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       infoList: [
         MapEntry(
           'Religion',
-          _valueOrDefault(CamelCaseUtils.formatCamelCase(religion?.religion ?? profile?.profile?.religionName)),
-        ),
-        MapEntry('Community', _valueOrDefault(CamelCaseUtils.formatCamelCase(religion?.community))),
-        MapEntry(
-          'Sub community',
-          _valueOrDefault(CamelCaseUtils.formatCamelCase(religion?.religiousBackground)),
+          _valueOrDefault(CamelCaseUtils.formatCamelCase(
+              religion?.religion ?? profile?.profile?.religionName)),
         ),
         MapEntry(
-          'Mother Tongue',
-          _valueOrDefault(CamelCaseUtils.formatCamelCase(profile?.profile?.motherTongue)),
+            'Community',
+            _valueOrDefault(
+                CamelCaseUtils.formatCamelCase(religion?.community))),
+        MapEntry(
+          'Religious Background',
+          _valueOrDefault(
+              CamelCaseUtils.formatCamelCase(religion?.religiousBackground)),
         ),
       ],
     );
@@ -383,13 +390,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       infoList: [
         MapEntry(
           'Highest Qualification',
-          _valueOrDefault(
-            CamelCaseUtils.formatCamelCase(education?.qualification ?? education?.educationLevel,)
-          ),
+          _valueOrDefault(CamelCaseUtils.formatCamelCase(
+            education?.qualification ?? education?.educationLevel,
+          )),
         ),
         MapEntry(
           'College(s) Attended',
-          _valueOrDefault(CamelCaseUtils.formatCamelCase(education?.institutionName)),
+          _valueOrDefault(
+              CamelCaseUtils.formatCamelCase(education?.institutionName)),
         ),
         MapEntry(
           'Annual Income',
