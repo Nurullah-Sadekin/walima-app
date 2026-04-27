@@ -1936,7 +1936,7 @@ enum LookupCategory implements ApiUiEnum {
   mediaAndLearning('media-and-learning'),
   foodAndCuisine('food-and-cuisine'),
   travelAndLeisure('travel-and-leisure'),
-  healthInformation('health-information');
+  healthInformation('health-condition');
 
   const LookupCategory(this.apiValue, [this._label]);
 

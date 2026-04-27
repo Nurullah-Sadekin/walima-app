@@ -9,8 +9,8 @@ import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
 import 'package:flutter_boilerplate/core/global/components/paginated_search_picker_sheet.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
 import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
+import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/network/app_urls.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
@@ -19,10 +19,8 @@ import 'package:flutter_boilerplate/features/profile/data/model/response/get_com
 import 'package:flutter_boilerplate/features/profile/data/repository/profile_repository.dart';
 import 'package:flutter_boilerplate/features/profile/presentation/screen/profile_edit_section.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/data/models/request/update_preferences_request_body.dart';
-import 'package:flutter_boilerplate/features/recommended_preferences/data/repository/preferences_repository.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/lookup_option.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/request/update_family_request_body.dart';
-import 'package:flutter_boilerplate/features/registration/data/repository/family_repository.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/lookup_repository.dart';
 import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/hobbies_interests_custom_card.dart';
@@ -68,8 +66,6 @@ class _ProfileSectionEditScreenState
     LookupOption(key: 'others', label: 'Others'),
   ];
 
-  final PreferencesRepository _preferencesRepository = PreferencesRepository();
-  final FamilyRepository _familyRepository = FamilyRepository();
   final LookupRepository _lookupRepository = LookupRepository();
 
   List<LookupOption> _educationLevelOptions = <LookupOption>[];
@@ -77,6 +73,11 @@ class _ProfileSectionEditScreenState
   List<LookupOption> _incomeRangeOptions = <LookupOption>[];
   List<LookupOption> _communityOptions = <LookupOption>[];
   List<LookupOption> _healthInfoOptions = <LookupOption>[];
+  List<LookupOption> _motherTongueOptions = <LookupOption>[];
+  List<LookupOption> _familyTypeOptions = <LookupOption>[];
+  List<LookupOption> _familyValuesOptions = <LookupOption>[];
+  List<LookupOption> _marriageTimelineOptions = <LookupOption>[];
+  List<SingleStringModel> _languageOptions = <SingleStringModel>[];
 
   static final List<int> _heightInchOptions = List<int>.generate(
     33,
@@ -92,6 +93,8 @@ class _ProfileSectionEditScreenState
   final TextEditingController _dobController = TextEditingController();
   final TextEditingController _maritalStatusController =
       TextEditingController();
+  final TextEditingController _motherTongueController = TextEditingController();
+  final TextEditingController _languagesController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
   final TextEditingController _heightDisplayController =
       TextEditingController();
@@ -117,6 +120,11 @@ class _ProfileSectionEditScreenState
   final TextEditingController _brothersController = TextEditingController();
   final TextEditingController _sistersController = TextEditingController();
   final TextEditingController _familyFinancialController =
+      TextEditingController();
+  final TextEditingController _familyTypeController = TextEditingController();
+  final TextEditingController _familyValuesController = TextEditingController();
+  final TextEditingController _aboutFamilyController = TextEditingController();
+  final TextEditingController _marriageTimelineController =
       TextEditingController();
 
   final TextEditingController _highestQualificationController =
@@ -163,14 +171,19 @@ class _ProfileSectionEditScreenState
   final TextEditingController _prefProfileManagedByController =
       TextEditingController();
   final TextEditingController _prefDietController = TextEditingController();
+  final TextEditingController _prefPartnerExpectationsController =
+      TextEditingController();
 
   bool _isSaving = false;
   bool _didPrefill = false;
+  bool _didLoadFamilyLookups = false;
 
   List<SingleStringModel> _creativeOptions = <SingleStringModel>[];
   List<SingleStringModel> _funOptions = <SingleStringModel>[];
   List<SingleStringModel> _fitnessOptions = <SingleStringModel>[];
   List<SingleStringModel> _otherOptions = <SingleStringModel>[];
+  late List<SingleStringModel> _prefProfileManagedByOptions;
+  late List<SingleStringModel> _prefDietOptions;
 
   bool _isLookupLoading = false;
 
@@ -181,6 +194,15 @@ class _ProfileSectionEditScreenState
     _funOptions = _cloneOptions(funItemListDataInserted);
     _fitnessOptions = _cloneOptions(fitnessItemListDataInserted);
     _otherOptions = _cloneOptions(otherInterestsItemListDataInserted);
+    _prefProfileManagedByOptions = RegistrationProfileManagedBy.values
+        .map(
+          (item) => SingleStringModel(
+            name: item.label,
+            value: item.apiValue,
+          ),
+        )
+        .toList(growable: false);
+    _prefDietOptions = _cloneOptions(dietDataListInserted);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final provider = ref.read(profileProvider);
@@ -209,6 +231,9 @@ class _ProfileSectionEditScreenState
         futures.add(_loadEducationLevelLookup());
         futures.add(_loadProfessionAndIncomeLookup());
         break;
+      case ProfileEditSection.familyDetails:
+        futures.add(_loadFamilyLookups());
+        break;
       case ProfileEditSection.hobbiesInterests:
         futures.add(_loadHobbyLookups());
         break;
@@ -233,11 +258,41 @@ class _ProfileSectionEditScreenState
   }
 
   Future<void> _loadBasicDetailsLookups() async {
-    if (_healthInfoOptions.isNotEmpty) return;
-    final options =
-        await _lookupRepository.getLookups(LookupCategory.healthInformation);
-    if (!mounted) return;
-    _healthInfoOptions = options;
+    final tasks = <Future<void>>[];
+
+    if (_healthInfoOptions.isEmpty) {
+      tasks.add(() async {
+        final options = await _lookupRepository
+            .getLookups(LookupCategory.healthInformation);
+        if (!mounted) return;
+        _healthInfoOptions = options;
+      }());
+    }
+
+    if (_motherTongueOptions.isEmpty || _languageOptions.isEmpty) {
+      tasks.add(() async {
+        final options = await _lookupRepository.getLookupsBySlug(
+          'mother-tongue',
+        );
+        if (!mounted) return;
+        if (_motherTongueOptions.isEmpty) {
+          _motherTongueOptions = options;
+        }
+        if (_languageOptions.isEmpty) {
+          _languageOptions = options
+              .map(
+                (option) => SingleStringModel(
+                  name: option.label,
+                  value: option.key,
+                ),
+              )
+              .toList(growable: false);
+        }
+      }());
+    }
+
+    if (tasks.isEmpty) return;
+    await Future.wait(tasks);
   }
 
   Future<void> _loadEducationLevelLookup() async {
@@ -257,6 +312,38 @@ class _ProfileSectionEditScreenState
     if (!mounted) return;
     _professionOptions = results[0];
     _incomeRangeOptions = results[1];
+  }
+
+  Future<void> _loadFamilyLookups() async {
+    if (_didLoadFamilyLookups) return;
+    _didLoadFamilyLookups = true;
+
+    _familyTypeOptions = await _loadLookupByPrioritySlugs(
+      slugs: const <String>[
+        'family-type',
+        'familyType',
+        'family_type',
+      ],
+      fallback: _enumValuesToLookupOptions(FamilyType.values),
+    );
+
+    _familyValuesOptions = await _loadLookupByPrioritySlugs(
+      slugs: const <String>[
+        'family-values',
+        'familyValues',
+        'family_values',
+      ],
+      fallback: _enumValuesToLookupOptions(FamilyValues.values),
+    );
+
+    _marriageTimelineOptions = await _loadLookupByPrioritySlugs(
+      slugs: const <String>[
+        'marriage-timeline',
+        'marriageTimeline',
+        'marriage_time_line',
+      ],
+      fallback: const <LookupOption>[],
+    );
   }
 
   Future<void> _loadHobbyLookups() async {
@@ -291,6 +378,37 @@ class _ProfileSectionEditScreenState
           (option) => SingleStringModel(
             name: option.label,
             value: option.key,
+          ),
+        )
+        .toList(growable: false);
+  }
+
+  Future<List<LookupOption>> _loadLookupByPrioritySlugs({
+    required List<String> slugs,
+    required List<LookupOption> fallback,
+  }) async {
+    for (final slug in slugs) {
+      try {
+        final options = await _lookupRepository.getLookupsBySlug(slug);
+        if (options.isNotEmpty) {
+          return options;
+        }
+      } catch (_) {
+        // Try next slug and fall back if none works.
+      }
+    }
+
+    return fallback;
+  }
+
+  List<LookupOption> _enumValuesToLookupOptions<T extends ApiUiEnum>(
+    Iterable<T> values,
+  ) {
+    return values
+        .map(
+          (value) => LookupOption(
+            key: value.apiValue,
+            label: value.label,
           ),
         )
         .toList(growable: false);
@@ -338,6 +456,8 @@ class _ProfileSectionEditScreenState
         _genderController,
         _dobController,
         _maritalStatusController,
+        _motherTongueController,
+        _languagesController,
         _heightController,
         _heightDisplayController,
         _dietController,
@@ -356,6 +476,10 @@ class _ProfileSectionEditScreenState
         _brothersController,
         _sistersController,
         _familyFinancialController,
+        _familyTypeController,
+        _familyValuesController,
+        _aboutFamilyController,
+        _marriageTimelineController,
         _highestQualificationController,
         _collegeController,
         _annualIncomeController,
@@ -385,6 +509,7 @@ class _ProfileSectionEditScreenState
         _prefIncomeController,
         _prefProfileManagedByController,
         _prefDietController,
+        _prefPartnerExpectationsController,
       ];
 
   @override
@@ -462,6 +587,20 @@ class _ProfileSectionEditScreenState
               values: RegistrationMaritalStatus.values,
               popupHeader: 'Select Marital Status',
               fieldKey: 'maritalStatus',
+            ),
+            _lookupDropdown(
+              label: 'Mother Tongue',
+              controller: _motherTongueController,
+              options: _motherTongueOptions,
+              popupHeader: 'Select Mother Tongue',
+              fieldKey: 'motherTongue',
+              onTap: _loadBasicDetailsLookups,
+            ),
+            _multiLookupField(
+              label: 'Languages',
+              controller: _languagesController,
+              hintText: 'Select Languages',
+              onTap: _openLanguagesPicker,
             ),
             DropDownField(
               headLine: 'Height',
@@ -549,6 +688,22 @@ class _ProfileSectionEditScreenState
       case ProfileEditSection.familyDetails:
         return _buildCard(
           children: [
+            _lookupDropdown(
+              label: 'Family Type',
+              controller: _familyTypeController,
+              options: _familyTypeOptions,
+              popupHeader: 'Select Family Type',
+              fieldKey: 'familyType',
+              onTap: _loadFamilyLookups,
+            ),
+            _lookupDropdown(
+              label: 'Family Values',
+              controller: _familyValuesController,
+              options: _familyValuesOptions,
+              popupHeader: 'Select Family Values',
+              fieldKey: 'familyValues',
+              onTap: _loadFamilyLookups,
+            ),
             _field(label: 'Father Name', controller: _fatherNameController),
             _singleStringDropdown(
               label: 'Father Profession',
@@ -586,6 +741,28 @@ class _ProfileSectionEditScreenState
               readOnly: true,
               onTap: _pickFamilyEconomicCondition,
             ),
+            _field(
+              label: 'About Family',
+              controller: _aboutFamilyController,
+              minLines: 4,
+              maxLines: 5,
+              hintText: 'Write about your family',
+            ),
+            if (_marriageTimelineOptions.isNotEmpty)
+              _lookupDropdown(
+                label: 'Marriage Timeline',
+                controller: _marriageTimelineController,
+                options: _marriageTimelineOptions,
+                popupHeader: 'Select Marriage Timeline',
+                fieldKey: 'marriageTimeline',
+                onTap: _loadFamilyLookups,
+              )
+            else
+              _field(
+                label: 'Marriage Timeline',
+                controller: _marriageTimelineController,
+                hintText: 'Enter Marriage Timeline',
+              ),
           ],
         );
       case ProfileEditSection.educationCareer:
@@ -753,13 +930,23 @@ class _ProfileSectionEditScreenState
       case ProfileEditSection.preferenceOtherDetails:
         return _buildCard(
           children: [
-            _field(
-              label: 'Profile Managed By (comma separated)',
-              controller: _prefProfileManagedByController,
+            _multiSelectField(
+              label: 'Profile Managed By',
+              options: _prefProfileManagedByOptions,
+              onItemTap: (index) =>
+                  _toggleOption(_prefProfileManagedByOptions, index),
+            ),
+            _multiSelectField(
+              label: 'Diet Preference',
+              options: _prefDietOptions,
+              onItemTap: (index) => _toggleOption(_prefDietOptions, index),
             ),
             _field(
-              label: 'Diet Preference (comma separated)',
-              controller: _prefDietController,
+              label: 'Partner Expectations',
+              controller: _prefPartnerExpectationsController,
+              maxLines: 5,
+              minLines: 4,
+              hintText: 'Write what you expect from your partner',
             ),
           ],
         );
@@ -795,6 +982,64 @@ class _ProfileSectionEditScreenState
       maxLine: maxLines,
       errorText: '',
       onTap: onTap ?? () {},
+    );
+  }
+
+  Widget _multiLookupField({
+    required String label,
+    required TextEditingController controller,
+    required String hintText,
+    required VoidCallback onTap,
+  }) {
+    return PrimaryTextField(
+      headLine: label,
+      hintText: hintText,
+      controller: controller,
+      readOnly: true,
+      errorText: '',
+      noPrefix: true,
+      onTap: onTap,
+      suffix: Icon(
+        Icons.keyboard_arrow_down_outlined,
+        size: TextSize.font20(context),
+        color: AppColors.grey,
+      ),
+    );
+  }
+
+  Widget _multiSelectField({
+    required String label,
+    required List<SingleStringModel> options,
+    required ValueChanged<int> onItemTap,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: AppColors.textPrimaryLight,
+            fontSize: TextSize.font14(context),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: List.generate(options.length, (index) {
+            final item = options[index];
+            return SelectionCard(
+              buttonStyle: item.isSelected
+                  ? SelectionStyle.selectedCheckbox
+                  : SelectionStyle.unSelectedCheckbox,
+              onTap: () => onItemTap(index),
+              isSelected: item.isSelected,
+              title: item.name,
+            );
+          }),
+        ),
+      ],
     );
   }
 
@@ -951,6 +1196,106 @@ class _ProfileSectionEditScreenState
     });
   }
 
+  Future<void> _openLanguagesPicker() async {
+    if (_languageOptions.isEmpty) {
+      setState(() => _isLookupLoading = true);
+      try {
+        await _loadBasicDetailsLookups();
+      } finally {
+        if (mounted) {
+          setState(() => _isLookupLoading = false);
+        }
+      }
+    }
+
+    if (!mounted || _languageOptions.isEmpty) return;
+
+    final draftOptions = _languageOptions
+        .map((item) => item.copyWith(isSelected: item.isSelected))
+        .toList(growable: false);
+
+    final selectedOptions = await showModalBottomSheet<List<SingleStringModel>>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      builder: (context) {
+        return SafeArea(
+          child: StatefulBuilder(
+            builder: (context, setModalState) {
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Select Languages',
+                            style: TextStyle(
+                              color: AppColors.textPrimaryLight,
+                              fontSize: TextSize.font18(context),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('Cancel'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Flexible(
+                      child: SingleChildScrollView(
+                        child: Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: List.generate(draftOptions.length, (index) {
+                            final item = draftOptions[index];
+                            return SelectionCard(
+                              buttonStyle: item.isSelected
+                                  ? SelectionStyle.selectedCheckbox
+                                  : SelectionStyle.unSelectedCheckbox,
+                              onTap: () {
+                                setModalState(() {
+                                  draftOptions[index].isSelected =
+                                      !draftOptions[index].isSelected;
+                                });
+                              },
+                              isSelected: item.isSelected,
+                              title: item.name,
+                            );
+                          }),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () =>
+                            Navigator.of(context).pop(draftOptions),
+                        child: const Text('Done'),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+
+    if (!mounted || selectedOptions == null) return;
+
+    setState(() {
+      _languageOptions = selectedOptions;
+      _languagesController.text = _selectedDisplayValues(_languageOptions);
+    });
+  }
+
   Future<void> _pickFamilyEconomicCondition() async {
     final currentValue = _resolveFamilyEconomicConditionValue(
       _familyFinancialController.text,
@@ -1069,6 +1414,11 @@ class _ProfileSectionEditScreenState
   }
 
   Future<bool> _saveCurrentSection() async {
+    final profileSnapshot = ref.read(profileProvider).profile;
+    final primaryLocation = _firstOrNull(profileSnapshot?.locations);
+    final primaryEducation = _firstOrNull(profileSnapshot?.educations);
+    final primaryProfession = _firstOrNull(profileSnapshot?.profession);
+
     switch (widget.section) {
       case ProfileEditSection.aboutYourself:
         return _updateWithUniversal(
@@ -1080,16 +1430,25 @@ class _ProfileSectionEditScreenState
           fallbackMessage: 'Failed to update about section',
         );
       case ProfileEditSection.basicDetails:
-        return _saveBasicDetails();
+        return _saveBasicDetails(
+          existingLocationId: primaryLocation?.id,
+          existingLocationType: primaryLocation?.locationType,
+        );
       case ProfileEditSection.religiousBackground:
+        final religionValue = _apiValueOrText('religion', _religionController);
         return _updateWithUniversal(
           fields: {
-            'religionName': _apiValueOrText('religion', _religionController),
-            'community': _apiValueOrText('community', _communityController),
-            'religiousBackground': _apiValueOrText(
-              'religiousBackground',
-              _religiousBackgroundController,
-            ),
+            'profile': <String, dynamic>{
+              'religionName': religionValue,
+            },
+            'religion': <String, dynamic>{
+              'religion': religionValue,
+              'community': _apiValueOrText('community', _communityController),
+              'religiousBackground': _apiValueOrText(
+                'religiousBackground',
+                _religiousBackgroundController,
+              ),
+            },
           },
           fallbackMessage: 'Failed to update religious background',
         );
@@ -1104,6 +1463,9 @@ class _ProfileSectionEditScreenState
         }
 
         final body = UpdateFamilyRequestBody(
+          familyType: _apiValueOrText('familyType', _familyTypeController),
+          familyValues:
+              _apiValueOrText('familyValues', _familyValuesController),
           fatherName: _toTrimmedOrNull(_fatherNameController),
           fatherProfession:
               _apiValueOrText('fatherProfession', _fatherProfessionController),
@@ -1114,43 +1476,71 @@ class _ProfileSectionEditScreenState
           brothers: _toIntOrNull(_brothersController),
           sisters: _toIntOrNull(_sistersController),
           familyEconomicCondition: familyEconomicCondition,
+          aboutFamily: _toTrimmedOrNull(_aboutFamilyController),
+          marriageTimeline:
+              _apiValueOrText('marriageTimeline', _marriageTimelineController),
         );
 
-        if (body.toJson().isEmpty) {
-          return true;
-        }
-
-        final response = await _familyRepository.updateFamily(body);
-        if ((response.code ?? '').toUpperCase() == 'SUCCESS') {
-          return true;
-        }
-
-        await _showError(
-          response.message ?? 'Failed to update family details',
-        );
-        return false;
-      case ProfileEditSection.educationCareer:
         return _updateWithUniversal(
           fields: {
-            'highestLevelOfEducation': _apiValueOrText(
+            'family': body.toJson(),
+          },
+          fallbackMessage: 'Failed to update family details',
+        );
+      case ProfileEditSection.educationCareer:
+        final educationPayload = _buildRecordPayload(
+          id: primaryEducation?.id,
+          fields: <String, dynamic>{
+            'qualification': _apiValueOrText(
+              'highestQualification',
+              _highestQualificationController,
+            ),
+            'educationLevel': _apiValueOrText(
               'highestQualification',
               _highestQualificationController,
             ),
             'institutionName': _toTrimmedOrNull(_collegeController),
-            'incomeRange':
-                _apiValueOrText('annualIncome', _annualIncomeController),
-            'workWith': _apiValueOrText('workingWith', _workingWithController),
-            'workingAs': _apiValueOrText('workingAs', _workingAsController),
-            'currentCompany': _toTrimmedOrNull(_employerController),
+          },
+        );
+        final professionPayload = _buildRecordPayload(
+          id: primaryProfession?.id,
+          fields: <String, dynamic>{
+            'incomeRange': _apiValueOrText(
+              'annualIncome',
+              _annualIncomeController,
+            ),
+            'employmentType': _apiValueOrText(
+              'workingWith',
+              _workingWithController,
+            ),
+            'designation': _apiValueOrText('workingAs', _workingAsController),
+            'profession': _apiValueOrText('workingAs', _workingAsController),
+            'employer': _toTrimmedOrNull(_employerController),
+          },
+        );
+        return _updateWithUniversal(
+          fields: {
+            if (educationPayload != null)
+              'educations': <Map<String, dynamic>>[
+                educationPayload,
+              ],
+            if (professionPayload != null)
+              'professions': <Map<String, dynamic>>[
+                professionPayload,
+              ],
           },
           fallbackMessage: 'Failed to update education and career details',
         );
       case ProfileEditSection.location:
-        return _updateWithUniversal(
-          fields: {
-            'livingIn': _toTrimmedOrNull(_countryController),
+        final locationType =
+            _resolveLocationType(primaryLocation?.locationType);
+        final locationPayload = _buildRecordPayload(
+          id: primaryLocation?.id,
+          fields: <String, dynamic>{
+            'locationType': locationType,
+            'country': _toTrimmedOrNull(_countryController),
             'state': _toTrimmedOrNull(_stateController),
-            'cityName': _toTrimmedOrNull(_cityController),
+            'city': _toTrimmedOrNull(_cityController),
             'residencyStatus': _apiValueOrText(
               'residencyStatus',
               _residencyStatusController,
@@ -1158,134 +1548,153 @@ class _ProfileSectionEditScreenState
             'zipCode': _toTrimmedOrNull(_zipController),
             'grewUpIn': _toTrimmedOrNull(_grewUpController),
           },
+        );
+        return _updateWithUniversal(
+          fields: {
+            if (locationPayload != null)
+              'locations': <Map<String, dynamic>>[
+                locationPayload,
+              ],
+          },
           fallbackMessage: 'Failed to update location details',
         );
       case ProfileEditSection.hobbiesInterests:
-        final response = await ProfileRepository.updateProfileByEndpoint(
-          endpoint: AppUrls.updateProfileInterests,
-          body: UpdateProfileSectionRequestBody(
-            fields: {
+        return _updateWithUniversal(
+          fields: {
+            'interests': {
               'creativePursuits': _selectedValues(_creativeOptions),
               'outdoorActivities': _selectedValues(_funOptions),
               'fitnessAndSports': _selectedValues(_fitnessOptions),
               'mediaAndLearning': _selectedValues(_otherOptions),
             },
-          ),
+          },
+          fallbackMessage: 'Failed to update hobbies',
         );
-
-        if (response.isSuccess) {
-          return true;
-        }
-
-        await _showError(response.message ?? 'Failed to update hobbies');
-        return false;
       case ProfileEditSection.preferenceBasicInfo:
-        return _updatePreferences(
-          body: UpdatePreferencesRequestBody(
-            ageMin: _toIntOrNull(_prefAgeMinController),
-            ageMax: _toIntOrNull(_prefAgeMaxController),
-            heightMin: _toIntOrNull(_prefHeightMinController),
-            heightMax: _toIntOrNull(_prefHeightMaxController),
-            religionPreference: _toCsvListOrNull(_prefReligionController),
-            communityPreference: _toCsvListOrNull(_prefCommunityController),
-            motherTonguePreference:
-                _toCsvListOrNull(_prefMotherTongueController),
-            maritalStatusPreference: _toCsvListOrNull(_prefMaritalController),
-          ),
+        return _updateWithUniversal(
+          fields: {
+            'preferences': UpdatePreferencesRequestBody(
+              ageMin: _toIntOrNull(_prefAgeMinController),
+              ageMax: _toIntOrNull(_prefAgeMaxController),
+              heightMin: _toIntOrNull(_prefHeightMinController),
+              heightMax: _toIntOrNull(_prefHeightMaxController),
+              religionPreference: _toCsvListOrNull(_prefReligionController),
+              communityPreference: _toCsvListOrNull(_prefCommunityController),
+              motherTonguePreference:
+                  _toCsvListOrNull(_prefMotherTongueController),
+              maritalStatusPreference: _toCsvListOrNull(_prefMaritalController),
+            ).toJson(),
+          },
           fallbackMessage: 'Failed to update preference basic details',
         );
       case ProfileEditSection.preferenceLocationDetails:
-        return _updatePreferences(
-          body: UpdatePreferencesRequestBody(
-            preferredCountries: _toCsvListOrNull(_prefCountryController),
-            preferredStates: _toCsvListOrNull(_prefStateController),
-            preferredCities: _toCsvListOrNull(_prefCityController),
-          ),
+        return _updateWithUniversal(
+          fields: {
+            'preferences': UpdatePreferencesRequestBody(
+              preferredCountries: _toCsvListOrNull(_prefCountryController),
+              preferredStates: _toCsvListOrNull(_prefStateController),
+              preferredCities: _toCsvListOrNull(_prefCityController),
+            ).toJson(),
+          },
           fallbackMessage: 'Failed to update preference location details',
         );
       case ProfileEditSection.preferenceEducationCareer:
-        return _updatePreferences(
-          body: UpdatePreferencesRequestBody(
-            educationPreference: _toCsvListOrNull(_prefEducationController),
-            professionPreference: _toCsvListOrNull(_prefProfessionController),
-            workingAsPreference: _toCsvListOrNull(_prefWorkingAsController),
-            annualIncomePreference: _toCsvListOrNull(_prefIncomeController),
-          ),
+        return _updateWithUniversal(
+          fields: {
+            'preferences': UpdatePreferencesRequestBody(
+              educationPreference: _toCsvListOrNull(_prefEducationController),
+              professionPreference: _toCsvListOrNull(_prefProfessionController),
+              workingAsPreference: _toCsvListOrNull(_prefWorkingAsController),
+              annualIncomePreference: _toCsvListOrNull(_prefIncomeController),
+            ).toJson(),
+          },
           fallbackMessage:
               'Failed to update preference education and career details',
         );
       case ProfileEditSection.preferenceOtherDetails:
-        return _updatePreferences(
-          body: UpdatePreferencesRequestBody(
-            profileManagedByPreference:
-                _toCsvListOrNull(_prefProfileManagedByController),
-            dietPreference: _toCsvListOrNull(_prefDietController),
-          ),
+        return _updateWithUniversal(
+          fields: {
+            'preferences': UpdatePreferencesRequestBody(
+              profileManagedByPreference:
+                  _selectedApiValuesOrNames(_prefProfileManagedByOptions),
+              dietPreference: _selectedApiValuesOrNames(_prefDietOptions),
+              expectationsFromLifePartner:
+                  _toTrimmedOrNull(_prefPartnerExpectationsController),
+            ).toJson(),
+          },
           fallbackMessage: 'Failed to update preference other details',
         );
     }
   }
 
-  Future<bool> _saveBasicDetails() async {
-    final universalSuccess = await _updateWithUniversal(
-      fields: {
-        'profileManagedBy': _apiValueOrText('managedBy', _managedByController),
-        'gender': _apiValueOrText('gender', _genderController),
-        'dateOfBirth': _toTrimmedOrNull(_dobController),
-        'maritalStatus':
-            _apiValueOrText('maritalStatus', _maritalStatusController),
-        'height': _toIntOrNull(_heightController),
+  Future<bool> _saveBasicDetails({
+    String? existingLocationId,
+    String? existingLocationType,
+  }) async {
+    final locationType = _resolveLocationType(existingLocationType);
+    final locationPayload = _buildRecordPayload(
+      id: existingLocationId,
+      fields: <String, dynamic>{
+        'locationType': locationType,
         'grewUpIn': _apiValueOrText('grewUpIn', _grewUpInController),
-        'diet': _apiValueOrText('diet', _dietController),
-        'bloodGroup': _apiValueOrText('bloodGroup', _bloodGroupController),
-        'healthDetails':
-            _apiValueOrText('healthDetails', _healthInfoController),
-        'specialCases': _toTrimmedOrNull(_disabilityController),
+      },
+    );
+
+    return _updateWithUniversal(
+      fields: {
+        'profile': <String, dynamic>{
+          'profileManagedBy':
+              _apiValueOrText('managedBy', _managedByController),
+          'gender': _apiValueOrText('gender', _genderController),
+          'dateOfBirth': _toTrimmedOrNull(_dobController),
+          'maritalStatus':
+              _apiValueOrText('maritalStatus', _maritalStatusController),
+          'motherTongue': _apiValueOrText(
+            'motherTongue',
+            _motherTongueController,
+          ),
+          'languages': _selectedApiValuesOrNames(_languageOptions),
+        },
+        'appearance': <String, dynamic>{
+          'height': _toIntOrNull(_heightController),
+          'bloodGroup': _apiValueOrText('bloodGroup', _bloodGroupController),
+          'healthDetails':
+              _apiValueOrText('healthDetails', _healthInfoController),
+          'specialCases': _toTrimmedOrNull(_disabilityController),
+        },
+        'lifestyle': <String, dynamic>{
+          'dietType': _apiValueOrText('diet', _dietController),
+        },
+        if (locationPayload != null)
+          'locations': <Map<String, dynamic>>[
+            locationPayload,
+          ],
       },
       fallbackMessage: 'Failed to update basic details',
     );
-
-    if (!universalSuccess) {
-      return false;
-    }
-
-    final grewUpInValue = _apiValueOrText('grewUpIn', _grewUpInController);
-    if (grewUpInValue == null || grewUpInValue.isEmpty) {
-      return true;
-    }
-
-    final response = await ProfileRepository.updateProfileByEndpoint(
-      endpoint: AppUrls.updateProfileLocations,
-      body: UpdateProfileSectionRequestBody(
-        fields: {
-          'grewUpIn': grewUpInValue,
-        },
-      ),
-    );
-
-    if (response.isSuccess) {
-      return true;
-    }
-
-    await _showError(response.message ?? 'Failed to update grew up in');
-    return false;
   }
 
-  Future<bool> _updatePreferences({
-    required UpdatePreferencesRequestBody body,
-    required String fallbackMessage,
-  }) async {
-    if (body.toJson().isEmpty) {
-      return true;
+  Map<String, dynamic>? _buildRecordPayload({
+    String? id,
+    required Map<String, dynamic> fields,
+  }) {
+    final payload = UpdateProfileSectionRequestBody(fields: fields).toJson();
+    if (payload.isEmpty) {
+      return null;
     }
-
-    final response = await _preferencesRepository.updatePreferences(body);
-    if ((response.code ?? '').toUpperCase() == 'SUCCESS') {
-      return true;
+    final normalizedId = id?.trim();
+    if (normalizedId != null && normalizedId.isNotEmpty) {
+      payload['id'] = normalizedId;
     }
+    return payload;
+  }
 
-    await _showError(response.message ?? fallbackMessage);
-    return false;
+  String _resolveLocationType(String? value) {
+    final normalized = value?.trim().toLowerCase();
+    if (normalized == 'present' || normalized == 'permanent') {
+      return normalized!;
+    }
+    return 'present';
   }
 
   Future<bool> _updateWithUniversal({
@@ -1349,6 +1758,19 @@ class _ProfileSectionEditScreenState
       values: RegistrationMaritalStatus.values,
       fieldKey: 'maritalStatus',
     );
+    _prefillLookup(
+      controller: _motherTongueController,
+      raw: profileData?.motherTongue,
+      options: _motherTongueOptions,
+      fieldKey: 'motherTongue',
+    );
+    _setSelectedValues(
+      _languageOptions,
+      profileData?.languages
+          ?.map((value) => value.toString())
+          .toList(growable: false),
+    );
+    _languagesController.text = _selectedDisplayValues(_languageOptions);
     _prefillHeight(appearance?.height);
     _prefillEnum<RegistrationDiet>(
       controller: _dietController,
@@ -1403,6 +1825,18 @@ class _ProfileSectionEditScreenState
     }
 
     _fatherNameController.text = family?.fatherName ?? '';
+    _prefillLookup(
+      controller: _familyTypeController,
+      raw: family?.familyType,
+      options: _familyTypeOptions,
+      fieldKey: 'familyType',
+    );
+    _prefillLookup(
+      controller: _familyValuesController,
+      raw: family?.familyValues,
+      options: _familyValuesOptions,
+      fieldKey: 'familyValues',
+    );
     _prefillSingleString(
       controller: _fatherProfessionController,
       raw: family?.fatherProfession,
@@ -1421,6 +1855,19 @@ class _ProfileSectionEditScreenState
     _sistersController.text = family?.sisters?.toString() ?? '';
     _familyFinancialController.text =
         _familyEconomicConditionLabel(family?.familyEconomicCondition) ?? '';
+    _aboutFamilyController.text = family?.aboutFamily ?? '';
+    if (_marriageTimelineOptions.isNotEmpty) {
+      _prefillLookup(
+        controller: _marriageTimelineController,
+        raw: family?.marriageTimeline?.toString(),
+        options: _marriageTimelineOptions,
+        fieldKey: 'marriageTimeline',
+      );
+    } else {
+      _marriageTimelineController.text =
+          family?.marriageTimeline?.toString() ?? '';
+      _selectedApiValues.remove('marriageTimeline');
+    }
 
     _prefillLookup(
       controller: _highestQualificationController,
@@ -1501,6 +1948,15 @@ class _ProfileSectionEditScreenState
     _prefProfileManagedByController.text =
         _toCsv(preferences?.profileManagedByPreference);
     _prefDietController.text = _toCsv(preferences?.dietPreference);
+    _prefPartnerExpectationsController.text = _firstNonEmpty(
+      preferences?.expectationsFromLifePartner,
+      preferences?.partnerExpectations?.toString(),
+    );
+    _setSelectedValues(
+      _prefProfileManagedByOptions,
+      preferences?.profileManagedByPreference,
+    );
+    _setSelectedValues(_prefDietOptions, preferences?.dietPreference);
 
     setState(() {});
   }
@@ -1590,7 +2046,10 @@ class _ProfileSectionEditScreenState
         <String>{};
 
     for (final option in options) {
-      option.isSelected = normalized.contains(option.name.trim().toLowerCase());
+      final normalizedName = option.name.trim().toLowerCase();
+      final normalizedValue = option.value?.trim().toLowerCase();
+      option.isSelected = normalized.contains(normalizedName) ||
+          (normalizedValue != null && normalized.contains(normalizedValue));
     }
   }
 
@@ -1605,6 +2064,35 @@ class _ProfileSectionEditScreenState
       return null;
     }
     return values;
+  }
+
+  List<String>? _selectedApiValuesOrNames(List<SingleStringModel> options) {
+    final values = options
+        .where((option) => option.isSelected)
+        .map((option) {
+          final apiValue = option.value?.trim();
+          if (apiValue != null && apiValue.isNotEmpty) {
+            return apiValue;
+          }
+          return option.name.trim();
+        })
+        .where((value) => value.isNotEmpty)
+        .toList(growable: false);
+
+    if (values.isEmpty) {
+      return null;
+    }
+    return values;
+  }
+
+  String _selectedDisplayValues(List<SingleStringModel> options) {
+    final values = options
+        .where((option) => option.isSelected)
+        .map((option) => option.name.trim())
+        .where((value) => value.isNotEmpty)
+        .toList(growable: false);
+    if (values.isEmpty) return '';
+    return values.join(', ');
   }
 
   String? _apiValueOrText(String fieldKey, TextEditingController controller) {

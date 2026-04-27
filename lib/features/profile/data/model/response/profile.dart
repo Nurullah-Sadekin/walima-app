@@ -40,12 +40,7 @@ class Profile {
       });
     }
     motherTongue = json['motherTongue'];
-    if (json['languages'] != null) {
-      languages = [];
-      json['languages'].forEach((v) {
-        languages?.add(v);
-      });
-    }
+    languages = _parseLanguages(json['languages']);
     religionName = json['religionName'];
     countryCode = json['countryCode'];
     isVerified = json['isVerified'];
@@ -70,6 +65,33 @@ class Profile {
   bool? isVerified;
   String? createdAt;
   String? updatedAt;
+
+  static List<dynamic>? _parseLanguages(dynamic rawLanguages) {
+    if (rawLanguages == null) {
+      return null;
+    }
+
+    if (rawLanguages is List) {
+      return rawLanguages
+          .map((value) => value.toString().trim())
+          .where((value) => value.isNotEmpty)
+          .toList(growable: false);
+    }
+
+    if (rawLanguages is String) {
+      return rawLanguages
+          .split(',')
+          .map((value) => value.trim())
+          .where((value) => value.isNotEmpty)
+          .toList(growable: false);
+    }
+
+    final fallback = rawLanguages.toString().trim();
+    if (fallback.isEmpty) {
+      return null;
+    }
+    return [fallback];
+  }
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
