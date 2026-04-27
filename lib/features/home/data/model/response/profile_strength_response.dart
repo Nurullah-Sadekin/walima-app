@@ -91,10 +91,10 @@ class ProfileStrengthSection {
   ProfileStrengthSection.fromJson(dynamic json) {
     key = json['key'];
     label = json['label'];
-    weight = _toInt(json['weight']);
-    score = _toInt(json['score']);
+    weight = _toDouble(json['weight']);
+    score = _toDouble(json['score']);
     completionPercentage = _toInt(json['completionPercentage']);
-    completed = json['completed'];
+    completed = _toBool(json['completed']);
     fields = json['fields'] != null
         ? List<ProfileStrengthField>.from(
             json['fields'].map(ProfileStrengthField.fromJson),
@@ -104,14 +104,21 @@ class ProfileStrengthSection {
 
   String? key;
   String? label;
-  int? weight;
-  int? score;
+  double? weight;
+  double? score;
   int? completionPercentage;
   bool? completed;
   List<ProfileStrengthField>? fields;
 
+  List<ProfileStrengthField> get incompleteFields =>
+      (fields ?? const <ProfileStrengthField>[])
+          .where((field) => field.completed != true)
+          .toList(growable: false);
+
+  int get remainingFieldCount => incompleteFields.length;
+
   String? get firstIncompleteFieldKey {
-    for (final field in fields ?? const <ProfileStrengthField>[]) {
+    for (final field in incompleteFields) {
       if (field.completed != true) {
         return field.key;
       }
@@ -142,7 +149,7 @@ class ProfileStrengthField {
   ProfileStrengthField.fromJson(dynamic json) {
     key = json['key'];
     label = json['label'];
-    completed = json['completed'];
+    completed = _toBool(json['completed']);
   }
 
   String? key;
@@ -163,4 +170,25 @@ int? _toInt(dynamic value) {
   if (value is int) return value;
   if (value is num) return value.round();
   return int.tryParse(value.toString());
+}
+
+double? _toDouble(dynamic value) {
+  if (value == null) return null;
+  if (value is double) return value;
+  if (value is num) return value.toDouble();
+  return double.tryParse(value.toString());
+}
+
+bool? _toBool(dynamic value) {
+  if (value == null) return null;
+  if (value is bool) return value;
+
+  final normalized = value.toString().trim().toLowerCase();
+  if (normalized == 'true' || normalized == '1' || normalized == 'yes') {
+    return true;
+  }
+  if (normalized == 'false' || normalized == '0' || normalized == 'no') {
+    return false;
+  }
+  return null;
 }

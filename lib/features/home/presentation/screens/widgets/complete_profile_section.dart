@@ -18,7 +18,8 @@ class CompleteProfileSection extends ConsumerStatefulWidget {
       _CompleteProfileSectionState();
 }
 
-class _CompleteProfileSectionState extends ConsumerState<CompleteProfileSection> {
+class _CompleteProfileSectionState
+    extends ConsumerState<CompleteProfileSection> {
   bool _isExpanded = false;
 
   @override
@@ -46,7 +47,8 @@ class _CompleteProfileSectionState extends ConsumerState<CompleteProfileSection>
       return const SizedBox.shrink();
     }
 
-    final itemsToShow = _isExpanded ? incompleteItems : incompleteItems.take(2).toList();
+    final itemsToShow =
+        _isExpanded ? incompleteItems : incompleteItems.take(2).toList();
     final hasMoreItems = incompleteItems.length > 2;
 
     return Padding(
@@ -73,22 +75,22 @@ class _CompleteProfileSectionState extends ConsumerState<CompleteProfileSection>
           ),
           const SizedBox(height: 12),
           if (incompleteItems.isNotEmpty)
-          ...List.generate(itemsToShow.length, (index) {
-            final item = itemsToShow[index];
-            return Padding(
-              padding: EdgeInsets.only(
-                bottom: index == itemsToShow.length - 1 ? 0 : 10,
-              ),
-              child: VerificationTile(
-                iconImagePath: item.iconImagePath,
-                title: item.title,
-                statusText: item.statusText,
-                statusColor: AppColors.primary,
-                statusBackgroundColor: AppColors.primaryVariant,
-                onTap: () => item.open(context),
-              ),
-            );
-          }),
+            ...List.generate(itemsToShow.length, (index) {
+              final item = itemsToShow[index];
+              return Padding(
+                padding: EdgeInsets.only(
+                  bottom: index == itemsToShow.length - 1 ? 0 : 10,
+                ),
+                child: VerificationTile(
+                  iconImagePath: item.iconImagePath,
+                  title: item.title,
+                  statusText: item.statusText,
+                  statusColor: AppColors.primary,
+                  statusBackgroundColor: AppColors.primaryVariant,
+                  onTap: () => item.open(context),
+                ),
+              );
+            }),
 
           if (hasMoreItems && !_isExpanded)
             Padding(
@@ -104,7 +106,6 @@ class _CompleteProfileSectionState extends ConsumerState<CompleteProfileSection>
                         color: AppColors.primary,
                         fontSize: TextSize.font14(context),
                         fontWeight: FontWeight.w600,
-
                       ),
                     ),
                     const SizedBox(width: 4),
@@ -159,6 +160,75 @@ class _CompleteProfileTileData {
   });
 
   static const String completeProfileSource = 'completeProfile';
+  static const Map<String, List<String>> _requiredFieldsBySection =
+      <String, List<String>>{
+    'preferences': <String>[
+      'ageRange',
+      'heightRange',
+      'maritalStatusPreference',
+      'educationPreference',
+      'religionPreference',
+      'locationPreference',
+      'partnerExpectations',
+      'dietPreference',
+    ],
+    'basic_profile': <String>[
+      'dateOfBirth',
+      'maritalStatus',
+      'bio',
+      'motherTongue',
+      'languages',
+      'displayName',
+    ],
+    'photos': <String>[
+      'hasPhoto',
+      'hasPrimaryPhoto',
+      'hasMultiplePhotos',
+    ],
+    'family': <String>[
+      'familyType',
+      'familyValues',
+      'parentInfo',
+      'aboutFamily',
+      'marriageTimeline',
+    ],
+    'education': <String>[
+      'hasEducation',
+      'educationLevel',
+      'fieldOfStudy',
+    ],
+    'profession': <String>[
+      'hasProfession',
+      'profession',
+      'incomeRange',
+    ],
+    'appearance': <String>[
+      'height',
+      'weight',
+      'bodyType',
+    ],
+    'religion': <String>[
+      'religion',
+      'community',
+      'religiousBackground',
+    ],
+    'lifestyle': <String>[
+      'dietType',
+      'drinkingHabits',
+      'smokingHabits',
+    ],
+    'location': <String>[
+      'hasLocation',
+      'country',
+      'city',
+    ],
+    'interests': <String>[
+      'hasInterests',
+    ],
+    'contact': <String>[
+      'hasContact',
+    ],
+  };
 
   final String title;
   final String iconImagePath;
@@ -170,10 +240,11 @@ class _CompleteProfileTileData {
   static _CompleteProfileTileData fromStrengthSection(
     ProfileStrengthSection section,
   ) {
-    final sectionKey = section.key?.trim().toLowerCase();
-    final fieldKey = section.firstIncompleteFieldKey;
+    final sectionKey = _normalizeKey(section.key);
+    final fieldKey = section.firstIncompleteFieldKey ??
+        _requiredFieldsBySection[sectionKey]?.first;
     final title = 'Complete ${section.label ?? 'Profile Section'}';
-    final statusText = '${section.completionPercentage ?? 0}%';
+    final statusText = _statusTextFor(section);
 
     switch (sectionKey) {
       case 'preferences':
@@ -195,28 +266,28 @@ class _CompleteProfileTileData {
           title: title,
           statusText: statusText,
           iconImagePath: AppImages.person,
-          section: ProfileEditSection.basicDetails,
+          section: _appearanceSectionForField(fieldKey),
         );
       case 'location':
         return _profileEditTile(
           title: title,
           statusText: statusText,
           iconImagePath: AppImages.locationSvgIcon,
-          section: ProfileEditSection.location,
+          section: _locationSectionForField(fieldKey),
         );
       case 'education':
         return _profileEditTile(
           title: title,
           statusText: statusText,
           iconImagePath: AppImages.educationSvgIcon,
-          section: ProfileEditSection.educationCareer,
+          section: _educationSectionForField(fieldKey),
         );
       case 'profession':
         return _profileEditTile(
           title: title,
           statusText: statusText,
           iconImagePath: AppImages.workSvgIcon,
-          section: ProfileEditSection.educationCareer,
+          section: _professionSectionForField(fieldKey),
         );
       case 'religion':
         return _profileEditTile(
@@ -230,14 +301,14 @@ class _CompleteProfileTileData {
           title: title,
           statusText: statusText,
           iconImagePath: AppImages.groupsIcon,
-          section: ProfileEditSection.familyDetails,
+          section: _familySectionForField(fieldKey),
         );
       case 'lifestyle':
         return _profileEditTile(
           title: title,
           statusText: statusText,
           iconImagePath: AppImages.lifeStyleSvgIcon,
-          section: ProfileEditSection.basicDetails,
+          section: _lifestyleSectionForField(fieldKey),
         );
       case 'contact':
       case 'contacts':
@@ -255,11 +326,14 @@ class _CompleteProfileTileData {
           onTap: _openPhotoUpload,
         );
       case 'interests':
+      case 'hobbies':
+      case 'hobbies_interests':
+      case 'interest':
         return _profileEditTile(
           title: title,
           statusText: statusText,
           iconImagePath: AppImages.habitsSvgIcon,
-          section: ProfileEditSection.hobbiesInterests,
+          section: _interestsSectionForField(fieldKey),
         );
       default:
         return _profileEditTile(
@@ -295,37 +369,129 @@ class _CompleteProfileTileData {
     );
   }
 
+  static String _normalizeKey(String? value) {
+    return value?.trim().toLowerCase() ?? '';
+  }
+
+  static String _statusTextFor(ProfileStrengthSection section) {
+    final remaining = section.remainingFieldCount;
+    if (remaining > 0) {
+      final suffix = remaining == 1 ? 'field left' : 'fields left';
+      return '$remaining $suffix';
+    }
+    return '${section.completionPercentage ?? 0}%';
+  }
+
   static ProfileEditSection _basicProfileSectionForField(String? fieldKey) {
-    switch (fieldKey) {
+    switch (_normalizeKey(fieldKey)) {
       case 'bio':
         return ProfileEditSection.aboutYourself;
+      case 'mothertongue':
       case 'languages':
-      case 'dateOfBirth':
-      case 'maritalStatus':
-      case 'displayName':
+      case 'dateofbirth':
+      case 'maritalstatus':
+      case 'displayname':
         return ProfileEditSection.basicDetails;
-      case 'motherTongue':
-        return ProfileEditSection.religiousBackground;
       default:
         return ProfileEditSection.basicDetails;
     }
   }
 
   static ProfileEditSection _preferenceSectionForField(String? fieldKey) {
-    switch (fieldKey) {
-      case 'locationPreference':
+    switch (_normalizeKey(fieldKey)) {
+      case 'locationpreference':
         return ProfileEditSection.preferenceLocationDetails;
-      case 'educationPreference':
+      case 'educationpreference':
+      case 'professionpreference':
+      case 'workingaspreference':
+      case 'annualincomepreference':
         return ProfileEditSection.preferenceEducationCareer;
-      case 'partnerExpectations':
-      case 'dietPreference':
+      case 'partnerexpectations':
+      case 'expectationsfromlifepartner':
+      case 'dietpreference':
+      case 'drinkingpreference':
+      case 'smokingpreference':
+      case 'profilemanagedbypreference':
         return ProfileEditSection.preferenceOtherDetails;
-      case 'ageRange':
-      case 'heightRange':
-      case 'maritalStatusPreference':
-      case 'religionPreference':
+      case 'agerange':
+      case 'heightrange':
+      case 'maritalstatuspreference':
+      case 'religionpreference':
+      case 'communitypreference':
+      case 'mothertonguepreference':
+      case 'languagepreference':
       default:
         return ProfileEditSection.preferenceBasicInfo;
+    }
+  }
+
+  static ProfileEditSection _familySectionForField(String? fieldKey) {
+    switch (_normalizeKey(fieldKey)) {
+      case 'familytype':
+      case 'familyvalues':
+      case 'parentinfo':
+      case 'aboutfamily':
+      case 'marriagetimeline':
+      default:
+        return ProfileEditSection.familyDetails;
+    }
+  }
+
+  static ProfileEditSection _appearanceSectionForField(String? fieldKey) {
+    switch (_normalizeKey(fieldKey)) {
+      case 'height':
+      case 'weight':
+      case 'bodytype':
+      default:
+        return ProfileEditSection.basicDetails;
+    }
+  }
+
+  static ProfileEditSection _lifestyleSectionForField(String? fieldKey) {
+    switch (_normalizeKey(fieldKey)) {
+      case 'diettype':
+      case 'drinkinghabits':
+      case 'smokinghabits':
+      default:
+        return ProfileEditSection.basicDetails;
+    }
+  }
+
+  static ProfileEditSection _educationSectionForField(String? fieldKey) {
+    switch (_normalizeKey(fieldKey)) {
+      case 'haseducation':
+      case 'educationlevel':
+      case 'fieldofstudy':
+      default:
+        return ProfileEditSection.educationCareer;
+    }
+  }
+
+  static ProfileEditSection _professionSectionForField(String? fieldKey) {
+    switch (_normalizeKey(fieldKey)) {
+      case 'hasprofession':
+      case 'profession':
+      case 'incomerange':
+      default:
+        return ProfileEditSection.educationCareer;
+    }
+  }
+
+  static ProfileEditSection _locationSectionForField(String? fieldKey) {
+    switch (_normalizeKey(fieldKey)) {
+      case 'haslocation':
+      case 'country':
+      case 'city':
+      default:
+        return ProfileEditSection.location;
+    }
+  }
+
+  static ProfileEditSection _interestsSectionForField(String? fieldKey) {
+    switch (_normalizeKey(fieldKey)) {
+      case 'hasinterests':
+      default:
+        return ProfileEditSection.hobbiesInterests;
     }
   }
 

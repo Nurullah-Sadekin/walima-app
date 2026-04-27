@@ -1,6 +1,7 @@
 part of 'get_complete_profile_response.dart';
 
 enum ProfileCompletionSection {
+  preferences,
   basicProfile,
   appearance,
   location,
@@ -17,6 +18,7 @@ extension ProfileCompletionSectionX on ProfileCompletionSection {
   static final Map<String, ProfileCompletionSection> _aliases =
       <String, ProfileCompletionSection>{
     'basic_profile': ProfileCompletionSection.basicProfile,
+    'preferences': ProfileCompletionSection.preferences,
     'appearance': ProfileCompletionSection.appearance,
     'location': ProfileCompletionSection.location,
     'locations': ProfileCompletionSection.location,
@@ -27,6 +29,7 @@ extension ProfileCompletionSectionX on ProfileCompletionSection {
     'religion': ProfileCompletionSection.religion,
     'family': ProfileCompletionSection.family,
     'lifestyle': ProfileCompletionSection.lifestyle,
+    'contact': ProfileCompletionSection.contacts,
     'contacts': ProfileCompletionSection.contacts,
     'photos': ProfileCompletionSection.photos,
     'galleryimages': ProfileCompletionSection.photos,
