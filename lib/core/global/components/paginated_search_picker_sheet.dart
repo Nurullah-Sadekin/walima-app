@@ -82,10 +82,27 @@ class _PaginatedSearchPickerSheetState
   static const double _expandedSize = 0.95;
   bool _wasKeyboardVisible = false;
 
+  /// Cache of every distinct item the sheet has ever observed via
+  /// [widget.items]. This lets local filtering keep working even after the
+  /// parent provider clears its list to fetch a fresh API page.
+  final List<String> _cachedItems = <String>[];
+  final Set<String> _cachedItemKeys = <String>{};
+  String _localQuery = '';
+
   @override
   void initState() {
     super.initState();
     _searchController = TextEditingController(text: widget.initialQuery);
+    _localQuery = widget.initialQuery;
+    _mergeIntoCache(widget.items);
+  }
+
+  @override
+  void didUpdateWidget(covariant _PaginatedSearchPickerSheet oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(widget.items, oldWidget.items)) {
+      _mergeIntoCache(widget.items);
+    }
   }
 
   @override
@@ -94,6 +111,49 @@ class _PaginatedSearchPickerSheetState
     _searchController.dispose();
     _sheetController.dispose();
     super.dispose();
+  }
+
+  void _mergeIntoCache(List<String> incoming) {
+    for (final item in incoming) {
+      final trimmed = item.trim();
+      if (trimmed.isEmpty) continue;
+      final key = trimmed.toLowerCase();
+      if (_cachedItemKeys.add(key)) {
+        _cachedItems.add(trimmed);
+      }
+    }
+  }
+
+  List<String> _resolveDisplayItems() {
+    final query = _localQuery.trim().toLowerCase();
+    if (query.isEmpty) {
+      // No active query — show whatever the parent currently exposes so the
+      // pagination/loading semantics match the API state exactly.
+      return widget.items;
+    }
+
+    final filtered = <String>[];
+    final seen = <String>{};
+    for (final item in _cachedItems) {
+      if (!item.toLowerCase().contains(query)) continue;
+      final key = item.toLowerCase();
+      if (seen.add(key)) {
+        filtered.add(item);
+      }
+    }
+    // Also include anything from widget.items that may not have been merged
+    // yet (defensive — covers the rare race where build runs before
+    // didUpdateWidget).
+    for (final item in widget.items) {
+      final trimmed = item.trim();
+      if (trimmed.isEmpty) continue;
+      if (!trimmed.toLowerCase().contains(query)) continue;
+      final key = trimmed.toLowerCase();
+      if (seen.add(key)) {
+        filtered.add(trimmed);
+      }
+    }
+    return filtered;
   }
 
   void _syncSheetToKeyboard(bool isKeyboardVisible) {
@@ -170,7 +230,11 @@ class _PaginatedSearchPickerSheetState
                       onChanged: _onSearchChanged,
                       decoration: InputDecoration(
                         hintText: widget.searchHintText,
-                        prefixIcon: const Icon(Icons.search),
+                        hintStyle: TextStyle(
+                          fontSize: TextSize.font16(context),
+                          color: AppColors.textSecondaryLight,
+                        ),
+                        prefixIcon: Icon(Icons.search,color: AppColors.textSecondaryLight,size: TextSize.font22(context),),
                         suffixIcon: _searchController.text.isEmpty
                             ? null
                             : IconButton(
@@ -178,10 +242,10 @@ class _PaginatedSearchPickerSheetState
                                   _searchController.clear();
                                   _onSearchChanged('');
                                 },
-                                icon: const Icon(Icons.close),
+                                icon:  Icon(Icons.close,color: AppColors.primary,size: TextSize.font22(context),),
                               ),
                         filled: true,
-                        fillColor: const Color(0xFFF7F7F7),
+                        fillColor:  AppColors.greyLight.withOpacity(0.5),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
@@ -193,10 +257,16 @@ class _PaginatedSearchPickerSheetState
                   Expanded(
                     child: _PaginatedSearchPickerList(
                       scrollController: scrollController,
-                      items: widget.items,
+                      items: _resolveDisplayItems(),
                       isInitialLoading: widget.isInitialLoading,
                       isLoadingMore: widget.isLoadingMore,
-                      hasMoreItems: widget.hasMoreItems,
+                      // Disable load-more while a local query is active so the
+                      // user is not nudged to paginate past the locally
+                      // filtered results — once the API returns matching
+                      // items they get merged into the cache automatically.
+                      hasMoreItems: _localQuery.trim().isEmpty
+                          ? widget.hasMoreItems
+                          : false,
                       onLoadMore: widget.onLoadMore,
                       emptyStateText: widget.emptyStateText,
                     ),
@@ -211,7 +281,11 @@ class _PaginatedSearchPickerSheetState
   }
 
   void _onSearchChanged(String value) {
-    setState(() {});
+    setState(() {
+      // Apply the local filter immediately so the user sees instant feedback
+      // from already-loaded items while the debounced API call is in flight.
+      _localQuery = value;
+    });
     _searchDebounce?.cancel();
     _searchDebounce = Timer(widget.searchDebounce, () {
       widget.onSearchChanged(value);
