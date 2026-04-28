@@ -788,7 +788,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     }
     if (firstText.isEmpty) return secondText;
     if (secondText.isEmpty) return firstText;
-    return CamelCaseUtils.formatCamelCase('$firstText $secondText');
+    return CamelCaseUtils.formatCamelCase('$firstText ($secondText)');
   }
 
   String _valueOrDefault(dynamic value, [String fallback = 'Not Specified']) {
