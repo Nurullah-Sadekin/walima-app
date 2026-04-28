@@ -20,6 +20,7 @@ import 'package:flutter_boilerplate/features/profile/data/repository/profile_rep
 import 'package:flutter_boilerplate/features/profile/presentation/screen/profile_edit_section.dart';
 import 'package:flutter_boilerplate/features/recommended_preferences/data/models/request/update_preferences_request_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/lookup_option.dart';
+import 'package:flutter_boilerplate/features/registration/data/repository/location_data_repository_impl.dart';
 import 'package:flutter_boilerplate/features/registration/data/models/request/update_family_request_body.dart';
 import 'package:flutter_boilerplate/features/registration/data/repository/lookup_repository.dart';
 import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
@@ -67,6 +68,8 @@ class _ProfileSectionEditScreenState
   ];
 
   final LookupRepository _lookupRepository = LookupRepository();
+  final LocationDataRepositoryImpl _locationRepository =
+      LocationDataRepositoryImpl();
 
   List<LookupOption> _educationLevelOptions = <LookupOption>[];
   List<LookupOption> _professionOptions = <LookupOption>[];
@@ -182,10 +185,35 @@ class _ProfileSectionEditScreenState
   List<SingleStringModel> _funOptions = <SingleStringModel>[];
   List<SingleStringModel> _fitnessOptions = <SingleStringModel>[];
   List<SingleStringModel> _otherOptions = <SingleStringModel>[];
+  List<SingleStringModel> _prefEducationOptions = <SingleStringModel>[];
+  List<SingleStringModel> _prefWorkingAsOptions = <SingleStringModel>[];
+  late List<SingleStringModel> _prefMaritalOptions;
   late List<SingleStringModel> _prefProfileManagedByOptions;
   late List<SingleStringModel> _prefDietOptions;
 
   bool _isLookupLoading = false;
+  List<String> _countryDropdownItems = <String>[];
+  List<String> _cityDropdownItems = <String>[];
+  bool _isCountryLoading = false;
+  bool _isCountryLoadingMore = false;
+  bool _hasMoreCountries = false;
+  bool _isCityLoading = false;
+  bool _isCityLoadingMore = false;
+  bool _hasMoreCities = false;
+  int _countryPage = 1;
+  int _cityPage = 1;
+  String _countrySearchQuery = '';
+  String _citySearchQuery = '';
+  String? _selectedCityCountry;
+  static const int _prefAgeMinLimit = 18;
+  static const int _prefAgeMaxLimit = 70;
+  static const int _prefHeightMinLimit = 120;
+  static const int _prefHeightMaxLimit = 220;
+  int _prefAgeStart = 25;
+  int _prefAgeEnd = 35;
+  int _prefHeightStart = 160;
+  int _prefHeightEnd = 180;
+  final List<String> _preferredCitySelections = <String>[];
 
   @override
   void initState() {
@@ -194,6 +222,14 @@ class _ProfileSectionEditScreenState
     _funOptions = _cloneOptions(funItemListDataInserted);
     _fitnessOptions = _cloneOptions(fitnessItemListDataInserted);
     _otherOptions = _cloneOptions(otherInterestsItemListDataInserted);
+    _prefMaritalOptions = RegistrationMaritalStatus.values
+        .map(
+          (item) => SingleStringModel(
+            name: item.label,
+            value: item.apiValue,
+          ),
+        )
+        .toList(growable: false);
     _prefProfileManagedByOptions = RegistrationProfileManagedBy.values
         .map(
           (item) => SingleStringModel(
@@ -227,12 +263,27 @@ class _ProfileSectionEditScreenState
       case ProfileEditSection.basicDetails:
         futures.add(_loadBasicDetailsLookups());
         break;
+      case ProfileEditSection.preferenceBasicInfo:
+        futures.add(_loadPreferenceBasicInfoLookups());
+        break;
+      case ProfileEditSection.preferenceLocationDetails:
+        futures.add(_loadPreferenceLocationLookups());
+        break;
+      case ProfileEditSection.preferenceEducationCareer:
+        futures.add(_loadPreferenceEducationCareerLookups());
+        break;
+      case ProfileEditSection.preferenceOtherDetails:
+        futures.add(_loadPreferenceOtherDetailLookups());
+        break;
       case ProfileEditSection.educationCareer:
         futures.add(_loadEducationLevelLookup());
         futures.add(_loadProfessionAndIncomeLookup());
         break;
       case ProfileEditSection.familyDetails:
         futures.add(_loadFamilyLookups());
+        break;
+      case ProfileEditSection.location:
+        futures.add(_loadLocationLookups());
         break;
       case ProfileEditSection.hobbiesInterests:
         futures.add(_loadHobbyLookups());
@@ -346,6 +397,60 @@ class _ProfileSectionEditScreenState
     );
   }
 
+  Future<void> _loadLocationLookups() async {
+    await _syncCountryOptions(reset: _countryDropdownItems.isEmpty);
+    final selectedCountry = _countryController.text.trim();
+    if (selectedCountry.isNotEmpty) {
+      await _syncCityOptionsForCountry(selectedCountry, reset: true);
+    }
+  }
+
+  Future<void> _loadPreferenceBasicInfoLookups() async {
+    await _loadBasicDetailsLookups();
+    if (_prefReligionController.text.trim().isNotEmpty) {
+      await _loadCommunityOptionsForReligion(_prefReligionController.text);
+    }
+  }
+
+  Future<void> _loadPreferenceLocationLookups() async {
+    await _syncCountryOptions(reset: _countryDropdownItems.isEmpty);
+    final selectedCountry = _prefCountryController.text.trim();
+    if (selectedCountry.isNotEmpty) {
+      await _syncCityOptionsForCountry(
+        selectedCountry,
+        reset: true,
+        usePreferenceSelection: true,
+      );
+    }
+  }
+
+  Future<void> _loadPreferenceEducationCareerLookups() async {
+    await _loadEducationLevelLookup();
+    await _loadProfessionAndIncomeLookup();
+
+    _prefEducationOptions = _educationLevelOptions
+        .map(
+          (option) => SingleStringModel(
+            name: option.label,
+            value: option.key,
+          ),
+        )
+        .toList(growable: false);
+
+    _prefWorkingAsOptions = _professionOptions
+        .map(
+          (option) => SingleStringModel(
+            name: option.label,
+            value: option.key,
+          ),
+        )
+        .toList(growable: false);
+  }
+
+  Future<void> _loadPreferenceOtherDetailLookups() async {
+    // Preference chips already come from local enums/static data.
+  }
+
   Future<void> _loadHobbyLookups() async {
     final results = await Future.wait<List<LookupOption>>([
       _lookupRepository.getLookups(LookupCategory.creativePursuits),
@@ -440,6 +545,29 @@ class _ProfileSectionEditScreenState
         setState(() => _isLookupLoading = false);
       }
     }
+  }
+
+  Future<void> _syncPreferredCommunitySelection(String? rawCommunity) async {
+    await _loadCommunityOptionsForReligion(_prefReligionController.text);
+    if (!mounted) return;
+
+    final normalized = rawCommunity?.trim();
+    if (normalized == null || normalized.isEmpty) {
+      return;
+    }
+
+    final match = _findLookupOption(_communityOptions, normalized);
+    if (match == null) {
+      setState(() {
+        _selectedApiValues.remove('prefCommunity');
+      });
+      return;
+    }
+
+    setState(() {
+      _prefCommunityController.text = match.label;
+      _selectedApiValues['prefCommunity'] = match.key;
+    });
   }
 
   @override
@@ -613,7 +741,7 @@ class _ProfileSectionEditScreenState
             ),
             PrimaryTextField(
               headLine: 'Grew up in',
-              hintText: 'Select',
+              hintText: 'Select Country',
               controller: _grewUpInController,
               errorText: '',
               noPrefix: true,
@@ -806,9 +934,22 @@ class _ProfileSectionEditScreenState
       case ProfileEditSection.location:
         return _buildCard(
           children: [
-            _field(label: 'Current Country', controller: _countryController),
+            _pickerField(
+              label: 'Current Country',
+              controller: _countryController,
+              hintText: 'Select Country',
+              onTap: _openCurrentCountryPicker,
+            ),
             _field(label: 'State of Residence', controller: _stateController),
-            _field(label: 'Current City', controller: _cityController),
+            _pickerField(
+              label: 'Current City',
+              controller: _cityController,
+              hintText: _countryController.text.trim().isEmpty
+                  ? 'Select Country First'
+                  : 'Select City',
+              enabled: _countryController.text.trim().isNotEmpty,
+              onTap: _openCurrentCityPicker,
+            ),
             _enumDropdown<ResidencyStatus>(
               label: 'Residency Status',
               controller: _residencyStatusController,
@@ -817,7 +958,12 @@ class _ProfileSectionEditScreenState
               fieldKey: 'residencyStatus',
             ),
             _field(label: 'Zip/Pin code', controller: _zipController),
-            _field(label: 'Grew up in', controller: _grewUpController),
+            _pickerField(
+              label: 'Grew up in',
+              controller: _grewUpController,
+              hintText: 'Select Country',
+              onTap: _openCurrentGrewUpCountryPicker,
+            ),
           ],
         );
       case ProfileEditSection.hobbiesInterests:
@@ -851,79 +997,114 @@ class _ProfileSectionEditScreenState
       case ProfileEditSection.preferenceBasicInfo:
         return _buildCard(
           children: [
-            _field(
-              label: 'Preferred Age Min',
-              controller: _prefAgeMinController,
-              keyboardType: TextInputType.number,
+            _rangeSelector(
+              label: 'Age Range',
+              startValue: _prefAgeStart,
+              endValue: _prefAgeEnd,
+              min: _prefAgeMinLimit,
+              max: _prefAgeMaxLimit,
+              startLabel: '$_prefAgeStart',
+              endLabel: '$_prefAgeEnd',
+              onChanged: _setPreferredAgeRange,
             ),
-            _field(
-              label: 'Preferred Age Max',
-              controller: _prefAgeMaxController,
-              keyboardType: TextInputType.number,
+            _rangeSelector(
+              label: 'Height Range',
+              startValue: _prefHeightStart,
+              endValue: _prefHeightEnd,
+              min: _prefHeightMinLimit,
+              max: _prefHeightMaxLimit,
+              startLabel: _formatPreferenceHeight(_prefHeightStart),
+              endLabel: _formatPreferenceHeight(_prefHeightEnd),
+              onChanged: _setPreferredHeightRange,
             ),
-            _field(
-              label: 'Preferred Height Min (cm)',
-              controller: _prefHeightMinController,
-              keyboardType: TextInputType.number,
+            _multiSelectField(
+              label: 'Marital Status',
+              options: _prefMaritalOptions,
+              onItemTap: (index) => _toggleOption(_prefMaritalOptions, index),
             ),
-            _field(
-              label: 'Preferred Height Max (cm)',
-              controller: _prefHeightMaxController,
-              keyboardType: TextInputType.number,
-            ),
-            _field(
-              label: 'Religion (comma separated)',
+            _lookupDropdown(
+              label: 'Religion',
               controller: _prefReligionController,
+              options: _religionOptions,
+              popupHeader: 'Select Religion',
+              fieldKey: 'prefReligion',
+              onSelected: (_) {
+                _prefCommunityController.clear();
+                _selectedApiValues.remove('prefCommunity');
+                unawaited(
+                  _loadCommunityOptionsForReligion(_prefReligionController.text),
+                );
+              },
             ),
-            _field(
-              label: 'Community (comma separated)',
+            _lookupDropdown(
+              label: 'Community',
               controller: _prefCommunityController,
+              options: _communityOptions,
+              popupHeader: 'Select Community',
+              fieldKey: 'prefCommunity',
+              onTap: () =>
+                  _loadCommunityOptionsForReligion(_prefReligionController.text),
             ),
-            _field(
-              label: 'Mother Tongue (comma separated)',
+            _lookupDropdown(
+              label: 'Mother Tongue',
               controller: _prefMotherTongueController,
-            ),
-            _field(
-              label: 'Marital Status (comma separated)',
-              controller: _prefMaritalController,
+              options: _motherTongueOptions,
+              popupHeader: 'Select Mother Tongue',
+              fieldKey: 'prefMotherTongue',
+              onTap: _loadBasicDetailsLookups,
             ),
           ],
         );
       case ProfileEditSection.preferenceLocationDetails:
         return _buildCard(
           children: [
-            _field(
-              label: 'Preferred Countries (comma separated)',
+            _pickerField(
+              label: 'Country Living In',
               controller: _prefCountryController,
+              hintText: 'Select Country',
+              onTap: _openPreferredCountryPicker,
             ),
-            _field(
-              label: 'Preferred States (comma separated)',
-              controller: _prefStateController,
-            ),
-            _field(
-              label: 'Preferred Cities (comma separated)',
-              controller: _prefCityController,
-            ),
+            if (_prefCountryController.text.trim().isNotEmpty)
+              _multiTextSelectionField(
+                label: 'City',
+                options: _cityDropdownItems,
+                selectedValues: _preferredCitySelections,
+                isLoading: _isCityLoading && _cityDropdownItems.isEmpty,
+                isLoadingMore: _isCityLoadingMore,
+                emptyText: 'No cities available for the selected country.',
+                onItemTap: _togglePreferredCitySelection,
+                onLoadMore: _hasMoreCities ? _loadMorePreferredCities : null,
+              ),
           ],
         );
       case ProfileEditSection.preferenceEducationCareer:
         return _buildCard(
           children: [
-            _field(
-              label: 'Education Preference (comma separated)',
-              controller: _prefEducationController,
+            _multiSelectField(
+              label: 'Education Qualification',
+              options: _prefEducationOptions,
+              onItemTap: (index) => _toggleOption(_prefEducationOptions, index),
             ),
-            _field(
-              label: 'Profession Preference (comma separated)',
+            _multiSelectField(
+              label: 'Working As',
+              options: _prefWorkingAsOptions,
+              onItemTap: (index) => _toggleOption(_prefWorkingAsOptions, index),
+            ),
+            _lookupDropdown(
+              label: 'Profession',
               controller: _prefProfessionController,
+              options: _professionOptions,
+              popupHeader: 'Select Profession',
+              fieldKey: 'prefProfession',
+              onTap: _loadProfessionAndIncomeLookup,
             ),
-            _field(
-              label: 'Working As Preference (comma separated)',
-              controller: _prefWorkingAsController,
-            ),
-            _field(
-              label: 'Annual Income Preference (comma separated)',
+            _lookupDropdown(
+              label: 'Annual Income',
               controller: _prefIncomeController,
+              options: _incomeRangeOptions,
+              popupHeader: 'Select Annual Income',
+              fieldKey: 'prefIncome',
+              onTap: _loadProfessionAndIncomeLookup,
             ),
           ],
         );
@@ -1007,6 +1188,30 @@ class _ProfileSectionEditScreenState
     );
   }
 
+  Widget _pickerField({
+    required String label,
+    required TextEditingController controller,
+    required String hintText,
+    required VoidCallback onTap,
+    bool enabled = true,
+  }) {
+    return PrimaryTextField(
+      headLine: label,
+      hintText: hintText,
+      controller: controller,
+      readOnly: true,
+      enabled: enabled,
+      errorText: '',
+      noPrefix: true,
+      onTap: onTap,
+      suffix: Icon(
+        Icons.keyboard_arrow_down_outlined,
+        size: TextSize.font20(context),
+        color: AppColors.grey,
+      ),
+    );
+  }
+
   Widget _multiSelectField({
     required String label,
     required List<SingleStringModel> options,
@@ -1039,6 +1244,109 @@ class _ProfileSectionEditScreenState
             );
           }),
         ),
+      ],
+    );
+  }
+
+  Widget _rangeSelector({
+    required String label,
+    required int startValue,
+    required int endValue,
+    required int min,
+    required int max,
+    required String startLabel,
+    required String endLabel,
+    required ValueChanged<RangeValues> onChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: AppColors.textPrimaryLight,
+            fontSize: TextSize.font14(context),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 10),
+        _StyledRangeSlider(
+          values: RangeValues(startValue.toDouble(), endValue.toDouble()),
+          min: min.toDouble(),
+          max: max.toDouble(),
+          divisions: max - min,
+          startLabel: startLabel,
+          endLabel: endLabel,
+          onChanged: onChanged,
+        ),
+      ],
+    );
+  }
+
+  Widget _multiTextSelectionField({
+    required String label,
+    required List<String> options,
+    required List<String> selectedValues,
+    required bool isLoading,
+    required bool isLoadingMore,
+    required String emptyText,
+    required ValueChanged<String> onItemTap,
+    VoidCallback? onLoadMore,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: AppColors.textPrimaryLight,
+            fontSize: TextSize.font14(context),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 10),
+        if (isLoading)
+          const Center(child: CircularProgressIndicator())
+        else if (options.isEmpty)
+          Text(
+            emptyText,
+            style: TextStyle(
+              color: AppColors.textSecondaryLight,
+              fontSize: TextSize.font13(context),
+              fontWeight: FontWeight.w400,
+            ),
+          )
+        else
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: options.map((value) {
+              final isSelected = selectedValues.any(
+                (item) => item.toLowerCase() == value.toLowerCase(),
+              );
+              return SelectionCard(
+                buttonStyle: isSelected
+                    ? SelectionStyle.selectedCheckbox
+                    : SelectionStyle.unSelectedCheckbox,
+                onTap: () => onItemTap(value),
+                isSelected: isSelected,
+                title: value,
+              );
+            }).toList(growable: false),
+          ),
+        if (isLoadingMore)
+          const Padding(
+            padding: EdgeInsets.only(top: 12),
+            child: Center(child: CircularProgressIndicator()),
+          )
+        else if (onLoadMore != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: TextButton(
+              onPressed: onLoadMore,
+              child: const Text('Load more'),
+            ),
+          ),
       ],
     );
   }
@@ -1165,25 +1473,21 @@ class _ProfileSectionEditScreenState
   }
 
   Future<void> _openGrewUpInCountryPicker() async {
-    final registration = ref.read(registrationProvider);
-    await registration.loadCountryData(
-      reset: registration.countryDropdownItems.isEmpty,
-    );
+    await _syncCountryOptions(reset: _countryDropdownItems.isEmpty);
     if (!mounted) return;
 
     final selectedCountry = await showPaginatedSearchPickerSheet(
       context: context,
       title: 'Select Grew Up In',
       searchHintText: 'Search country',
-      items: registration.countryDropdownItems,
-      isInitialLoading: registration.isCountryLoading &&
-          registration.countryDropdownItems.isEmpty,
-      isLoadingMore: registration.isCountryLoadingMore,
-      hasMoreItems: registration.hasMoreCountries,
-      initialQuery: registration.countrySearchQuery,
+      items: _countryDropdownItems,
+      isInitialLoading: _isCountryLoading && _countryDropdownItems.isEmpty,
+      isLoadingMore: _isCountryLoadingMore,
+      hasMoreItems: _hasMoreCountries,
+      initialQuery: _countrySearchQuery,
       emptyStateText: 'No countries found',
-      onSearchChanged: registration.setCountrySearchQuery,
-      onLoadMore: registration.loadMoreCountries,
+      onSearchChanged: _setCountrySearchQuery,
+      onLoadMore: _loadMoreCountries,
     );
 
     if (!mounted || selectedCountry == null || selectedCountry.trim().isEmpty) {
@@ -1194,6 +1498,398 @@ class _ProfileSectionEditScreenState
       _grewUpInController.text = selectedCountry.trim();
       _selectedApiValues['grewUpIn'] = selectedCountry.trim();
     });
+  }
+
+  Future<void> _openCurrentCountryPicker() async {
+    await _syncCountryOptions(reset: _countryDropdownItems.isEmpty);
+    if (!mounted) return;
+
+    final selectedCountry = await showPaginatedSearchPickerSheet(
+      context: context,
+      title: 'Select Current Country',
+      searchHintText: 'Search country',
+      items: _countryDropdownItems,
+      isInitialLoading: _isCountryLoading && _countryDropdownItems.isEmpty,
+      isLoadingMore: _isCountryLoadingMore,
+      hasMoreItems: _hasMoreCountries,
+      initialQuery: _countrySearchQuery,
+      emptyStateText: 'No countries found',
+      onSearchChanged: _setCountrySearchQuery,
+      onLoadMore: _loadMoreCountries,
+    );
+
+    if (!mounted || selectedCountry == null || selectedCountry.trim().isEmpty) {
+      return;
+    }
+
+    final normalizedCountry = selectedCountry.trim();
+    final previousCountry = _countryController.text.trim();
+
+    setState(() {
+      _countryController.text = normalizedCountry;
+      if (previousCountry.toLowerCase() != normalizedCountry.toLowerCase()) {
+        _cityController.clear();
+        _citySearchQuery = '';
+      }
+    });
+
+    await _syncCityOptionsForCountry(normalizedCountry, reset: true);
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Future<void> _openCurrentCityPicker() async {
+    final selectedCountry = _countryController.text.trim();
+    if (selectedCountry.isEmpty) {
+      return;
+    }
+
+    await _syncCityOptionsForCountry(
+      selectedCountry,
+      reset: _cityDropdownItems.isEmpty ||
+          _selectedCityCountry?.toLowerCase() != selectedCountry.toLowerCase(),
+    );
+    if (!mounted) return;
+
+    final selectedCity = await showPaginatedSearchPickerSheet(
+      context: context,
+      title: 'Select Current City',
+      searchHintText: 'Search city',
+      items: _cityDropdownItems,
+      isInitialLoading: _isCityLoading && _cityDropdownItems.isEmpty,
+      isLoadingMore: _isCityLoadingMore,
+      hasMoreItems: _hasMoreCities,
+      initialQuery: _citySearchQuery,
+      emptyStateText: 'No cities found',
+      onSearchChanged: _setCitySearchQuery,
+      onLoadMore: _loadMoreCities,
+    );
+
+    if (!mounted || selectedCity == null || selectedCity.trim().isEmpty) {
+      return;
+    }
+
+    setState(() {
+      _cityController.text = selectedCity.trim();
+    });
+  }
+
+  Future<void> _openCurrentGrewUpCountryPicker() async {
+    await _syncCountryOptions(reset: _countryDropdownItems.isEmpty);
+    if (!mounted) return;
+
+    final selectedCountry = await showPaginatedSearchPickerSheet(
+      context: context,
+      title: 'Select Grew Up In',
+      searchHintText: 'Search country',
+      items: _countryDropdownItems,
+      isInitialLoading: _isCountryLoading && _countryDropdownItems.isEmpty,
+      isLoadingMore: _isCountryLoadingMore,
+      hasMoreItems: _hasMoreCountries,
+      initialQuery: _countrySearchQuery,
+      emptyStateText: 'No countries found',
+      onSearchChanged: _setCountrySearchQuery,
+      onLoadMore: _loadMoreCountries,
+    );
+
+    if (!mounted || selectedCountry == null || selectedCountry.trim().isEmpty) {
+      return;
+    }
+
+    setState(() {
+      _grewUpController.text = selectedCountry.trim();
+    });
+  }
+
+  Future<void> _openPreferredCountryPicker() async {
+    await _syncCountryOptions(reset: _countryDropdownItems.isEmpty);
+    if (!mounted) return;
+
+    final selectedCountry = await showPaginatedSearchPickerSheet(
+      context: context,
+      title: 'Select Preferable Country Living In',
+      searchHintText: 'Search country',
+      items: _countryDropdownItems,
+      isInitialLoading: _isCountryLoading && _countryDropdownItems.isEmpty,
+      isLoadingMore: _isCountryLoadingMore,
+      hasMoreItems: _hasMoreCountries,
+      initialQuery: _countrySearchQuery,
+      emptyStateText: 'No countries found',
+      onSearchChanged: _setCountrySearchQuery,
+      onLoadMore: _loadMoreCountries,
+    );
+
+    if (!mounted || selectedCountry == null || selectedCountry.trim().isEmpty) {
+      return;
+    }
+
+    final normalizedCountry = selectedCountry.trim();
+    final previousCountry = _prefCountryController.text.trim();
+
+    setState(() {
+      _prefCountryController.text = normalizedCountry;
+      if (previousCountry.toLowerCase() != normalizedCountry.toLowerCase()) {
+        _preferredCitySelections.clear();
+        _prefCityController.clear();
+        _prefStateController.clear();
+        _citySearchQuery = '';
+      }
+    });
+
+    await _syncCityOptionsForCountry(
+      normalizedCountry,
+      reset: true,
+      usePreferenceSelection: true,
+    );
+  }
+
+  void _setPreferredAgeRange(RangeValues values) {
+    setState(() {
+      _prefAgeStart =
+          values.start.round().clamp(_prefAgeMinLimit, _prefAgeMaxLimit);
+      _prefAgeEnd =
+          values.end.round().clamp(_prefAgeMinLimit, _prefAgeMaxLimit);
+      if (_prefAgeStart > _prefAgeEnd) {
+        final temp = _prefAgeStart;
+        _prefAgeStart = _prefAgeEnd;
+        _prefAgeEnd = temp;
+      }
+      _prefAgeMinController.text = _prefAgeStart.toString();
+      _prefAgeMaxController.text = _prefAgeEnd.toString();
+    });
+  }
+
+  void _setPreferredHeightRange(RangeValues values) {
+    setState(() {
+      _prefHeightStart = values.start
+          .round()
+          .clamp(_prefHeightMinLimit, _prefHeightMaxLimit);
+      _prefHeightEnd = values.end
+          .round()
+          .clamp(_prefHeightMinLimit, _prefHeightMaxLimit);
+      if (_prefHeightStart > _prefHeightEnd) {
+        final temp = _prefHeightStart;
+        _prefHeightStart = _prefHeightEnd;
+        _prefHeightEnd = temp;
+      }
+      _prefHeightMinController.text = _prefHeightStart.toString();
+      _prefHeightMaxController.text = _prefHeightEnd.toString();
+    });
+  }
+
+  Future<void> _setCountrySearchQuery(String value) async {
+    final normalized = value.trim();
+    if (_countrySearchQuery == normalized) {
+      return;
+    }
+
+    _countrySearchQuery = normalized;
+    await _syncCountryOptions(reset: true);
+  }
+
+  Future<void> _setCitySearchQuery(String value) async {
+    final normalized = value.trim();
+    if (_citySearchQuery == normalized) {
+      return;
+    }
+
+    _citySearchQuery = normalized;
+    final selectedCountry = _countryController.text.trim();
+    if (selectedCountry.isEmpty) {
+      return;
+    }
+    await _syncCityOptionsForCountry(selectedCountry, reset: true);
+  }
+
+  Future<void> _loadMoreCountries() async {
+    if (!_hasMoreCountries || _isCountryLoading || _isCountryLoadingMore) {
+      return;
+    }
+    await _syncCountryOptions(reset: false);
+  }
+
+  Future<void> _loadMoreCities() async {
+    final selectedCountry = _countryController.text.trim();
+    if (selectedCountry.isEmpty ||
+        !_hasMoreCities ||
+        _isCityLoading ||
+        _isCityLoadingMore) {
+      return;
+    }
+    await _syncCityOptionsForCountry(selectedCountry, reset: false);
+  }
+
+  Future<void> _loadMorePreferredCities() async {
+    final selectedCountry = _prefCountryController.text.trim();
+    if (selectedCountry.isEmpty ||
+        !_hasMoreCities ||
+        _isCityLoading ||
+        _isCityLoadingMore) {
+      return;
+    }
+    await _syncCityOptionsForCountry(
+      selectedCountry,
+      reset: false,
+      usePreferenceSelection: true,
+    );
+  }
+
+  void _togglePreferredCitySelection(String cityName) {
+    final normalized = cityName.trim();
+    if (normalized.isEmpty) {
+      return;
+    }
+
+    setState(() {
+      final existingIndex = _preferredCitySelections.indexWhere(
+        (item) => item.toLowerCase() == normalized.toLowerCase(),
+      );
+      if (existingIndex >= 0) {
+        _preferredCitySelections.removeAt(existingIndex);
+      } else {
+        _preferredCitySelections.add(normalized);
+      }
+      _prefCityController.text = _preferredCitySelections.join(', ');
+    });
+  }
+
+  Future<void> _syncCountryOptions({required bool reset}) async {
+    try {
+      if (reset) {
+        _countryPage = 1;
+        _hasMoreCountries = true;
+        _countryDropdownItems = <String>[];
+        _isCountryLoading = true;
+        _isCountryLoadingMore = false;
+      } else {
+        _isCountryLoadingMore = true;
+      }
+      if (mounted) {
+        setState(() {});
+      }
+
+      final result = await _locationRepository.getCountriesPage(
+        page: _countryPage,
+        keyword: _countrySearchQuery,
+      );
+
+      final merged =
+          reset ? <String>[] : List<String>.from(_countryDropdownItems);
+      for (final country in result.items) {
+        if (!merged.any(
+          (item) => item.toLowerCase() == country.name.toLowerCase(),
+        )) {
+          merged.add(country.name);
+        }
+      }
+
+      _countryDropdownItems = merged;
+      _hasMoreCountries = result.hasNextPage;
+      if (_hasMoreCountries) {
+        _countryPage++;
+      }
+    } catch (_) {
+      if (reset) {
+        _countryDropdownItems = <String>[];
+      }
+      _hasMoreCountries = false;
+    } finally {
+      _isCountryLoading = false;
+      _isCountryLoadingMore = false;
+      if (mounted) {
+        setState(() {});
+      }
+    }
+  }
+
+  Future<void> _syncCityOptionsForCountry(
+    String country, {
+    required bool reset,
+    bool usePreferenceSelection = false,
+  }) async {
+    final normalizedCountry = country.trim();
+    if (normalizedCountry.isEmpty) {
+      _cityDropdownItems = <String>[];
+      _hasMoreCities = false;
+      _selectedCityCountry = null;
+      _cityPage = 1;
+      if (mounted) {
+        setState(() {});
+      }
+      return;
+    }
+
+    try {
+      final shouldReset = reset ||
+          _selectedCityCountry?.toLowerCase() !=
+              normalizedCountry.toLowerCase();
+
+      if (shouldReset) {
+        _selectedCityCountry = normalizedCountry;
+        _cityPage = 1;
+        _hasMoreCities = true;
+        _cityDropdownItems = <String>[];
+        _isCityLoading = true;
+        _isCityLoadingMore = false;
+      } else {
+        _isCityLoadingMore = true;
+      }
+      if (mounted) {
+        setState(() {});
+      }
+
+      final result = await _locationRepository.getCitiesByCountryPage(
+        country: normalizedCountry,
+        page: _cityPage,
+        keyword: _citySearchQuery,
+      );
+
+      final merged =
+          shouldReset ? <String>[] : List<String>.from(_cityDropdownItems);
+      for (final city in result.items) {
+        if (!merged.any((item) => item.toLowerCase() == city.toLowerCase())) {
+          merged.add(city);
+        }
+      }
+
+      _cityDropdownItems = merged;
+      _hasMoreCities = result.hasNextPage;
+      if (_hasMoreCities) {
+        _cityPage++;
+      }
+    } catch (_) {
+      if (reset) {
+        _cityDropdownItems = <String>[];
+      }
+      _hasMoreCities = false;
+    } finally {
+      _isCityLoading = false;
+      _isCityLoadingMore = false;
+      if (_cityController.text.trim().isNotEmpty) {
+        if (!usePreferenceSelection) {
+          final selectedCity = _cityController.text.trim().toLowerCase();
+          final exists = _cityDropdownItems.any(
+            (item) => item.toLowerCase() == selectedCity,
+          );
+          if (!exists) {
+            _cityController.clear();
+          }
+        }
+      }
+
+      if (usePreferenceSelection) {
+        _preferredCitySelections.removeWhere(
+          (city) => !_cityDropdownItems.any(
+            (item) => item.toLowerCase() == city.toLowerCase(),
+          ),
+        );
+        _prefCityController.text = _preferredCitySelections.join(', ');
+      }
+      if (mounted) {
+        setState(() {});
+      }
+    }
   }
 
   Future<void> _openLanguagesPicker() async {
@@ -1574,15 +2270,24 @@ class _ProfileSectionEditScreenState
         return _updateWithUniversal(
           fields: {
             'preferences': UpdatePreferencesRequestBody(
-              ageMin: _toIntOrNull(_prefAgeMinController),
-              ageMax: _toIntOrNull(_prefAgeMaxController),
-              heightMin: _toIntOrNull(_prefHeightMinController),
-              heightMax: _toIntOrNull(_prefHeightMaxController),
-              religionPreference: _toCsvListOrNull(_prefReligionController),
-              communityPreference: _toCsvListOrNull(_prefCommunityController),
-              motherTonguePreference:
-                  _toCsvListOrNull(_prefMotherTongueController),
-              maritalStatusPreference: _toCsvListOrNull(_prefMaritalController),
+              ageMin: _prefAgeStart,
+              ageMax: _prefAgeEnd,
+              heightMin: _prefHeightStart,
+              heightMax: _prefHeightEnd,
+              religionPreference: _singlePreferenceList(
+                _prefReligionController,
+                fieldKey: 'prefReligion',
+              ),
+              communityPreference: _singlePreferenceList(
+                _prefCommunityController,
+                fieldKey: 'prefCommunity',
+              ),
+              motherTonguePreference: _singlePreferenceList(
+                _prefMotherTongueController,
+                fieldKey: 'prefMotherTongue',
+              ),
+              maritalStatusPreference:
+                  _selectedApiValuesOrNames(_prefMaritalOptions),
             ).toJson(),
           },
           fallbackMessage: 'Failed to update preference basic details',
@@ -1591,9 +2296,12 @@ class _ProfileSectionEditScreenState
         return _updateWithUniversal(
           fields: {
             'preferences': UpdatePreferencesRequestBody(
-              preferredCountries: _toCsvListOrNull(_prefCountryController),
+              preferredCountries: _singlePreferenceList(_prefCountryController),
               preferredStates: _toCsvListOrNull(_prefStateController),
-              preferredCities: _toCsvListOrNull(_prefCityController),
+              preferredCities:
+                  _preferredCitySelections.isEmpty
+                      ? _toCsvListOrNull(_prefCityController)
+                      : List<String>.from(_preferredCitySelections),
             ).toJson(),
           },
           fallbackMessage: 'Failed to update preference location details',
@@ -1602,10 +2310,18 @@ class _ProfileSectionEditScreenState
         return _updateWithUniversal(
           fields: {
             'preferences': UpdatePreferencesRequestBody(
-              educationPreference: _toCsvListOrNull(_prefEducationController),
-              professionPreference: _toCsvListOrNull(_prefProfessionController),
-              workingAsPreference: _toCsvListOrNull(_prefWorkingAsController),
-              annualIncomePreference: _toCsvListOrNull(_prefIncomeController),
+              educationPreference:
+                  _selectedApiValuesOrNames(_prefEducationOptions),
+              professionPreference: _singlePreferenceList(
+                _prefProfessionController,
+                fieldKey: 'prefProfession',
+              ),
+              workingAsPreference:
+                  _selectedApiValuesOrNames(_prefWorkingAsOptions),
+              annualIncomePreference: _singlePreferenceList(
+                _prefIncomeController,
+                fieldKey: 'prefIncome',
+              ),
             ).toJson(),
           },
           fallbackMessage:
@@ -1926,24 +2642,88 @@ class _ProfileSectionEditScreenState
       ],
     );
 
-    _prefAgeMinController.text = preferences?.ageMin?.toString() ?? '';
-    _prefAgeMaxController.text = preferences?.ageMax?.toString() ?? '';
-    _prefHeightMinController.text = preferences?.heightMin?.toString() ?? '';
-    _prefHeightMaxController.text = preferences?.heightMax?.toString() ?? '';
-    _prefReligionController.text = _toCsv(preferences?.religionPreference);
-    _prefCommunityController.text = _toCsv(preferences?.communityPreference);
-    _prefMotherTongueController.text =
-        _toCsv(preferences?.motherTonguePreference);
-    _prefMaritalController.text = _toCsv(preferences?.maritalStatusPreference);
+    _prefAgeStart = (preferences?.ageMin ?? _prefAgeStart)
+        .clamp(_prefAgeMinLimit, _prefAgeMaxLimit);
+    _prefAgeEnd = (preferences?.ageMax ?? _prefAgeEnd)
+        .clamp(_prefAgeMinLimit, _prefAgeMaxLimit);
+    if (_prefAgeStart > _prefAgeEnd) {
+      final temp = _prefAgeStart;
+      _prefAgeStart = _prefAgeEnd;
+      _prefAgeEnd = temp;
+    }
+    _prefAgeMinController.text = _prefAgeStart.toString();
+    _prefAgeMaxController.text = _prefAgeEnd.toString();
+    _prefHeightStart = (preferences?.heightMin ?? _prefHeightStart)
+        .clamp(_prefHeightMinLimit, _prefHeightMaxLimit);
+    _prefHeightEnd = (preferences?.heightMax ?? _prefHeightEnd)
+        .clamp(_prefHeightMinLimit, _prefHeightMaxLimit);
+    if (_prefHeightStart > _prefHeightEnd) {
+      final temp = _prefHeightStart;
+      _prefHeightStart = _prefHeightEnd;
+      _prefHeightEnd = temp;
+    }
+    _prefHeightMinController.text = _prefHeightStart.toString();
+    _prefHeightMaxController.text = _prefHeightEnd.toString();
+    _prefillLookup(
+      controller: _prefReligionController,
+      raw: _firstOrNull(preferences?.religionPreference),
+      options: _religionOptions,
+      fieldKey: 'prefReligion',
+    );
+    _prefCommunityController.text =
+        _firstOrNull(preferences?.communityPreference)?.trim() ?? '';
+    _selectedApiValues.remove('prefCommunity');
+    if (_prefReligionController.text.trim().isNotEmpty &&
+        _prefCommunityController.text.trim().isNotEmpty) {
+      unawaited(
+        _syncPreferredCommunitySelection(_prefCommunityController.text),
+      );
+    }
+    _prefillLookup(
+      controller: _prefMotherTongueController,
+      raw: _firstOrNull(preferences?.motherTonguePreference),
+      options: _motherTongueOptions,
+      fieldKey: 'prefMotherTongue',
+    );
+    _setSelectedValues(
+      _prefMaritalOptions,
+      preferences?.maritalStatusPreference,
+    );
+    _prefMaritalController.text = _selectedDisplayValues(_prefMaritalOptions);
 
-    _prefCountryController.text = _toCsv(preferences?.preferredCountries);
+    _prefCountryController.text =
+        _firstOrNull(preferences?.preferredCountries)?.trim() ?? '';
     _prefStateController.text = _toCsv(preferences?.preferredStates);
-    _prefCityController.text = _toCsv(preferences?.preferredCities);
+    _preferredCitySelections
+      ..clear()
+      ..addAll(preferences?.preferredCities ?? const <String>[]);
+    _prefCityController.text = _preferredCitySelections.join(', ');
+    if (_prefCountryController.text.trim().isNotEmpty) {
+      unawaited(
+        _syncCityOptionsForCountry(
+          _prefCountryController.text,
+          reset: true,
+          usePreferenceSelection: true,
+        ),
+      );
+    }
 
-    _prefEducationController.text = _toCsv(preferences?.educationPreference);
-    _prefProfessionController.text = _toCsv(preferences?.professionPreference);
-    _prefWorkingAsController.text = _toCsv(preferences?.workingAsPreference);
-    _prefIncomeController.text = _toCsv(preferences?.annualIncomePreference);
+    _setSelectedValues(_prefEducationOptions, preferences?.educationPreference);
+    _prefEducationController.text = _selectedDisplayValues(_prefEducationOptions);
+    _prefillLookup(
+      controller: _prefProfessionController,
+      raw: _firstOrNull(preferences?.professionPreference),
+      options: _professionOptions,
+      fieldKey: 'prefProfession',
+    );
+    _setSelectedValues(_prefWorkingAsOptions, preferences?.workingAsPreference);
+    _prefWorkingAsController.text = _selectedDisplayValues(_prefWorkingAsOptions);
+    _prefillLookup(
+      controller: _prefIncomeController,
+      raw: _firstOrNull(preferences?.annualIncomePreference),
+      options: _incomeRangeOptions,
+      fieldKey: 'prefIncome',
+    );
 
     _prefProfileManagedByController.text =
         _toCsv(preferences?.profileManagedByPreference);
@@ -2085,6 +2865,23 @@ class _ProfileSectionEditScreenState
     return values;
   }
 
+  List<String>? _singlePreferenceList(
+    TextEditingController controller, {
+    String? fieldKey,
+  }) {
+    final tracked =
+        fieldKey == null ? null : _selectedApiValues[fieldKey]?.trim();
+    if (tracked != null && tracked.isNotEmpty) {
+      return <String>[tracked];
+    }
+
+    final value = controller.text.trim();
+    if (value.isEmpty) {
+      return null;
+    }
+    return <String>[value];
+  }
+
   String _selectedDisplayValues(List<SingleStringModel> options) {
     final values = options
         .where((option) => option.isSelected)
@@ -2093,6 +2890,13 @@ class _ProfileSectionEditScreenState
         .toList(growable: false);
     if (values.isEmpty) return '';
     return values.join(', ');
+  }
+
+  String _formatPreferenceHeight(int heightCm) {
+    final totalInches = (heightCm / 2.54).round();
+    final feet = totalInches ~/ 12;
+    final inches = totalInches % 12;
+    return "$feet' $inches\"";
   }
 
   String? _apiValueOrText(String fieldKey, TextEditingController controller) {
@@ -2261,5 +3065,147 @@ class _ProfileSectionEditScreenState
         .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
         .replaceAll(RegExp(r'_+'), '_')
         .replaceAll(RegExp(r'^_|_$'), '');
+  }
+}
+
+class _StyledRangeSlider extends StatelessWidget {
+  const _StyledRangeSlider({
+    required this.values,
+    required this.min,
+    required this.max,
+    required this.startLabel,
+    required this.endLabel,
+    required this.onChanged,
+    this.divisions,
+  });
+
+  final RangeValues values;
+  final double min;
+  final double max;
+  final int? divisions;
+  final String startLabel;
+  final String endLabel;
+  final ValueChanged<RangeValues> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    const horizontalPadding = 20.0;
+    const thumbDiameter = 22.0;
+    const sliderTop = 34.0;
+    final availableWidth =
+        MediaQuery.of(context).size.width - 40 - (horizontalPadding * 2);
+    final startFactor = ((values.start - min) / (max - min)).clamp(0.0, 1.0);
+    final endFactor = ((values.end - min) / (max - min)).clamp(0.0, 1.0);
+    final startLeft = (availableWidth * startFactor) - 22;
+    final endLeft = (availableWidth * endFactor) - 22;
+
+    return SizedBox(
+      height: 74,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Positioned(
+            left: horizontalPadding + startLeft,
+            top: 0,
+            child: IgnorePointer(
+              child: _SliderBubble(label: startLabel),
+            ),
+          ),
+          Positioned(
+            left: horizontalPadding + endLeft,
+            top: 0,
+            child: IgnorePointer(
+              child: _SliderBubble(label: endLabel),
+            ),
+          ),
+          Positioned.fill(
+            top: sliderTop,
+            child: SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                trackHeight: 6,
+                activeTrackColor: AppColors.primary,
+                inactiveTrackColor: const Color(0xFFF0F0F0),
+                overlayShape: SliderComponentShape.noOverlay,
+                rangeTrackShape: const RoundedRectRangeSliderTrackShape(),
+                thumbColor: Colors.white,
+                activeTickMarkColor: Colors.transparent,
+                inactiveTickMarkColor: Colors.transparent,
+                rangeThumbShape: const _RingRangeThumbShape(
+                  thumbRadius: thumbDiameter / 2,
+                ),
+              ),
+              child: RangeSlider(
+                values: values,
+                min: min,
+                max: max,
+                divisions: divisions,
+                onChanged: onChanged,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SliderBubble extends StatelessWidget {
+  const _SliderBubble({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: TextSize.font12(context),
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}
+
+class _RingRangeThumbShape extends RangeSliderThumbShape {
+  const _RingRangeThumbShape({required this.thumbRadius});
+
+  final double thumbRadius;
+
+  @override
+  Size getPreferredSize(bool isEnabled, bool isDiscrete) {
+    return Size.fromRadius(thumbRadius);
+  }
+
+  @override
+  void paint(
+    PaintingContext context,
+    Offset center, {
+    required Animation<double> activationAnimation,
+    required Animation<double> enableAnimation,
+    bool isDiscrete = false,
+    bool isEnabled = false,
+    bool isOnTop = false,
+    TextDirection textDirection = TextDirection.ltr,
+    required SliderThemeData sliderTheme,
+    Thumb thumb = Thumb.start,
+    bool isPressed = false,
+  }) {
+    final canvas = context.canvas;
+    final fillPaint = Paint()..color = Colors.white;
+    final strokePaint = Paint()
+      ..color = AppColors.primary
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4;
+
+    canvas.drawCircle(center, thumbRadius, fillPaint);
+    canvas.drawCircle(center, thumbRadius, strokePaint);
   }
 }
