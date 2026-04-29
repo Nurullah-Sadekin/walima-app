@@ -123,15 +123,13 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
   Widget bottomAction() {
     return PrimaryButtons(
       buttonStyle: provider.highestQualification.text.isNotEmpty &&
-              provider.instituteController.text.isNotEmpty &&
-              provider.anotherInstituteController.text.isNotEmpty
+              provider.instituteController.text.isNotEmpty
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,
       title: 'Continue',
       onTap: () {
         if (provider.highestQualification.text.isEmpty ||
-            provider.instituteController.text.isEmpty ||
-            provider.anotherInstituteController.text.isEmpty) {
+            provider.instituteController.text.isEmpty) {
           return;
         }
         context.push(Paths.profession);
