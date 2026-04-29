@@ -6,8 +6,7 @@ import 'package:flutter_boilerplate/core/global/enums/enums.dart';
 import 'package:flutter_boilerplate/core/global/repositorys/global_repository.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
 import 'package:flutter_boilerplate/core/utils/app_error_reporting_service.dart';
-import 'package:flutter_boilerplate/features/login/data/models/get_me_response_body.dart'
-    as me_response;
+import 'package:flutter_boilerplate/features/login/data/models/get_me_response_body.dart' as me_response;
 
 class GlobalProvider extends BaseChangeNotifier {
   GlobalProvider({

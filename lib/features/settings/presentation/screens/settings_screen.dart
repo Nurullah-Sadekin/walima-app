@@ -110,8 +110,8 @@ class SettingsScreen extends ConsumerWidget {
 
           // About Section
           _buildSectionHeader(context, l10n.about),
-          Card(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          const Card(
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Column(
               children: [
                 ListTile(
@@ -119,17 +119,17 @@ class SettingsScreen extends ConsumerWidget {
                     Icons.info_outline,
                     color: AppColors.primary,
                   ),
-                  title: const Text('Version'),
-                  subtitle: const Text('1.0.0'),
+                  title: Text('Version'),
+                  subtitle: Text('1.0.0'),
                 ),
-                const Divider(height: 1),
+                Divider(height: 1),
                 ListTile(
                   leading: Icon(
                     Icons.code,
                     color: AppColors.primary,
                   ),
-                  title: const Text('Build Number'),
-                  subtitle: const Text('1'),
+                  title: Text('Build Number'),
+                  subtitle: Text('1'),
                 ),
               ],
             ),

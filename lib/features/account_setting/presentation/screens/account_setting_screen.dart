@@ -159,8 +159,6 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               provider.clearPasswordErrors();
               setState(() => _step = AccountSettingStep.setPassword);
             },
-            // Note: ProfileActionTile might need custom styling for the delete option
-            // You may need to check if ProfileActionTile supports custom colors
           ),
           ProfileActionTile(
             iconImagePath: AppImages.safetySvgIcon,

@@ -11,8 +11,6 @@ import 'package:flutter_boilerplate/features/login/data/repository/login_reposit
 import 'package:package_info_plus/package_info_plus.dart';
 
 class GlobalRepository {
-
-
   Future<String> getAppVersion() async {
     await Future.delayed(const Duration(seconds: 1));
       final packageInfo = await PackageInfo.fromPlatform();
