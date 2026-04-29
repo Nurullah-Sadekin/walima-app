@@ -264,15 +264,31 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         ),
         MapEntry('Age', _valueOrDefault(basic?.age)),
         MapEntry('Date of Birth', _formatDate(basic?.dateOfBirth)),
+        MapEntry('Height', _formatHeightCm(appearance?.height)),
         MapEntry(
           'Marital Status',
           _valueOrDefault(CamelCaseUtils.formatCamelCase(basic?.maritalStatus)),
         ),
-        MapEntry('Height', _formatHeightCm(appearance?.height)),
         MapEntry(
           'Grew up in',
           _valueOrDefault(
             CamelCaseUtils.formatCamelCase(location?.grewUpIn?.toString()),
+          ),
+        ),
+        MapEntry(
+          'Mother\'s Tough',
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(basic?.motherTongue.toString()),
+          ),
+        ),
+        MapEntry(
+          'Languages',
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(
+              (basic?.languages)
+                  ?.map((e) => e.toString())
+                  .join(', ') ?? '',
+            ),
           ),
         ),
         MapEntry(

@@ -27,6 +27,7 @@ import 'package:flutter_boilerplate/features/registration/domain/single_string_m
 import 'package:flutter_boilerplate/features/registration/presentation/widgets/hobbies_interests_custom_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart' show DateFormat;
 
 class ProfileSectionEditScreen extends ConsumerStatefulWidget {
   const ProfileSectionEditScreen({
@@ -94,13 +95,11 @@ class _ProfileSectionEditScreenState
   final TextEditingController _managedByController = TextEditingController();
   final TextEditingController _genderController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
-  final TextEditingController _maritalStatusController =
-      TextEditingController();
+  final TextEditingController _maritalStatusController = TextEditingController();
   final TextEditingController _motherTongueController = TextEditingController();
   final TextEditingController _languagesController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
-  final TextEditingController _heightDisplayController =
-      TextEditingController();
+  final TextEditingController _heightDisplayController = TextEditingController();
   final TextEditingController _dietController = TextEditingController();
   final TextEditingController _bloodGroupController = TextEditingController();
   final TextEditingController _healthInfoController = TextEditingController();
@@ -108,30 +107,23 @@ class _ProfileSectionEditScreenState
 
   final TextEditingController _religionController = TextEditingController();
   final TextEditingController _communityController = TextEditingController();
-  final TextEditingController _religiousBackgroundController =
-      TextEditingController();
+  final TextEditingController _religiousBackgroundController = TextEditingController();
   final TextEditingController _grewUpInController = TextEditingController();
 
   final TextEditingController _fatherNameController = TextEditingController();
-  final TextEditingController _fatherProfessionController =
-      TextEditingController();
+  final TextEditingController _fatherProfessionController = TextEditingController();
   final TextEditingController _motherNameController = TextEditingController();
-  final TextEditingController _motherProfessionController =
-      TextEditingController();
-  final TextEditingController _familyLocationController =
-      TextEditingController();
+  final TextEditingController _motherProfessionController = TextEditingController();
+  final TextEditingController _familyLocationController = TextEditingController();
   final TextEditingController _brothersController = TextEditingController();
   final TextEditingController _sistersController = TextEditingController();
-  final TextEditingController _familyFinancialController =
-      TextEditingController();
+  final TextEditingController _familyFinancialController = TextEditingController();
   final TextEditingController _familyTypeController = TextEditingController();
   final TextEditingController _familyValuesController = TextEditingController();
   final TextEditingController _aboutFamilyController = TextEditingController();
-  final TextEditingController _marriageTimelineController =
-      TextEditingController();
+  final TextEditingController _marriageTimelineController = TextEditingController();
 
-  final TextEditingController _highestQualificationController =
-      TextEditingController();
+  final TextEditingController _highestQualificationController = TextEditingController();
   final TextEditingController _collegeController = TextEditingController();
   final TextEditingController _annualIncomeController = TextEditingController();
   final TextEditingController _workingWithController = TextEditingController();
@@ -141,41 +133,31 @@ class _ProfileSectionEditScreenState
   final TextEditingController _countryController = TextEditingController();
   final TextEditingController _stateController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
-  final TextEditingController _residencyStatusController =
-      TextEditingController();
+  final TextEditingController _residencyStatusController = TextEditingController();
   final TextEditingController _zipController = TextEditingController();
   final TextEditingController _grewUpController = TextEditingController();
 
   final TextEditingController _prefAgeMinController = TextEditingController();
   final TextEditingController _prefAgeMaxController = TextEditingController();
-  final TextEditingController _prefHeightMinController =
-      TextEditingController();
-  final TextEditingController _prefHeightMaxController =
-      TextEditingController();
+  final TextEditingController _prefHeightMinController = TextEditingController();
+  final TextEditingController _prefHeightMaxController = TextEditingController();
   final TextEditingController _prefReligionController = TextEditingController();
-  final TextEditingController _prefCommunityController =
-      TextEditingController();
-  final TextEditingController _prefMotherTongueController =
-      TextEditingController();
+  final TextEditingController _prefCommunityController = TextEditingController();
+  final TextEditingController _prefMotherTongueController = TextEditingController();
   final TextEditingController _prefMaritalController = TextEditingController();
 
   final TextEditingController _prefCountryController = TextEditingController();
   final TextEditingController _prefStateController = TextEditingController();
   final TextEditingController _prefCityController = TextEditingController();
 
-  final TextEditingController _prefEducationController =
-      TextEditingController();
-  final TextEditingController _prefProfessionController =
-      TextEditingController();
-  final TextEditingController _prefWorkingAsController =
-      TextEditingController();
+  final TextEditingController _prefEducationController = TextEditingController();
+  final TextEditingController _prefProfessionController = TextEditingController();
+  final TextEditingController _prefWorkingAsController = TextEditingController();
   final TextEditingController _prefIncomeController = TextEditingController();
 
-  final TextEditingController _prefProfileManagedByController =
-      TextEditingController();
+  final TextEditingController _prefProfileManagedByController = TextEditingController();
   final TextEditingController _prefDietController = TextEditingController();
-  final TextEditingController _prefPartnerExpectationsController =
-      TextEditingController();
+  final TextEditingController _prefPartnerExpectationsController = TextEditingController();
 
   bool _isSaving = false;
   bool _didPrefill = false;
@@ -704,10 +686,44 @@ class _ProfileSectionEditScreenState
               popupHeader: 'Select Gender',
               fieldKey: 'gender',
             ),
-            _field(
-              label: 'Date of Birth',
-              controller: _dobController,
-              datePicker: true,
+            Row(
+              spacing: 5,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: _field(
+                    label: 'Date of Birth',
+                    controller: _dobController,
+                    datePicker: true,
+                  ),
+                ),
+                Container(
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                        color: AppColors.disableBackground,
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: AppColors.greyLight, width: 1)),
+                    child: Text(
+                      ageText(),
+                      style: TextStyle(
+                        fontSize: TextSize.font14(context),
+                        fontWeight: FontWeight.w500,
+                        color: _dobController.text.isNotEmpty
+                            ? AppColors.textPrimaryLight
+                            : AppColors.grey,
+                      ),
+                    ))
+              ],
+            ),
+            DropDownField(
+              headLine: 'Height',
+              hintText: 'Select Height',
+              popUpHeader: 'Select Height',
+              items: _heightDropdownItems,
+              controller: _heightDisplayController,
+              isSearch: true,
+              onConfirm: (value) => _selectHeight(value?.toString()),
             ),
             _enumDropdown<RegistrationMaritalStatus>(
               label: 'Marital Status',
@@ -715,6 +731,21 @@ class _ProfileSectionEditScreenState
               values: RegistrationMaritalStatus.values,
               popupHeader: 'Select Marital Status',
               fieldKey: 'maritalStatus',
+            ),
+
+            PrimaryTextField(
+              headLine: 'Grew up in',
+              hintText: 'Select Country',
+              controller: _grewUpInController,
+              errorText: '',
+              noPrefix: true,
+              readOnly: true,
+              onTap: _openGrewUpInCountryPicker,
+              suffix: Icon(
+                Icons.keyboard_arrow_down_outlined,
+                size: TextSize.font20(context),
+                color: AppColors.grey,
+              ),
             ),
             _lookupDropdown(
               label: 'Mother Tongue',
@@ -730,29 +761,7 @@ class _ProfileSectionEditScreenState
               hintText: 'Select Languages',
               onTap: _openLanguagesPicker,
             ),
-            DropDownField(
-              headLine: 'Height',
-              hintText: 'Select Height',
-              popUpHeader: 'Select Height',
-              items: _heightDropdownItems,
-              controller: _heightDisplayController,
-              isSearch: true,
-              onConfirm: (value) => _selectHeight(value?.toString()),
-            ),
-            PrimaryTextField(
-              headLine: 'Grew up in',
-              hintText: 'Select Country',
-              controller: _grewUpInController,
-              errorText: '',
-              noPrefix: true,
-              readOnly: true,
-              onTap: _openGrewUpInCountryPicker,
-              suffix: Icon(
-                Icons.keyboard_arrow_down_outlined,
-                size: TextSize.font20(context),
-                color: AppColors.grey,
-              ),
-            ),
+
             _enumDropdown<RegistrationDiet>(
               label: 'Diet',
               controller: _dietController,
@@ -3066,6 +3075,31 @@ class _ProfileSectionEditScreenState
         .replaceAll(RegExp(r'_+'), '_')
         .replaceAll(RegExp(r'^_|_$'), '');
   }
+
+  String ageText() {
+    final txt = _dobController.text;
+    if (txt.isEmpty) return '0 Year Age';
+
+    DateTime? dob;
+    try {
+      dob = DateTime.tryParse(txt);
+      dob ??= DateFormat('yyyy-MM-dd').parseLoose(txt);
+    } catch (_) {
+      dob = null;
+    }
+
+    if (dob == null) return '0 Year Age';
+
+    final now = DateTime.now();
+    int years = now.year - dob.year;
+    if (now.month < dob.month ||
+        (now.month == dob.month && now.day < dob.day)) {
+      years--;
+    }
+    if (years < 0) years = 0;
+    return '$years years old'.replaceFirst('\u007f', '');
+  }
+
 }
 
 class _StyledRangeSlider extends StatelessWidget {
