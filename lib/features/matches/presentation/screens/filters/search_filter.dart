@@ -25,7 +25,9 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
   void initState() {
     super.initState();
     provider = ref.read(searchFilterProvider);
-    WidgetsBinding.instance.addPostFrameCallback((_) async {});
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await provider.loadLookupData();
+    });
   }
 
   @override

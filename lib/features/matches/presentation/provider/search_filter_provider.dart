@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/global/enums/enums.dart';
 import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
+import 'package:flutter_boilerplate/features/registration/data/models/lookup_option.dart';
+import 'package:flutter_boilerplate/features/registration/data/repository/lookup_repository.dart';
 import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
 
 class SearchFilterProvider extends BaseChangeNotifier {
+    SearchFilterProvider();
+
+    final LookupRepository _lookupRepository = LookupRepository();
+    static final List<int> _heightInchOptions = List<int>.generate(
+      33,
+      (index) => 51 + index,
+    );
+
     SearchFilterScreenStates screenStates = SearchFilterScreenStates.defaultLoading;
     SearchFilterScreenStates loaderState = SearchFilterScreenStates.defaultLoading;
 
@@ -31,10 +41,9 @@ class SearchFilterProvider extends BaseChangeNotifier {
 
 
     List<SingleStringModel> ageRangeDropdownItems = ageListDataInserted;
-    List<SingleStringModel> heightRangeDropdownItems = List.generate(
-      121,
-      (index) => SingleStringModel(name: '${100 + index}'),
-    );
+    List<SingleStringModel> heightRangeDropdownItems = _defaultHeightRangeItems();
+
+    List<SingleStringModel> motherTongueDropdownItems = _defaultMotherTongueItems();
     List<SingleStringModel> maritalStatusDropdownItems = maritalStatusListDataInserted;
     List<SingleStringModel> religionDropdownItems = [
       ...Religion.values.map(
@@ -42,13 +51,6 @@ class SearchFilterProvider extends BaseChangeNotifier {
       ),
     ];
     List<SingleStringModel> communityDropdownItems = communityListDataInserted;
-    List<SingleStringModel> motherTongueDropdownItems = [
-      SingleStringModel(name: 'Bengali'),
-      SingleStringModel(name: 'English'),
-      SingleStringModel(name: 'Hindi'),
-      SingleStringModel(name: 'Urdu'),
-      SingleStringModel(name: 'Arabic'),
-    ];
     List<SingleStringModel> countryDropdownItems = countryListDataInserted;
     List<SingleStringModel> residencyStatusDropdownItems = [
       ...ResidencyStatus.values.map(
@@ -80,6 +82,29 @@ class SearchFilterProvider extends BaseChangeNotifier {
     String? selectedDietStatus;
     bool? filteredProfiles = false;
     bool? viewedProfile = false;
+    bool _isLookupDataLoading = false;
+
+    Future<void> loadLookupData() async {
+      if (_isLookupDataLoading) return;
+      _isLookupDataLoading = true;
+
+      try {
+        final motherTongueOptions = _lookupToSingleStrings(
+          await _loadLookupByPrioritySlugs(
+            const <String>['mother-tongue'],
+          ),
+        );
+
+        if (motherTongueOptions.isNotEmpty) {
+          motherTongueDropdownItems = motherTongueOptions;
+        }
+      } catch (_) {
+        // Keep fallback lists when lookup loading fails.
+      } finally {
+        _isLookupDataLoading = false;
+        notifyListeners();
+      }
+    }
 
     bool _isValidIndex(int index, int length) {
       return index >= 0 && index < length;
@@ -141,6 +166,65 @@ class SearchFilterProvider extends BaseChangeNotifier {
       }
       if (loadingState != null) loaderState = loadingState;
       notifyListeners();
+    }
+
+    static List<SingleStringModel> _defaultHeightRangeItems() {
+      return _heightInchOptions
+          .map(
+            (heightInches) => SingleStringModel(
+              name: _formatHeightDisplay(heightInches),
+              value: _heightCmFromInches(heightInches).toString(),
+            ),
+          )
+          .toList(growable: false);
+    }
+
+    static List<SingleStringModel> _defaultMotherTongueItems() {
+      return <SingleStringModel>[
+        SingleStringModel(name: 'Bengali', value: 'bengali'),
+        SingleStringModel(name: 'English', value: 'english'),
+        SingleStringModel(name: 'Hindi', value: 'hindi'),
+        SingleStringModel(name: 'Urdu', value: 'urdu'),
+        SingleStringModel(name: 'Arabic', value: 'arabic'),
+      ];
+    }
+
+    Future<List<LookupOption>> _loadLookupByPrioritySlugs(
+      List<String> slugs,
+    ) async {
+      for (final slug in slugs) {
+        try {
+          final options = await _lookupRepository.getLookupsBySlug(slug);
+          if (options.isNotEmpty) {
+            return options;
+          }
+        } catch (_) {
+          // Try the next possible slug.
+        }
+      }
+
+      return const <LookupOption>[];
+    }
+
+    List<SingleStringModel> _lookupToSingleStrings(List<LookupOption> options) {
+      return options
+          .map(
+            (option) => SingleStringModel(
+              name: option.label,
+              value: option.key,
+            ),
+          )
+          .toList(growable: false);
+    }
+
+    static String _formatHeightDisplay(int totalInches) {
+      final feet = totalInches ~/ 12;
+      final inches = totalInches % 12;
+      return '$feet ft $inches in';
+    }
+
+    static int _heightCmFromInches(int totalInches) {
+      return (totalInches * 2.54).round();
     }
  }
 
