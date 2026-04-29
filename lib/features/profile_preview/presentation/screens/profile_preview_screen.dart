@@ -561,14 +561,14 @@ class _ProfilePreviewScreenState extends ConsumerState<ProfilePreviewScreen> {
       widget: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          IconTitleCard(
-            title: 'Super Connect',
-            imagePath: AppImages.chatIcon,
-            backgroundColor: AppColors.primary,
-            textColor: AppColors.textSecondaryLight,
-            iconColor: AppColors.white,
-            onTap: () {},
-          ),
+          // IconTitleCard(
+          //   title: 'Super Connect',
+          //   imagePath: AppImages.chatIcon,
+          //   backgroundColor: AppColors.primary,
+          //   textColor: AppColors.textSecondaryLight,
+          //   iconColor: AppColors.white,
+          //   onTap: () {},
+          // ),
           IconTitleCard(
             title: 'Connect Now',
             imagePath: AppImages.favouriteIcon,
