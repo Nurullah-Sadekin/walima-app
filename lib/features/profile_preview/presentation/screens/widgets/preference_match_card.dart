@@ -24,7 +24,7 @@ class PreferenceMatchCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userImage = ref.watch(globalProvider).currentUser?.profilePicture ?? matchImage;
+    final userImage = ref.watch(globalProvider).currentUser?.profilePicture?.url ?? matchImage;
     final items = data.audit;
     final matchedCount = data.matchedCount ?? 0;
     final totalCount = data.totalCriteria ?? items.length;
