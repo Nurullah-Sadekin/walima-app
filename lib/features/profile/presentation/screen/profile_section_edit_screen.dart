@@ -621,6 +621,8 @@ class _ProfileSectionEditScreenState
         _prefProfileManagedByController,
         _prefDietController,
         _prefPartnerExpectationsController,
+        _prefDrinkingExpectationsController,
+        _prefSmokingExpectationsController
       ];
 
   @override
@@ -2761,7 +2763,8 @@ class _ProfileSectionEditScreenState
       preferences?.profileManagedByPreference,
     );
     _setSelectedValues(_prefDietOptions, preferences?.dietPreference);
-
+    _prefSmokingExpectationsController.text = (preferences?.smokingPreference ?? []).join(', ');
+    _prefDrinkingExpectationsController.text = (preferences?.drinkingPreference ?? []).join(', ');
     setState(() {});
   }
 
