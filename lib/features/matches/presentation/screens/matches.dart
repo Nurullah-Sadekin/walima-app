@@ -40,18 +40,35 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
     'Near Me',
     'More Matches',
   ];
+  final ScrollController _tabScrollController = ScrollController();
+  late final List<GlobalKey> _tabKeys;
+  int? _lastCenteredTabIndex;
 
   @override
   void initState() {
     super.initState();
+    _tabKeys = List.generate(tabs.length, (_) => GlobalKey());
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(matchesProvider).loadMatchesForSelectedTab();
+      _centerSelectedTab(ref.read(matchesProvider).selectedTabIndex);
     });
+  }
+
+  @override
+  void dispose() {
+    _tabScrollController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = ref.watch(matchesProvider);
+
+    if (_lastCenteredTabIndex != provider.selectedTabIndex) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _centerSelectedTab(provider.selectedTabIndex);
+      });
+    }
 
     return TransparentLoading(
       isLoading: provider.screenStates ==
@@ -92,7 +109,8 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
   Widget _headerSection(MatchesProvider provider) {
     return Row(
       children: [
-        if(provider.selectedTabIndex != 2 && provider.selectedTabIndex != 4)...[
+        if (provider.selectedTabIndex != 2 &&
+            provider.selectedTabIndex != 4) ...[
           InkWell(
             onTap: () => _openFilter(provider),
             child: Container(
@@ -127,48 +145,90 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
 
   Widget _customTabBar(MatchesProvider provider) {
     return SingleChildScrollView(
+      controller: _tabScrollController,
       scrollDirection: Axis.horizontal,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         spacing: 8,
         children: [
-          TabBarWidget(
-            text: tabs[0],
-            isSelected: provider.selectedTabIndex == 0,
+          _buildTabItem(
+            index: 0,
+            provider: provider,
             prefixImagePath: AppImages.searchSvgIcon,
-            onTap: () => ref.read(matchesProvider).setSelectedTab(0),
           ),
-          TabBarWidget(
-            text: tabs[1],
-            isSelected: provider.selectedTabIndex == 1,
-            onTap: () => ref.read(matchesProvider).setSelectedTab(1),
-          ),
-          TabBarWidget(
-            text: tabs[2],
-            isSelected: provider.selectedTabIndex == 2,
-            onTap: () => ref.read(matchesProvider).setSelectedTab(2),
-          ),
-          TabBarWidget(
-            text: tabs[3],
-            isSelected: provider.selectedTabIndex == 3,
+          _buildTabItem(index: 1, provider: provider),
+          _buildTabItem(index: 2, provider: provider),
+          _buildTabItem(
+            index: 3,
+            provider: provider,
             selectedBackgroundColor: AppColors.primary,
             selectedTextColor: AppColors.white,
             selectedBorderColor: AppColors.primary,
-            onTap: () => ref.read(matchesProvider).setSelectedTab(3),
           ),
-          TabBarWidget(
-            text: tabs[4],
-            isSelected: provider.selectedTabIndex == 4,
+          _buildTabItem(
+            index: 4,
+            provider: provider,
             selectedBackgroundColor: AppColors.primary,
-            onTap: () => ref.read(matchesProvider).setSelectedTab(4),
           ),
-          TabBarWidget(
-            text: tabs[5],
-            isSelected: provider.selectedTabIndex == 5,
-            onTap: () => ref.read(matchesProvider).setSelectedTab(5),
-          ),
+          _buildTabItem(index: 5, provider: provider),
         ],
       ),
+    );
+  }
+
+  Widget _buildTabItem({
+    required int index,
+    required MatchesProvider provider,
+    String? prefixImagePath,
+    Color? selectedBackgroundColor,
+    Color? selectedTextColor,
+    Color? selectedBorderColor,
+  }) {
+    return Container(
+      key: _tabKeys[index],
+      child: TabBarWidget(
+        text: tabs[index],
+        isSelected: provider.selectedTabIndex == index,
+        prefixImagePath: prefixImagePath,
+        selectedBackgroundColor: selectedBackgroundColor,
+        selectedTextColor: selectedTextColor,
+        selectedBorderColor: selectedBorderColor,
+        onTap: () => ref.read(matchesProvider).setSelectedTab(index),
+      ),
+    );
+  }
+
+  void _centerSelectedTab(int index) {
+    if (!_tabScrollController.hasClients ||
+        index < 0 ||
+        index >= _tabKeys.length) {
+      return;
+    }
+
+    final tabContext = _tabKeys[index].currentContext;
+    final scrollableContext =
+        _tabScrollController.position.context.storageContext;
+    if (tabContext == null) return;
+
+    final tabBox = tabContext.findRenderObject() as RenderBox?;
+    final scrollBox = scrollableContext.findRenderObject() as RenderBox?;
+    if (tabBox == null || scrollBox == null) return;
+
+    final tabOffset = tabBox.localToGlobal(Offset.zero, ancestor: scrollBox).dx;
+    final targetOffset = _tabScrollController.offset +
+        tabOffset -
+        ((scrollBox.size.width - tabBox.size.width) / 2);
+
+    final clampedOffset = targetOffset.clamp(
+      _tabScrollController.position.minScrollExtent,
+      _tabScrollController.position.maxScrollExtent,
+    );
+
+    _lastCenteredTabIndex = index;
+    _tabScrollController.animateTo(
+      clampedOffset.toDouble(),
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOut,
     );
   }
 
@@ -249,6 +309,9 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
                   ? AppImages.womenAvatar
                   : AppImages.manAvatar);
           return ProfileComprehensiveCard(
+              onTapCard: () {
+                context.pushNamed(Routes.profilePreview, extra: {'userId': match.id});
+              },
             imagePath: imagePath,
             leftIconPath: AppImages.favouriteIcon,
             isPremiumConnect: match.isPremium ?? false,
@@ -317,7 +380,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
               );
             },
             isOnline: match.isOnline ?? false,
-            viewOnAccept: match.profilePhoto?.visibilityStatus?.toLowerCase() != 'visible',
+            viewOnAccept: false
           );
         },
       ),
@@ -343,7 +406,6 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
 
     return parts.isEmpty ? 'N/A' : parts.join(', ');
   }
-
 
   Future<void> _openFilter(MatchesProvider provider) async {
     dynamic result;
@@ -383,7 +445,6 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
       }
       return;
     }
-
   }
 
   Future<void> _sortFilterSheet(
