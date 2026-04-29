@@ -158,6 +158,8 @@ class _ProfileSectionEditScreenState
   final TextEditingController _prefProfileManagedByController = TextEditingController();
   final TextEditingController _prefDietController = TextEditingController();
   final TextEditingController _prefPartnerExpectationsController = TextEditingController();
+  final TextEditingController _prefSmokingExpectationsController = TextEditingController();
+  final TextEditingController _prefDrinkingExpectationsController = TextEditingController();
 
   bool _isSaving = false;
   bool _didPrefill = false;
@@ -1130,6 +1132,17 @@ class _ProfileSectionEditScreenState
               label: 'Diet Preference',
               options: _prefDietOptions,
               onItemTap: (index) => _toggleOption(_prefDietOptions, index),
+            ),
+            _field(
+              label: 'Smoking',
+              controller: _prefSmokingExpectationsController,
+              hintText: 'expectation',
+            ),
+            _field(
+              label: 'Drinking',
+              controller: _prefDrinkingExpectationsController,
+
+              hintText: 'expectation',
             ),
             _field(
               label: 'Partner Expectations',
@@ -2341,11 +2354,12 @@ class _ProfileSectionEditScreenState
         return _updateWithUniversal(
           fields: {
             'preferences': UpdatePreferencesRequestBody(
-              profileManagedByPreference:
-                  _selectedApiValuesOrNames(_prefProfileManagedByOptions),
+              profileManagedByPreference: _selectedApiValuesOrNames(_prefProfileManagedByOptions),
               dietPreference: _selectedApiValuesOrNames(_prefDietOptions),
-              expectationsFromLifePartner:
-                  _toTrimmedOrNull(_prefPartnerExpectationsController),
+              expectationsFromLifePartner: _toTrimmedOrNull(_prefPartnerExpectationsController),
+              drinkingPreference: [_prefDrinkingExpectationsController.text],
+              smokingPreference:   [ _prefSmokingExpectationsController.text],
+
             ).toJson(),
           },
           fallbackMessage: 'Failed to update preference other details',
@@ -3191,22 +3205,54 @@ class _SliderBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppColors.primary,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: TextSize.font12(context),
-          fontWeight: FontWeight.w600,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(5),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x12000000),
+                blurRadius: 18,
+                offset: Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimaryLight,
+            ),
+          ),
         ),
-      ),
+        CustomPaint(
+          size: const Size(18, 10),
+          painter: _BubblePointerPainter(),
+        ),
+      ],
     );
   }
+}
+
+class _BubblePointerPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = Colors.white;
+    final path = Path()
+      ..moveTo(0, 0)
+      ..lineTo(size.width / 2, size.height)
+      ..lineTo(size.width, 0)
+      ..close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _RingRangeThumbShape extends RangeSliderThumbShape {
@@ -3221,26 +3267,23 @@ class _RingRangeThumbShape extends RangeSliderThumbShape {
 
   @override
   void paint(
-    PaintingContext context,
-    Offset center, {
-    required Animation<double> activationAnimation,
-    required Animation<double> enableAnimation,
-    bool isDiscrete = false,
-    bool isEnabled = false,
-    bool isOnTop = false,
-    TextDirection textDirection = TextDirection.ltr,
-    required SliderThemeData sliderTheme,
-    Thumb thumb = Thumb.start,
-    bool isPressed = false,
-  }) {
+      PaintingContext context,
+      Offset center, {
+        required Animation<double> activationAnimation,
+        required Animation<double> enableAnimation,
+        bool isDiscrete = false,
+        bool isEnabled = false,
+        bool isOnTop = false,
+        required SliderThemeData sliderTheme,
+        TextDirection textDirection = TextDirection.ltr,
+        Thumb thumb = Thumb.start,
+        bool isPressed = false,
+      }) {
     final canvas = context.canvas;
-    final fillPaint = Paint()..color = Colors.white;
-    final strokePaint = Paint()
-      ..color = AppColors.primary
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 4;
+    final outerPaint = Paint()..color = Colors.white;
+    final innerPaint = Paint()..color = AppColors.primary;
 
-    canvas.drawCircle(center, thumbRadius, fillPaint);
-    canvas.drawCircle(center, thumbRadius, strokePaint);
+    canvas.drawCircle(center, thumbRadius, outerPaint);
+    canvas.drawCircle(center, thumbRadius - 7, innerPaint);
   }
 }
