@@ -38,7 +38,7 @@ class ProfileSummerySection extends ConsumerWidget {
           planName: planName,
           expiryText: expiryText,
           profileImagePath: profile?.profilePicture?.url ?? AppImages.demoProfile,
-          showTopIcon: profile?.isVerified ?? false,
+          showTopIcon: profile?.profilePicture?.status == 'approved'? true : false,
           showBottomIcon: true,
           topIconPath: AppImages.verifiedBadgeSvgIcon,
           bottomIconPath: AppImages.cameraSvgIcon,
