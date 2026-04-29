@@ -35,7 +35,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
   final tabs = const [
     'Search',
     'New',
-    'Daily',
+    'Today',
     'My Matches',
     'Near Me',
     'More Matches',
@@ -92,32 +92,34 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
   Widget _headerSection(MatchesProvider provider) {
     return Row(
       children: [
-        InkWell(
-          onTap: () => _openFilter(provider),
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: AppColors.greyLight),
-            ),
-            child: ShowImage(
-              imagePath: AppImages.filterSvgIcon,
-              height: TextSize.font16(context),
-              width: TextSize.font16(context),
-            ),
-          ),
-        ),
-        SizedBox(
-          height: TextSize.font28(context),
-          child: const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.0),
-            child: VerticalDivider(
-              thickness: 1,
-              color: AppColors.greyLight,
+        if(provider.selectedTabIndex != 2 && provider.selectedTabIndex != 4)...[
+          InkWell(
+            onTap: () => _openFilter(provider),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: AppColors.greyLight),
+              ),
+              child: ShowImage(
+                imagePath: AppImages.filterSvgIcon,
+                height: TextSize.font16(context),
+                width: TextSize.font16(context),
+              ),
             ),
           ),
-        ),
+          SizedBox(
+            height: TextSize.font28(context),
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              child: VerticalDivider(
+                thickness: 1,
+                color: AppColors.greyLight,
+              ),
+            ),
+          ),
+        ],
         Flexible(child: _customTabBar(provider)),
       ],
     );
@@ -342,10 +344,6 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
     return parts.isEmpty ? 'N/A' : parts.join(', ');
   }
 
-  String _matchHeight(num? height) {
-    if (height == null) return 'N/A';
-    return '$height';
-  }
 
   Future<void> _openFilter(MatchesProvider provider) async {
     dynamic result;
@@ -386,7 +384,6 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
       return;
     }
 
-    await _sortFilterSheet(context, provider);
   }
 
   Future<void> _sortFilterSheet(

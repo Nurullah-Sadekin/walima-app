@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/core/constants/app_colors.dart';
+import 'package:flutter_boilerplate/core/constants/app_image.dart';
 import 'package:flutter_boilerplate/core/global/enums/enums.dart';
 import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
 import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
@@ -13,6 +14,7 @@ import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
 import 'package:flutter_boilerplate/core/config/text_responsive.dart';
 import 'package:flutter_boilerplate/core/providers/providers.dart';
 import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
+import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_boilerplate/features/profile/data/model/request/update_profile_section_request_body.dart';
 import 'package:flutter_boilerplate/features/profile/data/model/response/get_complete_profile_response.dart';
@@ -690,7 +692,7 @@ class _ProfileSectionEditScreenState
               fieldKey: 'gender',
             ),
             Row(
-              spacing: 5,
+              spacing: 8,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
@@ -1187,6 +1189,14 @@ class _ProfileSectionEditScreenState
       maxLine: maxLines,
       errorText: '',
       onTap: onTap ?? () {},
+      suffix: datePicker == true ? ShowImage(
+        imagePath: AppImages.calendarSvgIcon,
+        width: TextSize.font20(context),
+        height: TextSize.font20(context),
+        color: _dobController.text.isNotEmpty
+            ? AppColors.primary
+            : AppColors.hintTextColor,
+      ) : null,
     );
   }
 
