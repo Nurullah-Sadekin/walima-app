@@ -330,10 +330,9 @@ class _ProfileSectionEditScreenState
 
   Future<void> _loadEducationLevelLookup() async {
     if (_educationLevelOptions.isNotEmpty) return;
-    final options =
-        await _lookupRepository.getLookups(LookupCategory.educationLevels);
+    _educationLevelOptions = await _lookupRepository.getLookups(LookupCategory.educationLevels);
+    if(_educationLevelOptions.isEmpty) _educationLevelOptions = EducationLevel.values.map((e) => LookupOption(key: e.apiValue, label: e.label)).toList(growable: false);
     if (!mounted) return;
-    _educationLevelOptions = options;
   }
 
   Future<void> _loadProfessionAndIncomeLookup() async {
@@ -825,22 +824,7 @@ class _ProfileSectionEditScreenState
       case ProfileEditSection.familyDetails:
         return _buildCard(
           children: [
-            _lookupDropdown(
-              label: 'Family Type',
-              controller: _familyTypeController,
-              options: _familyTypeOptions,
-              popupHeader: 'Select Family Type',
-              fieldKey: 'familyType',
-              onTap: _loadFamilyLookups,
-            ),
-            _lookupDropdown(
-              label: 'Family Values',
-              controller: _familyValuesController,
-              options: _familyValuesOptions,
-              popupHeader: 'Select Family Values',
-              fieldKey: 'familyValues',
-              onTap: _loadFamilyLookups,
-            ),
+
             _field(label: 'Father Name', controller: _fatherNameController),
             _singleStringDropdown(
               label: 'Father Profession',
@@ -884,6 +868,22 @@ class _ProfileSectionEditScreenState
               minLines: 4,
               maxLines: 5,
               hintText: 'Write about your family',
+            ),
+            _lookupDropdown(
+              label: 'Family Type',
+              controller: _familyTypeController,
+              options: _familyTypeOptions,
+              popupHeader: 'Select Family Type',
+              fieldKey: 'familyType',
+              onTap: _loadFamilyLookups,
+            ),
+            _lookupDropdown(
+              label: 'Family Values',
+              controller: _familyValuesController,
+              options: _familyValuesOptions,
+              popupHeader: 'Select Family Values',
+              fieldKey: 'familyValues',
+              onTap: _loadFamilyLookups,
             ),
             if (_marriageTimelineOptions.isNotEmpty)
               _lookupDropdown(
@@ -2204,6 +2204,7 @@ class _ProfileSectionEditScreenState
               'highestQualification',
               _highestQualificationController,
             ),
+
             'institutionName': _toTrimmedOrNull(_collegeController),
           },
         );
