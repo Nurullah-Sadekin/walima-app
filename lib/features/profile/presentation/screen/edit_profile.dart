@@ -687,8 +687,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   String _resolveProfileImagePath(CompleteProfile? profile) {
     final pictures = profile?.profile?.profilePictures;
+    final gender = ref.read(globalProvider).currentUser?.gender;
     if (pictures == null || pictures.isEmpty) {
-      return AppImages.demoProfile;
+      return gender == 'female'
+          ? AppImages.womenAvatar
+          : AppImages.manAvatar;
     }
 
     for (final picture in pictures) {

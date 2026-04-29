@@ -29,6 +29,7 @@ class ProfileSummerySection extends ConsumerWidget {
     final memberId = resolveMemberId(profile);
     final planName = resolvePlanName(profile?.membership);
     final expiryText = formatExpiry(profile?.membership?.membershipExpiresAt);
+    final gender = ref.read(globalProvider).currentUser?.gender;
 
     return Column(
       children: [
@@ -37,13 +38,13 @@ class ProfileSummerySection extends ConsumerWidget {
           memberId: memberId,
           planName: planName,
           expiryText: expiryText,
-          profileImagePath: profile?.profilePicture?.url ?? AppImages.demoProfile,
+          profileImagePath: profile?.profilePicture?.url ?? (gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar),
           showTopIcon: profile?.profilePicture?.status == 'approved'? true : false,
           showBottomIcon: true,
           topIconPath: AppImages.verifiedBadgeSvgIcon,
           bottomIconPath: AppImages.cameraSvgIcon,
           onTapImage: () async {
-            await DialogUtils.showFullScreenImage(context: context, imagePath: profile?.profilePicture?.url ?? AppImages.demoProfile);
+            await DialogUtils.showFullScreenImage(context: context, imagePath: profile?.profilePicture?.url ?? (gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar));
           },
           onBottomIconPressed: () async {
             final String? imagePath = await PickerDialog().imagePicker(context);
