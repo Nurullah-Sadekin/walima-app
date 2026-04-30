@@ -1084,8 +1084,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         duration: const Duration(seconds: 1),
-        backgroundColor:
-            response.isSuccess ? AppColors.success : AppColors.error,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: response.isSuccess ? AppColors.success : AppColors.error,
         content: Text(
           response.isSuccess
               ? (response.message.isNotEmpty
@@ -1330,7 +1330,7 @@ class _MessageEditDialogState extends State<_MessageEditDialog> {
                     fontSize: TextSize.font14(context),
                     fontWeight: FontWeight.w500,
                   ),
-                )),
+                ),),
             InkWell(
                 onTap: () => Navigator.of(context).pop(_controller.text.trim()),
                 child: Container(
@@ -1347,7 +1347,7 @@ class _MessageEditDialogState extends State<_MessageEditDialog> {
                         fontSize: TextSize.font14(context),
                         fontWeight: FontWeight.w500,
                       ),
-                    ))),
+                    ),),),
           ],
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),

@@ -10,6 +10,7 @@ import 'package:flutter_boilerplate/features/contact_filter/presentation/provide
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/into_tile.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class ContactFilterScreen extends ConsumerStatefulWidget {
   const ContactFilterScreen({super.key});
@@ -403,6 +404,9 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+            duration: const Duration(seconds: 1),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: response.isSuccess ? AppColors.success : AppColors.error,
             content: Text(
               response.isSuccess
                   ? (response.message.isNotEmpty
