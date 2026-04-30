@@ -325,8 +325,7 @@ GoRouter goRouter(Ref ref) {
             }
             final rawStrengthFields = map['strengthFields'];
             if (rawStrengthFields is List) {
-              strengthFields = rawStrengthFields
-                  .whereType<Map>()
+              strengthFields = rawStrengthFields.whereType<Map>()
                   .map(
                     (item) => ProfileStrengthField.fromJson(
                       Map<String, dynamic>.from(item),

@@ -24,6 +24,7 @@ extension _ProfileSectionEditUiStrengthPart on _ProfileSectionEditScreenState {
     }
 
     return _buildCard(children: children);
+    
   }
 
   Widget? _buildStrengthDrivenField(ProfileStrengthField field) {
@@ -76,7 +77,7 @@ extension _ProfileSectionEditUiStrengthPart on _ProfileSectionEditScreenState {
         controller: fallbackController,
       );
     }
-
+    
     if (normalized == 'languages') {
       return _multiLookupField(
         label: label,
