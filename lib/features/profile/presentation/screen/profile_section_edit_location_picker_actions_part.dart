@@ -199,70 +199,75 @@ extension _ProfileSectionEditLocationPickerActionsPart
       isScrollControlled: true,
       backgroundColor: Colors.white,
       builder: (context) {
+        final maxHeight = MediaQuery.of(context).size.height * 0.5;
         return SafeArea(
-          child: StatefulBuilder(
-            builder: (context, setModalState) {
-              return Padding(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Select Languages',
-                            style: TextStyle(
-                              color: AppColors.textPrimaryLight,
-                              fontSize: TextSize.font18(context),
-                              fontWeight: FontWeight.w600,
+          child: SizedBox(
+            height: maxHeight,
+            child: StatefulBuilder(
+              builder: (context, setModalState) {
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Select Languages',
+                              style: TextStyle(
+                                color: AppColors.textPrimaryLight,
+                                fontSize: TextSize.font18(context),
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                        ),
-                        TextButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          child: const Text('Cancel'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Flexible(
-                      child: SingleChildScrollView(
-                        child: Wrap(
-                          spacing: 10,
-                          runSpacing: 10,
-                          children: List.generate(draftOptions.length, (index) {
-                            final item = draftOptions[index];
-                            return SelectionCard(
-                              buttonStyle: item.isSelected
-                                  ? SelectionStyle.selectedCheckbox
-                                  : SelectionStyle.unSelectedCheckbox,
-                              onTap: () {
-                                setModalState(() {
-                                  draftOptions[index].isSelected =
-                                      !draftOptions[index].isSelected;
-                                });
-                              },
-                              isSelected: item.isSelected,
-                              title: item.name,
-                            );
-                          }),
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: const Text('Cancel'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Wrap(
+                            spacing: 10,
+                            runSpacing: 10,
+                            children: List.generate(draftOptions.length, (
+                              index,
+                            ) {
+                              final item = draftOptions[index];
+                              return SelectionCard(
+                                buttonStyle: item.isSelected
+                                    ? SelectionStyle.selectedCheckbox
+                                    : SelectionStyle.unSelectedCheckbox,
+                                onTap: () {
+                                  setModalState(() {
+                                    draftOptions[index].isSelected =
+                                        !draftOptions[index].isSelected;
+                                  });
+                                },
+                                isSelected: item.isSelected,
+                                title: item.name,
+                              );
+                            }),
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () =>
-                            Navigator.of(context).pop(draftOptions),
-                        child: const Text('Done'),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () =>
+                              Navigator.of(context).pop(draftOptions),
+                          child: const Text('Done'),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              );
-            },
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         );
       },
