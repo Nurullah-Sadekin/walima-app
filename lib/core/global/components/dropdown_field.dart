@@ -106,8 +106,7 @@ class _DropDownFieldState extends State<DropDownField> {
       },
       hintText: widget.hintText,
       icon: widget.icon,
-      suffix: widget.suffix ??
-          Icon(
+      suffix: widget.suffix ?? Icon(
             Icons.keyboard_arrow_down_outlined,
             size: TextSize.font20(context),
             color: AppColors.grey,
