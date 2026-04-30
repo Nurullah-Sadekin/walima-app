@@ -439,6 +439,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 : AppImages.manAvatar,
         description: match.connection?.message,
         isDescriptionVisible: false,
+        onWalimaChatPressed: match.id == null
+          ? null
+          : () {
+        context.pushNamed(
+          Routes.chatScreen,
+          extra: {
+            'conversationId': match.connection?.conversationId,
+            'participant': {
+              'userId': match.id,
+              'displayName': match.displayName,
+              'profilePictureUrl': match.profilePhoto?.url,
+              'isOnline': match.isOnline,
+            },
+          },
+        );
+      },
       ),
     );
   }
@@ -692,6 +708,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 : AppImages.manAvatar,
         description: visitor.connection?.message,
         isDescriptionVisible: false,
+        onWalimaChatPressed: visitor.id == null
+            ? null
+            : () {
+          context.pushNamed(
+            Routes.chatScreen,
+            extra: {
+              'conversationId': visitor.connection?.conversationId,
+              'participant': {
+                'userId': visitor.id,
+                'displayName': visitor.displayName,
+                'profilePictureUrl': visitor.profilePhoto?.url,
+                'isOnline': visitor.isOnline,
+              },
+            },
+          );
+        },
       ),
     );
   }
