@@ -375,6 +375,22 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
                     profileImagePath: imagePath,
                     description: match.connection?.message,
                     isDescriptionVisible: false,
+                    onWalimaChatPressed: match.id == null
+                        ? null
+                        : () {
+                      context.pushNamed(
+                        Routes.chatScreen,
+                        extra: {
+                          'conversationId': match.connection?.conversationId,
+                          'participant': {
+                            'userId': match.id,
+                            'displayName': match.displayName,
+                            'profilePictureUrl': match.profilePhoto?.url,
+                            'isOnline': match.isOnline,
+                          },
+                        },
+                      );
+                    },
                   ),
                 ),
               );

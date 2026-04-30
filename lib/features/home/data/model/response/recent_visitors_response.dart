@@ -113,7 +113,8 @@ class Data {
       this.profilePhoto, 
       this.age, 
       this.height, 
-      this.gender, 
+      this.gender,
+      this.isOnline,
       this.location, 
       this.maritalStatus, 
       this.profession, 
@@ -132,6 +133,7 @@ class Data {
     age = json['age'];
     height = json['height'];
     gender = json['gender'];
+    isOnline = json['isOnline'];
     location = json['location'] != null ? Location.fromJson(json['location']) : null;
     maritalStatus = json['maritalStatus'];
     profession = json['profession'];
@@ -149,6 +151,7 @@ class Data {
   num? age;
   num? height;
   String? gender;
+  bool? isOnline;
   Location? location;
   String? maritalStatus;
   dynamic profession;
@@ -170,6 +173,7 @@ class Data {
     map['age'] = age;
     map['height'] = height;
     map['gender'] = gender;
+    map['isOnline'] = isOnline;
     if (location != null) {
       map['location'] = location?.toJson();
     }
