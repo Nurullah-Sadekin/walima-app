@@ -179,8 +179,9 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     final selected = value?.trim() ?? '';
     if (selected.isEmpty) return;
 
-    final previous = countryPreferenceController.text;
-    final isSameCountry = previous.toLowerCase() == selected.toLowerCase();
+    final previousCountry = _selectedCityCountry?.trim() ?? '';
+    final isSameCountry =
+        previousCountry.toLowerCase() == selected.toLowerCase();
     countryPreferenceController.text = selected;
 
     if (!isSameCountry) {
@@ -393,9 +394,11 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
           )
           .toList(growable: false);
 
-       if(educationLookupOptions.isEmpty){
-        educationDataList =  EducationLevel.values.map((e) => SingleStringModel(value: e.apiValue, name: e.label)).toList(growable: false);
-       }
+      if (educationLookupOptions.isEmpty) {
+        educationDataList = EducationLevel.values
+            .map((e) => SingleStringModel(value: e.apiValue, name: e.label))
+            .toList(growable: false);
+      }
     } catch (e) {
       educationLookupError = e.toString();
     } finally {
