@@ -14,16 +14,21 @@ class BottomSheetUtils {
     required String header,
     dynamic selectedValue,
     String? hintText,
+    bool isSearchEnabled = false,
+    String? searchHintText,
   }) async {
     // Create a local copy of selected value to manage state
     dynamic tempSelectedValue = selectedValue;
+    String searchQuery = '';
 
     // Calculate dynamic height based on number of items
     double itemHeight = 70.0; // Approximate height per item
     double headerHeight = 60.0; // Height of header section
+    double searchHeight = isSearchEnabled ? 72.0 : 0.0;
     double maxHeight =
         MediaQuery.of(context).size.height * 0.9; // Max 60% of screen
-    double calculatedHeight = (items.length * itemHeight) + headerHeight;
+    double calculatedHeight =
+        (items.length * itemHeight) + headerHeight + searchHeight;
     double bottomSheetHeight =
         calculatedHeight > maxHeight ? maxHeight : calculatedHeight;
 
@@ -37,6 +42,13 @@ class BottomSheetUtils {
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
+            final filteredItems = isSearchEnabled
+                ? items.where((item) {
+                    final displayText = _display(item).toLowerCase();
+                    return displayText.contains(searchQuery.toLowerCase());
+                  }).toList(growable: false)
+                : items;
+
             return Container(
               height: bottomSheetHeight, // Dynamic height based on content
               decoration: const BoxDecoration(
@@ -50,7 +62,6 @@ class BottomSheetUtils {
                 child: Column(
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    // Header section with drag handle
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -66,10 +77,45 @@ class BottomSheetUtils {
                       ],
                     ),
                     _buildHeader(context, header),
+                    if (isSearchEnabled)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: TextField(
+                          onChanged: (value) {
+                            setState(() {
+                              searchQuery = value.trim();
+                            });
+                          },
+                          decoration: InputDecoration(
+                            hintText: searchHintText ?? 'Search',
+                            hintStyle: TextStyle(
+                              fontSize: TextSize.font16(context),
+                              color: AppColors.textSecondaryLight,
+                            ),
+                            prefixIcon: Icon(Icons.search,color: AppColors.textSecondaryLight,size: TextSize.font22(context),),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 12,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(
+                                color: AppColors.greyLight
+                              ),
+                            ),
+                            filled: true,
+                            fillColor:  AppColors.greyLight.withOpacity(0.5),
+                          ),
+                        ),
+                      ),
                     Expanded(
                       child: _buildItemsList(
                         context,
-                        items,
+                        filteredItems,
                         tempSelectedValue,
                         (dynamic newValue) {
                           setState(() {
@@ -221,29 +267,15 @@ class BottomSheetUtils {
     dynamic selectedValue,
     Function(dynamic) onItemSelected,
   ) {
-    String display(dynamic item) {
-      try {
-        if (item == null) return '';
-        if (item is String) return item;
-        if (item is Map) {
-          return (item['name'] ?? item['title'] ?? item.toString()).toString();
-        }
-        final dynamic name = item.name ?? item.title;
-        return (name ?? item.toString()).toString();
-      } catch (_) {
-        return item.toString();
-      }
-    }
-
     if (items.isEmpty) {
       return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.inbox,
-              size: 50,
-              color: Colors.grey,
+              Icons.do_not_disturb_outlined,
+              size: 30,
+              color: AppColors.disableText,
             ),
             SizedBox(height: 10),
             Text(
@@ -263,21 +295,24 @@ class BottomSheetUtils {
         bottom: 10,
       ), // Remove padding to eliminate extra space
       shrinkWrap: true, // Important: makes ListView take only needed space
-      physics:
-          const AlwaysScrollableScrollPhysics(), // Enable scrolling if needed
+      physics: const AlwaysScrollableScrollPhysics(), // Enable scrolling if needed
       itemCount: items.length,
       separatorBuilder: (context, index) => const Padding(
         padding: EdgeInsets.symmetric(horizontal: 16),
       ),
       itemBuilder: (context, index) {
         final item = items[index];
-        final displayText = display(item);
+        final displayText = _display(item);
         final selectedText =
             selectedValue != null ? selectedValue.toString() : '';
         final isSelected = displayText == selectedText;
 
         return Container(
-          color: isSelected ? AppColors.primaryVariant : Colors.transparent,
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.primaryVariant : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+          ),
           child: ListTile(
             onTap: () {
               // Update selection visually with the display string
@@ -316,5 +351,19 @@ class BottomSheetUtils {
         );
       },
     );
+  }
+
+  static String _display(dynamic item) {
+    try {
+      if (item == null) return '';
+      if (item is String) return item;
+      if (item is Map) {
+        return (item['name'] ?? item['title'] ?? item.toString()).toString();
+      }
+      final dynamic name = item.name ?? item.title;
+      return (name ?? item.toString()).toString();
+    } catch (_) {
+      return item.toString();
+    }
   }
 }

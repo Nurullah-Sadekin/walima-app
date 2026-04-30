@@ -7,7 +7,6 @@ import 'package:flutter_boilerplate/core/global/components/primary_textField.dar
 import 'bottom_sheet.dart'; // Make sure this imports BottomSheetUtils
 
 class DropDownField extends StatefulWidget {
-
   const DropDownField({
     super.key,
     this.controller,
@@ -87,10 +86,13 @@ class _DropDownFieldState extends State<DropDownField> {
           context: context,
           items: effectiveItems,
           header: widget.popUpHeader,
-          selectedValue: (widget.controller != null && (widget.controller!.text).isNotEmpty)
+          selectedValue: (widget.controller != null &&
+                  (widget.controller!.text).isNotEmpty)
               ? widget.controller!.text
               : widget.selectedValue,
           hintText: widget.hintText,
+          isSearchEnabled: widget.isSearch,
+          searchHintText: widget.searchBoxHintText,
         );
 
         if (dropdownValue != null) {
@@ -104,11 +106,12 @@ class _DropDownFieldState extends State<DropDownField> {
       },
       hintText: widget.hintText,
       icon: widget.icon,
-      suffix: widget.suffix ??  Icon(
-        Icons.keyboard_arrow_down_outlined,
-        size: TextSize.font20(context),
-        color: AppColors.grey,
-      ),
+      suffix: widget.suffix ??
+          Icon(
+            Icons.keyboard_arrow_down_outlined,
+            size: TextSize.font20(context),
+            color: AppColors.grey,
+          ),
       readOnly: true,
       headLine: widget.headLine,
       fillColor: Colors.white,
