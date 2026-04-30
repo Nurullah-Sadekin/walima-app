@@ -10,7 +10,6 @@ import 'package:flutter_boilerplate/features/contact_filter/presentation/provide
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_boilerplate/features/matches/presentation/widgets/into_tile.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 class ContactFilterScreen extends ConsumerStatefulWidget {
   const ContactFilterScreen({super.key});
@@ -23,6 +22,12 @@ class ContactFilterScreen extends ConsumerStatefulWidget {
 class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
   late ContactFilterProvider provider;
   ContactFilterStep _step = ContactFilterStep.contactFilterScreen;
+  final TextEditingController _communitySearchController =
+      TextEditingController();
+  final TextEditingController _motherTongueSearchController =
+      TextEditingController();
+  final TextEditingController _countrySearchController =
+      TextEditingController();
 
   @override
   void initState() {
@@ -31,6 +36,14 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider.loadInitialData();
     });
+  }
+
+  @override
+  void dispose() {
+    _communitySearchController.dispose();
+    _motherTongueSearchController.dispose();
+    _countrySearchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -54,7 +67,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
             child: _body(provider),
           ),
         ),
-        floatingActionButton:  BottomBorderedWidget(widget: _bottomAction()),
+        floatingActionButton: BottomBorderedWidget(widget: _bottomAction()),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
@@ -128,16 +141,22 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           helperText: provider.religionOptions.every((item) => !item.isSelected)
               ? 'Select religion first to load community options.'
               : null,
+          searchController: _communitySearchController,
+          searchHintText: 'Search community',
         );
       case ContactFilterStep.motherTongue:
         return _selectionBody(
           items: provider.motherTongueOptions,
           onTap: provider.toggleMotherTongue,
+          searchController: _motherTongueSearchController,
+          searchHintText: 'Search mother tongue',
         );
       case ContactFilterStep.countryLivingIn:
         return _selectionBody(
           items: provider.countryOptions,
           onTap: provider.toggleCountryLivingIn,
+          searchController: _countrySearchController,
+          searchHintText: 'Search country',
         );
       case ContactFilterStep.workingWith:
         return _selectionBody(
@@ -199,7 +218,8 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           InfoTile(
             title: 'Marital Status',
             value: provider.maritalStatusSummary,
-            onTap: () => setState(() => _step = ContactFilterStep.maritalStatus),
+            onTap: () =>
+                setState(() => _step = ContactFilterStep.maritalStatus),
             leadingImagePath: AppImages.weddingSvgIcon,
             showTrailingImage: false,
           ),
@@ -262,7 +282,14 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
     required List<dynamic> items,
     required void Function(int) onTap,
     String? helperText,
+    TextEditingController? searchController,
+    String? searchHintText,
   }) {
+    final filteredIndexes = _filterIndexes(
+      items,
+      searchQuery: searchController?.text ?? '',
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -287,28 +314,92 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           const SizedBox(height: 16),
         ] else
           const SizedBox(height: 12),
-        Expanded(
-          child: SingleChildScrollView(
-            child: Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: List.generate(items.length, (index) {
-                final item = items[index];
-                return SelectionCard(
-                  buttonStyle: item.isSelected
-                      ? SelectionStyle.selectedCheckbox
-                      : SelectionStyle.unSelectedCheckbox,
-                  onTap: () => onTap(index),
-                  isSelected: item.isSelected,
-                  title: item.name,
-                  isExpand: true,
-                );
-              }),
+        if (searchController != null) ...[
+          TextField(
+            controller: searchController,
+            onChanged: (_) => setState(() {}),
+            decoration: InputDecoration(
+              hintText: searchHintText ?? 'Search',
+              hintStyle: TextStyle(
+                fontSize: TextSize.font16(context),
+                color: AppColors.textSecondaryLight,
+              ),
+              prefixIcon: Icon(Icons.search,color: AppColors.textSecondaryLight,size: TextSize.font22(context),),
+              suffixIcon: searchController.text.isEmpty
+                  ? null
+                  : IconButton(
+                      onPressed: () {
+                        searchController.clear();
+                        setState(() {});
+                      },
+                      icon: const Icon(Icons.close),
+                    ),
+              filled: true,
+              fillColor:  AppColors.greyLight.withOpacity(0.5),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 12,
+              ),
             ),
           ),
+          const SizedBox(height: 16),
+        ] else
+          const SizedBox(height: 0),
+        Expanded(
+          child: filteredIndexes.isEmpty
+              ? Center(
+                  child: Text(
+                    'No matching items found',
+                    style: TextStyle(
+                      fontSize: TextSize.font14(context),
+                      color: AppColors.textSecondaryLight,
+                    ),
+                  ),
+                )
+              : SingleChildScrollView(
+                  child: Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: filteredIndexes.map((index) {
+                      final item = items[index];
+                      return SelectionCard(
+                        buttonStyle: item.isSelected
+                            ? SelectionStyle.selectedCheckbox
+                            : SelectionStyle.unSelectedCheckbox,
+                        onTap: () => onTap(index),
+                        isSelected: item.isSelected,
+                        title: item.name,
+                        isExpand: true,
+                      );
+                    }).toList(growable: false),
+                  ),
+                ),
         ),
       ],
     );
+  }
+
+  List<int> _filterIndexes(
+    List<dynamic> items, {
+    required String searchQuery,
+  }) {
+    final normalizedQuery = searchQuery.trim().toLowerCase();
+    if (normalizedQuery.isEmpty) {
+      return List<int>.generate(items.length, (index) => index);
+    }
+
+    final indexes = <int>[];
+    for (var index = 0; index < items.length; index++) {
+      final name = items[index].name.toString().trim().toLowerCase();
+      if (name.contains(normalizedQuery)) {
+        indexes.add(index);
+      }
+    }
+    return indexes;
   }
 
   Widget _ageRange(ContactFilterProvider provider) {
@@ -406,7 +497,8 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           SnackBar(
             duration: const Duration(seconds: 1),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: response.isSuccess ? AppColors.success : AppColors.error,
+            backgroundColor:
+                response.isSuccess ? AppColors.success : AppColors.error,
             content: Text(
               response.isSuccess
                   ? (response.message.isNotEmpty
