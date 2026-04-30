@@ -203,6 +203,7 @@ class Participants {
     this.displayName,
     this.firstName,
     this.lastName,
+    this.gender,
     this.username,
     this.userReference,
     this.profilePhoto,
@@ -215,6 +216,7 @@ class Participants {
     displayName = json['displayName'];
     firstName = json['firstName'];
     lastName = json['lastName'];
+    gender = json['gender'];
     username = json['username'];
     userReference = json['userReference'];
     profilePhoto = json['profilePhoto'] != null
@@ -228,6 +230,7 @@ class Participants {
   String? displayName;
   String? firstName;
   String? lastName;
+  String? gender;
   String? username;
   String? userReference;
   ProfilePhoto? profilePhoto;
@@ -240,6 +243,7 @@ class Participants {
     map['displayName'] = displayName;
     map['firstName'] = firstName;
     map['lastName'] = lastName;
+    map['gender'] = gender;
     map['username'] = username;
     map['userReference'] = userReference;
     if (profilePhoto != null) {

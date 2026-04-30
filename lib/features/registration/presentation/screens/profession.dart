@@ -174,18 +174,16 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
   }
 
   Widget bottomAction() {
-    final hasAnyValue = provider.currentCompanyNameController.text.isEmpty ||
+    final hasAnyValue =
         provider.selectedIncomePeriodStatus == null ||
         provider.incomeRangeController.text.isEmpty ||
-        provider.yourWorkController.text.isEmpty ||
-        provider.youWorkAsController.text.isEmpty;
+        provider.yourWorkController.text.isEmpty ;
 
     return PrimaryButtons(
-      buttonStyle: provider.currentCompanyNameController.text.isNotEmpty &&
+      buttonStyle:
               provider.selectedIncomePeriodStatus != null &&
               provider.incomeRangeController.text.isNotEmpty &&
-              provider.yourWorkController.text.isNotEmpty &&
-              provider.youWorkAsController.text.isNotEmpty
+              provider.yourWorkController.text.isNotEmpty
           ? ButtonsStyle.activePrimaryButton
           : ButtonsStyle.disableButton,
       title: 'Continue',

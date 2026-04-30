@@ -26,7 +26,7 @@ class InboxAcceptedTab extends ConsumerStatefulWidget {
 class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
     with SingleTickerProviderStateMixin {
   late final TabController _subTabController;
-  final _tabs = const ['Accepted by Her', 'Accepted by Me'];
+  final _tabs = const ['Accepted by Them', 'Accepted by Me'];
 
   @override
   void initState() {

@@ -195,16 +195,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         final conversation = conversations[index];
         final participant = provider.getConversationCounterpart(conversation);
         final userName = participant?.displayName?.trim();
-        final displayName =
-            (userName?.isNotEmpty ?? false) ? userName! : 'Unknown User';
+        final displayName = (userName?.isNotEmpty ?? false) ? userName! : 'Unknown User';
         final lastMessage = conversation.lastMessage?.trim();
         final isTyping = provider.isConversationTyping(conversation.id);
-
+        final gender = participant?.gender?.toLowerCase();
         return Padding(
           padding: const EdgeInsets.only(bottom: 16),
           child: ChatListItem(
             name: displayName,
-            imagePath: participant?.profilePhoto?.url ?? AppImages.demoProfile2,
+            imagePath: participant?.profilePhoto?.url ?? (gender == 'male' ? AppImages.manAvatar : AppImages.womenAvatar),
             isVerified: participant?.profilePhoto?.isVerified,
             isOnline: participant?.isOnline,
             unReadMessage: conversation.unreadCount != 0,
@@ -287,13 +286,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           provider.connectableUsers?.length ?? 0,
           (index) {
             final user = provider.connectableUsers![index];
+            final userGender = user.gender?.toLowerCase();
             return Padding(
               padding: const EdgeInsets.only(
                 right: 16.0,
               ),
               child: ProfileAvatarWithName(
                 name: user.displayName,
-                imagePath: user.profilePhoto?.url ?? AppImages.demoProfile2,
+                imagePath: user.profilePhoto?.url ?? (userGender == 'male' ? AppImages.manAvatar : AppImages.womenAvatar),
                 indicatorColor: user.isOnline == true
                     ? AppColors.greenButtonColor
                     : Colors.red,

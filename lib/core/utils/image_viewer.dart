@@ -20,7 +20,7 @@ class ShowImage extends StatefulWidget {
     this.radius,
     this.margin,
     this.border,
-    this.placeHolder = 'assets/pngs/no_image.png',
+    this.placeHolder = 'assets/svgIcons/photo.svg',
     this.placeHolderWidget,
   });
   final String? imagePath;

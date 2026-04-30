@@ -1571,7 +1571,6 @@ class RegistrationProvider extends BaseChangeNotifier {
     if (heightInCm == null) return;
 
     heightController.text = heightInCm.toString();
-    heightDisplayController.text = _formatHeightDisplay(heightInCm);
     _notifyAndPersist();
   }
 
