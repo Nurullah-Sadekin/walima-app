@@ -14,12 +14,10 @@ class CompleteProfileSection extends ConsumerStatefulWidget {
   const CompleteProfileSection({super.key});
 
   @override
-  ConsumerState<CompleteProfileSection> createState() =>
-      _CompleteProfileSectionState();
+  ConsumerState<CompleteProfileSection> createState() => _CompleteProfileSectionState();
 }
 
-class _CompleteProfileSectionState
-    extends ConsumerState<CompleteProfileSection> {
+class _CompleteProfileSectionState extends ConsumerState<CompleteProfileSection> {
   bool _isExpanded = false;
 
   @override
@@ -27,10 +25,8 @@ class _CompleteProfileSectionState
     final provider = ref.watch(homeProvider);
     final profileStrength = provider.profileStrength;
     final completionPercentage = profileStrength?.overallScore ?? 0;
-    final incompleteItems = (profileStrength?.incompleteSections ??
-            const <ProfileStrengthSection>[])
-        .map(_CompleteProfileTileData.fromStrengthSection)
-        .toList();
+    final incompleteItems =
+        (profileStrength?.incompleteSections ?? const <ProfileStrengthSection>[]).map(_CompleteProfileTileData.fromStrengthSection).toList();
 
     if (provider.isLoadingProfileStrength && profileStrength == null) {
       return const Padding(
@@ -41,14 +37,11 @@ class _CompleteProfileSectionState
       );
     }
 
-    if (completionPercentage >= 100 ||
-        incompleteItems.isEmpty ||
-        provider.profileStrengthError != null) {
+    if (completionPercentage >= 100 || incompleteItems.isEmpty || provider.profileStrengthError != null) {
       return const SizedBox.shrink();
     }
 
-    final itemsToShow =
-        _isExpanded ? incompleteItems : incompleteItems.take(2).toList();
+    final itemsToShow = _isExpanded ? incompleteItems : incompleteItems.take(2).toList();
     final hasMoreItems = incompleteItems.length > 2;
 
     return Padding(
@@ -160,8 +153,7 @@ class _CompleteProfileTileData {
   });
 
   static const String completeProfileSource = 'completeProfile';
-  static const Map<String, List<String>> _requiredFieldsBySection =
-      <String, List<String>>{
+  static const Map<String, List<String>> _requiredFieldsBySection = <String, List<String>>{
     'preferences': <String>[
       'ageRange',
       'heightRange',
@@ -241,8 +233,8 @@ class _CompleteProfileTileData {
     ProfileStrengthSection section,
   ) {
     final sectionKey = _normalizeKey(section.key);
-    final fieldKey = section.firstIncompleteFieldKey ??
-        _requiredFieldsBySection[sectionKey]?.first;
+    final strengthFields = section.incompleteFields.isNotEmpty ? section.incompleteFields : (section.fields ?? const <ProfileStrengthField>[]);
+    final fieldKey = section.firstIncompleteFieldKey ?? _requiredFieldsBySection[sectionKey]?.first;
     final title = 'Complete ${section.label ?? 'Profile Section'}';
     final statusText = _statusTextFor(section);
 
@@ -253,6 +245,9 @@ class _CompleteProfileTileData {
           statusText: statusText,
           iconImagePath: AppImages.userLoveSvgIcon,
           section: _preferenceSectionForField(fieldKey),
+          strengthSectionKey: sectionKey,
+          strengthSectionLabel: section.label,
+          strengthFields: strengthFields,
         );
       case 'basic_profile':
         return _profileEditTile(
@@ -260,6 +255,9 @@ class _CompleteProfileTileData {
           statusText: statusText,
           iconImagePath: AppImages.profileSvgIcon,
           section: _basicProfileSectionForField(fieldKey),
+          strengthSectionKey: sectionKey,
+          strengthSectionLabel: section.label,
+          strengthFields: strengthFields,
         );
       case 'appearance':
         return _profileEditTile(
@@ -267,6 +265,9 @@ class _CompleteProfileTileData {
           statusText: statusText,
           iconImagePath: AppImages.person,
           section: _appearanceSectionForField(fieldKey),
+          strengthSectionKey: sectionKey,
+          strengthSectionLabel: section.label,
+          strengthFields: strengthFields,
         );
       case 'location':
         return _profileEditTile(
@@ -274,6 +275,9 @@ class _CompleteProfileTileData {
           statusText: statusText,
           iconImagePath: AppImages.locationSvgIcon,
           section: _locationSectionForField(fieldKey),
+          strengthSectionKey: sectionKey,
+          strengthSectionLabel: section.label,
+          strengthFields: strengthFields,
         );
       case 'education':
         return _profileEditTile(
@@ -281,6 +285,9 @@ class _CompleteProfileTileData {
           statusText: statusText,
           iconImagePath: AppImages.educationSvgIcon,
           section: _educationSectionForField(fieldKey),
+          strengthSectionKey: sectionKey,
+          strengthSectionLabel: section.label,
+          strengthFields: strengthFields,
         );
       case 'profession':
         return _profileEditTile(
@@ -288,6 +295,9 @@ class _CompleteProfileTileData {
           statusText: statusText,
           iconImagePath: AppImages.workSvgIcon,
           section: _professionSectionForField(fieldKey),
+          strengthSectionKey: sectionKey,
+          strengthSectionLabel: section.label,
+          strengthFields: strengthFields,
         );
       case 'religion':
         return _profileEditTile(
@@ -295,6 +305,9 @@ class _CompleteProfileTileData {
           statusText: statusText,
           iconImagePath: AppImages.religionSvgIcon,
           section: ProfileEditSection.religiousBackground,
+          strengthSectionKey: sectionKey,
+          strengthSectionLabel: section.label,
+          strengthFields: strengthFields,
         );
       case 'family':
         return _profileEditTile(
@@ -302,6 +315,9 @@ class _CompleteProfileTileData {
           statusText: statusText,
           iconImagePath: AppImages.groupsIcon,
           section: _familySectionForField(fieldKey),
+          strengthSectionKey: sectionKey,
+          strengthSectionLabel: section.label,
+          strengthFields: strengthFields,
         );
       case 'lifestyle':
         return _profileEditTile(
@@ -309,6 +325,9 @@ class _CompleteProfileTileData {
           statusText: statusText,
           iconImagePath: AppImages.lifeStyleSvgIcon,
           section: _lifestyleSectionForField(fieldKey),
+          strengthSectionKey: sectionKey,
+          strengthSectionLabel: section.label,
+          strengthFields: strengthFields,
         );
       case 'contact':
       case 'contacts':
@@ -334,6 +353,9 @@ class _CompleteProfileTileData {
           statusText: statusText,
           iconImagePath: AppImages.habitsSvgIcon,
           section: _interestsSectionForField(fieldKey),
+          strengthSectionKey: sectionKey,
+          strengthSectionLabel: section.label,
+          strengthFields: strengthFields,
         );
       default:
         return _profileEditTile(
@@ -341,6 +363,9 @@ class _CompleteProfileTileData {
           statusText: statusText,
           iconImagePath: AppImages.profileSvgIcon,
           section: ProfileEditSection.aboutYourself,
+          strengthSectionKey: sectionKey,
+          strengthSectionLabel: section.label,
+          strengthFields: strengthFields,
         );
     }
   }
@@ -350,15 +375,25 @@ class _CompleteProfileTileData {
     required String statusText,
     required String iconImagePath,
     required ProfileEditSection section,
+    String? strengthSectionKey,
+    String? strengthSectionLabel,
+    List<ProfileStrengthField>? strengthFields,
   }) {
     return _CompleteProfileTileData(
       title: title,
       statusText: statusText,
       iconImagePath: iconImagePath,
       onTap: (context) async {
+        final resolvedStrengthFields =
+            strengthFields?.where((field) => field.key?.trim().isNotEmpty ?? false).toList(growable: false) ?? const <ProfileStrengthField>[];
         await context.pushNamed(
           Routes.profileSectionEdit,
-          extra: {'section': section.key},
+          extra: {
+            'section': section.key,
+            if (strengthSectionKey != null) 'strengthSectionKey': strengthSectionKey,
+            if (strengthSectionLabel != null) 'strengthSectionLabel': strengthSectionLabel,
+            if (resolvedStrengthFields.isNotEmpty) 'strengthFields': resolvedStrengthFields.map((field) => field.toJson()).toList(growable: false),
+          },
         );
         if (!context.mounted) return;
         await ProviderScope.containerOf(

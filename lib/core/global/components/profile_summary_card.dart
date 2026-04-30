@@ -18,6 +18,7 @@ class ProfileSummaryCard extends StatelessWidget {
     this.topIconPath,
     this.bottomIconPath,
     this.imageSize = 97,
+    this.profileImageVerificationStatus = 'none',
     this.iconSize = 20,
     this.onTapImage,
     this.onBottomIconPressed,
@@ -25,6 +26,7 @@ class ProfileSummaryCard extends StatelessWidget {
 
   final String displayName;
   final String memberId;
+  final String profileImageVerificationStatus;
   final String planName;
   final String expiryText;
   final String profileImagePath;

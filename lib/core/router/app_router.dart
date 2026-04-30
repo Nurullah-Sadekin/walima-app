@@ -5,6 +5,7 @@ import 'package:flutter_boilerplate/features/account_setting/presentation/screen
 import 'package:flutter_boilerplate/features/profile/presentation/screen/edit_profile.dart';
 import 'package:flutter_boilerplate/features/profile/presentation/screen/profile_edit_section.dart';
 import 'package:flutter_boilerplate/features/profile/presentation/screen/profile_section_edit_screen.dart';
+import 'package:flutter_boilerplate/features/home/data/model/response/profile_strength_response.dart';
 import 'package:flutter_boilerplate/features/login/presentation/screens/new_password.dart';
 import 'package:flutter_boilerplate/features/login/presentation/screens/otp_verify.dart';
 import 'package:flutter_boilerplate/features/login/presentation/screens/reset_pssword_status.dart';
@@ -90,7 +91,6 @@ GoRouter goRouter(Ref ref) {
         name: Routes.otpVerify,
         builder: (context, state) => const OtpVerifyScreen(),
       ),
-
       GoRoute(
         path: Paths.otpVerifyForSignUp,
         name: Routes.otpVerifyForSignUp,
@@ -229,7 +229,6 @@ GoRouter goRouter(Ref ref) {
         name: Routes.hobbiesInterests,
         builder: (context, state) => const HobbiesInterestsScreen(),
       ),
-
       GoRoute(
         path: Paths.familyDetails,
         name: Routes.familyDetails,
@@ -301,6 +300,10 @@ GoRouter goRouter(Ref ref) {
         builder: (context, state) {
           final extra = state.extra;
           String? sectionKey;
+          String? strengthSectionKey;
+          String? strengthSectionLabel;
+          List<ProfileStrengthField> strengthFields =
+              const <ProfileStrengthField>[];
 
           if (extra is String) {
             sectionKey = extra;
@@ -310,10 +313,36 @@ GoRouter goRouter(Ref ref) {
             if (rawSection is String) {
               sectionKey = rawSection;
             }
+            final rawStrengthSectionKey = map['strengthSectionKey'];
+            if (rawStrengthSectionKey is String &&
+                rawStrengthSectionKey.trim().isNotEmpty) {
+              strengthSectionKey = rawStrengthSectionKey.trim();
+            }
+            final rawStrengthSectionLabel = map['strengthSectionLabel'];
+            if (rawStrengthSectionLabel is String &&
+                rawStrengthSectionLabel.trim().isNotEmpty) {
+              strengthSectionLabel = rawStrengthSectionLabel.trim();
+            }
+            final rawStrengthFields = map['strengthFields'];
+            if (rawStrengthFields is List) {
+              strengthFields = rawStrengthFields
+                  .whereType<Map>()
+                  .map(
+                    (item) => ProfileStrengthField.fromJson(
+                      Map<String, dynamic>.from(item),
+                    ),
+                  )
+                  .toList(growable: false);
+            }
           }
 
           final section = ProfileEditSectionX.fromKey(sectionKey);
-          return ProfileSectionEditScreen(section: section);
+          return ProfileSectionEditScreen(
+            section: section,
+            strengthSectionKey: strengthSectionKey,
+            strengthSectionLabel: strengthSectionLabel,
+            strengthFields: strengthFields,
+          );
         },
       ),
       GoRoute(
@@ -442,7 +471,6 @@ GoRouter goRouter(Ref ref) {
           );
         },
       ),
-
       GoRoute(
         path: Paths.chatScreen,
         name: Routes.chatScreen,
