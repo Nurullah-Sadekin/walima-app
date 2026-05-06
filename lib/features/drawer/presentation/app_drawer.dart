@@ -28,7 +28,6 @@ class AppDrawer extends ConsumerStatefulWidget {
 }
 
 class _AppDrawerState extends ConsumerState<AppDrawer> {
-
   Future<void> _openLink(String title, String url) {
     return LinkOpener.open(
       context,
@@ -132,7 +131,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
     final displayName = resolveDisplayName(profileData);
     final memberId = resolveMemberId(profileData);
     final planName = resolvePlanName(profileData?.membership);
-    final expiryText = formatExpiry(profileData?.membership?.membershipExpiresAt);
+    final expiryText =
+        formatExpiry(profileData?.membership?.membershipExpiresAt);
     final gender = ref.read(globalProvider).currentUser?.gender;
 
     return ProfileSummaryCard(
@@ -140,8 +140,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
       memberId: memberId,
       planName: planName,
       expiryText: expiryText,
-      profileImagePath:
-          profileData?.profilePicture?.url ?? (gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar),
+      profileImagePath: profileData?.profilePicture?.url ??
+          (gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar),
       showTopIcon: profileData?.isVerified ?? true,
       showBottomIcon: true,
       topIconPath: AppImages.verifiedBadgeSvgIcon,
@@ -149,7 +149,10 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
       onTapImage: () async {
         await DialogUtils.showFullScreenImage(
           context: context,
-          imagePath: profileData?.profilePicture?.url ?? (gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar),
+          imagePath: profileData?.profilePicture?.url ??
+              (gender == 'female'
+                  ? AppImages.womenAvatar
+                  : AppImages.manAvatar),
         );
       },
       onBottomIconPressed: () async {
@@ -191,7 +194,9 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         ProfileActionTile(
           iconImagePath: AppImages.shareSvgIcon,
           title: 'Download & Share profile',
-          onTap: () {},
+          onTap: () {
+            context.pushNamed(Routes.biodataGenerator);
+          },
         ),
       ],
     );

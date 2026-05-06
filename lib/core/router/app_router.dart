@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:walima_llc/features/biodata/presentation/screens/biodata_generator_screen.dart';
 import 'package:walima_llc/features/matches/presentation/screens/filters/new_filter.dart';
 import 'package:walima_llc/features/contact_filter/presentation/screens/contact_filter_screen.dart';
 import 'package:walima_llc/features/account_setting/presentation/screens/account_setting_screen.dart';
@@ -325,7 +326,8 @@ GoRouter goRouter(Ref ref) {
             }
             final rawStrengthFields = map['strengthFields'];
             if (rawStrengthFields is List) {
-              strengthFields = rawStrengthFields.whereType<Map>()
+              strengthFields = rawStrengthFields
+                  .whereType<Map>()
                   .map(
                     (item) => ProfileStrengthField.fromJson(
                       Map<String, dynamic>.from(item),
@@ -343,6 +345,11 @@ GoRouter goRouter(Ref ref) {
             strengthFields: strengthFields,
           );
         },
+      ),
+      GoRoute(
+        path: Paths.biodataGenerator,
+        name: Routes.biodataGenerator,
+        builder: (context, state) => const BioDataGeneratorScreen(),
       ),
       GoRoute(
         path: Paths.upgradePackage,

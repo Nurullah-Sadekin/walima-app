@@ -48,6 +48,7 @@ abstract class Paths {
   // Home Screens
   static const editProfile = '/editProfile';
   static const profileSectionEdit = '/profileSectionEdit';
+  static const biodataGenerator = '/biodataGenerator';
   static const upgradePackage = '/upgradePackage';
   static const paymentWebView = '/paymentWebView';
   static const premiumMatches = '/premiumMatches';
@@ -122,6 +123,7 @@ abstract class Routes {
   // Home Screens
   static const editProfile = 'editProfile';
   static const profileSectionEdit = 'profileSectionEdit';
+  static const biodataGenerator = 'biodataGenerator';
   static const upgradePackage = 'upgradePackage';
   static const paymentWebView = 'paymentWebView';
   static const premiumMatches = 'premiumMatches';

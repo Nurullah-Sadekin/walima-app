@@ -1,4 +1,5 @@
 import 'package:walima_llc/core/global/providers/global_provider.dart';
+import 'package:walima_llc/features/biodata/presentation/provider/biodata_provider.dart';
 import 'package:walima_llc/features/chat/presentation/provider/chat_provider.dart';
 import 'package:walima_llc/features/drawer/presentation/providers/app_drawer_provider.dart';
 import 'package:walima_llc/features/home/presentation/providers/home_provider.dart';
@@ -131,6 +132,10 @@ final matchesProvider = ChangeNotifierProvider<MatchesProvider>((ref) {
 });
 final profileProvider = ChangeNotifierProvider<ProfileProvider>((ref) {
   return ProfileProvider();
+});
+
+final bioDataProvider = ChangeNotifierProvider<BioDataProvider>((ref) {
+  return BioDataProvider();
 });
 
 final profilePreviewProvider =
