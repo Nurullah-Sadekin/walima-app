@@ -1,4 +1,4 @@
-import 'package:flutter_boilerplate/features/profile/data/model/response/get_complete_profile_response.dart';
+import 'package:walima_llc/features/profile/data/model/response/get_complete_profile_response.dart';
 
 class ProfileSectionProfileValueUseCase {
   const ProfileSectionProfileValueUseCase();

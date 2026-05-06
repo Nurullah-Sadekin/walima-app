@@ -1,4 +1,4 @@
-import 'package:flutter_boilerplate/core/global/enums/enums.dart';
+import 'package:walima_llc/core/global/enums/enums.dart';
 
 class Filter {
   Filter({required this.value, required this.label, this.isSelected = false});

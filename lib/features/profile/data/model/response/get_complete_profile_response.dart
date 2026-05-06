@@ -1,5 +1,5 @@
-import 'package:flutter_boilerplate/features/profile/data/model/response/contacts.dart';
-import 'package:flutter_boilerplate/features/profile/data/model/response/interest_response.dart';
+import 'package:walima_llc/features/profile/data/model/response/contacts.dart';
+import 'package:walima_llc/features/profile/data/model/response/interest_response.dart';
 
 part 'appearance.dart';
 part 'complete_profile.dart';

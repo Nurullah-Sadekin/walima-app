@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/global/enums/enums.dart';
-import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/lookup_option.dart';
-import 'package:flutter_boilerplate/features/registration/data/repository/lookup_repository.dart';
-import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
+import 'package:walima_llc/core/global/enums/enums.dart';
+import 'package:walima_llc/core/providers/base_change_notifier.dart';
+import 'package:walima_llc/features/registration/data/models/lookup_option.dart';
+import 'package:walima_llc/features/registration/data/repository/lookup_repository.dart';
+import 'package:walima_llc/features/registration/domain/single_string_model.dart';
 
 class SearchFilterProvider extends BaseChangeNotifier {
     SearchFilterProvider();

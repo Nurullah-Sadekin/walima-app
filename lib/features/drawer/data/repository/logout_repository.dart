@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_boilerplate/core/network/app_urls.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/features/profile/data/model/response/logout_response.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/features/profile/data/model/response/logout_response.dart';
 
 class LogoutRepository {
   static Future<LogoutResponse> logout() async {

@@ -1,5 +1,3 @@
-// ignore_for_file: invalid_use_of_protected_member
-
 part of 'profile_section_edit_screen.dart';
 
 extension _ProfileSectionEditLookupDynamicPart

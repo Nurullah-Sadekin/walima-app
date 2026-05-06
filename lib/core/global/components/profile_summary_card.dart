@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
-import 'package:flutter_boilerplate/core/utils/clipboard_utils.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/global/components/profile_image_card.dart';
+import 'package:walima_llc/core/utils/clipboard_utils.dart';
 
 class ProfileSummaryCard extends StatelessWidget {
   const ProfileSummaryCard({

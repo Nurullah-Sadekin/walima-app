@@ -1,9 +1,9 @@
-import 'package:flutter_boilerplate/core/global/enums/enums.dart';
-import 'package:flutter_boilerplate/features/profile/data/model/request/update_profile_section_request_body.dart';
-import 'package:flutter_boilerplate/features/profile/data/model/response/update_profile_section_response.dart';
-import 'package:flutter_boilerplate/features/profile/data/repository/profile_repository.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/lookup_option.dart';
-import 'package:flutter_boilerplate/features/registration/data/repository/lookup_repository.dart';
+import 'package:walima_llc/core/global/enums/enums.dart';
+import 'package:walima_llc/features/profile/data/model/request/update_profile_section_request_body.dart';
+import 'package:walima_llc/features/profile/data/model/response/update_profile_section_response.dart';
+import 'package:walima_llc/features/profile/data/repository/profile_repository.dart';
+import 'package:walima_llc/features/registration/data/models/lookup_option.dart';
+import 'package:walima_llc/features/registration/data/repository/lookup_repository.dart';
 
 abstract class ProfileSectionEditDomainRepository {
   Future<List<LookupOption>> getLookupsBySlug(

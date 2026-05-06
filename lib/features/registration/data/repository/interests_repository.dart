@@ -1,7 +1,7 @@
-import 'package:flutter_boilerplate/core/network/app_urls.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/request/update_interests_request_body.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/response/update_interests_response.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/features/registration/data/models/request/update_interests_request_body.dart';
+import 'package:walima_llc/features/registration/data/models/response/update_interests_response.dart';
 
 class InterestsRepository {
   Future<UpdateInterestsResponse> updateInterests(

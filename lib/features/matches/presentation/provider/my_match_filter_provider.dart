@@ -1,5 +1,5 @@
-import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
+import 'package:walima_llc/core/providers/base_change_notifier.dart';
+import 'package:walima_llc/features/registration/domain/single_string_model.dart';
 
 class MyMatchFilterProvider extends BaseChangeNotifier {
   MyMatchFilterProvider();

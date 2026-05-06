@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/features/home/data/model/response/profile_strength_response.dart';
-import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/verification_tile.dart';
-import 'package:flutter_boilerplate/features/profile/presentation/screen/profile_edit_section.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/features/home/data/model/response/profile_strength_response.dart';
+import 'package:walima_llc/features/home/presentation/screens/widgets/verification_tile.dart';
+import 'package:walima_llc/features/profile/presentation/screen/profile_edit_section.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -384,8 +384,9 @@ class _CompleteProfileTileData {
       statusText: statusText,
       iconImagePath: iconImagePath,
       onTap: (context) async {
-        final resolvedStrengthFields =
-            strengthFields?.where((field) => field.key?.trim().isNotEmpty ?? false).toList(growable: false) ?? const <ProfileStrengthField>[];
+        final resolvedStrengthFields = strengthFields?.where((field) => 
+        field.key?.trim().isNotEmpty ?? false,
+        ).toList(growable: false) ?? const <ProfileStrengthField>[];
         await context.pushNamed(
           Routes.profileSectionEdit,
           extra: {

@@ -1,18 +1,18 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/global/enums/enums.dart';
-import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/features/contact_filter/data/models/contact_filters_settings.dart';
-import 'package:flutter_boilerplate/features/contact_filter/data/repository/contact_filters_repository.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/lookup_option.dart';
-import 'package:flutter_boilerplate/features/registration/data/repository/location_data_repository_impl.dart';
-import 'package:flutter_boilerplate/features/registration/data/repository/lookup_repository.dart';
-import 'package:flutter_boilerplate/features/registration/data/repository/religion_data_repository_impl.dart';
-import 'package:flutter_boilerplate/features/registration/domain/repository/location_data_repository.dart';
-import 'package:flutter_boilerplate/features/registration/domain/repository/religion_data_repository.dart';
-import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
+import 'package:walima_llc/core/global/enums/enums.dart';
+import 'package:walima_llc/core/providers/base_change_notifier.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/features/contact_filter/data/models/contact_filters_settings.dart';
+import 'package:walima_llc/features/contact_filter/data/repository/contact_filters_repository.dart';
+import 'package:walima_llc/features/registration/data/models/lookup_option.dart';
+import 'package:walima_llc/features/registration/data/repository/location_data_repository_impl.dart';
+import 'package:walima_llc/features/registration/data/repository/lookup_repository.dart';
+import 'package:walima_llc/features/registration/data/repository/religion_data_repository_impl.dart';
+import 'package:walima_llc/features/registration/domain/repository/location_data_repository.dart';
+import 'package:walima_llc/features/registration/domain/repository/religion_data_repository.dart';
+import 'package:walima_llc/features/registration/domain/single_string_model.dart';
 
 class ContactFilterProvider extends BaseChangeNotifier {
   ContactFilterProvider();

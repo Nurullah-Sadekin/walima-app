@@ -50,6 +50,39 @@ extension _ProfileSectionEditSavePrefillUtilsPart
     );
   }
 
+  Future<bool> _addUnknownPayloadValue({
+    required Map<String, dynamic> payload,
+    required String rawKey,
+    required String normalizedKey,
+    required String value,
+  }) async {
+    switch (normalizedKey) {
+      case 'weight':
+        final weight = int.tryParse(value);
+        if (weight == null) {
+          await _showError('Please enter a valid weight.');
+          return false;
+        }
+        if (weight > 200) {
+          await _showError('Weight must not be greater than 200.');
+          return false;
+        }
+        payload[rawKey] = weight;
+        return true;
+      case 'bodytype':
+        final bodyType = _resolveBodyTypeValue(value);
+        if (bodyType == null) {
+          await _showError('Please select a valid body type.');
+          return false;
+        }
+        payload[rawKey] = bodyType;
+        return true;
+      default:
+        payload[rawKey] = value;
+        return true;
+    }
+  }
+
   void _prefillEnum<T extends ApiUiEnum>({
     required TextEditingController controller,
     required String? raw,
@@ -214,6 +247,89 @@ extension _ProfileSectionEditSavePrefillUtilsPart
       return tracked;
     }
     return _toTrimmedOrNull(controller);
+  }
+
+  String? _resolveBodyTypeValue(String value) {
+    return _findEnumByLabelOrValue(BodyType.values, value)?.apiValue;
+  }
+
+  String? _resolveEducationLevelValue(TextEditingController controller) {
+    final selected = controller.text.trim();
+    if (selected.isEmpty) {
+      return null;
+    }
+
+    final tracked = _selectedApiValues['highestQualification']?.trim();
+    final allowedValues =
+        EducationLevel.values.map((value) => value.apiValue).toSet();
+    if (tracked != null && allowedValues.contains(tracked)) {
+      return tracked;
+    }
+
+    final lookupMatch = _findLookupOption(_educationLevelOptions, selected);
+    final lookupKey = lookupMatch?.key.trim() ?? '';
+    if (allowedValues.contains(lookupKey)) {
+      return lookupKey;
+    }
+
+    final normalized = selected.toLowerCase().replaceAll('’', "'");
+    if (normalized.contains('no formal')) {
+      return EducationLevel.noFormalEducation.apiValue;
+    }
+    if (RegExp(r'\bprimary\b').hasMatch(normalized)) {
+      return EducationLevel.primary.apiValue;
+    }
+    if (normalized.contains('higher secondary') ||
+        normalized.contains('high secondary') ||
+        RegExp(r'\bhsc\b').hasMatch(normalized) ||
+        normalized.contains('intermediate')) {
+      return EducationLevel.higherSecondary.apiValue;
+    }
+    if (RegExp(r'\bsecondary\b').hasMatch(normalized) ||
+        RegExp(r'\bssc\b').hasMatch(normalized)) {
+      return EducationLevel.secondary.apiValue;
+    }
+    if (normalized.contains('diploma')) {
+      return EducationLevel.diploma.apiValue;
+    }
+    if (RegExp(
+      r"\b(bachelor|bachelors|bachelor's|bsc|b\.sc|ba|b\.a|bcom|b\.com|btech|b\.tech|be|b\.e)\b",
+    ).hasMatch(normalized)) {
+      return EducationLevel.bachelor.apiValue;
+    }
+    if (RegExp(
+      r"\b(master|masters|master's|msc|m\.sc|ma|m\.a|mba|m\.b\.a|mtech|m\.tech|mcom|m\.com|me|m\.e)\b",
+    ).hasMatch(normalized)) {
+      return EducationLevel.masters.apiValue;
+    }
+    if (RegExp(r'\b(phd|ph\.d)\b').hasMatch(normalized)) {
+      return EducationLevel.phd.apiValue;
+    }
+    if (normalized.contains('doctorate')) {
+      return EducationLevel.doctorate.apiValue;
+    }
+    if (normalized.contains('professional') ||
+        normalized.contains('mbbs') ||
+        normalized.contains('llb') ||
+        normalized.contains('pharmd')) {
+      return EducationLevel.professionalDegree.apiValue;
+    }
+    if (normalized.contains('vocational')) {
+      return EducationLevel.vocationalTraining.apiValue;
+    }
+    if (normalized.contains('certificate')) {
+      return EducationLevel.certificate.apiValue;
+    }
+
+    final candidate = selected
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
+        .replaceAll(RegExp(r'_+'), '_')
+        .replaceAll(RegExp(r'^_|_$'), '');
+    if (allowedValues.contains(candidate)) {
+      return candidate;
+    }
+    return EducationLevel.others.apiValue;
   }
 
   String? _toTrimmedOrNull(TextEditingController controller) {

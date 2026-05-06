@@ -1,10 +1,10 @@
-import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/features/matches/domain/enums/match_filter_type.dart';
-import 'package:flutter_boilerplate/features/matches/data/models/request/get_matches_query_params.dart';
-import 'package:flutter_boilerplate/features/matches/data/models/response/get_matches_response.dart';
-import 'package:flutter_boilerplate/features/matches/data/repository/matches_repository.dart';
-import 'package:flutter_boilerplate/features/matches/domain/enums/match_sort_by.dart';
-import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
+import 'package:walima_llc/core/providers/base_change_notifier.dart';
+import 'package:walima_llc/features/matches/domain/enums/match_filter_type.dart';
+import 'package:walima_llc/features/matches/data/models/request/get_matches_query_params.dart';
+import 'package:walima_llc/features/matches/data/models/response/get_matches_response.dart';
+import 'package:walima_llc/features/matches/data/repository/matches_repository.dart';
+import 'package:walima_llc/features/matches/domain/enums/match_sort_by.dart';
+import 'package:walima_llc/features/registration/domain/single_string_model.dart';
 
 class MatchesProvider extends BaseChangeNotifier {
   MatchesProviderScreenStates screenStates = MatchesProviderScreenStates.defaultLoading;

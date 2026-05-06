@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_boilerplate/generated/l10n/app_localizations.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/providers/theme_provider.dart';
-import 'package:flutter_boilerplate/core/providers/locale_provider.dart';
+import 'package:walima_llc/generated/l10n/app_localizations.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/providers/theme_provider.dart';
+import 'package:walima_llc/core/providers/locale_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});

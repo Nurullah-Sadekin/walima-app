@@ -115,7 +115,7 @@ lib/
 
 ### Using Colors
 ```dart
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
 
 Container(
   color: AppColors.primary,
@@ -128,7 +128,7 @@ Container(
 
 ### Using Texts
 ```dart
-import 'package:flutter_boilerplate/core/constants/app_texts.dart';
+import 'package:walima_llc/core/constants/app_texts.dart';
 
 Text(AppTexts.appName)
 ```

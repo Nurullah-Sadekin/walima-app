@@ -1,5 +1,5 @@
-import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/providers/registration_provider.dart';
+import 'package:walima_llc/core/providers/base_change_notifier.dart';
+import 'package:walima_llc/features/registration/presentation/providers/registration_provider.dart';
 
 class RegistrationScreenStateProvider extends BaseChangeNotifier {
   RegistrationScreenStates screenStates = RegistrationScreenStates.defaultLoading;

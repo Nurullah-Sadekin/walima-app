@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_boilerplate/core/network/app_urls.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/features/home/data/model/response/homepage_top_matches_response.dart';
-import 'package:flutter_boilerplate/features/home/data/model/response/profile_strength_response.dart';
-import 'package:flutter_boilerplate/features/home/data/model/response/recent_visitors_response.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/features/home/data/model/response/homepage_top_matches_response.dart';
+import 'package:walima_llc/features/home/data/model/response/profile_strength_response.dart';
+import 'package:walima_llc/features/home/data/model/response/recent_visitors_response.dart';
 
 class HomeRepository {
   static Future<HomepageTopMatchesResponse> getHomepageTopMatches() async {

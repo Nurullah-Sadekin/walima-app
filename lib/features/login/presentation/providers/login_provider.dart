@@ -1,25 +1,25 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/core/utils/app_error_reporting_service.dart';
-import 'package:flutter_boilerplate/core/utils/firebase_messaging_service.dart';
-import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
-import 'package:flutter_boilerplate/core/utils/validators.dart';
-import 'package:flutter_boilerplate/features/login/data/models/login_body.dart';
-import 'package:flutter_boilerplate/features/login/data/models/login_response.dart';
-import 'package:flutter_boilerplate/features/login/data/models/login_with_otp_body.dart';
-import 'package:flutter_boilerplate/features/login/data/models/otp_verify_body.dart';
-import 'package:flutter_boilerplate/features/login/data/models/resend_otp_body.dart';
-import 'package:flutter_boilerplate/features/login/data/models/set_password_body.dart';
-import 'package:flutter_boilerplate/features/login/data/repository/login_repository.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/providers/base_change_notifier.dart';
+import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/core/utils/app_error_reporting_service.dart';
+import 'package:walima_llc/core/utils/firebase_messaging_service.dart';
+import 'package:walima_llc/core/utils/dialog_utils.dart';
+import 'package:walima_llc/core/utils/validators.dart';
+import 'package:walima_llc/features/login/data/models/login_body.dart';
+import 'package:walima_llc/features/login/data/models/login_response.dart';
+import 'package:walima_llc/features/login/data/models/login_with_otp_body.dart';
+import 'package:walima_llc/features/login/data/models/otp_verify_body.dart';
+import 'package:walima_llc/features/login/data/models/resend_otp_body.dart';
+import 'package:walima_llc/features/login/data/models/set_password_body.dart';
+import 'package:walima_llc/features/login/data/repository/login_repository.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_boilerplate/core/constants/storage_keys.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/features/chat/data/socket/socket_service.dart';
+import 'package:walima_llc/core/constants/storage_keys.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/features/chat/data/socket/socket_service.dart';
 
 class LoginProvider extends BaseChangeNotifier {
   static const String _mobileOrEmailRequiredMessage =

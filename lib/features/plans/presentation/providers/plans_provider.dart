@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
-import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/features/plans/data/models/get_current_subscription_response.dart';
-import 'package:flutter_boilerplate/features/plans/data/models/get_plans_response.dart';
-import 'package:flutter_boilerplate/features/plans/data/models/initiate_payment_request.dart';
-import 'package:flutter_boilerplate/features/plans/data/models/initiate_payment_response.dart';
-import 'package:flutter_boilerplate/features/plans/data/models/upgrade_quote_request.dart';
-import 'package:flutter_boilerplate/features/plans/data/models/upgrade_quote_response.dart';
-import 'package:flutter_boilerplate/features/plans/data/repository/plan_repository.dart';
-import 'package:flutter_boilerplate/features/plans/domain/upgrade_package_model.dart';
+import 'package:walima_llc/core/utils/dialog_utils.dart';
+import 'package:walima_llc/core/providers/base_change_notifier.dart';
+import 'package:walima_llc/features/plans/data/models/get_current_subscription_response.dart';
+import 'package:walima_llc/features/plans/data/models/get_plans_response.dart';
+import 'package:walima_llc/features/plans/data/models/initiate_payment_request.dart';
+import 'package:walima_llc/features/plans/data/models/initiate_payment_response.dart';
+import 'package:walima_llc/features/plans/data/models/upgrade_quote_request.dart';
+import 'package:walima_llc/features/plans/data/models/upgrade_quote_response.dart';
+import 'package:walima_llc/features/plans/data/repository/plan_repository.dart';
+import 'package:walima_llc/features/plans/domain/upgrade_package_model.dart';
 
 class PlansProvider extends BaseChangeNotifier {
   // current selected page index for carousel

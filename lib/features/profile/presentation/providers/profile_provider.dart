@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
-import 'package:flutter_boilerplate/features/profile/data/model/request/update_profile_photo_request.dart';
-import 'package:flutter_boilerplate/features/profile/data/model/response/dashboard_response.dart';
-import 'package:flutter_boilerplate/features/profile/data/model/response/get_complete_profile_response.dart';
-import 'package:flutter_boilerplate/features/profile/data/repository/profile_repository.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/request/upload_media_request_body.dart';
-import 'package:flutter_boilerplate/features/registration/data/repository/media_repository.dart';
+import 'package:walima_llc/core/providers/base_change_notifier.dart';
+import 'package:walima_llc/core/utils/dialog_utils.dart';
+import 'package:walima_llc/features/profile/data/model/request/update_profile_photo_request.dart';
+import 'package:walima_llc/features/profile/data/model/response/dashboard_response.dart';
+import 'package:walima_llc/features/profile/data/model/response/get_complete_profile_response.dart';
+import 'package:walima_llc/features/profile/data/repository/profile_repository.dart';
+import 'package:walima_llc/features/registration/data/models/request/upload_media_request_body.dart';
+import 'package:walima_llc/features/registration/data/repository/media_repository.dart';
 
 class ProfileProvider extends BaseChangeNotifier {
   ProfileScreenStates screenStates = ProfileScreenStates.defaultState;

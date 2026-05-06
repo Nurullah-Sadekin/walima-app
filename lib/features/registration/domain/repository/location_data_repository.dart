@@ -1,4 +1,4 @@
-import 'package:flutter_boilerplate/features/registration/domain/location_data_model.dart';
+import 'package:walima_llc/features/registration/domain/location_data_model.dart';
 
 abstract class LocationDataRepository {
   Future<List<CountryLocationModel>> getCountries();

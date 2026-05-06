@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
-import 'package:flutter_boilerplate/features/registration/domain/religion_option_model.dart';
-import 'package:flutter_boilerplate/features/registration/domain/repository/religion_data_repository.dart';
+import 'package:walima_llc/features/registration/domain/religion_option_model.dart';
+import 'package:walima_llc/features/registration/domain/repository/religion_data_repository.dart';
 
 class ReligionDataRepositoryImpl implements ReligionDataRepository {
   static const String _assetPath =

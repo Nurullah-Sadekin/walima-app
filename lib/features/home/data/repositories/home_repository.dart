@@ -1,4 +1,4 @@
-import 'package:flutter_boilerplate/features/home/data/model/response/recent_visitors_response.dart';
+import 'package:walima_llc/features/home/data/model/response/recent_visitors_response.dart';
 
 class HomeRepository {
   // get recent visitors

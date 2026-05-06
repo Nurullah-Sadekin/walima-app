@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/contact_bottom_sheet.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/contact_bottom_sheet.dart';
+import 'package:walima_llc/core/router/route_name.dart';
 import 'package:go_router/go_router.dart';
 
 enum InboxMoreMenuAction { cancelRequest, decline, block, report }

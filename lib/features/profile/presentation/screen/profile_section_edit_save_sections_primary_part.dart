@@ -33,7 +33,9 @@ extension _ProfileSectionEditSaveSectionsPrimaryPart
           'religion': religionValue,
           'community': _apiValueOrText('community', _communityController),
           'religiousBackground': _apiValueOrText(
-              'religiousBackground', _religiousBackgroundController),
+            'religiousBackground',
+            _religiousBackgroundController,
+          ),
         },
       },
       fallbackMessage: 'Failed to update religious background',
@@ -85,9 +87,12 @@ extension _ProfileSectionEditSaveSectionsPrimaryPart
       id: primaryEducation?.id,
       fields: <String, dynamic>{
         'qualification': _apiValueOrText(
-            'highestQualification', _highestQualificationController),
-        'educationLevel': _apiValueOrText(
-            'highestQualification', _highestQualificationController),
+          'highestQualification',
+          _highestQualificationController,
+        ),
+        'educationLevel': _resolveEducationLevelValue(
+          _highestQualificationController,
+        ),
         'institutionName': _toTrimmedOrNull(_collegeController),
       },
     );

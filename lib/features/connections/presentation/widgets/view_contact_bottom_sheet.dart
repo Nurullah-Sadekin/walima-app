@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/features/connections/data/models/response/view_contact_info.dart';
-import 'package:flutter_boilerplate/features/connections/data/repository/connections_repository.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/contact_bottom_sheet.dart';
+import 'package:walima_llc/features/connections/data/models/response/view_contact_info.dart';
+import 'package:walima_llc/features/connections/data/repository/connections_repository.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/contact_bottom_sheet.dart';
 
 class ViewContactBottomSheet extends StatefulWidget {
   const ViewContactBottomSheet({

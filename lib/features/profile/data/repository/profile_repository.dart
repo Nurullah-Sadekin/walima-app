@@ -1,11 +1,11 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_boilerplate/core/network/app_urls.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/features/profile/data/model/request/update_profile_photo_request.dart';
-import 'package:flutter_boilerplate/features/profile/data/model/request/update_profile_section_request_body.dart';
-import 'package:flutter_boilerplate/features/profile/data/model/response/dashboard_response.dart';
-import 'package:flutter_boilerplate/features/profile/data/model/response/get_complete_profile_response.dart';
-import 'package:flutter_boilerplate/features/profile/data/model/response/update_profile_section_response.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/features/profile/data/model/request/update_profile_photo_request.dart';
+import 'package:walima_llc/features/profile/data/model/request/update_profile_section_request_body.dart';
+import 'package:walima_llc/features/profile/data/model/response/dashboard_response.dart';
+import 'package:walima_llc/features/profile/data/model/response/get_complete_profile_response.dart';
+import 'package:walima_llc/features/profile/data/model/response/update_profile_section_response.dart';
 
 class ProfileRepository {
   static Future<GetCompleteProfileResponse> getCompleteProfile() async {

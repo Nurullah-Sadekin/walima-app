@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_boilerplate/core/constants/storage_keys.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:walima_llc/core/constants/storage_keys.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/core/router/route_name.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class SplashScreen extends StatefulWidget {

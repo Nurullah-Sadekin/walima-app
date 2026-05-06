@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_boilerplate/core/network/app_urls.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/features/contact_filter/data/models/contact_filters_settings.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/features/contact_filter/data/models/contact_filters_settings.dart';
 
 class ContactFiltersRepository {
   static Future<ApiResponse<ContactFiltersSettings>> getContactFilters() async {

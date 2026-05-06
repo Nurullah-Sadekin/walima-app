@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_boilerplate/core/network/app_urls.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/features/account_setting/data/models/account_settings.dart';
-import 'package:flutter_boilerplate/features/account_setting/data/models/contact_settings.dart';
-import 'package:flutter_boilerplate/features/account_setting/data/models/messages_settings.dart';
-import 'package:flutter_boilerplate/features/account_setting/data/models/notification_settings.dart';
-import 'package:flutter_boilerplate/features/account_setting/data/models/premium_settings.dart';
-import 'package:flutter_boilerplate/features/account_setting/data/models/privacy_settings.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/features/account_setting/data/models/account_settings.dart';
+import 'package:walima_llc/features/account_setting/data/models/contact_settings.dart';
+import 'package:walima_llc/features/account_setting/data/models/messages_settings.dart';
+import 'package:walima_llc/features/account_setting/data/models/notification_settings.dart';
+import 'package:walima_llc/features/account_setting/data/models/premium_settings.dart';
+import 'package:walima_llc/features/account_setting/data/models/privacy_settings.dart';
 
 class AccountSettingsRepository {
   static Future<ApiResponse<AccountSettings>> getAccountSettings() async {

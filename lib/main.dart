@@ -6,22 +6,22 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_boilerplate/generated/l10n/app_localizations.dart';
-import 'package:flutter_boilerplate/core/firebase/firebase_options.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/core/router/app_router.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/core/theme/app_theme.dart';
-import 'package:flutter_boilerplate/core/providers/theme_provider.dart';
-import 'package:flutter_boilerplate/core/providers/locale_provider.dart';
-import 'package:flutter_boilerplate/core/connectivity/connectivity_keys.dart';
-import 'package:flutter_boilerplate/core/connectivity/connectivity_monitor.dart';
-import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/utils/app_error_reporting_service.dart';
-import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
-import 'package:flutter_boilerplate/core/utils/firebase_messaging_service.dart';
-import 'package:flutter_boilerplate/core/utils/foreground_alert_service.dart';
-import 'package:flutter_boilerplate/features/chat/data/socket/socket_service.dart';
+import 'package:walima_llc/generated/l10n/app_localizations.dart';
+import 'package:walima_llc/core/firebase/firebase_options.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/core/router/app_router.dart';
+import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/core/theme/app_theme.dart';
+import 'package:walima_llc/core/providers/theme_provider.dart';
+import 'package:walima_llc/core/providers/locale_provider.dart';
+import 'package:walima_llc/core/connectivity/connectivity_keys.dart';
+import 'package:walima_llc/core/connectivity/connectivity_monitor.dart';
+import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/utils/app_error_reporting_service.dart';
+import 'package:walima_llc/core/utils/prefs_helper.dart';
+import 'package:walima_llc/core/utils/firebase_messaging_service.dart';
+import 'package:walima_llc/core/utils/foreground_alert_service.dart';
+import 'package:walima_llc/features/chat/data/socket/socket_service.dart';
 
 Future<void> main() async {
   runZonedGuarded(

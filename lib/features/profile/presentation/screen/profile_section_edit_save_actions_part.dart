@@ -71,13 +71,25 @@ extension _ProfileSectionEditSaveActionsPart on _ProfileSectionEditScreenState {
       final selectedLookupValue =
           _dynamicFieldSelectedApiValues[rawKey]?.trim();
       if (selectedLookupValue != null && selectedLookupValue.isNotEmpty) {
-        unknownPayload[rawKey] = selectedLookupValue;
+        final didAdd = await _addUnknownPayloadValue(
+          payload: unknownPayload,
+          rawKey: rawKey,
+          normalizedKey: normalized,
+          value: selectedLookupValue,
+        );
+        if (!didAdd) return false;
         continue;
       }
 
       final value = controller.text.trim();
       if (value.isNotEmpty) {
-        unknownPayload[rawKey] = value;
+        final didAdd = await _addUnknownPayloadValue(
+          payload: unknownPayload,
+          rawKey: rawKey,
+          normalizedKey: normalized,
+          value: value,
+        );
+        if (!didAdd) return false;
       }
     }
 
@@ -106,7 +118,9 @@ extension _ProfileSectionEditSaveActionsPart on _ProfileSectionEditScreenState {
         fields = <String, dynamic>{
           'educations': <Map<String, dynamic>>[
             _buildRecordPayload(
-                    id: primaryEducation?.id, fields: unknownPayload) ??
+                  id: primaryEducation?.id,
+                  fields: unknownPayload,
+                ) ??
                 unknownPayload,
           ],
         };
@@ -115,7 +129,9 @@ extension _ProfileSectionEditSaveActionsPart on _ProfileSectionEditScreenState {
         fields = <String, dynamic>{
           'professions': <Map<String, dynamic>>[
             _buildRecordPayload(
-                    id: primaryProfession?.id, fields: unknownPayload) ??
+                  id: primaryProfession?.id,
+                  fields: unknownPayload,
+                ) ??
                 unknownPayload,
           ],
         };

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
-import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/global/components/custom_back_appbar.dart';
+import 'package:walima_llc/core/global/components/selection_card.dart';
+import 'package:walima_llc/core/router/route_name.dart';
 import 'package:go_router/go_router.dart';
 
 class ReportScreen extends StatefulWidget {

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
+import 'package:walima_llc/core/providers/base_change_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_boilerplate/core/constants/storage_keys.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/core/utils/app_error_reporting_service.dart';
-import 'package:flutter_boilerplate/features/chat/data/socket/socket_service.dart';
-import 'package:flutter_boilerplate/features/drawer/data/repository/logout_repository.dart';
+import 'package:walima_llc/core/constants/storage_keys.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/core/utils/app_error_reporting_service.dart';
+import 'package:walima_llc/features/chat/data/socket/socket_service.dart';
+import 'package:walima_llc/features/drawer/data/repository/logout_repository.dart';
 
 class DrawerProvider extends BaseChangeNotifier {
   DrawerScreenStates screenStates = DrawerScreenStates.defaultState;

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_card.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/contact_whatsapp_call_bottom_sheet.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/contact_bottom_sheet.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/info_card.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/premium_contact_bottom_sheet.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/setting_switcher_title.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/global/components/custom_back_appbar.dart';
+import 'package:walima_llc/features/inbox/presentation/widgets/inbox_card.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/bottom_bordered_widget.dart';
+import 'package:walima_llc/core/global/components/primary_button.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/contact_whatsapp_call_bottom_sheet.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/contact_bottom_sheet.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/info_card.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/premium_contact_bottom_sheet.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/setting_switcher_title.dart';
 
 class MoreMatchesScreen extends StatelessWidget {
   const MoreMatchesScreen({super.key});

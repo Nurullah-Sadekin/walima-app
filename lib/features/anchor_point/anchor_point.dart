@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
-import 'package:flutter_boilerplate/features/chat/presentation/screens/chat_home.dart';
-import 'package:flutter_boilerplate/features/home/presentation/screens/home_screen.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/screens/inbox_screen.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/screens/matches.dart';
-import 'package:flutter_boilerplate/features/plans/presentation/screens/plans_screen.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/utils/dialog_utils.dart';
+import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/features/chat/presentation/screens/chat_home.dart';
+import 'package:walima_llc/features/home/presentation/screens/home_screen.dart';
+import 'package:walima_llc/features/inbox/presentation/screens/inbox_screen.dart';
+import 'package:walima_llc/features/matches/presentation/screens/matches.dart';
+import 'package:walima_llc/features/plans/presentation/screens/plans_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Current tab provider

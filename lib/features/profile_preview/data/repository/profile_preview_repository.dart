@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_boilerplate/core/network/app_urls.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/features/profile_preview/data/models/profile_compare_response.dart';
-import 'package:flutter_boilerplate/features/profile_preview/data/models/profile_preview_response.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/features/profile_preview/data/models/profile_compare_response.dart';
+import 'package:walima_llc/features/profile_preview/data/models/profile_preview_response.dart';
 
 class ProfilePreviewRepository {
   static Future<ProfilePreviewResponse> getProfilePreview(String userId) async {

@@ -1,17 +1,17 @@
-import 'package:flutter_boilerplate/core/global/enums/enums.dart';
-import 'package:flutter_boilerplate/core/global/models/filter_model.dart';
-import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/features/connections/data/models/request/get_requested_connections_query_params.dart';
-import 'package:flutter_boilerplate/features/connections/data/models/request/perform_connection_action_request_body.dart';
-import 'package:flutter_boilerplate/features/connections/data/models/response/get_accepted_connection_response.dart'
+import 'package:walima_llc/core/global/enums/enums.dart';
+import 'package:walima_llc/core/global/models/filter_model.dart';
+import 'package:walima_llc/core/providers/base_change_notifier.dart';
+import 'package:walima_llc/features/connections/data/models/request/get_requested_connections_query_params.dart';
+import 'package:walima_llc/features/connections/data/models/request/perform_connection_action_request_body.dart';
+import 'package:walima_llc/features/connections/data/models/response/get_accepted_connection_response.dart'
     as accepted_models;
-import 'package:flutter_boilerplate/features/connections/data/models/response/get_blocked_connection_response.dart'
+import 'package:walima_llc/features/connections/data/models/response/get_blocked_connection_response.dart'
     as blocked_models;
-import 'package:flutter_boilerplate/features/connections/data/models/response/get_requested_connections_response.dart'
+import 'package:walima_llc/features/connections/data/models/response/get_requested_connections_response.dart'
     as requested_models;
-import 'package:flutter_boilerplate/features/connections/data/models/response/get_sent_connection_response.dart'
+import 'package:walima_llc/features/connections/data/models/response/get_sent_connection_response.dart'
     as sent_models;
-import 'package:flutter_boilerplate/features/connections/data/repository/connections_repository.dart';
+import 'package:walima_llc/features/connections/data/repository/connections_repository.dart';
 
 class InboxProvider extends BaseChangeNotifier {
   InboxScreenStates screenStates = InboxScreenStates.defaultState;

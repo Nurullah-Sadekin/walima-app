@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
-import 'package:flutter_boilerplate/core/global/components/empty_state.dart';
-import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
-import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/providers/inbox_providers.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/filter_widget.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/global/components/bottom_sheet.dart';
+import 'package:walima_llc/core/global/components/empty_state.dart';
+import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/utils/camel_case_utils.dart';
+import 'package:walima_llc/core/utils/date_time_utils.dart';
+import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/features/inbox/presentation/providers/inbox_providers.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/filter_widget.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/profile_comprehensive_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class InboxReceivedTab extends ConsumerStatefulWidget {

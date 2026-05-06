@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
 
 class ClipboardUtils {
   /// Copies [value] to the system clipboard and shows a confirmation snackbar.

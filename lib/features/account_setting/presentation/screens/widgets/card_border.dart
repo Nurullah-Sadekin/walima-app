@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
 
 class CardBorder extends StatelessWidget {
   const CardBorder({

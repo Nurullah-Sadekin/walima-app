@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_boilerplate/core/network/app_urls.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/features/chat/data/model/response/connectable_user_response.dart';
-import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_list.dart';
-import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_messages_response.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/features/chat/data/model/response/connectable_user_response.dart';
+import 'package:walima_llc/features/chat/data/model/response/conversation_list.dart';
+import 'package:walima_llc/features/chat/data/model/response/conversation_messages_response.dart';
 
 class ChatRepository {
   static Future<ConnectableUserResponse> getConnectableUserList() async {

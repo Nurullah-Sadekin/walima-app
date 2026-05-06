@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/models/filter_model.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/features/account_setting/data/models/account_settings.dart';
-import 'package:flutter_boilerplate/features/account_setting/data/models/contact_settings.dart';
-import 'package:flutter_boilerplate/features/account_setting/data/models/messages_settings.dart';
-import 'package:flutter_boilerplate/features/account_setting/data/models/notification_settings.dart';
-import 'package:flutter_boilerplate/features/account_setting/data/models/premium_settings.dart';
-import 'package:flutter_boilerplate/features/account_setting/data/models/privacy_settings.dart';
-import 'package:flutter_boilerplate/features/account_setting/data/repository/account_settings_repository.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/global/models/filter_model.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/core/providers/base_change_notifier.dart';
+import 'package:walima_llc/features/account_setting/data/models/account_settings.dart';
+import 'package:walima_llc/features/account_setting/data/models/contact_settings.dart';
+import 'package:walima_llc/features/account_setting/data/models/messages_settings.dart';
+import 'package:walima_llc/features/account_setting/data/models/notification_settings.dart';
+import 'package:walima_llc/features/account_setting/data/models/premium_settings.dart';
+import 'package:walima_llc/features/account_setting/data/models/privacy_settings.dart';
+import 'package:walima_llc/features/account_setting/data/repository/account_settings_repository.dart';
 
 class NotificationAlertOption {
   const NotificationAlertOption({required this.label, required this.value});

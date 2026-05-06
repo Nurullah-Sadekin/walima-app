@@ -90,7 +90,7 @@ flutter run
 - The app currently points to the development API domain configured in [lib/core/network/app_urls.dart](/Volumes/development/freelance/walima/lib/core/network/app_urls.dart:1).
 - Firebase initialization is handled in [lib/main.dart](/Volumes/development/freelance/walima/lib/main.dart:1) and platform configuration files.
 - Push notification, crash reporting, connectivity monitoring, and realtime bootstrap logic are also initialized from `main.dart`.
-- The package name still contains legacy `flutter_boilerplate` references in code imports and `pubspec.yaml`, even though the app branding is Walima.
+- The package name still contains legacy `walima_llc` references in code imports and `pubspec.yaml`, even though the app branding is Walima.
 
 ## Useful Repository Docs
 

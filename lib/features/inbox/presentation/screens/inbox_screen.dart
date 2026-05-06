@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
-import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/screens/tabs/inbox_accepted_tab.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/screens/tabs/inbox_contacts_tab.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/screens/tabs/inbox_more_tab.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/screens/tabs/inbox_received_tab.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/screens/tabs/inbox_sent_tab.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/tab_bar_widget.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/global/components/gradient_background.dart';
+import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/features/anchor_point/achore_appbar.dart';
+import 'package:walima_llc/features/inbox/presentation/screens/tabs/inbox_accepted_tab.dart';
+import 'package:walima_llc/features/inbox/presentation/screens/tabs/inbox_contacts_tab.dart';
+import 'package:walima_llc/features/inbox/presentation/screens/tabs/inbox_more_tab.dart';
+import 'package:walima_llc/features/inbox/presentation/screens/tabs/inbox_received_tab.dart';
+import 'package:walima_llc/features/inbox/presentation/screens/tabs/inbox_sent_tab.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/tab_bar_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 

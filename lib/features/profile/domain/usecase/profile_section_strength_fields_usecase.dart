@@ -1,4 +1,4 @@
-import 'package:flutter_boilerplate/features/home/data/model/response/profile_strength_response.dart';
+import 'package:walima_llc/features/home/data/model/response/profile_strength_response.dart';
 
 class ProfileSectionStrengthFieldsUseCase {
   const ProfileSectionStrengthFieldsUseCase();

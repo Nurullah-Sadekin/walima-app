@@ -1,4 +1,4 @@
-import 'package:flutter_boilerplate/features/registration/domain/religion_option_model.dart';
+import 'package:walima_llc/features/registration/domain/religion_option_model.dart';
 
 abstract class ReligionDataRepository {
   Future<List<ReligionOptionModel>> getReligionOptions();

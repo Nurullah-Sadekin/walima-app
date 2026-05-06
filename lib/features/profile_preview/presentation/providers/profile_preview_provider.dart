@@ -1,7 +1,7 @@
-import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/features/profile_preview/data/models/profile_compare_response.dart';
-import 'package:flutter_boilerplate/features/profile_preview/data/models/profile_preview_response.dart';
-import 'package:flutter_boilerplate/features/profile_preview/data/repository/profile_preview_repository.dart';
+import 'package:walima_llc/core/providers/base_change_notifier.dart';
+import 'package:walima_llc/features/profile_preview/data/models/profile_compare_response.dart';
+import 'package:walima_llc/features/profile_preview/data/models/profile_preview_response.dart';
+import 'package:walima_llc/features/profile_preview/data/repository/profile_preview_repository.dart';
 
 class ProfilePreviewProvider extends BaseChangeNotifier {
   bool isLoading = false;
