@@ -16,7 +16,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.walima.app"
+    namespace = "com.walima.matrimony"
     compileSdk = flutter.compileSdkVersion
     // Flutter 3.41 defaults to NDK 28.2.x, but that local install is incomplete on this machine.
     // Pin to a healthy installed NDK version so Gradle can configure the Android project.
@@ -35,7 +35,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.walima.app"
+        applicationId = "com.walima.matrimony"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
