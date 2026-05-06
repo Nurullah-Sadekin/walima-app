@@ -112,17 +112,9 @@ class _Content extends StatelessWidget {
                   onChanged: onTemplateChanged,
                 ),
                 const SizedBox(height: 18),
-                if (biodata.bio.isNotEmpty)
-                  _BioCard(
-                    bio: biodata.bio,
-                    template: selectedTemplate,
-                  ),
-                if (biodata.bio.isNotEmpty) const SizedBox(height: 14),
-                ...biodata.sections.map(
-                  (section) => Padding(
-                    padding: const EdgeInsets.only(bottom: 14),
-                    child: _SectionCard(section: section),
-                  ),
+                _BiodataTemplatePreview(
+                  biodata: biodata,
+                  template: selectedTemplate,
                 ),
               ],
             ),
@@ -162,68 +154,6 @@ class _Content extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _HeaderCard extends StatelessWidget {
-  const _HeaderCard({required this.biodata});
-
-  final BiodataDocument biodata;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: _cardDecoration(),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 34,
-            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-            backgroundImage: biodata.profileImageUrl.startsWith('http')
-                ? NetworkImage(biodata.profileImageUrl)
-                : null,
-            child: biodata.profileImageUrl.startsWith('http')
-                ? null
-                : Text(
-                    _initials(biodata.fullName),
-                    style: TextStyle(
-                      color: AppColors.primary,
-                      fontSize: TextSize.font20(context),
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  biodata.fullName.isEmpty
-                      ? 'Walima Biodata'
-                      : biodata.fullName,
-                  style: TextStyle(
-                    color: AppColors.textPrimaryLight,
-                    fontSize: TextSize.font20(context),
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Marriage Biodata',
-                  style: TextStyle(
-                    color: AppColors.textSecondaryLight,
-                    fontSize: TextSize.font13(context),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -428,98 +358,67 @@ class _TemplateCard extends StatelessWidget {
   }
 }
 
-class _BioCard extends StatelessWidget {
-  const _BioCard({
-    required this.bio,
+class _BiodataTemplatePreview extends StatelessWidget {
+  const _BiodataTemplatePreview({
+    required this.biodata,
     required this.template,
   });
 
-  final String bio;
+  final BiodataDocument biodata;
   final BiodataTemplate template;
 
   @override
   Widget build(BuildContext context) {
     final accent = _templateColor(template);
+    final sections = biodata.sections
+        .where((section) => section.items.isNotEmpty)
+        .toList(growable: false);
 
     return Container(
+      constraints: const BoxConstraints(minHeight: 540),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: accent.withValues(alpha: 0.45)),
+        color: const Color(0xFFECECEC),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: accent.withValues(alpha: 0.28)),
         boxShadow: [
           BoxShadow(
-            color: accent.withValues(alpha: 0.1),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
+            color: Colors.black.withValues(alpha: 0.12),
+            blurRadius: 22,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
       clipBehavior: Clip.antiAlias,
       child: Stack(
         children: [
-          Positioned.fill(
-            child: Image.asset(
-              template.thumbnailPath,
-              fit: BoxFit.cover,
-            ),
-          ),
-          Positioned.fill(
-            child: Container(
-              color: Colors.white.withValues(alpha: 0.88),
-            ),
-          ),
-          Positioned(
-            top: 0,
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: accent,
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(18),
-                ),
-              ),
-              child: Text(
-                template.label,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: TextSize.font12(context),
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ),
+          _TemplatePreviewBackground(template: template, accent: accent),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 18, 16, 16),
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 26,
-                      height: 26,
-                      decoration: BoxDecoration(
-                        color: accent.withValues(alpha: 0.12),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.description_outlined,
-                        color: accent,
-                        size: 16,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    const _SectionTitle(title: 'About'),
-                  ],
+                _PreviewHeader(biodata: biodata, accent: accent),
+                if (biodata.bio.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  _PreviewParagraph(text: biodata.bio),
+                ],
+                const SizedBox(height: 18),
+                ...sections.map(
+                  (section) => Padding(
+                    padding: const EdgeInsets.only(bottom: 18),
+                    child: _PreviewSection(section: section, accent: accent),
+                  ),
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  bio,
-                  style: TextStyle(
-                    color: AppColors.textPrimaryLight,
-                    fontSize: TextSize.font14(context),
-                    height: 1.4,
-                    fontWeight: FontWeight.w500,
+                const SizedBox(height: 18),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    'Walima',
+                    style: TextStyle(
+                      color: Colors.black.withValues(alpha: 0.25),
+                      fontSize: TextSize.font18(context),
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ),
               ],
@@ -531,50 +430,210 @@ class _BioCard extends StatelessWidget {
   }
 }
 
-class _SectionCard extends StatelessWidget {
-  const _SectionCard({required this.section});
+class _TemplatePreviewBackground extends StatelessWidget {
+  const _TemplatePreviewBackground({
+    required this.template,
+    required this.accent,
+  });
 
-  final BiodataSection section;
+  final BiodataTemplate template;
+  final Color accent;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: _cardDecoration(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Positioned.fill(
+      child: Stack(
         children: [
-          _SectionTitle(title: section.title),
-          const SizedBox(height: 10),
-          ...section.items.map((item) => _InfoRow(item: item)),
+          Positioned.fill(
+            child: Image.asset(
+              template.thumbnailPath,
+              fit: BoxFit.cover,
+              opacity: const AlwaysStoppedAnimation(0.11),
+            ),
+          ),
+          Positioned.fill(
+            child: Container(color: Colors.white.withValues(alpha: 0.88)),
+          ),
+          Positioned(
+            top: -40,
+            right: -34,
+            child: Container(
+              width: 168,
+              height: 118,
+              decoration: BoxDecoration(
+                color: accent,
+                borderRadius: BorderRadius.circular(64),
+              ),
+            ),
+          ),
+          Positioned(
+            right: -18,
+            top: 74,
+            child: Container(
+              width: 86,
+              height: 118,
+              decoration: BoxDecoration(
+                color: accent.withValues(alpha: 0.72),
+                borderRadius: BorderRadius.circular(64),
+              ),
+            ),
+          ),
+          Positioned(
+            left: -24,
+            bottom: -28,
+            child: Container(
+              width: 170,
+              height: 145,
+              decoration: BoxDecoration(
+                color: accent.withValues(alpha: 0.18),
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(92),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-class _SectionTitle extends StatelessWidget {
-  const _SectionTitle({required this.title});
+class _PreviewHeader extends StatelessWidget {
+  const _PreviewHeader({
+    required this.biodata,
+    required this.accent,
+  });
 
-  final String title;
+  final BiodataDocument biodata;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                biodata.fullName.isEmpty ? 'Walima Biodata' : biodata.fullName,
+                style: TextStyle(
+                  color: AppColors.textPrimaryLight,
+                  fontSize: TextSize.font24(context),
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Marriage Biodata',
+                style: TextStyle(
+                  color: AppColors.textPrimaryLight,
+                  fontSize: TextSize.font14(context),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 14),
+        Container(
+          width: 96,
+          height: 118,
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.76),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: accent.withValues(alpha: 0.14)),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: biodata.profileImageUrl.startsWith('http')
+              ? Image.network(
+                  biodata.profileImageUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => _PreviewImageFallback(
+                    accent: accent,
+                  ),
+                )
+              : _PreviewImageFallback(accent: accent),
+        ),
+      ],
+    );
+  }
+}
+
+class _PreviewImageFallback extends StatelessWidget {
+  const _PreviewImageFallback({required this.accent});
+
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return Icon(
+      Icons.person_rounded,
+      color: accent.withValues(alpha: 0.6),
+      size: 42,
+    );
+  }
+}
+
+class _PreviewParagraph extends StatelessWidget {
+  const _PreviewParagraph({required this.text});
+
+  final String text;
 
   @override
   Widget build(BuildContext context) {
     return Text(
-      title,
+      text,
       style: TextStyle(
         color: AppColors.textPrimaryLight,
-        fontSize: TextSize.font16(context),
-        fontWeight: FontWeight.w700,
+        fontSize: TextSize.font13(context),
+        height: 1.35,
+        fontWeight: FontWeight.w500,
       ),
     );
   }
 }
 
-class _InfoRow extends StatelessWidget {
-  const _InfoRow({required this.item});
+class _PreviewSection extends StatelessWidget {
+  const _PreviewSection({
+    required this.section,
+    required this.accent,
+  });
+
+  final BiodataSection section;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          section.title,
+          style: TextStyle(
+            color: AppColors.textPrimaryLight,
+            fontSize: TextSize.font16(context),
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 10),
+        ...section.items.map(
+          (item) => _PreviewInfoRow(item: item, accent: accent),
+        ),
+      ],
+    );
+  }
+}
+
+class _PreviewInfoRow extends StatelessWidget {
+  const _PreviewInfoRow({
+    required this.item,
+    required this.accent,
+  });
 
   final BiodataItem item;
+  final Color accent;
 
   @override
   Widget build(BuildContext context) {
@@ -583,14 +642,24 @@ class _InfoRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Container(
+            width: 4,
+            height: 4,
+            margin: const EdgeInsets.only(top: 7),
+            decoration: BoxDecoration(
+              color: accent,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 8),
           SizedBox(
-            width: 128,
+            width: 118,
             child: Text(
               item.label,
               style: TextStyle(
-                color: AppColors.textSecondaryLight,
-                fontSize: TextSize.font13(context),
-                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimaryLight,
+                fontSize: TextSize.font12(context),
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
@@ -600,8 +669,9 @@ class _InfoRow extends StatelessWidget {
               item.value,
               style: TextStyle(
                 color: AppColors.textPrimaryLight,
-                fontSize: TextSize.font14(context),
-                height: 1.25,
+                fontSize: TextSize.font13(context),
+                height: 1.3,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
@@ -680,21 +750,6 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
-BoxDecoration _cardDecoration() {
-  return BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(14),
-    border: Border.all(color: const Color(0xFFE6ECE9)),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withValues(alpha: 0.035),
-        blurRadius: 12,
-        offset: const Offset(0, 6),
-      ),
-    ],
-  );
-}
-
 Color _templateColor(BiodataTemplate template) {
   switch (template) {
     case BiodataTemplate.mainBioData:
@@ -716,10 +771,4 @@ Color _templateColor(BiodataTemplate template) {
     case BiodataTemplate.designSeven:
       return const Color(0xFFF97316);
   }
-}
-
-String _initials(String name) {
-  final parts = name.trim().split(RegExp(r'\s+'));
-  if (parts.isEmpty || parts.first.isEmpty) return 'W';
-  return parts.take(2).map((part) => part[0].toUpperCase()).join();
 }
