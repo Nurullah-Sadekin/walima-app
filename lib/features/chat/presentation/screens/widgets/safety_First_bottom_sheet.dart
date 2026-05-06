@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
 
 import '../../../../../core/utils/image_viewer.dart';
 import 'dismissible_safety_card.dart';

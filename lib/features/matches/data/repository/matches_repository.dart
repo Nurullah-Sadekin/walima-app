@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_boilerplate/core/network/app_urls.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/features/matches/data/models/request/get_matches_query_params.dart';
-import 'package:flutter_boilerplate/features/matches/data/models/response/connect_response.dart';
-import 'package:flutter_boilerplate/features/matches/data/models/response/get_matches_response.dart';
-import 'package:flutter_boilerplate/features/matches/data/models/response/get_public_matches_response.dart';
-import 'package:flutter_boilerplate/features/matches/domain/request/bulk_send_connections_request_body.dart';
-import 'package:flutter_boilerplate/features/matches/domain/request/create_connection_request_body.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/features/matches/data/models/request/get_matches_query_params.dart';
+import 'package:walima_llc/features/matches/data/models/response/connect_response.dart';
+import 'package:walima_llc/features/matches/data/models/response/get_matches_response.dart';
+import 'package:walima_llc/features/matches/data/models/response/get_public_matches_response.dart';
+import 'package:walima_llc/features/matches/domain/request/bulk_send_connections_request_body.dart';
+import 'package:walima_llc/features/matches/domain/request/create_connection_request_body.dart';
 
 class MatchesRepository {
   static Future<GetMatchesResponse> getMatches(

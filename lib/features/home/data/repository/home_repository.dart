@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_boilerplate/core/network/app_urls.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/features/home/data/model/response/homepage_top_matches_response.dart';
-import 'package:flutter_boilerplate/features/home/data/model/response/recent_visitors_response.dart';
-import 'package:flutter_boilerplate/features/home/data/model/response/unread_notification_count.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/features/home/data/model/response/homepage_top_matches_response.dart';
+import 'package:walima_llc/features/home/data/model/response/profile_strength_response.dart';
+import 'package:walima_llc/features/home/data/model/response/recent_visitors_response.dart';
 
 class HomeRepository {
   static Future<HomepageTopMatchesResponse> getHomepageTopMatches() async {
@@ -50,5 +50,22 @@ class HomeRepository {
       );
     }
   }
-  
+
+  static Future<ProfileStrengthResponse> getProfileStrength() async {
+    try {
+      final response = await DioClient().get(
+        AppUrls.getProfileStrength,
+        isTokenRequired: true,
+      );
+      return ProfileStrengthResponse.fromJson(response.data);
+    } catch (e) {
+      final errorMessage = e is DioException
+          ? e.response?.data['message'] ?? e.message
+          : e.toString();
+      return ProfileStrengthResponse(
+        code: 'FAILED',
+        message: errorMessage,
+      );
+    }
+  }
 }

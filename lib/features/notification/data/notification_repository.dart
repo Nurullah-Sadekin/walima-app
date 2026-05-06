@@ -1,11 +1,11 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:flutter_boilerplate/core/network/app_urls.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
-import 'package:flutter_boilerplate/features/home/data/model/response/unread_notification_count.dart';
-import 'package:flutter_boilerplate/features/notification/data/notification_response.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/core/utils/prefs_helper.dart';
+import 'package:walima_llc/features/home/data/model/response/unread_notification_count.dart';
+import 'package:walima_llc/features/notification/data/notification_response.dart';
 
 class NotificationRepository {
   static Future<NotificationResponse> getNotifications({

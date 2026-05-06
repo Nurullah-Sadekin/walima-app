@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/utils/image_viewer.dart';
 
 class VerificationTile extends StatelessWidget {
 
@@ -9,11 +9,13 @@ class VerificationTile extends StatelessWidget {
     super.key,
     required this.iconImagePath,
     required this.title,
-    required this.statusText,
-    required this.statusColor,
-    required this.statusBackgroundColor,
+    this.titleSize,
+    this.statusText,
+    this.statusColor,
+    this.statusBackgroundColor,
     this.onTap,
-    this.iconSize = 30,
+    this.iconSize = 26,
+    this.iconColor,
     this.statusFontSize = 10,
     this.padding = const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
     this.backgroundColor = AppColors.white,
@@ -28,11 +30,13 @@ class VerificationTile extends StatelessWidget {
   });
   final String iconImagePath;
   final String title;
-  final String statusText;
-  final Color statusColor;
-  final Color statusBackgroundColor;
+  final double? titleSize;
+  final String? statusText;
+  final Color? statusColor;
+  final Color? statusBackgroundColor;
   final VoidCallback? onTap;
   final double iconSize;
+  final Color? iconColor;
   final double statusFontSize;
   final EdgeInsetsGeometry padding;
   final Color backgroundColor;
@@ -68,32 +72,37 @@ class VerificationTile extends StatelessWidget {
                   imagePath: iconImagePath,
                   width: iconSize,
                   height: iconSize,
+                  color: iconColor ?? AppColors.primary,
                 ),
                 // Title
                 Text(
                   title,
                   style: titleStyle ?? TextStyle(
                     color: titleColor,
-                    fontSize: TextSize.font14(context),
+                    fontSize: titleSize ?? TextSize.font14(context),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 // Status Badge (Custom or Default)
-                customStatusBadge ?? Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
-                  decoration: BoxDecoration(
-                    color: statusBackgroundColor,
-                    borderRadius: BorderRadius.circular(4.0),
-                  ),
-                  child: Text(
-                    statusText,
-                    style: statusStyle ?? TextStyle(
-                      color: statusColor,
-                      fontSize: TextSize.font10(context),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
+                customStatusBadge ??
+                    (statusText == null || statusText!.isEmpty
+                        ? const SizedBox()
+                        : Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                      decoration: BoxDecoration(
+                        color: statusBackgroundColor,
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                      child: Text(
+                        statusText!,
+                        style: statusStyle ??
+                            TextStyle(
+                              color: statusColor,
+                              fontSize: TextSize.font10(context),
+                              fontWeight: FontWeight.w500,
+                            ),
+                      ),
+                    )),
               ],
             ),
             // Trailing Arrow or Custom Widget

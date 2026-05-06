@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/bottom_sheet_widget/widgets/icon_title_card.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/global/components/bottom_sheet_widget/widgets/icon_title_card.dart';
+import 'package:walima_llc/core/global/components/primary_button.dart';
+import 'package:walima_llc/core/utils/image_viewer.dart';
 
 class ContactBottomSheet extends StatelessWidget {
   const ContactBottomSheet({
@@ -14,6 +14,7 @@ class ContactBottomSheet extends StatelessWidget {
     this.profileType,
     this.email,
     this.phone,
+    this.isVerified = false,
     this.description,
     this.onWalimaChatPressed,
     this.onWhatsappPressed,
@@ -32,6 +33,7 @@ class ContactBottomSheet extends StatelessWidget {
   final String? profileType;
   final String? email;
   final String? phone;
+  final bool isVerified;
   final String? description;
   final VoidCallback? onWalimaChatPressed;
   final VoidCallback? onWhatsappPressed;
@@ -97,13 +99,31 @@ class ContactBottomSheet extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          userName,
-          style: TextStyle(
-            fontSize: TextSize.font18(context),
-            fontWeight: FontWeight.w500,
-            color: AppColors.textPrimaryLight,
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Flexible(
+              child: Text(
+                userName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: TextSize.font18(context),
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textPrimaryLight,
+                ),
+              ),
+            ),
+            if (isVerified) ...[
+              const SizedBox(width: 6),
+              ShowImage(
+                imagePath: AppImages.verifiedBadgeSvgIcon,
+                height: TextSize.font18(context),
+                width: TextSize.font18(context),
+              ),
+            ],
+          ],
         ),
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,

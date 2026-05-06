@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
-import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/screens/tabs/inbox_accepted_tab.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/screens/tabs/inbox_contacts_tab.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/screens/tabs/inbox_more_tab.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/screens/tabs/inbox_received_tab.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/screens/tabs/inbox_sent_tab.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/tab_bar_widget.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/global/components/gradient_background.dart';
+import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/features/anchor_point/achore_appbar.dart';
+import 'package:walima_llc/features/inbox/presentation/screens/tabs/inbox_accepted_tab.dart';
+import 'package:walima_llc/features/inbox/presentation/screens/tabs/inbox_contacts_tab.dart';
+import 'package:walima_llc/features/inbox/presentation/screens/tabs/inbox_more_tab.dart';
+import 'package:walima_llc/features/inbox/presentation/screens/tabs/inbox_received_tab.dart';
+import 'package:walima_llc/features/inbox/presentation/screens/tabs/inbox_sent_tab.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/tab_bar_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -26,7 +26,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
   final _primaryTabs = const [
     'Received',
     'Accepted',
-    'Contacts',
+    // 'Contacts',
     'Sent',
     'More',
   ];
@@ -35,7 +35,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
   void initState() {
     super.initState();
     _primaryTabController =
-        TabController(initialIndex: 0, length: 5, vsync: this)
+        TabController(initialIndex: 0, length: 4, vsync: this)
           ..addListener(_handlePrimaryTabChange);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -97,7 +97,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
                 onExploreAcceptedTap: () => _primaryTabController.animateTo(1),
               ),
               const InboxAcceptedTab(),
-              const InboxContactsTab(),
+              // const InboxContactsTab(),
               const InboxSentTab(),
               const InboxMoreTab(),
             ],
@@ -108,45 +108,42 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
   }
 
   Widget _buildPrimaryTabs() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        spacing: 8,
-        children: [
-          TabBarWidget(
-            text: _primaryTabs[0],
-            isSelected: _primaryTabController.index == 0,
-            onTap: () => _primaryTabController.animateTo(0),
-          ),
-          TabBarWidget(
-            text: _primaryTabs[1],
-            isSelected: _primaryTabController.index == 1,
-            onTap: () => _primaryTabController.animateTo(1),
-          ),
-          TabBarWidget(
-            text: _primaryTabs[2],
-            isSelected: _primaryTabController.index == 2,
-            onTap: () => _primaryTabController.animateTo(2),
-          ),
-          TabBarWidget(
-            text: _primaryTabs[3],
-            isSelected: _primaryTabController.index == 3,
-            selectedBackgroundColor: AppColors.primary,
-            selectedTextColor: AppColors.white,
-            selectedBorderColor: AppColors.primary,
-            onTap: () => _primaryTabController.animateTo(3),
-          ),
-          TabBarWidget(
-            text: _primaryTabs[4],
-            isSelected: _primaryTabController.index == 4,
-            selectedBackgroundColor: AppColors.primary,
-            selectedTextColor: AppColors.white,
-            selectedBorderColor: AppColors.primary,
-            onTap: () => _primaryTabController.animateTo(4),
-          ),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      spacing: 8,
+      children: [
+        TabBarWidget(
+          text: _primaryTabs[0],
+          isSelected: _primaryTabController.index == 0,
+          onTap: () => _primaryTabController.animateTo(0),
+        ),
+        TabBarWidget(
+          text: _primaryTabs[1],
+          isSelected: _primaryTabController.index == 1,
+          onTap: () => _primaryTabController.animateTo(1),
+        ),
+        // TabBarWidget(
+        //   text: _primaryTabs[2],
+        //   isSelected: _primaryTabController.index == 2,
+        //   onTap: () => _primaryTabController.animateTo(2),
+        // ),
+        TabBarWidget(
+          text: _primaryTabs[2],
+          isSelected: _primaryTabController.index == 2,
+          selectedBackgroundColor: AppColors.primary,
+          selectedTextColor: AppColors.white,
+          selectedBorderColor: AppColors.primary,
+          onTap: () => _primaryTabController.animateTo(2),
+        ),
+        TabBarWidget(
+          text: _primaryTabs[3],
+          isSelected: _primaryTabController.index == 3,
+          selectedBackgroundColor: AppColors.primary,
+          selectedTextColor: AppColors.white,
+          selectedBorderColor: AppColors.primary,
+          onTap: () => _primaryTabController.animateTo(3),
+        ),
+      ],
     );
   }
 }

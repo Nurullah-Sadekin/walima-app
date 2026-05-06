@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
-import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
-import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
-import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_list.dart';
-import 'package:flutter_boilerplate/features/chat/presentation/provider/chat_provider.dart';
-import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/chat_list_item.dart';
-import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/profile_avatar_with_name.dart';
-import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/safety_First_bottom_sheet.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/tab_bar_widget.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/global/components/gradient_background.dart';
+import 'package:walima_llc/core/global/components/loading_widget.dart';
+import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/features/anchor_point/achore_appbar.dart';
+import 'package:walima_llc/features/chat/data/model/response/conversation_list.dart';
+import 'package:walima_llc/features/chat/presentation/provider/chat_provider.dart';
+import 'package:walima_llc/features/chat/presentation/screens/widgets/chat_list_item.dart';
+import 'package:walima_llc/features/chat/presentation/screens/widgets/profile_avatar_with_name.dart';
+import 'package:walima_llc/features/chat/presentation/screens/widgets/safety_First_bottom_sheet.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/tab_bar_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -195,16 +195,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         final conversation = conversations[index];
         final participant = provider.getConversationCounterpart(conversation);
         final userName = participant?.displayName?.trim();
-        final displayName =
-            (userName?.isNotEmpty ?? false) ? userName! : 'Unknown User';
+        final displayName = (userName?.isNotEmpty ?? false) ? userName! : 'Unknown User';
         final lastMessage = conversation.lastMessage?.trim();
         final isTyping = provider.isConversationTyping(conversation.id);
-
+        final gender = participant?.gender?.toLowerCase();
         return Padding(
           padding: const EdgeInsets.only(bottom: 16),
           child: ChatListItem(
             name: displayName,
-            imagePath: participant?.profilePhoto?.url ?? AppImages.demoProfile2,
+            imagePath: participant?.profilePhoto?.url ?? (gender == 'male' ? AppImages.manAvatar : AppImages.womenAvatar),
             isVerified: participant?.profilePhoto?.isVerified,
             isOnline: participant?.isOnline,
             unReadMessage: conversation.unreadCount != 0,
@@ -287,13 +286,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           provider.connectableUsers?.length ?? 0,
           (index) {
             final user = provider.connectableUsers![index];
+            final userGender = user.gender?.toLowerCase();
             return Padding(
               padding: const EdgeInsets.only(
                 right: 16.0,
               ),
               child: ProfileAvatarWithName(
                 name: user.displayName,
-                imagePath: user.profilePhoto?.url ?? AppImages.demoProfile2,
+                imagePath: user.profilePhoto?.url ?? (userGender == 'male' ? AppImages.manAvatar : AppImages.womenAvatar),
                 indicatorColor: user.isOnline == true
                     ? AppColors.greenButtonColor
                     : Colors.red,

@@ -1,15 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/features/chat/data/model/response/connectable_user_response.dart';
-import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_list.dart';
-import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_messages_response.dart'
+import 'package:walima_llc/core/providers/base_change_notifier.dart';
+import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/features/chat/data/model/response/connectable_user_response.dart';
+import 'package:walima_llc/features/chat/data/model/response/conversation_list.dart';
+import 'package:walima_llc/features/chat/data/model/response/conversation_messages_response.dart'
     hide ProfilePhoto;
-import 'package:flutter_boilerplate/features/chat/data/repository/chat_repository.dart';
-import 'package:flutter_boilerplate/features/chat/data/socket/socket_service.dart';
-import 'package:flutter_boilerplate/features/connections/data/repository/connections_repository.dart';
+import 'package:walima_llc/features/chat/data/repository/chat_repository.dart';
+import 'package:walima_llc/features/chat/data/socket/socket_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ChatProvider extends BaseChangeNotifier {
@@ -820,7 +819,7 @@ class ChatProvider extends BaseChangeNotifier {
       notifyListeners();
     }
   }
-   
+
   // Future<void> blockConnection() async {
   //   final response = await ConnectionsRepository.performConnectionAction(
   //     connectionId,

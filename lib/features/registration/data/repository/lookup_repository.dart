@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_boilerplate/core/global/enums/enums.dart';
-import 'package:flutter_boilerplate/core/network/app_urls.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/lookup_option.dart';
+import 'package:walima_llc/core/global/enums/enums.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/features/registration/data/models/lookup_option.dart';
 
 class LookupRepository {
   Future<List<LookupOption>> getLookups(

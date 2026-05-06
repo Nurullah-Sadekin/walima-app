@@ -1,6 +1,6 @@
 import 'package:intl/intl.dart';
 
-import 'package:flutter_boilerplate/features/profile/data/model/response/dashboard_response.dart';
+import 'package:walima_llc/features/profile/data/model/response/dashboard_response.dart';
 
 String resolveDisplayName(Profile? profile) {
   final displayName = profile?.displayName?.trim();

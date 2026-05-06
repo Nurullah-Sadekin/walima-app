@@ -1,6 +1,6 @@
-import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/features/notification/data/notification_repository.dart';
-import 'package:flutter_boilerplate/features/notification/data/notification_response.dart';
+import 'package:walima_llc/core/providers/base_change_notifier.dart';
+import 'package:walima_llc/features/notification/data/notification_repository.dart';
+import 'package:walima_llc/features/notification/data/notification_response.dart';
 
 class NotificationProvider extends BaseChangeNotifier {
   NotificationScreenStates screenStates = NotificationScreenStates.defaultState;

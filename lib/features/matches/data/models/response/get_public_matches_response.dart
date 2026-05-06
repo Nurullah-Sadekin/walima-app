@@ -1,4 +1,4 @@
-import 'package:flutter_boilerplate/features/matches/data/models/response/get_matches_response.dart';
+import 'package:walima_llc/features/matches/data/models/response/get_matches_response.dart';
 
 class GetPublicMatchesResponse {
   GetPublicMatchesResponse({

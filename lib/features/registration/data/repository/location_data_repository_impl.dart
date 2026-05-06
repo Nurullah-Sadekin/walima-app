@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
-import 'package:flutter_boilerplate/core/network/app_urls.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/features/registration/domain/location_data_model.dart';
-import 'package:flutter_boilerplate/features/registration/domain/repository/location_data_repository.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/features/registration/domain/location_data_model.dart';
+import 'package:walima_llc/features/registration/domain/repository/location_data_repository.dart';
 
 class LocationDataRepositoryImpl implements LocationDataRepository {
   static const String _residencyAssetPath =

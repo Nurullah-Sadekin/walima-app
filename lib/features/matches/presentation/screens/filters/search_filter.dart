@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/global/components/dropdown_field.dart';
-import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/provider/search_filter_provider.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/setting_switcher_title.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/global/components/dropdown_field.dart';
+import 'package:walima_llc/core/global/components/selection_card.dart';
+import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/features/matches/presentation/provider/search_filter_provider.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/bottom_bordered_widget.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/setting_switcher_title.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
+import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/global/components/primary_button.dart';
 
 class SearchFilterScreen extends ConsumerStatefulWidget {
   const SearchFilterScreen({super.key});
@@ -25,7 +25,9 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
   void initState() {
     super.initState();
     provider = ref.read(searchFilterProvider);
-    WidgetsBinding.instance.addPostFrameCallback((_) async {});
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await provider.loadLookupData();
+    });
   }
 
   @override
@@ -270,15 +272,15 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
             controller: provider.countryLivingController,
             isSearch: true,
           ),
-          SizedBox(height: TextSize.font12(context)),
-          headLineText('State Living In'),
-          DropDownField(
-            hintText: 'Select',
-            popUpHeader: 'State Living In',
-            items: provider.ageRangeDropdownItems,
-            controller: provider.stateLivingController,
-            isSearch: true,
-          ),
+          // SizedBox(height: TextSize.font12(context)),
+          // headLineText('State Living In'),
+          // DropDownField(
+          //   hintText: 'Select',
+          //   popUpHeader: 'State Living In',
+          //   items: provider.ageRangeDropdownItems,
+          //   controller: provider.stateLivingController,
+          //   isSearch: true,
+          // ),
           SizedBox(height: TextSize.font12(context)),
           headLineText('Country Grew Up In'),
           DropDownField(
@@ -336,15 +338,15 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
             controller: provider.qualificationController,
             isSearch: true,
           ),
-          SizedBox(height: TextSize.font12(context)),
-          headLineText('Education Area'),
-          DropDownField(
-            hintText: 'Select',
-            popUpHeader: 'Education Area',
-            items: provider.ageRangeDropdownItems,
-            controller: provider.educationAreaController,
-            isSearch: true,
-          ),
+          // SizedBox(height: TextSize.font12(context)),
+          // headLineText('Education Area'),
+          // DropDownField(
+          //   hintText: 'Select',
+          //   popUpHeader: 'Education Area',
+          //   items: provider.ageRangeDropdownItems,
+          //   controller: provider.educationAreaController,
+          //   isSearch: true,
+          // ),
           SizedBox(height: TextSize.font12(context)),
           headLineText('Working With'),
           DropDownField(
@@ -354,15 +356,15 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
             controller: provider.workingWithController,
             isSearch: true,
           ),
-          SizedBox(height: TextSize.font12(context)),
-          headLineText('Profession Area'),
-          DropDownField(
-            hintText: 'Select',
-            popUpHeader: 'Profession Area',
-            items: provider.ageRangeDropdownItems,
-            controller: provider.professionAreaController,
-            isSearch: true,
-          ),
+          // SizedBox(height: TextSize.font12(context)),
+          // headLineText('Profession Area'),
+          // DropDownField(
+          //   hintText: 'Select',
+          //   popUpHeader: 'Profession Area',
+          //   items: provider.ageRangeDropdownItems,
+          //   controller: provider.professionAreaController,
+          //   isSearch: true,
+          // ),
           SizedBox(height: TextSize.font12(context)),
           headLineText('Annual Income'),
           SizedBox(height: TextSize.font10(context)),

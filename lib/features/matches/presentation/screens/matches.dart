@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/empty_state.dart';
-import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
-import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
-import 'package:flutter_boilerplate/core/global/enums/enums.dart';
-import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
-import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
-import 'package:flutter_boilerplate/core/utils/height_utils.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
-import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
-import 'package:flutter_boilerplate/features/matches/data/models/response/get_matches_response.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/provider/matcher_provider.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/screens/filters/more_matches.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/filter_widget.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/tab_bar_widget.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/global/components/empty_state.dart';
+import 'package:walima_llc/core/global/components/gradient_background.dart';
+import 'package:walima_llc/core/global/components/bottom_sheet.dart';
+import 'package:walima_llc/core/global/components/loading_widget.dart';
+import 'package:walima_llc/core/global/enums/enums.dart';
+import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/core/utils/camel_case_utils.dart';
+import 'package:walima_llc/core/utils/date_time_utils.dart';
+import 'package:walima_llc/core/utils/height_utils.dart';
+import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/features/anchor_point/achore_appbar.dart';
+import 'package:walima_llc/features/connections/presentation/widgets/view_contact_bottom_sheet.dart';
+import 'package:walima_llc/features/matches/data/models/response/get_matches_response.dart';
+import 'package:walima_llc/features/matches/presentation/provider/matcher_provider.dart';
+import 'package:walima_llc/features/matches/presentation/screens/filters/more_matches.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/filter_widget.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/profile_comprehensive_card.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/tab_bar_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -33,23 +35,40 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
   final tabs = const [
     'Search',
     'New',
-    'Daily',
+    'Today',
     'My Matches',
     'Near Me',
     'More Matches',
   ];
+  final ScrollController _tabScrollController = ScrollController();
+  late final List<GlobalKey> _tabKeys;
+  int? _lastCenteredTabIndex;
 
   @override
   void initState() {
     super.initState();
+    _tabKeys = List.generate(tabs.length, (_) => GlobalKey());
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(matchesProvider).loadMatchesForSelectedTab();
+      _centerSelectedTab(ref.read(matchesProvider).selectedTabIndex);
     });
+  }
+
+  @override
+  void dispose() {
+    _tabScrollController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = ref.watch(matchesProvider);
+
+    if (_lastCenteredTabIndex != provider.selectedTabIndex) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _centerSelectedTab(provider.selectedTabIndex);
+      });
+    }
 
     return TransparentLoading(
       isLoading: provider.screenStates ==
@@ -90,32 +109,35 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
   Widget _headerSection(MatchesProvider provider) {
     return Row(
       children: [
-        InkWell(
-          onTap: () => _openFilter(provider),
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: AppColors.greyLight),
-            ),
-            child: ShowImage(
-              imagePath: AppImages.filterSvgIcon,
-              height: TextSize.font16(context),
-              width: TextSize.font16(context),
-            ),
-          ),
-        ),
-        SizedBox(
-          height: TextSize.font28(context),
-          child: const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.0),
-            child: VerticalDivider(
-              thickness: 1,
-              color: AppColors.greyLight,
+        if (provider.selectedTabIndex != 2 &&
+            provider.selectedTabIndex != 4) ...[
+          InkWell(
+            onTap: () => _openFilter(provider),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: AppColors.greyLight),
+              ),
+              child: ShowImage(
+                imagePath: AppImages.filterSvgIcon,
+                height: TextSize.font16(context),
+                width: TextSize.font16(context),
+              ),
             ),
           ),
-        ),
+          SizedBox(
+            height: TextSize.font28(context),
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              child: VerticalDivider(
+                thickness: 1,
+                color: AppColors.greyLight,
+              ),
+            ),
+          ),
+        ],
         Flexible(child: _customTabBar(provider)),
       ],
     );
@@ -123,48 +145,90 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
 
   Widget _customTabBar(MatchesProvider provider) {
     return SingleChildScrollView(
+      controller: _tabScrollController,
       scrollDirection: Axis.horizontal,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         spacing: 8,
         children: [
-          TabBarWidget(
-            text: tabs[0],
-            isSelected: provider.selectedTabIndex == 0,
+          _buildTabItem(
+            index: 0,
+            provider: provider,
             prefixImagePath: AppImages.searchSvgIcon,
-            onTap: () => ref.read(matchesProvider).setSelectedTab(0),
           ),
-          TabBarWidget(
-            text: tabs[1],
-            isSelected: provider.selectedTabIndex == 1,
-            onTap: () => ref.read(matchesProvider).setSelectedTab(1),
-          ),
-          TabBarWidget(
-            text: tabs[2],
-            isSelected: provider.selectedTabIndex == 2,
-            onTap: () => ref.read(matchesProvider).setSelectedTab(2),
-          ),
-          TabBarWidget(
-            text: tabs[3],
-            isSelected: provider.selectedTabIndex == 3,
+          _buildTabItem(index: 1, provider: provider),
+          _buildTabItem(index: 2, provider: provider),
+          _buildTabItem(
+            index: 3,
+            provider: provider,
             selectedBackgroundColor: AppColors.primary,
             selectedTextColor: AppColors.white,
             selectedBorderColor: AppColors.primary,
-            onTap: () => ref.read(matchesProvider).setSelectedTab(3),
           ),
-          TabBarWidget(
-            text: tabs[4],
-            isSelected: provider.selectedTabIndex == 4,
+          _buildTabItem(
+            index: 4,
+            provider: provider,
             selectedBackgroundColor: AppColors.primary,
-            onTap: () => ref.read(matchesProvider).setSelectedTab(4),
           ),
-          TabBarWidget(
-            text: tabs[5],
-            isSelected: provider.selectedTabIndex == 5,
-            onTap: () => ref.read(matchesProvider).setSelectedTab(5),
-          ),
+          _buildTabItem(index: 5, provider: provider),
         ],
       ),
+    );
+  }
+
+  Widget _buildTabItem({
+    required int index,
+    required MatchesProvider provider,
+    String? prefixImagePath,
+    Color? selectedBackgroundColor,
+    Color? selectedTextColor,
+    Color? selectedBorderColor,
+  }) {
+    return Container(
+      key: _tabKeys[index],
+      child: TabBarWidget(
+        text: tabs[index],
+        isSelected: provider.selectedTabIndex == index,
+        prefixImagePath: prefixImagePath,
+        selectedBackgroundColor: selectedBackgroundColor,
+        selectedTextColor: selectedTextColor,
+        selectedBorderColor: selectedBorderColor,
+        onTap: () => ref.read(matchesProvider).setSelectedTab(index),
+      ),
+    );
+  }
+
+  void _centerSelectedTab(int index) {
+    if (!_tabScrollController.hasClients ||
+        index < 0 ||
+        index >= _tabKeys.length) {
+      return;
+    }
+
+    final tabContext = _tabKeys[index].currentContext;
+    final scrollableContext =
+        _tabScrollController.position.context.storageContext;
+    if (tabContext == null) return;
+
+    final tabBox = tabContext.findRenderObject() as RenderBox?;
+    final scrollBox = scrollableContext.findRenderObject() as RenderBox?;
+    if (tabBox == null || scrollBox == null) return;
+
+    final tabOffset = tabBox.localToGlobal(Offset.zero, ancestor: scrollBox).dx;
+    final targetOffset = _tabScrollController.offset +
+        tabOffset -
+        ((scrollBox.size.width - tabBox.size.width) / 2);
+
+    final clampedOffset = targetOffset.clamp(
+      _tabScrollController.position.minScrollExtent,
+      _tabScrollController.position.maxScrollExtent,
+    );
+
+    _lastCenteredTabIndex = index;
+    _tabScrollController.animateTo(
+      clampedOffset.toDouble(),
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOut,
     );
   }
 
@@ -240,8 +304,15 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
         separatorBuilder: (_, __) => const SizedBox(height: 10),
         itemBuilder: (context, index) {
           final match = provider.matches[index];
+          final imagePath = match.profilePhoto?.url ??
+              (match.gender == 'female'
+                  ? AppImages.womenAvatar
+                  : AppImages.manAvatar);
           return ProfileComprehensiveCard(
-            imagePath: match.profilePhoto?.url ?? (match.gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar),
+              onTapCard: () {
+                context.pushNamed(Routes.profilePreview, extra: {'userId': match.id});
+              },
+            imagePath: imagePath,
             leftIconPath: AppImages.favouriteIcon,
             isPremiumConnect: match.isPremium ?? false,
             isVerified: match.profilePhoto?.isVerified ?? false,
@@ -284,11 +355,48 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             leftButtonBorderColor: match.connection?.status == 'none'
                 ? AppColors.greenButtonColor
                 : AppColors.disableBackground,
-            onTapRightButton: () {
-              // Handle right button tap
+            onTapRightButton: () async {
+              final userId = match.id?.trim();
+              if (userId == null || userId.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('User id not found')),
+                );
+                return;
+              }
+
+              await BottomSheetUtils.open(
+                context: context,
+                fullHeight: false,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: ViewContactBottomSheet(
+                    userId: userId,
+                    userName: match.displayName ?? 'Walima Member',
+                    profileImagePath: imagePath,
+                    description: match.connection?.message,
+                    isDescriptionVisible: false,
+                    onWalimaChatPressed: match.id == null
+                        ? null
+                        : () {
+                      context.pushNamed(
+                        Routes.chatScreen,
+                        extra: {
+                          'conversationId': match.connection?.conversationId,
+                          'participant': {
+                            'userId': match.id,
+                            'displayName': match.displayName,
+                            'profilePictureUrl': match.profilePhoto?.url,
+                            'isOnline': match.isOnline,
+                          },
+                        },
+                      );
+                    },
+                  ),
+                ),
+              );
             },
             isOnline: match.isOnline ?? false,
-            viewOnAccept: match.profilePhoto?.visibilityStatus?.toLowerCase() != 'visible',
+            viewOnAccept: false
           );
         },
       ),
@@ -313,11 +421,6 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
     ].whereType<String>().where((value) => value.trim().isNotEmpty).toList();
 
     return parts.isEmpty ? 'N/A' : parts.join(', ');
-  }
-
-  String _matchHeight(num? height) {
-    if (height == null) return 'N/A';
-    return '$height';
   }
 
   Future<void> _openFilter(MatchesProvider provider) async {
@@ -358,8 +461,6 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
       }
       return;
     }
-
-    await _sortFilterSheet(context, provider);
   }
 
   Future<void> _sortFilterSheet(

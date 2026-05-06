@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
-import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
-import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
-import 'package:flutter_boilerplate/core/utils/picker_dialog.dart';
-import 'package:flutter_boilerplate/features/home/presentation/widgets/profile_info_card.dart';
-import 'package:flutter_boilerplate/features/profile/data/model/response/get_complete_profile_response.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
-import 'package:flutter_boilerplate/features/profile/presentation/screen/profile_edit_section.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/global/components/custom_back_appbar.dart';
+import 'package:walima_llc/core/global/components/primary_button.dart';
+import 'package:walima_llc/core/global/components/profile_image_card.dart';
+import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/core/utils/camel_case_utils.dart';
+import 'package:walima_llc/core/utils/clipboard_utils.dart';
+import 'package:walima_llc/core/utils/dialog_utils.dart';
+import 'package:walima_llc/core/utils/height_utils.dart';
+import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/picker_dialog.dart';
+import 'package:walima_llc/features/home/presentation/screens/widgets/profile_info_card.dart';
+import 'package:walima_llc/features/profile/data/model/response/get_complete_profile_response.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/bottom_bordered_widget.dart';
+import 'package:walima_llc/features/profile/presentation/screen/profile_edit_section.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -40,7 +43,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             _topBar(context),
             _headerSection(context, profile),
             _bodySection(profile),
-             const SizedBox(height: 50,)
+            const SizedBox(
+              height: 50,
+            )
           ],
         ),
       ),
@@ -98,17 +103,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             showBottomIcon: true,
             topPositionImagePath: AppImages.verifiedBadgeSvgIcon,
             bottomPositionImagePath: AppImages.cameraSvgIcon,
-            onTopPressed: () async{
-              await DialogUtils.showFullScreenImage(context: context,
+            onTopPressed: () async {
+              await DialogUtils.showFullScreenImage(
+                  context: context,
                   imagePath: _resolveProfileImagePath(profile));
             },
             onEdit: () async {
-              final String? imagePath = await PickerDialog().imagePicker(context);
+              final String? imagePath =
+                  await PickerDialog().imagePicker(context);
               if (imagePath != null) {
                 await ref.watch(profileProvider).updateProfileImage(
-                  context: context,
-                  filePath: imagePath,
-                );
+                      context: context,
+                      filePath: imagePath,
+                    );
               }
             },
           ),
@@ -143,33 +150,40 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   Widget _memberIdChip(BuildContext context, CompleteProfile? profile) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(6.0),
-        border: Border.all(color: AppColors.greyLight),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text(
-            'ID : ${_valueOrDefault(profile?.user?.userReference, '--')}',
-            style: TextStyle(
-              color: AppColors.textSecondaryLight,
-              fontSize: TextSize.font12(context),
-              fontWeight: FontWeight.w400,
+    final memberId = profile?.user?.userReference ?? '';
+    return InkWell(
+      borderRadius: BorderRadius.circular(6.0),
+      onTap: memberId.isEmpty
+          ? null
+          : () => ClipboardUtils.copyWithSnack(context, memberId),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(6.0),
+          border: Border.all(color: AppColors.greyLight),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              'ID : ${_valueOrDefault(memberId.isEmpty ? null : memberId, '--')}',
+              style: TextStyle(
+                color: AppColors.textSecondaryLight,
+                fontSize: TextSize.font12(context),
+                fontWeight: FontWeight.w400,
+              ),
             ),
-          ),
-          const SizedBox(width: 4),
-          ShowImage(
-            imagePath: AppImages.copy,
-            width: TextSize.font12(context),
-            height: TextSize.font12(context),
-            color: AppColors.textSecondaryLight,
-          )
-        ],
+            const SizedBox(width: 4),
+            ShowImage(
+              imagePath: AppImages.copy,
+              width: TextSize.font12(context),
+              height: TextSize.font12(context),
+              color: AppColors.textSecondaryLight,
+            )
+          ],
+        ),
       ),
     );
   }
@@ -232,31 +246,79 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   Widget _basicDetails(CompleteProfile? profile) {
     final appearance = profile?.appearance;
     final location = _firstLocation(profile);
+    final basic = profile?.profile;
 
     return ProfileInfoCard(
       title: 'Basic Details',
       showEdit: true,
       onEdit: () => _openSectionEditor(ProfileEditSection.basicDetails),
       infoList: [
-        MapEntry('Age', _valueOrDefault(profile?.profile?.age)),
-        MapEntry('Date of Birth', _formatDate(profile?.profile?.dateOfBirth)),
+        MapEntry(
+          'Profile Managed By',
+          _valueOrDefault(
+              CamelCaseUtils.formatCamelCase(basic?.profileManagedBy)),
+        ),
+        MapEntry(
+          'Gender',
+          _valueOrDefault(CamelCaseUtils.formatCamelCase(basic?.gender)),
+        ),
+        MapEntry('Age', _valueOrDefault(basic?.age)),
+        MapEntry('Date of Birth', _formatDate(basic?.dateOfBirth)),
+        MapEntry('Height', _formatHeightCm(appearance?.height)),
         MapEntry(
           'Marital Status',
-          _valueOrDefault(profile?.profile?.maritalStatus),
+          _valueOrDefault(CamelCaseUtils.formatCamelCase(basic?.maritalStatus)),
         ),
-        MapEntry('Height', _formatHeightCm(appearance?.height)),
-        MapEntry('Grew up in', _valueOrDefault(location?.grewUpIn)),
-        MapEntry('Diet', _valueOrDefault(profile?.lifestyle?.dietType)),
-        MapEntry('Blood Group', _valueOrDefault(appearance?.bloodGroup)),
+        MapEntry(
+          'Grew up in',
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(location?.grewUpIn?.toString()),
+          ),
+        ),
+        MapEntry(
+          'Mother\'s Tough',
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(basic?.motherTongue.toString()),
+          ),
+        ),
+        MapEntry(
+          'Languages',
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(
+              (basic?.languages)
+                  ?.map((e) => e.toString())
+                  .join(', ') ?? '',
+            ),
+          ),
+        ),
+        MapEntry(
+          'Diet',
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(profile?.lifestyle?.dietType),
+          ),
+        ),
+        MapEntry(
+          'Blood Group',
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(appearance?.bloodGroup?.toString()),
+          ),
+        ),
         MapEntry(
           'Health Information',
           _valueOrDefault(
-            appearance?.healthDetails ?? appearance?.healthCondition,
+            CamelCaseUtils.formatCamelCase(
+              (appearance?.healthDetails ?? appearance?.healthCondition)
+                  ?.toString(),
+            ),
           ),
         ),
         MapEntry(
           'Disability',
-          _valueOrDefault(appearance?.specialCases, 'None'),
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(
+                appearance?.specialCases?.toString()),
+            'None',
+          ),
         ),
       ],
     );
@@ -272,16 +334,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       infoList: [
         MapEntry(
           'Religion',
-          _valueOrDefault(religion?.religion ?? profile?.profile?.religionName),
-        ),
-        MapEntry('Community', _valueOrDefault(religion?.community)),
-        MapEntry(
-          'Sub community',
-          _valueOrDefault(religion?.religiousBackground),
+          _valueOrDefault(CamelCaseUtils.formatCamelCase(
+              religion?.religion ?? profile?.profile?.religionName)),
         ),
         MapEntry(
-          'Mother Tongue',
-          _valueOrDefault(profile?.profile?.motherTongue),
+            'Community',
+            _valueOrDefault(
+                CamelCaseUtils.formatCamelCase(religion?.community))),
+        MapEntry(
+          'Religious Background',
+          _valueOrDefault(
+              CamelCaseUtils.formatCamelCase(religion?.religiousBackground)),
         ),
       ],
     );
@@ -314,11 +377,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
         ),
         MapEntry('Family Location', _valueOrDefault(family?.familyLocation)),
-        MapEntry('No. of Sisters', _valueOrDefault(family?.sisters)),
-        MapEntry('No. of Brothers', _valueOrDefault(family?.brothers)),
+        MapEntry(
+          'No. of Sisters',
+          _valueOrDefault(family?.sisters?.toString()),
+        ),
+        MapEntry(
+          'No. of Brothers',
+          _valueOrDefault(family?.brothers?.toString()),
+        ),
         MapEntry(
           'Family Financial Status',
-          _valueOrDefault(family?.familyEconomicCondition),
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(family?.familyEconomicCondition),
+          ),
         ),
       ],
     );
@@ -335,21 +406,41 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       infoList: [
         MapEntry(
           'Highest Qualification',
-          _valueOrDefault(
+          _valueOrDefault(CamelCaseUtils.formatCamelCase(
             education?.qualification ?? education?.educationLevel,
-          ),
+          )),
         ),
         MapEntry(
           'College(s) Attended',
-          _valueOrDefault(education?.institutionName),
+          _valueOrDefault(
+              CamelCaseUtils.formatCamelCase(education?.institutionName)),
         ),
-        MapEntry('Annual Income', _valueOrDefault(profession?.incomeRange)),
-        MapEntry('Working with', _valueOrDefault(profession?.employmentType)),
+        MapEntry(
+          'Annual Income',
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(profession?.incomeRange),
+          ),
+        ),
+        MapEntry(
+          'Working with',
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(
+              profession?.employmentType?.toString(),
+            ),
+          ),
+        ),
         MapEntry(
           'Working as',
-          _valueOrDefault(profession?.designation ?? profession?.profession),
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(
+              (profession?.designation ?? profession?.profession)?.toString(),
+            ),
+          ),
         ),
-        MapEntry('Employer Name', _valueOrDefault(profession?.employer)),
+        MapEntry(
+          'Employer Name',
+          _valueOrDefault(CamelCaseUtils.formatCamelCase(profession?.employer)),
+        ),
       ],
     );
   }
@@ -369,12 +460,22 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             location?.country,
           ),
         ),
-        MapEntry('State of Residence', _valueOrDefault(location?.state)),
+        MapEntry(
+          'State of Residence',
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(location?.state?.toString()),
+          ),
+        ),
         MapEntry(
           'Residency Status',
-          _valueOrDefault(location?.residencyStatus),
+          _valueOrDefault(
+            CamelCaseUtils.formatCamelCase(location?.residencyStatus),
+          ),
         ),
-        MapEntry('ZIP/Pin code', _valueOrDefault(location?.zipCode)),
+        MapEntry(
+          'ZIP/Pin code',
+          _valueOrDefault(location?.zipCode?.toString()),
+        ),
       ],
     );
   }
@@ -389,20 +490,20 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       infoList: [
         MapEntry(
           'Creative',
-          _valueOrDefault(_joinList(interest?.creativePursuits)),
+          _valueOrDefault(_joinPrettyList(interest?.creativePursuits)),
         ),
         MapEntry(
           'Fun',
-          _valueOrDefault(_joinList(interest?.outdoorActivities)),
+          _valueOrDefault(_joinPrettyList(interest?.outdoorActivities)),
         ),
         MapEntry(
           'Fitness',
-          _valueOrDefault(_joinList(interest?.fitnessAndSports)),
+          _valueOrDefault(_joinPrettyList(interest?.fitnessAndSports)),
         ),
         MapEntry(
           'Other',
           _valueOrDefault(
-            _joinList([
+            _joinPrettyList([
               ...?interest?.mediaAndLearning,
               ...?interest?.foodAndCuisine,
               ...?interest?.travelAndLeisure,
@@ -452,15 +553,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         ),
         MapEntry(
           'Religion',
-          _valueOrDefault(_joinList(preference?.religionPreference)),
+          _valueOrDefault(_joinPrettyList(preference?.religionPreference)),
         ),
         MapEntry(
           'Community',
-          _valueOrDefault(_joinList(preference?.communityPreference)),
+          _valueOrDefault(_joinPrettyList(preference?.communityPreference)),
         ),
         MapEntry(
           'Mother Tongue',
-          _valueOrDefault(_joinList(preference?.motherTonguePreference)),
+          _valueOrDefault(_joinPrettyList(preference?.motherTonguePreference)),
+        ),
+        MapEntry(
+          'Marital Status',
+          _valueOrDefault(_joinPrettyList(preference?.maritalStatusPreference)),
         ),
       ],
     );
@@ -477,15 +582,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       infoList: [
         MapEntry(
           'Countries',
-          _valueOrDefault(_joinList(preference?.preferredCountries)),
+          _valueOrDefault(_joinPrettyList(preference?.preferredCountries)),
         ),
         MapEntry(
           'States',
-          _valueOrDefault(_joinList(preference?.preferredStates)),
+          _valueOrDefault(_joinPrettyList(preference?.preferredStates)),
         ),
         MapEntry(
           'Cities',
-          _valueOrDefault(_joinList(preference?.preferredCities)),
+          _valueOrDefault(_joinPrettyList(preference?.preferredCities)),
         ),
       ],
     );
@@ -502,19 +607,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       infoList: [
         MapEntry(
           'Education',
-          _valueOrDefault(_joinList(preference?.educationPreference)),
+          _valueOrDefault(_joinPrettyList(preference?.educationPreference)),
         ),
         MapEntry(
           'Profession',
-          _valueOrDefault(_joinList(preference?.professionPreference)),
+          _valueOrDefault(_joinPrettyList(preference?.professionPreference)),
         ),
         MapEntry(
           'Working As',
-          _valueOrDefault(_joinList(preference?.workingAsPreference)),
+          _valueOrDefault(_joinPrettyList(preference?.workingAsPreference)),
         ),
         MapEntry(
           'Annual Income',
-          _valueOrDefault(_joinList(preference?.annualIncomePreference)),
+          _valueOrDefault(_joinPrettyList(preference?.annualIncomePreference)),
         ),
       ],
     );
@@ -531,21 +636,37 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       infoList: [
         MapEntry(
           'Profile Managed By',
-          _valueOrDefault(_joinList(preference?.profileManagedByPreference)),
+          _valueOrDefault(
+            _joinPrettyList(preference?.profileManagedByPreference),
+          ),
         ),
         MapEntry(
           'Diet',
-          _valueOrDefault(_joinList(preference?.dietPreference)),
+          _valueOrDefault(_joinPrettyList(preference?.dietPreference)),
+        ),
+        MapEntry(
+          'Drinking',
+          _valueOrDefault(_joinPrettyList(preference?.drinkingPreference)),
+        ),
+        MapEntry(
+          'Smoking',
+          _valueOrDefault(_joinPrettyList(preference?.smokingPreference)),
         ),
       ],
     );
   }
 
-  void _openSectionEditor(ProfileEditSection section) {
-    context.pushNamed(
+  Future<void> _openSectionEditor(ProfileEditSection section) async {
+    final result = await context.pushNamed(
       Routes.profileSectionEdit,
       extra: section.key,
     );
+    if (!mounted) return;
+    if (result == true) {
+      await ref.read(profileProvider).getProfile(context);
+      if (!mounted) return;
+      setState(() {});
+    }
   }
 
   String _resolveDisplayName(CompleteProfile? profile) {
@@ -566,8 +687,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   String _resolveProfileImagePath(CompleteProfile? profile) {
     final pictures = profile?.profile?.profilePictures;
+    final gender = ref.read(globalProvider).currentUser?.gender;
     if (pictures == null || pictures.isEmpty) {
-      return AppImages.demoProfile;
+      return gender == 'female'
+          ? AppImages.womenAvatar
+          : AppImages.manAvatar;
     }
 
     for (final picture in pictures) {
@@ -622,7 +746,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (heightCm == null || heightCm <= 0) {
       return 'Not Specified';
     }
-    return '$heightCm cm';
+    return HeightUtils.formatHeight(heightCm.toString());
   }
 
   String _composeLocation(dynamic city, dynamic country) {
@@ -637,13 +761,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return '$cityText, $countryText';
   }
 
-  String _joinList(List<String>? values) {
+  String _joinPrettyList(List<String>? values) {
     if (values == null || values.isEmpty) {
       return '';
     }
 
     final normalized = values
-        .map((item) => item.trim())
+        .map((item) => CamelCaseUtils.formatCamelCase(item).trim())
         .where((item) => item.isNotEmpty)
         .toList(growable: false);
 
@@ -683,7 +807,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     }
     if (firstText.isEmpty) return secondText;
     if (secondText.isEmpty) return firstText;
-    return '$firstText, $secondText';
+    return CamelCaseUtils.formatCamelCase('$firstText ($secondText)');
   }
 
   String _valueOrDefault(dynamic value, [String fallback = 'Not Specified']) {

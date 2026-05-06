@@ -1,7 +1,7 @@
-import 'package:flutter_boilerplate/core/network/app_urls.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/features/recommended_preferences/data/models/request/update_preferences_request_body.dart';
-import 'package:flutter_boilerplate/features/recommended_preferences/data/models/response/update_preferences_response.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/features/recommended_preferences/data/models/request/update_preferences_request_body.dart';
+import 'package:walima_llc/features/recommended_preferences/data/models/response/update_preferences_response.dart';
 
 class PreferencesRepository {
   Future<UpdatePreferencesResponse> updatePreferences(

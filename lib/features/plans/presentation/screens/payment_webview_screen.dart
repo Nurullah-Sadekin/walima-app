@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
-import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
-import 'package:flutter_boilerplate/features/plans/data/repository/plan_repository.dart';
+import 'package:walima_llc/core/global/components/loading_widget.dart';
+import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/core/utils/dialog_utils.dart';
+import 'package:walima_llc/features/plans/data/repository/plan_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:webview_flutter/webview_flutter.dart';

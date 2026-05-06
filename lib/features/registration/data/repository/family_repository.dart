@@ -1,7 +1,7 @@
-import 'package:flutter_boilerplate/core/network/app_urls.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/request/update_family_request_body.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/response/update_family_response.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/features/registration/data/models/request/update_family_request_body.dart';
+import 'package:walima_llc/features/registration/data/models/response/update_family_response.dart';
 
 class FamilyRepository {
   Future<UpdateFamilyResponse> updateFamily(

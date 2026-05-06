@@ -1,15 +1,15 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_boilerplate/core/network/app_urls.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/features/login/data/models/login_response.dart';
-import 'package:flutter_boilerplate/features/login/data/models/resend_otp_body.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/request/register_body.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_otp_body.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_request_body.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/response/email_availability_response.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/response/onboarding_response.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/response/phone_availability_response.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/response/sign_up_otp_response.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/features/login/data/models/login_response.dart';
+import 'package:walima_llc/features/login/data/models/resend_otp_body.dart';
+import 'package:walima_llc/features/registration/data/models/request/register_body.dart';
+import 'package:walima_llc/features/registration/data/models/request/sign_up_otp_body.dart';
+import 'package:walima_llc/features/registration/data/models/request/sign_up_request_body.dart';
+import 'package:walima_llc/features/registration/data/models/response/email_availability_response.dart';
+import 'package:walima_llc/features/registration/data/models/response/onboarding_response.dart';
+import 'package:walima_llc/features/registration/data/models/response/phone_availability_response.dart';
+import 'package:walima_llc/features/registration/data/models/response/sign_up_otp_response.dart';
 
 class RegistrationRepository {
   late final DioClient dioClient;

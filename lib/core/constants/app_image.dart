@@ -5,8 +5,8 @@ class AppImages {
 
   // Image asset paths
   static const String photoGuidelines = 'assets/images/photo_guidelines.png';
-  static const String demoProfile = 'assets/images/demoProfile.png';
-  static const String demoProfile2 = 'assets/images/demoProfile2.png';
+  static const String demoProfile =  'assets/images/men_avatar.jpg';
+  static const String demoProfile2 = 'assets/images/women_avatar.jpg';
   static const String manAvatar = 'assets/images/men_avatar.jpg';
   static const String womenAvatar = 'assets/images/women_avatar.jpg';
 
@@ -156,6 +156,7 @@ class AppImages {
   static const String photoGuidelinesSvg = 'assets/svgs/photo_guidelines.svg';
   static const String loginBgSvg = 'assets/svgs/login_bg.svg';
   static const String walimaSvg = 'assets/svgs/walima.svg';
+  static const String walimaIcon = 'assets/svgs/walima_icon.svg';
 
   // Navigation icons
   static const String home = 'assets/nav_icons/home.svg';
@@ -166,6 +167,6 @@ class AppImages {
   
   
   static const String homeProfileBg = 'assets/svgs/home_profile_bg.svg';
-  
-  
+
+
 }

@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/global/components/empty_state.dart';
-import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
-import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
+import 'package:walima_llc/core/global/components/empty_state.dart';
+import 'package:walima_llc/core/utils/camel_case_utils.dart';
+import 'package:walima_llc/core/utils/date_time_utils.dart';
+import 'package:walima_llc/features/connections/presentation/widgets/view_contact_bottom_sheet.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
-import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
-import 'package:flutter_boilerplate/features/inbox/domain/models/menu_item_model.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/providers/inbox_providers.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_card.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/filter_widget.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/global/components/bottom_sheet.dart';
+import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/features/inbox/domain/models/menu_item_model.dart';
+import 'package:walima_llc/features/inbox/presentation/providers/inbox_providers.dart';
+import 'package:walima_llc/features/inbox/presentation/widgets/inbox_card.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/filter_widget.dart';
 import 'package:go_router/go_router.dart';
 
 class InboxSentTab extends ConsumerStatefulWidget {
@@ -137,22 +138,22 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
                 CamelCaseUtils.formatCamelCase(item.connection?.status ?? ''),
             subtitleColor: AppColors.primary,
             isVerified: item.profilePhoto?.isVerified ?? false,
-            onTapWalimaChat: item.id == null
-                ? null
-                : () {
-                    context.pushNamed(
-                      Routes.chatScreen,
-                      extra: {
-                        'conversationId': conversationId,
-                        'participant': {
-                          'userId': item.id,
-                          'displayName': item.displayName,
-                          'profilePictureUrl': item.profilePhoto?.url,
-                          'isOnline': item.isOnline,
-                        },
-                      },
-                    );
-                  },
+            // onTapWalimaChat: item.id == null
+            //     ? null
+            //     : () {
+            //         context.pushNamed(
+            //           Routes.chatScreen,
+            //           extra: {
+            //             'conversationId': conversationId,
+            //             'participant': {
+            //               'userId': item.id,
+            //               'displayName': item.displayName,
+            //               'profilePictureUrl': item.profilePhoto?.url,
+            //               'isOnline': item.isOnline,
+            //             },
+            //           },
+            //         );
+            //       },
             middleBottomItemIBgColor: AppColors.warning,
             middleBottomItemIcon: AppImages.notificationSvgIcon,
             middleBottomItemText: 'Remind',
@@ -181,12 +182,44 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
                       ),
                     );
                   },
+            // onTapRightBottomItem:() async{
+            //   if (item.id != null) {
+            //     await BottomSheetUtils.open(
+            //       context: context,
+            //       fullHeight: false,
+            //       child: _contactBottomSheet(item),
+            //     );
+            //   } else {
+            //     ScaffoldMessenger.of(context).showSnackBar(
+            //       const SnackBar(content: Text('User information unavailable.')),
+            //     );
+            //   }
+            // },
             rightBottomItemIcon: AppImages.callIcon,
             rightBottomItemText: 'Contact',
             rightBottomItemBgColor: AppColors.blue,
           ),
         );
       }).toList(),
+    );
+  }
+
+  Widget _contactBottomSheet(item) {
+    final profileImagePath = (item?.profilePhoto?.url?.isNotEmpty ?? false)
+        ? item!.profilePhoto!.url!
+        : (item?.gender ?? '').toLowerCase() == 'female'
+        ? AppImages.womenAvatar
+        : AppImages.manAvatar;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: ViewContactBottomSheet(
+        userId: item?.id ?? '',
+        userName: item?.displayName ?? 'Unknown',
+        profileImagePath: profileImagePath,
+        description: null,
+        isDescriptionVisible: false,
+      ),
     );
   }
 

@@ -4,34 +4,35 @@ import 'dart:convert';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/core/global/enums/enums.dart';
-import 'package:flutter_boilerplate/core/utils/app_error_reporting_service.dart';
-import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
-import 'package:flutter_boilerplate/core/utils/firebase_messaging_service.dart';
-import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
-import 'package:flutter_boilerplate/features/login/data/models/resend_otp_body.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_otp_body.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/request/sign_up_request_body.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/request/upload_media_request_body.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/request/update_interests_request_body.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/request/update_family_request_body.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/response/onboarding_response.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/response/upload_media_response.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/lookup_option.dart';
-import 'package:flutter_boilerplate/features/registration/data/repository/interests_repository.dart';
-import 'package:flutter_boilerplate/features/registration/data/repository/family_repository.dart';
-import 'package:flutter_boilerplate/features/registration/data/repository/lookup_repository.dart';
-import 'package:flutter_boilerplate/features/registration/data/repository/location_data_repository_impl.dart';
-import 'package:flutter_boilerplate/features/registration/data/repository/media_repository.dart';
-import 'package:flutter_boilerplate/features/registration/data/repository/registration_repository.dart';
-import 'package:flutter_boilerplate/features/registration/domain/location_data_model.dart';
-import 'package:flutter_boilerplate/features/registration/domain/repository/location_data_repository.dart';
-import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
-import 'package:flutter_boilerplate/features/registration/domain/is_with_family_status_model.dart';
-import 'package:flutter_boilerplate/features/registration/domain/profile_for_model.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/providers/base_change_notifier.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/core/global/enums/enums.dart';
+import 'package:walima_llc/core/utils/app_error_reporting_service.dart';
+import 'package:walima_llc/core/utils/dialog_utils.dart';
+import 'package:walima_llc/core/utils/firebase_messaging_service.dart';
+import 'package:walima_llc/core/utils/prefs_helper.dart';
+import 'package:walima_llc/features/login/data/models/resend_otp_body.dart';
+import 'package:walima_llc/features/registration/data/models/request/sign_up_otp_body.dart';
+import 'package:walima_llc/features/registration/data/models/request/sign_up_request_body.dart';
+import 'package:walima_llc/features/registration/data/models/request/upload_media_request_body.dart';
+import 'package:walima_llc/features/registration/data/models/request/update_interests_request_body.dart';
+import 'package:walima_llc/features/registration/data/models/request/update_family_request_body.dart';
+import 'package:walima_llc/features/registration/data/models/response/onboarding_response.dart';
+import 'package:walima_llc/features/registration/data/models/response/upload_media_response.dart';
+import 'package:walima_llc/features/registration/data/models/lookup_option.dart';
+import 'package:walima_llc/features/registration/data/repository/interests_repository.dart';
+import 'package:walima_llc/features/registration/data/repository/family_repository.dart';
+import 'package:walima_llc/features/registration/data/repository/lookup_repository.dart';
+import 'package:walima_llc/features/registration/data/repository/location_data_repository_impl.dart';
+import 'package:walima_llc/features/registration/data/repository/media_repository.dart';
+import 'package:walima_llc/features/registration/data/repository/registration_repository.dart';
+import 'package:walima_llc/features/registration/domain/location_data_model.dart';
+import 'package:walima_llc/features/registration/domain/repository/location_data_repository.dart';
+import 'package:walima_llc/features/registration/domain/single_string_model.dart';
+import 'package:walima_llc/features/registration/domain/is_with_family_status_model.dart';
+import 'package:walima_llc/features/registration/domain/profile_for_model.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
@@ -408,15 +409,35 @@ class RegistrationProvider extends BaseChangeNotifier {
       purpose: 'signup',
     );
     final response = await RegistrationRepository.resendOtp(body);
-    if (response.code != 'SUCCESS') {
-      DialogUtils.showErrorDialog(
-        context: context,
-        message: response.message ?? 'Failed to resend OTP',
+    if (!context.mounted) return response.code == 'SUCCESS';
+    final isSuccess = response.code == 'SUCCESS';
+    _showResendSnackBar(
+      context,
+      message: response.message ??
+          (isSuccess ? 'OTP sent' : 'Failed to resend OTP'),
+      isSuccess: isSuccess,
+    );
+    return isSuccess;
+  }
+
+  void _showResendSnackBar(
+    BuildContext context, {
+    required String message,
+    required bool isSuccess,
+  }) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: isSuccess ? AppColors.success : AppColors.error,
+          duration: const Duration(seconds: 2),
+          content: Text(
+            message,
+            style: const TextStyle(color: Colors.white),
+          ),
+        ),
       );
-      return false;
-    } else {
-      return true;
-    }
   }
 
   void initControllersListener() {
@@ -646,6 +667,9 @@ class RegistrationProvider extends BaseChangeNotifier {
       educationLevelOptions = await _lookupRepository.getLookups(
         LookupCategory.educationLevels,
       );
+      if(educationLevelOptions.isEmpty) {
+        educationLevelOptions = EducationLevel.values.map((e) => LookupOption(key: e.apiValue, label: e.label)).toList(growable: false);
+      }
     } catch (e) {
       lookupDataError = e.toString();
     } finally {
@@ -1237,7 +1261,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       years--;
     }
     if (years < 0) years = 0;
-    return '$years Years Age'.replaceFirst('\u007f', '');
+    return '$years years old'.replaceFirst('\u007f', '');
   }
 
   int selectedHobbiesCount() {
@@ -1547,7 +1571,6 @@ class RegistrationProvider extends BaseChangeNotifier {
     if (heightInCm == null) return;
 
     heightController.text = heightInCm.toString();
-    heightDisplayController.text = _formatHeightDisplay(heightInCm);
     _notifyAndPersist();
   }
 
@@ -2222,15 +2245,19 @@ class RegistrationProvider extends BaseChangeNotifier {
       return true;
     } else {
       if (emailRes.response?.isAvailable != true) {
-        emailAvailabilityErrorMessage =
-            emailRes.message ?? 'Email already exists';
-        // DialogUtils.showErrorDialog(ctx: context, message: emailRes.message ?? 'Email already exists');
+        emailAvailabilityErrorMessage = emailRes.message ?? 'Email already exists';
+        notifyListeners();
+      }
+      if (emailRes.response?.isAvailable == true) {
+        emailAvailabilityErrorMessage = '';
         notifyListeners();
       }
       if (phoneRes.response?.isAvailable != true) {
         phoneAvailabilityErrorMessage =
             phoneRes.message ?? 'Phone number already exists';
-        // DialogUtils.showErrorDialog(ctx: context, message: phoneRes.message ?? 'Phone number already exists');
+      }
+      if (phoneRes.response?.isAvailable == true) {
+        phoneAvailabilityErrorMessage = '';
       }
       _notifyAndPersist();
       return false;
@@ -2240,6 +2267,8 @@ class RegistrationProvider extends BaseChangeNotifier {
   Future<bool> signUpViaOtp(BuildContext context) async {
     final body = SignUpOtpBody(
       registrationSource: 'referral',
+      firstName: firstNameController.text,
+      lastName: lastNameController.text,
       identifier: selectedVerificationType.toLowerCase() == 'email'
           ? emailController.text
           : phoneController.text,
@@ -2296,8 +2325,10 @@ class RegistrationProvider extends BaseChangeNotifier {
   }
 
   List<String> _getSelectedHobbiesFromList(List<SingleStringModel> list) {
+     final selectedSet = selectedHobbies.map((e) => e.toLowerCase()).toSet();
     return list
-        .where((item) => item.isSelected)
+        .where((item) =>
+            item.isSelected || selectedSet.contains(item.name.toLowerCase()))
         .map((item) => item.value ?? item.name)
         .toList();
   }

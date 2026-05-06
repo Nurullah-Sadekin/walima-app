@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/global/components/custom_back_appbar.dart';
+import 'package:walima_llc/core/utils/image_viewer.dart';
 
 class UpperLayer extends StatelessWidget {
 

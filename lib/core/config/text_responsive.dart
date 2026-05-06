@@ -1,7 +1,7 @@
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_boilerplate/core/config/responsive_scale.dart';
-import 'package:flutter_boilerplate/core/config/size_config.dart';
+import 'package:walima_llc/core/config/responsive_scale.dart';
+import 'package:walima_llc/core/config/size_config.dart';
 
 
 class FontConstants{

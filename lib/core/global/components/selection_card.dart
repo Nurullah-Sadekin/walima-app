@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/utils/image_viewer.dart';
 
 class SelectionCard extends StatelessWidget {
   const SelectionCard({
@@ -59,7 +59,7 @@ class SelectionCard extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 6,
           children: [
             ShowImage(
@@ -67,13 +67,14 @@ class SelectionCard extends StatelessWidget {
               width: TextSize.font20(context),
               height: TextSize.font20(context),
             ),
-            Text(
-              title ?? '',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: AppColors.textPrimaryLight,
-                fontSize: TextSize.font14(context),
-                fontWeight: FontWeight.w500,
+            Flexible(
+              child: Text(
+                title ?? '',
+                style: TextStyle(
+                  color: AppColors.textPrimaryLight,
+                  fontSize: TextSize.font14(context),
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ],
@@ -105,13 +106,14 @@ class SelectionCard extends StatelessWidget {
               width: TextSize.font20(context),
               height: TextSize.font20(context),
             ),
-            Text(
-              title ?? '',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: AppColors.textSecondaryLight,
-                fontSize: TextSize.font14(context),
-                fontWeight: FontWeight.w500,
+            Flexible(
+              child: Text(
+                title ?? '',
+                style: TextStyle(
+                  color: AppColors.textSecondaryLight,
+                  fontSize: TextSize.font14(context),
+                  fontWeight: FontWeight.w400,
+                ),
               ),
             ),
           ],

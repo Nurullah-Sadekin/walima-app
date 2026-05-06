@@ -1,27 +1,27 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/connectivity/connectivity_keys.dart';
-import 'package:flutter_boilerplate/core/global/enums/enums.dart';
-import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
-import 'package:flutter_boilerplate/features/matches/data/models/request/get_matches_query_params.dart';
-import 'package:flutter_boilerplate/features/matches/data/models/response/get_matches_response.dart';
-import 'package:flutter_boilerplate/features/matches/data/repository/matches_repository.dart';
-import 'package:flutter_boilerplate/features/matches/domain/enums/match_education_level.dart';
-import 'package:flutter_boilerplate/features/matches/domain/enums/match_marital_status.dart';
-import 'package:flutter_boilerplate/features/matches/domain/request/bulk_send_connections_request_body.dart';
-import 'package:flutter_boilerplate/features/recommended_preferences/data/models/request/update_preferences_request_body.dart';
-import 'package:flutter_boilerplate/features/recommended_preferences/data/repository/preferences_repository.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/lookup_option.dart';
-import 'package:flutter_boilerplate/features/registration/data/repository/location_data_repository_impl.dart';
-import 'package:flutter_boilerplate/features/registration/data/repository/lookup_repository.dart';
-import 'package:flutter_boilerplate/features/registration/data/repository/religion_data_repository_impl.dart';
-import 'package:flutter_boilerplate/features/registration/domain/location_data_model.dart';
-import 'package:flutter_boilerplate/features/registration/domain/religion_option_model.dart';
-import 'package:flutter_boilerplate/features/registration/domain/repository/location_data_repository.dart';
-import 'package:flutter_boilerplate/features/registration/domain/repository/religion_data_repository.dart';
-import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
+import 'package:walima_llc/core/connectivity/connectivity_keys.dart';
+import 'package:walima_llc/core/global/enums/enums.dart';
+import 'package:walima_llc/core/providers/base_change_notifier.dart';
+import 'package:walima_llc/core/utils/dialog_utils.dart';
+import 'package:walima_llc/features/matches/data/models/request/get_matches_query_params.dart';
+import 'package:walima_llc/features/matches/data/models/response/get_matches_response.dart';
+import 'package:walima_llc/features/matches/data/repository/matches_repository.dart';
+import 'package:walima_llc/features/matches/domain/enums/match_education_level.dart';
+import 'package:walima_llc/features/matches/domain/enums/match_marital_status.dart';
+import 'package:walima_llc/features/matches/domain/request/bulk_send_connections_request_body.dart';
+import 'package:walima_llc/features/recommended_preferences/data/models/request/update_preferences_request_body.dart';
+import 'package:walima_llc/features/recommended_preferences/data/repository/preferences_repository.dart';
+import 'package:walima_llc/features/registration/data/models/lookup_option.dart';
+import 'package:walima_llc/features/registration/data/repository/location_data_repository_impl.dart';
+import 'package:walima_llc/features/registration/data/repository/lookup_repository.dart';
+import 'package:walima_llc/features/registration/data/repository/religion_data_repository_impl.dart';
+import 'package:walima_llc/features/registration/domain/location_data_model.dart';
+import 'package:walima_llc/features/registration/domain/religion_option_model.dart';
+import 'package:walima_llc/features/registration/domain/repository/location_data_repository.dart';
+import 'package:walima_llc/features/registration/domain/repository/religion_data_repository.dart';
+import 'package:walima_llc/features/registration/domain/single_string_model.dart';
 
 class RecommendedPreferencesProvider extends BaseChangeNotifier {
   RecommendedPreferencesScreenStates screenStates =
@@ -179,8 +179,9 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     final selected = value?.trim() ?? '';
     if (selected.isEmpty) return;
 
-    final previous = countryPreferenceController.text;
-    final isSameCountry = previous.toLowerCase() == selected.toLowerCase();
+    final previousCountry = _selectedCityCountry?.trim() ?? '';
+    final isSameCountry =
+        previousCountry.toLowerCase() == selected.toLowerCase();
     countryPreferenceController.text = selected;
 
     if (!isSameCountry) {
@@ -380,6 +381,10 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
       educationLookupOptions = await _lookupRepository.getLookups(
         LookupCategory.educationLevels,
       );
+      // if(educationLevelOptions.isEmpty) {
+      //   educationLevelOptions = EducationLevel.values.map((e) => LookupOption(key: e.apiValue, label: e.label)).toList(growable: false);
+      // }
+
       educationDataList = educationLookupOptions
           .map(
             (item) => SingleStringModel(
@@ -388,6 +393,12 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
             ),
           )
           .toList(growable: false);
+
+      if (educationLookupOptions.isEmpty) {
+        educationDataList = EducationLevel.values
+            .map((e) => SingleStringModel(value: e.apiValue, name: e.label))
+            .toList(growable: false);
+      }
     } catch (e) {
       educationLookupError = e.toString();
     } finally {

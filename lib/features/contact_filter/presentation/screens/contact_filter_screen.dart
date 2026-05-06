@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/custom_back_appbar.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
-import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
-import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/features/contact_filter/presentation/providers/contact_filter_provider.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/into_tile.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/global/components/custom_back_appbar.dart';
+import 'package:walima_llc/core/global/components/primary_button.dart';
+import 'package:walima_llc/core/global/components/selection_card.dart';
+import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/features/contact_filter/presentation/providers/contact_filter_provider.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/bottom_bordered_widget.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/into_tile.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ContactFilterScreen extends ConsumerStatefulWidget {
@@ -22,6 +22,12 @@ class ContactFilterScreen extends ConsumerStatefulWidget {
 class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
   late ContactFilterProvider provider;
   ContactFilterStep _step = ContactFilterStep.contactFilterScreen;
+  final TextEditingController _communitySearchController =
+      TextEditingController();
+  final TextEditingController _motherTongueSearchController =
+      TextEditingController();
+  final TextEditingController _countrySearchController =
+      TextEditingController();
 
   @override
   void initState() {
@@ -30,6 +36,14 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider.loadInitialData();
     });
+  }
+
+  @override
+  void dispose() {
+    _communitySearchController.dispose();
+    _motherTongueSearchController.dispose();
+    _countrySearchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -53,9 +67,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
             child: _body(provider),
           ),
         ),
-        floatingActionButton: _step == ContactFilterStep.contactFilterScreen
-            ? null
-            : BottomBorderedWidget(widget: _bottomAction()),
+        floatingActionButton: BottomBorderedWidget(widget: _bottomAction()),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
@@ -129,16 +141,22 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           helperText: provider.religionOptions.every((item) => !item.isSelected)
               ? 'Select religion first to load community options.'
               : null,
+          searchController: _communitySearchController,
+          searchHintText: 'Search community',
         );
       case ContactFilterStep.motherTongue:
         return _selectionBody(
           items: provider.motherTongueOptions,
           onTap: provider.toggleMotherTongue,
+          searchController: _motherTongueSearchController,
+          searchHintText: 'Search mother tongue',
         );
       case ContactFilterStep.countryLivingIn:
         return _selectionBody(
           items: provider.countryOptions,
           onTap: provider.toggleCountryLivingIn,
+          searchController: _countrySearchController,
+          searchHintText: 'Search country',
         );
       case ContactFilterStep.workingWith:
         return _selectionBody(
@@ -154,11 +172,33 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
   }
 
   Widget _contactFilterBody(ContactFilterProvider provider) {
+    if (provider.isRemoteFilterLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 6),
+          if (provider.remoteFilterError != null) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.primaryVariant,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                provider.remoteFilterError!,
+                style: TextStyle(
+                  fontSize: TextSize.font12(context),
+                  color: AppColors.textSecondaryLight,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
           InfoTile(
             title: 'Age Range',
             value: provider.ageRangeSummary,
@@ -178,7 +218,8 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           InfoTile(
             title: 'Marital Status',
             value: provider.maritalStatusSummary,
-            onTap: () => setState(() => _step = ContactFilterStep.maritalStatus),
+            onTap: () =>
+                setState(() => _step = ContactFilterStep.maritalStatus),
             leadingImagePath: AppImages.weddingSvgIcon,
             showTrailingImage: false,
           ),
@@ -241,7 +282,14 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
     required List<dynamic> items,
     required void Function(int) onTap,
     String? helperText,
+    TextEditingController? searchController,
+    String? searchHintText,
   }) {
+    final filteredIndexes = _filterIndexes(
+      items,
+      searchQuery: searchController?.text ?? '',
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -266,28 +314,92 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           const SizedBox(height: 16),
         ] else
           const SizedBox(height: 12),
-        Expanded(
-          child: SingleChildScrollView(
-            child: Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: List.generate(items.length, (index) {
-                final item = items[index];
-                return SelectionCard(
-                  buttonStyle: item.isSelected
-                      ? SelectionStyle.selectedCheckbox
-                      : SelectionStyle.unSelectedCheckbox,
-                  onTap: () => onTap(index),
-                  isSelected: item.isSelected,
-                  title: item.name,
-                  isExpand: true,
-                );
-              }),
+        if (searchController != null) ...[
+          TextField(
+            controller: searchController,
+            onChanged: (_) => setState(() {}),
+            decoration: InputDecoration(
+              hintText: searchHintText ?? 'Search',
+              hintStyle: TextStyle(
+                fontSize: TextSize.font16(context),
+                color: AppColors.textSecondaryLight,
+              ),
+              prefixIcon: Icon(Icons.search,color: AppColors.textSecondaryLight,size: TextSize.font22(context),),
+              suffixIcon: searchController.text.isEmpty
+                  ? null
+                  : IconButton(
+                      onPressed: () {
+                        searchController.clear();
+                        setState(() {});
+                      },
+                      icon: const Icon(Icons.close),
+                    ),
+              filled: true,
+              fillColor:  AppColors.greyLight.withOpacity(0.5),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 12,
+              ),
             ),
           ),
+          const SizedBox(height: 16),
+        ] else
+          const SizedBox(height: 0),
+        Expanded(
+          child: filteredIndexes.isEmpty
+              ? Center(
+                  child: Text(
+                    'No matching items found',
+                    style: TextStyle(
+                      fontSize: TextSize.font14(context),
+                      color: AppColors.textSecondaryLight,
+                    ),
+                  ),
+                )
+              : SingleChildScrollView(
+                  child: Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: filteredIndexes.map((index) {
+                      final item = items[index];
+                      return SelectionCard(
+                        buttonStyle: item.isSelected
+                            ? SelectionStyle.selectedCheckbox
+                            : SelectionStyle.unSelectedCheckbox,
+                        onTap: () => onTap(index),
+                        isSelected: item.isSelected,
+                        title: item.name,
+                        isExpand: true,
+                      );
+                    }).toList(growable: false),
+                  ),
+                ),
         ),
       ],
     );
+  }
+
+  List<int> _filterIndexes(
+    List<dynamic> items, {
+    required String searchQuery,
+  }) {
+    final normalizedQuery = searchQuery.trim().toLowerCase();
+    if (normalizedQuery.isEmpty) {
+      return List<int>.generate(items.length, (index) => index);
+    }
+
+    final indexes = <int>[];
+    for (var index = 0; index < items.length; index++) {
+      final name = items[index].name.toString().trim().toLowerCase();
+      if (name.contains(normalizedQuery)) {
+        indexes.add(index);
+      }
+    }
+    return indexes;
   }
 
   Widget _ageRange(ContactFilterProvider provider) {
@@ -368,10 +480,36 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
 
   Widget _bottomAction() {
     return PrimaryButtons(
-      buttonStyle: ButtonsStyle.activePrimaryButton,
+      buttonStyle: (provider.isApplying || provider.isRemoteFilterLoading)
+          ? ButtonsStyle.disableButton
+          : ButtonsStyle.activePrimaryButton,
       title: 'Apply',
-      onTap: () {
-        setState(() => _step = ContactFilterStep.contactFilterScreen);
+      onTap: () async {
+        if (provider.isApplying || provider.isRemoteFilterLoading) return;
+        if (_step != ContactFilterStep.contactFilterScreen) {
+          setState(() => _step = ContactFilterStep.contactFilterScreen);
+          return;
+        }
+
+        final response = await provider.applyContactFilters();
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: const Duration(seconds: 1),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor:
+                response.isSuccess ? AppColors.success : AppColors.error,
+            content: Text(
+              response.isSuccess
+                  ? (response.message.isNotEmpty
+                      ? response.message
+                      : 'Contact filter updated')
+                  : (response.message.isNotEmpty
+                      ? response.message
+                      : 'Unable to update contact filter'),
+            ),
+          ),
+        );
       },
     );
   }

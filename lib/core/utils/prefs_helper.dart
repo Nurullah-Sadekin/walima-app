@@ -1,4 +1,4 @@
-import 'package:flutter_boilerplate/core/constants/storage_keys.dart';
+import 'package:walima_llc/core/constants/storage_keys.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PrefsHelper {

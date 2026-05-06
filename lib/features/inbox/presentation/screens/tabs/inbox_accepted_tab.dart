@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/utils/camel_case_utils.dart';
-import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
-import 'package:flutter_boilerplate/features/connections/data/models/response/get_accepted_connection_response.dart'
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/global/components/bottom_sheet.dart';
+import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/core/utils/camel_case_utils.dart';
+import 'package:walima_llc/core/utils/date_time_utils.dart';
+import 'package:walima_llc/features/connections/data/models/response/get_accepted_connection_response.dart'
     as accepted_models;
-import 'package:flutter_boilerplate/features/inbox/domain/models/menu_item_model.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_card.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/widgets/inbox_tab_shared.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/text_tab_bar.dart';
+import 'package:walima_llc/features/connections/presentation/widgets/view_contact_bottom_sheet.dart';
+import 'package:walima_llc/features/inbox/domain/models/menu_item_model.dart';
+import 'package:walima_llc/features/inbox/presentation/widgets/inbox_card.dart';
+import 'package:walima_llc/features/inbox/presentation/widgets/inbox_tab_shared.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/text_tab_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class InboxAcceptedTab extends ConsumerStatefulWidget {
   const InboxAcceptedTab({super.key});
@@ -22,7 +26,7 @@ class InboxAcceptedTab extends ConsumerStatefulWidget {
 class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
     with SingleTickerProviderStateMixin {
   late final TabController _subTabController;
-  final _tabs = const ['Accepted by Her', 'Accepted by Me'];
+  final _tabs = const ['Accepted by Them', 'Accepted by Me'];
 
   @override
   void initState() {
@@ -149,6 +153,35 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
             ),
             age: '${item.age} Yr',
             height: CamelCaseUtils.formatCamelCase(item.religion ?? ''),
+            onTapWalimaChat: item.id == null
+                ? null
+                : () {
+                    context.pushNamed(
+                      Routes.chatScreen,
+                      extra: {
+                        'conversationId': item.connection?.conversationId,
+                        'participant': {
+                          'userId': item.id,
+                          'displayName': item.displayName,
+                          'profilePictureUrl': item.profilePhoto?.url,
+                          'isOnline': item.isOnline,
+                        },
+                      },
+                    );
+                  },
+            onTapMiddleBottomItem:() async{
+              if (item.id != null) {
+                await BottomSheetUtils.open(
+                  context: context,
+                  fullHeight: false,
+                  child: _contactBottomSheet(item),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('User information unavailable.')),
+                );
+              }
+            },
             location: [
               item.location?.city,
               item.location?.state,
@@ -189,4 +222,24 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
       ),
     );
   }
+
+  Widget _contactBottomSheet(item) {
+    final profileImagePath = (item?.profilePhoto?.url?.isNotEmpty ?? false)
+        ? item!.profilePhoto!.url!
+        : (item?.gender ?? '').toLowerCase() == 'female'
+        ? AppImages.womenAvatar
+        : AppImages.manAvatar;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: ViewContactBottomSheet(
+        userId: item?.id ?? '',
+        userName: item?.displayName ?? 'Unknown',
+        profileImagePath: profileImagePath,
+        description: null,
+        isDescriptionVisible: false,
+      ),
+    );
+  }
+
 }

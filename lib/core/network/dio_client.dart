@@ -3,14 +3,14 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/connectivity/connectivity_keys.dart';
+import 'package:walima_llc/core/connectivity/connectivity_keys.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
-import 'package:flutter_boilerplate/core/constants/app_texts.dart';
-import 'package:flutter_boilerplate/core/global/repositorys/global_repository.dart';
-import 'package:flutter_boilerplate/core/network/app_urls.dart';
-import 'package:flutter_boilerplate/core/utils/app_error_reporting_service.dart';
-import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
-import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
+import 'package:walima_llc/core/constants/app_texts.dart';
+import 'package:walima_llc/core/global/repositorys/global_repository.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/utils/app_error_reporting_service.dart';
+import 'package:walima_llc/core/utils/dialog_utils.dart';
+import 'package:walima_llc/core/utils/prefs_helper.dart';
 
 /// Singleton Dio client for handling all API calls
 /// Includes status code handling and pretty logger

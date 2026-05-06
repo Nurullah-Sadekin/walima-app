@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
-import 'package:flutter_boilerplate/features/chat/presentation/screens/chat_home.dart';
-import 'package:flutter_boilerplate/features/home/presentation/screens/home_screen.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/screens/inbox_screen.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/screens/matches.dart';
-import 'package:flutter_boilerplate/features/plans/presentation/screens/plans_screen.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/utils/dialog_utils.dart';
+import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/features/chat/presentation/screens/chat_home.dart';
+import 'package:walima_llc/features/home/presentation/screens/home_screen.dart';
+import 'package:walima_llc/features/inbox/presentation/screens/inbox_screen.dart';
+import 'package:walima_llc/features/matches/presentation/screens/matches.dart';
+import 'package:walima_llc/features/plans/presentation/screens/plans_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Current tab provider
@@ -20,6 +21,7 @@ class AnchorPointScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentTab = ref.watch(currentTabProvider);
+    final unreadChatCount = ref.watch(chatProvider).unreadCount;
 
     final screens = [
       const HomeScreen(),
@@ -68,6 +70,7 @@ class AnchorPointScreen extends ConsumerWidget {
                   _buildNavItem(
                     icon: AppImages.chat,
                     isActive: currentTab == 3,
+                    badgeCount: unreadChatCount,
                     onTap: () => ref.read(currentTabProvider.notifier).state = 3,
                   ),
                   _buildNavItem(
@@ -88,16 +91,48 @@ class AnchorPointScreen extends ConsumerWidget {
     required String icon,
     required bool isActive,
     required VoidCallback onTap,
+    int badgeCount = 0,
   }) {
     return InkWell(
       onTap: onTap,
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,
-      child: ShowImage(
-        imagePath: icon,
-        width: 45,
-        height: 45,
-        color: isActive ? AppColors.primary: AppColors.textSub600,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          ShowImage(
+            imagePath: icon,
+            width: 45,
+            height: 45,
+            color: isActive ? AppColors.primary : AppColors.textSub600,
+          ),
+          if (badgeCount > 0)
+            Positioned(
+              top: 0,
+              right: 4,
+              child: Container(
+                constraints: const BoxConstraints(minWidth: 12, minHeight: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  badgeCount > 99 ? '99+' : '$badgeCount',
+                  textHeightBehavior: const TextHeightBehavior(
+                    applyHeightToFirstAscent: false,
+                    applyHeightToLastDescent: false,
+                  ),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

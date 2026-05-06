@@ -178,12 +178,12 @@ enum RegistrationMaritalStatus implements ApiUiEnum {
 }
 
 enum RegistrationDiet implements ApiUiEnum {
-  vegetarian('vegetarian'),
-  nonVegetarian('non_vegetarian', 'Non-Vegetarian'),
   halalOnly('halal_only', 'Halal Only'),
-  vegan('vegan'),
+  vegetarian('vegetarian'),
+  occasionallyNonVeg('occasionally_non_veg', 'Occasionally Non-Veg'),
   jainVegetarian('jain_vegetarian', 'Jain Vegetarian'),
-  occasionallyNonVeg('occasionally_non_veg', 'Occasionally Non-Veg');
+  nonVegetarian('non_vegetarian', 'Non-Vegetarian'),
+  vegan('vegan');
 
   const RegistrationDiet(this.apiValue, [this._label]);
 
@@ -1935,7 +1935,8 @@ enum LookupCategory implements ApiUiEnum {
   fitnessAndSports('fitness-and-sports'),
   mediaAndLearning('media-and-learning'),
   foodAndCuisine('food-and-cuisine'),
-  travelAndLeisure('travel-and-leisure');
+  travelAndLeisure('travel-and-leisure'),
+  healthInformation('health-condition');
 
   const LookupCategory(this.apiValue, [this._label]);
 

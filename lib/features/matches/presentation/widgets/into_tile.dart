@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/utils/image_viewer.dart';
 
 class InfoTile extends StatelessWidget { // Control leading image visibility
 
   const InfoTile({
     super.key,
     required this.title,
-    required this.value,
+    this.value,
+    this.subtitle,
     this.leadingImagePath,
-    this.trailingImagePath,
+    this.trailingImagePath = AppImages.editWrite,
     this.leadingImageColor,
     this.trailingImageColor,
     this.leadingBackgroundColor,
@@ -20,12 +22,15 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
     this.leadingImageSize = 16,
     this.trailingImageSize = 16,
     this.leadingRadius = 14,
+    this.borderRadius,
     this.padding,
     this.showTrailingImage = true,
+    this.trailingText,
     this.showLeadingImage = true,
   });
   final String title;
-  final String value;
+  final String? value;
+  final String? subtitle;
   final String? leadingImagePath ; // Optional leading image
   final String? trailingImagePath; // Optional trailing image
   final Color? leadingImageColor;
@@ -37,8 +42,10 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
   final double? leadingImageSize;
   final double? trailingImageSize;
   final double? leadingRadius;
+  final double? borderRadius;
   final EdgeInsetsGeometry? padding;
   final bool showTrailingImage ; // Control trailing image visibility
+  final String? trailingText; // Optional trailing text
   final bool showLeadingImage ;
 
   @override
@@ -50,11 +57,12 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
         padding: padding ?? const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
           color: AppColors.white,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular( borderRadius ?? 4),
           border: Border.all(color: AppColors.greyLight, width: 1),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          spacing: 8,
           children: [
             // Left side - Leading image and title
             Expanded(
@@ -72,47 +80,83 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
                         color: leadingImageColor ?? AppColors.primary,
                       ),
                     ),
-                  Text(
-                    title,
-                    style: titleStyle ??
-                        TextStyle(
-                          color: AppColors.textSecondaryLight,
-                          fontSize: TextSize.font12(context),
-                          fontWeight: FontWeight.w400,
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: titleStyle ??
+                              TextStyle(
+                                color: subtitle != null ?  AppColors.textPrimaryLight : AppColors.textSecondaryLight,
+                                fontSize:  subtitle != null ? TextSize.font14(context) : TextSize.font12(context),
+                                fontWeight: subtitle != null ?  FontWeight.w500: FontWeight.w400,
+                              ),
                         ),
+                        if(subtitle != null)...[
+                          const SizedBox(height: 4,),
+                          Text(
+                            subtitle!,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: titleStyle ??
+                                TextStyle(
+                                  color: AppColors.textSecondaryLight,
+                                  fontSize: TextSize.font12(context),
+                                  fontWeight: FontWeight.w400,
+                                ),
+                          ),
+                        ]
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
 
-            // Right side - Value and trailing image
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                spacing: 8,
-                children: [
-                  Flexible(
-                    child: Text(
-                      value,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: valueStyle ??
-                          TextStyle(
-                            color: AppColors.textPrimaryLight,
-                            fontSize: TextSize.font12(context),
-                            fontWeight: FontWeight.w500,
-                          ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              spacing: 8,
+              children: [
+                if (value != null)
+                Flexible(
+                  child: Text(
+                    value!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: valueStyle ??
+                        TextStyle(
+                          color: AppColors.textPrimaryLight,
+                          fontSize: TextSize.font12(context),
+                          fontWeight: FontWeight.w500,
+                        ),
+                  ),
+                ),
+                if (showTrailingImage)
+                  ShowImage(
+                    imagePath: trailingImagePath!,
+                    width: trailingImageSize,
+                    height: trailingImageSize,
+                    color: trailingImageColor ?? AppColors.primary,
+                  ),
+                if (!showTrailingImage && trailingText != null)
+                 Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryShade200,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    trailingText!,
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: TextSize.font8(context),
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                  if (showTrailingImage && trailingImagePath != null)
-                    ShowImage(
-                      imagePath: trailingImagePath!,
-                      width: trailingImageSize,
-                      height: trailingImageSize,
-                      color: trailingImageColor ?? AppColors.primary,
-                    ),
-                ],
-              ),
+                 )
+              ],
             ),
           ],
         ),

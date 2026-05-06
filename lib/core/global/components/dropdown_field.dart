@@ -1,13 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_textField.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/global/components/primary_textField.dart';
 import 'bottom_sheet.dart'; // Make sure this imports BottomSheetUtils
 
 class DropDownField extends StatefulWidget {
-
   const DropDownField({
     super.key,
     this.controller,
@@ -87,10 +86,13 @@ class _DropDownFieldState extends State<DropDownField> {
           context: context,
           items: effectiveItems,
           header: widget.popUpHeader,
-          selectedValue: (widget.controller != null && (widget.controller!.text).isNotEmpty)
+          selectedValue: (widget.controller != null &&
+                  (widget.controller!.text).isNotEmpty)
               ? widget.controller!.text
               : widget.selectedValue,
           hintText: widget.hintText,
+          isSearchEnabled: widget.isSearch,
+          searchHintText: widget.searchBoxHintText,
         );
 
         if (dropdownValue != null) {
@@ -104,11 +106,11 @@ class _DropDownFieldState extends State<DropDownField> {
       },
       hintText: widget.hintText,
       icon: widget.icon,
-      suffix: widget.suffix ??  Icon(
-        Icons.keyboard_arrow_down_outlined,
-        size: TextSize.font20(context),
-        color: AppColors.grey,
-      ),
+      suffix: widget.suffix ?? Icon(
+            Icons.keyboard_arrow_down_outlined,
+            size: TextSize.font20(context),
+            color: AppColors.grey,
+          ),
       readOnly: true,
       headLine: widget.headLine,
       fillColor: Colors.white,

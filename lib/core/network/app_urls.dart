@@ -5,7 +5,6 @@ class AppUrls {
   static const String login = '$baseUrl/auth/signin-with-password';
   static const String getMe = '$baseUrl/auth/me';
   static const String register = '$baseUrl/auth/register';
-  static const String signinWithPassword = '$baseUrl/auth/signin-with-password';
   static const String loginWithOTP = '$baseUrl/auth/signin-with-otp';
   static const String signUpWithOTP = '$baseUrl/auth/sign-up-with-otp';
   static const String verifyOTP = '$baseUrl/auth/verify-otp';
@@ -38,6 +37,8 @@ class AppUrls {
 
   // User Profile Endpoints
   static const String getCompleteProfile = '$baseUrl/users/profile'; //GET
+  static const String getProfileStrength =
+      '$baseUrl/users/profile/strength'; //GET
   static const String getProfilePreview =
       '$baseUrl/users/profile/preview'; //GET
   static const String getBasicProfile = '$baseUrl/users/profile/basic'; //GET
@@ -156,8 +157,7 @@ class AppUrls {
   static const String downloadBlogFile = '$baseUrl/blogs/{slug}/file'; //GET
 
   //Chat & Connections
-  static const String getConnectableUsers =
-      '$baseUrl/chat/connectable-users'; //GET
+  static const String getConnectableUsers = '$baseUrl/chat/conversations'; //GET
   static const String getUserConversations =
       '$baseUrl/chat/conversations'; //GET
   static const String getConversationMessages =
@@ -185,8 +185,7 @@ class AppUrls {
       '$baseUrl/connections/deleted'; //GET
   static const String getConnectionById = '$baseUrl/connections/{id}'; //GET
   static const String getConnectionStats = '$baseUrl/connections/stats'; //GET
-  static const String viewContact =
-      '$baseUrl/connections/view-contact/{userId}'; //GET
+  static const String viewContact = '$baseUrl/connections/view-contact/'; //GET
   static String performConnectionAction(String id) =>
       '$baseUrl/connections/$id/action'; //PATCH
   static const String createConnection = '$baseUrl/connections'; //POST
@@ -205,6 +204,10 @@ class AppUrls {
       '$baseUrl/matches/homepage/top'; //GET
   static const String getCompatibilityResult =
       '$baseUrl/matches/compatibility/{userId}'; //GET
+  static const String getMatchPreview =
+      '$baseUrl/matches/preview/{userId}'; //GET
+  static const String getMatchCompare =
+      '$baseUrl/matches/compare/{userId}'; //GET
 
   // --- Plans & Subscriptions ---
   static const String getActivePlan = '$baseUrl/plans/active-plan'; //GET
@@ -229,6 +232,10 @@ class AppUrls {
 
   // --- Activities & Interactions ---
   static const String getProfileVisitors = '$baseUrl/activities/visitors'; //GET
+
+  // --- Settings ---
+  static const String contactFilters =
+      '$baseUrl/settings/contact-filters'; //GET,PUT
   static const String getShortlistedUsers =
       '$baseUrl/activities/shortlist'; //GET
   static const String addToShortlist = '$baseUrl/activities/shortlist'; //POST
@@ -275,4 +282,22 @@ class AppUrls {
   static const String getAllPlans = '$baseUrl/plans'; //POST
 
   static const String getPlanById = '$baseUrl/plans/{planId}'; //GET
+
+  //------  Account Settings ------
+  static const String updateNameAndEmail = '$baseUrl/settings/account'; //GET
+  static const String contactSettings = '$baseUrl/settings/contact'; //GET, PUT
+  static const String premiumSettings = '$baseUrl/settings/premium'; //GET, PUT
+  static const String messagesSettings = '$baseUrl/settings/messages'; //GET
+
+  // ---- External Links ----
+  static const String helpCenterUrl =
+      'https://dev.walima.app/en/account/help-desk';
+  static const String beSafeOnlineUrl =
+      'https://dev.walima.app/en/be-safe-online';
+  static const String privacyPolicyUrl = 'https://dev.walima.app/en/privacy';
+  static const String safetyUrl = 'https://dev.walima.app/en/safety';
+  static const String termsUrl = 'https://dev.walima.app/en/terms';
+  static const String facebookUrl = 'https://www.facebook.com/WalimaApp';
+  static const String instagramUrl = 'https://www.instagram.com/walima.app';
+  static const String xUrl = 'https://x.com/WalimaApp';
 }

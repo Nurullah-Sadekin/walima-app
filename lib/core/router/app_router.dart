@@ -1,61 +1,62 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/screens/filters/new_filter.dart';
-import 'package:flutter_boilerplate/features/contact_filter/presentation/screens/contact_filter_screen.dart';
-import 'package:flutter_boilerplate/features/account_setting/presentation/screens/account_setting_screen.dart';
-import 'package:flutter_boilerplate/features/profile/presentation/screen/edit_profile.dart';
-import 'package:flutter_boilerplate/features/profile/presentation/screen/profile_edit_section.dart';
-import 'package:flutter_boilerplate/features/profile/presentation/screen/profile_section_edit_screen.dart';
-import 'package:flutter_boilerplate/features/login/presentation/screens/new_password.dart';
-import 'package:flutter_boilerplate/features/login/presentation/screens/otp_verify.dart';
-import 'package:flutter_boilerplate/features/login/presentation/screens/reset_pssword_status.dart';
-import 'package:flutter_boilerplate/features/login/presentation/screens/send_otp.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/screens/matches.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/screens/filters/search_filter.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/screens/filters/my_match_filter.dart';
-import 'package:flutter_boilerplate/features/notification/presentation/notification_screen.dart';
-import 'package:flutter_boilerplate/features/onboarding_screen.dart';
-import 'package:flutter_boilerplate/features/recommended_preferences/presentation/connect_matches.dart';
-import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/basic_details.dart';
-import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/career.dart';
-import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/community.dart';
-import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/education.dart';
-import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/other_details.dart';
-import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/partner_preferences.dart';
-import 'package:flutter_boilerplate/features/recommended_preferences/presentation/recommended_preferences/preference_location.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/crop_image.dart';
-import 'package:flutter_boilerplate/features/plans/presentation/screens/plans_screen.dart';
-import 'package:flutter_boilerplate/features/plans/presentation/screens/payment_webview_screen.dart';
-import 'package:flutter_boilerplate/features/home/presentation/screens/home_view_all_screen.dart';
-import 'package:flutter_boilerplate/features/home/presentation/screens/government_id_verify_screen.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/about_you.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/email_phone.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/family_details.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/family_financial_status.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/hobbies_interests.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/photo_upload.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/profile_created_status.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/profile_is_for.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/verify_number.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/verify_otp_for_sign_up.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/your_religion.dart';
-import 'package:flutter_boilerplate/features/settings/presentation/screens/settings_screen.dart';
-import 'package:flutter_boilerplate/core/connectivity/connectivity_keys.dart';
+import 'package:walima_llc/features/matches/presentation/screens/filters/new_filter.dart';
+import 'package:walima_llc/features/contact_filter/presentation/screens/contact_filter_screen.dart';
+import 'package:walima_llc/features/account_setting/presentation/screens/account_setting_screen.dart';
+import 'package:walima_llc/features/profile/presentation/screen/edit_profile.dart';
+import 'package:walima_llc/features/profile/presentation/screen/profile_edit_section.dart';
+import 'package:walima_llc/features/profile/presentation/screen/profile_section_edit_screen.dart';
+import 'package:walima_llc/features/home/data/model/response/profile_strength_response.dart';
+import 'package:walima_llc/features/login/presentation/screens/new_password.dart';
+import 'package:walima_llc/features/login/presentation/screens/otp_verify.dart';
+import 'package:walima_llc/features/login/presentation/screens/reset_pssword_status.dart';
+import 'package:walima_llc/features/login/presentation/screens/send_otp.dart';
+import 'package:walima_llc/features/matches/presentation/screens/matches.dart';
+import 'package:walima_llc/features/matches/presentation/screens/filters/search_filter.dart';
+import 'package:walima_llc/features/matches/presentation/screens/filters/my_match_filter.dart';
+import 'package:walima_llc/features/notification/presentation/notification_screen.dart';
+import 'package:walima_llc/features/onboarding_screen.dart';
+import 'package:walima_llc/features/recommended_preferences/presentation/connect_matches.dart';
+import 'package:walima_llc/features/recommended_preferences/presentation/recommended_preferences/basic_details.dart';
+import 'package:walima_llc/features/recommended_preferences/presentation/recommended_preferences/career.dart';
+import 'package:walima_llc/features/recommended_preferences/presentation/recommended_preferences/community.dart';
+import 'package:walima_llc/features/recommended_preferences/presentation/recommended_preferences/education.dart';
+import 'package:walima_llc/features/recommended_preferences/presentation/recommended_preferences/other_details.dart';
+import 'package:walima_llc/features/recommended_preferences/presentation/recommended_preferences/partner_preferences.dart';
+import 'package:walima_llc/features/recommended_preferences/presentation/recommended_preferences/preference_location.dart';
+import 'package:walima_llc/features/registration/presentation/screens/crop_image.dart';
+import 'package:walima_llc/features/plans/presentation/screens/plans_screen.dart';
+import 'package:walima_llc/features/plans/presentation/screens/payment_webview_screen.dart';
+import 'package:walima_llc/features/home/presentation/screens/home_view_all_screen.dart';
+import 'package:walima_llc/features/home/presentation/screens/government_id_verify_screen.dart';
+import 'package:walima_llc/features/registration/presentation/screens/about_you.dart';
+import 'package:walima_llc/features/registration/presentation/screens/email_phone.dart';
+import 'package:walima_llc/features/registration/presentation/screens/family_details.dart';
+import 'package:walima_llc/features/registration/presentation/screens/family_financial_status.dart';
+import 'package:walima_llc/features/registration/presentation/screens/hobbies_interests.dart';
+import 'package:walima_llc/features/registration/presentation/screens/photo_upload.dart';
+import 'package:walima_llc/features/registration/presentation/screens/profile_created_status.dart';
+import 'package:walima_llc/features/registration/presentation/screens/profile_is_for.dart';
+import 'package:walima_llc/features/registration/presentation/screens/verify_number.dart';
+import 'package:walima_llc/features/registration/presentation/screens/verify_otp_for_sign_up.dart';
+import 'package:walima_llc/features/registration/presentation/screens/your_religion.dart';
+import 'package:walima_llc/features/settings/presentation/screens/settings_screen.dart';
+import 'package:walima_llc/core/connectivity/connectivity_keys.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:flutter_boilerplate/features/splash_screen.dart';
-import 'package:flutter_boilerplate/features/anchor_point/anchor_point.dart';
-import 'package:flutter_boilerplate/features/login/presentation/login_screen.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/location.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/marital_status.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/qualification.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/profession.dart';
-import 'package:flutter_boilerplate/features/registration/presentation/screens/about_yourself.dart';
+import 'package:walima_llc/features/splash_screen.dart';
+import 'package:walima_llc/features/anchor_point/anchor_point.dart';
+import 'package:walima_llc/features/login/presentation/login_screen.dart';
+import 'package:walima_llc/features/registration/presentation/screens/location.dart';
+import 'package:walima_llc/features/registration/presentation/screens/marital_status.dart';
+import 'package:walima_llc/features/registration/presentation/screens/qualification.dart';
+import 'package:walima_llc/features/registration/presentation/screens/profession.dart';
+import 'package:walima_llc/features/registration/presentation/screens/about_yourself.dart';
 import '../../features/chat/presentation/screens/one_to_one_chat_screen.dart';
 import '../../features/profile_preview/presentation/screens/profile_preview_screen.dart';
 import 'route_name.dart';
-import 'package:flutter_boilerplate/features/chat/presentation/screens/report_screen.dart';
-import 'package:flutter_boilerplate/features/chat/presentation/screens/status_screen.dart';
+import 'package:walima_llc/features/chat/presentation/screens/report_screen.dart';
+import 'package:walima_llc/features/chat/presentation/screens/status_screen.dart';
 part 'app_router.g.dart';
 
 @riverpod
@@ -90,7 +91,6 @@ GoRouter goRouter(Ref ref) {
         name: Routes.otpVerify,
         builder: (context, state) => const OtpVerifyScreen(),
       ),
-
       GoRoute(
         path: Paths.otpVerifyForSignUp,
         name: Routes.otpVerifyForSignUp,
@@ -229,7 +229,6 @@ GoRouter goRouter(Ref ref) {
         name: Routes.hobbiesInterests,
         builder: (context, state) => const HobbiesInterestsScreen(),
       ),
-
       GoRoute(
         path: Paths.familyDetails,
         name: Routes.familyDetails,
@@ -301,6 +300,10 @@ GoRouter goRouter(Ref ref) {
         builder: (context, state) {
           final extra = state.extra;
           String? sectionKey;
+          String? strengthSectionKey;
+          String? strengthSectionLabel;
+          List<ProfileStrengthField> strengthFields =
+              const <ProfileStrengthField>[];
 
           if (extra is String) {
             sectionKey = extra;
@@ -310,10 +313,35 @@ GoRouter goRouter(Ref ref) {
             if (rawSection is String) {
               sectionKey = rawSection;
             }
+            final rawStrengthSectionKey = map['strengthSectionKey'];
+            if (rawStrengthSectionKey is String &&
+                rawStrengthSectionKey.trim().isNotEmpty) {
+              strengthSectionKey = rawStrengthSectionKey.trim();
+            }
+            final rawStrengthSectionLabel = map['strengthSectionLabel'];
+            if (rawStrengthSectionLabel is String &&
+                rawStrengthSectionLabel.trim().isNotEmpty) {
+              strengthSectionLabel = rawStrengthSectionLabel.trim();
+            }
+            final rawStrengthFields = map['strengthFields'];
+            if (rawStrengthFields is List) {
+              strengthFields = rawStrengthFields.whereType<Map>()
+                  .map(
+                    (item) => ProfileStrengthField.fromJson(
+                      Map<String, dynamic>.from(item),
+                    ),
+                  )
+                  .toList(growable: false);
+            }
           }
 
           final section = ProfileEditSectionX.fromKey(sectionKey);
-          return ProfileSectionEditScreen(section: section);
+          return ProfileSectionEditScreen(
+            section: section,
+            strengthSectionKey: strengthSectionKey,
+            strengthSectionLabel: strengthSectionLabel,
+            strengthFields: strengthFields,
+          );
         },
       ),
       GoRoute(
@@ -442,7 +470,6 @@ GoRouter goRouter(Ref ref) {
           );
         },
       ),
-
       GoRoute(
         path: Paths.chatScreen,
         name: Routes.chatScreen,
@@ -486,10 +513,11 @@ GoRouter goRouter(Ref ref) {
         path: Paths.profilePreview,
         name: Routes.profilePreview,
         builder: (context, state) {
-          final userData = state.extra is Map<String, dynamic>
+          final extra = state.extra is Map<String, dynamic>
               ? state.extra as Map<String, dynamic>
-              : null;
-          return ProfilePreviewScreen(userData: userData);
+              : const <String, dynamic>{};
+          final userId = extra['userId']?.toString() ?? '';
+          return ProfilePreviewScreen(userId: userId);
         },
       ),
     ],

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_boilerplate/generated/l10n/app_localizations.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/providers/theme_provider.dart';
-import 'package:flutter_boilerplate/core/providers/locale_provider.dart';
+import 'package:walima_llc/generated/l10n/app_localizations.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/providers/theme_provider.dart';
+import 'package:walima_llc/core/providers/locale_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -110,8 +110,8 @@ class SettingsScreen extends ConsumerWidget {
 
           // About Section
           _buildSectionHeader(context, l10n.about),
-          Card(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          const Card(
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Column(
               children: [
                 ListTile(
@@ -119,17 +119,17 @@ class SettingsScreen extends ConsumerWidget {
                     Icons.info_outline,
                     color: AppColors.primary,
                   ),
-                  title: const Text('Version'),
-                  subtitle: const Text('1.0.0'),
+                  title: Text('Version'),
+                  subtitle: Text('1.0.0'),
                 ),
-                const Divider(height: 1),
+                Divider(height: 1),
                 ListTile(
                   leading: Icon(
                     Icons.code,
                     color: AppColors.primary,
                   ),
-                  title: const Text('Build Number'),
-                  subtitle: const Text('1'),
+                  title: Text('Build Number'),
+                  subtitle: Text('1'),
                 ),
               ],
             ),

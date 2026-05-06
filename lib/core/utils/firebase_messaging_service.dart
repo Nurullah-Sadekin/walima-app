@@ -6,11 +6,11 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_boilerplate/core/firebase/firebase_options.dart';
-import 'package:flutter_boilerplate/core/network/app_urls.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/core/utils/foreground_alert_service.dart';
-import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
+import 'package:walima_llc/core/firebase/firebase_options.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/core/utils/foreground_alert_service.dart';
+import 'package:walima_llc/core/utils/prefs_helper.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:uuid/uuid.dart';
 

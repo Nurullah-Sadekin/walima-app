@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
 
 Future<String?> showPaginatedSearchPickerSheet({
   required BuildContext context,
@@ -76,26 +76,111 @@ class _PaginatedSearchPickerSheetState
     extends State<_PaginatedSearchPickerSheet> {
   late final TextEditingController _searchController;
   Timer? _searchDebounce;
+  final DraggableScrollableController _sheetController =
+      DraggableScrollableController();
+  static const double _collapsedSize = 0.65;
+  static const double _expandedSize = 0.95;
+  bool _wasKeyboardVisible = false;
+
+  /// Cache of every distinct item the sheet has ever observed via
+  /// [widget.items]. This lets local filtering keep working even after the
+  /// parent provider clears its list to fetch a fresh API page.
+  final List<String> _cachedItems = <String>[];
+  final Set<String> _cachedItemKeys = <String>{};
+  String _localQuery = '';
 
   @override
   void initState() {
     super.initState();
     _searchController = TextEditingController(text: widget.initialQuery);
+    _localQuery = widget.initialQuery;
+    _mergeIntoCache(widget.items);
+  }
+
+  @override
+  void didUpdateWidget(covariant _PaginatedSearchPickerSheet oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(widget.items, oldWidget.items)) {
+      _mergeIntoCache(widget.items);
+    }
   }
 
   @override
   void dispose() {
     _searchDebounce?.cancel();
     _searchController.dispose();
+    _sheetController.dispose();
     super.dispose();
+  }
+
+  void _mergeIntoCache(List<String> incoming) {
+    for (final item in incoming) {
+      final trimmed = item.trim();
+      if (trimmed.isEmpty) continue;
+      final key = trimmed.toLowerCase();
+      if (_cachedItemKeys.add(key)) {
+        _cachedItems.add(trimmed);
+      }
+    }
+  }
+
+  List<String> _resolveDisplayItems() {
+    final query = _localQuery.trim().toLowerCase();
+    if (query.isEmpty) {
+      // No active query — show whatever the parent currently exposes so the
+      // pagination/loading semantics match the API state exactly.
+      return widget.items;
+    }
+
+    final filtered = <String>[];
+    final seen = <String>{};
+    for (final item in _cachedItems) {
+      if (!item.toLowerCase().contains(query)) continue;
+      final key = item.toLowerCase();
+      if (seen.add(key)) {
+        filtered.add(item);
+      }
+    }
+    // Also include anything from widget.items that may not have been merged
+    // yet (defensive — covers the rare race where build runs before
+    // didUpdateWidget).
+    for (final item in widget.items) {
+      final trimmed = item.trim();
+      if (trimmed.isEmpty) continue;
+      if (!trimmed.toLowerCase().contains(query)) continue;
+      final key = trimmed.toLowerCase();
+      if (seen.add(key)) {
+        filtered.add(trimmed);
+      }
+    }
+    return filtered;
+  }
+
+  void _syncSheetToKeyboard(bool isKeyboardVisible) {
+    if (isKeyboardVisible == _wasKeyboardVisible) return;
+    _wasKeyboardVisible = isKeyboardVisible;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_sheetController.isAttached) return;
+      final target = isKeyboardVisible ? _expandedSize : _collapsedSize;
+      if ((_sheetController.size - target).abs() < 0.01) return;
+      _sheetController.animateTo(
+        target,
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOut,
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    final isKeyboardVisible = keyboardHeight > 0;
+    _syncSheetToKeyboard(isKeyboardVisible);
     return DraggableScrollableSheet(
-      initialChildSize: 0.65,
+      controller: _sheetController,
+      initialChildSize: _collapsedSize,
       minChildSize: 0.5,
-      maxChildSize: 0.92,
+      maxChildSize: _expandedSize,
       expand: false,
       builder: (context, scrollController) {
         return Container(
@@ -105,76 +190,89 @@ class _PaginatedSearchPickerSheetState
           ),
           child: SafeArea(
             top: false,
-            child: Column(
-              children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.black26,
-                    borderRadius: BorderRadius.circular(2),
+            child: Padding(
+              padding: EdgeInsets.only(bottom: keyboardHeight),
+              child: Column(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.black26,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          widget.title,
-                          style: TextStyle(
-                            fontSize: TextSize.font18(context),
-                            fontWeight: FontWeight.w600,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            widget.title,
+                            style: TextStyle(
+                              fontSize: TextSize.font18(context),
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                      ),
-                      IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.close, size: 20),
-                      ),
-                    ],
+                        IconButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: const Icon(Icons.close, size: 20),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: TextField(
-                    controller: _searchController,
-                    onChanged: _onSearchChanged,
-                    decoration: InputDecoration(
-                      hintText: widget.searchHintText,
-                      prefixIcon: const Icon(Icons.search),
-                      suffixIcon: _searchController.text.isEmpty
-                          ? null
-                          : IconButton(
-                              onPressed: () {
-                                _searchController.clear();
-                                _onSearchChanged('');
-                              },
-                              icon: const Icon(Icons.close),
-                            ),
-                      filled: true,
-                      fillColor: const Color(0xFFF7F7F7),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: _onSearchChanged,
+                      decoration: InputDecoration(
+                        hintText: widget.searchHintText,
+                        hintStyle: TextStyle(
+                          fontSize: TextSize.font16(context),
+                          color: AppColors.textSecondaryLight,
+                        ),
+                        prefixIcon: Icon(Icons.search,color: AppColors.textSecondaryLight,size: TextSize.font22(context),),
+                        suffixIcon: _searchController.text.isEmpty
+                            ? null
+                            : IconButton(
+                                onPressed: () {
+                                  _searchController.clear();
+                                  _onSearchChanged('');
+                                },
+                                icon:  Icon(Icons.close,color: AppColors.primary,size: TextSize.font22(context),),
+                              ),
+                        filled: true,
+                        fillColor:  AppColors.greyLight.withOpacity(0.5),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                Expanded(
-                  child: _PaginatedSearchPickerList(
-                    scrollController: scrollController,
-                    items: widget.items,
-                    isInitialLoading: widget.isInitialLoading,
-                    isLoadingMore: widget.isLoadingMore,
-                    hasMoreItems: widget.hasMoreItems,
-                    onLoadMore: widget.onLoadMore,
-                    emptyStateText: widget.emptyStateText,
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: _PaginatedSearchPickerList(
+                      scrollController: scrollController,
+                      items: _resolveDisplayItems(),
+                      isInitialLoading: widget.isInitialLoading,
+                      isLoadingMore: widget.isLoadingMore,
+                      // Disable load-more while a local query is active so the
+                      // user is not nudged to paginate past the locally
+                      // filtered results — once the API returns matching
+                      // items they get merged into the cache automatically.
+                      hasMoreItems: _localQuery.trim().isEmpty
+                          ? widget.hasMoreItems
+                          : false,
+                      onLoadMore: widget.onLoadMore,
+                      emptyStateText: widget.emptyStateText,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
@@ -183,7 +281,11 @@ class _PaginatedSearchPickerSheetState
   }
 
   void _onSearchChanged(String value) {
-    setState(() {});
+    setState(() {
+      // Apply the local filter immediately so the user sees instant feedback
+      // from already-loaded items while the debounced API call is in flight.
+      _localQuery = value;
+    });
     _searchDebounce?.cancel();
     _searchDebounce = Timer(widget.searchDebounce, () {
       widget.onSearchChanged(value);

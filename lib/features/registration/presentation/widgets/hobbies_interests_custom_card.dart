@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
-import 'package:flutter_boilerplate/features/registration/domain/single_string_model.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/global/components/selection_card.dart';
+import 'package:walima_llc/features/registration/domain/single_string_model.dart';
 
 class HobbiesInterestsCard extends StatelessWidget {
 

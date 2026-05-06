@@ -1,4 +1,4 @@
-import 'package:flutter_boilerplate/core/global/enums/enums.dart';
+import 'package:walima_llc/core/global/enums/enums.dart';
 
 class GetMatchesQueryParams {
   GetMatchesQueryParams({

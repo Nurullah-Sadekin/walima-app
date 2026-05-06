@@ -1,24 +1,25 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/providers/base_change_notifier.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/core/utils/app_error_reporting_service.dart';
-import 'package:flutter_boilerplate/core/utils/firebase_messaging_service.dart';
-import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
-import 'package:flutter_boilerplate/core/utils/validators.dart';
-import 'package:flutter_boilerplate/features/login/data/models/login_body.dart';
-import 'package:flutter_boilerplate/features/login/data/models/login_response.dart';
-import 'package:flutter_boilerplate/features/login/data/models/login_with_otp_body.dart';
-import 'package:flutter_boilerplate/features/login/data/models/otp_verify_body.dart';
-import 'package:flutter_boilerplate/features/login/data/models/resend_otp_body.dart';
-import 'package:flutter_boilerplate/features/login/data/models/set_password_body.dart';
-import 'package:flutter_boilerplate/features/login/data/repository/login_repository.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/providers/base_change_notifier.dart';
+import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/core/utils/app_error_reporting_service.dart';
+import 'package:walima_llc/core/utils/firebase_messaging_service.dart';
+import 'package:walima_llc/core/utils/dialog_utils.dart';
+import 'package:walima_llc/core/utils/validators.dart';
+import 'package:walima_llc/features/login/data/models/login_body.dart';
+import 'package:walima_llc/features/login/data/models/login_response.dart';
+import 'package:walima_llc/features/login/data/models/login_with_otp_body.dart';
+import 'package:walima_llc/features/login/data/models/otp_verify_body.dart';
+import 'package:walima_llc/features/login/data/models/resend_otp_body.dart';
+import 'package:walima_llc/features/login/data/models/set_password_body.dart';
+import 'package:walima_llc/features/login/data/repository/login_repository.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_boilerplate/core/constants/storage_keys.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/features/chat/data/socket/socket_service.dart';
+import 'package:walima_llc/core/constants/storage_keys.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/features/chat/data/socket/socket_service.dart';
 
 class LoginProvider extends BaseChangeNotifier {
   static const String _mobileOrEmailRequiredMessage =
@@ -200,18 +201,35 @@ class LoginProvider extends BaseChangeNotifier {
       purpose: _authPurpose,
     );
     final response = await LoginRepository.resendOtp(body);
-    if (!context.mounted) return;
-    if (response.code != 'SUCCESS') {
-      _handleLoginFailure(context, response.message);
-      return;
-    }
     _hideLoading();
-    await DialogUtils.showSuccessDialog(
-      context: context,
-      message: response.message,
-      autoClose: true,
-      autoCloseDuration: const Duration(seconds: 2),
+    if (!context.mounted) return;
+    final isSuccess = response.code == 'SUCCESS';
+    _showResendSnackBar(
+      context,
+      message: response.message ??
+          (isSuccess ? 'OTP sent' : 'Failed to resend OTP'),
+      isSuccess: isSuccess,
     );
+  }
+
+  void _showResendSnackBar(
+    BuildContext context, {
+    required String message,
+    required bool isSuccess,
+  }) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: isSuccess ? AppColors.success : AppColors.error,
+          duration: const Duration(seconds: 2),
+          content: Text(
+            message,
+            style: const TextStyle(color: Colors.white),
+          ),
+        ),
+      );
   }
 
   Future<void> loginWithOtp(BuildContext context) async {
@@ -282,7 +300,9 @@ class LoginProvider extends BaseChangeNotifier {
     BuildContext context,
     LoginResponse response,
   ) async {
-    if (response.code == 'SUCCESS') {
+    final hasAuthTokens = _hasAuthTokens(response);
+
+    if (response.code == 'SUCCESS' && hasAuthTokens) {
       await _persistAuthTokens(response);
       await AppErrorReportingService.instance.setUserContext(
         userId: response.response?.user?.id,
@@ -295,21 +315,25 @@ class LoginProvider extends BaseChangeNotifier {
       return;
     }
 
-    _handleLoginFailure(context, response.message);
+    _handleLoginFailure(
+      context,
+      response.message ?? 'Login failed. Please try again.',
+    );
+  }
+
+  bool _hasAuthTokens(LoginResponse response) {
+    final accessToken = response.response?.accessToken?.trim() ?? '';
+    final refreshToken = response.response?.refreshToken?.trim() ?? '';
+    return accessToken.isNotEmpty && refreshToken.isNotEmpty;
   }
 
   Future<void> _persistAuthTokens(LoginResponse response) async {
     final prefs = await SharedPreferences.getInstance();
-    final accessToken = response.response?.accessToken;
-    final refreshToken = response.response?.refreshToken;
+    final accessToken = response.response?.accessToken?.trim() ?? '';
+    final refreshToken = response.response?.refreshToken?.trim() ?? '';
 
-    if (accessToken != null && accessToken.isNotEmpty) {
-      await _saveAccessToken(prefs, accessToken);
-    }
-
-    if (refreshToken != null && refreshToken.isNotEmpty) {
-      await _saveRefreshToken(prefs, refreshToken);
-    }
+    await _saveAccessToken(prefs, accessToken);
+    await _saveRefreshToken(prefs, refreshToken);
   }
 
   Future<void> _saveAccessToken(

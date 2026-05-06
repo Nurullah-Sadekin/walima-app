@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/input_border_style.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/input_border_style.dart';
 import 'package:intl/intl.dart';
 
 class PrimaryTextField extends StatefulWidget {
@@ -18,7 +18,7 @@ class PrimaryTextField extends StatefulWidget {
     this.headLine,
     this.keyboardType,
     this.obscureText,
-    required this.errorText,
+    this.errorText,
     this.onChanged,
     this.minLine,
     this.isCountryDropdown = false,
@@ -34,11 +34,12 @@ class PrimaryTextField extends StatefulWidget {
     this.contentPadding,
     this.enabled,
     this.hideHeadline,
-    this.length
+    this.length,
+    this.isRequired = false,
   });
 
   final TextEditingController? controller;
-  final dynamic errorText;
+  final String? errorText;
   final bool isCountryDropdown;
   final VoidCallback? onTap;
   final EdgeInsetsGeometry? contentPadding;
@@ -65,6 +66,8 @@ class PrimaryTextField extends StatefulWidget {
   final bool? showPassIcon;
   final bool? headLineInfoIcon;
   final int? length;
+  final bool? isRequired;
+
 
   @override
   State<PrimaryTextField> createState() => _PrimaryTextFieldState();
@@ -266,6 +269,13 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
             if (widget.headLineInfoIcon == true && widget.headLine != null)
               Icon(Icons.info,
                   size: TextSize.font13(context), color: AppColors.disableText),
+            if (widget.isRequired == true && widget.headLine != null)
+           Text('*',
+                style: TextStyle(
+                    fontSize: TextSize.font14(context),
+                    fontWeight: FontWeight.w600,
+                  color: Colors.redAccent
+                ))
           ],
         ),
         const SizedBox(height: 6),

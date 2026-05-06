@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/global/components/selection_card.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/global/components/selection_card.dart';
+import 'package:walima_llc/core/utils/image_viewer.dart';
 
 class FilterWidget extends StatelessWidget {
-
   const FilterWidget({
     super.key,
-    required this.title,
+    this.title,
     required this.items,
     required this.onItemTap,
     this.iconPath,
@@ -26,7 +25,7 @@ class FilterWidget extends StatelessWidget {
     this.titleExtractor,
   });
 
-  final String title;
+  final String? title;
   final String? iconPath;
   final Widget? customIcon;
   final double? iconSize;
@@ -58,33 +57,33 @@ class FilterWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            spacing: effectiveSpacing,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              if (customIcon != null)
-                customIcon!
-              else if (iconPath != null)
-                ShowImage(
-                  imagePath: iconPath!,
-                  width: effectiveIconSize,
-                  height: effectiveIconSize,
-                  color: iconColor ?? effectiveTitleColor,
+          if (title != null)...[
+            Row(
+              spacing: effectiveSpacing,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (customIcon != null)
+                  customIcon!
+                else if (iconPath != null)
+                  ShowImage(
+                    imagePath: iconPath!,
+                    width: effectiveIconSize,
+                    height: effectiveIconSize,
+                    color: iconColor ?? effectiveTitleColor,
+                  ),
+                Text(
+                  title!,
+                  style: TextStyle(
+                    fontSize: effectiveTitleFontSize,
+                    fontWeight: effectiveTitleFontWeight,
+                    color: effectiveTitleColor,
+                  ),
                 ),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: effectiveTitleFontSize,
-                  fontWeight: effectiveTitleFontWeight,
-                  color: effectiveTitleColor,
-                ),
-              ),
-            ],
-          ),
-
-          SizedBox(height: effectiveItemSpacing),
-
+              ],
+            ),
+            SizedBox(height: effectiveItemSpacing),
+          ],
           // Sort Items List
           ListView.builder(
             shrinkWrap: true,
@@ -93,10 +92,9 @@ class FilterWidget extends StatelessWidget {
             itemCount: items.length,
             itemBuilder: (context, index) {
               final item = items[index];
-              final isSelected = isSelectedChecker?.call(item) ??
-                  (item.isSelected);
-              final titleText = titleExtractor?.call(item) ??
-                  (item.name);
+              final isSelected =
+                  isSelectedChecker?.call(item) ?? (item.isSelected);
+              final titleText = titleExtractor?.call(item) ?? (item.name);
 
               return Padding(
                 padding: EdgeInsets.only(bottom: effectiveItemSpacing),
@@ -132,7 +130,6 @@ class FilterItem {
 }
 
 class FilterModel<T> {
-
   const FilterModel({
     required this.name,
     this.isSelected = false,

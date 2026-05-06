@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_boilerplate/core/network/app_urls.dart';
-import 'package:flutter_boilerplate/core/network/dio_client.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/request/upload_media_request_body.dart';
-import 'package:flutter_boilerplate/features/registration/data/models/response/upload_media_response.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/network/dio_client.dart';
+import 'package:walima_llc/features/registration/data/models/request/upload_media_request_body.dart';
+import 'package:walima_llc/features/registration/data/models/response/upload_media_response.dart';
 
 class MediaRepository {
   Future<UploadMediaResponse> uploadMedia(UploadMediaRequestBody body) async {

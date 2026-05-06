@@ -1,27 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/bottom_sheet.dart';
-import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
-import 'package:flutter_boilerplate/core/global/enums/enums.dart';
-import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/core/utils/date_time_utils.dart';
-import 'package:flutter_boilerplate/core/utils/height_utils.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
-import 'package:flutter_boilerplate/core/utils/link_opener.dart';
-import 'package:flutter_boilerplate/features/anchor_point/achore_appbar.dart';
-import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
-import 'package:flutter_boilerplate/features/home/data/model/response/recent_visitors_response.dart';
-import 'package:flutter_boilerplate/features/home/presentation/providers/home_provider.dart';
-import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/complete_profile_section.dart';
-import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/profile_summery_section.dart';
-import 'package:flutter_boilerplate/features/home/presentation/screens/widgets/social_media_icon.dart';
-import 'package:flutter_boilerplate/features/matches/data/models/response/get_matches_response.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/contact_bottom_sheet.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/profile_comprehensive_card.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/global/components/bottom_sheet.dart';
+import 'package:walima_llc/core/global/components/loading_widget.dart';
+import 'package:walima_llc/core/global/enums/enums.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/core/utils/date_time_utils.dart';
+import 'package:walima_llc/core/utils/height_utils.dart';
+import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/link_opener.dart';
+import 'package:walima_llc/features/anchor_point/achore_appbar.dart';
+import 'package:walima_llc/features/drawer/presentation/app_drawer.dart';
+import 'package:walima_llc/features/home/data/model/response/recent_visitors_response.dart';
+import 'package:walima_llc/features/home/presentation/providers/home_provider.dart';
+import 'package:walima_llc/features/home/presentation/screens/widgets/complete_profile_section.dart';
+import 'package:walima_llc/features/home/presentation/screens/widgets/profile_summery_section.dart';
+import 'package:walima_llc/features/home/presentation/screens/widgets/social_media_icon.dart';
+import 'package:walima_llc/features/matches/data/models/response/get_matches_response.dart';
+import 'package:walima_llc/features/connections/presentation/widgets/view_contact_bottom_sheet.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/profile_comprehensive_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -33,9 +34,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  static const String _facebookUrl = 'https://www.facebook.com/WalimaApp';
-  static const String _instagramUrl = 'https://www.instagram.com/walima.app';
-  static const String _xUrl = 'https://x.com/WalimaApp';
+
 
   final Key profileImageKey = const ValueKey('home_profile_image');
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -55,6 +54,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(profileProvider).getProfile(context);
       ref.read(profileProvider).getDashboard();
+      ref.read(homeProvider).ensureHomeDataLoaded();
     });
   }
 
@@ -77,7 +77,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return TransparentLoading(
-      isLoading: ref.watch(homeProvider).screenStates == HomeScreenStates.transparentLoading,
+      isLoading: ref.watch(homeProvider).screenStates ==
+          HomeScreenStates.transparentLoading,
       child: Scaffold(
         key: _scaffoldKey,
         drawer: const AppDrawer(),
@@ -159,8 +160,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(homeProvider).ensureHomeDataLoaded();
+    });
+  }
+
   Widget _premiumMatches() {
     final provider = ref.watch(homeProvider);
+    final currentPlan = ref.watch(profileProvider).dashboard?.profile?.membership?.plan?.name;
     final matches = provider.premiumMatches;
     final isLoading = provider.isLoadingPremiumMatches;
     final errorText = provider.premiumMatchesError;
@@ -199,6 +210,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
               ),
+              if (currentPlan != 'Free')
               InkWell(
                 borderRadius: BorderRadius.circular(8.0),
                 onTap: () => context.pushNamed(Routes.premiumMatches),
@@ -277,13 +289,69 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               return SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: matches.map(_buildPremiumMatchCard).toList(),
+                  children: [
+                    ...matches.take(2).map(_buildPremiumMatchCard),
+
+                    if (currentPlan == 'Free')
+                      _buildUpgradeWidget(matches.length - 2),
+
+                    if (currentPlan != 'Free')
+                      ...matches.skip(2).map(_buildPremiumMatchCard),
+                  ],
                 ),
               );
             },
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildUpgradeWidget(int remainingCount, {bool? isForVisitors}) {
+    String subText = isForVisitors == true ? 'recent visitors' : 'premium matches';
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const ShowImage(
+            imagePath: AppImages.premiumSvgIcon,
+            width: 80,
+            height: 80,
+            color: AppColors.primary,
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'Upgrade Your Plan',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'See $remainingCount more $subText',
+            style: TextStyle(fontSize: TextSize.font14(context), color: AppColors.textSecondaryLight),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+
+          InkWell(
+            onTap: () => context.pushNamed(
+              Routes.upgradePackage,
+              extra: Routes.anchor,
+            ),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Text(
+                'Upgrade Now',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -299,6 +367,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: SizedBox(
         width: 300,
         child: ProfileComprehensiveCard(
+          onTapCard: () {
+            context.pushNamed(Routes.profilePreview, extra: {'userId': match.id});
+          },
           imagePath: imagePath ??
               (match.gender == 'female'
                   ? AppImages.womenAvatar
@@ -339,12 +410,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             );
           },
           onTapLeftButton: () {
-            ref.read(homeProvider).connect(
-                  context,
-                  match.id ?? '',
-                  match.displayName ?? 'Unknown',
-                  ConnectionRequestType.match.apiValue,
-                );
+            if (match.connection?.status == 'none') {
+              ref.read(homeProvider).connect(
+                    context,
+                    match.id ?? '',
+                    match.displayName ?? 'Unknown',
+                    ConnectionRequestType.match.apiValue,
+                  );
+            }
             // print('Left button tapped for ${match.displayName}');
           },
           activeStatusText: activeStatus,
@@ -356,15 +429,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _contactPremiumBottomSheet(MatchProfile match) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: ContactBottomSheet(
+      child: ViewContactBottomSheet(
+        userId: match.id ?? '',
         userName: match.displayName ?? 'Unknown',
         profileImagePath: (match.profilePhoto?.url?.isNotEmpty ?? false)
             ? match.profilePhoto!.url!
-            : match.gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar,
+            : match.gender == 'female'
+                ? AppImages.womenAvatar
+                : AppImages.manAvatar,
         description: match.connection?.message,
         isDescriptionVisible: false,
-        email: 'test@gmail.com',
-        phone: '+8801234567890',
+        onWalimaChatPressed: match.id == null
+          ? null
+          : () {
+        context.pushNamed(
+          Routes.chatScreen,
+          extra: {
+            'conversationId': match.connection?.conversationId,
+            'participant': {
+              'userId': match.id,
+              'displayName': match.displayName,
+              'profilePictureUrl': match.profilePhoto?.url,
+              'isOnline': match.isOnline,
+            },
+          },
+        );
+      },
       ),
     );
   }
@@ -405,6 +495,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _recentVisitors() {
     final provider = ref.watch(homeProvider);
     final visitors = provider.recentVisitors;
+    final currentPlan = ref.watch(profileProvider).dashboard?.profile?.membership?.plan?.name;
     final isLoading = provider.isLoadingRecentVisitors;
     final errorText = provider.recentVisitorsError;
     final subtitleText = isLoading
@@ -442,6 +533,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
               ),
+              if (currentPlan != 'Free')
               InkWell(
                 borderRadius: BorderRadius.circular(8.0),
                 onTap: () => context.pushNamed(Routes.recentVisitors),
@@ -520,7 +612,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               return SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: visitors.map(_buildRecentVisitorCard).toList(),
+                  children: [
+                    ...visitors.take(2).map(_buildRecentVisitorCard),
+
+                    if (currentPlan == 'Free')
+                      _buildUpgradeWidget(visitors.length - 2, isForVisitors: true),
+
+                    if (currentPlan != 'Free')
+                      ...visitors.skip(2).map(_buildRecentVisitorCard),
+                  ],
                 ),
               );
             },
@@ -544,6 +644,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: SizedBox(
         width: 300,
         child: ProfileComprehensiveCard(
+          onTapCard: () {
+            context.pushNamed(Routes.profilePreview, extra: {'userId': visitor.id});
+          },
           imagePath: imagePath,
           imageHeight: 250,
           isPremiumConnect: visitor.isPremium ?? false,
@@ -578,12 +681,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             );
           },
           onTapLeftButton: () {
-            ref.read(homeProvider).connect(
-                  context,
-                  visitor.id ?? '',
-                  visitor.displayName ?? 'Unknown',
-                  ConnectionRequestType.match.apiValue,
-                );
+            if (visitor.connection?.status == 'none') {
+              ref.read(homeProvider).connect(
+                    context,
+                    visitor.id ?? '',
+                    visitor.displayName ?? 'Unknown',
+                    ConnectionRequestType.match.apiValue,
+                  );
+            }
           },
         ),
       ),
@@ -593,15 +698,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _contactVisitorBottomSheet(Data visitor) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: ContactBottomSheet(
+      child: ViewContactBottomSheet(
+        userId: visitor.id ?? '',
         userName: visitor.displayName ?? 'Unknown',
         profileImagePath: (visitor.profilePhoto?.url?.isNotEmpty ?? false)
             ? visitor.profilePhoto!.url!
-            : visitor.gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar,
+            : visitor.gender == 'female'
+                ? AppImages.womenAvatar
+                : AppImages.manAvatar,
         description: visitor.connection?.message,
         isDescriptionVisible: false,
-        email: 'test@gmail.com',
-        phone: '+8801234567890',
+        onWalimaChatPressed: visitor.id == null
+            ? null
+            : () {
+          context.pushNamed(
+            Routes.chatScreen,
+            extra: {
+              'conversationId': visitor.connection?.conversationId,
+              'participant': {
+                'userId': visitor.id,
+                'displayName': visitor.displayName,
+                'profilePictureUrl': visitor.profilePhoto?.url,
+                'isOnline': visitor.isOnline,
+              },
+            },
+          );
+        },
       ),
     );
   }
@@ -662,15 +784,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 children: [
                   SocialMediaIcon(
                     imagePath: AppImages.instagramIcon,
-                    onTap: () => _openLink('Instagram', _instagramUrl),
+                    onTap: () => _openLink('Instagram', AppUrls.instagramUrl),
                   ),
                   SocialMediaIcon(
                     imagePath: AppImages.facebookIcon,
-                    onTap: () => _openLink('Facebook', _facebookUrl),
+                    onTap: () => _openLink('Facebook', AppUrls.facebookUrl),
                   ),
                   SocialMediaIcon(
                     imagePath: AppImages.twitterIcon,
-                    onTap: () => _openLink('X', _xUrl),
+                    onTap: () => _openLink('X', AppUrls.xUrl),
                   ),
                   SocialMediaIcon(
                     imagePath: AppImages.whatsappSvgIcon,

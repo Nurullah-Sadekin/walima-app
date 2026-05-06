@@ -3,10 +3,10 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
-import 'package:flutter_boilerplate/core/network/app_urls.dart';
-import 'package:flutter_boilerplate/core/utils/foreground_alert_service.dart';
-import 'package:flutter_boilerplate/core/utils/prefs_helper.dart';
-import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_messages_response.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/utils/foreground_alert_service.dart';
+import 'package:walima_llc/core/utils/prefs_helper.dart';
+import 'package:walima_llc/features/chat/data/model/response/conversation_messages_response.dart';
 
 class SocketService {
   SocketService._internal();

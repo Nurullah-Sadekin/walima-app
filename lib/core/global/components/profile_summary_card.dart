@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/profile_image_card.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/global/components/profile_image_card.dart';
+import 'package:walima_llc/core/utils/clipboard_utils.dart';
 
 class ProfileSummaryCard extends StatelessWidget {
   const ProfileSummaryCard({
@@ -17,6 +18,7 @@ class ProfileSummaryCard extends StatelessWidget {
     this.topIconPath,
     this.bottomIconPath,
     this.imageSize = 97,
+    this.profileImageVerificationStatus = 'none',
     this.iconSize = 20,
     this.onTapImage,
     this.onBottomIconPressed,
@@ -24,6 +26,7 @@ class ProfileSummaryCard extends StatelessWidget {
 
   final String displayName;
   final String memberId;
+  final String profileImageVerificationStatus;
   final String planName;
   final String expiryText;
   final String profileImagePath;
@@ -88,34 +91,38 @@ class ProfileSummaryCard extends StatelessWidget {
   }
 
   Widget _memberIdChip(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(6.0),
-        border: Border.all(
-          color: AppColors.greyLight,
-          width: 1,
+    return InkWell(
+      borderRadius: BorderRadius.circular(6.0),
+      onTap: () => ClipboardUtils.copyWithSnack(context, memberId),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(6.0),
+          border: Border.all(
+            color: AppColors.greyLight,
+            width: 1,
+          ),
         ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'ID : $memberId',
-            style: TextStyle(
-              color: AppColors.textSecondaryLight,
-              fontSize: TextSize.font12(context),
-              fontWeight: FontWeight.w400,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'ID : $memberId',
+              style: TextStyle(
+                color: AppColors.textSecondaryLight,
+                fontSize: TextSize.font12(context),
+                fontWeight: FontWeight.w400,
+              ),
             ),
-          ),
-          const SizedBox(width: 4),
-          Icon(
-            Icons.copy_rounded,
-            color: AppColors.textSecondaryLight,
-            size: TextSize.font12(context),
-          ),
-        ],
+            const SizedBox(width: 4),
+            Icon(
+              Icons.copy_rounded,
+              color: AppColors.textSecondaryLight,
+              size: TextSize.font12(context),
+            ),
+          ],
+        ),
       ),
     );
   }

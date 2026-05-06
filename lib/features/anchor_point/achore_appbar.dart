@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
-import 'package:flutter_boilerplate/features/drawer/presentation/app_drawer.dart';
-import 'package:flutter_boilerplate/features/notification/presentation/notification_icon_with_badge.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/features/drawer/presentation/app_drawer.dart';
+import 'package:walima_llc/features/notification/presentation/notification_icon_with_badge.dart';
 
 class AnchoredAppBar extends StatelessWidget implements PreferredSizeWidget {
 

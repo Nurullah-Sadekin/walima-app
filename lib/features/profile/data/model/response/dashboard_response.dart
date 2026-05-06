@@ -9,8 +9,9 @@ class DashboardResponse {
   DashboardResponse.fromJson(dynamic json) {
     code = json['code'];
     message = json['message'];
-    response =
-        json['response'] != null ? DashboardData.fromJson(json['response']) : null;
+    response = json['response'] != null
+        ? DashboardData.fromJson(json['response'])
+        : null;
     traceId = json['traceId'];
   }
   String? code;
@@ -268,12 +269,7 @@ class Profile {
     maritalStatus = json['maritalStatus'];
     bio = json['bio'];
     motherTongue = json['motherTongue'];
-    if (json['languages'] != null) {
-      languages = [];
-      json['languages'].forEach((v) {
-        // languages?.add(Dynamic.fromJson(v));
-      });
-    }
+    languages = _parseLanguages(json['languages']);
     isVerified = json['isVerified'];
     userReference = json['userReference'];
     username = json['username'];
@@ -306,6 +302,33 @@ class Profile {
   bool? mobileVerified;
   String? accountStatus;
 
+  static List<dynamic>? _parseLanguages(dynamic rawLanguages) {
+    if (rawLanguages == null) {
+      return null;
+    }
+
+    if (rawLanguages is List) {
+      return rawLanguages
+          .map((value) => value.toString().trim())
+          .where((value) => value.isNotEmpty)
+          .toList(growable: false);
+    }
+
+    if (rawLanguages is String) {
+      return rawLanguages
+          .split(',')
+          .map((value) => value.trim())
+          .where((value) => value.isNotEmpty)
+          .toList(growable: false);
+    }
+
+    final fallback = rawLanguages.toString().trim();
+    if (fallback.isEmpty) {
+      return null;
+    }
+    return [fallback];
+  }
+
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['id'] = id;
@@ -320,7 +343,7 @@ class Profile {
     map['bio'] = bio;
     map['motherTongue'] = motherTongue;
     if (languages != null) {
-      map['languages'] = languages?.map((v) => v.toJson()).toList();
+      map['languages'] = languages;
     }
     map['isVerified'] = isVerified;
     map['userReference'] = userReference;

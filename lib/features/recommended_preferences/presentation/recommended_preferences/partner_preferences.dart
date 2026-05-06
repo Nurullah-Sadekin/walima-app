@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/global/components/gradient_background.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/features/recommended_preferences/presentation/providers/recommended_preferences_provider.dart';
-import 'package:flutter_boilerplate/core/global/components/upper_layer.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/global/components/gradient_background.dart';
+import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/features/recommended_preferences/presentation/providers/recommended_preferences_provider.dart';
+import 'package:walima_llc/core/global/components/upper_layer.dart';
+import 'package:walima_llc/features/anchor_point/anchor_point.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
+import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/global/components/loading_widget.dart';
+import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:go_router/go_router.dart';
 
 class PartnerPreferencesScreen extends ConsumerStatefulWidget {
@@ -25,7 +26,8 @@ class PartnerPreferencesScreen extends ConsumerStatefulWidget {
       _PartnerPreferencesScreenState();
 }
 
-class _PartnerPreferencesScreenState extends ConsumerState<PartnerPreferencesScreen> {
+class _PartnerPreferencesScreenState
+    extends ConsumerState<PartnerPreferencesScreen> {
   late RecommendedPreferencesProvider provider;
 
   @override
@@ -49,27 +51,38 @@ class _PartnerPreferencesScreenState extends ConsumerState<PartnerPreferencesScr
   Widget build(BuildContext context) {
     provider = ref.watch(recommendedPreferencesProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == RecommendedPreferencesScreenStates.preferences,
+      isLoading: provider.loaderState ==
+          RecommendedPreferencesScreenStates.preferences,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == RecommendedPreferencesScreenStates.preferences
+          child: provider.screenStates ==
+                  RecommendedPreferencesScreenStates.preferences
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(
-                        imagePath: AppImages.recommendedPreferences,
-                        isShowAppbar: true,
-                        isBackButton: true,
-                        isTrailing: true,
-                        trailingText: 'Skip',
-                        onTrailingTap: null),
+                    UpperLayer(
+                      imagePath: AppImages.recommendedPreferences,
+                      isShowAppbar: true,
+                      isBackButton: true,
+                      isTrailing: true,
+                      trailingText: 'Skip',
+                      onTrailingTap: _onSkipTap,
+                    ),
                     body(),
                   ],
                 ),
         ),
       ),
     );
+  }
+
+  void _onSkipTap() {
+    ref.read(currentTabProvider.notifier).state = 0;
+    final homeState = ref.read(homeProvider);
+    homeState.loadPremiumMatches(force: true);
+    homeState.loadRecentVisitors(force: true);
+    context.goNamed(Routes.anchor);
   }
 
   Widget body() {
@@ -123,7 +136,7 @@ class _PartnerPreferencesScreenState extends ConsumerState<PartnerPreferencesScr
       buttonStyle: ButtonsStyle.activePrimaryButton,
       title: 'Continue',
       onTap: () {
-         context.push(Paths.basicDetails);
+        context.push(Paths.basicDetails);
       },
     );
   }

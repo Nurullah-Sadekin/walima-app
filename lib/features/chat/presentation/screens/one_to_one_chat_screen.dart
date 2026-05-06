@@ -1,22 +1,23 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
-import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
-import 'package:flutter_boilerplate/features/chat/presentation/provider/chat_provider.dart';
-import 'package:flutter_boilerplate/features/chat/presentation/screens/widgets/profile_avatar_with_name.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/contact_bottom_sheet.dart';
-import 'package:flutter_boilerplate/features/inbox/presentation/widgets/remind_card.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/global/components/primary_button.dart';
+import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/core/utils/dialog_utils.dart';
+import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/features/chat/presentation/provider/chat_provider.dart';
+import 'package:walima_llc/features/chat/presentation/screens/widgets/profile_avatar_with_name.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/bottom_bordered_widget.dart';
+import 'package:walima_llc/features/connections/presentation/widgets/view_contact_bottom_sheet.dart';
+import 'package:walima_llc/features/inbox/presentation/widgets/remind_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'widgets/message_bubble.dart';
-import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_messages_response.dart';
+import 'package:walima_llc/features/chat/data/model/response/conversation_messages_response.dart';
 
 enum MoreMenuAction { viewProfile, viewContact, block, report }
 
@@ -340,7 +341,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
         );
         break;
       case MoreMenuAction.viewContact:
-        _viewContactBottomSheet();
+        _viewContactBottomSheet(participant);
 
         break;
       case MoreMenuAction.block:
@@ -410,7 +411,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
     }
   }
 
-  void _viewContactBottomSheet() {
+  void _viewContactBottomSheet(_ResolvedParticipant participant) {
+    final userId = participant.userId;
+    if (userId == null || userId.isEmpty) {
+      DialogUtils.showErrorDialog(
+        context: context,
+        title: 'Unable to View Contact',
+        message: 'User id is missing for this profile.',
+        buttonText: 'OK',
+      );
+      return;
+    }
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -422,21 +433,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
-          child: const SafeArea(
+          child: SafeArea(
             top: false,
             child: Wrap(
               children: [
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 16),
-                  child: ContactBottomSheet(
-                    userName: 'Sadia Sultana',
-                    profileImagePath: AppImages.demoProfile,
-                    profileType: 'Profile Created by Self',
-                    description:
-                        'She shares her phone number only with connected members.',
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16),
+                  child: ViewContactBottomSheet(
+                    userId: userId,
+                    userName: participant.displayName,
+                    profileImagePath:
+                        participant.imagePath ?? AppImages.demoProfile,
                     isDescriptionVisible: false,
-                    email: 'test@gmail.com',
-                    phone: '+8801234567890',
                   ),
                 ),
               ],

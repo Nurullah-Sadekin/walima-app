@@ -1,5 +1,5 @@
 // ProfileFor Model Class
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
 
 class ProfileForModel {
   ProfileForModel({

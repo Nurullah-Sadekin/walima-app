@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_boilerplate/features/chat/data/model/response/conversation_messages_response.dart'
+import 'package:walima_llc/features/chat/data/model/response/conversation_messages_response.dart'
     as chat_message;
 
 class ForegroundAlertService {

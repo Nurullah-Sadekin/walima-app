@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/global/components/loading_widget.dart';
-import 'package:flutter_boilerplate/core/global/components/primary_button.dart';
-import 'package:flutter_boilerplate/core/global/components/profile_summary_card.dart';
-import 'package:flutter_boilerplate/core/global/repositorys/global_repository.dart';
-import 'package:flutter_boilerplate/core/providers/providers.dart';
-import 'package:flutter_boilerplate/core/router/app_router.dart';
-import 'package:flutter_boilerplate/core/router/route_name.dart';
-import 'package:flutter_boilerplate/core/utils/dialog_utils.dart';
-import 'package:flutter_boilerplate/core/utils/link_opener.dart';
-import 'package:flutter_boilerplate/core/utils/picker_dialog.dart';
-import 'package:flutter_boilerplate/features/anchor_point/anchor_point.dart';
-import 'package:flutter_boilerplate/features/drawer/presentation/providers/app_drawer_provider.dart';
-import 'package:flutter_boilerplate/features/profile/presentation/utils/profile_summary_utils.dart';
-import 'package:flutter_boilerplate/features/drawer/presentation/screens/widgets/profile_action_tile.dart';
-import 'package:flutter_boilerplate/features/matches/presentation/widgets/bottom_bordered_widget.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/global/components/loading_widget.dart';
+import 'package:walima_llc/core/global/components/primary_button.dart';
+import 'package:walima_llc/core/global/components/profile_summary_card.dart';
+import 'package:walima_llc/core/global/repositorys/global_repository.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/router/app_router.dart';
+import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/core/utils/dialog_utils.dart';
+import 'package:walima_llc/core/utils/link_opener.dart';
+import 'package:walima_llc/core/utils/picker_dialog.dart';
+import 'package:walima_llc/features/anchor_point/anchor_point.dart';
+import 'package:walima_llc/features/drawer/presentation/providers/app_drawer_provider.dart';
+import 'package:walima_llc/features/profile/presentation/utils/profile_summary_utils.dart';
+import 'package:walima_llc/features/drawer/presentation/screens/widgets/profile_action_tile.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -27,13 +28,6 @@ class AppDrawer extends ConsumerStatefulWidget {
 }
 
 class _AppDrawerState extends ConsumerState<AppDrawer> {
-  static const String _helpCenterUrl =
-      'https://dev.walima.app/en/account/help-desk';
-  static const String _beSafeOnlineUrl =
-      'https://dev.walima.app/en/be-safe-online';
-  static const String _privacyPolicyUrl = 'https://dev.walima.app/en/privacy';
-  static const String _safetyUrl = 'https://dev.walima.app/en/safety';
-  static const String _termsUrl = 'https://dev.walima.app/en/terms';
 
   Future<void> _openLink(String title, String url) {
     return LinkOpener.open(
@@ -138,15 +132,16 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
     final displayName = resolveDisplayName(profileData);
     final memberId = resolveMemberId(profileData);
     final planName = resolvePlanName(profileData?.membership);
-    final expiryText =
-        formatExpiry(profileData?.membership?.membershipExpiresAt);
+    final expiryText = formatExpiry(profileData?.membership?.membershipExpiresAt);
+    final gender = ref.read(globalProvider).currentUser?.gender;
+
     return ProfileSummaryCard(
       displayName: displayName,
       memberId: memberId,
       planName: planName,
       expiryText: expiryText,
       profileImagePath:
-          profileData?.profilePicture?.url ?? AppImages.demoProfile,
+          profileData?.profilePicture?.url ?? (gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar),
       showTopIcon: profileData?.isVerified ?? true,
       showBottomIcon: true,
       topIconPath: AppImages.verifiedBadgeSvgIcon,
@@ -154,7 +149,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
       onTapImage: () async {
         await DialogUtils.showFullScreenImage(
           context: context,
-          imagePath: profileData?.profilePicture?.url ?? AppImages.demoProfile,
+          imagePath: profileData?.profilePicture?.url ?? (gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar),
         );
       },
       onBottomIconPressed: () async {
@@ -303,22 +298,22 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         ProfileActionTile(
           iconImagePath: AppImages.customerSupportSvgIcon,
           title: 'Help & Support',
-          onTap: () => _openLink('Help Center', _helpCenterUrl),
+          onTap: () => _openLink('Help Center', AppUrls.helpCenterUrl),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.bubbleChatSvgIcon,
           title: 'Be Safe Online',
-          onTap: () => _openLink('Be Safe Online', _beSafeOnlineUrl),
+          onTap: () => _openLink('Be Safe Online', AppUrls.beSafeOnlineUrl),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.documentValidationSvgIcon,
           title: 'Privacy Policy',
-          onTap: () => _openLink('Privacy Policy', _privacyPolicyUrl),
+          onTap: () => _openLink('Privacy Policy', AppUrls.privacyPolicyUrl),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.safetySvgIcon,
           title: 'Safety',
-          onTap: () => _openLink('Safety', _safetyUrl),
+          onTap: () => _openLink('Safety', AppUrls.safetyUrl),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.starSvgIcon,
@@ -328,7 +323,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         ProfileActionTile(
           iconImagePath: AppImages.documentValidationSvgIcon,
           title: 'Terms & Conditions',
-          onTap: () => _openLink('Terms & Conditions', _termsUrl),
+          onTap: () => _openLink('Terms & Conditions', AppUrls.termsUrl),
         ),
       ],
     );
@@ -365,8 +360,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
               final versionLabel =
                   snapshot.connectionState == ConnectionState.done &&
                           snapshot.hasData
-                      ? 'Version ${snapshot.data}'
-                      : 'Version';
+                      ? '${snapshot.data}'
+                      : '';
               return Text(
                 versionLabel,
                 textAlign: TextAlign.center,

@@ -1,63 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/config/text_responsive.dart';
-import 'package:flutter_boilerplate/core/constants/app_colors.dart';
-import 'package:flutter_boilerplate/core/constants/app_image.dart';
-import 'package:flutter_boilerplate/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/utils/camel_case_utils.dart';
+import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/features/profile_preview/data/models/profile_compare_response.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class PreferenceMatchCard extends StatelessWidget {
-  const PreferenceMatchCard({super.key});
+class PreferenceMatchCard extends ConsumerWidget {
+  const PreferenceMatchCard({
+    super.key,
+    required this.data,
+    this.ownerGender,
+    this.matchImage,
+    this.otherImage,
+  });
 
-  static const List<_PreferenceItem> _items = [
-    _PreferenceItem(label: 'Age', value: '25 to 28', isMatched: true),
-    _PreferenceItem(
-      label: 'Height',
-      value: '5\' 0" (152 cm) to 5\' 6" (167 cm)',
-      isMatched: true,
-    ),
-    _PreferenceItem(
-      label: 'Religion / Community',
-      value: 'Muslim, Sunni',
-      isMatched: true,
-    ),
-    _PreferenceItem(
-      label: 'Mother Tongue',
-      value: 'Bengali',
-      isMatched: true,
-    ),
-    _PreferenceItem(
-      label: 'Marital Status',
-      value: 'Never Married',
-      isMatched: false,
-    ),
-    _PreferenceItem(
-      label: 'Country Living In',
-      value: 'Bangladesh',
-      isMatched: true,
-    ),
-    _PreferenceItem(
-      label: 'State Living In',
-      value: 'Dhaka, Bangladesh',
-      isMatched: true,
-    ),
-    _PreferenceItem(
-      label: 'City / District',
-      value: 'Open to All',
-      isMatched: true,
-    ),
-    _PreferenceItem(
-      label: 'Education',
-      value: 'Open to All',
-      isMatched: false,
-    ),
-    _PreferenceItem(
-      label: 'Profession Area',
-      value: 'Open to All',
-      isMatched: false,
-    ),
-  ];
+  final ProfileCompareData data;
+  final String? ownerGender;
+  final String? matchImage;
+  final String? otherImage;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userImage = ref.watch(globalProvider).currentUser?.profilePicture?.url ?? matchImage;
+    final items = data.audit;
+    final matchedCount = data.matchedCount ?? 0;
+    final totalCount = data.totalCriteria ?? items.length;
+    final percentage = data.matchPercentage ?? 0;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
@@ -69,21 +41,62 @@ class PreferenceMatchCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _Header(),
+          _Header(
+            title: 'Preferences Analysis',
+            subtitle: data.verdict ?? 'Seeking a genuine connection',
+          ),
           const SizedBox(height: 20),
-          _MatchSummary(),
+          _MatchSummary(
+            percentage: percentage,
+            matchedCount: matchedCount,
+            totalCount: totalCount,
+            matchImage: userImage,
+            otherImage: otherImage,
+            ownerGender: ownerGender,
+          ),
           const SizedBox(height: 18),
-          ..._items.map((item) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: _PreferenceInfoTile(item: item),
-              )),
+          if (items.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Text(
+                'No comparison criteria available.',
+                style: TextStyle(
+                  fontSize: TextSize.font12(context),
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+            )
+          else
+            ...items.map((item) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: _PreferenceInfoTile(item: item),
+                )),
+          Center(
+            child: Text(
+              data.compatibilityLevel != null
+                  ? ' ${CamelCaseUtils.formatCamelCase(data.compatibilityLevel)} Compatibility'
+                  : 'Compatibility level not available.',
+              style: TextStyle(
+                fontSize: TextSize.font14(context),
+                color: AppColors.primary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
+
+
 }
 
 class _Header extends StatelessWidget {
+  const _Header({required this.title, required this.subtitle});
+
+  final String title;
+  final String subtitle;
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -107,26 +120,28 @@ class _Header extends StatelessWidget {
             color: AppColors.primary,
           ),
         ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Her Preferences',
-              style: TextStyle(
-                color: AppColors.textPrimaryLight,
-                fontSize: TextSize.font14(context),
-                fontWeight: FontWeight.w400,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  color: AppColors.textPrimaryLight,
+                  fontSize: TextSize.font14(context),
+                  fontWeight: FontWeight.w400,
+                ),
               ),
-            ),
-            Text(
-              'Seeking a genuine connection',
-              style: TextStyle(
-                color: AppColors.textSecondaryLight,
-                fontSize: TextSize.font12(context),
-                fontWeight: FontWeight.w400,
+              Text(
+                subtitle,
+                style: TextStyle(
+                  color: AppColors.textSecondaryLight,
+                  fontSize: TextSize.font12(context),
+                  fontWeight: FontWeight.w400,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
@@ -134,12 +149,37 @@ class _Header extends StatelessWidget {
 }
 
 class _MatchSummary extends StatelessWidget {
+  const _MatchSummary({
+    required this.percentage,
+    required this.matchedCount,
+    required this.totalCount,
+    this.matchImage,
+    this.otherImage,
+    this.ownerGender,
+  });
+
+  final int percentage;
+  final int matchedCount;
+  final int totalCount;
+  final String? matchImage;
+  final String? otherImage;
+  final String? ownerGender;
+
   @override
   Widget build(BuildContext context) {
+    final otherFallback = (ownerGender ?? '').toLowerCase() == 'male'
+        ? AppImages.manAvatar
+        : AppImages.womenAvatar;
+    final viewerFallback = (ownerGender ?? '').toLowerCase() == 'male'
+        ? AppImages.womenAvatar
+        : AppImages.manAvatar;
+
     return Row(
       children: [
-        const _AvatarBubble(
-          imagePath: AppImages.womenAvatar,
+        _AvatarBubble(
+          imagePath: (otherImage != null && otherImage!.isNotEmpty)
+              ? otherImage!
+              : otherFallback,
           alignment: Alignment.centerLeft,
         ),
         const SizedBox(width: 10),
@@ -154,14 +194,14 @@ class _MatchSummary extends StatelessWidget {
                   ShowImage(
                     imagePath: AppImages.favouriteIcon,
                     fit: BoxFit.cover,
-                    height: MediaQuery.of(context).size.width * 0.2, // 20% of screen width
+                    height: MediaQuery.of(context).size.width * 0.2,
                     width: MediaQuery.of(context).size.width * 0.2,
                     color: AppColors.primary,
                   ),
                   Text(
-                    '92%',
+                    '$percentage%',
                     style: TextStyle(
-                      fontSize: TextSize.font15(context), // Responsive font size
+                      fontSize: TextSize.font15(context),
                       fontWeight: FontWeight.w700,
                       color: AppColors.primary,
                     ),
@@ -176,7 +216,7 @@ class _MatchSummary extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  'Matched 07/10',
+                  'Matched $matchedCount/$totalCount',
                   style: TextStyle(
                     fontSize: TextSize.font12(context),
                     fontWeight: FontWeight.w500,
@@ -189,8 +229,10 @@ class _MatchSummary extends StatelessWidget {
         ),
         const Expanded(child: _ConnectorLine()),
         const SizedBox(width: 10),
-        const _AvatarBubble(
-          imagePath: AppImages.manAvatar,
+        _AvatarBubble(
+          imagePath: (matchImage != null && matchImage!.isNotEmpty)
+              ? matchImage!
+              : viewerFallback,
           alignment: Alignment.centerRight,
         ),
       ],
@@ -264,31 +306,37 @@ class _ConnectorLine extends StatelessWidget {
 class _PreferenceInfoTile extends StatelessWidget {
   const _PreferenceInfoTile({required this.item});
 
-  final _PreferenceItem item;
+  final CompareAuditItem item;
 
   @override
   Widget build(BuildContext context) {
-    final Color statusColor =
-        item.isMatched ? AppColors.primary : AppColors.textSecondaryLight;
-    final IconData statusIcon =
-        item.isMatched ? Icons.check_rounded : Icons.close_rounded;
+    final String statusImage = item.isMatched ? AppImages.successCircle : AppImages.cancelCircle ;
+    final Color statusColor = item.isMatched ? AppColors.greenButtonColor.withOpacity(0.1) : AppColors.error.withOpacity(0.1);
+    final label = item.field ?? '-';
+    final preferredValue = (item.preferredValue ?? '').trim().isNotEmpty
+        ? item.preferredValue!
+        :  '-';
+    final actualValue = (item.actualValue ?? '').trim().isNotEmpty
+        ? item.actualValue!
+        :  '-';
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: statusColor,
         borderRadius: BorderRadius.circular(6),
         border: Border.all(color: AppColors.greyLight),
       ),
       child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${item.label}:',
+                  label,
                   style: TextStyle(
                     fontSize: TextSize.font12(context),
                     fontWeight: FontWeight.w400,
@@ -297,7 +345,7 @@ class _PreferenceInfoTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  item.value,
+                    CamelCaseUtils.formatCamelCase(actualValue),
                   style: TextStyle(
                     fontSize: TextSize.font12(context),
                     fontWeight: FontWeight.w500,
@@ -307,26 +355,42 @@ class _PreferenceInfoTile extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 12),
-          Icon(
-            statusIcon,
-            color: statusColor,
-            size: 18,
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: ShowImage(
+              imagePath: statusImage,
+              height: TextSize.font18(context),
+              width: TextSize.font18(context),
+            )
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: TextSize.font12(context),
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  CamelCaseUtils.formatCamelCase(preferredValue),
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    fontSize: TextSize.font12(context),
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textPrimaryLight,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
-}
-
-class _PreferenceItem {
-  const _PreferenceItem({
-    required this.label,
-    required this.value,
-    required this.isMatched,
-  });
-
-  final String label;
-  final String value;
-  final bool isMatched;
 }
