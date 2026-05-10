@@ -40,33 +40,78 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             height: double.infinity,
             width: double.infinity,
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 40),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(
-                      top: MediaQuery.of(context).size.height * 0.15,
-                    ),
-                    child: const ShowImage(
-                      imagePath: 'assets/svgs/walima.svg',
-                      width: 270,
-                      height: 72,
+                    padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.2,),
+                    child:  Column(
+                      children: [
+                        const ShowImage(
+                          imagePath: 'assets/svgs/walima.svg',
+                          width: 270,
+                          height: 72,
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          spacing: 12,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'MATCH',
+                              style: TextStyle(
+                                color: AppColors.white.withOpacity(0.65),
+                                fontSize: TextSize.font14(context),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Icon(Icons.circle, color: AppColors.white.withOpacity(0.35), size: 6),
+                            Text(
+                              'MEET',
+                              style: TextStyle(
+                                color: AppColors.white.withOpacity(0.65),
+                                fontSize: TextSize.font14(context),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Icon(Icons.circle, color: AppColors.white.withOpacity(0.35), size: 6),
+                            Text(
+                              'MARRY ',
+                              style: TextStyle(
+                                color: AppColors.white.withOpacity(0.65),
+                                fontSize: TextSize.font14(context),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
                     ),
                   ),
                   Column(
                     children: [
+                      Text(
+                        'New to Walima?',
+                        style: TextStyle(
+                          color: AppColors.white.withOpacity(0.65),
+                          fontSize: TextSize.font15(context),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
                       PrimaryButtons(
                         buttonStyle: ButtonsStyle.authButton,
                         svgIconPath: AppImages.emailSvgIcon,
                         svgIconColor: AppColors.primary,
                         textColor: AppColors.primary,
+                        borderRadius: 50,
                         bgColor: Colors.white,
                         onTap: () {
                           context.push(Paths.isProfileFor);
                         },
-                        title: 'Create an account',
+                        title: 'Get Started',
                       ),
                       const SizedBox(height: 16),
                       // PrimaryButtons(
@@ -85,10 +130,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Already have an account?',
+                              'Already a member?',
                               style: TextStyle(
-                                color: Colors.white,
-                                fontSize: TextSize.font16(context),
+                                color: AppColors.white.withOpacity(0.65),
+                                fontSize: TextSize.font15(context),
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -96,11 +141,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               margin: const EdgeInsets.only(left: 10),
                               padding: const EdgeInsets.symmetric(
                                 vertical: 4,
-                                horizontal: 8,
+                                horizontal: 16,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
                                   color: Colors.white.withValues(alpha: 0.3),
                                   width: 1,
@@ -115,7 +159,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   style: TextStyle(
                                     color: AppColors.white,
                                     fontSize: TextSize.font16(context),
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
