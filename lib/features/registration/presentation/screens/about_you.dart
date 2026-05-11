@@ -62,7 +62,7 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.aboutYou),
+                    const UpperLayer(imagePath: AppImages.aboutYou, totalProgressCount: 5, currentIndexProgress: 1,showProgress: true),
                     body(),
                   ],
                 ),
@@ -74,7 +74,7 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
   Widget body() {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           spacing: 10,
           children: [
@@ -97,6 +97,7 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
           headLine: 'Your Name',
           hintText: 'First Name',
           noPrefix: true,
+          borderRadius: 8,
           errorText: null,
           onTap: () {},
         ),
@@ -106,6 +107,7 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
           hintText: 'Last Name',
           noPrefix: true,
           errorText: null,
+          borderRadius: 8,
           onTap: () {},
         ),
         const SizedBox(height: 10),
@@ -123,6 +125,7 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
                 datePicker: true,
                 readOnly: true,
                 noPrefix: true,
+                borderRadius: 8,
                 suffix: ShowImage(
                   imagePath: AppImages.calendarSvgIcon,
                   width: TextSize.font20(context),
@@ -152,6 +155,14 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
                 ))
           ],
         ),
+        const SizedBox(height: 10),
+        Text('Must be 18 or older to register on Walima',
+          style: TextStyle(
+            fontSize: TextSize.font12(context),
+            fontWeight: FontWeight.w400,
+            color: AppColors.hintTextColor,
+          ),
+        )
       ],
     );
   }
@@ -161,8 +172,11 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
       buttonStyle: provider.firstNameController.text.isNotEmpty &&
               provider.lastNameController.text.isNotEmpty &&
               provider.dateOfBirthController.text.isNotEmpty
-          ? ButtonsStyle.activePrimaryButton
+          ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
+      verticalPadding: 14,
+      borderRadius: 50,
+      svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
       onTap: () {
         if (provider.firstNameController.text.isEmpty ||

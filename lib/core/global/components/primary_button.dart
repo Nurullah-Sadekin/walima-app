@@ -18,7 +18,7 @@ class PrimaryButtons extends StatelessWidget {
     this.borderRadius,
     this.svgIconColor,
     this.svgIconPath,
-    this.iconLeftPosition = true,
+    this.iconLeftPosition = false,
     this.isExpand = true,
     this.verticalPadding,
     this.horizontalPadding,
@@ -139,8 +139,7 @@ class PrimaryButtons extends StatelessWidget {
       onTap: onTap,
       child: Container(
           alignment: Alignment.center,
-          padding: const EdgeInsets.symmetric(
-            vertical: 10,
+          padding:  EdgeInsets.symmetric(vertical: verticalPadding ?? 10,
           ),
           decoration: BoxDecoration(
             color: AppColors.disableBackground,
@@ -186,9 +185,8 @@ class PrimaryButtons extends StatelessWidget {
       child: Container(
         padding:  EdgeInsets.symmetric(vertical: verticalPadding ?? 10),
         decoration: BoxDecoration(
-          color: bgColor,
-          border:
-              Border.all(color: borderColor ?? Colors.transparent, width: 1),
+          color: bgColor ?? AppColors.primary,
+          border: Border.all(color: borderColor ?? Colors.transparent, width: 1),
           borderRadius: BorderRadius.circular(borderRadius ?? 6),
         ),
         child: Row(
@@ -201,7 +199,7 @@ class PrimaryButtons extends StatelessWidget {
                 imagePath: svgIconPath,
                 width: iconSize ?? 20,
                 height: iconSize ?? 20,
-                color: svgIconColor,
+                color: svgIconColor ?? Colors.white,
               ),
             if (iconLeftPosition! && svgIconPath != null)
               const SizedBox(
@@ -225,7 +223,7 @@ class PrimaryButtons extends StatelessWidget {
                 imagePath: svgIconPath,
                 width: 20,
                 height: 20,
-                color: svgIconColor,
+                color: svgIconColor ?? Colors.white,
               ),
           ],
         ),

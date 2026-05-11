@@ -103,7 +103,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       const SizedBox(height: 12),
                       PrimaryButtons(
                         buttonStyle: ButtonsStyle.authButton,
-                        svgIconPath: AppImages.emailSvgIcon,
+                        svgIconPath: AppImages.getStarted,
                         svgIconColor: AppColors.primary,
                         textColor: AppColors.primary,
                         borderRadius: 50,

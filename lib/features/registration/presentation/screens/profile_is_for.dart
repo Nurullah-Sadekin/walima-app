@@ -5,6 +5,7 @@ import 'package:walima_llc/core/global/components/gradient_background.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:walima_llc/core/global/components/profile_type_card.dart';
+import 'package:walima_llc/core/global/components/progress_indicator.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/features/registration/presentation/providers/registration_provider.dart';
@@ -42,7 +43,7 @@ class _IsProfileForScreenState extends ConsumerState<IsProfileForScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.isProfileFor),
+                    const UpperLayer(imagePath: AppImages.isProfileFor, totalProgressCount: 5, currentIndexProgress: 0,showProgress: true),
                     body(),
                   ],
                 ),
@@ -54,11 +55,12 @@ class _IsProfileForScreenState extends ConsumerState<IsProfileForScreen> {
   Widget body() {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           spacing: 10,
           children: [
             isProfileForView(),
+            const SizedBox(height: 10),
             provider.selectedProfileName == null
                 ? const SizedBox.shrink()
                 : genderView(),
@@ -80,14 +82,15 @@ class _IsProfileForScreenState extends ConsumerState<IsProfileForScreen> {
             Text(
               'This Profile is for',
               style: TextStyle(
-                fontSize: TextSize.font14(context),
+                fontSize: TextSize.font20(context),
                 fontWeight: FontWeight.w500,
               ),
             ),
           ],
         ),
-        Column(
+        Wrap(
           spacing: 10,
+          runSpacing: 10,
           children: List.generate(provider.profileForList.length, (index) {
             final isProfileFor = provider.profileForList[index];
             return IsProfileForItemWidget(
@@ -109,12 +112,25 @@ class _IsProfileForScreenState extends ConsumerState<IsProfileForScreen> {
       spacing: 10,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Gender',
-          style: TextStyle(
-            fontSize: TextSize.font14(context),
-            fontWeight: FontWeight.w500,
-          ),
+        Row(
+          spacing: 4,
+          children: [
+            Text(
+              'Gender',
+              style: TextStyle(
+                fontSize: TextSize.font14(context),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              '*',
+              style: TextStyle(
+                fontSize: TextSize.font14(context),
+                color: Colors.redAccent,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
         Wrap(
           spacing: 10,
@@ -131,6 +147,7 @@ class _IsProfileForScreenState extends ConsumerState<IsProfileForScreen> {
                 title: genderFor.name,
                 imagePath: genderFor.emoji,
                 isSelected: genderFor.isSelected,
+                showIcon: true,
                 onTap: () {
                   ref.read(registrationProvider).selectedGender(index);
                 },
@@ -146,8 +163,11 @@ class _IsProfileForScreenState extends ConsumerState<IsProfileForScreen> {
     return PrimaryButtons(
       buttonStyle: provider.selectedProfileName != null &&
               provider.selectedGenderName != null
-          ? ButtonsStyle.activePrimaryButton
+          ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
+      verticalPadding: 14,
+      borderRadius: 50,
+      svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
       onTap: () {
         if (provider.selectedProfileName == null ||

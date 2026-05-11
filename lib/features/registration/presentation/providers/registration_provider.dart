@@ -1242,7 +1242,7 @@ class RegistrationProvider extends BaseChangeNotifier {
 
   String ageText() {
     final txt = dateOfBirthController.text;
-    if (txt.isEmpty) return '0 Year Age';
+    if (txt.isEmpty) return 'Age';
 
     DateTime? dob;
     try {
@@ -1252,7 +1252,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       dob = null;
     }
 
-    if (dob == null) return '0 Year Age';
+    if (dob == null) return 'Age';
 
     final now = DateTime.now();
     int years = now.year - dob.year;
@@ -1261,7 +1261,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       years--;
     }
     if (years < 0) years = 0;
-    return '$years years old'.replaceFirst('\u007f', '');
+    return '$years years'.replaceFirst('\u007f', '');
   }
 
   int selectedHobbiesCount() {

@@ -85,6 +85,10 @@ class AppImages {
   static const String apple = 'assets/svgIcons/apple.svg';
   static const String google = 'assets/svgIcons/google.svg';
   static const String mobile = 'assets/svgIcons/mobile.svg';
+  static const String getStartedSecondary = 'assets/svgIcons/get_started.svg';
+  static const String getStarted = 'assets/svgIcons/get_started_rocket.svg';
+  static const String male = 'assets/svgIcons/male.svg';
+  static const String female = 'assets/svgIcons/female.svg';
 
   static const String arrowRightSvgIcon = 'assets/svgIcons/arrow_left.svg';
   static const String alertSvgIcon = 'assets/svgIcons/alert.svg';
