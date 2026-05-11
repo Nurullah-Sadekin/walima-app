@@ -18,24 +18,16 @@ class ProgressNumberedIndicator extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: List.generate(total, (index) {
-          final isActive = index == activeIndex;
-          final number = index + 1;
+          // All indices <= activeIndex get primary color (left side)
+          final isActiveOrDone = index <= activeIndex;
 
           return Expanded(
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 2),
               height: 4,
               decoration: BoxDecoration(
-                color: isActive ? AppColors.primary : AppColors.greyLight,
+                color: isActiveOrDone ? AppColors.primary : AppColors.greyLight,
                 borderRadius: BorderRadius.circular(50),
-              ),
-              child: Text(
-                '$number',
-                style: TextStyle(
-                  color: isActive ? Colors.white : Colors.grey[700],
-                  fontSize: 16,
-                  fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-                ),
               ),
             ),
           );

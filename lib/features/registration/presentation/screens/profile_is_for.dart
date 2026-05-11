@@ -138,7 +138,7 @@ class _IsProfileForScreenState extends ConsumerState<IsProfileForScreen> {
           children: List.generate(provider.genderForList.length, (index) {
             final genderFor = provider.genderForList[index];
 
-            double screenWidth = MediaQuery.of(context).size.width - 40;
+            double screenWidth = MediaQuery.of(context).size.width - 48;
             double itemWidth = (screenWidth - 10) / 2;
 
             return SizedBox(

@@ -58,7 +58,7 @@ class _YourRegionState extends ConsumerState<YourReligion> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.religion),
+                    const UpperLayer(imagePath: AppImages.religion, totalProgressCount: 5, currentIndexProgress: 2,showProgress: true),
                     body(),
                   ],
                 ),
@@ -70,7 +70,7 @@ class _YourRegionState extends ConsumerState<YourReligion> {
   Widget body() {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           spacing: 10,
           children: [
@@ -90,6 +90,7 @@ class _YourRegionState extends ConsumerState<YourReligion> {
       children: [
         DropDownField(
           headLine: 'Your Religion',
+          isRequired: true,
           hintText: 'Select',
           popUpHeader: 'Select Religion',
           items: provider.religionDropdownItems,
@@ -104,7 +105,7 @@ class _YourRegionState extends ConsumerState<YourReligion> {
                 headLine: 'Community',
                 hintText: 'Select',
                 popUpHeader: 'Select Community',
-                headLineInfoIcon: true,
+                isRequired: true,
                 items: provider.communityDropdownItems,
                 controller: provider.communityController,
                 onTap: provider.loadLocationData,
@@ -115,20 +116,40 @@ class _YourRegionState extends ConsumerState<YourReligion> {
         provider.religionController.text.isEmpty ||
                 provider.communityController.text.isEmpty
             ? const SizedBox.shrink()
-            : PrimaryTextField(
-                headLine: 'Living In',
-                hintText: 'Select',
-                controller: provider.livingInController,
-                errorText: '',
-                noPrefix: true,
-                readOnly: true,
-                onTap: _openCountryPicker,
-                suffix: Icon(
-                  Icons.keyboard_arrow_down_outlined,
-                  size: TextSize.font20(context),
-                  color: AppColors.grey,
-                ),
-              ),
+            : Column(
+              children: [
+                PrimaryTextField(
+                    headLine: 'Living In',
+                    hintText: 'Select',
+                    controller: provider.livingInController,
+                    errorText: '',
+                    noPrefix: true,
+                    readOnly: true,
+                    isRequired: true,
+                    onTap: _openCountryPicker,
+                    suffix: Icon(
+                      Icons.keyboard_arrow_down_outlined,
+                      size: TextSize.font20(context),
+                      color: AppColors.grey,
+                    ),
+                  ),
+                SizedBox(height: TextSize.font10(context)),
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                      child: Text('Select the country you currently live in',
+                        style: TextStyle(
+                          fontSize: TextSize.font12(context),
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.hintTextColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
       ],
     );
   }
@@ -138,8 +159,11 @@ class _YourRegionState extends ConsumerState<YourReligion> {
       buttonStyle: provider.religionController.text.isNotEmpty &&
               provider.communityController.text.isNotEmpty &&
               provider.livingInController.text.isNotEmpty
-          ? ButtonsStyle.activePrimaryButton
+          ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
+      verticalPadding: 14,
+      borderRadius: 50,
+      svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
       onTap: () {
         if (provider.religionController.text.isEmpty ||

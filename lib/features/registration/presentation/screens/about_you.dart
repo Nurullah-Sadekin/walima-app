@@ -97,7 +97,6 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
           headLine: 'Your Name',
           hintText: 'First Name',
           noPrefix: true,
-          borderRadius: 8,
           errorText: null,
           onTap: () {},
         ),
@@ -107,7 +106,6 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
           hintText: 'Last Name',
           noPrefix: true,
           errorText: null,
-          borderRadius: 8,
           onTap: () {},
         ),
         const SizedBox(height: 10),
@@ -125,7 +123,6 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
                 datePicker: true,
                 readOnly: true,
                 noPrefix: true,
-                borderRadius: 8,
                 suffix: ShowImage(
                   imagePath: AppImages.calendarSvgIcon,
                   width: TextSize.font20(context),
@@ -155,13 +152,19 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
                 ))
           ],
         ),
-        const SizedBox(height: 10),
-        Text('Must be 18 or older to register on Walima',
-          style: TextStyle(
-            fontSize: TextSize.font12(context),
-            fontWeight: FontWeight.w400,
-            color: AppColors.hintTextColor,
-          ),
+        Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6.0),
+              child: Text('Must be 18 or older to register on Walima',
+                style: TextStyle(
+                  fontSize: TextSize.font12(context),
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.hintTextColor,
+                ),
+              ),
+            ),
+          ],
         )
       ],
     );

@@ -23,7 +23,7 @@ class PrimaryTextField extends StatefulWidget {
     this.minLine,
     this.isCountryDropdown = false,
     this.maxLine,
-    this.borderRadius,
+    this.borderRadius = 10,
     this.readOnly,
     required this.onTap,
     this.prefixIcon,

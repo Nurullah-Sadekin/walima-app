@@ -100,7 +100,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
           headLine: 'Partner Community',
           hintText: 'Select',
           popUpHeader: 'Select Community',
-          headLineInfoIcon: true,
+          isRequired: true,
           items: provider.communityDropdownItems,
           controller: provider.communityPreferenceController,
           onTap: () {},
