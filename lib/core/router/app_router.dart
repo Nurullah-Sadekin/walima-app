@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:walima_llc/features/biodata/presentation/screens/biodata_generator_screen.dart';
+import 'package:walima_llc/features/login/presentation/login_with_email_screen.dart';
 import 'package:walima_llc/features/matches/presentation/screens/filters/new_filter.dart';
 import 'package:walima_llc/features/contact_filter/presentation/screens/contact_filter_screen.dart';
 import 'package:walima_llc/features/account_setting/presentation/screens/account_setting_screen.dart';
@@ -81,6 +82,11 @@ GoRouter goRouter(Ref ref) {
         path: Paths.login,
         name: Routes.login,
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: Paths.loginWithEmail,
+        name: Routes.loginWithEmail,
+        builder: (context, state) => const LoginWithEmailScreen(),
       ),
       GoRoute(
         path: Paths.sendOtp,

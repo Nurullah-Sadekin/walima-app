@@ -40,7 +40,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             height: double.infinity,
             width: double.infinity,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40),
+              padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 40),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

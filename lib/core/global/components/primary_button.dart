@@ -61,6 +61,9 @@ class PrimaryButtons extends StatelessWidget {
 
       case (ButtonsStyle.authButton):
         return authButton(context);
+
+      case (ButtonsStyle.authButton2):
+        return authButton2(context);
     }
   }
 
@@ -270,6 +273,49 @@ class PrimaryButtons extends StatelessWidget {
       ),
     );
   }
+
+  Widget authButton2(context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 32),
+        decoration: BoxDecoration(
+          color: bgColor,
+          border: Border.all(color: borderColor ?? Colors.transparent, width: 1),
+          borderRadius: BorderRadius.circular(borderRadius ?? 12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            svgIconPath != null
+                ? ShowImage(
+                    imagePath: svgIconPath,
+                    width: 20,
+                    height: 20,
+                    color: svgIconColor,
+                  )
+                : const SizedBox.shrink(),
+
+            Expanded(
+              child: Center(
+                child: Text(
+                  title ?? '',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: textColor ?? Colors.white,
+                    fontSize: TextSize.font16(context),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 enum ButtonsStyle {
@@ -278,5 +324,6 @@ enum ButtonsStyle {
   disableButton,
   cancelButton,
   iconicDynamicButton,
-  authButton
+  authButton,
+  authButton2,
 }

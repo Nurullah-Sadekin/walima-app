@@ -3,6 +3,7 @@ abstract class Paths {
 
   // Login Screens
   static const login = '/login';
+  static const loginWithEmail = '/loginWithEmail';
   static const sendOtp = '/sendOtp';
   static const otpVerify = '/otpVerify';
   static const newPassword = '/newPassword';
@@ -78,6 +79,7 @@ abstract class Routes {
 
   // Login Screens
   static const login = 'login';
+  static const loginWithEmail = 'loginWithEmail';
   static const sendOtp = 'sendOtp';
   static const otpVerify = 'otpVerify';
   static const newPassword = 'newPassword';

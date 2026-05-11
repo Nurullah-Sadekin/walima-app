@@ -166,16 +166,16 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         prefix: _getPrefix(),
         prefixIcon: _getPrefixIcon(),
-        border: InputBorderStyle.border(6, borderColor: widget.borderColor),
-        focusedBorder: InputBorderStyle.focusedBorder(6),
+        border: InputBorderStyle.border(widget.borderRadius ?? 6, borderColor: widget.borderColor),
+        focusedBorder: InputBorderStyle.focusedBorder(widget.borderRadius ?? 6),
         enabledBorder: (widget.controller?.text ??
                     _internalController?.text ??
                     '')
                 .isNotEmpty
-            ? InputBorderStyle.validBorder(6, borderColor: widget.borderColor)
-            : InputBorderStyle.border(6),
-        focusedErrorBorder: InputBorderStyle.focusedErrorBorder(6),
-        errorBorder: InputBorderStyle.errorBorder(6),
+            ? InputBorderStyle.validBorder(widget.borderRadius ?? 6, borderColor: widget.borderColor)
+            : InputBorderStyle.border(widget.borderRadius ?? 6),
+        focusedErrorBorder: InputBorderStyle.focusedErrorBorder( widget.borderRadius ?? 6),
+        errorBorder: InputBorderStyle.errorBorder( widget.borderRadius ?? 6),
         hintStyle: TextStyle(
           color: const Color(0xFFA3A3A3),
           fontSize: TextSize.font14(context),

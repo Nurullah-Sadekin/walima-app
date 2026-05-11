@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/global/components/custom_back_appbar.dart';
 import 'package:walima_llc/core/global/components/gradient_background.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
@@ -53,22 +54,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         body: GradientBackground(
           child: provider.screenStates == LoginScreenStates.loading
               ? const Loading()
-              : SizedBox(
-                  height: MediaQuery.sizeOf(context).height,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        UpperLayer(
-                          imagePath: AppImages.login,
-                          onBackPressed: () {
-                            context.pushNamed(Routes.onboarding);
-                          },
-                          backCancelMood: true,
-                        ),
-                        body(),
-                      ],
+              : Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    const CustomBackAppBar(
+                      backIconBackground: Colors.transparent,
                     ),
-                  ),
+                    Expanded(child: body()),
+                  ],
                 ),
         ),
       ),
@@ -77,182 +70,214 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Widget body() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 40.0),
       child: Column(
         spacing: 10,
         children: [
-          loginDataField(),
-          bottomAction(),
-          SizedBox(height: MediaQuery.sizeOf(context).height * 0.25),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 6,
-            children: [
-              Text(
-                "Don't have an account?",
-                style: TextStyle(
-                  color: AppColors.textPrimaryLight,
-                  fontWeight: FontWeight.w400,
-                  fontSize: TextSize.font14(context),
-                ),
-              ),
-              InkWell(
-                onTap: () {
-                  // context.pop();
-                  context.pushNamed(Routes.onboarding);
-                },
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: AppColors.greyLight,
-                      width: 1,
+          SizedBox(height: MediaQuery.sizeOf(context).height * 0.02),
+          staticText(),
+          const SizedBox(height: 20),
+          continueWithButton(),
+          loginWithOtp(),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 6,
+                  children: [
+                    Text(
+                      "Don't have an account?",
+                      style: TextStyle(
+                        color: AppColors.hintTextColor,
+                        fontWeight: FontWeight.w500,
+                        fontSize: TextSize.font14(context),
+                      ),
                     ),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    'Sign Up',
-                    style: TextStyle(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w500,
-                      fontSize: TextSize.font16(context),
+                    InkWell(
+                      onTap: () {
+                        // context.pop();
+                        context.pushNamed(Routes.onboarding);
+                      },
+                      child: Row(
+                        spacing: 4,
+                        children: [
+                          Text(
+                            'Sign Up Free',
+                            style: TextStyle(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: TextSize.font16(context),
+                            ),
+                          ),
+                          const Icon(Icons.arrow_forward_ios,color: AppColors.primary, size:8)
+                        ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          // SizedBox(height: MediaQuery.sizeOf(context).height * 0.03),
+          SizedBox(height: MediaQuery.sizeOf(context).height * 0.005),
         ],
       ),
     );
   }
 
-  Widget loginDataField() {
-    return Column(
-      spacing: 10,
-      children: [
-        PrimaryTextField(
-          controller: provider.mobileNoOrEmailController,
-          headLine: 'Mobile No. / Email ID',
-          hintText: 'Write here',
-          noPrefix: true,
-          errorText: provider.mobileOrEmailError,
-          validator: Validators.validateMobileOrEmail,
-          onTap: () {},
-        ),
-        PrimaryTextField(
-          controller: provider.passwordController,
-          headLine: 'Password',
-          hintText: 'Write here',
-          noPrefix: true,
-          errorText: provider.passwordError,
-          showPassIcon: true,
-          onTap: () {},
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget staticText() {
+    return Column(spacing: 10, children: [
+      Column(
+        children: [
+          Text(
+            'Welcome Back!',
+            style: TextStyle(
+              color: AppColors.textPrimaryLight,
+              fontWeight: FontWeight.bold,
+              fontSize: TextSize.font28(context),
+              fontFamily: FontFamily.timesNewRoman,
+            ),
+          ),
+          Row(
+            spacing: 6,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              InkWell(
-                onTap: () {
-                  provider.keepMeLoggedIn = !provider.keepMeLoggedIn;
-                  provider.notifyListeners();
-                },
-                child: Row(
-                  children: [
-                    Container(
-                      height: TextSize.font16(context),
-                      width: TextSize.font16(context),
-                      margin: const EdgeInsets.only(right: 6),
-                      decoration: BoxDecoration(
-                        color: provider.keepMeLoggedIn
-                            ? AppColors.primary
-                            : Colors.white,
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(
-                          color: provider.keepMeLoggedIn
-                              ? AppColors.primary
-                              : AppColors.textSecondaryLight,
-                          width: 1,
-                        ),
-                      ),
-                      child: provider.keepMeLoggedIn
-                          ? Icon(
-                        Icons.check,
-                        size: TextSize.font12(context),
-                        color: Colors.white,
-                      )
-                          : null,
-                    ),
-                    Text(
-                      'Keep me logged in',
-                      style: TextStyle(
-                        color: AppColors.textPrimaryLight,
-                        fontWeight: FontWeight.w400,
-                        fontSize: TextSize.font12(context),
-                      ),
-                    ),
-                  ],
+              Text(
+                'Please',
+                style: TextStyle(
+                  color: AppColors.textPrimaryLight,
+                  fontWeight: FontWeight.bold,
+                  fontSize: TextSize.font28(context),
+                  fontFamily: FontFamily.timesNewRoman,
                 ),
               ),
-              InkWell(
-                onTap: () {
-                  provider.forgotPassword = true;
-                  provider.updateViewState();
-                  context.push(Paths.sendOtp);
-                },
-                child: Container(
-                  padding: const EdgeInsets.only(bottom: 1), // controls space
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: AppColors.primary,
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                  child: Text(
-                    'Forgot password?',
-                    style: TextStyle(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w500,
-                      fontSize: TextSize.font13(context),
-                    ),
-                  ),
-                )
+              Text(
+                'Login',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: TextSize.font28(context),
+                  fontFamily: FontFamily.timesNewRoman,
+                ),
               ),
             ],
           ),
+        ],
+      ),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30.0),
+        child: Text(
+          'Use the same Email or Mobile No. That you used to create your profile on Walima.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: AppColors.hintTextColor,
+            fontWeight: FontWeight.w400,
+            fontSize: TextSize.font14(context),
+          ),
+        ),
+      ),
+    ]);
+  }
+
+  Widget continueWithButton() {
+    return Column(
+      spacing: 12,
+      children: [
+        PrimaryButtons(
+          buttonStyle: ButtonsStyle.authButton2,
+          svgIconPath: AppImages.apple,
+          svgIconColor: AppColors.textPrimaryLight,
+          textColor: AppColors.textPrimaryLight,
+          borderRadius: 50,
+          borderColor: AppColors.inputBorderColor,
+          bgColor: Colors.white,
+          onTap: () {
+            //context.push(Paths.isProfileFor);
+          },
+          title: 'Continue with Apple',
+        ),
+        PrimaryButtons(
+          buttonStyle: ButtonsStyle.authButton2,
+          svgIconPath: AppImages.google,
+          textColor: AppColors.textPrimaryLight,
+          borderRadius: 50,
+          borderColor: AppColors.inputBorderColor,
+          bgColor: Colors.white,
+          onTap: () {
+            //context.push(Paths.isProfileFor);
+          },
+          title: 'Continue with Google',
+        ),
+        PrimaryButtons(
+          buttonStyle: ButtonsStyle.authButton2,
+          svgIconPath: AppImages.emailSvgIcon,
+          svgIconColor: AppColors.primary,
+          textColor: AppColors.textPrimaryLight,
+          borderRadius: 50,
+          borderColor: AppColors.inputBorderColor,
+          bgColor: Colors.white,
+          onTap: () {
+            context.push(Paths.loginWithEmail);
+          },
+          title: 'Continue with Email',
         ),
       ],
     );
   }
 
-  Widget bottomAction() {
+  Widget loginWithOtp() {
     return Column(
-      spacing: 10,
       children: [
-        PrimaryButtons(
-          buttonStyle: ButtonsStyle.activePrimaryButton,
-          title: 'Login',
-          onTap: () async {
-            await provider.login(context);
-            //context.push(Paths.yourReligion);
-          },
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 24.0),
+          child: Row(
+            children: [
+              const Expanded(
+                  child: Divider(color: AppColors.inputBorderColor, thickness: 1)),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  'OR LOGIN WITH OTP',
+                  style: TextStyle(
+                    color: AppColors.hintTextColor,
+                    fontSize: TextSize.font12(context),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              const Expanded(
+                  child:
+                      Divider(color: AppColors.inputBorderColor, thickness: 1)),
+            ],
+          ),
         ),
+        PrimaryTextField(
+          controller: provider.mobileNoOrEmailController,
+          headLine: 'Mobile No. / Email ID',
+          hintText: 'Enter mobile or email',
+          noPrefix: true,
+          errorText: provider.mobileOrEmailError,
+          onTap: null,
+          borderRadius: 50,
+        ),
+        SizedBox(height: MediaQuery.sizeOf(context).height * 0.02),
         PrimaryButtons(
-          buttonStyle: ButtonsStyle.activeSecondaryButton,
-          title: 'Login with OTP',
+          buttonStyle: ButtonsStyle.authButton,
+          svgIconPath: AppImages.safetySvgIcon,
+          svgIconColor: AppColors.white,
+          textColor: AppColors.white,
+          borderRadius: 50,
+          borderColor: AppColors.inputBorderColor,
+          bgColor: AppColors.primary,
           onTap: () {
-            provider.forgotPassword = false;
-            provider.notifyListeners();
-            context.push(Paths.sendOtp);
+            provider.loginWithOtp(context);
           },
+          title: 'Continue with OTP',
         ),
       ],
     );
   }
+
 }

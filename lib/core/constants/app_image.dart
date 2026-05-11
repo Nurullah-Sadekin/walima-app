@@ -82,6 +82,8 @@ class AppImages {
   static const String cardView = 'assets/svgIcons/card_view.svg';
   static const String chatIcon = 'assets/svgIcons/chat_icon.svg';
   static const String cancelSvgIcon = 'assets/svgIcons/cancel.svg';
+  static const String apple = 'assets/svgIcons/apple.svg';
+  static const String google = 'assets/svgIcons/google.svg';
 
   static const String arrowRightSvgIcon = 'assets/svgIcons/arrow_left.svg';
   static const String alertSvgIcon = 'assets/svgIcons/alert.svg';

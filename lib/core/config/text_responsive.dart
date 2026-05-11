@@ -42,3 +42,12 @@ class TextSize {
   static double font48(BuildContext context) => ResponsiveScale.of(context).fontSize(5.5);
   static double font54(BuildContext context) => ResponsiveScale.of(context).fontSize(6.17);
 }
+
+class FontFamily {
+  static const String merriweather = 'Merriweather';
+  static const String playfairDisplay = 'Playfair Display';
+  static const String dmSerifDisplay = 'DM Serif Display';
+  static const String georgia = 'Georgia';
+  static const String timesNewRoman = 'Times New Roman';
+  static const String garamond = 'Garamond';
+}
