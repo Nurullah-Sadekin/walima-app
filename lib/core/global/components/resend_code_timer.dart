@@ -89,10 +89,9 @@ class _ResendCodeTimerState extends State<ResendCodeTimer> {
         style: TextStyle(
           fontSize: TextSize.font14(context),
           color: isActive
-              ? AppColors.textPrimaryLight
+              ? AppColors.primary
               : AppColors.textSecondaryLight,
           fontWeight: FontWeight.w500,
-          decoration: isActive ? TextDecoration.underline : null,
           decorationColor: AppColors.textPrimaryLight,
           decorationThickness: 1,
         ),

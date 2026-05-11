@@ -264,7 +264,8 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
                 style: TextStyle(
                     fontSize: TextSize.font14(context),
                     fontWeight: FontWeight.w500,
-                    color: const Color(0xFF171717)),
+                    color: AppColors.textSecondaryLight
+                ),
               ),
             if (widget.headLineInfoIcon == true && widget.headLine != null)
               Icon(Icons.info,

@@ -84,6 +84,7 @@ class AppImages {
   static const String cancelSvgIcon = 'assets/svgIcons/cancel.svg';
   static const String apple = 'assets/svgIcons/apple.svg';
   static const String google = 'assets/svgIcons/google.svg';
+  static const String mobile = 'assets/svgIcons/mobile.svg';
 
   static const String arrowRightSvgIcon = 'assets/svgIcons/arrow_left.svg';
   static const String alertSvgIcon = 'assets/svgIcons/alert.svg';
