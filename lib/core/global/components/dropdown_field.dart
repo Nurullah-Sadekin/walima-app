@@ -27,6 +27,7 @@ class DropDownField extends StatefulWidget {
     this.onTap,
     this.selectedValue,
     this.isRequired = false,
+    this.isOptional = false,
     this.headLineInfoIcon = false,
   });
   final String? hintText;
@@ -46,6 +47,7 @@ class DropDownField extends StatefulWidget {
   final Function(String searchKey)? searchItemList;
   final bool isSearch;
   final bool? isRequired;
+  final bool? isOptional;
   final bool? headLineInfoIcon;
   final String? selectedValue;
 
@@ -63,6 +65,7 @@ class _DropDownFieldState extends State<DropDownField> {
       controller: widget.controller,
       errorText: widget.errorText,
       isRequired: widget.isRequired,
+      isOptional: widget.isOptional,
       headLineInfoIcon: widget.headLineInfoIcon,
       noPrefix: true,
       onTap: () async {

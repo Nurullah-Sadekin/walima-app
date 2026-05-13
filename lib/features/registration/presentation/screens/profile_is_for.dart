@@ -12,6 +12,7 @@ import 'package:walima_llc/features/registration/presentation/providers/registra
 import 'package:walima_llc/core/global/components/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:walima_llc/features/registration/presentation/widgets/static_text_widget.dart';
 
 class IsProfileForScreen extends ConsumerStatefulWidget {
   const IsProfileForScreen({super.key});
@@ -59,6 +60,7 @@ class _IsProfileForScreenState extends ConsumerState<IsProfileForScreen> {
         child: Column(
           spacing: 10,
           children: [
+            const StaticTextWidget(title: 'Join Walima Now', subtitle: 'Let\'s set up your account, while we fund Matches for you!'),
             isProfileForView(),
             const SizedBox(height: 10),
             provider.selectedProfileName == null
@@ -78,11 +80,20 @@ class _IsProfileForScreenState extends ConsumerState<IsProfileForScreen> {
       spacing: 10,
       children: [
         Row(
+          spacing: 4,
           children: [
             Text(
               'This Profile is for',
               style: TextStyle(
-                fontSize: TextSize.font20(context),
+                fontSize: TextSize.font14(context),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              '*',
+              style: TextStyle(
+                fontSize: TextSize.font14(context),
+                color: Colors.redAccent,
                 fontWeight: FontWeight.w500,
               ),
             ),

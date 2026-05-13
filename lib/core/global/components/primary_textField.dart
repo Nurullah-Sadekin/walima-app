@@ -36,6 +36,7 @@ class PrimaryTextField extends StatefulWidget {
     this.hideHeadline,
     this.length,
     this.isRequired = false,
+    this.isOptional = false,
   });
 
   final TextEditingController? controller;
@@ -67,7 +68,7 @@ class PrimaryTextField extends StatefulWidget {
   final bool? headLineInfoIcon;
   final int? length;
   final bool? isRequired;
-
+  final bool? isOptional;
 
   @override
   State<PrimaryTextField> createState() => _PrimaryTextFieldState();
@@ -163,19 +164,22 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
       decoration: InputDecoration(
         isDense: true,
         counterText: '',
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         prefix: _getPrefix(),
         prefixIcon: _getPrefixIcon(),
-        border: InputBorderStyle.border(widget.borderRadius ?? 6, borderColor: widget.borderColor),
+        border: InputBorderStyle.border(widget.borderRadius ?? 6,
+            borderColor: widget.borderColor),
         focusedBorder: InputBorderStyle.focusedBorder(widget.borderRadius ?? 6),
-        enabledBorder: (widget.controller?.text ??
-                    _internalController?.text ??
-                    '')
-                .isNotEmpty
-            ? InputBorderStyle.validBorder(widget.borderRadius ?? 6, borderColor: widget.borderColor)
-            : InputBorderStyle.border(widget.borderRadius ?? 6),
-        focusedErrorBorder: InputBorderStyle.focusedErrorBorder( widget.borderRadius ?? 6),
-        errorBorder: InputBorderStyle.errorBorder( widget.borderRadius ?? 6),
+        enabledBorder:
+            (widget.controller?.text ?? _internalController?.text ?? '')
+                    .isNotEmpty
+                ? InputBorderStyle.validBorder(widget.borderRadius ?? 6,
+                    borderColor: widget.borderColor)
+                : InputBorderStyle.border(widget.borderRadius ?? 6),
+        focusedErrorBorder:
+            InputBorderStyle.focusedErrorBorder(widget.borderRadius ?? 6),
+        errorBorder: InputBorderStyle.errorBorder(widget.borderRadius ?? 6),
         hintStyle: TextStyle(
           color: const Color(0xFFA3A3A3),
           fontSize: TextSize.font14(context),
@@ -264,19 +268,27 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
                 style: TextStyle(
                     fontSize: TextSize.font14(context),
                     fontWeight: FontWeight.w500,
-                    color: AppColors.textSecondaryLight
-                ),
+                    color: AppColors.textSecondaryLight),
               ),
             if (widget.headLineInfoIcon == true && widget.headLine != null)
               Icon(Icons.info,
                   size: TextSize.font13(context), color: AppColors.disableText),
             if (widget.isRequired == true && widget.headLine != null)
-           Text('*',
+              Text(
+                '*',
                 style: TextStyle(
                     fontSize: TextSize.font14(context),
                     fontWeight: FontWeight.w600,
-                  color: Colors.redAccent
-                ))
+                    color: Colors.redAccent),
+              ),
+            if (widget.isOptional == true && widget.headLine != null)
+              Text(
+                '(optional)',
+                style: TextStyle(
+                    fontSize: TextSize.font10(context),
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.hintTextColor),
+              ),
           ],
         ),
         const SizedBox(height: 6),

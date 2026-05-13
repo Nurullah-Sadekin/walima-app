@@ -57,7 +57,7 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.maritalStatus),
+                    const UpperLayer(imagePath: AppImages.maritalStatus, totalProgressCount: 5, currentIndexProgress: 5,showProgress: true),
                     body(),
                   ],
                 ),
@@ -69,7 +69,7 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
   Widget body() {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           spacing: 10,
           children: [
@@ -91,6 +91,7 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
           DropDownField(
             headLine: 'Marital Status',
             hintText: 'Select',
+            isRequired: true,
             popUpHeader: 'Select Marital Status',
             items: maritalStatusListDataInserted
                 .map((item) => item.name)
@@ -106,6 +107,7 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
           DropDownField(
             headLine: 'Height',
             hintText: 'Select',
+            isRequired: true,
             popUpHeader: 'Select Height',
             items: provider.heightDropdownItems,
             controller: provider.heightDisplayController,
@@ -122,10 +124,17 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
                 style: TextStyle(
                   fontSize: TextSize.font14(context),
                   fontWeight: FontWeight.w500,
+                  color: AppColors.textSecondaryLight
                 ),
               ),
-              Icon(Icons.info,
-                  size: TextSize.font13(context), color: AppColors.disableText),
+              Text(
+                '(optional)',
+                style: TextStyle(
+                  fontSize: TextSize.font10(context),
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.hintTextColor,
+                ),
+              ),
             ],
           ),
           Expanded(
@@ -141,6 +150,7 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
                         List.generate(provider.dietDataList.length, (index) {
                       final dietItems = provider.dietDataList[index];
                       return SelectionCard(
+                        borderRadius: 30,
                         buttonStyle: dietItems.isSelected
                             ? SelectionStyle.selectedRadio
                             : SelectionStyle.unSelectedRadio,
@@ -164,15 +174,16 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
   Widget bottomAction() {
     return PrimaryButtons(
       buttonStyle: provider.maritalStatusController.text.isNotEmpty &&
-              provider.heightController.text.isNotEmpty &&
-              provider.selectedDietStatus != null
-          ? ButtonsStyle.activePrimaryButton
+              provider.heightController.text.isNotEmpty
+          ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
+      verticalPadding: 14,
+      borderRadius: 50,
+      svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
       onTap: () {
         if (provider.maritalStatusController.text.isEmpty ||
-            provider.heightController.text.isEmpty ||
-            provider.selectedDietStatus == null) {
+            provider.heightController.text.isEmpty) {
           return;
         }
         context.push(Paths.qualification);

@@ -15,6 +15,7 @@ import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
 import 'package:go_router/go_router.dart';
+import 'package:walima_llc/features/registration/presentation/widgets/static_text_widget.dart';
 
 class EmailPhoneScreen extends ConsumerStatefulWidget {
   const EmailPhoneScreen({super.key, this.fromScreen});
@@ -49,7 +50,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.emailPhone),
+                    const UpperLayer(imagePath: AppImages.emailPhone, totalProgressCount: 5, currentIndexProgress: 3,showProgress: true),
                     body(),
                   ],
                 ),
@@ -65,6 +66,10 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
         child: Column(
           spacing: 10,
           children: [
+            const StaticTextWidget(
+              title: 'Contact Details',
+              subtitle: 'We\'ll use these to verify and secure your account'
+            ),
             dataInsertField(),
             const Spacer(),
             bottomAction(),
@@ -83,8 +88,9 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
         PrimaryTextField(
           controller: provider.emailController,
           headLine: 'Email Address',
-          hintText: 'hello@faliguni.com',
+          hintText: 'your@gmail.com',
           keyboardType: TextInputType.emailAddress,
+          isRequired: true,
           prefixIcon: ShowImage(
             imagePath: AppImages.emailSvgIcon,
             width: TextSize.font18(context),
@@ -124,8 +130,9 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
           isCountryDropdown: true,
           controller: provider.phoneController,
           headLine: 'Phone Number',
+          isRequired: true,
           keyboardType: TextInputType.phone,
-          hintText: '168011685',
+          hintText: 'Enter phone number',
           length: 10,
           errorText: provider.phoneAvailabilityErrorMessage,
           onTap: null,
@@ -189,8 +196,11 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
     return PrimaryButtons(
       buttonStyle: provider.emailController.text.isNotEmpty &&
               provider.phoneController.text.isNotEmpty
-          ? ButtonsStyle.activePrimaryButton
+          ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
+      verticalPadding: 14,
+      borderRadius: 50,
+      svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
       onTap: () async {
         if (provider.emailController.text.isEmpty ||

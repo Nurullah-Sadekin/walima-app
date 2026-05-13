@@ -57,7 +57,7 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.qualification),
+                    const UpperLayer(imagePath: AppImages.qualification, totalProgressCount: 5, currentIndexProgress: 4,showProgress: true),
                     body(),
                   ],
                 ),
@@ -69,7 +69,7 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
   Widget body() {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           spacing: 10,
           children: [
@@ -91,6 +91,7 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
           controller: provider.highestQualification,
           headLine: 'Highest Qualification',
           hintText: 'Select',
+          isRequired: true,
           popUpHeader: 'Select Highest Qualification',
           items: provider.educationLevelDropdownItems,
           onTap: provider.loadEducationLookupData,
@@ -102,16 +103,18 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
         ),
         PrimaryTextField(
           controller: provider.instituteController,
-          headLine: 'Institute Name',
-          hintText: 'Write here',
+          isRequired: true,
+          headLine: 'Institute / University Name',
+          hintText: 'e.g. University of Dhaka',
           errorText: null,
           noPrefix: true,
           onTap: () {},
         ),
         PrimaryTextField(
           controller: provider.anotherInstituteController,
-          headLine: 'Another Institute Name',
-          hintText: 'Write here',
+          headLine: 'Another Institute',
+          isOptional : true,
+          hintText: 'e.g. North South University',
           errorText: null,
           noPrefix: true,
           onTap: () {},
@@ -124,8 +127,11 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
     return PrimaryButtons(
       buttonStyle: provider.highestQualification.text.isNotEmpty &&
               provider.instituteController.text.isNotEmpty
-          ? ButtonsStyle.activePrimaryButton
+          ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
+      verticalPadding: 14,
+      borderRadius: 50,
+      svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
       onTap: () {
         if (provider.highestQualification.text.isEmpty ||

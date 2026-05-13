@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/global/components/gradient_background.dart';
 import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/global/components/upper_layer.dart';
@@ -57,7 +58,7 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.profession),
+                    const UpperLayer(imagePath: AppImages.profession, totalProgressCount: 10, currentIndexProgress: 7,showProgress: true),
                     body(),
                   ],
                 ),
@@ -69,7 +70,7 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
   Widget body() {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           spacing: 10,
           children: [
@@ -88,60 +89,119 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
       spacing: 20,
       children: [
         Column(
-          spacing: 10,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Income',
-              style: TextStyle(
-                fontSize: TextSize.font14(context),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children:
-                  List.generate(provider.incomePeriodDataList.length, (index) {
-                final incomePeriod = provider.incomePeriodDataList[index];
-
-                double screenWidth = MediaQuery.of(context).size.width - 40;
-                double itemWidth = (screenWidth - 10) / 2;
-
-                return SizedBox(
-                  width: itemWidth,
-                  child: SelectionCard(
-                    buttonStyle: incomePeriod.isSelected
-                        ? SelectionStyle.selectedRadio
-                        : SelectionStyle.unSelectedRadio,
-                    onTap: () {
-                      provider.selectedIncomePeriod(index);
-                    },
-                    isSelected: incomePeriod.isSelected,
-                    title: incomePeriod.name,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  spacing: 4,
+                  children: [
+                    Text(
+                      'Income',
+                      style: TextStyle(
+                        fontSize: TextSize.font14(context),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      '(optional)',
+                      style: TextStyle(
+                          fontSize: TextSize.font10(context),
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.hintTextColor),
+                    ),
+                  ],
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(width: 1,color: AppColors.disableText)
                   ),
-                );
-              }),
+                  child: Row(
+                    children: List.generate(
+                      provider.incomePeriodDataList.length,
+                          (index) {
+                        final incomePeriod = provider.incomePeriodDataList[index];
+
+                        return GestureDetector(
+                          onTap: () {
+                            provider.selectedIncomePeriod(index);
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 250),
+                            alignment: Alignment.center,
+                            padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 4),
+                            decoration: BoxDecoration(
+                              color: incomePeriod.isSelected
+                                  ? const Color(0xFFE83E7A)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                            child: Text(
+                              incomePeriod.name,
+                              style: TextStyle(
+                                fontSize: TextSize.font12(context),
+                                fontWeight: FontWeight.w600,
+                                color: incomePeriod.isSelected
+                                    ? Colors.white
+                                    : Colors.grey,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                )
+              ],
             ),
+            // Income Range Dropdown
+            DropDownField(
+              hintText: 'Select',
+              popUpHeader: 'Select Income Range',
+              items: provider.incomeRangeDropdownItems,
+              controller: provider.incomeRangeController,
+              onTap: provider.loadProfessionLookupData,
+              onConfirm: (value) => provider.selectIncomeRange(value?.toString()),
+              isSearch: true,
+            ),
+            // Wrap(
+            //   spacing: 10,
+            //   runSpacing: 10,
+            //   children:
+            //       List.generate(provider.incomePeriodDataList.length, (index) {
+            //     final incomePeriod = provider.incomePeriodDataList[index];
+            //
+            //     double screenWidth = MediaQuery.of(context).size.width - 48;
+            //     double itemWidth = (screenWidth - 10) / 2;
+            //
+            //     return SizedBox(
+            //       width: itemWidth,
+            //       child: SelectionCard(
+            //         buttonStyle: incomePeriod.isSelected
+            //             ? SelectionStyle.selectedRadio
+            //             : SelectionStyle.unSelectedRadio,
+            //         onTap: () {
+            //           provider.selectedIncomePeriod(index);
+            //         },
+            //         isSelected: incomePeriod.isSelected,
+            //         title: incomePeriod.name,
+            //       ),
+            //     );
+            //   }),
+            // ),
           ],
         ),
 
-        // Income Range Dropdown
-        DropDownField(
-          headLine: 'Income Range',
-          hintText: 'Select',
-          popUpHeader: 'Select Income Range',
-          items: provider.incomeRangeDropdownItems,
-          controller: provider.incomeRangeController,
-          onTap: provider.loadProfessionLookupData,
-          onConfirm: (value) => provider.selectIncomeRange(value?.toString()),
-          isSearch: true,
-        ),
 
-        // Your Work Dropdown
+
+        // YourWork Dropdown
         DropDownField(
-          headLine: 'Your Work with',
+          headLine: 'Work Sector',
           hintText: 'Select',
+          isRequired: true,
           popUpHeader: 'Select Your Work',
           items: provider.yourWorkList,
           controller: provider.yourWorkController,
@@ -151,8 +211,9 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
 
         // You Work As Dropdown
         DropDownField(
-          headLine: 'You Work As',
+          headLine: 'Your Profession',
           hintText: 'Select',
+          isRequired: true,
           popUpHeader: 'Select Profession',
           items: provider.professionDropdownItems,
           controller: provider.youWorkAsController,
@@ -163,8 +224,9 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
 
         PrimaryTextField(
           controller: provider.currentCompanyNameController,
-          headLine: 'Your Current Company Name',
-          hintText: 'Write here',
+          headLine: 'Company / Organisation',
+          hintText: 'e.g. BRAC Bank, Grameenphone',
+          isOptional: true,
           errorText: null,
           noPrefix: true,
           onTap: () {},
@@ -174,18 +236,18 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
   }
 
   Widget bottomAction() {
-    final hasAnyValue =
-        provider.selectedIncomePeriodStatus == null ||
-        provider.incomeRangeController.text.isEmpty ||
+    final hasAnyValue = provider.youWorkAsController.text.isEmpty ||
         provider.yourWorkController.text.isEmpty ;
 
     return PrimaryButtons(
       buttonStyle:
-              provider.selectedIncomePeriodStatus != null &&
-              provider.incomeRangeController.text.isNotEmpty &&
+              provider.youWorkAsController.text.isNotEmpty &&
               provider.yourWorkController.text.isNotEmpty
-          ? ButtonsStyle.activePrimaryButton
-          : ButtonsStyle.disableButton,
+                  ? ButtonsStyle.iconicDynamicButton
+                  : ButtonsStyle.disableButton,
+      verticalPadding: 14,
+      borderRadius: 50,
+      svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
       onTap: () {
         if (hasAnyValue) return;

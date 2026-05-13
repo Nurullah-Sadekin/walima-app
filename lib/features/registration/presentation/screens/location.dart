@@ -56,7 +56,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.location),
+                    const UpperLayer(imagePath: AppImages.location, totalProgressCount: 5, currentIndexProgress: 4,showProgress: true),
                     body(),
                   ],
                 ),
@@ -68,7 +68,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
   Widget body() {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           spacing: 10,
           children: [
@@ -87,38 +87,50 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
       spacing: 20,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        PrimaryTextField(
-          headLine: 'City',
-          hintText: provider.livingInController.text.isEmpty ? 'Select Living In first' : 'Select',
-          controller: provider.cityController,
-          errorText: '',
-          enabled: provider.livingInController.text.isNotEmpty,
-          noPrefix: true,
-          readOnly: true,
-          onTap: _openCityPicker,
-          suffix: Icon(
-            Icons.keyboard_arrow_down_outlined,
-            size: TextSize.font20(context),
-            color: AppColors.grey,
-          ),
-        ),
+        // PrimaryTextField(
+        //   headLine: 'City',
+        //   hintText: provider.livingInController.text.isEmpty ? 'Select Living In first' : 'Select',
+        //   controller: provider.cityController,
+        //   errorText: '',
+        //   enabled: provider.livingInController.text.isNotEmpty,
+        //   noPrefix: true,
+        //   readOnly: true,
+        //   onTap: _openCityPicker,
+        //   suffix: Icon(
+        //     Icons.keyboard_arrow_down_outlined,
+        //     size: TextSize.font20(context),
+        //     color: AppColors.grey,
+        //   ),
+        // ),
         Column(
           spacing: 10,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'You Live with Your Family',
-              style: TextStyle(
-                fontSize: TextSize.font14(context),
-                fontWeight: FontWeight.w500,
-              ),
+            Row(
+              spacing: 4,
+              children: [
+                Text(
+                  'You Live with Your Family',
+                  style: TextStyle(
+                    fontSize: TextSize.font14(context),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  '*',
+                  style: TextStyle(
+                      fontSize: TextSize.font14(context),
+                      fontWeight: FontWeight.w600,
+                      color: Colors.redAccent),
+                ),
+              ],
             ),
             Wrap(
               spacing: 10,
               runSpacing: 10,
               children: List.generate(provider.isWithFamilyDataList.length, (index) {
                 final isWithFamily = provider.isWithFamilyDataList[index];
-                double screenWidth = MediaQuery.of(context).size.width - 40;
+                double screenWidth = MediaQuery.of(context).size.width - 48;
                 double itemWidth = (screenWidth - 10) / 2;
                 return SizedBox(
                   width: itemWidth,
@@ -138,6 +150,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
         DropDownField(
           headLine: 'Residency Status',
           hintText: 'Select',
+          isRequired: true,
           popUpHeader: 'Select Residency Status',
           items: provider.residencyStatusDropdownItems,
           controller: provider.residencyStatusController,
@@ -152,8 +165,11 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
     return PrimaryButtons(
       buttonStyle:
           provider.cityController.text.isNotEmpty && provider.residencyStatusController.text.isNotEmpty && provider.selectedIsWithFamilyStatus != null
-              ? ButtonsStyle.activePrimaryButton
+              ? ButtonsStyle.iconicDynamicButton
               : ButtonsStyle.disableButton,
+      verticalPadding: 14,
+      borderRadius: 50,
+      svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
       onTap: () {
         if (provider.cityController.text.isEmpty || provider.residencyStatusController.text.isEmpty || provider.selectedIsWithFamilyStatus == null) {

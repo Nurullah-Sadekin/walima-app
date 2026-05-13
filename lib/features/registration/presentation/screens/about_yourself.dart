@@ -28,6 +28,7 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
   void initState() {
     super.initState();
     provider = ref.read(registrationProvider);
+    provider.aboutYourselfController.text = 'I enjoy spending time with friends and value meaningful relationships. I am seeking a partner who is supportive, family-oriented, and composed in nature. If this aligns with what you are looking for, I would be glad to connect.';
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider.getInitialData();
       provider.initControllersListener();
@@ -56,7 +57,7 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.aboutYourself),
+                    const UpperLayer(imagePath: AppImages.aboutYourself,totalProgressCount: 10,currentIndexProgress: 9,showProgress: true,),
                     body(),
                   ],
                 ),
@@ -68,7 +69,7 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
   Widget body() {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           spacing: 10,
           children: [
@@ -128,6 +129,7 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
           controller: provider.aboutYourselfController,
           headLine: 'About Yourself',
           hintText: 'Write here ',
+          isRequired: true,
           errorText: null,
           onTap: () {},
           maxLine: 5,

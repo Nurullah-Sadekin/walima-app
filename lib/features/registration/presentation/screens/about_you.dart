@@ -13,6 +13,7 @@ import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
 import 'package:go_router/go_router.dart';
+import 'package:walima_llc/features/registration/presentation/widgets/static_text_widget.dart';
 
 class AboutYouScreen extends ConsumerStatefulWidget {
   const AboutYouScreen({super.key});
@@ -78,6 +79,7 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
         child: Column(
           spacing: 10,
           children: [
+            const StaticTextWidget(title: 'Personal Information', subtitle: 'Tell us about yourself'),
             dataInsertField(),
             const Spacer(),
             bottomAction(),
@@ -96,6 +98,7 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
           controller: provider.firstNameController,
           headLine: 'Your Name',
           hintText: 'First Name',
+          isRequired: true,
           noPrefix: true,
           errorText: null,
           onTap: () {},
@@ -118,6 +121,7 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
                 controller: provider.dateOfBirthController,
                 headLine: 'Date of Birth',
                 hintText: 'DD/MM/YYYY',
+                isRequired: true,
                 errorText: null,
                 onTap: () {},
                 datePicker: true,

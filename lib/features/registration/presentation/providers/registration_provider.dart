@@ -69,11 +69,9 @@ class RegistrationProvider extends BaseChangeNotifier {
   final TextEditingController heightDisplayController = TextEditingController();
   final TextEditingController highestQualification = TextEditingController();
   final TextEditingController instituteController = TextEditingController();
-  final TextEditingController anotherInstituteController =
-      TextEditingController();
+  final TextEditingController anotherInstituteController = TextEditingController();
   final TextEditingController aboutYourselfController = TextEditingController();
-  final TextEditingController currentCompanyNameController =
-      TextEditingController();
+  final TextEditingController currentCompanyNameController = TextEditingController();
   final TextEditingController incomeRangeController = TextEditingController();
   final TextEditingController yourWorkController = TextEditingController();
   final TextEditingController youWorkAsController = TextEditingController();
