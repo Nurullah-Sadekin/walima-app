@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
@@ -370,58 +371,64 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
               const SizedBox(height: 16),
               Row(
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(4),
+                  InkWell(
+                    onTap: () => callNumber('01305455665'),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const ShowImage(
+                            imagePath: AppImages.callIcon,
+                            width: 16,
+                            height: 16,
+                            color: AppColors.white,
+                          ),
                         ),
-                        child: const ShowImage(
-                          imagePath: AppImages.callSvgIcon,
-                          width: 16,
-                          height: 16,
-                          color: AppColors.white,
+                        const SizedBox(width: 6),
+                        Text(
+                          '01305-455665',
+                          style: TextStyle(
+                            fontSize: TextSize.font14(context),
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textSecondaryLight,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        '01715-7277279',
-                        style: TextStyle(
-                          fontSize: TextSize.font14(context),
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textSecondaryLight,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   const SizedBox(width: 20),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(4),
+                  InkWell(
+                    onTap: () => openWhatsApp('1305345665'),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: AppColors.greenButtonColor,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const ShowImage(
+                            imagePath: AppImages.whatsappSvgIcon,
+                            width: 16,
+                            height: 16,
+                            color: AppColors.white,
+                          ),
                         ),
-                        child: const ShowImage(
-                          imagePath: AppImages.whatsappSvgIcon,
-                          width: 16,
-                          height: 16,
-                          color: AppColors.white,
+                        const SizedBox(width: 6),
+                        Text(
+                          '01305-345665',
+                          style: TextStyle(
+                            fontSize: TextSize.font14(context),
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textSecondaryLight,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        '01715-7277279',
-                        style: TextStyle(
-                          fontSize: TextSize.font14(context),
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textSecondaryLight,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -431,4 +438,19 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
       ],
     );
   }
+  void openWhatsApp(String number) async {
+    final uri = Uri.parse('https://wa.me/88$number'); // BD country code
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  Future<void> callNumber(String number) async {
+    final uri = Uri(scheme: 'tel', path: number);
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
 }
