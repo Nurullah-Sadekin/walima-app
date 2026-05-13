@@ -130,21 +130,24 @@ class _FamilyDetailsScreenState extends ConsumerState<FamilyDetailsScreen> {
   }
 
   Widget bottomAction() {
-    final hasAnyValue = provider.motherDetailsController.text.isEmpty ||
-        provider.fatherDetailsController.text.isEmpty ||
-        provider.noOfSisterController.text.isEmpty ||
-        provider.noOfBrotherController.text.isEmpty;
+    final hasAnyValue = provider.motherDetailsController.text.isNotEmpty ||
+        provider.fatherDetailsController.text.isNotEmpty ||
+        provider.noOfSisterController.text.isNotEmpty ||
+        provider.noOfBrotherController.text.isNotEmpty;
 
     return PrimaryButtons(
-      buttonStyle: provider.motherDetailsController.text.isNotEmpty &&
-              provider.fatherDetailsController.text.isNotEmpty &&
-              provider.noOfSisterController.text.isNotEmpty &&
+      buttonStyle: provider.motherDetailsController.text.isNotEmpty ||
+              provider.fatherDetailsController.text.isNotEmpty ||
+              provider.noOfSisterController.text.isNotEmpty ||
               provider.noOfBrotherController.text.isNotEmpty
-          ? ButtonsStyle.activePrimaryButton
+          ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
+      verticalPadding: 14,
+      borderRadius: 50,
+      svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
       onTap: () async{
-        if (hasAnyValue) return;
+        if (!hasAnyValue) return;
         final screenProvider = ref.read(familyDetailsScreenProvider);
         screenProvider.updateViewState(loadingState: RegistrationScreenStates.isProfileFor);
          final updated = await provider.updateFamilyDetails(context);

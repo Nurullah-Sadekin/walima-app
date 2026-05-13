@@ -89,7 +89,7 @@ class MyApp extends ConsumerWidget {
     DioClient().setLogoutHandler(() {
       ref.read(chatProvider).clearChatState();
       SocketService.instance.disconnect(reason: 'session expired logout');
-      router.go(Paths.login);
+      router.go(Paths.onboarding);
     });
 
     final themeMode = ref.watch(themeNotifierProvider);

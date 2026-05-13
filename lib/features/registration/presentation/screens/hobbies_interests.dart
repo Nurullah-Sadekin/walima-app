@@ -177,7 +177,9 @@ class _HobbiesInterestsScreenState
   Widget bottomAction() {
     final selected = provider.selectedHobbiesCount();
     return PrimaryButtons(
-      buttonStyle: ButtonsStyle.activePrimaryButton,
+      buttonStyle: ButtonsStyle.iconicDynamicButton,
+      verticalPadding: 14,
+      borderRadius: 50,
       title: 'Save & Continue ($selected/${RegistrationProvider.hobbiesSelectionMax})',
       onTap: () async{
         // show the save selected hobbies dialog

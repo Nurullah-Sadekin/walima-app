@@ -78,7 +78,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
               onTap: () async {
                 await provider.logout(
                   () {
-                    router.go(Paths.login);
+                    router.go(Paths.onboarding);
                   },
                   onBeforeLogout: () {
                     ref.invalidate(homeProvider);

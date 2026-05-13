@@ -264,30 +264,19 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
                       style: TextStyle(
                         fontSize: TextSize.font18(context),
                         fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimaryLight,
                       ),
                       decoration: InputDecoration(
                         counterText: '',
                         fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 4),
+                        contentPadding: const EdgeInsets.all(0),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(8),
                           borderSide: const BorderSide(color: AppColors.grey),
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: AppColors.greyLight),
-                        ),
-                        disabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: AppColors.greyLight),
-                        ),
-                        errorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: Colors.red),
-                        ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: AppColors.primary),
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: AppColors.greyLight),
                         ),
                       ),
                       onChanged: (value) {

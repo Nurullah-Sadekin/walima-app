@@ -65,24 +65,28 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                     UpperLayer(
                       imagePath: AppImages.otp,
                       trailingText: 'Skip',
+                      totalProgressCount: 10,
+                      showProgress: true,
+                      currentIndexProgress: 9,
                       isTrailing: true,
                       onTrailingTap: () async {
-                        final screenProvider = ref.read(verifyOtpForSignUp);
-                        screenProvider.updateViewState(loadingState: RegistrationScreenStates.isProfileFor);
-                        final validate = await provider.submitRegistration(
-                          context,
-                          skipOtp: true,
-                          useDebugTemplate: _isDebugOtpFlow,
-                        );
-                        if (!validate) {
-                          screenProvider.updateViewState(loadingState: RegistrationScreenStates.loadingComplete);
-                          return;
-                        } else {
-                          screenProvider.updateViewState(screenStates: RegistrationScreenStates.loadingComplete);
-                          if (mounted) {
-                            _navigateAfterRegistrationSuccess();
-                          }
-                        }
+                        _navigateAfterRegistrationSuccess();
+                        // final screenProvider = ref.read(verifyOtpForSignUp);
+                        // screenProvider.updateViewState(loadingState: RegistrationScreenStates.isProfileFor);
+                        // final validate = await provider.submitRegistration(
+                        //   context,
+                        //   skipOtp: true,
+                        //   useDebugTemplate: _isDebugOtpFlow,
+                        // );
+                        // if (!validate) {
+                        //   screenProvider.updateViewState(loadingState: RegistrationScreenStates.loadingComplete);
+                        //   return;
+                        // } else {
+                        //   screenProvider.updateViewState(screenStates: RegistrationScreenStates.loadingComplete);
+                        //   if (mounted) {
+                        //     _navigateAfterRegistrationSuccess();
+                        //   }
+                        // }
                       },
                     ),
                     body(),
@@ -100,59 +104,54 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
         child: Column(
           spacing: 10,
           children: [
-            Text(
-              provider.selectedVerificationType.toLowerCase() == 'email' ? 'Verify email' : 'Verify Number',
-              style: TextStyle(fontSize: TextSize.font18(context), color: AppColors.textPrimaryLight, fontWeight: FontWeight.w500),
-            ),
-            Row(
-              spacing: 8,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (provider.selectedVerificationType.toLowerCase() == 'email')
-                  Text(
-                    'We\'ve sent a code to ${provider.emailController.text}',
-                    style: TextStyle(
-                      fontSize: TextSize.font14(context),
-                      color: AppColors.textSecondaryLight,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  )
-                else
-                  Text(
-                    'We\'ve sent a code to ${provider.selectedCountryCodeForNumber}${provider.phoneController.text}',
-                    style: TextStyle(fontSize: TextSize.font14(context), color: AppColors.textSecondaryLight, fontWeight: FontWeight.w400),
-                  ),
-                InkWell(
-                  onTap: () {
-                    context.pushNamed(
-                      Routes.emailPhone,
-                      queryParameters: const {'fromScreen': 'otpScreen'},
-                      extra: 'otpScreen',
-                    );
-                  },
-                  child: Row(
-                    spacing: 2,
-                    children: [
-                      Icon(Icons.edit_outlined, size: TextSize.font14(context), color: AppColors.primary),
-                      Text(
-                        'Edit',
-                        style: TextStyle(fontSize: TextSize.font14(context), color: AppColors.primary, fontWeight: FontWeight.w600),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+            staticText(),
+
+            SizedBox(height: MediaQuery.sizeOf(context).height * 0.01),
+            // Text(
+            //   provider.selectedVerificationType.toLowerCase() == 'email' ? 'Verify email' : 'Verify Number',
+            //   style: TextStyle(fontSize: TextSize.font18(context), color: AppColors.textPrimaryLight, fontWeight: FontWeight.w500),
+            // ),
+            // Row(
+            //   spacing: 8,
+            //   mainAxisAlignment: MainAxisAlignment.center,
+            //   children: [
+            //     if (provider.selectedVerificationType.toLowerCase() == 'email')
+            //       Text(
+            //         'We\'ve sent a code to ${provider.emailController.text}',
+            //         style: TextStyle(
+            //           fontSize: TextSize.font14(context),
+            //           color: AppColors.textSecondaryLight,
+            //           fontWeight: FontWeight.w400,
+            //         ),
+            //       )
+            //     else
+            //       Text(
+            //         'We\'ve sent a code to ${provider.selectedCountryCodeForNumber}${provider.phoneController.text}',
+            //         style: TextStyle(fontSize: TextSize.font14(context), color: AppColors.textSecondaryLight, fontWeight: FontWeight.w400),
+            //       ),
+            //     InkWell(
+            //       onTap: () {
+            //         context.pushNamed(
+            //           Routes.emailPhone,
+            //           queryParameters: const {'fromScreen': 'otpScreen'},
+            //           extra: 'otpScreen',
+            //         );
+            //       },
+            //       child: Row(
+            //         spacing: 2,
+            //         children: [
+            //           Icon(Icons.edit_outlined, size: TextSize.font14(context), color: AppColors.primary),
+            //           Text(
+            //             'Edit',
+            //             style: TextStyle(fontSize: TextSize.font14(context), color: AppColors.primary, fontWeight: FontWeight.w600),
+            //           ),
+            //         ],
+            //       ),
+            //     ),
+            //   ],
+            // ),
             loginDataField(),
             const SizedBox(height: 10),
-            Text(
-              'Experiencing issues receiving the code?',
-              style: TextStyle(
-                fontSize: TextSize.font14(context),
-                color: AppColors.textSecondaryLight,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
             ResendCodeTimer(
               onResend: () async {
                 final screenProvider = ref.read(verifyOtpForSignUp);
@@ -164,14 +163,186 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                 );
               },
             ),
-            const Spacer(),
+
+
             bottomAction(),
-            const SizedBox(height: 20),
+            SizedBox(height: MediaQuery.sizeOf(context).height * 0.01),
+
+            SizedBox(height: MediaQuery.sizeOf(context).height * 0.01),
+            contactSupport(),
+
+
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 6,
+                    children: [
+                      Text(
+                        "Don't have an account?",
+                        style: TextStyle(
+                          color: AppColors.hintTextColor,
+                          fontWeight: FontWeight.w500,
+                          fontSize: TextSize.font14(context),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          // context.pop();
+                          context.pushNamed(Routes.onboarding);
+                        },
+                        child: Row(
+                          spacing: 4,
+                          children: [
+                            Text(
+                              'Sign Up Free',
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: TextSize.font16(context),
+                              ),
+                            ),
+                            const Icon(Icons.arrow_forward_ios,color: AppColors.primary, size:8)
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: MediaQuery.sizeOf(context).height * 0.005),
           ],
         ),
       ),
     );
   }
+
+  Widget contactSupport() {
+    return Column(
+      children: [
+        Text(
+          'Did\'nt receive the SMS?',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: AppColors.hintTextColor,
+            fontWeight: FontWeight.w400,
+            fontSize: TextSize.font14(context),
+          ),
+        ),
+        Row(
+          spacing: 6,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Check your number or',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: AppColors.hintTextColor,
+                fontWeight: FontWeight.w400,
+                fontSize: TextSize.font14(context),
+              ),
+            ),
+            Text(
+              'Contact support',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w500,
+                fontSize: TextSize.font14(context),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+
+  Widget staticText() {
+    return Column(spacing: 12, children: [
+      Column(
+        spacing: 6,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Verify your',
+            style: TextStyle(
+              color: AppColors.textPrimaryLight,
+              fontWeight: FontWeight.bold,
+              fontSize: TextSize.font24(context),
+              fontFamily: FontFamily.timesNewRoman,
+            ),
+          ),
+          Text(
+           provider.selectedVerificationType.toLowerCase() == 'email' ? 'email address' : 'phone number',
+            style: TextStyle(
+              color: AppColors.primary,
+              fontWeight: FontWeight.bold,
+              fontSize: TextSize.font24(context),
+              fontFamily: FontFamily.timesNewRoman,
+            ),
+          ),
+        ],
+      ),
+
+      Column(
+        children: [
+          Text(
+            'We\'ve sent a 6-digit code to',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: AppColors.hintTextColor,
+              fontWeight: FontWeight.w400,
+              fontSize: TextSize.font14(context),
+            ),
+          ),
+          Row(
+            spacing: 6,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (provider.selectedVerificationType.toLowerCase() == 'email')
+                    Text(
+                      provider.emailController.text,
+                      style: TextStyle(
+                        fontSize: TextSize.font14(context),
+                        color: AppColors.textSecondaryLight,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    )
+                  else
+                    Text(
+                      '+${provider.selectedCountryCodeForNumber} ${provider.phoneController.text}',
+                      style: TextStyle(fontSize: TextSize.font14(context), color: AppColors.textSecondaryLight, fontWeight: FontWeight.w400),
+                    ),
+              InkWell(
+                onTap: () {
+                  context.pushNamed(
+                    Routes.emailPhone,
+                    queryParameters: const {'fromScreen': 'otpScreen'},
+                    extra: 'otpScreen',
+                  );
+                },
+                child: Text(
+                  'Edit',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w500,
+                    fontSize: TextSize.font14(context),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      )
+    ]);
+  }
+
 
   Widget loginDataField() {
     return Column(
@@ -257,14 +428,16 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
         provider.otpControllers.isNotEmpty;
     return PrimaryButtons(
       buttonStyle: isComplete
-          ? ButtonsStyle.activePrimaryButton
+          ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
+      verticalPadding: 14,
+      borderRadius: 50,
+      svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Done',
       onTap: isComplete
           ? () async {
               final screenProvider = ref.read(verifyOtpForSignUp);
-              screenProvider.updateViewState(
-                  loadingState: RegistrationScreenStates.isProfileFor);
+              screenProvider.updateViewState(loadingState: RegistrationScreenStates.isProfileFor);
               final validate = await provider.submitRegistration(
                 context,
                 useDebugTemplate: _isDebugOtpFlow,

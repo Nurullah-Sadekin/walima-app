@@ -89,47 +89,47 @@ class _FamilyFinancialStatusScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 10,
         children: [
-          Column(
-            spacing: 10,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Live with Family',
-                style: TextStyle(
-                  fontSize: TextSize.font14(context),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: List.generate(provider.isWithFamilyDataList.length,
-                    (index) {
-                  final incomePeriod = provider.isWithFamilyDataList[index];
-
-                  double screenWidth = MediaQuery.of(context).size.width - 40;
-                  double itemWidth = (screenWidth - 10) / 2;
-
-                  return SizedBox(
-                    width: itemWidth,
-                    child: SelectionCard(
-                      buttonStyle: incomePeriod.isSelected
-                          ? SelectionStyle.selectedRadio
-                          : SelectionStyle.unSelectedRadio,
-                      onTap: () {
-                        provider.selectedIsWithFamily(index);
-                      },
-                      isSelected: incomePeriod.isSelected,
-                      title: incomePeriod.name,
-                    ),
-                  );
-                }),
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 10,
-          ),
+          // Column(
+          //   spacing: 10,
+          //   crossAxisAlignment: CrossAxisAlignment.start,
+          //   children: [
+          //     Text(
+          //       'Live with Family',
+          //       style: TextStyle(
+          //         fontSize: TextSize.font14(context),
+          //         fontWeight: FontWeight.w500,
+          //       ),
+          //     ),
+          //     Wrap(
+          //       spacing: 10,
+          //       runSpacing: 10,
+          //       children: List.generate(provider.isWithFamilyDataList.length,
+          //           (index) {
+          //         final incomePeriod = provider.isWithFamilyDataList[index];
+          //
+          //         double screenWidth = MediaQuery.of(context).size.width - 40;
+          //         double itemWidth = (screenWidth - 10) / 2;
+          //
+          //         return SizedBox(
+          //           width: itemWidth,
+          //           child: SelectionCard(
+          //             buttonStyle: incomePeriod.isSelected
+          //                 ? SelectionStyle.selectedRadio
+          //                 : SelectionStyle.unSelectedRadio,
+          //             onTap: () {
+          //               provider.selectedIsWithFamily(index);
+          //             },
+          //             isSelected: incomePeriod.isSelected,
+          //             title: incomePeriod.name,
+          //           ),
+          //         );
+          //       }),
+          //     ),
+          //   ],
+          // ),
+          // const SizedBox(
+          //   height: 10,
+          // ),
           Text(
             'Family\'s Financial Status',
             style: TextStyle(

@@ -195,7 +195,7 @@ class _YourRegionState extends ConsumerState<YourReligion> {
       title: 'Continue',
       onTap: () {
         if (provider.religionController.text.isEmpty ||
-            provider.communityController.text.isEmpty ||
+            provider.cityController.text.isEmpty ||
             provider.livingInController.text.isEmpty) {
           return;
         }

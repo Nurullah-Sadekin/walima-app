@@ -417,8 +417,11 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
   Widget bottomAction() {
     return PrimaryButtons(
       buttonStyle: (_selectedImagePath?.trim().isNotEmpty ?? false)
-          ? ButtonsStyle.activePrimaryButton
+          ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
+      svgIconPath: AppImages.arrowRightSvgIcon,
+      verticalPadding: 14,
+      borderRadius: 50,
       title: 'Continue',
       onTap: _handleContinue,
     );
