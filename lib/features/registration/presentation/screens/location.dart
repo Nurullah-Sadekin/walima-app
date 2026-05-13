@@ -15,6 +15,7 @@ import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:go_router/go_router.dart';
+import 'package:walima_llc/features/registration/presentation/widgets/static_text_widget.dart';
 
 class LocationScreen extends ConsumerStatefulWidget {
   const LocationScreen({super.key});
@@ -56,7 +57,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.location, totalProgressCount: 5, currentIndexProgress: 4,showProgress: true),
+                    const UpperLayer(imagePath: AppImages.location, totalProgressCount: 10, currentIndexProgress: 4,showProgress: true),
                     body(),
                   ],
                 ),
@@ -72,6 +73,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
         child: Column(
           spacing: 10,
           children: [
+            const StaticTextWidget(title: 'Residency Information', subtitle: 'Where do you currently live?'),
             dataInsertField(),
             const Spacer(),
             bottomAction(),

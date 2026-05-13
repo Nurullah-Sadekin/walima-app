@@ -52,8 +52,13 @@ class _FamilyDetailsScreenState extends ConsumerState<FamilyDetailsScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(
+                    UpperLayer(
                       imagePath: AppImages.familyDetails,
+                      trailingText: 'Skip',
+                      isTrailing: true,
+                      onTrailingTap: () {
+                        context.push(Paths.financialStatus);
+                      },
                     ),
                     body(),
                   ],
@@ -66,7 +71,7 @@ class _FamilyDetailsScreenState extends ConsumerState<FamilyDetailsScreen> {
   Widget body() {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           spacing: 10,
           children: [

@@ -13,6 +13,7 @@ import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:go_router/go_router.dart';
+import 'package:walima_llc/features/registration/presentation/widgets/static_text_widget.dart';
 
 class AboutYourselfScreen extends ConsumerStatefulWidget {
   const AboutYourselfScreen({super.key});
@@ -73,6 +74,8 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
         child: Column(
           spacing: 10,
           children: [
+
+            const StaticTextWidget(title: 'About Yourself', subtitle: 'Almost done! A genuine bil helps you find the right match faster'),
             dataInsertField(),
             const SizedBox(height: 20),
             Column(
@@ -84,7 +87,7 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
                   style: TextStyle(
                     fontSize: TextSize.font14(context),
                     fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimaryLight,
+                    color: AppColors.textSecondaryLight,
                   ),
                 ),
                 Row(
@@ -141,10 +144,12 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: provider.aboutYourselfController.text.isNotEmpty &&
-              provider.selectedVerificationType.isNotEmpty
-          ? ButtonsStyle.activePrimaryButton
+      buttonStyle: provider.aboutYourselfController.text.isNotEmpty
+          ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
+      verticalPadding: 14,
+      borderRadius: 50,
+      svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
       onTap: _handleContinue,
     );
@@ -152,8 +157,7 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
 
   Future<void> _handleContinue() async {
     final screenProvider = ref.read(aboutYourselfScreenProvider);
-    if (provider.aboutYourselfController.text.isNotEmpty &&
-        provider.selectedVerificationType.isNotEmpty) {
+    if (provider.aboutYourselfController.text.isNotEmpty ) {
       screenProvider.updateViewState(
         loadingState: RegistrationScreenStates.isProfileFor,
       );

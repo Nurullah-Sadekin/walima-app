@@ -210,7 +210,7 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
   Widget body(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           spacing: 10,
           children: [

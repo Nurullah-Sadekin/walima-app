@@ -14,6 +14,7 @@ import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:go_router/go_router.dart';
+import 'package:walima_llc/features/registration/presentation/widgets/static_text_widget.dart';
 
 class MaritalStatusScreen extends ConsumerStatefulWidget {
   const MaritalStatusScreen({super.key});
@@ -57,7 +58,7 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.maritalStatus, totalProgressCount: 5, currentIndexProgress: 5,showProgress: true),
+                    const UpperLayer(imagePath: AppImages.maritalStatus, totalProgressCount: 10, currentIndexProgress: 5,showProgress: true),
                     body(),
                   ],
                 ),
@@ -73,6 +74,7 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
         child: Column(
           spacing: 10,
           children: [
+            const StaticTextWidget(title: 'Personal Details', subtitle: 'Tell us a bit more about yourself'),
             dataInsertField(),
             bottomAction(),
             const SizedBox(height: 20),

@@ -11,6 +11,7 @@ import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:go_router/go_router.dart';
+import 'package:walima_llc/features/registration/presentation/widgets/static_text_widget.dart';
 
 class QualificationScreen extends ConsumerStatefulWidget {
   const QualificationScreen({super.key});
@@ -57,7 +58,7 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.qualification, totalProgressCount: 5, currentIndexProgress: 4,showProgress: true),
+                    const UpperLayer(imagePath: AppImages.qualification, totalProgressCount: 10, currentIndexProgress: 6,showProgress: true),
                     body(),
                   ],
                 ),
@@ -73,6 +74,7 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
         child: Column(
           spacing: 10,
           children: [
+            const StaticTextWidget(title: 'Educational Background', subtitle: 'Share your qualifications'),
             dataInsertField(),
             const Spacer(),
             bottomAction(),

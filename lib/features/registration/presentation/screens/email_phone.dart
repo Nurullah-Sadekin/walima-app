@@ -50,7 +50,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.emailPhone, totalProgressCount: 5, currentIndexProgress: 3,showProgress: true),
+                    const UpperLayer(imagePath: AppImages.emailPhone, totalProgressCount: 10, currentIndexProgress: 3,showProgress: true),
                     body(),
                   ],
                 ),

@@ -44,7 +44,7 @@ class _IsProfileForScreenState extends ConsumerState<IsProfileForScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.isProfileFor, totalProgressCount: 5, currentIndexProgress: 0,showProgress: true),
+                    const UpperLayer(imagePath: AppImages.isProfileFor, totalProgressCount: 10, currentIndexProgress: 0,showProgress: true),
                     body(),
                   ],
                 ),

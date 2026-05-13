@@ -61,7 +61,7 @@ class _YourRegionState extends ConsumerState<YourReligion> {
                   children: [
                     const UpperLayer(
                         imagePath: AppImages.religion,
-                        totalProgressCount: 5,
+                        totalProgressCount: 10,
                         currentIndexProgress: 2,
                         showProgress: true),
                     body(),

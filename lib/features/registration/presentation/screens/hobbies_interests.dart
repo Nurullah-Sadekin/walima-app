@@ -58,7 +58,13 @@ class _HobbiesInterestsScreenState
               ? const Loading()
               : Column(
                   children: [
-                    const CustomBackAppBar(),
+                     CustomBackAppBar(
+                      trailingText: 'Skip',
+                      isTrailing: true,
+                      onTrailingTap: () {
+                        context.push(Paths.familyDetails);
+                      },
+                    ),
                     body(),
                   ],
                 ),
@@ -70,7 +76,7 @@ class _HobbiesInterestsScreenState
   Widget body() {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10),
         child: Column(
           children: [
             _bodyScrollable(context),
