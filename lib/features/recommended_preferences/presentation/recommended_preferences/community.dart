@@ -10,6 +10,7 @@ import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/upper_layer.dart';
 import 'package:go_router/go_router.dart';
+import 'package:walima_llc/features/registration/presentation/widgets/static_text_widget.dart';
 
 class CommunityScreen extends ConsumerStatefulWidget {
   const CommunityScreen({super.key});
@@ -48,10 +49,15 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
               ? const Loading()
               : Column(
             children: [
-              const UpperLayer(
+               UpperLayer(
                   imagePath: AppImages.recommendedPreferences,
                   isShowAppbar: true,
                   isBackButton: true,
+                isTrailing: true,
+                trailingText: 'Skip',
+                onTrailingTap: (){
+                  context.push(Paths.preferenceLocation);
+                },
               ),
               body(),
             ],
@@ -64,10 +70,15 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
   Widget body() {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           spacing: 10,
           children: [
+            const StaticTextWidget(
+              title: 'Preference Religion',
+              subtitle:
+              'Choose your preferred religion, community, and mother tongue to help us find better matches for you.',
+            ),
             dropdownSelection(),
             const Spacer(),
             bottomAction(),
@@ -100,7 +111,6 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
           headLine: 'Partner Community',
           hintText: 'Select',
           popUpHeader: 'Select Community',
-          isRequired: true,
           items: provider.communityDropdownItems,
           controller: provider.communityPreferenceController,
           onTap: () {},
@@ -128,8 +138,11 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       buttonStyle: provider.religionPreferenceController.text.isNotEmpty &&
           provider.communityPreferenceController.text.isNotEmpty &&
           provider.motherTonguePreferenceController.text.isNotEmpty
-          ? ButtonsStyle.activePrimaryButton
+          ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
+      verticalPadding: 14,
+      borderRadius: 50,
+      svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
       onTap: () {
         if (provider.religionPreferenceController.text.isEmpty ||
@@ -141,4 +154,5 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       },
     );
   }
+
 }

@@ -174,7 +174,7 @@ class SelectionCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
         decoration: ShapeDecoration(
-          color: Colors.white,
+          color: AppColors.primaryVariant,
           shape: RoundedRectangleBorder(
             side: BorderSide(width: 1, color: isSelected ? AppColors.primary : AppColors.inputBorderColor),
             borderRadius: BorderRadius.circular(borderRadius ?? 6),
@@ -227,7 +227,7 @@ class SelectionCard extends StatelessWidget {
             Text(
               title ?? '',
               style: TextStyle(
-                color: AppColors.textPrimaryLight,
+                color: AppColors.textSecondaryLight,
                 fontSize: TextSize.font14(context),
                 fontWeight: FontWeight.w500,
               ),

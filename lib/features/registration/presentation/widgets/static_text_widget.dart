@@ -26,19 +26,22 @@ class StaticTextWidget extends StatelessWidget {
             style: TextStyle(
               color: AppColors.textPrimaryLight,
               fontWeight: FontWeight.bold,
+              fontFamily: FontFamily.garamond,
               fontSize: TextSize.font24(context),
             ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                subtitle,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AppColors.disable,
-                  fontWeight: FontWeight.w400,
-                  fontSize: TextSize.font14(context),
+              Flexible(
+                child: Text(
+                  subtitle,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.disable,
+                    fontWeight: FontWeight.w400,
+                    fontSize: TextSize.font14(context),
+                  ),
                 ),
               ),
               if(isOptional)

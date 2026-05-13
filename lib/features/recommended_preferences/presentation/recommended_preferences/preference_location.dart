@@ -12,6 +12,7 @@ import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:go_router/go_router.dart';
+import 'package:walima_llc/features/registration/presentation/widgets/static_text_widget.dart';
 
 class PreferenceLocationScreen extends ConsumerStatefulWidget {
   const PreferenceLocationScreen({super.key});
@@ -71,10 +72,15 @@ class _PreferenceLocationScreenState
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(
+                    UpperLayer(
                       imagePath: AppImages.recommendedPreferences,
                       isShowAppbar: true,
                       isBackButton: true,
+                      isTrailing: true,
+                      trailingText: 'Skip',
+                      onTrailingTap: (){
+                        context.push(Paths.education);
+                      },
                     ),
                     body(),
                   ],
@@ -87,10 +93,15 @@ class _PreferenceLocationScreenState
   Widget body() {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           spacing: 10,
           children: [
+            const StaticTextWidget(
+              title: 'Partner Location Preference',
+              subtitle:
+              'Select preference country and city',
+            ),
             dataField(),
             bottomAction(),
             const SizedBox(height: 20),
@@ -163,6 +174,7 @@ class _PreferenceLocationScreenState
                                 final isSelected =
                                     provider.preferableCity.contains(cityName);
                                 return SelectionCard(
+                                  borderRadius: 40,
                                   buttonStyle: isSelected
                                       ? SelectionStyle.selectedCheckbox
                                       : SelectionStyle.unSelectedCheckbox,
@@ -194,7 +206,10 @@ class _PreferenceLocationScreenState
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: ButtonsStyle.activePrimaryButton,
+      buttonStyle: ButtonsStyle.iconicDynamicButton,
+      verticalPadding: 14,
+      borderRadius: 50,
+      svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
       onTap: () {
         context.push(Paths.education);

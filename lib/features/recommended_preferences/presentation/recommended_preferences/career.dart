@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/global/components/dropdown_field.dart';
 import 'package:walima_llc/core/global/components/gradient_background.dart';
 import 'package:walima_llc/core/global/components/selection_card.dart';
@@ -7,11 +8,13 @@ import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/global/components/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
+import 'package:walima_llc/features/anchor_point/anchor_point.dart';
 import 'package:walima_llc/features/recommended_preferences/presentation/providers/recommended_preferences_provider.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:go_router/go_router.dart';
+import 'package:walima_llc/features/registration/presentation/widgets/static_text_widget.dart';
 
 class CareerScreen extends ConsumerStatefulWidget {
   const CareerScreen({super.key});
@@ -52,7 +55,15 @@ class _CareerScreenState extends ConsumerState<CareerScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.recommendedPreferences),
+                    UpperLayer(imagePath: AppImages.recommendedPreferences,
+                      isShowAppbar: true,
+                      isBackButton: true,
+                      isTrailing: true,
+                      trailingText: 'Skip',
+                      onTrailingTap: (){
+                        context.push(Paths.connectMatches);
+                      },
+                    ),
                     Expanded(child: body(provider)),
                   ],
                 ),
@@ -63,16 +74,36 @@ class _CareerScreenState extends ConsumerState<CareerScreen> {
 
   Widget body(RecommendedPreferencesProvider rec) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      child: Column(
+        spacing: 10,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          const StaticTextWidget(
+            title: 'Partner\'s Work & Income',
+            subtitle: 'What career does your ideal prefer have',
+          ),
+          Expanded(child: dataFields(rec)),
+          bottomAction(),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  Widget dataFields(RecommendedPreferencesProvider rec) {
+    return SingleChildScrollView(
       child: Column(
         spacing: 10,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Working As',
+            'Work Sector',
             style: TextStyle(
               fontSize: TextSize.font14(context),
               fontWeight: FontWeight.w500,
+              color: AppColors.textSecondaryLight
             ),
           ),
           LayoutBuilder(
@@ -119,9 +150,6 @@ class _CareerScreenState extends ConsumerState<CareerScreen> {
             onTap: provider.loadCareerLookupData,
             isSearch: true,
           ),
-          const Spacer(),
-          bottomAction(),
-          const SizedBox(height: 20),
         ],
       ),
     );
@@ -129,10 +157,21 @@ class _CareerScreenState extends ConsumerState<CareerScreen> {
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: ButtonsStyle.activePrimaryButton,
+      buttonStyle: ButtonsStyle.iconicDynamicButton,
+      verticalPadding: 14,
+      borderRadius: 50,
+      svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
-      onTap: () {
-        context.push(Paths.otherDetails);
+      onTap: () async{
+        final success = await provider.updatePreferences(context);
+        if (success && context.mounted) {
+          if (provider.isDrawerEditFlow) {
+            ref.read(currentTabProvider.notifier).state = 0;
+            context.goNamed(Routes.anchor);
+            return;
+          }
+          context.push(Paths.connectMatches);
+        }
       },
     );
   }

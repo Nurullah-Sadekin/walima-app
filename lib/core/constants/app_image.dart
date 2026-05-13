@@ -9,6 +9,7 @@ class AppImages {
   static const String demoProfile2 = 'assets/images/women_avatar.jpg';
   static const String manAvatar = 'assets/images/men_avatar.jpg';
   static const String womenAvatar = 'assets/images/women_avatar.jpg';
+  static const String saveTime = 'assets/images/save_time.png';
 
 
   // Icon asset paths
