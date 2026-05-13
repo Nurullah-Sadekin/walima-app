@@ -94,11 +94,21 @@ class _HobbiesInterestsScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 10,
         children: [
-          Text('Add Hobbies & Interests',
-              style: TextStyle(
-                  fontSize: TextSize.font14(context),
-                  color: AppColors.textPrimaryLight,
-                  fontWeight: FontWeight.w500)),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text('Add Hobbies & Interests',
+                  style: TextStyle(
+                      fontSize: TextSize.font18(context),
+                      color: AppColors.textPrimaryLight,
+                      fontWeight: FontWeight.bold)),
+              Text('Helps us suggest more compatible matches',
+                  style: TextStyle(
+                      fontSize: TextSize.font14(context),
+                      color: AppColors.textSecondaryLight,
+                      fontWeight: FontWeight.w500)),
+            ],
+          ),
           Expanded(
             child: SingleChildScrollView(
               child: Column(

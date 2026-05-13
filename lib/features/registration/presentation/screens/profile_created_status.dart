@@ -67,13 +67,13 @@ class _ProfileCreateStatusScreenState
 
   Widget body() {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           spacing: 10,
           children: [
-            completeMessage(),
-            const Spacer(),
+            Expanded(child: Center(child: completeMessage())),
             bottomAction(),
             const SizedBox(height: 20),
           ],
@@ -113,7 +113,10 @@ class _ProfileCreateStatusScreenState
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: ButtonsStyle.activePrimaryButton,
+      buttonStyle: ButtonsStyle.iconicDynamicButton,
+      verticalPadding: 14,
+      borderRadius: 50,
+      svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
       onTap: () async {
         await provider.saveRegistrationProgress(verificationDone: true);

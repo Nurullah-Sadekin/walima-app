@@ -68,9 +68,9 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                       totalProgressCount: 10,
                       showProgress: true,
                       currentIndexProgress: 9,
-                      isTrailing: true,
+                      isTrailing: false,
                       onTrailingTap: () async {
-                        _navigateAfterRegistrationSuccess();
+                        // _navigateAfterRegistrationSuccess();
                         // final screenProvider = ref.read(verifyOtpForSignUp);
                         // screenProvider.updateViewState(loadingState: RegistrationScreenStates.isProfileFor);
                         // final validate = await provider.submitRegistration(

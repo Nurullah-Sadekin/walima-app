@@ -10,6 +10,7 @@ import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:go_router/go_router.dart';
+import 'package:walima_llc/features/registration/presentation/widgets/static_text_widget.dart';
 
 class FamilyDetailsScreen extends ConsumerStatefulWidget {
   const FamilyDetailsScreen({super.key});
@@ -75,6 +76,7 @@ class _FamilyDetailsScreenState extends ConsumerState<FamilyDetailsScreen> {
         child: Column(
           spacing: 10,
           children: [
+            const StaticTextWidget(title: 'Family Details', subtitle: 'This is optional - you can add later',isOptional: true),
             dataInsertField(),
             const Spacer(),
             bottomAction(),
