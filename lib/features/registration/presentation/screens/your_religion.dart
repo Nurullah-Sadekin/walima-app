@@ -159,7 +159,8 @@ class _YourRegionState extends ConsumerState<YourReligion> {
                   ),
                 ),
               ],
-            )
+            ),
+            SizedBox(height: TextSize.font20(context)),
           ],
         ),
         provider.livingInController.text.isEmpty

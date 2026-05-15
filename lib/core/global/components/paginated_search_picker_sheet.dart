@@ -344,9 +344,13 @@ class _PaginatedSearchPickerList extends StatelessWidget {
       },
       child: ListView.separated(
         controller: scrollController,
-        padding: const EdgeInsets.only(bottom: 24),
+        padding: const EdgeInsets.only(bottom: 10),
         itemCount: items.length + (isLoadingMore ? 1 : 0),
-        separatorBuilder: (_, __) => const Divider(height: 1),
+        shrinkWrap: true, // Important: makes ListView take only needed space
+        physics: const AlwaysScrollableScrollPhysics(),
+        separatorBuilder: (context, index) => const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+        ),
         itemBuilder: (context, index) {
           if (index >= items.length) {
             return const Padding(
