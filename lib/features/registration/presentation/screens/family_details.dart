@@ -110,23 +110,33 @@ class _FamilyDetailsScreenState extends ConsumerState<FamilyDetailsScreen> {
           isSearch: false,
         ),
 
-        DropDownField(
-          headLine: 'No. of Sisters',
-          hintText: 'Select',
-          popUpHeader: 'Select No. of Sisters',
-          items: provider.siblingCountList,
-          controller: provider.noOfSisterController,
-          isSearch: false,
+        Row(
+          spacing: 10,
+          children: [
+            Expanded(
+              child: DropDownField(
+                headLine: 'No. of Sisters',
+                hintText: 'Select',
+                popUpHeader: 'Select No. of Sisters',
+                items: provider.siblingCountList,
+                controller: provider.noOfSisterController,
+                isSearch: false,
+              ),
+            ),
+
+            Expanded(
+              child: DropDownField(
+                headLine: 'No. of Brothers',
+                hintText: 'Select',
+                popUpHeader: 'Select No. of Brothers',
+                items: provider.siblingCountList,
+                controller: provider.noOfBrotherController,
+                isSearch: false,
+              ),
+            ),
+          ],
         ),
 
-        DropDownField(
-          headLine: 'No. of Brothers',
-          hintText: 'Select',
-          popUpHeader: 'Select No. of Brothers',
-          items: provider.siblingCountList,
-          controller: provider.noOfBrotherController,
-          isSearch: false,
-        ),
       ],
     );
   }

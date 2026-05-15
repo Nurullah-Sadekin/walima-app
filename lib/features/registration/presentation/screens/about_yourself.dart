@@ -75,7 +75,7 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
           spacing: 10,
           children: [
 
-            const StaticTextWidget(title: 'About Yourself', subtitle: 'Almost done! A genuine bil helps you find the right match faster'),
+            const StaticTextWidget(title: 'About Yourself', subtitle: 'Almost done!\n A well-written bio helps you get 3x more profile views'),
             dataInsertField(),
             const SizedBox(height: 20),
             Column(

@@ -17,6 +17,7 @@ class PreferenceConnectCard extends StatelessWidget {
     required this.height,
     required this.religion,
     required this.location,
+    this.profession,
   });
 
   final bool isSelected;
@@ -27,18 +28,21 @@ class PreferenceConnectCard extends StatelessWidget {
   final String height;
   final String religion;
   final String location;
+  final String? profession;
+
 
   @override
   Widget build(BuildContext context) {
-    final double imageSize = MediaQuery.of(context).size.width * 0.3;
+    final double imageSize = MediaQuery.of(context).size.width * 0.31;
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
+          color: isSelected ? AppColors.primaryVariant : AppColors.white,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.greyLight, width: 1),
+          border: Border.all(color: isSelected ? AppColors.primary : AppColors.greyLight, width: 1),
         ),
         child: IntrinsicHeight(
           child: Row(
@@ -74,11 +78,18 @@ class PreferenceConnectCard extends StatelessWidget {
                           color: isSelected
                               ? AppColors.primary
                               : AppColors.hintTextColor,
-                          size: TextSize.font18(context),
+                          size: TextSize.font22(context),
                         ),
                       ],
                     ),
-
+                    Text(
+                      profession ?? 'Profession',
+                      style: TextStyle(
+                        fontSize: TextSize.font13(context),
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
                     IconTextRow(
                       imagePath: AppImages.calendarSvgIcon,
                       text: age,

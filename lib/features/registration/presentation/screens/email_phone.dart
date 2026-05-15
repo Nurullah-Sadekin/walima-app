@@ -106,12 +106,12 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
           prefixIcon: InkWell(
             onTap: _openCountryPicker,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: Row(
                 children: [
                   Text(
                     provider.selectedCountry.flagEmoji,
-                    style: const TextStyle(fontSize: 20),
+                    style: TextStyle(fontSize: TextSize.font18(context)),
                   ),
                   const SizedBox(width: 8),
                   Text(
@@ -159,25 +159,17 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
         ),
         inputDecoration: InputDecoration(
           hintText: 'Search country',
-          hintStyle: const TextStyle(
-            color: Colors.grey,
-            fontSize: 14,
+          hintStyle: TextStyle(
+            fontSize: TextSize.font16(context),
+            color: AppColors.textSecondaryLight,
           ),
+          prefixIcon: Icon(Icons.search,color: AppColors.textSecondaryLight,size: TextSize.font22(context),),
           filled: true,
-          fillColor: Colors.white,
+          fillColor:  AppColors.greyLight.withOpacity(0.5),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: Colors.grey.shade800),
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: Colors.grey.shade800),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: AppColors.primary),
-          ),
-          prefixIcon: const Icon(Icons.search, color: Colors.grey),
         ),
         borderRadius: BorderRadius.circular(12),
         bottomSheetHeight: 600,

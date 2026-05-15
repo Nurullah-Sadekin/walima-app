@@ -9,6 +9,7 @@ import 'package:walima_llc/core/global/components/primary_textField.dart';
 import 'package:walima_llc/core/global/components/selection_card.dart';
 import 'package:walima_llc/core/global/components/dropdown_field.dart';
 import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/features/matches/presentation/widgets/setting_switcher_title.dart';
 import 'package:walima_llc/features/registration/presentation/providers/registration_provider.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
@@ -59,7 +60,11 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.profession, totalProgressCount: 10, currentIndexProgress: 7,showProgress: true),
+                    const UpperLayer(
+                        imagePath: AppImages.profession,
+                        totalProgressCount: 10,
+                        currentIndexProgress: 7,
+                        showProgress: true),
                     body(),
                   ],
                 ),
@@ -75,8 +80,9 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
         child: Column(
           spacing: 10,
           children: [
-
-            const StaticTextWidget(title: 'Work Details', subtitle: 'Tell us about your career & income'),
+            const StaticTextWidget(
+                title: 'Work Details',
+                subtitle: 'Tell us about your career & income'),
             dataInsertField(),
             const Spacer(),
             bottomAction(),
@@ -118,15 +124,16 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
                 ),
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
-                    border: Border.all(width: 1,color: AppColors.disableText)
-                  ),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(30),
+                      border:
+                          Border.all(width: 1, color: AppColors.disableText)),
                   child: Row(
                     children: List.generate(
                       provider.incomePeriodDataList.length,
-                          (index) {
-                        final incomePeriod = provider.incomePeriodDataList[index];
+                      (index) {
+                        final incomePeriod =
+                            provider.incomePeriodDataList[index];
 
                         return GestureDetector(
                           onTap: () {
@@ -135,7 +142,8 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 250),
                             alignment: Alignment.center,
-                            padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
                               color: incomePeriod.isSelected
                                   ? const Color(0xFFE83E7A)
@@ -170,6 +178,23 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
               onConfirm: (value) => provider.selectIncomeRange(value?.toString()),
               isSearch: true,
             ),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 12,horizontal: 16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(6),
+                color: AppColors.disableBackground,
+              ),
+              child: SettingsSwitchTile(
+                title: 'Hide income from others',
+                subtitle: 'Income helps us find better matches but won\'t be shown to others',
+                value: provider.hideIncome,
+                onChanged: (bool value) {
+                  provider.hideIncome = value;
+                  provider.notifyListeners();
+                },
+              ),
+            )
             // Wrap(
             //   spacing: 10,
             //   runSpacing: 10,
@@ -197,8 +222,6 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
             // ),
           ],
         ),
-
-
 
         // YourWork Dropdown
         DropDownField(
@@ -240,14 +263,13 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
 
   Widget bottomAction() {
     final hasAnyValue = provider.youWorkAsController.text.isEmpty ||
-        provider.yourWorkController.text.isEmpty ;
+        provider.yourWorkController.text.isEmpty;
 
     return PrimaryButtons(
-      buttonStyle:
-              provider.youWorkAsController.text.isNotEmpty &&
+      buttonStyle: provider.youWorkAsController.text.isNotEmpty &&
               provider.yourWorkController.text.isNotEmpty
-                  ? ButtonsStyle.iconicDynamicButton
-                  : ButtonsStyle.disableButton,
+          ? ButtonsStyle.iconicDynamicButton
+          : ButtonsStyle.disableButton,
       verticalPadding: 14,
       borderRadius: 50,
       svgIconPath: AppImages.arrowRightSvgIcon,

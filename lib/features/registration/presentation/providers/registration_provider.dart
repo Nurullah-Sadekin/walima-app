@@ -62,8 +62,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController cityController = TextEditingController();
-  final TextEditingController residencyStatusController =
-      TextEditingController();
+  final TextEditingController residencyStatusController = TextEditingController();
   final TextEditingController maritalStatusController = TextEditingController();
   final TextEditingController heightController = TextEditingController();
   final TextEditingController heightDisplayController = TextEditingController();
@@ -94,10 +93,8 @@ class RegistrationProvider extends BaseChangeNotifier {
   List<SingleStringModel> otherInterestsItemList = <SingleStringModel>[];
   List<SingleStringModel> foodCuisineItemList = <SingleStringModel>[];
   List<SingleStringModel> travelLeisureItemList = <SingleStringModel>[];
-  List<SingleStringModel> motherDetailsItemList =
-      motherDetailsItemListDataInserted;
-  List<SingleStringModel> fatherDetailsItemList =
-      fatherDetailsItemListDataInserted;
+  List<SingleStringModel> motherDetailsItemList = motherDetailsItemListDataInserted;
+  List<SingleStringModel> fatherDetailsItemList = fatherDetailsItemListDataInserted;
   List<SingleStringModel> siblingCountList = siblingCountListDataInserted;
   List<SingleStringModel> verificationList = verificationTypeList;
   static const int hobbiesSelectionMax = 5;
@@ -108,6 +105,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   bool fitnessSectionSelected = false;
   bool otherInterestsSectionSelected = false;
   bool verificationDone = false;
+  bool hideIncome = false;
 
   String selectedVerificationType = 'email'; // or 'phone'
 

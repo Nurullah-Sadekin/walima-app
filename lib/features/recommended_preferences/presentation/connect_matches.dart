@@ -103,12 +103,13 @@ class _ConnectMatchesState extends ConsumerState<ConnectMatches> {
         final match = provider.connectMatches[index];
         final matchId = match.id ?? '';
         return Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 6),
           child: PreferenceConnectCard(
             isSelected: provider.selectedConnectMatchIds.contains(matchId),
             onTap: () => provider.toggleConnectMatchSelection(matchId),
             imagePath: match.profilePhoto?.url ?? AppImages.demoProfile,
             name: match.displayName ?? 'Profile Name',
+            profession: match.profession ?? 'Profession',
             age: _formatAge(match),
             height: _formatHeight(match),
             religion: _formatReligion(match),
@@ -127,8 +128,12 @@ class _ConnectMatchesState extends ConsumerState<ConnectMatches> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: PrimaryButtons(
         buttonStyle: hasSelection && !isBusy
-            ? ButtonsStyle.activePrimaryButton
+            ? ButtonsStyle.iconicDynamicButton
             : ButtonsStyle.disableButton,
+        verticalPadding: 14,
+        borderRadius: 50,
+        svgIconPath: AppImages.sentMessage,
+        iconLeftPosition: true,
         title: isBusy
             ? 'Sending...'
             : hasSelection

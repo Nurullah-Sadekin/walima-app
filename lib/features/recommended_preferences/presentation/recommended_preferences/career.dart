@@ -118,6 +118,8 @@ class _CareerScreenState extends ConsumerState<CareerScreen> {
                     final item = provider.professionDataList[index];
 
                     return SelectionCard(
+
+                      borderRadius: 40,
                       buttonStyle: item.isSelected
                           ? SelectionStyle.selectedCheckbox
                           : SelectionStyle.unSelectedCheckbox,
