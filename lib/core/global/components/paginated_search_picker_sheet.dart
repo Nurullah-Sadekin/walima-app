@@ -357,7 +357,14 @@ class _PaginatedSearchPickerList extends StatelessWidget {
 
           final item = items[index];
           return ListTile(
-            title: Text(item),
+            title: Text(
+              item,
+              style: TextStyle(
+                fontWeight: FontWeight.normal,
+                color:Colors.black87,
+                fontSize: TextSize.font16(context),
+              ),
+            ),
             onTap: () => Navigator.of(context).pop(item),
           );
         },

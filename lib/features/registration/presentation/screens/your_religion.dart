@@ -95,7 +95,6 @@ class _YourRegionState extends ConsumerState<YourReligion> {
 
   Widget dataInsertField() {
     return Column(
-      spacing: 20,
       children: [
         DropDownField(
           headLine: 'Your Religion',
@@ -108,21 +107,26 @@ class _YourRegionState extends ConsumerState<YourReligion> {
           onConfirm: (value) => provider.onReligionSelected(value?.toString()),
           isSearch: true,
         ),
-        provider.religionController.text.isEmpty
-            ? const SizedBox.shrink()
-            : DropDownField(
-                headLine: 'Community',
-                hintText: 'Select',
-                isOptional: true,
-                popUpHeader: 'Select Community',
-                isRequired: false,
-                items: provider.communityDropdownItems,
-                controller: provider.communityController,
-                onTap: provider.loadLocationData,
-                onConfirm: (value) =>
-                    provider.onCommunitySelected(value?.toString()),
-                isSearch: true,
-              ),
+        SizedBox(height: TextSize.font20(context)),
+
+        if(provider.religionController.text.isNotEmpty)...[
+          provider.religionController.text.isEmpty
+              ? const SizedBox.shrink()
+              : DropDownField(
+            headLine: 'Community',
+            hintText: 'Select',
+            isOptional: true,
+            popUpHeader: 'Select Community',
+            isRequired: false,
+            items: provider.communityDropdownItems,
+            controller: provider.communityController,
+            onTap: provider.loadLocationData,
+            onConfirm: (value) =>
+                provider.onCommunitySelected(value?.toString()),
+            isSearch: true,
+          ),
+          SizedBox(height: TextSize.font20(context)),
+        ],
         Column(
           children: [
             PrimaryTextField(
@@ -249,8 +253,7 @@ class _YourRegionState extends ConsumerState<YourReligion> {
       title: 'Select City',
       searchHintText: 'Search city',
       items: provider.cityDropdownItems,
-      isInitialLoading:
-          provider.isCityLoading && provider.cityDropdownItems.isEmpty,
+      isInitialLoading: provider.isCityLoading && provider.cityDropdownItems.isEmpty,
       isLoadingMore: provider.isCityLoadingMore,
       hasMoreItems: provider.hasMoreCities,
       initialQuery: provider.citySearchQuery,

@@ -109,7 +109,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         borderRadius: 50,
                         bgColor: Colors.white,
                         onTap: () {
-                          context.push(Paths.hobbiesInterests);
+                          context.push(Paths.isProfileFor);
                         },
                         title: 'Get Started',
                       ),
