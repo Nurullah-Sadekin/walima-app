@@ -1262,6 +1262,35 @@ class RegistrationProvider extends BaseChangeNotifier {
     return '$years years'.replaceFirst('\u007f', '');
   }
 
+  double age() {
+    final txt = dateOfBirthController.text;
+    if (txt.isEmpty) return 0;
+
+    DateTime? dob;
+
+    try {
+      dob = DateTime.tryParse(txt);
+      dob ??= DateFormat('yyyy-MM-dd').parseLoose(txt);
+    } catch (_) {
+      dob = null;
+    }
+
+    if (dob == null) return 0;
+
+    final now = DateTime.now();
+
+    int years = now.year - dob.year;
+
+    if (now.month < dob.month ||
+        (now.month == dob.month && now.day < dob.day)) {
+      years--;
+    }
+
+    if (years < 0) years = 0;
+
+    return years.toDouble();
+  }
+
   int selectedHobbiesCount() {
     return selectedHobbies.length;
   }
@@ -2226,7 +2255,10 @@ class RegistrationProvider extends BaseChangeNotifier {
 
   String phoneAvailabilityErrorMessage = '';
   String emailAvailabilityErrorMessage = '';
+  String dateOfBirthErrorMessage = '';
+
   String phoneNumber = '';
+
   Future<bool> checkEmailAndPhoneAvailability(
       BuildContext context, String countryCode) async {
     final emailRes =

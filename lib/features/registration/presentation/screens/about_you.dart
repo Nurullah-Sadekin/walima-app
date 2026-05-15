@@ -63,7 +63,11 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.aboutYou, totalProgressCount: 10, currentIndexProgress: 1,showProgress: true),
+                    const UpperLayer(
+                        imagePath: AppImages.aboutYou,
+                        totalProgressCount: 10,
+                        currentIndexProgress: 1,
+                        showProgress: true),
                     body(),
                   ],
                 ),
@@ -79,7 +83,9 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
         child: Column(
           spacing: 10,
           children: [
-            const StaticTextWidget(title: 'Personal Information', subtitle: 'Tell us about yourself'),
+            const StaticTextWidget(
+                title: 'Personal Information',
+                subtitle: 'Tell us about yourself'),
             dataInsertField(),
             const Spacer(),
             bottomAction(),
@@ -115,6 +121,7 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
         Row(
           spacing: 5,
           crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
               child: PrimaryTextField(
@@ -122,7 +129,7 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
                 headLine: 'Date of Birth',
                 hintText: 'DD/MM/YYYY',
                 isRequired: true,
-                errorText: null,
+                errorText: provider.dateOfBirthErrorMessage,
                 onTap: () {},
                 datePicker: true,
                 readOnly: true,
@@ -156,11 +163,20 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
                 ))
           ],
         ),
+      ],
+    );
+  }
+
+  Widget bottomAction() {
+    return Column(
+      children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 6.0),
-              child: Text('Must be 18 or older to register on Walima',
+              child: Text(
+                'Must be 18 or older to register on Walima',
                 style: TextStyle(
                   fontSize: TextSize.font12(context),
                   fontWeight: FontWeight.w400,
@@ -169,30 +185,34 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
               ),
             ),
           ],
-        )
+        ),
+        const SizedBox(height: 10),
+        PrimaryButtons(
+          buttonStyle: provider.firstNameController.text.isNotEmpty &&
+                  provider.lastNameController.text.isNotEmpty &&
+                  provider.dateOfBirthController.text.isNotEmpty
+              ? ButtonsStyle.iconicDynamicButton
+              : ButtonsStyle.disableButton,
+          verticalPadding: 14,
+          borderRadius: 50,
+          svgIconPath: AppImages.arrowRightSvgIcon,
+          title: 'Continue',
+          onTap: () {
+            provider.dateOfBirthErrorMessage = '';
+            if (provider.firstNameController.text.isEmpty ||
+                provider.lastNameController.text.isEmpty ||
+                provider.dateOfBirthController.text.isEmpty) {
+              return;
+            }
+            if (provider.age() < 18) {
+              provider.dateOfBirthErrorMessage = 'Must be 18 or older to register on Walima';
+              provider.notifyListeners();
+              return;
+            }
+            context.push(Paths.yourReligion);
+          },
+        ),
       ],
-    );
-  }
-
-  Widget bottomAction() {
-    return PrimaryButtons(
-      buttonStyle: provider.firstNameController.text.isNotEmpty &&
-              provider.lastNameController.text.isNotEmpty &&
-              provider.dateOfBirthController.text.isNotEmpty
-          ? ButtonsStyle.iconicDynamicButton
-          : ButtonsStyle.disableButton,
-      verticalPadding: 14,
-      borderRadius: 50,
-      svgIconPath: AppImages.arrowRightSvgIcon,
-      title: 'Continue',
-      onTap: () {
-        if (provider.firstNameController.text.isEmpty ||
-            provider.lastNameController.text.isEmpty ||
-            provider.dateOfBirthController.text.isEmpty) {
-          return;
-        }
-        context.push(Paths.yourReligion);
-      },
     );
   }
 }
