@@ -115,7 +115,7 @@ class _DropDownFieldState extends State<DropDownField> {
       suffix: widget.suffix ?? Icon(
             Icons.keyboard_arrow_down_outlined,
             size: TextSize.font20(context),
-            color: AppColors.grey,
+            color: widget.controller!.text.isNotEmpty ? AppColors.primary : AppColors.grey,
           ),
       readOnly: true,
       headLine: widget.headLine,

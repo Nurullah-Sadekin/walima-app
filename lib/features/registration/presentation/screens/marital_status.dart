@@ -188,7 +188,7 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
             provider.heightController.text.isEmpty) {
           return;
         }
-        context.push(Paths.qualification);
+        context.push(Paths.marriageIntention);
         // proceed
       },
     );
