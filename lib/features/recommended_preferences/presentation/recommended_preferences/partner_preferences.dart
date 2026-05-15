@@ -68,7 +68,7 @@ class _PartnerPreferencesScreenState
                       isShowAppbar: true,
                       isBackButton: true,
                       isTrailing: true,
-                      trailingText: 'Skip',
+                      trailingText: 'Skip Preferences',
                       onTrailingTap: _onSkipTap,
                     ),
                     body(),
@@ -80,11 +80,11 @@ class _PartnerPreferencesScreenState
   }
 
   void _onSkipTap() {
-    ref.read(currentTabProvider.notifier).state = 0;
-    final homeState = ref.read(homeProvider);
-    homeState.loadPremiumMatches(force: true);
-    homeState.loadRecentVisitors(force: true);
-    context.goNamed(Routes.anchor);
+    // ref.read(currentTabProvider.notifier).state = 0;
+    // final homeState = ref.read(homeProvider);
+    // homeState.loadPremiumMatches(force: true);
+    // homeState.loadRecentVisitors(force: true);
+    context.goNamed(Routes.connectMatches);
   }
 
   Widget body() {
