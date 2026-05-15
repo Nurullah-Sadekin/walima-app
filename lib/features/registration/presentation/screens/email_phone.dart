@@ -96,7 +96,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
             width: TextSize.font18(context),
             height: TextSize.font18(context),
             color: provider.emailController.text.isNotEmpty
-                ? AppColors.textPrimaryLight
+                ? AppColors.primary
                 : AppColors.hintTextColor,
           ),
           errorText: provider.emailAvailabilityErrorMessage,

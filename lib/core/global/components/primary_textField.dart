@@ -3,6 +3,7 @@ import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/input_border_style.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/cupertino.dart';
 
 class PrimaryTextField extends StatefulWidget {
   const PrimaryTextField({
@@ -109,45 +110,142 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
         if (widget.datePicker == true) {
           if (widget.controller == null && _internalController == null) {
             _internalController = TextEditingController();
-
             setState(() {});
           }
-          //initial date will be 18 years ago from today
-          DateTime initialDate =
-              DateTime.now().subtract(const Duration(days: 365 * 19));
+
+          DateTime selectedDate =
+          DateTime.now().subtract(const Duration(days: 365 * 19));
+
           try {
             final existing =
                 widget.controller?.text ?? _internalController?.text ?? '';
+
             if (existing.isNotEmpty) {
               try {
-                initialDate = DateTime.parse(existing);
+                selectedDate = DateTime.parse(existing);
               } catch (_) {
-                initialDate = DateFormat('yyyy-MM-dd').parseLoose(existing);
+                selectedDate = DateFormat('yyyy-MM-dd').parseLoose(existing);
               }
             }
           } catch (_) {}
 
-          final picked = await showDatePicker(
+          await showCupertinoModalPopup(
             context: context,
-            initialDate: initialDate,
-            firstDate: DateTime(1900),
-            lastDate: DateTime(2100),
+            builder: (context) {
+              return Container(
+                height: 320,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 0,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CupertinoButton(
+                            padding: EdgeInsets.zero,
+                            child: const Text(
+                              'Cancel',
+                              style: TextStyle(
+                                color: AppColors.textSecondaryLight,
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                          Text(
+                            'Select Date',
+                            style: TextStyle(
+                              color: AppColors.textPrimaryLight,
+                              fontSize: TextSize.font18(context),
+                              fontWeight: FontWeight.w500,
+                              fontFamily: 'Inter',
+                              decoration: TextDecoration.none,
+                            ),
+                          ),
+                          CupertinoButton(
+                            padding: EdgeInsets.zero,
+                            child: const Text(
+                              'Done',
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            onPressed: () {
+                              final formatted =
+                              DateFormat('yyyy-MM-dd').format(selectedDate);
+
+                              if (widget.controller != null) {
+                                widget.controller!.text = formatted;
+                              } else if (_internalController != null) {
+                                _internalController!.text = formatted;
+                              }
+
+                              if (widget.onChanged != null) {
+                                widget.onChanged!(formatted);
+                              }
+
+                              setState(() {});
+
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    Expanded(
+                      child: CupertinoTheme(
+                        data: CupertinoThemeData(
+                          brightness: Brightness.light,
+                          textTheme: CupertinoTextThemeData(
+                            dateTimePickerTextStyle: TextStyle(
+                              color: AppColors.textPrimaryLight,
+                              fontSize: TextSize.font18(context),
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          primaryColor: AppColors.primary,
+                          applyThemeToAll: true,
+
+                        ),
+                        child: CupertinoDatePicker(
+                          mode: CupertinoDatePickerMode.date,
+                          initialDateTime: selectedDate,
+                          minimumDate: DateTime(1950),
+                          maximumDate: DateTime(2050),
+                          use24hFormat: true,
+                          onDateTimeChanged: (DateTime value) {
+                            selectedDate = value;
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
           );
 
-          if (picked != null) {
-            final formatted = DateFormat('yyyy-MM-dd').format(picked);
-            if (widget.controller != null) {
-              widget.controller!.text = formatted;
-            } else if (_internalController != null) {
-              _internalController!.text = formatted;
-            }
-            if (widget.onChanged != null) widget.onChanged!(formatted);
-            setState(() {});
+          if (widget.onTap != null) {
+            widget.onTap!();
           }
 
-          if (widget.onTap != null) widget.onTap!();
           return;
         }
+
+
         if (widget.onTap != null) widget.onTap!();
       },
       onChanged: (value) =>

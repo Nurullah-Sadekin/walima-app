@@ -132,7 +132,7 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
                   width: TextSize.font20(context),
                   height: TextSize.font20(context),
                   color: provider.dateOfBirthController.text.isNotEmpty
-                      ? AppColors.textPrimaryLight
+                      ? AppColors.primary
                       : AppColors.hintTextColor,
                 ),
               ),
