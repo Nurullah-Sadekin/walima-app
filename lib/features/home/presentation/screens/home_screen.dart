@@ -25,6 +25,7 @@ import 'package:walima_llc/features/connections/presentation/widgets/view_contac
 import 'package:walima_llc/features/matches/presentation/widgets/profile_comprehensive_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:walima_llc/features/profile/data/model/response/dashboard_response.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -133,6 +134,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  String resolvePlanName(Membership? membership) {
+    final planName = membership?.plan?.name?.trim();
+    if (planName != null && planName.isNotEmpty) {
+      return planName.toLowerCase();
+    }
+
+    final tier = membership?.membershipTier?.trim();
+    if (tier != null && tier.isNotEmpty) {
+      return tier.toLowerCase();
+    }
+
+    return 'free';
+  }
+
   Widget _topBar(BuildContext context) {
     return AnchoredAppBar(
       context: context,
@@ -171,7 +186,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _premiumMatches() {
     final provider = ref.watch(homeProvider);
-    final currentPlan = ref.watch(profileProvider).dashboard?.profile?.membership?.plan?.name;
+    final currentPlan = resolvePlanName(ref.watch(profileProvider).dashboard?.profile?.membership);
     final matches = provider.premiumMatches;
     final isLoading = provider.isLoadingPremiumMatches;
     final errorText = provider.premiumMatchesError;
@@ -210,7 +225,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
               ),
-              if (currentPlan != 'Free')
+              if (currentPlan != 'free')
               InkWell(
                 borderRadius: BorderRadius.circular(8.0),
                 onTap: () => context.pushNamed(Routes.premiumMatches),
@@ -292,10 +307,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   children: [
                     ...matches.take(2).map(_buildPremiumMatchCard),
 
-                    if (currentPlan == 'Free')
+                    if (currentPlan == 'free')
                       _buildUpgradeWidget(matches.length - 2),
 
-                    if (currentPlan != 'Free')
+                    if (currentPlan != 'free')
                       ...matches.skip(2).map(_buildPremiumMatchCard),
                   ],
                 ),
@@ -533,7 +548,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
               ),
-              if (currentPlan != 'Free')
+              if (currentPlan != 'free')
               InkWell(
                 borderRadius: BorderRadius.circular(8.0),
                 onTap: () => context.pushNamed(Routes.recentVisitors),
@@ -615,10 +630,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   children: [
                     ...visitors.take(2).map(_buildRecentVisitorCard),
 
-                    if (currentPlan == 'Free')
+                    if (currentPlan == 'free')
                       _buildUpgradeWidget(visitors.length - 2, isForVisitors: true),
 
-                    if (currentPlan != 'Free')
+                    if (currentPlan != 'free')
                       ...visitors.skip(2).map(_buildRecentVisitorCard),
                   ],
                 ),
