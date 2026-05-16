@@ -18,6 +18,9 @@ class BioTemplateRepository {
         AppUrls.getBioTemplates,
         isTokenRequired: false,
       );
+      if (!response.isSuccess) {
+        throw Exception(response.message);
+      }
 
       final data = response.data;
       final Map<String, dynamic>? payload = data is Map<String, dynamic>
@@ -33,7 +36,7 @@ class BioTemplateRepository {
               ? Map<String, dynamic>.from(nestedResponse)
               : null;
 
-      final templates = responseMap?['templates'];
+      final templates = responseMap?['templates'] ?? responseMap?['data'];
       if (templates is! List) {
         return const <BioTemplate>[];
       }
@@ -43,11 +46,8 @@ class BioTemplateRepository {
           .map((item) => BioTemplate.fromJson(Map<String, dynamic>.from(item)))
           .where((t) => t.id.trim().isNotEmpty && t.content.trim().isNotEmpty)
           .toList(growable: false);
-    } catch (e) {
-      final message = e is DioException
-          ? _extractDioMessage(e)
-          : e.toString();
-      throw Exception(message);
+    } on DioException catch (e) {
+      throw Exception(_extractDioMessage(e));
     }
   }
 
@@ -70,6 +70,9 @@ class BioTemplateRepository {
           if (age != null) 'age': age,
         },
       );
+      if (!response.isSuccess) {
+        throw Exception(response.message);
+      }
 
       final data = response.data;
       final Map<String, dynamic>? payload = data is Map<String, dynamic>
@@ -85,7 +88,7 @@ class BioTemplateRepository {
               ? Map<String, dynamic>.from(nestedResponse)
               : null;
 
-      final template = responseMap?['template'];
+      final template = responseMap?['template'] ?? responseMap?['data'];
       if (template is Map<String, dynamic>) {
         return BioTemplate.fromJson(template);
       }
@@ -93,11 +96,8 @@ class BioTemplateRepository {
         return BioTemplate.fromJson(Map<String, dynamic>.from(template));
       }
       return null;
-    } catch (e) {
-      final message = e is DioException
-          ? _extractDioMessage(e)
-          : e.toString();
-      throw Exception(message);
+    } on DioException catch (e) {
+      throw Exception(_extractDioMessage(e));
     }
   }
 }

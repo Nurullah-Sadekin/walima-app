@@ -106,7 +106,6 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
           spacing: 10,
           children: [
             staticText(),
-
             SizedBox(height: MediaQuery.sizeOf(context).height * 0.01),
             // Text(
             //   provider.selectedVerificationType.toLowerCase() == 'email' ? 'Verify email' : 'Verify Number',
