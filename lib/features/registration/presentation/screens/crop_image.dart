@@ -131,6 +131,12 @@ class _CropImageScreenState extends ConsumerState<CropImageScreen> {
   }
 
   Future<void> _handleContinue() async {
+    
+    if(provider.profileImageUploadErrorMessage.isNotEmpty) {
+      provider.resetPhotoUploadFlow();
+      context.pop();
+      return;
+    }
     final imagePath = _selectedImagePath?.trim() ?? '';
     final validationError = provider.validateProfileImageFile(imagePath);
     if (validationError != null) {
@@ -140,7 +146,7 @@ class _CropImageScreenState extends ConsumerState<CropImageScreen> {
       return;
     }
     if (_isUploading) return;
-
+     
     provider.resetPhotoUploadFlow();
     final isUploaded =
         await provider.uploadAndAttachProfileImage(filePath: imagePath);
@@ -161,8 +167,7 @@ class _CropImageScreenState extends ConsumerState<CropImageScreen> {
       message: provider.profileImageUploadErrorMessage.isNotEmpty
           ? provider.profileImageUploadErrorMessage
           : 'Failed to upload profile image.',
-      buttonText:
-          provider.canRetryProfileImageUpload ? 'Retry Upload' : 'Try again',
+      buttonText: provider.canRetryProfileImageUpload ? 'Retry Upload' : 'Try again',
       onButtonPressed: () {
         Navigator.of(context, rootNavigator: true).pop();
         if (provider.canRetryProfileImageUpload && mounted) {
@@ -221,7 +226,7 @@ class _CropImageScreenState extends ConsumerState<CropImageScreen> {
             (_selectedImagePath?.trim().isNotEmpty ?? false) && !_isUploading
                 ? ButtonsStyle.activePrimaryButton
                 : ButtonsStyle.disableButton,
-        title: _isUploading ? 'Verifying Photo...' : 'Upload Image',
+        title: _isUploading ? 'Verifying Photo...' : provider.profileImageUploadErrorMessage.isNotEmpty ? 'Try again' : 'Upload Image',
         onTap: _isUploading ? () {} : _handleContinue,
       ),
     );
