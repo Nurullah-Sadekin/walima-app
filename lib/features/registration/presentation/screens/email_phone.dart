@@ -40,18 +40,17 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
   Widget build(BuildContext context) {
     final screenProvider = ref.watch(emailPhoneScreenProvider);
     return TransparentLoading(
-      isLoading:
-          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: screenProvider.screenStates ==
-                  RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates == RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.emailPhone, totalProgressCount: 10, currentIndexProgress: 3,showProgress: true),
-                    body(),
+                    const UpperLayer(imagePath: AppImages.emailPhone, totalProgressCount: 10, currentIndexProgress: 3, showProgress: true),
+                    Expanded(child: body()),
                   ],
                 ),
         ),
@@ -60,23 +59,27 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
   }
 
   Widget body() {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: Column(
-          spacing: 10,
-          children: [
-            const StaticTextWidget(
-              title: 'Contact Details',
-              subtitle: 'We\'ll use these to verify and secure your account'
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: IntrinsicHeight(
+              child: Column(
+                spacing: 10,
+                children: [
+                  const StaticTextWidget(title: 'Contact Details', subtitle: 'We\'ll use these to verify and secure your account'),
+                  dataInsertField(),
+                  const Spacer(),
+                  bottomAction(),
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
-            dataInsertField(),
-            const Spacer(),
-            bottomAction(),
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -95,9 +98,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
             imagePath: AppImages.emailSvgIcon,
             width: TextSize.font18(context),
             height: TextSize.font18(context),
-            color: provider.emailController.text.isNotEmpty
-                ? AppColors.primary
-                : AppColors.hintTextColor,
+            color: provider.emailController.text.isNotEmpty ? AppColors.primary : AppColors.hintTextColor,
           ),
           errorText: provider.emailAvailabilityErrorMessage,
           onTap: () {},
@@ -121,8 +122,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
                       fontSize: TextSize.font14(context),
                     ),
                   ),
-                  const Icon(Icons.arrow_drop_down,
-                      color: Colors.grey, size: 20),
+                  const Icon(Icons.arrow_drop_down, color: Colors.grey, size: 20),
                 ],
               ),
             ),
@@ -163,9 +163,13 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
             fontSize: TextSize.font16(context),
             color: AppColors.textSecondaryLight,
           ),
-          prefixIcon: Icon(Icons.search,color: AppColors.textSecondaryLight,size: TextSize.font22(context),),
+          prefixIcon: Icon(
+            Icons.search,
+            color: AppColors.textSecondaryLight,
+            size: TextSize.font22(context),
+          ),
           filled: true,
-          fillColor:  AppColors.greyLight.withOpacity(0.5),
+          fillColor: AppColors.greyLight.withOpacity(0.5),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
@@ -186,8 +190,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
   Widget bottomAction() {
     final provider = ref.watch(registrationProvider);
     return PrimaryButtons(
-      buttonStyle: provider.emailController.text.isNotEmpty &&
-              provider.phoneController.text.isNotEmpty
+      buttonStyle: provider.emailController.text.isNotEmpty && provider.phoneController.text.isNotEmpty
           ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
       verticalPadding: 14,
@@ -195,8 +198,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
       svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
       onTap: () async {
-        if (provider.emailController.text.isEmpty ||
-            provider.phoneController.text.isEmpty) {
+        if (provider.emailController.text.isEmpty || provider.phoneController.text.isEmpty) {
           return;
         }
         final screenNotifier = ref.read(emailPhoneScreenProvider);

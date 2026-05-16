@@ -8,8 +8,8 @@ class UpperLayer extends StatelessWidget {
   const UpperLayer({
     super.key,
     required this.imagePath,
-    this.imageWidth = 110,
-    this.imageHeight = 110,
+    this.imageWidth = 80,
+    this.imageHeight = 80,
     this.verticalPadding = 14.0,
     this.spacing = 10.0,
     this.isTrailing = false,

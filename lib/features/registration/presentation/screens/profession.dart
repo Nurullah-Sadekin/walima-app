@@ -65,7 +65,7 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
                         totalProgressCount: 10,
                         currentIndexProgress: 7,
                         showProgress: true),
-                    body(),
+                    Expanded(child: body()),
                   ],
                 ),
         ),
@@ -74,7 +74,7 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
   }
 
   Widget body() {
-    return Expanded(
+    return SingleChildScrollView(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
@@ -84,8 +84,9 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
                 title: 'Work Details',
                 subtitle: 'Tell us about your career & income'),
             dataInsertField(),
-            const Spacer(),
+            const SizedBox(height: 20),
             bottomAction(),
+            
             const SizedBox(height: 20),
           ],
         ),
