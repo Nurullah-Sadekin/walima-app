@@ -23,6 +23,8 @@ import 'package:walima_llc/core/utils/firebase_messaging_service.dart';
 import 'package:walima_llc/core/utils/foreground_alert_service.dart';
 import 'package:walima_llc/features/chat/data/socket/socket_service.dart';
 
+import 'core/config/size_config.dart';
+
 Future<void> main() async {
   runZonedGuarded(
     () async {
@@ -85,7 +87,7 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(goRouterProvider);
-
+    SizeConfig().init(context);
     DioClient().setLogoutHandler(() {
       ref.read(chatProvider).clearChatState();
       SocketService.instance.disconnect(reason: 'session expired logout');

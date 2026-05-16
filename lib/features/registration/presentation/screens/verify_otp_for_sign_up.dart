@@ -71,23 +71,6 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                       currentIndexProgress: 9,
                       isTrailing: false,
                       onTrailingTap: () async {
-                        // _navigateAfterRegistrationSuccess();
-                        // final screenProvider = ref.read(verifyOtpForSignUp);
-                        // screenProvider.updateViewState(loadingState: RegistrationScreenStates.isProfileFor);
-                        // final validate = await provider.submitRegistration(
-                        //   context,
-                        //   skipOtp: true,
-                        //   useDebugTemplate: _isDebugOtpFlow,
-                        // );
-                        // if (!validate) {
-                        //   screenProvider.updateViewState(loadingState: RegistrationScreenStates.loadingComplete);
-                        //   return;
-                        // } else {
-                        //   screenProvider.updateViewState(screenStates: RegistrationScreenStates.loadingComplete);
-                        //   if (mounted) {
-                        //     _navigateAfterRegistrationSuccess();
-                        //   }
-                        // }
                       },
                     ),
                     body(),
@@ -100,123 +83,81 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
 
   Widget body() {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: Column(
-          spacing: 10,
-          children: [
-            staticText(),
-            SizedBox(height: MediaQuery.sizeOf(context).height * 0.01),
-            // Text(
-            //   provider.selectedVerificationType.toLowerCase() == 'email' ? 'Verify email' : 'Verify Number',
-            //   style: TextStyle(fontSize: TextSize.font18(context), color: AppColors.textPrimaryLight, fontWeight: FontWeight.w500),
-            // ),
-            // Row(
-            //   spacing: 8,
-            //   mainAxisAlignment: MainAxisAlignment.center,
-            //   children: [
-            //     if (provider.selectedVerificationType.toLowerCase() == 'email')
-            //       Text(
-            //         'We\'ve sent a code to ${provider.emailController.text}',
-            //         style: TextStyle(
-            //           fontSize: TextSize.font14(context),
-            //           color: AppColors.textSecondaryLight,
-            //           fontWeight: FontWeight.w400,
-            //         ),
-            //       )
-            //     else
-            //       Text(
-            //         'We\'ve sent a code to ${provider.selectedCountryCodeForNumber}${provider.phoneController.text}',
-            //         style: TextStyle(fontSize: TextSize.font14(context), color: AppColors.textSecondaryLight, fontWeight: FontWeight.w400),
-            //       ),
-            //     InkWell(
-            //       onTap: () {
-            //         context.pushNamed(
-            //           Routes.emailPhone,
-            //           queryParameters: const {'fromScreen': 'otpScreen'},
-            //           extra: 'otpScreen',
-            //         );
-            //       },
-            //       child: Row(
-            //         spacing: 2,
-            //         children: [
-            //           Icon(Icons.edit_outlined, size: TextSize.font14(context), color: AppColors.primary),
-            //           Text(
-            //             'Edit',
-            //             style: TextStyle(fontSize: TextSize.font14(context), color: AppColors.primary, fontWeight: FontWeight.w600),
-            //           ),
-            //         ],
-            //       ),
-            //     ),
-            //   ],
-            // ),
-            loginDataField(),
-            const SizedBox(height: 10),
-            ResendCodeTimer(
-              onResend: () async {
-                final screenProvider = ref.read(verifyOtpForSignUp);
-                screenProvider.updateViewState(
-                    loadingState: RegistrationScreenStates.isProfileFor);
-                await provider.resendOtp(context);
-                screenProvider.updateViewState(
-                  loadingState: RegistrationScreenStates.loadingComplete,
-                );
-              },
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+              20,
+              0,
+              20,
+              MediaQuery.of(context).viewInsets.bottom,
             ),
-
-
-            bottomAction(),
-            SizedBox(height: MediaQuery.sizeOf(context).height * 0.01),
-
-            SizedBox(height: MediaQuery.sizeOf(context).height * 0.01),
-            contactSupport(),
-
-
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    spacing: 6,
-                    children: [
-                      Text(
-                        "Don't have an account?",
-                        style: TextStyle(
-                          color: AppColors.hintTextColor,
-                          fontWeight: FontWeight.w500,
-                          fontSize: TextSize.font14(context),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Column(
+                  spacing: 10,
+                  children: [
+                    staticText(),
+                    SizedBox(height: MediaQuery.sizeOf(context).height * 0.01),
+                    loginDataField(),
+                    const SizedBox(height: 10),
+                    ResendCodeTimer(
+                      onResend: () async {
+                        final screenProvider = ref.read(verifyOtpForSignUp);
+                        screenProvider.updateViewState(
+                            loadingState: RegistrationScreenStates.isProfileFor);
+                        await provider.resendOtp(context);
+                        screenProvider.updateViewState(
+                          loadingState: RegistrationScreenStates.loadingComplete,
+                        );
+                      },
+                    ),
+                    bottomAction(),
+                    SizedBox(height: MediaQuery.sizeOf(context).height * 0.01),
+                    SizedBox(height: MediaQuery.sizeOf(context).height * 0.01),
+                    contactSupport(),
+                    const Spacer(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      spacing: 6,
+                      children: [
+                        Text(
+                          "Don't have an account?",
+                          style: TextStyle(
+                            color: AppColors.hintTextColor,
+                            fontWeight: FontWeight.w500,
+                            fontSize: TextSize.font14(context),
+                          ),
                         ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          // context.pop();
-                          context.pushNamed(Routes.onboarding);
-                        },
-                        child: Row(
-                          spacing: 4,
-                          children: [
-                            Text(
-                              'Sign Up Free',
-                              style: TextStyle(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.bold,
-                                fontSize: TextSize.font16(context),
+                        InkWell(
+                          onTap: () {
+                            context.pushNamed(Routes.onboarding);
+                          },
+                          child: Row(
+                            spacing: 4,
+                            children: [
+                              Text(
+                                'Sign Up Free',
+                                style: TextStyle(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: TextSize.font16(context),
+                                ),
                               ),
-                            ),
-                            const Icon(Icons.arrow_forward_ios,color: AppColors.primary, size:8)
-                          ],
+                              const Icon(Icons.arrow_forward_ios, color: AppColors.primary, size: 8),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                    SizedBox(height: MediaQuery.sizeOf(context).height * 0.005),
+                  ],
+                ),
               ),
             ),
-            SizedBox(height: MediaQuery.sizeOf(context).height * 0.005),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
