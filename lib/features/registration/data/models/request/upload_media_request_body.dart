@@ -9,6 +9,8 @@ class UploadMediaRequestBody {
     required this.caption,
     required this.description,
     this.isPrimary = true,
+    this.resourceType,
+    this.resource,
   });
 
   final String filePath;
@@ -16,6 +18,8 @@ class UploadMediaRequestBody {
   final String caption;
   final String description;
   final bool isPrimary;
+  final String? resourceType;
+  final String? resource;
 
   Future<FormData> toFormData() async {
     final normalizedPath = filePath.trim();
@@ -30,6 +34,10 @@ class UploadMediaRequestBody {
       'caption': caption,
       'description': description,
       'isPrimary': isPrimary.toString(),
+      if (resourceType != null && resourceType!.trim().isNotEmpty)
+        'resourceType': resourceType!.trim(),
+      if (resource != null && resource!.trim().isNotEmpty)
+        'resource': resource!.trim(),
     });
   }
 }

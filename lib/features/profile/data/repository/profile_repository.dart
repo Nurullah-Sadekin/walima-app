@@ -101,12 +101,18 @@ class ProfileRepository {
 
       final data = response.data;
       if (data is Map<String, dynamic>) {
-        return UpdateProfileSectionResponse.fromJson(data);
+        final normalized = <String, dynamic>{...data};
+        normalized['code'] = normalized['code']?.toString() ?? 'SUCCESS';
+        normalized['response'] = normalized['response'] ?? normalized['data'];
+        return UpdateProfileSectionResponse.fromJson(normalized);
       }
 
       if (data is Map) {
+        final normalized = Map<String, dynamic>.from(data);
+        normalized['code'] = normalized['code']?.toString() ?? 'SUCCESS';
+        normalized['response'] = normalized['response'] ?? normalized['data'];
         return UpdateProfileSectionResponse.fromJson(
-          Map<String, dynamic>.from(data),
+          normalized,
         );
       }
 

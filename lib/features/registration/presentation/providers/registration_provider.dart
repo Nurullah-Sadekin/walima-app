@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -14,6 +15,8 @@ import 'package:walima_llc/core/utils/dialog_utils.dart';
 import 'package:walima_llc/core/utils/firebase_messaging_service.dart';
 import 'package:walima_llc/core/utils/prefs_helper.dart';
 import 'package:walima_llc/features/login/data/models/resend_otp_body.dart';
+import 'package:walima_llc/features/profile/data/model/request/update_profile_photo_request.dart';
+import 'package:walima_llc/features/profile/data/repository/profile_repository.dart';
 import 'package:walima_llc/features/registration/data/models/request/sign_up_otp_body.dart';
 import 'package:walima_llc/features/registration/data/models/request/sign_up_request_body.dart';
 import 'package:walima_llc/features/registration/data/models/request/upload_media_request_body.dart';
@@ -115,8 +118,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   bool isBioTemplateSuggesting = false;
   List<BioTemplate> bioTemplates = <BioTemplate>[];
 
-  final LocationDataRepository _locationDataRepository =
-      LocationDataRepositoryImpl();
+  final LocationDataRepository _locationDataRepository = LocationDataRepositoryImpl();
   final LookupRepository _lookupRepository = LookupRepository();
   final MediaRepository _mediaRepository = MediaRepository();
   final InterestsRepository _interestsRepository = InterestsRepository();
@@ -135,8 +137,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   bool isLookupDataLoading = false;
   String? lookupDataError;
 
-  List<ResidencyStatusOptionModel> residencyStatusOptions =
-      <ResidencyStatusOptionModel>[];
+  List<ResidencyStatusOptionModel> residencyStatusOptions = <ResidencyStatusOptionModel>[];
   List<String> countryDropdownItems = <String>[];
   List<String> cityDropdownItems = <String>[];
   List<String> residencyStatusDropdownItems = <String>[];
@@ -162,6 +163,25 @@ class RegistrationProvider extends BaseChangeNotifier {
 
   UploadMediaData? uploadedProfileMedia;
   String profileImageUploadErrorMessage = '';
+  String profileImageUploadStatusMessage = '';
+  bool canRetryProfileImageUpload = false;
+  PhotoUploadFlowState photoUploadFlowState = PhotoUploadFlowState.idle;
+
+  static const int _profilePhotoMaxBytes = 5 * 1024 * 1024;
+  static const List<Duration> _temporaryUploadRetryDelays = <Duration>[
+    Duration(seconds: 5),
+    Duration(seconds: 15),
+  ];
+  static const Set<String> _allowedProfilePhotoExtensions = <String>{
+    'jpg',
+    'jpeg',
+    'png',
+    'webp',
+    'gif',
+    'avif',
+    'heic',
+    'heif',
+  };
 
   static const List<LookupOption> _staticReligionOptions = <LookupOption>[
     LookupOption(key: 'islam', label: 'Islam'),
@@ -226,14 +246,12 @@ class RegistrationProvider extends BaseChangeNotifier {
   };
 
   static final Map<String, String> _maritalStatusAliases = <String, String>{
-    for (final status in RegistrationMaritalStatus.values)
-      status.label.toLowerCase(): status.apiValue,
+    for (final status in RegistrationMaritalStatus.values) status.label.toLowerCase(): status.apiValue,
     'single': RegistrationMaritalStatus.neverMarried.apiValue,
   };
 
   static final Map<String, String> _dietAliases = <String, String>{
-    for (final diet in RegistrationDiet.values)
-      diet.label.toLowerCase(): diet.apiValue,
+    for (final diet in RegistrationDiet.values) diet.label.toLowerCase(): diet.apiValue,
     'occasionally non veg': RegistrationDiet.occasionallyNonVeg.apiValue,
     'healthy': RegistrationDiet.occasionallyNonVeg.apiValue,
     'modern balanced diet': RegistrationDiet.occasionallyNonVeg.apiValue,
@@ -247,10 +265,8 @@ class RegistrationProvider extends BaseChangeNotifier {
     'no preferences': RegistrationDiet.occasionallyNonVeg.apiValue,
   };
 
-  static final Map<String, String> _familyEconomicConditionAliases =
-      <String, String>{
-    for (final condition in RegistrationFamilyEconomicCondition.values)
-      condition.label.toLowerCase(): condition.apiValue,
+  static final Map<String, String> _familyEconomicConditionAliases = <String, String>{
+    for (final condition in RegistrationFamilyEconomicCondition.values) condition.label.toLowerCase(): condition.apiValue,
     'elite': RegistrationFamilyEconomicCondition.eliteClass.apiValue,
     'elite class': RegistrationFamilyEconomicCondition.eliteClass.apiValue,
     'high': RegistrationFamilyEconomicCondition.upperClass.apiValue,
@@ -259,8 +275,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     'middle class': RegistrationFamilyEconomicCondition.middleClass.apiValue,
     'middle_class': RegistrationFamilyEconomicCondition.middleClass.apiValue,
     'aspiring': RegistrationFamilyEconomicCondition.lowerMiddleClass.apiValue,
-    'lower middle class':
-        RegistrationFamilyEconomicCondition.lowerMiddleClass.apiValue,
+    'lower middle class': RegistrationFamilyEconomicCondition.lowerMiddleClass.apiValue,
   };
 
   static const Set<String> _maleLockedProfileNames = <String>{
@@ -406,9 +421,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       c.clear();
     }
     final body = ResendOtpBody(
-      identifier: selectedVerificationType == 'email'
-          ? emailController.text
-          : phoneController.text,
+      identifier: selectedVerificationType == 'email' ? emailController.text : phoneController.text,
       purpose: 'signup',
     );
     final response = await RegistrationRepository.resendOtp(body);
@@ -416,8 +429,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     final isSuccess = response.code == 'SUCCESS';
     _showResendSnackBar(
       context,
-      message: response.message ??
-          (isSuccess ? 'OTP sent' : 'Failed to resend OTP'),
+      message: response.message ?? (isSuccess ? 'OTP sent' : 'Failed to resend OTP'),
       isSuccess: isSuccess,
     );
     return isSuccess;
@@ -471,6 +483,11 @@ class RegistrationProvider extends BaseChangeNotifier {
     verificationDone = false;
     phoneAvailabilityErrorMessage = '';
     emailAvailabilityErrorMessage = '';
+    uploadedProfileMedia = null;
+    profileImageUploadErrorMessage = '';
+    profileImageUploadStatusMessage = '';
+    canRetryProfileImageUpload = false;
+    photoUploadFlowState = PhotoUploadFlowState.idle;
     unawaited(PrefsHelper.clearRegistrationDraft());
     notifyListeners();
   }
@@ -515,32 +532,20 @@ class RegistrationProvider extends BaseChangeNotifier {
   }
 
   void _resetAllSelections() {
-    _resetSelection(
-        profileForList, (item, selected) => item.isSelected = selected);
-    _resetSelection(
-        genderForList, (item, selected) => item.isSelected = selected);
-    _resetSelection(
-        isWithFamilyDataList, (item, selected) => item.isSelected = selected);
-    _resetSelection(
-        dietDataList, (item, selected) => item.isSelected = selected);
-    _resetSelection(
-        incomePeriodDataList, (item, selected) => item.isSelected = selected);
+    _resetSelection(profileForList, (item, selected) => item.isSelected = selected);
+    _resetSelection(genderForList, (item, selected) => item.isSelected = selected);
+    _resetSelection(isWithFamilyDataList, (item, selected) => item.isSelected = selected);
+    _resetSelection(dietDataList, (item, selected) => item.isSelected = selected);
+    _resetSelection(incomePeriodDataList, (item, selected) => item.isSelected = selected);
 
-    _resetSelection(
-        creativeItemList, (item, selected) => item.isSelected = selected);
-    _resetSelection(
-        funItemList, (item, selected) => item.isSelected = selected);
-    _resetSelection(
-        fitnessItemList, (item, selected) => item.isSelected = selected);
-    _resetSelection(
-        otherInterestsItemList, (item, selected) => item.isSelected = selected);
+    _resetSelection(creativeItemList, (item, selected) => item.isSelected = selected);
+    _resetSelection(funItemList, (item, selected) => item.isSelected = selected);
+    _resetSelection(fitnessItemList, (item, selected) => item.isSelected = selected);
+    _resetSelection(otherInterestsItemList, (item, selected) => item.isSelected = selected);
 
-    _resetSelection(
-        motherDetailsItemList, (item, selected) => item.isSelected = selected);
-    _resetSelection(
-        fatherDetailsItemList, (item, selected) => item.isSelected = selected);
-    _resetSelection(
-        siblingCountList, (item, selected) => item.isSelected = selected);
+    _resetSelection(motherDetailsItemList, (item, selected) => item.isSelected = selected);
+    _resetSelection(fatherDetailsItemList, (item, selected) => item.isSelected = selected);
+    _resetSelection(siblingCountList, (item, selected) => item.isSelected = selected);
   }
 
   void _resetSelection<T>(
@@ -563,8 +568,7 @@ class RegistrationProvider extends BaseChangeNotifier {
 
   Future<void> loadReligionData() async {
     religionOptions = List<LookupOption>.from(_staticReligionOptions);
-    religionDropdownItems =
-        religionOptions.map((item) => item.label).toList(growable: false);
+    religionDropdownItems = religionOptions.map((item) => item.label).toList(growable: false);
     await _syncCommunityOptionsFromSelectedReligion();
     notifyListeners();
   }
@@ -619,8 +623,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       communityOptions = await _lookupRepository.getLookupsBySlug(
         matchedReligion.key,
       );
-      communityDropdownItems =
-          communityOptions.map((item) => item.label).toList(growable: false);
+      communityDropdownItems = communityOptions.map((item) => item.label).toList(growable: false);
     } catch (e) {
       communityOptions = <LookupOption>[];
       communityDropdownItems = <String>[];
@@ -670,7 +673,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       educationLevelOptions = await _lookupRepository.getLookups(
         LookupCategory.educationLevels,
       );
-      if(educationLevelOptions.isEmpty) {
+      if (educationLevelOptions.isEmpty) {
         educationLevelOptions = EducationLevel.values.map((e) => LookupOption(key: e.apiValue, label: e.label)).toList(growable: false);
       }
     } catch (e) {
@@ -800,14 +803,11 @@ class RegistrationProvider extends BaseChangeNotifier {
     }
   }
 
-  List<String> get educationLevelDropdownItems =>
-      educationLevelOptions.map((item) => item.label).toList(growable: false);
+  List<String> get educationLevelDropdownItems => educationLevelOptions.map((item) => item.label).toList(growable: false);
 
-  List<String> get professionDropdownItems =>
-      professionOptions.map((item) => item.label).toList(growable: false);
+  List<String> get professionDropdownItems => professionOptions.map((item) => item.label).toList(growable: false);
 
-  List<String> get incomeRangeDropdownItems =>
-      incomeRangeOptions.map((item) => item.label).toList(growable: false);
+  List<String> get incomeRangeDropdownItems => incomeRangeOptions.map((item) => item.label).toList(growable: false);
 
   List<SingleStringModel> _toSingleStringModels(List<LookupOption> items) {
     return items
@@ -834,12 +834,9 @@ class RegistrationProvider extends BaseChangeNotifier {
     notifyListeners();
 
     try {
-      residencyStatusOptions =
-          await _locationDataRepository.getResidencyStatuses();
+      residencyStatusOptions = await _locationDataRepository.getResidencyStatuses();
 
-      residencyStatusDropdownItems = residencyStatusOptions
-          .map((item) => item.name)
-          .toList(growable: false);
+      residencyStatusDropdownItems = residencyStatusOptions.map((item) => item.name).toList(growable: false);
 
       await _syncCityOptionsFromSelectedCountry(notify: false, reset: true);
     } catch (e) {
@@ -946,8 +943,7 @@ class RegistrationProvider extends BaseChangeNotifier {
         keyword: _countrySearchQuery,
       );
 
-      final merged =
-          reset ? <String>[] : List<String>.from(countryDropdownItems);
+      final merged = reset ? <String>[] : List<String>.from(countryDropdownItems);
       for (final country in result.items) {
         if (!merged.any(
           (item) => item.toLowerCase() == country.name.toLowerCase(),
@@ -957,8 +953,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       }
 
       countryDropdownItems = merged;
-      hasMoreCountries =
-          result.hasNextPage && result.items.length >= _countryPageSize;
+      hasMoreCountries = result.hasNextPage && result.items.length >= _countryPageSize;
       if (hasMoreCountries) {
         _countryPage++;
       }
@@ -994,8 +989,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     }
 
     try {
-      final shouldReset = reset ||
-          _selectedCityCountry?.toLowerCase() != selectedCountry.toLowerCase();
+      final shouldReset = reset || _selectedCityCountry?.toLowerCase() != selectedCountry.toLowerCase();
 
       if (shouldReset) {
         _selectedCityCountry = selectedCountry;
@@ -1019,13 +1013,11 @@ class RegistrationProvider extends BaseChangeNotifier {
         keyword: _citySearchQuery,
       );
 
-      if (_selectedCityCountry?.toLowerCase() !=
-          selectedCountry.toLowerCase()) {
+      if (_selectedCityCountry?.toLowerCase() != selectedCountry.toLowerCase()) {
         return;
       }
 
-      final merged =
-          shouldReset ? <String>[] : List<String>.from(cityDropdownItems);
+      final merged = shouldReset ? <String>[] : List<String>.from(cityDropdownItems);
       for (final city in result.items) {
         if (!merged.any((item) => item.toLowerCase() == city.toLowerCase())) {
           merged.add(city);
@@ -1033,8 +1025,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       }
 
       cityDropdownItems = merged;
-      hasMoreCities =
-          result.hasNextPage && result.items.length >= _cityPageSize;
+      hasMoreCities = result.hasNextPage && result.items.length >= _cityPageSize;
       if (hasMoreCities) {
         _cityPage++;
       }
@@ -1134,8 +1125,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       return;
     }
 
-    if (selectedFamilyEconomicCondition?.toLowerCase() ==
-        normalizedValue.toLowerCase()) {
+    if (selectedFamilyEconomicCondition?.toLowerCase() == normalizedValue.toLowerCase()) {
       return;
     }
 
@@ -1213,8 +1203,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     _notifyAndPersist();
   }
 
-  void toggleHobbySelection(int index, List<SingleStringModel> dataList,
-      {BuildContext? context}) {
+  void toggleHobbySelection(int index, List<SingleStringModel> dataList, {BuildContext? context}) {
     if (index < 0 || index >= dataList.length) return;
 
     final currentlySelected = dataList[index].isSelected;
@@ -1224,8 +1213,7 @@ class RegistrationProvider extends BaseChangeNotifier {
         if (context != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content:
-                  Text('You can select up to $hobbiesSelectionMax hobbies.'),
+              content: Text('You can select up to $hobbiesSelectionMax hobbies.'),
               duration: Duration(seconds: 2),
             ),
           );
@@ -1259,8 +1247,7 @@ class RegistrationProvider extends BaseChangeNotifier {
 
     final now = DateTime.now();
     int years = now.year - dob.year;
-    if (now.month < dob.month ||
-        (now.month == dob.month && now.day < dob.day)) {
+    if (now.month < dob.month || (now.month == dob.month && now.day < dob.day)) {
       years--;
     }
     if (years < 0) years = 0;
@@ -1286,8 +1273,7 @@ class RegistrationProvider extends BaseChangeNotifier {
 
     int years = now.year - dob.year;
 
-    if (now.month < dob.month ||
-        (now.month == dob.month && now.day < dob.day)) {
+    if (now.month < dob.month || (now.month == dob.month && now.day < dob.day)) {
       years--;
     }
 
@@ -1498,81 +1484,50 @@ class RegistrationProvider extends BaseChangeNotifier {
 
       final controllerValues = decoded['controllers'];
       if (controllerValues is Map<String, dynamic>) {
-        _restoreControllerText(
-            firstNameController, controllerValues['firstName']);
-        _restoreControllerText(
-            lastNameController, controllerValues['lastName']);
-        _restoreControllerText(
-            dateOfBirthController, controllerValues['dateOfBirth']);
-        _restoreControllerText(
-            religionController, controllerValues['religion']);
-        _restoreControllerText(
-            communityController, controllerValues['community']);
-        _restoreControllerText(
-            livingInController, controllerValues['livingIn']);
+        _restoreControllerText(firstNameController, controllerValues['firstName']);
+        _restoreControllerText(lastNameController, controllerValues['lastName']);
+        _restoreControllerText(dateOfBirthController, controllerValues['dateOfBirth']);
+        _restoreControllerText(religionController, controllerValues['religion']);
+        _restoreControllerText(communityController, controllerValues['community']);
+        _restoreControllerText(livingInController, controllerValues['livingIn']);
         _restoreControllerText(emailController, controllerValues['email']);
         _restoreControllerText(phoneController, controllerValues['phone']);
-        _restoreControllerText(
-            passwordController, controllerValues['password']);
+        _restoreControllerText(passwordController, controllerValues['password']);
         _restoreControllerText(cityController, controllerValues['city']);
-        _restoreControllerText(
-            residencyStatusController, controllerValues['residencyStatus']);
-        _restoreControllerText(
-            maritalStatusController, controllerValues['maritalStatus']);
+        _restoreControllerText(residencyStatusController, controllerValues['residencyStatus']);
+        _restoreControllerText(maritalStatusController, controllerValues['maritalStatus']);
         _restoreControllerText(heightController, controllerValues['height']);
         syncHeightDisplayFromStoredValue();
-        _restoreControllerText(
-            highestQualification, controllerValues['highestQualification']);
-        _restoreControllerText(
-            instituteController, controllerValues['institute']);
-        _restoreControllerText(
-            anotherInstituteController, controllerValues['anotherInstitute']);
-        _restoreControllerText(
-            aboutYourselfController, controllerValues['aboutYourself']);
-        _restoreControllerText(currentCompanyNameController,
-            controllerValues['currentCompanyName']);
-        _restoreControllerText(
-            incomeRangeController, controllerValues['incomeRange']);
-        _restoreControllerText(
-            yourWorkController, controllerValues['yourWork']);
-        _restoreControllerText(
-            youWorkAsController, controllerValues['youWorkAs']);
-        _restoreControllerText(
-            motherDetailsController, controllerValues['motherDetails']);
-        _restoreControllerText(
-            fatherDetailsController, controllerValues['fatherDetails']);
-        _restoreControllerText(
-            noOfSisterController, controllerValues['noOfSister']);
-        _restoreControllerText(
-            noOfBrotherController, controllerValues['noOfBrother']);
+        _restoreControllerText(highestQualification, controllerValues['highestQualification']);
+        _restoreControllerText(instituteController, controllerValues['institute']);
+        _restoreControllerText(anotherInstituteController, controllerValues['anotherInstitute']);
+        _restoreControllerText(aboutYourselfController, controllerValues['aboutYourself']);
+        _restoreControllerText(currentCompanyNameController, controllerValues['currentCompanyName']);
+        _restoreControllerText(incomeRangeController, controllerValues['incomeRange']);
+        _restoreControllerText(yourWorkController, controllerValues['yourWork']);
+        _restoreControllerText(youWorkAsController, controllerValues['youWorkAs']);
+        _restoreControllerText(motherDetailsController, controllerValues['motherDetails']);
+        _restoreControllerText(fatherDetailsController, controllerValues['fatherDetails']);
+        _restoreControllerText(noOfSisterController, controllerValues['noOfSister']);
+        _restoreControllerText(noOfBrotherController, controllerValues['noOfBrother']);
       }
 
       selectedProfileName = _asStringOrNull(decoded['selectedProfileName']);
       selectedGenderName = _asStringOrNull(decoded['selectedGenderName']);
-      selectedIsWithFamilyStatus =
-          _asStringOrNull(decoded['selectedIsWithFamilyStatus']);
+      selectedIsWithFamilyStatus = _asStringOrNull(decoded['selectedIsWithFamilyStatus']);
       selectedDietStatus = _asStringOrNull(decoded['selectedDietStatus']);
-      selectedIncomePeriodStatus =
-          _asStringOrNull(decoded['selectedIncomePeriodStatus']);
-      selectedIncomeRange = _asStringOrNull(decoded['selectedIncomeRange']) ??
-          incomeRangeController.text;
-      selectedYourWork = _asStringOrNull(decoded['selectedYourWork']) ??
-          yourWorkController.text;
-      selectedYouWorkAs = _asStringOrNull(decoded['selectedYouWorkAs']) ??
-          youWorkAsController.text;
-      selectedFamilyEconomicCondition =
-          _asStringOrNull(decoded['selectedFamilyEconomicCondition']);
-      selectedVerificationType =
-          _asStringOrNull(decoded['selectedVerificationType']) ??
-              selectedVerificationType;
+      selectedIncomePeriodStatus = _asStringOrNull(decoded['selectedIncomePeriodStatus']);
+      selectedIncomeRange = _asStringOrNull(decoded['selectedIncomeRange']) ?? incomeRangeController.text;
+      selectedYourWork = _asStringOrNull(decoded['selectedYourWork']) ?? yourWorkController.text;
+      selectedYouWorkAs = _asStringOrNull(decoded['selectedYouWorkAs']) ?? youWorkAsController.text;
+      selectedFamilyEconomicCondition = _asStringOrNull(decoded['selectedFamilyEconomicCondition']);
+      selectedVerificationType = _asStringOrNull(decoded['selectedVerificationType']) ?? selectedVerificationType;
 
       creativeSectionSelected = decoded['creativeSectionSelected'] == true;
       funSectionSelected = decoded['funSectionSelected'] == true;
       fitnessSectionSelected = decoded['fitnessSectionSelected'] == true;
-      otherInterestsSectionSelected =
-          decoded['otherInterestsSectionSelected'] == true;
-      verificationDone =
-          decoded['verificationDone'] == true || verificationDone;
+      otherInterestsSectionSelected = decoded['otherInterestsSectionSelected'] == true;
+      verificationDone = decoded['verificationDone'] == true || verificationDone;
 
       selectedHobbies
         ..clear()
@@ -1704,9 +1659,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     controller.text = value is String ? value : '';
   }
 
-  List<String> get heightDropdownItems => _heightInchOptions
-      .map((heightInches) => _formatHeightDisplay(heightInches))
-      .toList(growable: false);
+  List<String> get heightDropdownItems => _heightInchOptions.map((heightInches) => _formatHeightDisplay(heightInches)).toList(growable: false);
 
   void selectHeight(String? displayValue) {
     final selectedValue = displayValue?.trim() ?? '';
@@ -1826,8 +1779,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   ) {
     final normalizedSelected = selectedName?.toLowerCase();
     for (final item in list) {
-      final isSelected = normalizedSelected != null &&
-          getName(item).toLowerCase() == normalizedSelected;
+      final isSelected = normalizedSelected != null && getName(item).toLowerCase() == normalizedSelected;
       setSelected(item, isSelected);
     }
   }
@@ -1844,8 +1796,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     }
   }
 
-  void _addListenerSafely(
-      TextEditingController controller, VoidCallback listener) {
+  void _addListenerSafely(TextEditingController controller, VoidCallback listener) {
     try {
       controller.addListener(listener);
     } catch (_) {}
@@ -1865,9 +1816,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     if (normalized.isEmpty) return '';
 
     final withUnderscores = normalized.replaceAll(RegExp(r'[^a-z0-9]+'), '_');
-    return withUnderscores
-        .replaceAll(RegExp(r'_+'), '_')
-        .replaceAll(RegExp(r'^_|_$'), '');
+    return withUnderscores.replaceAll(RegExp(r'_+'), '_').replaceAll(RegExp(r'^_|_$'), '');
   }
 
   String _resolveReligionValue() {
@@ -1875,8 +1824,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     if (selected.isEmpty) return '';
 
     final matchedReligion = _findReligionOption(selected);
-    final candidate =
-        matchedReligion?.key.trim().toLowerCase() ?? _toSnakeCase(selected);
+    final candidate = matchedReligion?.key.trim().toLowerCase() ?? _toSnakeCase(selected);
 
     if (_staticReligionOptions.any((item) => item.key == candidate)) {
       return candidate;
@@ -1900,8 +1848,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       }
     }
 
-    final candidate =
-        _residencyStatusAliases[normalized] ?? _toSnakeCase(selected);
+    final candidate = _residencyStatusAliases[normalized] ?? _toSnakeCase(selected);
     if (_allowedResidencyStatusValues.contains(candidate)) {
       return candidate;
     }
@@ -1913,8 +1860,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     if (selected.isEmpty) return '';
 
     final normalized = selected.toLowerCase();
-    final candidate =
-        _maritalStatusAliases[normalized] ?? _toSnakeCase(selected);
+    final candidate = _maritalStatusAliases[normalized] ?? _toSnakeCase(selected);
     if (_allowedMaritalStatusValues.contains(candidate)) {
       return candidate;
     }
@@ -1940,8 +1886,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     }
 
     final normalized = selected.toLowerCase();
-    return _familyEconomicConditionAliases[normalized] ??
-        _toSnakeCase(selected);
+    return _familyEconomicConditionAliases[normalized] ?? _toSnakeCase(selected);
   }
 
   String _resolveHighestEducationValue() {
@@ -1968,8 +1913,7 @@ class RegistrationProvider extends BaseChangeNotifier {
         normalized.contains('intermediate')) {
       return 'higher_secondary';
     }
-    if (RegExp(r'\bsecondary\b').hasMatch(normalized) ||
-        RegExp(r'\bssc\b').hasMatch(normalized)) {
+    if (RegExp(r'\bsecondary\b').hasMatch(normalized) || RegExp(r'\bssc\b').hasMatch(normalized)) {
       return 'secondary';
     }
     if (normalized.contains('diploma')) {
@@ -1991,10 +1935,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     if (normalized.contains('doctorate')) {
       return 'doctorate';
     }
-    if (normalized.contains('professional') ||
-        normalized.contains('mbbs') ||
-        normalized.contains('llb') ||
-        normalized.contains('pharmd')) {
+    if (normalized.contains('professional') || normalized.contains('mbbs') || normalized.contains('llb') || normalized.contains('pharmd')) {
       return 'professional_degree';
     }
     if (normalized.contains('vocational')) {
@@ -2026,8 +1967,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     for (final option in yourWorkList) {
       final optionName = option.name.trim().toLowerCase();
       final optionValue = (option.value ?? '').trim().toLowerCase();
-      if (optionName == selected.toLowerCase() ||
-          optionValue == selected.toLowerCase()) {
+      if (optionName == selected.toLowerCase() || optionValue == selected.toLowerCase()) {
         return option.value ?? option.name;
       }
     }
@@ -2054,8 +1994,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   LookupOption? _findLookupOption(List<LookupOption> options, String selected) {
     final normalized = selected.trim().toLowerCase();
     for (final option in options) {
-      if (option.label.toLowerCase() == normalized ||
-          option.key.toLowerCase() == normalized) {
+      if (option.label.toLowerCase() == normalized || option.key.toLowerCase() == normalized) {
         return option;
       }
     }
@@ -2063,8 +2002,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   }
 
   String _resolveLocationTypeValue(String residencyStatusValue) {
-    if (residencyStatusValue == 'citizen' ||
-        residencyStatusValue == 'permanent_resident') {
+    if (residencyStatusValue == 'citizen' || residencyStatusValue == 'permanent_resident') {
       return 'permanent';
     }
     return 'present';
@@ -2105,21 +2043,167 @@ class RegistrationProvider extends BaseChangeNotifier {
     await PrefsHelper.clearRegistrationDraft();
   }
 
-  Future<bool> uploadProfileImage({
+  void resetPhotoUploadFlow({bool notify = true}) {
+    profileImageUploadErrorMessage = '';
+    profileImageUploadStatusMessage = '';
+    canRetryProfileImageUpload = false;
+    photoUploadFlowState = PhotoUploadFlowState.idle;
+    if (notify) {
+      notifyListeners();
+    }
+  }
+
+  void _setPhotoUploadFlowState(
+    PhotoUploadFlowState state, {
+    String? statusMessage,
+    String? errorMessage,
+    bool? canRetry,
+  }) {
+    photoUploadFlowState = state;
+    if (statusMessage != null) {
+      profileImageUploadStatusMessage = statusMessage;
+    }
+    if (errorMessage != null) {
+      profileImageUploadErrorMessage = errorMessage;
+    }
+    if (canRetry != null) {
+      canRetryProfileImageUpload = canRetry;
+    }
+    notifyListeners();
+  }
+
+  String? validateProfileImageFile(String filePath) {
+    final normalizedPath = filePath.trim();
+    if (normalizedPath.isEmpty) {
+      return 'Please select an image to upload.';
+    }
+
+    final extension = normalizedPath.contains('.') ? normalizedPath.split('.').last.toLowerCase() : '';
+    if (!_allowedProfilePhotoExtensions.contains(extension)) {
+      return 'Unsupported image format. Please use JPG, PNG, WEBP, GIF, AVIF, HEIC, or HEIF.';
+    }
+
+    final file = File(normalizedPath);
+    if (!file.existsSync()) {
+      return 'Selected image could not be found. Please choose it again.';
+    }
+
+    final int fileSizeInBytes;
+    try {
+      fileSizeInBytes = file.lengthSync();
+    } catch (_) {
+      return 'Selected image could not be read. Please choose it again.';
+    }
+    if (fileSizeInBytes > _profilePhotoMaxBytes) {
+      return 'This image is too large. Please use a photo under 5 MB.';
+    }
+
+    return null;
+  }
+
+  bool _isSuccessfulUploadResponse(UploadMediaResponse response) {
+    final code = (response.code ?? '').toUpperCase();
+    return code == 'SUCCESS' && response.response?.data != null && (response.response?.data?.id?.trim().isNotEmpty ?? false);
+  }
+
+  String _mapProfileImageUploadMessage(String? rawMessage) {
+    final message = rawMessage?.trim();
+    if (message == null || message.isEmpty) {
+      return 'Failed to upload profile image.';
+    }
+
+    final lower = message.toLowerCase();
+    if (lower.contains('ai-generated photos are not allowed')) {
+      return 'This photo looks AI-generated. Please upload a real recent photo.';
+    }
+    if (lower.contains('reused from public websites')) {
+      return 'This looks like a publicly reused image. Upload your own photo.';
+    }
+    if (lower.contains('front-facing photo')) {
+      return 'Please upload a clear front-facing photo.';
+    }
+    if (lower.contains('temporarily busy')) {
+      return 'Photo verification is temporarily busy. Please wait a moment and try again.';
+    }
+    if (lower.contains('too large') || lower.contains('5mb')) {
+      return 'This image is too large. Please use a photo under 5 MB.';
+    }
+    return message;
+  }
+
+  bool _isTemporaryProfileImageFailure(String? rawMessage) {
+    final lower = rawMessage?.toLowerCase() ?? '';
+    return lower.contains('temporarily busy') ||
+        lower.contains('please wait a minute and try again') ||
+        lower.contains('status code: 429') ||
+        lower.contains('status code: 502');
+  }
+
+  bool _isAiRejectedProfileImage(String? rawMessage) {
+    final lower = rawMessage?.toLowerCase() ?? '';
+    return lower.contains('ai-generated photos are not allowed') ||
+        lower.contains('reused from public websites') ||
+        lower.contains('front-facing photo');
+  }
+
+  Future<UploadMediaResponse> _uploadProfileMediaWithRetry(
+    UploadMediaRequestBody requestBody,
+  ) async {
+    for (var attempt = 0; attempt <= _temporaryUploadRetryDelays.length; attempt++) {
+      _setPhotoUploadFlowState(
+        PhotoUploadFlowState.uploadingForAiCheck,
+        statusMessage: 'Checking your photo before upload...',
+        errorMessage: '',
+        canRetry: false,
+      );
+
+      final response = await _mediaRepository.uploadMedia(requestBody);
+      if (_isSuccessfulUploadResponse(response)) {
+        return response;
+      }
+
+      if (!_isTemporaryProfileImageFailure(response.message) || attempt == _temporaryUploadRetryDelays.length) {
+        return response;
+      }
+
+      final retryDelay = _temporaryUploadRetryDelays[attempt];
+      _setPhotoUploadFlowState(
+        PhotoUploadFlowState.uploadingForAiCheck,
+        statusMessage: 'Photo verification is busy. Retrying in ${retryDelay.inSeconds} seconds...',
+        errorMessage: '',
+        canRetry: false,
+      );
+      await Future<void>.delayed(retryDelay);
+    }
+
+    return UploadMediaResponse(
+      code: 'FAILED',
+      message: 'Photo verification is temporarily busy. Please wait a moment and try again.',
+    );
+  }
+
+  Future<bool> uploadAndAttachProfileImage({
     required String filePath,
     String alt = 'Profile photo',
-    String caption = 'My summer photo',
+    String caption = 'Profile photo',
     String description = 'This is my profile photo',
     bool isPrimary = true,
   }) async {
     final normalizedPath = filePath.trim();
-    if (normalizedPath.isEmpty) {
-      profileImageUploadErrorMessage = 'Please select an image to upload.';
-      notifyListeners();
+    final validationError = validateProfileImageFile(normalizedPath);
+    if (validationError != null) {
+      _setPhotoUploadFlowState(
+        PhotoUploadFlowState.failed,
+        errorMessage: validationError,
+        statusMessage: '',
+        canRetry: false,
+      );
       return false;
     }
 
-    profileImageUploadErrorMessage = '';
+    uploadedProfileMedia = null;
+    resetPhotoUploadFlow(notify: false);
+    notifyListeners();
 
     final requestBody = UploadMediaRequestBody(
       filePath: normalizedPath,
@@ -2127,21 +2211,78 @@ class RegistrationProvider extends BaseChangeNotifier {
       caption: caption,
       description: description,
       isPrimary: isPrimary,
+      resourceType: 'UserProfile',
+      resource: isPrimary ? 'profile_photo' : 'gallery_photo',
     );
 
-    final response = await _mediaRepository.uploadMedia(requestBody);
-    final uploadedData = response.response?.data;
-    final isSuccess = response.code == 'SUCCESS' && uploadedData != null;
+    final uploadResponse = await _uploadProfileMediaWithRetry(requestBody);
+    final uploadedData = uploadResponse.response?.data;
+    final isSuccess = _isSuccessfulUploadResponse(uploadResponse);
 
     if (!isSuccess) {
-      profileImageUploadErrorMessage =
-          response.message ?? 'Failed to upload profile image.';
-      notifyListeners();
+      final mappedMessage = _mapProfileImageUploadMessage(uploadResponse.message);
+      final failureState = _isAiRejectedProfileImage(uploadResponse.message) ? PhotoUploadFlowState.aiRejected : PhotoUploadFlowState.failed;
+      _setPhotoUploadFlowState(
+        failureState,
+        errorMessage: mappedMessage,
+        statusMessage: '',
+        canRetry: _isTemporaryProfileImageFailure(uploadResponse.message),
+      );
+      return false;
+    }
+
+    _setPhotoUploadFlowState(
+      PhotoUploadFlowState.mediaUploaded,
+      statusMessage: 'Photo accepted. Attaching it to your profile...',
+      errorMessage: '',
+      canRetry: false,
+    );
+
+    final originalUrl = uploadedData?.url?.trim();
+    final photoSizes = <String, String?>{};
+    if (originalUrl != null && originalUrl.isNotEmpty) {
+      photoSizes['original'] = originalUrl;
+    }
+
+    final attachRequest = UpdateProfilePhotoRequest(
+      mediaId: uploadedData!.id!.trim(),
+      category: isPrimary ? 'profile' : 'gallery',
+      isPrimary: isPrimary,
+      photoOrder: isPrimary ? 1 : null,
+      visibility: 'public',
+      shouldDelete: false,
+      photoSizes: photoSizes.isEmpty ? null : photoSizes,
+    );
+
+    _setPhotoUploadFlowState(
+      PhotoUploadFlowState.attachingToProfile,
+      statusMessage: 'Updating your profile photo...',
+      errorMessage: '',
+      canRetry: false,
+    );
+
+    final attachResponse = await ProfileRepository.updateProfilePhotos(
+      <UpdateProfilePhotoRequest>[attachRequest],
+    );
+    final attachSucceeded = (attachResponse.code ?? '').toUpperCase() == 'SUCCESS';
+
+    if (!attachSucceeded) {
+      _setPhotoUploadFlowState(
+        PhotoUploadFlowState.failed,
+        errorMessage: attachResponse.message ?? 'Failed to attach photo to your profile.',
+        statusMessage: '',
+        canRetry: false,
+      );
       return false;
     }
 
     uploadedProfileMedia = uploadedData;
-    notifyListeners();
+    _setPhotoUploadFlowState(
+      PhotoUploadFlowState.completed,
+      statusMessage: 'Photo uploaded successfully.',
+      errorMessage: '',
+      canRetry: false,
+    );
     return true;
   }
 
@@ -2173,8 +2314,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       await AppErrorReportingService.instance.setUserContext(
         userId: response.response?.user?.id,
         email: response.response?.user?.email ?? emailController.text,
-        phone: response.response?.user?.phoneNumber ??
-            _resolveSubmissionPhoneNumber(),
+        phone: response.response?.user?.phoneNumber ?? _resolveSubmissionPhoneNumber(),
       );
       unawaited(FirebaseMessagingService.instance.registerDeviceToken());
       await _clearRegistrationDraftCacheOnSuccess();
@@ -2240,31 +2380,19 @@ class RegistrationProvider extends BaseChangeNotifier {
     required bool skipOtp,
     required String otp,
   }) {
-    final fallbackCountryName =
-        selectedCountry.name.toLowerCase() == 'world wide'
-            ? 'Bangladesh'
-            : selectedCountry.name;
+    final fallbackCountryName = selectedCountry.name.toLowerCase() == 'world wide' ? 'Bangladesh' : selectedCountry.name;
 
     final firstName = _valueOrDefault(firstNameController.text, 'Debug');
     final lastName = _valueOrDefault(lastNameController.text, 'User');
-    final religionValue =
-        _resolveReligionValue().isNotEmpty ? _resolveReligionValue() : 'islam';
-    final residencyStatusValue = _resolveResidencyStatusValue().isNotEmpty
-        ? _resolveResidencyStatusValue()
-        : 'citizen';
-    final maritalStatusValue = _resolveMaritalStatusValue().isNotEmpty
-        ? _resolveMaritalStatusValue()
-        : 'never_married';
-    final dietValue =
-        _resolveDietValue().isNotEmpty ? _resolveDietValue() : 'non_vegetarian';
-    final highestEducationValue = _resolveHighestEducationValue().isNotEmpty
-        ? _resolveHighestEducationValue()
-        : 'bachelor';
+    final religionValue = _resolveReligionValue().isNotEmpty ? _resolveReligionValue() : 'islam';
+    final residencyStatusValue = _resolveResidencyStatusValue().isNotEmpty ? _resolveResidencyStatusValue() : 'citizen';
+    final maritalStatusValue = _resolveMaritalStatusValue().isNotEmpty ? _resolveMaritalStatusValue() : 'never_married';
+    final dietValue = _resolveDietValue().isNotEmpty ? _resolveDietValue() : 'non_vegetarian';
+    final highestEducationValue = _resolveHighestEducationValue().isNotEmpty ? _resolveHighestEducationValue() : 'bachelor';
 
     final verificationType = _resolveVerificationTypeValue();
     final dynamicPhone = _resolveSubmissionPhoneNumber();
-    final resolvedPhoneNumber =
-        dynamicPhone.isNotEmpty ? dynamicPhone : '+8801700000000';
+    final resolvedPhoneNumber = dynamicPhone.isNotEmpty ? dynamicPhone : '+8801700000000';
     final locationTypeValue = _resolveLocationTypeValue(residencyStatusValue);
 
     return SignUpRequestBody(
@@ -2273,9 +2401,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       firstName: firstName,
       lastName: lastName,
       religionName: religionValue,
-      community: _resolveCommunityValue().isNotEmpty
-          ? _resolveCommunityValue()
-          : 'sunni',
+      community: _resolveCommunityValue().isNotEmpty ? _resolveCommunityValue() : 'sunni',
       livingIn: _valueOrDefault(livingInController.text, fallbackCountryName),
       cityName: _valueOrDefault(cityController.text, 'Dhaka'),
       dateOfBirth: '1990-01-01',
@@ -2286,20 +2412,11 @@ class RegistrationProvider extends BaseChangeNotifier {
       height: num.tryParse(heightController.text) ?? 170,
       diet: dietValue,
       highestLevelOfEducation: highestEducationValue,
-      incomeRange: _resolveIncomeRangeValue().isNotEmpty
-          ? _resolveIncomeRangeValue()
-          : '50k-100k',
-      incomeRangeFrequency:
-          _valueOrDefault(selectedIncomePeriodStatus ?? '', 'monthly')
-              .toLowerCase(),
-      workWith: _resolveWorkTypeValue().isNotEmpty
-          ? _resolveWorkTypeValue()
-          : 'private_company',
-      workingAs: _resolveWorkingAsValue().isNotEmpty
-          ? _resolveWorkingAsValue()
-          : 'software-engineer',
-      currentCompany:
-          _valueOrDefault(currentCompanyNameController.text, 'Walima QA'),
+      incomeRange: _resolveIncomeRangeValue().isNotEmpty ? _resolveIncomeRangeValue() : '50k-100k',
+      incomeRangeFrequency: _valueOrDefault(selectedIncomePeriodStatus ?? '', 'monthly').toLowerCase(),
+      workWith: _resolveWorkTypeValue().isNotEmpty ? _resolveWorkTypeValue() : 'private_company',
+      workingAs: _resolveWorkingAsValue().isNotEmpty ? _resolveWorkingAsValue() : 'software-engineer',
+      currentCompany: _valueOrDefault(currentCompanyNameController.text, 'Walima QA'),
       bio: _valueOrDefault(
         aboutYourselfController.text,
         'Debug OTP registration flow',
@@ -2324,9 +2441,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   }
 
   String _resolveVerificationTypeValue() {
-    return selectedVerificationType.toLowerCase() == 'email'
-        ? 'email'
-        : 'phone';
+    return selectedVerificationType.toLowerCase() == 'email' ? 'email' : 'phone';
   }
 
   String _resolveSubmissionPhoneNumber() {
@@ -2377,14 +2492,10 @@ class RegistrationProvider extends BaseChangeNotifier {
 
   String phoneNumber = '';
 
-  Future<bool> checkEmailAndPhoneAvailability(
-      BuildContext context, String countryCode) async {
-    final emailRes =
-        await RegistrationRepository.checkEmail(emailController.text);
-    final phoneRes = await RegistrationRepository.checkMobile(
-        '+$countryCode${phoneController.text}');
-    if (emailRes.response?.isAvailable == true &&
-        phoneRes.response?.isAvailable == true) {
+  Future<bool> checkEmailAndPhoneAvailability(BuildContext context, String countryCode) async {
+    final emailRes = await RegistrationRepository.checkEmail(emailController.text);
+    final phoneRes = await RegistrationRepository.checkMobile('+$countryCode${phoneController.text}');
+    if (emailRes.response?.isAvailable == true && phoneRes.response?.isAvailable == true) {
       phoneAvailabilityErrorMessage = '';
       emailAvailabilityErrorMessage = '';
       selectedCountryCodeForNumber = countryCode;
@@ -2401,8 +2512,7 @@ class RegistrationProvider extends BaseChangeNotifier {
         notifyListeners();
       }
       if (phoneRes.response?.isAvailable != true) {
-        phoneAvailabilityErrorMessage =
-            phoneRes.message ?? 'Phone number already exists';
+        phoneAvailabilityErrorMessage = phoneRes.message ?? 'Phone number already exists';
       }
       if (phoneRes.response?.isAvailable == true) {
         phoneAvailabilityErrorMessage = '';
@@ -2417,9 +2527,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       registrationSource: 'referral',
       firstName: firstNameController.text,
       lastName: lastNameController.text,
-      identifier: selectedVerificationType.toLowerCase() == 'email'
-          ? emailController.text
-          : phoneController.text,
+      identifier: selectedVerificationType.toLowerCase() == 'email' ? emailController.text : phoneController.text,
     );
     final response = await RegistrationRepository.signUpWithOTP(body);
     if (response.code == 'SUCCESS') {
@@ -2450,11 +2558,9 @@ class RegistrationProvider extends BaseChangeNotifier {
       final creativePursuits = _getSelectedHobbiesFromList(creativeItemList);
       final outdoorActivities = _getSelectedHobbiesFromList(funItemList);
       final fitnessAndSports = _getSelectedHobbiesFromList(fitnessItemList);
-      final mediaAndLearning =
-          _getSelectedHobbiesFromList(otherInterestsItemList);
+      final mediaAndLearning = _getSelectedHobbiesFromList(otherInterestsItemList);
       final foodAndCuisine = _getSelectedHobbiesFromList(foodCuisineItemList);
-      final travelAndLeisure =
-          _getSelectedHobbiesFromList(travelLeisureItemList);
+      final travelAndLeisure = _getSelectedHobbiesFromList(travelLeisureItemList);
 
       final body = UpdateInterestsRequestBody(
         creativePursuits: creativePursuits,
@@ -2473,12 +2579,8 @@ class RegistrationProvider extends BaseChangeNotifier {
   }
 
   List<String> _getSelectedHobbiesFromList(List<SingleStringModel> list) {
-     final selectedSet = selectedHobbies.map((e) => e.toLowerCase()).toSet();
-    return list
-        .where((item) =>
-            item.isSelected || selectedSet.contains(item.name.toLowerCase()))
-        .map((item) => item.value ?? item.name)
-        .toList();
+    final selectedSet = selectedHobbies.map((e) => e.toLowerCase()).toSet();
+    return list.where((item) => item.isSelected || selectedSet.contains(item.name.toLowerCase())).map((item) => item.value ?? item.name).toList();
   }
 
   String? _toTrimmedOrNull(String value) {
@@ -2572,4 +2674,15 @@ enum RegistrationScreenStates {
   defaultLoading,
   loadingComplete,
   isProfileFor,
+}
+
+enum PhotoUploadFlowState {
+  idle,
+  cropping,
+  uploadingForAiCheck,
+  aiRejected,
+  mediaUploaded,
+  attachingToProfile,
+  completed,
+  failed,
 }
