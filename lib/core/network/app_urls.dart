@@ -151,6 +151,9 @@ class AppUrls {
   static const String getBiodataProfile = '$baseUrl/biodata'; //GET
   static const String createOrUpdateBiodataDraft = '$baseUrl/biodata'; //POST
   static const String updateBiodata = '$baseUrl/biodata'; //PUT
+  static const String getBioTemplates = '$baseUrl/public/bio-templates'; //GET
+  static const String suggestBioTemplate =
+      '$baseUrl/public/bio-templates/suggest'; //POST
 
   static const String getAllBlogs = '$baseUrl/blogs'; //GET
   static const String getBlogBySlug = '$baseUrl/blogs/{slug}'; //GET

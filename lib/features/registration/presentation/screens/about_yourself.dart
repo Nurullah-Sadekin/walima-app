@@ -76,6 +76,7 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
           children: [
 
             const StaticTextWidget(title: 'About Yourself', subtitle: 'Almost done!\n A well-written bio helps you get 3x more profile views'),
+            bioTemplateActionButtons(),
             dataInsertField(),
             const SizedBox(height: 20),
             Column(
@@ -121,6 +122,177 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget bioTemplateActionButtons() {
+    final smallOutlineStyle = OutlinedButton.styleFrom(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(50),
+      ),
+      textStyle: TextStyle(
+        fontSize: TextSize.font12(context),
+        fontWeight: FontWeight.w600,
+      ),
+    );
+
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Row(
+        children: [
+          OutlinedButton.icon(
+            style: smallOutlineStyle,
+            onPressed: provider.isBioTemplateSuggesting
+                ? null
+                : () => provider.suggestAndApplyBioTemplate(context),
+            icon: provider.isBioTemplateSuggesting
+                ? const SizedBox(
+                    height: 18,
+                    width: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.primary,
+                    ),
+                  )
+                : const Icon(Icons.auto_fix_high, size: 18),
+            label: const Text('Auto Suggest'),
+          ),
+          const SizedBox(width: 12),
+          OutlinedButton(
+            style: smallOutlineStyle,
+            onPressed:
+                provider.isBioTemplatesLoading ? null : _handleShowTemplates,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (provider.isBioTemplatesLoading) ...[
+                  const SizedBox(
+                    height: 18,
+                    width: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                const Text('Show Templates'),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _handleShowTemplates() async {
+    await provider.loadBioTemplates(context);
+    if (!mounted) return;
+    if (provider.bioTemplates.isEmpty) return;
+
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
+            ),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 10),
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.black26,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Select A Bio Template',
+                          style: TextStyle(
+                            fontSize: TextSize.font18(context),
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimaryLight,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        icon: const Icon(Icons.close, size: 22),
+                      ),
+                    ],
+                  ),
+                ),
+                Flexible(
+                  child: ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+                    itemCount: provider.bioTemplates.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    itemBuilder: (itemContext, index) {
+                      final template = provider.bioTemplates[index];
+                      return InkWell(
+                        onTap: () {
+                          provider.applyBioTemplate(template, context: context);
+                          Navigator.pop(ctx);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: AppColors.greyLight),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                template.title,
+                                style: TextStyle(
+                                  fontSize: TextSize.font14(context),
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textPrimaryLight,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                template.content,
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: TextSize.font13(context),
+                                  color: AppColors.textSecondaryLight,
+                                  height: 1.35,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

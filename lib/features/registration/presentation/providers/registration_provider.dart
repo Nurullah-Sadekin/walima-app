@@ -19,9 +19,11 @@ import 'package:walima_llc/features/registration/data/models/request/sign_up_req
 import 'package:walima_llc/features/registration/data/models/request/upload_media_request_body.dart';
 import 'package:walima_llc/features/registration/data/models/request/update_interests_request_body.dart';
 import 'package:walima_llc/features/registration/data/models/request/update_family_request_body.dart';
+import 'package:walima_llc/features/registration/data/models/bio_template.dart';
 import 'package:walima_llc/features/registration/data/models/response/onboarding_response.dart';
 import 'package:walima_llc/features/registration/data/models/response/upload_media_response.dart';
 import 'package:walima_llc/features/registration/data/models/lookup_option.dart';
+import 'package:walima_llc/features/registration/data/repository/bio_template_repository.dart';
 import 'package:walima_llc/features/registration/data/repository/interests_repository.dart';
 import 'package:walima_llc/features/registration/data/repository/family_repository.dart';
 import 'package:walima_llc/features/registration/data/repository/lookup_repository.dart';
@@ -109,12 +111,17 @@ class RegistrationProvider extends BaseChangeNotifier {
 
   String selectedVerificationType = 'email'; // or 'phone'
 
+  bool isBioTemplatesLoading = false;
+  bool isBioTemplateSuggesting = false;
+  List<BioTemplate> bioTemplates = <BioTemplate>[];
+
   final LocationDataRepository _locationDataRepository =
       LocationDataRepositoryImpl();
   final LookupRepository _lookupRepository = LookupRepository();
   final MediaRepository _mediaRepository = MediaRepository();
   final InterestsRepository _interestsRepository = InterestsRepository();
   final FamilyRepository _familyRepository = FamilyRepository();
+  final BioTemplateRepository _bioTemplateRepository = BioTemplateRepository();
 
   List<LookupOption> religionOptions = <LookupOption>[];
   List<LookupOption> communityOptions = <LookupOption>[];
@@ -1287,6 +1294,119 @@ class RegistrationProvider extends BaseChangeNotifier {
     if (years < 0) years = 0;
 
     return years.toDouble();
+  }
+
+  int? bioTemplateAge() {
+    final txt = dateOfBirthController.text.trim();
+    if (txt.isEmpty) return null;
+    final value = age();
+    if (value <= 0) return null;
+    return value.toInt();
+  }
+
+  Future<void> loadBioTemplates(
+    BuildContext context, {
+    bool forceRefresh = false,
+  }) async {
+    if (isBioTemplatesLoading) return;
+    if (!forceRefresh && bioTemplates.isNotEmpty) return;
+
+    isBioTemplatesLoading = true;
+    notifyListeners();
+
+    try {
+      final templates = await _bioTemplateRepository.getBioTemplates();
+      bioTemplates = templates;
+    } catch (e) {
+      if (!context.mounted) return;
+      await DialogUtils.showErrorDialog(
+        context: context,
+        message: e.toString().replaceFirst('Exception: ', ''),
+      );
+    } finally {
+      isBioTemplatesLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> suggestAndApplyBioTemplate(BuildContext context) async {
+    if (isBioTemplateSuggesting) return;
+
+    isBioTemplateSuggesting = true;
+    notifyListeners();
+
+    try {
+      final template = await _bioTemplateRepository.suggestBioTemplate(
+        maritalStatus: _resolveMaritalStatusValue(),
+        workingAs: _resolveWorkingAsValue(),
+        workWith: _resolveWorkTypeValue(),
+        religion: _resolveReligionValue(),
+        age: bioTemplateAge(),
+      );
+
+      if (template == null || template.content.trim().isEmpty) {
+        if (!context.mounted) return;
+        await DialogUtils.showErrorDialog(
+          context: context,
+          message: 'No suggestion found',
+        );
+        return;
+      }
+
+      aboutYourselfController.text = template.content;
+      _notifyAndPersist();
+
+      if (!context.mounted) return;
+      _showBioTemplateSnackBar(
+        context,
+        message: 'Applied: ${template.title}',
+        isSuccess: true,
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      await DialogUtils.showErrorDialog(
+        context: context,
+        message: e.toString().replaceFirst('Exception: ', ''),
+      );
+    } finally {
+      isBioTemplateSuggesting = false;
+      notifyListeners();
+    }
+  }
+
+  void applyBioTemplate(
+    BioTemplate template, {
+    BuildContext? context,
+  }) {
+    aboutYourselfController.text = template.content;
+    _notifyAndPersist();
+
+    if (context == null) return;
+    _showBioTemplateSnackBar(
+      context,
+      message: 'Applied: ${template.title}',
+      isSuccess: true,
+    );
+  }
+
+  void _showBioTemplateSnackBar(
+    BuildContext context, {
+    required String message,
+    required bool isSuccess,
+  }) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: isSuccess ? AppColors.success : AppColors.error,
+          duration: const Duration(seconds: 2),
+          content: Text(
+            message,
+            style: const TextStyle(color: Colors.white),
+          ),
+        ),
+      );
   }
 
   int selectedHobbiesCount() {
