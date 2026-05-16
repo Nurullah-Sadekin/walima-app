@@ -32,7 +32,9 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
   WidgetsBinding.instance.addPostFrameCallback((_) {
       provider.getInitialData();
       provider.initControllersListener();
-      provider.aboutYourselfController.text = 'I enjoy spending time with friends and value meaningful relationships. I am seeking a partner who is supportive, family-oriented, and composed in nature. If this aligns with what you are looking for, I would be glad to connect.';
+      if (provider.aboutYourselfController.text.trim().isEmpty) {
+        provider.aboutYourselfController.text = 'I enjoy spending time with friends and value meaningful relationships. I am seeking a partner who is supportive, family-oriented, and composed in nature. If this aligns with what you are looking for, I would be glad to connect.';
+      }
   });
   }
 
@@ -139,7 +141,9 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
 
     return Align(
       alignment: Alignment.centerLeft,
-      child: Row(
+      child: Wrap(
+        spacing: 12,
+        runSpacing: 12,
         children: [
           OutlinedButton.icon(
             style: smallOutlineStyle,
@@ -158,7 +162,6 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
                 : const Icon(Icons.auto_fix_high, size: 18),
             label: const Text('Auto Suggest'),
           ),
-          const SizedBox(width: 12),
           OutlinedButton(
             style: smallOutlineStyle,
             onPressed:
@@ -208,7 +211,7 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
           child: SafeArea(
             top: false,
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: MainAxisSize.max,
               children: [
                 const SizedBox(height: 10),
                 Container(
@@ -241,7 +244,7 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
                     ],
                   ),
                 ),
-                Flexible(
+                Expanded(
                   child: ListView.separated(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
                     itemCount: provider.bioTemplates.length,
