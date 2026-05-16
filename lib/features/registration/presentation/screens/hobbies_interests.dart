@@ -58,7 +58,13 @@ class _HobbiesInterestsScreenState
               ? const Loading()
               : Column(
                   children: [
-                    const CustomBackAppBar(),
+                     CustomBackAppBar(
+                      trailingText: 'Skip',
+                      isTrailing: true,
+                      onTrailingTap: () {
+                        context.push(Paths.familyDetails);
+                      },
+                    ),
                     body(),
                   ],
                 ),
@@ -70,7 +76,7 @@ class _HobbiesInterestsScreenState
   Widget body() {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10),
         child: Column(
           children: [
             _bodyScrollable(context),
@@ -88,11 +94,21 @@ class _HobbiesInterestsScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 10,
         children: [
-          Text('Add Hobbies & Interests',
-              style: TextStyle(
-                  fontSize: TextSize.font14(context),
-                  color: AppColors.textPrimaryLight,
-                  fontWeight: FontWeight.w500)),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text('Add Hobbies & Interests',
+                  style: TextStyle(
+                      fontSize: TextSize.font18(context),
+                      color: AppColors.textPrimaryLight,
+                      fontWeight: FontWeight.bold)),
+              Text('Helps us suggest more compatible matches',
+                  style: TextStyle(
+                      fontSize: TextSize.font14(context),
+                      color: AppColors.textSecondaryLight,
+                      fontWeight: FontWeight.w500)),
+            ],
+          ),
           Expanded(
             child: SingleChildScrollView(
               child: Column(
@@ -171,7 +187,9 @@ class _HobbiesInterestsScreenState
   Widget bottomAction() {
     final selected = provider.selectedHobbiesCount();
     return PrimaryButtons(
-      buttonStyle: ButtonsStyle.activePrimaryButton,
+      buttonStyle: ButtonsStyle.iconicDynamicButton,
+      verticalPadding: 14,
+      borderRadius: 50,
       title: 'Save & Continue ($selected/${RegistrationProvider.hobbiesSelectionMax})',
       onTap: () async{
         // show the save selected hobbies dialog

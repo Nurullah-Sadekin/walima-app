@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:walima_llc/core/global/components/custom_back_appbar.dart';
+import 'package:walima_llc/core/global/components/progress_indicator.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
 
 class UpperLayer extends StatelessWidget {
@@ -7,8 +8,8 @@ class UpperLayer extends StatelessWidget {
   const UpperLayer({
     super.key,
     required this.imagePath,
-    this.imageWidth = 110,
-    this.imageHeight = 110,
+    this.imageWidth = 80,
+    this.imageHeight = 80,
     this.verticalPadding = 14.0,
     this.spacing = 10.0,
     this.isTrailing = false,
@@ -19,6 +20,10 @@ class UpperLayer extends StatelessWidget {
     this.onBackPressed,
     this.backCancelMood = false,
     this.backIconBackground = Colors.white,
+
+    this.showProgress = false,
+    this.totalProgressCount,
+    this.currentIndexProgress,
   });
   final String imagePath;
   final double imageWidth;
@@ -34,6 +39,10 @@ class UpperLayer extends StatelessWidget {
   final bool backCancelMood;
   final Color backIconBackground;
 
+  final bool showProgress;
+  final int? totalProgressCount;
+  final int? currentIndexProgress;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -48,6 +57,8 @@ class UpperLayer extends StatelessWidget {
               backCancelMood: backCancelMood,
              backIconBackground: backIconBackground,
             ) : const  SizedBox.shrink(),
+        showProgress ?   ProgressNumberedIndicator(total: totalProgressCount ?? 0, activeIndex: currentIndexProgress ?? 0) : const SizedBox.shrink(),
+        SizedBox(height: spacing),
         Padding(
           padding: EdgeInsets.symmetric(vertical: verticalPadding),
           child: ShowImage(

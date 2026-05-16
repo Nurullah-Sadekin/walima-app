@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:walima_llc/core/config/size_config.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
@@ -65,24 +66,11 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                     UpperLayer(
                       imagePath: AppImages.otp,
                       trailingText: 'Skip',
-                      isTrailing: true,
+                      totalProgressCount: 10,
+                      showProgress: true,
+                      currentIndexProgress: 9,
+                      isTrailing: false,
                       onTrailingTap: () async {
-                        final screenProvider = ref.read(verifyOtpForSignUp);
-                        screenProvider.updateViewState(loadingState: RegistrationScreenStates.isProfileFor);
-                        final validate = await provider.submitRegistration(
-                          context,
-                          skipOtp: true,
-                          useDebugTemplate: _isDebugOtpFlow,
-                        );
-                        if (!validate) {
-                          screenProvider.updateViewState(loadingState: RegistrationScreenStates.loadingComplete);
-                          return;
-                        } else {
-                          screenProvider.updateViewState(screenStates: RegistrationScreenStates.loadingComplete);
-                          if (mounted) {
-                            _navigateAfterRegistrationSuccess();
-                          }
-                        }
                       },
                     ),
                     body(),
@@ -95,159 +83,273 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
 
   Widget body() {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: Column(
-          spacing: 10,
-          children: [
-            Text(
-              provider.selectedVerificationType.toLowerCase() == 'email' ? 'Verify email' : 'Verify Number',
-              style: TextStyle(fontSize: TextSize.font18(context), color: AppColors.textPrimaryLight, fontWeight: FontWeight.w500),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+              20,
+              0,
+              20,
+              MediaQuery.of(context).viewInsets.bottom,
             ),
-            Row(
-              spacing: 8,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (provider.selectedVerificationType.toLowerCase() == 'email')
-                  Text(
-                    'We\'ve sent a code to ${provider.emailController.text}',
-                    style: TextStyle(
-                      fontSize: TextSize.font14(context),
-                      color: AppColors.textSecondaryLight,
-                      fontWeight: FontWeight.w400,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Column(
+                  spacing: 10,
+                  children: [
+                    staticText(),
+                    SizedBox(height: MediaQuery.sizeOf(context).height * 0.01),
+                    loginDataField(),
+                    const SizedBox(height: 10),
+                    ResendCodeTimer(
+                      onResend: () async {
+                        final screenProvider = ref.read(verifyOtpForSignUp);
+                        screenProvider.updateViewState(
+                            loadingState: RegistrationScreenStates.isProfileFor);
+                        await provider.resendOtp(context);
+                        screenProvider.updateViewState(
+                          loadingState: RegistrationScreenStates.loadingComplete,
+                        );
+                      },
                     ),
-                  )
-                else
-                  Text(
-                    'We\'ve sent a code to ${provider.selectedCountryCodeForNumber}${provider.phoneController.text}',
-                    style: TextStyle(fontSize: TextSize.font14(context), color: AppColors.textSecondaryLight, fontWeight: FontWeight.w400),
-                  ),
-                InkWell(
-                  onTap: () {
-                    context.pushNamed(
-                      Routes.emailPhone,
-                      queryParameters: const {'fromScreen': 'otpScreen'},
-                      extra: 'otpScreen',
-                    );
-                  },
-                  child: Row(
-                    spacing: 2,
-                    children: [
-                      Icon(Icons.edit_outlined, size: TextSize.font14(context), color: AppColors.primary),
-                      Text(
-                        'Edit',
-                        style: TextStyle(fontSize: TextSize.font14(context), color: AppColors.primary, fontWeight: FontWeight.w600),
-                      ),
-                    ],
-                  ),
+                    bottomAction(),
+                    SizedBox(height: MediaQuery.sizeOf(context).height * 0.01),
+                    SizedBox(height: MediaQuery.sizeOf(context).height * 0.01),
+                    contactSupport(),
+                    const Spacer(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      spacing: 6,
+                      children: [
+                        Text(
+                          "Don't have an account?",
+                          style: TextStyle(
+                            color: AppColors.hintTextColor,
+                            fontWeight: FontWeight.w500,
+                            fontSize: TextSize.font14(context),
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            context.pushNamed(Routes.onboarding);
+                          },
+                          child: Row(
+                            spacing: 4,
+                            children: [
+                              Text(
+                                'Sign Up Free',
+                                style: TextStyle(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: TextSize.font16(context),
+                                ),
+                              ),
+                              const Icon(Icons.arrow_forward_ios, color: AppColors.primary, size: 8),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: MediaQuery.sizeOf(context).height * 0.005),
+                  ],
                 ),
-              ],
-            ),
-            loginDataField(),
-            const SizedBox(height: 10),
-            Text(
-              'Experiencing issues receiving the code?',
-              style: TextStyle(
-                fontSize: TextSize.font14(context),
-                color: AppColors.textSecondaryLight,
-                fontWeight: FontWeight.w400,
               ),
             ),
-            ResendCodeTimer(
-              onResend: () async {
-                final screenProvider = ref.read(verifyOtpForSignUp);
-                screenProvider.updateViewState(
-                    loadingState: RegistrationScreenStates.isProfileFor);
-                await provider.resendOtp(context);
-                screenProvider.updateViewState(
-                  loadingState: RegistrationScreenStates.loadingComplete,
-                );
-              },
-            ),
-            const Spacer(),
-            bottomAction(),
-            const SizedBox(height: 20),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 
-  Widget loginDataField() {
+  Widget contactSupport() {
     return Column(
-      spacing: 20,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        Text(
+          'Did\'nt receive the SMS?',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: AppColors.hintTextColor,
+            fontWeight: FontWeight.w400,
+            fontSize: TextSize.font14(context),
+          ),
+        ),
+        Row(
+          spacing: 6,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(provider.otpControllers.length, (index) {
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 6),
-                  width: 42,
-                  height: 40,
-                  child: TextField(
-                    controller: provider.otpControllers[index],
-                    focusNode: provider.otpFocusNodesController[index],
-                    textAlign: TextAlign.center,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    maxLength: 1,
-                    style: TextStyle(
-                      fontSize: TextSize.font18(context),
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimaryLight,
-                    ),
-                    decoration: InputDecoration(
-                      counterText: '',
-                      fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.all(0),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: AppColors.grey),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: AppColors.greyLight),
-                      ),
-                    ),
-                    onChanged: (value) {
-                      // Handle paste (multiple chars) and normal single char entry
-                      if (value.length > 1) {
-                        final chars = value.split('');
-                        for (var i = 0; i < chars.length && (index + i) < provider.otpControllers.length; i++) {
-                          provider.otpControllers[index + i].text = chars[i];
-                        }
-                        final next = index + chars.length;
-                        if (next >= provider.otpFocusNodesController.length) {
-                          provider.otpFocusNodesController.last.requestFocus();
-                          provider.otpFocusNodesController.last.unfocus();
-                        } else {
-                          provider.otpFocusNodesController[next].requestFocus();
-                        }
-                        setState(() {});
-                        return;
-                      }
-
-                      if (value.isNotEmpty) {
-                        if (index + 1 < provider.otpFocusNodesController.length) {
-                          provider.otpFocusNodesController[index + 1].requestFocus();
-                        } else {
-                          provider.otpFocusNodesController[index].unfocus();
-                        }
-                      } else if (index - 1 >= 0) {
-                        provider.otpFocusNodesController[index - 1].requestFocus();
-                      }
-                      setState(() {});
-                    },
-                  ),
-                );
-              }),
+            Text(
+              'Check your number or',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: AppColors.hintTextColor,
+                fontWeight: FontWeight.w400,
+                fontSize: TextSize.font14(context),
+              ),
+            ),
+            Text(
+              'Contact support',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w500,
+                fontSize: TextSize.font14(context),
+              ),
             ),
           ],
         ),
       ],
+    );
+  }
+
+
+  Widget staticText() {
+    return Column(spacing: 12, children: [
+      Column(
+        spacing: 6,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Verify your',
+            style: TextStyle(
+              color: AppColors.textPrimaryLight,
+              fontWeight: FontWeight.bold,
+              fontSize: TextSize.font24(context),
+              fontFamily: FontFamily.timesNewRoman,
+            ),
+          ),
+          Text(
+           provider.selectedVerificationType.toLowerCase() == 'email' ? 'email address' : 'phone number',
+            style: TextStyle(
+              color: AppColors.primary,
+              fontWeight: FontWeight.bold,
+              fontSize: TextSize.font24(context),
+              fontFamily: FontFamily.timesNewRoman,
+            ),
+          ),
+        ],
+      ),
+
+      Column(
+        children: [
+          Text(
+            'We\'ve sent a 6-digit code to',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: AppColors.hintTextColor,
+              fontWeight: FontWeight.w400,
+              fontSize: TextSize.font14(context),
+            ),
+          ),
+          Row(
+            spacing: 6,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (provider.selectedVerificationType.toLowerCase() == 'email')
+                    Text(
+                      provider.emailController.text,
+                      style: TextStyle(
+                        fontSize: TextSize.font14(context),
+                        color: AppColors.textSecondaryLight,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    )
+                  else
+                    Text(
+                      '+${provider.selectedCountryCodeForNumber} ${provider.phoneController.text}',
+                      style: TextStyle(fontSize: TextSize.font14(context), color: AppColors.textSecondaryLight, fontWeight: FontWeight.w400),
+                    ),
+              InkWell(
+                onTap: () {
+                  context.pushNamed(
+                    Routes.emailPhone,
+                    queryParameters: const {'fromScreen': 'otpScreen'},
+                    extra: 'otpScreen',
+                  );
+                },
+                child: Text(
+                  'Edit',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w500,
+                    fontSize: TextSize.font14(context),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      )
+    ]);
+  }
+
+
+  Widget loginDataField() {
+    // SizeConfig().init(context);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: List.generate(provider.otpControllers.length, (index) {
+        return SizedBox(
+          width: SizeConfig.screenWidth! * 0.12,
+          height: SizeConfig.screenWidth! * 0.12,
+          child: TextField(
+            controller: provider.otpControllers[index],
+            focusNode: provider.otpFocusNodesController[index],
+            textAlign: TextAlign.center,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            maxLength: 1,
+            style: TextStyle(
+              fontSize: TextSize.font18(context),
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimaryLight,
+            ),
+            decoration: InputDecoration(
+              counterText: '',
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.all(0),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: AppColors.grey),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: AppColors.greyLight),
+              ),
+            ),
+            onChanged: (value) {
+              // Handle paste (multiple chars) and normal single char entry
+              if (value.length > 1) {
+                final chars = value.split('');
+                for (var i = 0; i < chars.length && (index + i) < provider.otpControllers.length; i++) {
+                  provider.otpControllers[index + i].text = chars[i];
+                }
+                final next = index + chars.length;
+                if (next >= provider.otpFocusNodesController.length) {
+                  provider.otpFocusNodesController.last.requestFocus();
+                  provider.otpFocusNodesController.last.unfocus();
+                } else {
+                  provider.otpFocusNodesController[next].requestFocus();
+                }
+                setState(() {});
+                return;
+              }
+    
+              if (value.isNotEmpty) {
+                if (index + 1 < provider.otpFocusNodesController.length) {
+                  provider.otpFocusNodesController[index + 1].requestFocus();
+                } else {
+                  provider.otpFocusNodesController[index].unfocus();
+                }
+              } else if (index - 1 >= 0) {
+                provider.otpFocusNodesController[index - 1].requestFocus();
+              }
+              setState(() {});
+            },
+          ),
+        );
+      }),
     );
   }
 
@@ -257,14 +359,16 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
         provider.otpControllers.isNotEmpty;
     return PrimaryButtons(
       buttonStyle: isComplete
-          ? ButtonsStyle.activePrimaryButton
+          ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
+      verticalPadding: 14,
+      borderRadius: 50,
+      svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Done',
       onTap: isComplete
           ? () async {
               final screenProvider = ref.read(verifyOtpForSignUp);
-              screenProvider.updateViewState(
-                  loadingState: RegistrationScreenStates.isProfileFor);
+              screenProvider.updateViewState(loadingState: RegistrationScreenStates.isProfileFor);
               final validate = await provider.submitRegistration(
                 context,
                 useDebugTemplate: _isDebugOtpFlow,

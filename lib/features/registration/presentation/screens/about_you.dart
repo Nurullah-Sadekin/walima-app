@@ -13,6 +13,7 @@ import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
 import 'package:go_router/go_router.dart';
+import 'package:walima_llc/features/registration/presentation/widgets/static_text_widget.dart';
 
 class AboutYouScreen extends ConsumerStatefulWidget {
   const AboutYouScreen({super.key});
@@ -62,7 +63,11 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.aboutYou),
+                    const UpperLayer(
+                        imagePath: AppImages.aboutYou,
+                        totalProgressCount: 10,
+                        currentIndexProgress: 1,
+                        showProgress: true),
                     body(),
                   ],
                 ),
@@ -74,10 +79,13 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
   Widget body() {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           spacing: 10,
           children: [
+            const StaticTextWidget(
+                title: 'Personal Information',
+                subtitle: 'Tell us about yourself'),
             dataInsertField(),
             const Spacer(),
             bottomAction(),
@@ -96,6 +104,7 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
           controller: provider.firstNameController,
           headLine: 'Your Name',
           hintText: 'First Name',
+          isRequired: true,
           noPrefix: true,
           errorText: null,
           onTap: () {},
@@ -112,13 +121,15 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
         Row(
           spacing: 5,
           crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
               child: PrimaryTextField(
                 controller: provider.dateOfBirthController,
                 headLine: 'Date of Birth',
                 hintText: 'DD/MM/YYYY',
-                errorText: null,
+                isRequired: true,
+                errorText: provider.dateOfBirthErrorMessage,
                 onTap: () {},
                 datePicker: true,
                 readOnly: true,
@@ -128,7 +139,7 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
                   width: TextSize.font20(context),
                   height: TextSize.font20(context),
                   color: provider.dateOfBirthController.text.isNotEmpty
-                      ? AppColors.textPrimaryLight
+                      ? AppColors.primary
                       : AppColors.hintTextColor,
                 ),
               ),
@@ -157,21 +168,51 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
   }
 
   Widget bottomAction() {
-    return PrimaryButtons(
-      buttonStyle: provider.firstNameController.text.isNotEmpty &&
-              provider.lastNameController.text.isNotEmpty &&
-              provider.dateOfBirthController.text.isNotEmpty
-          ? ButtonsStyle.activePrimaryButton
-          : ButtonsStyle.disableButton,
-      title: 'Continue',
-      onTap: () {
-        if (provider.firstNameController.text.isEmpty ||
-            provider.lastNameController.text.isEmpty ||
-            provider.dateOfBirthController.text.isEmpty) {
-          return;
-        }
-        context.push(Paths.yourReligion);
-      },
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6.0),
+              child: Text(
+                'Must be 18 or older to register on Walima',
+                style: TextStyle(
+                  fontSize: TextSize.font12(context),
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.hintTextColor,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        PrimaryButtons(
+          buttonStyle: provider.firstNameController.text.isNotEmpty &&
+                  provider.lastNameController.text.isNotEmpty &&
+                  provider.dateOfBirthController.text.isNotEmpty
+              ? ButtonsStyle.iconicDynamicButton
+              : ButtonsStyle.disableButton,
+          verticalPadding: 14,
+          borderRadius: 50,
+          svgIconPath: AppImages.arrowRightSvgIcon,
+          title: 'Continue',
+          onTap: () {
+            provider.dateOfBirthErrorMessage = '';
+            if (provider.firstNameController.text.isEmpty ||
+                provider.lastNameController.text.isEmpty ||
+                provider.dateOfBirthController.text.isEmpty) {
+              return;
+            }
+            if (provider.age() < 18) {
+              provider.dateOfBirthErrorMessage = 'Must be 18 or older to register on Walima';
+              provider.notifyListeners();
+              return;
+            }
+            context.push(Paths.yourReligion);
+          },
+        ),
+      ],
     );
   }
 }

@@ -48,6 +48,7 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider.getInitialData();
       provider.initControllersListener();
+      provider.resetPhotoUploadFlow(notify: false);
     });
   }
 
@@ -62,7 +63,8 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(photoUploadScreenProvider);
     return TransparentLoading(
-      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor ||
+      isLoading:
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor ||
               _isPickingImage,
       child: Scaffold(
         extendBodyBehindAppBar: true,
@@ -130,9 +132,18 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
       final croppedPath = croppedFile.path.trim();
       if (croppedPath.isEmpty) return;
 
+      final validationError = provider.validateProfileImageFile(croppedPath);
+      if (validationError != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(validationError)),
+        );
+        return;
+      }
+
       setState(() {
         _selectedImagePath = croppedPath;
       });
+      provider.resetPhotoUploadFlow();
 
       if (!mounted) return;
       final normalizedFromScreen = widget.fromScreen?.trim();
@@ -185,13 +196,15 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
 
   Future<void> _handleContinue() async {
     final imagePath = _selectedImagePath?.trim() ?? '';
-    if (imagePath.isEmpty) {
+    final validationError = provider.validateProfileImageFile(imagePath);
+    if (validationError != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a profile image first.')),
+        SnackBar(content: Text(validationError)),
       );
       return;
     }
 
+    provider.resetPhotoUploadFlow();
     final normalizedFromScreen = widget.fromScreen?.trim();
     if (normalizedFromScreen != null && normalizedFromScreen.isNotEmpty) {
       context.pushNamed(
@@ -210,7 +223,7 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
   Widget body(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           spacing: 10,
           children: [
@@ -255,11 +268,13 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
                 spacing: 8,
                 children: [
                   KnowMoreItemCard(
-                    text: 'Your Photo should be front facing and your entire face should be visible.',
+                    text:
+                        'Your photo should be front-facing, clear, and show your full face.',
                     isActive: true,
                   ),
                   KnowMoreItemCard(
-                    text: 'Ensure that your Photo is recent and not with a group.',
+                    text:
+                        'We verify photos with AI before upload, so use a real and recent solo photo.',
                     isActive: true,
                   ),
                   KnowMoreItemCard(
@@ -267,15 +282,18 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
                     isActive: true,
                   ),
                   KnowMoreItemCard(
-                    text: 'Each Photo must be less than 15 MB in size and must be in one of the following formats: jpg, gif, png, bmp or tiff.',
+                    text:
+                        'Each photo must be under 5 MB and use jpg, jpeg, png, webp, gif, avif, heic, or heif.',
                     isActive: true,
                   ),
                   KnowMoreItemCard(
-                    text: 'Watermarked, digitally enhanced, morphed Photos or Photos with your personal information will be rejected.',
+                    text:
+                        'AI-generated, watermarked, morphed, or publicly reused photos will be rejected.',
                     isActive: false,
                   ),
                   KnowMoreItemCard(
-                    text: 'Irrelevant Photographs will lead to deactivation of your Profile and Membership.',
+                    text:
+                        'Irrelevant Photographs will lead to deactivation of your Profile and Membership.',
                     isActive: false,
                   ),
                   SizedBox(height: 12),
@@ -326,12 +344,12 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
                 ),
           Center(
             child: Text(
-                _selectedImagePath == null ? 'Upload Image' : 'Image Selected',
-                style: TextStyle(
-                    fontSize: TextSize.font14(context),
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.textSecondaryLight,
-                ),
+              _selectedImagePath == null ? 'Upload Image' : 'Image Selected',
+              style: TextStyle(
+                fontSize: TextSize.font14(context),
+                fontWeight: FontWeight.w400,
+                color: AppColors.textSecondaryLight,
+              ),
             ),
           ),
           Row(
@@ -344,12 +362,13 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Text('OR',
-                    style: TextStyle(
-                        fontSize: TextSize.font14(context),
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.textSecondaryLight,
-                    ),
+                child: Text(
+                  'OR',
+                  style: TextStyle(
+                    fontSize: TextSize.font14(context),
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.textSecondaryLight,
+                  ),
                 ),
               ),
               Expanded(
@@ -417,8 +436,11 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
   Widget bottomAction() {
     return PrimaryButtons(
       buttonStyle: (_selectedImagePath?.trim().isNotEmpty ?? false)
-          ? ButtonsStyle.activePrimaryButton
+          ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
+      svgIconPath: AppImages.arrowRightSvgIcon,
+      verticalPadding: 14,
+      borderRadius: 50,
       title: 'Continue',
       onTap: _handleContinue,
     );

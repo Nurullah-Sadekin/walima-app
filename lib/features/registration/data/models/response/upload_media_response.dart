@@ -7,10 +7,15 @@ class UploadMediaResponse {
   });
 
   UploadMediaResponse.fromJson(dynamic json) {
-    code = json['code']?.toString();
+    final hasWrappedResponse = json['response'] != null;
+    final hasTopLevelData = json['data'] != null;
+    code = json['code']?.toString() ??
+        ((hasWrappedResponse || hasTopLevelData) ? 'SUCCESS' : 'FAILED');
     message = json['message']?.toString();
-    response = json['response'] != null
-        ? UploadMediaResponseBody.fromJson(json['response'])
+    final responsePayload = json['response'] ??
+        (hasTopLevelData ? <String, dynamic>{'data': json['data']} : null);
+    response = responsePayload != null
+        ? UploadMediaResponseBody.fromJson(responsePayload)
         : null;
     traceId = json['traceId']?.toString();
   }

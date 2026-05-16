@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/global/components/custom_back_appbar.dart';
 import 'package:walima_llc/core/global/components/gradient_background.dart';
 import 'package:walima_llc/core/providers/providers.dart';
@@ -34,6 +35,14 @@ class _CropImageScreenState extends ConsumerState<CropImageScreen> {
     return widget.fromScreen?.trim() == _completeProfileSource;
   }
 
+  bool get _isUploading {
+    return provider.photoUploadFlowState ==
+            PhotoUploadFlowState.uploadingForAiCheck ||
+        provider.photoUploadFlowState == PhotoUploadFlowState.mediaUploaded ||
+        provider.photoUploadFlowState ==
+            PhotoUploadFlowState.attachingToProfile;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -44,6 +53,7 @@ class _CropImageScreenState extends ConsumerState<CropImageScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider.getInitialData();
       provider.initControllersListener();
+      provider.resetPhotoUploadFlow(notify: false);
     });
   }
 
@@ -84,7 +94,14 @@ class _CropImageScreenState extends ConsumerState<CropImageScreen> {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: Center(child: showImage()),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Center(child: showImage()),
+            const SizedBox(height: 16),
+            _uploadStatus(),
+          ],
+        ),
       ),
     );
   }
@@ -114,26 +131,27 @@ class _CropImageScreenState extends ConsumerState<CropImageScreen> {
   }
 
   Future<void> _handleContinue() async {
+    
+    if(provider.profileImageUploadErrorMessage.isNotEmpty) {
+      provider.resetPhotoUploadFlow();
+      context.pop();
+      return;
+    }
     final imagePath = _selectedImagePath?.trim() ?? '';
-    if (imagePath.isEmpty) {
+    final validationError = provider.validateProfileImageFile(imagePath);
+    if (validationError != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a profile image first.')),
+        SnackBar(content: Text(validationError)),
       );
       return;
     }
-
-    final screenProvider = ref.read(photoUploadScreenProvider);
-    screenProvider.updateViewState(
-      loadingState: RegistrationScreenStates.isProfileFor,
-    );
-
-    final isUploaded = await provider.uploadProfileImage(filePath: imagePath);
+    if (_isUploading) return;
+     
+    provider.resetPhotoUploadFlow();
+    final isUploaded =
+        await provider.uploadAndAttachProfileImage(filePath: imagePath);
 
     if (!mounted) return;
-
-    screenProvider.updateViewState(
-      loadingState: RegistrationScreenStates.loadingComplete,
-    );
 
     if (isUploaded) {
       if (_isFromCompleteProfile) {
@@ -149,20 +167,68 @@ class _CropImageScreenState extends ConsumerState<CropImageScreen> {
       message: provider.profileImageUploadErrorMessage.isNotEmpty
           ? provider.profileImageUploadErrorMessage
           : 'Failed to upload profile image.',
+      buttonText: provider.canRetryProfileImageUpload ? 'Retry Upload' : 'Try again',
+      onButtonPressed: () {
+        Navigator.of(context, rootNavigator: true).pop();
+        if (provider.canRetryProfileImageUpload && mounted) {
+          _handleContinue();
+        }
+      },
     );
+  }
+
+  Widget _uploadStatus() {
+    if (_isUploading) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(
+            height: 18,
+            width: 18,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: AppColors.primary,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Flexible(
+            child: Text(
+              provider.profileImageUploadStatusMessage.isNotEmpty
+                  ? provider.profileImageUploadStatusMessage
+                  : 'Uploading your photo...',
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: AppColors.textSecondaryLight),
+            ),
+          ),
+        ],
+      );
+    }
+
+    if (provider.profileImageUploadErrorMessage.isNotEmpty) {
+      return Text(
+        provider.profileImageUploadErrorMessage,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          color: AppColors.error,
+          fontWeight: FontWeight.w500,
+        ),
+      );
+    }
+
+    return const SizedBox.shrink();
   }
 
   Widget finallyUploadTheCroppedImage() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: PrimaryButtons(
-        buttonStyle: (_selectedImagePath?.trim().isNotEmpty ?? false)
-            ? ButtonsStyle.activePrimaryButton
-            : ButtonsStyle.disableButton,
-        title: 'Upload Image',
-        onTap: _handleContinue,
+        buttonStyle:
+            (_selectedImagePath?.trim().isNotEmpty ?? false) && !_isUploading
+                ? ButtonsStyle.activePrimaryButton
+                : ButtonsStyle.disableButton,
+        title: _isUploading ? 'Verifying Photo...' : provider.profileImageUploadErrorMessage.isNotEmpty ? 'Try again' : 'Upload Image',
+        onTap: _isUploading ? () {} : _handleContinue,
       ),
     );
   }
 }
-  

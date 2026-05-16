@@ -11,6 +11,7 @@ import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:go_router/go_router.dart';
+import 'package:walima_llc/features/registration/presentation/widgets/static_text_widget.dart';
 
 class EducationScreen extends ConsumerStatefulWidget {
   const EducationScreen({super.key});
@@ -48,14 +49,20 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == RecommendedPreferencesScreenStates.preferences
+          child: provider.screenStates ==
+                  RecommendedPreferencesScreenStates.preferences
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(
+                    UpperLayer(
                       imagePath: AppImages.recommendedPreferences,
                       isShowAppbar: true,
                       isBackButton: true,
+                      isTrailing: true,
+                      trailingText: 'Skip',
+                      onTrailingTap: () {
+                        context.push(Paths.career);
+                      },
                     ),
                     body(),
                   ],
@@ -68,7 +75,7 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
   Widget body() {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           spacing: 10,
           children: [
@@ -88,6 +95,10 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: 10,
         children: [
+          const StaticTextWidget(
+            title: 'Partner\'s Education',
+            subtitle: 'What qualifications do you prefer',
+          ),
           Text(
             'Education Qualification',
             style: TextStyle(
@@ -113,6 +124,7 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
                           final item = provider.educationDataList[index];
 
                           return SelectionCard(
+                            borderRadius: 40,
                             buttonStyle: item.isSelected
                                 ? SelectionStyle.selectedCheckbox
                                 : SelectionStyle.unSelectedCheckbox,
@@ -137,11 +149,17 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: ButtonsStyle.activePrimaryButton,
-      title: 'Continue',
-      onTap: () {
-        context.push(Paths.career);
-      },
-    );
+        buttonStyle: provider.preferableEducations.isNotEmpty
+            ? ButtonsStyle.iconicDynamicButton
+            : ButtonsStyle.disableButton,
+        verticalPadding: 14,
+        borderRadius: 50,
+        svgIconPath: AppImages.arrowRightSvgIcon,
+        title: 'Continue',
+        onTap: () {
+          if (provider.preferableEducations.isNotEmpty) {
+            context.push(Paths.career);
+          }
+        });
   }
 }

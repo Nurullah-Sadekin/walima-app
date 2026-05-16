@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,6 +21,7 @@ import 'package:walima_llc/core/utils/prefs_helper.dart';
 import 'package:walima_llc/core/utils/firebase_messaging_service.dart';
 import 'package:walima_llc/core/utils/foreground_alert_service.dart';
 import 'package:walima_llc/features/chat/data/socket/socket_service.dart';
+import 'core/config/size_config.dart';
 
 Future<void> main() async {
   runZonedGuarded(
@@ -85,11 +85,11 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(goRouterProvider);
-
+    SizeConfig().init(context);
     DioClient().setLogoutHandler(() {
       ref.read(chatProvider).clearChatState();
       SocketService.instance.disconnect(reason: 'session expired logout');
-      router.go(Paths.login);
+      router.go(Paths.onboarding);
     });
 
     final themeMode = ref.watch(themeNotifierProvider);

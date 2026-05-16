@@ -59,10 +59,11 @@ List<ProfileForModel> profileForListInserted = [
   ProfileForModel(name: 'My Brother', emoji: AppImages.maleIcon),
   ProfileForModel(name: 'My Sister', emoji: AppImages.mySisterIcon),
   ProfileForModel(name: 'My Friend', emoji: AppImages.myFriendIcon),
+  ProfileForModel(name: 'My Relative', emoji: AppImages.myFriendIcon),
 ];
 
 // Your ProfileFor List
 List<GenderProfileForModel> genderForListInserted = [
-  GenderProfileForModel(name: 'Male', emoji: AppImages.maleIcon),
-  GenderProfileForModel(name: 'Female', emoji: AppImages.femaleIcon),
+  GenderProfileForModel(name: 'Male', emoji: AppImages.male),
+  GenderProfileForModel(name: 'Female', emoji: AppImages.female),
 ];

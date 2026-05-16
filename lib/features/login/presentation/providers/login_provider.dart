@@ -22,8 +22,7 @@ import 'package:walima_llc/core/network/dio_client.dart';
 import 'package:walima_llc/features/chat/data/socket/socket_service.dart';
 
 class LoginProvider extends BaseChangeNotifier {
-  static const String _mobileOrEmailRequiredMessage =
-      'Please enter your mobile number or email ID';
+  static const String _mobileOrEmailRequiredMessage = 'Please enter your mobile number or email ID';
   static const String _passwordRequiredMessage = 'Please enter your password';
   static const String _otpIncompleteMessage = 'Please enter the complete OTP';
 
@@ -233,6 +232,12 @@ class LoginProvider extends BaseChangeNotifier {
   }
 
   Future<void> loginWithOtp(BuildContext context) async {
+    _setRequiredFieldErrors();
+    final canSubmit = validateOtpInputs();
+    updateViewState();
+    if (!canSubmit) {
+      return;
+    }
     _showLoading();
     final body = LoginWithOtpBody(identifier: mobileNoOrEmailController.text);
     final response =
@@ -259,9 +264,7 @@ class LoginProvider extends BaseChangeNotifier {
       updateViewState();
       return false;
     }
-
-    final mobileOrEmailValidation =
-        Validators.validateMobileOrEmail(mobileNoOrEmailController.text);
+    final mobileOrEmailValidation = Validators.validateMobileOrEmail(mobileNoOrEmailController.text);
     if (mobileOrEmailValidation != null) {
       mobileOrEmailError = mobileOrEmailValidation;
       updateViewState();
@@ -274,6 +277,9 @@ class LoginProvider extends BaseChangeNotifier {
   void _setRequiredFieldErrors() {
     if (_hasEmptyMobileOrEmail()) {
       mobileOrEmailError = _mobileOrEmailRequiredMessage;
+    }
+    else {
+      mobileOrEmailError = '';
     }
     if (passwordController.text.isEmpty) {
       passwordError = _passwordRequiredMessage;

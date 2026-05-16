@@ -10,6 +10,7 @@ import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:go_router/go_router.dart';
+import 'package:walima_llc/features/registration/presentation/widgets/static_text_widget.dart';
 
 class FamilyDetailsScreen extends ConsumerStatefulWidget {
   const FamilyDetailsScreen({super.key});
@@ -52,8 +53,13 @@ class _FamilyDetailsScreenState extends ConsumerState<FamilyDetailsScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(
+                    UpperLayer(
                       imagePath: AppImages.familyDetails,
+                      trailingText: 'Skip',
+                      isTrailing: true,
+                      onTrailingTap: () {
+                        context.push(Paths.financialStatus);
+                      },
                     ),
                     body(),
                   ],
@@ -66,10 +72,11 @@ class _FamilyDetailsScreenState extends ConsumerState<FamilyDetailsScreen> {
   Widget body() {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           spacing: 10,
           children: [
+            const StaticTextWidget(title: 'Family Details', subtitle: 'This is optional - you can add later',isOptional: true),
             dataInsertField(),
             const Spacer(),
             bottomAction(),
@@ -103,43 +110,56 @@ class _FamilyDetailsScreenState extends ConsumerState<FamilyDetailsScreen> {
           isSearch: false,
         ),
 
-        DropDownField(
-          headLine: 'No. of Sisters',
-          hintText: 'Select',
-          popUpHeader: 'Select No. of Sisters',
-          items: provider.siblingCountList,
-          controller: provider.noOfSisterController,
-          isSearch: false,
+        Row(
+          spacing: 10,
+          children: [
+            Expanded(
+              child: DropDownField(
+                headLine: 'No. of Sisters',
+                hintText: 'Select',
+                popUpHeader: 'Select No. of Sisters',
+                items: provider.siblingCountList,
+                controller: provider.noOfSisterController,
+                isSearch: false,
+              ),
+            ),
+
+            Expanded(
+              child: DropDownField(
+                headLine: 'No. of Brothers',
+                hintText: 'Select',
+                popUpHeader: 'Select No. of Brothers',
+                items: provider.siblingCountList,
+                controller: provider.noOfBrotherController,
+                isSearch: false,
+              ),
+            ),
+          ],
         ),
 
-        DropDownField(
-          headLine: 'No. of Brothers',
-          hintText: 'Select',
-          popUpHeader: 'Select No. of Brothers',
-          items: provider.siblingCountList,
-          controller: provider.noOfBrotherController,
-          isSearch: false,
-        ),
       ],
     );
   }
 
   Widget bottomAction() {
-    final hasAnyValue = provider.motherDetailsController.text.isEmpty ||
-        provider.fatherDetailsController.text.isEmpty ||
-        provider.noOfSisterController.text.isEmpty ||
-        provider.noOfBrotherController.text.isEmpty;
+    final hasAnyValue = provider.motherDetailsController.text.isNotEmpty ||
+        provider.fatherDetailsController.text.isNotEmpty ||
+        provider.noOfSisterController.text.isNotEmpty ||
+        provider.noOfBrotherController.text.isNotEmpty;
 
     return PrimaryButtons(
-      buttonStyle: provider.motherDetailsController.text.isNotEmpty &&
-              provider.fatherDetailsController.text.isNotEmpty &&
-              provider.noOfSisterController.text.isNotEmpty &&
+      buttonStyle: provider.motherDetailsController.text.isNotEmpty ||
+              provider.fatherDetailsController.text.isNotEmpty ||
+              provider.noOfSisterController.text.isNotEmpty ||
               provider.noOfBrotherController.text.isNotEmpty
-          ? ButtonsStyle.activePrimaryButton
+          ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
+      verticalPadding: 14,
+      borderRadius: 50,
+      svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
       onTap: () async{
-        if (hasAnyValue) return;
+        if (!hasAnyValue) return;
         final screenProvider = ref.read(familyDetailsScreenProvider);
         screenProvider.updateViewState(loadingState: RegistrationScreenStates.isProfileFor);
          final updated = await provider.updateFamilyDetails(context);

@@ -15,6 +15,7 @@ import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:go_router/go_router.dart';
+import 'package:walima_llc/features/registration/presentation/widgets/static_text_widget.dart';
 
 class FamilyFinancialStatusScreen extends ConsumerStatefulWidget {
   const FamilyFinancialStatusScreen({super.key});
@@ -58,7 +59,13 @@ class _FamilyFinancialStatusScreenState
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.familyDetails),
+                     UpperLayer(imagePath: AppImages.familyDetails,
+                      trailingText: 'Skip',
+                      isTrailing: true,
+                      onTrailingTap: () {
+                        context.push(Paths.profileCreatedStatus);
+                      },
+                    ),
                     body(),
                   ],
                 ),
@@ -70,10 +77,11 @@ class _FamilyFinancialStatusScreenState
   Widget body() {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           spacing: 10,
           children: [
+            const StaticTextWidget(title: 'Family\'s Financial Status', subtitle: 'Helps find compatible matches', isOptional: true),
             dataInsertField(),
             bottomAction(),
             const SizedBox(height: 20),
@@ -89,47 +97,47 @@ class _FamilyFinancialStatusScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 10,
         children: [
-          Column(
-            spacing: 10,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Live with Family',
-                style: TextStyle(
-                  fontSize: TextSize.font14(context),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: List.generate(provider.isWithFamilyDataList.length,
-                    (index) {
-                  final incomePeriod = provider.isWithFamilyDataList[index];
-
-                  double screenWidth = MediaQuery.of(context).size.width - 40;
-                  double itemWidth = (screenWidth - 10) / 2;
-
-                  return SizedBox(
-                    width: itemWidth,
-                    child: SelectionCard(
-                      buttonStyle: incomePeriod.isSelected
-                          ? SelectionStyle.selectedRadio
-                          : SelectionStyle.unSelectedRadio,
-                      onTap: () {
-                        provider.selectedIsWithFamily(index);
-                      },
-                      isSelected: incomePeriod.isSelected,
-                      title: incomePeriod.name,
-                    ),
-                  );
-                }),
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 10,
-          ),
+          // Column(
+          //   spacing: 10,
+          //   crossAxisAlignment: CrossAxisAlignment.start,
+          //   children: [
+          //     Text(
+          //       'Live with Family',
+          //       style: TextStyle(
+          //         fontSize: TextSize.font14(context),
+          //         fontWeight: FontWeight.w500,
+          //       ),
+          //     ),
+          //     Wrap(
+          //       spacing: 10,
+          //       runSpacing: 10,
+          //       children: List.generate(provider.isWithFamilyDataList.length,
+          //           (index) {
+          //         final incomePeriod = provider.isWithFamilyDataList[index];
+          //
+          //         double screenWidth = MediaQuery.of(context).size.width - 40;
+          //         double itemWidth = (screenWidth - 10) / 2;
+          //
+          //         return SizedBox(
+          //           width: itemWidth,
+          //           child: SelectionCard(
+          //             buttonStyle: incomePeriod.isSelected
+          //                 ? SelectionStyle.selectedRadio
+          //                 : SelectionStyle.unSelectedRadio,
+          //             onTap: () {
+          //               provider.selectedIsWithFamily(index);
+          //             },
+          //             isSelected: incomePeriod.isSelected,
+          //             title: incomePeriod.name,
+          //           ),
+          //         );
+          //       }),
+          //     ),
+          //   ],
+          // ),
+          // const SizedBox(
+          //   height: 10,
+          // ),
           Text(
             'Family\'s Financial Status',
             style: TextStyle(
@@ -302,12 +310,15 @@ class _FamilyFinancialStatusScreenState
   }
 
   Widget bottomAction() {
-    final hasAnyValue = provider.selectedIsWithFamilyStatus == null;
+    final hasAnyValue = provider.selectedFamilyEconomicCondition == null;
 
     return PrimaryButtons(
-      buttonStyle: provider.selectedIsWithFamilyStatus != null
-          ? ButtonsStyle.activePrimaryButton
+      buttonStyle: provider.selectedFamilyEconomicCondition != null
+          ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
+      svgIconPath: AppImages.arrowRightSvgIcon,
+      verticalPadding: 14,
+      borderRadius: 50,
       title: 'Continue & Submit',
       onTap: () async {
         if (hasAnyValue) return;

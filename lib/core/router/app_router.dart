@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:walima_llc/features/biodata/presentation/screens/biodata_generator_screen.dart';
+import 'package:walima_llc/features/login/presentation/login_with_email_screen.dart';
 import 'package:walima_llc/features/matches/presentation/screens/filters/new_filter.dart';
 import 'package:walima_llc/features/contact_filter/presentation/screens/contact_filter_screen.dart';
 import 'package:walima_llc/features/account_setting/presentation/screens/account_setting_screen.dart';
@@ -34,6 +35,7 @@ import 'package:walima_llc/features/registration/presentation/screens/email_phon
 import 'package:walima_llc/features/registration/presentation/screens/family_details.dart';
 import 'package:walima_llc/features/registration/presentation/screens/family_financial_status.dart';
 import 'package:walima_llc/features/registration/presentation/screens/hobbies_interests.dart';
+import 'package:walima_llc/features/registration/presentation/screens/marriage_intention.dart';
 import 'package:walima_llc/features/registration/presentation/screens/photo_upload.dart';
 import 'package:walima_llc/features/registration/presentation/screens/profile_created_status.dart';
 import 'package:walima_llc/features/registration/presentation/screens/profile_is_for.dart';
@@ -81,6 +83,11 @@ GoRouter goRouter(Ref ref) {
         path: Paths.login,
         name: Routes.login,
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: Paths.loginWithEmail,
+        name: Routes.loginWithEmail,
+        builder: (context, state) => const LoginWithEmailScreen(),
       ),
       GoRoute(
         path: Paths.sendOtp,
@@ -145,6 +152,11 @@ GoRouter goRouter(Ref ref) {
         path: Paths.yourReligion,
         name: Routes.yourReligion,
         builder: (context, state) => const YourReligion(),
+      ),
+      GoRoute(
+        path: Paths.marriageIntention,
+        name: Routes.marriageIntention,
+        builder: (context, state) => const MarriageIntentionScreen(),
       ),
       GoRoute(
         path: Paths.emailPhone,

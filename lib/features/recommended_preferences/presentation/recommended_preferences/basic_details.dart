@@ -12,6 +12,7 @@ import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:go_router/go_router.dart';
+import 'package:walima_llc/features/registration/presentation/widgets/static_text_widget.dart';
 
 class BasicDetailsScreen extends ConsumerStatefulWidget {
   const BasicDetailsScreen({super.key});
@@ -50,14 +51,17 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
               ? const Loading()
               : Column(
             children: [
-              const UpperLayer(
+               UpperLayer(
                   imagePath: AppImages.recommendedPreferences,
                   isShowAppbar: true,
                   isBackButton: true,
                   isTrailing: true,
                   trailingText: 'Skip',
-                  onTrailingTap: null),
-              body(),
+                  onTrailingTap: (){
+                    context.push(Paths.community);
+                  },
+               ),
+               body(),
             ],
           ),
         ),
@@ -68,11 +72,16 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
   Widget body() {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           spacing: 10,
           children: [
-            view(),
+            const StaticTextWidget(
+              title: 'Preference Details',
+              subtitle:
+              'Choose your preferred age, height, and marital status for recommended matches.',
+            ),
+            Expanded(child: view()),
             bottomAction(),
             const SizedBox(height: 20),
           ],
@@ -82,9 +91,10 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
   }
 
   Widget view() {
-    return Expanded(
+    return SingleChildScrollView(
       child: Column(
         spacing: 10,
+        mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -133,37 +143,34 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
               fontWeight: FontWeight.w500,
             ),
           ),
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  const double spacing = 10.0;
-                  return Consumer(builder: (context, ref, _) {
-                    final provider = ref.watch(recommendedPreferencesProvider);
-                    return Wrap(
-                      spacing: spacing,
-                      runSpacing: spacing,
-                      children: List.generate(provider.maritalStatusDataList.length, (index) {
-                        final item = provider.maritalStatusDataList[index];
+          LayoutBuilder(
+            builder: (context, constraints) {
+              const double spacing = 10.0;
+              return Consumer(builder: (context, ref, _) {
+                final provider = ref.watch(recommendedPreferencesProvider);
+                return Wrap(
+                  spacing: spacing,
+                  runSpacing: spacing,
+                  children: List.generate(provider.maritalStatusDataList.length, (index) {
+                    final item = provider.maritalStatusDataList[index];
 
-                        return SelectionCard(
-                          buttonStyle: item.isSelected
-                              ? SelectionStyle.selectedCheckbox
-                              : SelectionStyle.unSelectedCheckbox,
-                          onTap: () {
-                            provider.toggleMaritalStatus(index);
-                          },
-                          isSelected: item.isSelected,
-                          title: item.name,
-                        );
-                      }),
+                    return SelectionCard(
+                      borderRadius: 40,
+                      buttonStyle: item.isSelected
+                          ? SelectionStyle.selectedCheckbox
+                          : SelectionStyle.unSelectedCheckbox,
+                      onTap: () {
+                        provider.toggleMaritalStatus(index);
+                      },
+                      isSelected: item.isSelected,
+                      title: item.name,
                     );
-                  });
-                },
-              ),
-            ),
+                  }),
+                );
+              });
+            },
           ),
+          SizedBox(height: MediaQuery.sizeOf(context).height * 0.02),
         ],
       ),
     );
@@ -171,7 +178,10 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: ButtonsStyle.activePrimaryButton,
+      buttonStyle: ButtonsStyle.iconicDynamicButton,
+      verticalPadding: 14,
+      borderRadius: 50,
+      svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
       onTap: () {
         context.push(Paths.community);

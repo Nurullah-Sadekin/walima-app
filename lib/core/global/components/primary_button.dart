@@ -15,9 +15,10 @@ class PrimaryButtons extends StatelessWidget {
     this.textColor,
     this.bgColor,
     this.borderColor,
+    this.borderRadius,
     this.svgIconColor,
     this.svgIconPath,
-    this.iconLeftPosition = true,
+    this.iconLeftPosition = false,
     this.isExpand = true,
     this.verticalPadding,
     this.horizontalPadding,
@@ -31,6 +32,7 @@ class PrimaryButtons extends StatelessWidget {
   final BuildContext? context;
   final Color? textColor;
   final Color? bgColor;
+  final double? borderRadius;
   final Color? borderColor;
   final Color? svgIconColor;
   final bool? iconLeftPosition;
@@ -59,6 +61,9 @@ class PrimaryButtons extends StatelessWidget {
 
       case (ButtonsStyle.authButton):
         return authButton(context);
+
+      case (ButtonsStyle.authButton2):
+        return authButton2(context);
     }
   }
 
@@ -72,7 +77,7 @@ class PrimaryButtons extends StatelessWidget {
         decoration: ShapeDecoration(
           color: AppColors.primary,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(borderRadius ?? 6),
           ),
         ),
         child: Row(
@@ -104,7 +109,7 @@ class PrimaryButtons extends StatelessWidget {
           color: Colors.white,
           shape: RoundedRectangleBorder(
             side: const BorderSide(width: 1, color: AppColors.primary),
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(borderRadius ?? 6),
           ),
         ),
         child: Row(
@@ -134,12 +139,11 @@ class PrimaryButtons extends StatelessWidget {
       onTap: onTap,
       child: Container(
           alignment: Alignment.center,
-          padding: const EdgeInsets.symmetric(
-            vertical: 10,
+          padding:  EdgeInsets.symmetric(vertical: verticalPadding ?? 10,
           ),
           decoration: BoxDecoration(
             color: AppColors.disableBackground,
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(borderRadius ?? 6),
           ),
           child: Text(
             title ?? '',
@@ -161,7 +165,7 @@ class PrimaryButtons extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: bgColor ?? Colors.white,
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(borderRadius ?? 6),
           border: Border.all(color: AppColors.greyLight, width: 1),
         ),
         child: Text(
@@ -181,10 +185,9 @@ class PrimaryButtons extends StatelessWidget {
       child: Container(
         padding:  EdgeInsets.symmetric(vertical: verticalPadding ?? 10),
         decoration: BoxDecoration(
-          color: bgColor,
-          border:
-              Border.all(color: borderColor ?? Colors.transparent, width: 1),
-          borderRadius: BorderRadius.circular(6),
+          color: bgColor ?? AppColors.primary,
+          border: Border.all(color: borderColor ?? Colors.transparent, width: 1),
+          borderRadius: BorderRadius.circular(borderRadius ?? 6),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.max,
@@ -196,7 +199,7 @@ class PrimaryButtons extends StatelessWidget {
                 imagePath: svgIconPath,
                 width: iconSize ?? 20,
                 height: iconSize ?? 20,
-                color: svgIconColor,
+                color: svgIconColor ?? Colors.white,
               ),
             if (iconLeftPosition! && svgIconPath != null)
               const SizedBox(
@@ -220,7 +223,7 @@ class PrimaryButtons extends StatelessWidget {
                 imagePath: svgIconPath,
                 width: 20,
                 height: 20,
-                color: svgIconColor,
+                color: svgIconColor ?? Colors.white,
               ),
           ],
         ),
@@ -235,9 +238,8 @@ class PrimaryButtons extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
         decoration: BoxDecoration(
           color: bgColor,
-          border:
-              Border.all(color: borderColor ?? Colors.transparent, width: 1),
-          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: borderColor ?? Colors.transparent, width: 1),
+          borderRadius: BorderRadius.circular(borderRadius ?? 12),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.max,
@@ -261,7 +263,50 @@ class PrimaryButtons extends StatelessWidget {
               style: TextStyle(
                 color: textColor ?? Colors.white,
                 fontSize: TextSize.font16(context),
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget authButton2(context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 32),
+        decoration: BoxDecoration(
+          color: bgColor,
+          border: Border.all(color: borderColor ?? Colors.transparent, width: 1),
+          borderRadius: BorderRadius.circular(borderRadius ?? 12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            svgIconPath != null
+                ? ShowImage(
+                    imagePath: svgIconPath,
+                    width: 20,
+                    height: 20,
+                    color: svgIconColor,
+                  )
+                : const SizedBox.shrink(),
+
+            Expanded(
+              child: Center(
+                child: Text(
+                  title ?? '',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: textColor ?? Colors.white,
+                    fontSize: TextSize.font16(context),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
             ),
           ],
@@ -277,5 +322,6 @@ enum ButtonsStyle {
   disableButton,
   cancelButton,
   iconicDynamicButton,
-  authButton
+  authButton,
+  authButton2,
 }

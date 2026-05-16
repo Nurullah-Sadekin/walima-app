@@ -14,6 +14,7 @@ class SelectionCard extends StatelessWidget {
     this.isExpand = false,
     this.noBorder = false,
     this.radiaBackgroundColor ,
+    this.borderRadius,
   });
 
   final SelectionStyle buttonStyle;
@@ -23,6 +24,8 @@ class SelectionCard extends StatelessWidget {
   final bool isExpand;
   final bool noBorder;
   final Color? radiaBackgroundColor;
+  final double? borderRadius;
+
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +56,7 @@ class SelectionCard extends StatelessWidget {
           color: radiaBackgroundColor ?? Colors.white,
           shape: RoundedRectangleBorder(
             side: noBorder ? BorderSide.none : const BorderSide(width: 1, color: AppColors.inputBorderColor),
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(borderRadius ?? 6),
           ),
         ),
         child: Row(
@@ -72,7 +75,7 @@ class SelectionCard extends StatelessWidget {
                 title ?? '',
                 style: TextStyle(
                   color: AppColors.textPrimaryLight,
-                  fontSize: TextSize.font14(context),
+                  fontSize: TextSize.font13(context),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -92,7 +95,7 @@ class SelectionCard extends StatelessWidget {
           color: radiaBackgroundColor ?? Colors.white,
           shape: RoundedRectangleBorder(
             side: noBorder ? BorderSide.none : const BorderSide(width: 1, color: AppColors.inputBorderColor),
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(borderRadius ?? 6),
           ),
         ),
         child: Row(
@@ -111,7 +114,7 @@ class SelectionCard extends StatelessWidget {
                 title ?? '',
                 style: TextStyle(
                   color: AppColors.textSecondaryLight,
-                  fontSize: TextSize.font14(context),
+                  fontSize: TextSize.font13(context),
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -129,7 +132,7 @@ class SelectionCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primaryVariant : Colors.white,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(borderRadius ?? 8),
           border: Border.all(color: AppColors.primary, width: 1),
         ),
         child: Text(
@@ -151,7 +154,7 @@ class SelectionCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
         decoration: BoxDecoration(
           color: AppColors.disableBackground,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(borderRadius ?? 8),
         ),
         child: Text(
           title ?? '',
@@ -171,10 +174,10 @@ class SelectionCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
         decoration: ShapeDecoration(
-          color: Colors.white,
+          color: AppColors.primaryVariant,
           shape: RoundedRectangleBorder(
             side: BorderSide(width: 1, color: isSelected ? AppColors.primary : AppColors.inputBorderColor),
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(borderRadius ?? 6),
           ),
         ),
         child: Row(
@@ -209,7 +212,7 @@ class SelectionCard extends StatelessWidget {
           color: Colors.white,
           shape: RoundedRectangleBorder(
             side: const BorderSide(width: 1, color: AppColors.inputBorderColor),
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(borderRadius ?? 6),
           ),
         ),
         child: Row(
@@ -224,7 +227,7 @@ class SelectionCard extends StatelessWidget {
             Text(
               title ?? '',
               style: TextStyle(
-                color: AppColors.textPrimaryLight,
+                color: AppColors.textSecondaryLight,
                 fontSize: TextSize.font14(context),
                 fontWeight: FontWeight.w500,
               ),

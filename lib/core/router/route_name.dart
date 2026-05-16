@@ -3,6 +3,7 @@ abstract class Paths {
 
   // Login Screens
   static const login = '/login';
+  static const loginWithEmail = '/loginWithEmail';
   static const sendOtp = '/sendOtp';
   static const otpVerify = '/otpVerify';
   static const newPassword = '/newPassword';
@@ -18,6 +19,7 @@ abstract class Paths {
   static const isProfileFor = '/isProfileFor';
   static const aboutYou = '/aboutYou';
   static const yourReligion = '/yourReligion';
+  static const marriageIntention = '/marriageIntention';
   static const emailPhone = '/emailPhone';
   static const location = '/location';
   static const maritalStatus = '/maritalStatus';
@@ -78,6 +80,7 @@ abstract class Routes {
 
   // Login Screens
   static const login = 'login';
+  static const loginWithEmail = 'loginWithEmail';
   static const sendOtp = 'sendOtp';
   static const otpVerify = 'otpVerify';
   static const newPassword = 'newPassword';
@@ -93,6 +96,7 @@ abstract class Routes {
   static const isProfileFor = 'isProfileFor';
   static const aboutYou = 'aboutYou';
   static const yourReligion = 'yourReligion';
+  static const marriageIntention = 'marriageIntention';
   static const emailPhone = 'emailPhone';
   static const location = 'location';
   static const maritalStatus = 'maritalStatus';
