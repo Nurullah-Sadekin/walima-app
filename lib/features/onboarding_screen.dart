@@ -1,15 +1,25 @@
+import 'dart:io';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:walima_llc/core/network/app_urls.dart';
 import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/core/utils/auth_session_manager.dart';
+import 'package:walima_llc/core/utils/dialog_utils.dart';
 import 'package:walima_llc/core/utils/firebase_messaging_service.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/social_sign_in_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:walima_llc/core/utils/link_opener.dart';
+import 'package:walima_llc/features/login/data/models/login_response.dart';
+import 'package:walima_llc/features/login/data/repository/login_repository.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -19,6 +29,86 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
+  bool _isSocialLoading = false;
+
+  Future<void> _handleLoginResponse(LoginResponse response) async {
+    final success = response.code == 'SUCCESS' &&
+        await AuthSessionManager.applyLoginResponse(response);
+
+    if (success) {
+      if (!mounted) return;
+      context.go(Paths.anchor);
+      return;
+    }
+
+    if (!mounted) return;
+    DialogUtils.showErrorDialog(
+      context: context,
+      message: response.message ?? 'Login failed. Please try again.',
+    );
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() => _isSocialLoading = true);
+    try {
+      final result = await SocialSignInService.signInWithGoogle();
+      if (result == null) return;
+
+      final response = await LoginRepository.signInWithGoogle(
+        idToken: result.idToken,
+        accessToken: result.accessToken,
+        serverAuthCode: result.serverAuthCode,
+      );
+      await _handleLoginResponse(response);
+    } catch (e) {
+      if (!mounted) return;
+      DialogUtils.showErrorDialog(context: context, message: e.toString());
+    } finally {
+      if (mounted) setState(() => _isSocialLoading = false);
+    }
+  }
+
+  Future<void> _signInWithApple() async {
+    if (kIsWeb || !(Platform.isIOS || Platform.isMacOS)) {
+      DialogUtils.showErrorDialog(
+        context: context,
+        message: 'Apple sign-in is only available on iOS devices.',
+      );
+      return;
+    }
+
+    setState(() => _isSocialLoading = true);
+    try {
+      final result = await SocialSignInService.signInWithApple();
+      if (result == null) return;
+
+      final response = await LoginRepository.signInWithApple(
+        identityToken: result.identityToken,
+        authorizationCode: result.authorizationCode,
+        nonce: result.nonce,
+        email: result.email,
+        givenName: result.givenName,
+        familyName: result.familyName,
+      );
+      await _handleLoginResponse(response);
+    } on SignInWithAppleAuthorizationException catch (e) {
+      if (!mounted) return;
+      if (e.code == AuthorizationErrorCode.canceled) return;
+      final message = e.message;
+      DialogUtils.showErrorDialog(
+        context: context,
+        message: message.isNotEmpty
+            ? message
+            : 'Apple sign-in failed. Please try again.',
+      );
+    } catch (e) {
+      if (!mounted) return;
+      DialogUtils.showErrorDialog(context: context, message: e.toString());
+    } finally {
+      if (mounted) setState(() => _isSocialLoading = false);
+    }
+  }
+
   Future<void> _openHelpModal() async {
     await showModalBottomSheet<void>(
       context: context,
@@ -107,189 +197,199 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Stack(
-        children: [
-          const ShowImage(
-            imagePath: 'assets/images/login_bg.png',
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: double.infinity,
-          ),
-          Positioned.fill(
-            child: Container(
-              color: const Color(0xFF500F23).withValues(alpha: 0.10),
+    return TransparentLoading(
+      isLoading: _isSocialLoading,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Stack(
+          children: [
+            const ShowImage(
+              imagePath: 'assets/images/login_bg.png',
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
             ),
-          ),
-          Positioned.fill(
-            child: Align(
-              alignment: Alignment.bottomCenter,
+            Positioned.fill(
               child: Container(
-                height: MediaQuery.of(context).size.height * 0.58,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    stops: [0.0, 0.30, 0.60, 1.0],
-                    colors: [
-                      Color.fromRGBO(10, 2, 5, 0.97),
-                      Color.fromRGBO(10, 2, 5, 0.88),
-                      Color.fromRGBO(10, 2, 5, 0.50),
-                      Colors.transparent,
-                    ],
+                color: const Color(0xFF500F23).withValues(alpha: 0.10),
+              ),
+            ),
+            Positioned.fill(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  height: MediaQuery.of(context).size.height * 0.58,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      stops: [0.0, 0.30, 0.60, 1.0],
+                      colors: [
+                        Color.fromRGBO(10, 2, 5, 0.97),
+                        Color.fromRGBO(10, 2, 5, 0.88),
+                        Color.fromRGBO(10, 2, 5, 0.50),
+                        Colors.transparent,
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 10, 24, 18),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _PillButton(
-                        icon: Icons.language,
-                        label: 'English',
-                        onTap: () {},
-                      ),
-                      _CircleButton(
-                        icon: Icons.help_outline,
-                        onTap: _openHelpModal,
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  Column(
-                    children: [
-                      const ShowImage(
-                        imagePath: 'assets/svgs/walima.svg',
-                        width: 270,
-                        height: 72,
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'MATCH · MEET · MARRY',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.75),
-                          fontSize: TextSize.font12(context),
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 3.2,
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 10, 24, 18),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _PillButton(
+                          icon: Icons.language,
+                          label: 'English',
+                          onTap: () {},
                         ),
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  Column(
-                    children: [
-                      _CtaButton(
-                        backgroundColor: const Color(0xFFE8447A),
-                        foregroundColor: Colors.white,
-                        icon: Icons.phone_iphone,
-                        label: 'Continue with Phone',
-                        onTap: () => context.push(Paths.loginWithPhone),
-                      ),
-                      const SizedBox(height: 10),
-                      _CtaButton(
-                        backgroundColor: Colors.white,
-                        foregroundColor: const Color(0xFF1A1A1A),
-                        icon: Icons.email_outlined,
-                        label: 'Continue with Email',
-                        onTap: () => context.push(Paths.loginWithEmail),
-                      ),
-                      const SizedBox(height: 12),
-                      continueWithButton(),
-                      const SizedBox(height: 40),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            spacing: 6,
-                            children: [
-                              Text(
-                                "Don't have an account?",
-                                style: TextStyle(
-                                  color: AppColors.hintTextColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: TextSize.font14(context),
-                                ),
-                              ),
-                              InkWell(
-                                onTap: () {
-                                  context.pushNamed(Routes.isProfileFor);
-                                },
-                                child: Text(
-                                  'Create now',
+                        _CircleButton(
+                          icon: Icons.help_outline,
+                          onTap: _openHelpModal,
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    Column(
+                      children: [
+                        const ShowImage(
+                          imagePath: 'assets/svgs/walima.svg',
+                          width: 270,
+                          height: 72,
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          'MATCH · MEET · MARRY',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.75),
+                            fontSize: TextSize.font12(context),
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 3.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    Column(
+                      children: [
+                        _CtaButton(
+                          backgroundColor: const Color(0xFFE8447A),
+                          foregroundColor: Colors.white,
+                          icon: Icons.phone_iphone,
+                          label: 'Continue with Phone',
+                          onTap: () => context.push(Paths.loginWithPhone),
+                        ),
+                        const SizedBox(height: 10),
+                        _CtaButton(
+                          backgroundColor: Colors.white,
+                          foregroundColor: const Color(0xFF1A1A1A),
+                          icon: Icons.email_outlined,
+                          label: 'Continue with Email',
+                          onTap: () => context.push(Paths.loginWithEmail),
+                        ),
+                        const SizedBox(height: 12),
+                        continueWithButton(),
+                        const SizedBox(height: 40),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              spacing: 6,
+                              children: [
+                                Text(
+                                  "Don't have an account?",
                                   style: TextStyle(
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: TextSize.font16(context),
+                                    color: AppColors.hintTextColor,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: TextSize.font14(context),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 40),
-                      RichText(
-                        text: TextSpan(
-                          text: 'By continuing you agree to our ',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.40),
-                            fontSize: TextSize.font12(context),
-                            fontWeight: FontWeight.w300,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: 'Terms',
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.75),
-                                fontSize: TextSize.font12(context),
-                                fontWeight: FontWeight.w500,
-                              ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () async {
-                                  // open terms page
-                                  await LinkOpener.openLink(context, 'Terms & Conditions', AppUrls.termsUrl);
-                                },
-                            ),
-                            TextSpan(
-                              text: ' and ',
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.40),
-                                fontSize: TextSize.font12(context),
-                                fontWeight: FontWeight.w300,
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'Privacy policy',
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.75),
-                                fontSize: TextSize.font12(context),
-                                fontWeight: FontWeight.w500,
-                              ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () async {
-                                  await LinkOpener.openLink(context, 'Privacy Policy', AppUrls.privacyPolicyUrl);
-                                },
+                                InkWell(
+                                  onTap: () {
+                                    context.pushNamed(Routes.isProfileFor);
+                                  },
+                                  child: Text(
+                                    'Create now',
+                                    style: TextStyle(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: TextSize.font16(context),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                    ],
-                  ),
-                ],
+                        const SizedBox(height: 40),
+                        RichText(
+                          text: TextSpan(
+                            text: 'By continuing you agree to our ',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.40),
+                              fontSize: TextSize.font12(context),
+                              fontWeight: FontWeight.w300,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: 'Terms',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.75),
+                                  fontSize: TextSize.font12(context),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () async {
+                                    await LinkOpener.openLink(
+                                      context,
+                                      'Terms & Conditions',
+                                      AppUrls.termsUrl,
+                                    );
+                                  },
+                              ),
+                              TextSpan(
+                                text: ' and ',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.40),
+                                  fontSize: TextSize.font12(context),
+                                  fontWeight: FontWeight.w300,
+                                ),
+                              ),
+                              TextSpan(
+                                text: 'Privacy policy',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.75),
+                                  fontSize: TextSize.font12(context),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () async {
+                                    await LinkOpener.openLink(
+                                      context,
+                                      'Privacy Policy',
+                                      AppUrls.privacyPolicyUrl,
+                                    );
+                                  },
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -298,19 +398,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Column(
       spacing: 12,
       children: [
-        PrimaryButtons(
-          buttonStyle: ButtonsStyle.authButton,
-          svgIconPath: AppImages.apple,
-          svgIconColor: AppColors.textPrimaryLight,
-          textColor: AppColors.textPrimaryLight,
-          borderRadius: 50,
-          borderColor: AppColors.inputBorderColor,
-          bgColor: Colors.white,
-          onTap: () {
-            //context.push(Paths.isProfileFor);
-          },
-          title: 'Continue with Apple',
-        ),
+        if (!kIsWeb && Platform.isIOS)
+          PrimaryButtons(
+            buttonStyle: ButtonsStyle.authButton,
+            svgIconPath: AppImages.apple,
+            svgIconColor: AppColors.textPrimaryLight,
+            textColor: AppColors.textPrimaryLight,
+            borderRadius: 50,
+            borderColor: AppColors.inputBorderColor,
+            bgColor: Colors.white,
+            onTap: _signInWithApple,
+            title: 'Continue with Apple',
+          ),
         PrimaryButtons(
           buttonStyle: ButtonsStyle.authButton,
           svgIconPath: AppImages.google,
@@ -318,9 +417,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           borderRadius: 50,
           borderColor: AppColors.inputBorderColor,
           bgColor: Colors.white,
-          onTap: () {
-            //context.push(Paths.isProfileFor);
-          },
+          onTap: _signInWithGoogle,
           title: 'Continue with Google',
         ),
       ],
