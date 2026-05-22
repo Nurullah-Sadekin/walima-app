@@ -43,6 +43,7 @@ import 'package:walima_llc/features/registration/presentation/screens/profile_is
 import 'package:walima_llc/features/registration/presentation/screens/verify_number.dart';
 import 'package:walima_llc/features/registration/presentation/screens/verify_otp_for_sign_up.dart';
 import 'package:walima_llc/features/registration/presentation/screens/your_religion.dart';
+import 'package:walima_llc/features/settings/presentation/screens/language_settings_screen.dart';
 import 'package:walima_llc/features/settings/presentation/screens/settings_screen.dart';
 import 'package:walima_llc/core/connectivity/connectivity_keys.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -89,7 +90,7 @@ GoRouter goRouter(Ref ref) {
         path: Paths.loginWithEmail,
         name: Routes.loginWithEmail,
         builder: (context, state) => const LoginWithEmailScreen(),
-      ),   
+      ),
       GoRoute(
         path: Paths.loginWithPhone,
         name: Routes.loginWithPhone,
@@ -133,6 +134,11 @@ GoRouter goRouter(Ref ref) {
         path: Paths.settings,
         name: Routes.settings,
         builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: Paths.languageSettings,
+        name: Routes.languageSettings,
+        builder: (context, state) => const LanguageSettingsScreen(),
       ),
       GoRoute(
         path: Paths.notifications,

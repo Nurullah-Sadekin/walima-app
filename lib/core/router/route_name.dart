@@ -13,6 +13,7 @@ abstract class Paths {
   static const splash = '/';
   static const anchor = '/anchor';
   static const settings = '/settings';
+  static const languageSettings = '/languageSettings';
   static const notifications = '/notifications';
   static const onboarding = '/onboarding';
 
@@ -154,4 +155,8 @@ abstract class Routes {
 
   // Profile Preview
   static const profilePreview = 'profilePreview';
+
+  // app settings
+  static const appSettings = 'appSettings';
+  static const languageSettings = 'languageSettings';
 }
