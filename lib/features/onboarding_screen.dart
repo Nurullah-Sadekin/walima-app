@@ -4,10 +4,12 @@ import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
+import 'package:walima_llc/core/network/app_urls.dart';
 import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/firebase_messaging_service.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
 import 'package:go_router/go_router.dart';
+import 'package:walima_llc/core/utils/link_opener.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -228,8 +230,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               fontWeight: FontWeight.w500,
                             ),
                             recognizer: TapGestureRecognizer()
-                              ..onTap = () {
+                              ..onTap = () async {
                                 // open terms page
+                                await LinkOpener.openLink(context, 'Terms & Conditions', AppUrls.termsUrl);
                               },
                           ),
                           TextSpan(
@@ -248,8 +251,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               fontWeight: FontWeight.w500,
                             ),
                             recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                  // open privacy policy page
+                              ..onTap = () async {
+                                await LinkOpener.openLink(context, 'Privacy Policy', AppUrls.privacyPolicyUrl);
                               },
                           ),
                         ],
