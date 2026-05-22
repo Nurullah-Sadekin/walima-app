@@ -20,8 +20,7 @@ class LoginWithEmailScreen extends ConsumerStatefulWidget {
   const LoginWithEmailScreen({super.key});
 
   @override
-  ConsumerState<LoginWithEmailScreen> createState() =>
-      _LoginWithEmailScreenState();
+  ConsumerState<LoginWithEmailScreen> createState() => _LoginWithEmailScreenState();
 }
 
 enum _EmailLoginMode { password, otp }
@@ -176,8 +175,8 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
   }
 
   Widget staticText() {
-    final subtitle = _mode == _EmailLoginMode.password
-        ? 'Enter your registered email and password'
+    final subtitle = _mode == _EmailLoginMode.password 
+        ? 'Enter your registered email and password' 
         : 'Enter your registered email to get an OTP';
 
     return Column(
@@ -267,9 +266,7 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
           borderRadius: 50,
           prefixIcon: ShowImage(
             imagePath: AppImages.emailSvgIcon,
-            color: provider.mobileNoOrEmailController.text.isEmpty
-                ? AppColors.hintTextColor
-                : AppColors.primary,
+            color: provider.mobileNoOrEmailController.text.isEmpty ? AppColors.hintTextColor : AppColors.primary,
             width: TextSize.font16(context),
             height: TextSize.font16(context),
           ),
@@ -284,9 +281,7 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
             hintText: 'Enter your password',
             prefixIcon: ShowImage(
               imagePath: AppImages.lockPasswordSvgIcon,
-              color: provider.passwordController.text.isEmpty
-                  ? AppColors.hintTextColor
-                  : AppColors.primary,
+              color: provider.passwordController.text.isEmpty ? AppColors.hintTextColor : AppColors.primary,
               width: TextSize.font16(context),
               height: TextSize.font16(context),
             ),
@@ -312,14 +307,10 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
                         width: TextSize.font16(context),
                         margin: const EdgeInsets.only(right: 6),
                         decoration: BoxDecoration(
-                          color: provider.keepMeLoggedIn
-                              ? AppColors.primary
-                              : Colors.white,
+                          color: provider.keepMeLoggedIn ? AppColors.primary : Colors.white,
                           borderRadius: BorderRadius.circular(4),
                           border: Border.all(
-                            color: provider.keepMeLoggedIn
-                                ? AppColors.primary
-                                : AppColors.textSecondaryLight,
+                            color: provider.keepMeLoggedIn ? AppColors.primary : AppColors.textSecondaryLight,
                             width: 1,
                           ),
                         ),
@@ -366,8 +357,7 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
   }
 
   Widget loginButton() {
-    final buttonTitle =
-        _mode == _EmailLoginMode.password ? 'Log In' : 'Continue';
+    final buttonTitle = _mode == _EmailLoginMode.password ? 'Log In' : 'Continue';
     return PrimaryButtons(
       buttonStyle: ButtonsStyle.iconicDynamicButton,
       svgIconPath: AppImages.arrowRightSvgIcon,
@@ -436,8 +426,7 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white,
-                  border:
-                      Border.all(width: 1, color: AppColors.inputBorderColor),
+                  border: Border.all(width: 1, color: AppColors.inputBorderColor),
                 ),
                 child: const Center(
                   child: ShowImage(
@@ -457,8 +446,7 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white,
-                  border:
-                      Border.all(width: 1, color: AppColors.inputBorderColor),
+                  border: Border.all(width: 1, color: AppColors.inputBorderColor),
                 ),
                 child: const Center(
                   child: ShowImage(
@@ -477,8 +465,7 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white,
-                  border:
-                      Border.all(width: 1, color: AppColors.inputBorderColor),
+                  border: Border.all(width: 1, color: AppColors.inputBorderColor),
                 ),
                 child: const Center(
                   child: ShowImage(
