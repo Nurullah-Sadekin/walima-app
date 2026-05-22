@@ -17,6 +17,7 @@ class AppUrls {
   static const String getAccessToken = '$baseUrl/auth/refresh-token';
   static const String logout = '$baseUrl/auth/logout';
   static const String googleSignin = '$baseUrl/auth/google/signin';
+  static const String appleSignin = '$baseUrl/auth/apple/signin';
   static const String signUpCreateUserProfile = '$baseUrl/users/onboarding';
   static const String checkUserNameAvailability =
       '$baseUrl/users/check-username';

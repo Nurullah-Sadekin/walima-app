@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "249586231317-9dhu6j2ea39qoc3e6eukg4hk4ndhe4o7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.walima.matrimony",
+            "certificate_hash": "74bbd5b8990cb1fb2c6161b3522cb2cba7af7d01"
+          }
+        },
+        {
           "client_id": "249586231317-sftd9fqeoam50fs9t8cblmji32fpihik.apps.googleusercontent.com",
           "client_type": 3
         }

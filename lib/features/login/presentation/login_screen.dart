@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
@@ -7,11 +10,9 @@ import 'package:walima_llc/core/global/components/gradient_background.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:walima_llc/core/global/components/primary_textField.dart';
-import 'package:walima_llc/core/global/components/upper_layer.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/firebase_messaging_service.dart';
-import 'package:walima_llc/core/utils/validators.dart';
 import 'package:walima_llc/features/login/presentation/providers/login_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -112,7 +113,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               fontSize: TextSize.font16(context),
                             ),
                           ),
-                          const Icon(Icons.arrow_forward_ios,color: AppColors.primary, size:8)
+                          const Icon(Icons.arrow_forward_ios,
+                              color: AppColors.primary, size: 8)
                         ],
                       ),
                     ),
@@ -185,19 +187,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Column(
       spacing: 12,
       children: [
-        PrimaryButtons(
-          buttonStyle: ButtonsStyle.authButton2,
-          svgIconPath: AppImages.apple,
-          svgIconColor: AppColors.textPrimaryLight,
-          textColor: AppColors.textPrimaryLight,
-          borderRadius: 50,
-          borderColor: AppColors.inputBorderColor,
-          bgColor: Colors.white,
-          onTap: () {
-            //context.push(Paths.isProfileFor);
-          },
-          title: 'Continue with Apple',
-        ),
+        if (!kIsWeb && Platform.isIOS)
+          PrimaryButtons(
+            buttonStyle: ButtonsStyle.authButton2,
+            svgIconPath: AppImages.apple,
+            svgIconColor: AppColors.textPrimaryLight,
+            textColor: AppColors.textPrimaryLight,
+            borderRadius: 50,
+            borderColor: AppColors.inputBorderColor,
+            bgColor: Colors.white,
+            onTap: () => provider.signInWithApple(context),
+            title: 'Continue with Apple',
+          ),
         PrimaryButtons(
           buttonStyle: ButtonsStyle.authButton2,
           svgIconPath: AppImages.google,
@@ -205,9 +206,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           borderRadius: 50,
           borderColor: AppColors.inputBorderColor,
           bgColor: Colors.white,
-          onTap: () {
-            //context.push(Paths.isProfileFor);
-          },
+          onTap: () => provider.signInWithGoogle(context),
           title: 'Continue with Google',
         ),
         PrimaryButtons(
@@ -235,7 +234,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           child: Row(
             children: [
               const Expanded(
-                  child: Divider(color: AppColors.inputBorderColor, thickness: 1)),
+                  child:
+                      Divider(color: AppColors.inputBorderColor, thickness: 1)),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
@@ -279,5 +279,4 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ],
     );
   }
-
 }

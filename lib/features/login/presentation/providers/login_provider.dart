@@ -1,12 +1,16 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/providers/base_change_notifier.dart';
 import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/app_error_reporting_service.dart';
 import 'package:walima_llc/core/utils/firebase_messaging_service.dart';
 import 'package:walima_llc/core/utils/dialog_utils.dart';
+import 'package:walima_llc/core/utils/social_sign_in_service.dart';
 import 'package:walima_llc/core/utils/validators.dart';
 import 'package:walima_llc/features/login/data/models/login_body.dart';
 import 'package:walima_llc/features/login/data/models/login_response.dart';
@@ -22,7 +26,8 @@ import 'package:walima_llc/core/network/dio_client.dart';
 import 'package:walima_llc/features/chat/data/socket/socket_service.dart';
 
 class LoginProvider extends BaseChangeNotifier {
-  static const String _mobileOrEmailRequiredMessage = 'Please enter your mobile number or email ID';
+  static const String _mobileOrEmailRequiredMessage =
+      'Please enter your mobile number or email ID';
   static const String _passwordRequiredMessage = 'Please enter your password';
   static const String _otpIncompleteMessage = 'Please enter the complete OTP';
 
@@ -205,8 +210,8 @@ class LoginProvider extends BaseChangeNotifier {
     final isSuccess = response.code == 'SUCCESS';
     _showResendSnackBar(
       context,
-      message: response.message ??
-          (isSuccess ? 'OTP sent' : 'Failed to resend OTP'),
+      message:
+          response.message ?? (isSuccess ? 'OTP sent' : 'Failed to resend OTP'),
       isSuccess: isSuccess,
     );
   }
@@ -251,6 +256,78 @@ class LoginProvider extends BaseChangeNotifier {
     await _gotoOtpVerificationScreen(context);
   }
 
+  Future<void> signInWithGoogle(BuildContext context) async {
+    _showLoading();
+    try {
+      final result = await SocialSignInService.signInWithGoogle();
+      if (result == null) {
+        _hideLoading();
+        return;
+      }
+
+      final response = await LoginRepository.signInWithGoogle(
+        idToken: result.idToken,
+      );
+      if (!context.mounted) return;
+      await _handleLoginResult(context, response);
+    } catch (e) {
+      _hideLoading();
+      if (!context.mounted) return;
+      DialogUtils.showErrorDialog(
+        context: context,
+        message: e.toString(),
+      );
+    }
+  }
+
+  Future<void> signInWithApple(BuildContext context) async {
+    if (kIsWeb || !(Platform.isIOS || Platform.isMacOS)) {
+      DialogUtils.showErrorDialog(
+        context: context,
+        message: 'Apple sign-in is only available on iOS devices.',
+      );
+      return;
+    }
+
+    _showLoading();
+    try {
+      final result = await SocialSignInService.signInWithApple();
+      if (result == null) {
+        _hideLoading();
+        return;
+      }
+
+      final response = await LoginRepository.signInWithApple(
+        identityToken: result.identityToken,
+        authorizationCode: result.authorizationCode,
+        nonce: result.nonce,
+        email: result.email,
+        givenName: result.givenName,
+        familyName: result.familyName,
+      );
+      if (!context.mounted) return;
+      await _handleLoginResult(context, response);
+    } on SignInWithAppleAuthorizationException catch (e) {
+      _hideLoading();
+      if (!context.mounted) return;
+      if (e.code == AuthorizationErrorCode.canceled) return;
+      final message = e.message;
+      DialogUtils.showErrorDialog(
+        context: context,
+        message: message.isNotEmpty
+            ? message
+            : 'Apple sign-in failed. Please try again.',
+      );
+    } catch (e) {
+      _hideLoading();
+      if (!context.mounted) return;
+      DialogUtils.showErrorDialog(
+        context: context,
+        message: e.toString(),
+      );
+    }
+  }
+
   Future<void> _gotoOtpVerificationScreen(BuildContext context) async {
     _hideLoading();
     if (context.mounted) {
@@ -264,7 +341,8 @@ class LoginProvider extends BaseChangeNotifier {
       updateViewState();
       return false;
     }
-    final mobileOrEmailValidation = Validators.validateMobileOrEmail(mobileNoOrEmailController.text);
+    final mobileOrEmailValidation =
+        Validators.validateMobileOrEmail(mobileNoOrEmailController.text);
     if (mobileOrEmailValidation != null) {
       mobileOrEmailError = mobileOrEmailValidation;
       updateViewState();
@@ -277,8 +355,7 @@ class LoginProvider extends BaseChangeNotifier {
   void _setRequiredFieldErrors() {
     if (_hasEmptyMobileOrEmail()) {
       mobileOrEmailError = _mobileOrEmailRequiredMessage;
-    }
-    else {
+    } else {
       mobileOrEmailError = '';
     }
     if (passwordController.text.isEmpty) {
