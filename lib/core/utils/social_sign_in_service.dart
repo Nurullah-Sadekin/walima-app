@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -52,17 +53,32 @@ class SocialSignInService {
     if (account == null) return null;
 
     final authentication = await account.authentication;
-    final idToken = authentication.idToken?.trim() ?? '';
+    final googleIdToken = authentication.idToken?.trim() ?? '';
     final accessToken = authentication.accessToken?.trim() ?? '';
     final serverAuthCode = account.serverAuthCode?.trim();
 
-    if (idToken.isEmpty && accessToken.isEmpty) {
-      await googleSignIn.signOut();
-      throw StateError('Google sign-in returned empty tokens.');
+    if (googleIdToken.isEmpty && accessToken.isEmpty) {
+      try {
+        await googleSignIn.signOut();
+      } catch (_) {}
+      throw StateError('Google sign-in returned empty credentials.');
+    }
+
+    final credential = GoogleAuthProvider.credential(
+      idToken: googleIdToken.isEmpty ? null : googleIdToken,
+      accessToken: accessToken.isEmpty ? null : accessToken,
+    );
+    final userCredential =
+        await FirebaseAuth.instance.signInWithCredential(credential);
+    final firebaseIdToken =
+        (await userCredential.user?.getIdToken(true))?.trim() ?? '';
+
+    if (firebaseIdToken.isEmpty) {
+      throw StateError('Firebase sign-in returned empty ID token.');
     }
 
     return GoogleSignInResult(
-      idToken: idToken,
+      idToken: firebaseIdToken,
       accessToken: accessToken,
       serverAuthCode: serverAuthCode?.isEmpty == true ? null : serverAuthCode,
     );

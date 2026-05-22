@@ -39,6 +39,7 @@ dependencies:
   internet_connection_checker: ^1.0.0+1
   flutter_local_notifications: ^17.2.2
   firebase_core: ^3.8.1
+  firebase_auth: ^5.3.4
   firebase_crashlytics: ^4.3.10
   firebase_messaging: ^15.1.6
   device_info_plus: ^11.2.1

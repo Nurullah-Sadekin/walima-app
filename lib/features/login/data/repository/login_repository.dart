@@ -38,12 +38,15 @@ class LoginRepository {
     }
   }
 
-  static Future<LoginResponse> loginWithOtp(LoginWithOtpBody body,
-      {bool isForgotPass = false}) async {
+  static Future<LoginResponse> loginWithOtp(
+    LoginWithOtpBody body, {
+    bool isForgotPass = false,
+  }) async {
     try {
       final response = await DioClient().post(
-          isForgotPass ? AppUrls.forgotPassword : AppUrls.loginWithOTP,
-          data: body.toJson());
+        isForgotPass ? AppUrls.forgotPassword : AppUrls.loginWithOTP,
+        data: body.toJson(),
+      );
       return LoginResponse.fromJson(response.data);
     } catch (e) {
       final errorMessage = e is DioException
@@ -93,20 +96,14 @@ class LoginRepository {
   }
 
   static Future<LoginResponse> signInWithGoogle({
-    String? idToken,
-    String? accessToken,
-    String? serverAuthCode,
+    required String idToken,
   }) async {
     try {
       final response = await DioClient().post(
         AppUrls.googleSignin,
         data: <String, dynamic>{
-          if (idToken != null && idToken.trim().isNotEmpty)
-            'idToken': idToken.trim(),
-          if (accessToken != null && accessToken.trim().isNotEmpty)
-            'accessToken': accessToken.trim(),
-          if (serverAuthCode != null && serverAuthCode.trim().isNotEmpty)
-            'serverAuthCode': serverAuthCode.trim(),
+          'idToken': idToken.trim(),
+          'provider': 'google',
         },
       );
       return LoginResponse.fromJson(response.data);

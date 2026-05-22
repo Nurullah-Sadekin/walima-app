@@ -3,189 +3,29 @@ import 'dart:io';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/router/route_name.dart';
-import 'package:walima_llc/core/utils/auth_session_manager.dart';
-import 'package:walima_llc/core/utils/dialog_utils.dart';
 import 'package:walima_llc/core/utils/firebase_messaging_service.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
-import 'package:walima_llc/core/utils/social_sign_in_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:walima_llc/core/utils/link_opener.dart';
-import 'package:walima_llc/features/login/data/models/login_response.dart';
-import 'package:walima_llc/features/login/data/repository/login_repository.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:walima_llc/features/login/presentation/providers/login_provider.dart';
 
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
+  ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
-  bool _isSocialLoading = false;
-
-  Future<void> _handleLoginResponse(LoginResponse response) async {
-    final success = response.code == 'SUCCESS' &&
-        await AuthSessionManager.applyLoginResponse(response);
-
-    if (success) {
-      if (!mounted) return;
-      context.go(Paths.anchor);
-      return;
-    }
-
-    if (!mounted) return;
-    DialogUtils.showErrorDialog(
-      context: context,
-      message: response.message ?? 'Login failed. Please try again.',
-    );
-  }
-
-  Future<void> _signInWithGoogle() async {
-    setState(() => _isSocialLoading = true);
-    try {
-      final result = await SocialSignInService.signInWithGoogle();
-      if (result == null) return;
-
-      final response = await LoginRepository.signInWithGoogle(
-        idToken: result.idToken,
-        accessToken: result.accessToken,
-        serverAuthCode: result.serverAuthCode,
-      );
-      await _handleLoginResponse(response);
-    } catch (e) {
-      if (!mounted) return;
-      DialogUtils.showErrorDialog(context: context, message: e.toString());
-    } finally {
-      if (mounted) setState(() => _isSocialLoading = false);
-    }
-  }
-
-  Future<void> _signInWithApple() async {
-    if (kIsWeb || !(Platform.isIOS || Platform.isMacOS)) {
-      DialogUtils.showErrorDialog(
-        context: context,
-        message: 'Apple sign-in is only available on iOS devices.',
-      );
-      return;
-    }
-
-    setState(() => _isSocialLoading = true);
-    try {
-      final result = await SocialSignInService.signInWithApple();
-      if (result == null) return;
-
-      final response = await LoginRepository.signInWithApple(
-        identityToken: result.identityToken,
-        authorizationCode: result.authorizationCode,
-        nonce: result.nonce,
-        email: result.email,
-        givenName: result.givenName,
-        familyName: result.familyName,
-      );
-      await _handleLoginResponse(response);
-    } on SignInWithAppleAuthorizationException catch (e) {
-      if (!mounted) return;
-      if (e.code == AuthorizationErrorCode.canceled) return;
-      final message = e.message;
-      DialogUtils.showErrorDialog(
-        context: context,
-        message: message.isNotEmpty
-            ? message
-            : 'Apple sign-in failed. Please try again.',
-      );
-    } catch (e) {
-      if (!mounted) return;
-      DialogUtils.showErrorDialog(context: context, message: e.toString());
-    } finally {
-      if (mounted) setState(() => _isSocialLoading = false);
-    }
-  }
-
-  Future<void> _openHelpModal() async {
-    await showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: false,
-      builder: (context) {
-        return SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              padding: const EdgeInsets.fromLTRB(20, 22, 20, 18),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 52,
-                    height: 52,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: const Color(0xFFE8447A).withValues(alpha: 0.10),
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.favorite_rounded,
-                        color: Color(0xFFE8447A),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  const Text(
-                    'Need Help?',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF1A1A1A),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    "We're here to help you on your journey to finding the right match.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w300,
-                      color: Color(0xFF888888),
-                      height: 1.4,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _HelpItem(
-                    icon: Icons.policy_outlined,
-                    title: 'Terms & Privacy',
-                    onTap: () => Navigator.of(context).pop(),
-                  ),
-                  _HelpItem(
-                    icon: Icons.support_agent_outlined,
-                    title: 'Contact Support',
-                    onTap: () => Navigator.of(context).pop(),
-                  ),
-                  _HelpItem(
-                    icon: Icons.info_outline,
-                    title: 'About Walima',
-                    onTap: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   void initState() {
@@ -197,8 +37,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = ref.watch(loginProvider);
     return TransparentLoading(
-      isLoading: _isSocialLoading,
+      isLoading:
+          authProvider.loaderState == LoginScreenStates.transparentLoading,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Stack(
@@ -293,7 +135,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           onTap: () => context.push(Paths.loginWithEmail),
                         ),
                         const SizedBox(height: 12),
-                        continueWithButton(),
+                        continueWithButton(authProvider),
                         const SizedBox(height: 40),
                         Column(
                           mainAxisAlignment: MainAxisAlignment.end,
@@ -394,7 +236,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget continueWithButton() {
+  Widget continueWithButton(LoginProvider authProvider) {
     return Column(
       spacing: 12,
       children: [
@@ -407,7 +249,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             borderRadius: 50,
             borderColor: AppColors.inputBorderColor,
             bgColor: Colors.white,
-            onTap: _signInWithApple,
+            onTap: () => authProvider.signInWithApple(context),
             title: 'Continue with Apple',
           ),
         PrimaryButtons(
@@ -417,10 +259,88 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           borderRadius: 50,
           borderColor: AppColors.inputBorderColor,
           bgColor: Colors.white,
-          onTap: _signInWithGoogle,
+          onTap: () => authProvider.signInWithGoogle(context),
           title: 'Continue with Google',
         ),
       ],
+    );
+  }
+
+  Future<void> _openHelpModal() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: false,
+      builder: (context) {
+        return SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              padding: const EdgeInsets.fromLTRB(20, 22, 20, 18),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: const Color(0xFFE8447A).withValues(alpha: 0.10),
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.favorite_rounded,
+                        color: Color(0xFFE8447A),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  const Text(
+                    'Need Help?',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF1A1A1A),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    "We're here to help you on your journey to finding the right match.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w300,
+                      color: Color(0xFF888888),
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _HelpItem(
+                    icon: Icons.policy_outlined,
+                    title: 'Terms & Privacy',
+                    onTap: () => Navigator.of(context).pop(),
+                  ),
+                  _HelpItem(
+                    icon: Icons.support_agent_outlined,
+                    title: 'Contact Support',
+                    onTap: () => Navigator.of(context).pop(),
+                  ),
+                  _HelpItem(
+                    icon: Icons.info_outline,
+                    title: 'About Walima',
+                    onTap: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -267,8 +267,6 @@ class LoginProvider extends BaseChangeNotifier {
 
       final response = await LoginRepository.signInWithGoogle(
         idToken: result.idToken,
-        accessToken: result.accessToken,
-        serverAuthCode: result.serverAuthCode,
       );
       if (!context.mounted) return;
       await _handleLoginResult(context, response);
