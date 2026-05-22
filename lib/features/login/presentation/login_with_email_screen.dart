@@ -459,7 +459,9 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
               ),
             ),
             InkWell(
-              onTap: () {},
+              onTap: () {
+                context.push(Paths.loginWithPhone);
+              },
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(

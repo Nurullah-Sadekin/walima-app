@@ -140,7 +140,6 @@ class _LoginWithPhoneScreenState extends ConsumerState<LoginWithPhoneScreen> {
                     ),
                     InkWell(
                       onTap: () {
-                        // context.pop();
                         context.pushNamed(Routes.onboarding);
                       },
                       child: Row(
@@ -429,7 +428,7 @@ class _LoginWithPhoneScreenState extends ConsumerState<LoginWithPhoneScreen> {
           children: [
             InkWell(
               onTap: () {
-                context.push(Paths.login);
+                // context.push(Paths.login);
               },
               child: Container(
                 padding: const EdgeInsets.all(16),
@@ -469,7 +468,9 @@ class _LoginWithPhoneScreenState extends ConsumerState<LoginWithPhoneScreen> {
               ),
             ),
             InkWell(
-              onTap: () {},
+              onTap: () {
+                context.push(Paths.loginWithEmail);
+              },
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(

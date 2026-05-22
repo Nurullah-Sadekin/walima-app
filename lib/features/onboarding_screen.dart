@@ -224,7 +224,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   context.pushNamed(Routes.isProfileFor);
                                 },
                                 child: Text(
-                                  'Create an account',
+                                  'Create now',
                                   style: TextStyle(
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.bold,
