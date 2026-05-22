@@ -5,6 +5,14 @@ import 'package:url_launcher/url_launcher.dart';
 class LinkOpener {
   const LinkOpener._();
 
+  static Future<void> openLink( BuildContext context,String title, String url) {
+    return LinkOpener.open(
+      context,
+      title: title,
+      url: url,
+    );
+  }
+  
   static Future<void> open(
     BuildContext context, {
     required String title,
@@ -17,7 +25,6 @@ class LinkOpener {
       );
       return;
     }
-
     try {
       final launched = await launchUrl(
         uri,
