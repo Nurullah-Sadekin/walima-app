@@ -190,7 +190,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         foregroundColor: Colors.white,
                         icon: Icons.phone_iphone,
                         label: 'Continue with Phone',
-                        onTap: () => context.push(Paths.isProfileFor),
+                        onTap: () => context.push(Paths.loginWithEmail),
                       ),
                       const SizedBox(height: 10),
                       _CtaButton(
@@ -198,65 +198,90 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         foregroundColor: const Color(0xFF1A1A1A),
                         icon: Icons.email_outlined,
                         label: 'Continue with Email',
-                        onTap: () => context.push(Paths.login),
+                        onTap: () => context.push(Paths.loginWithEmail),
                       ),
                       const SizedBox(height: 12),
                       continueWithButton(),
-                      const SizedBox(height: 12),
-                      // Text(
-                      //   'By continuing you agree to our Terms and Privacy Policy',
-                      //   textAlign: TextAlign.center,
-                      //   style: TextStyle(
-                      //     color: Colors.white.withValues(alpha: 0.40),
-                      //     fontSize: TextSize.font10(context),
-                      //     fontWeight: FontWeight.w300,
-                      //   ),
-                      // ),
-                      //
-                      RichText(
-                          text: TextSpan(
-                        text: 'By continuing you agree to our ',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.40),
-                          fontSize: TextSize.font12(context),
-                          fontWeight: FontWeight.w300,
-                        ),
+                      const SizedBox(height: 40),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.max,
                         children: [
-                          TextSpan(
-                            text: 'Terms',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.75),
-                              fontSize: TextSize.font12(context),
-                              fontWeight: FontWeight.w500,
-                            ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () async {
-                                // open terms page
-                                await LinkOpener.openLink(context, 'Terms & Conditions', AppUrls.termsUrl);
-                              },
-                          ),
-                          TextSpan(
-                            text: ' and ',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.40),
-                              fontSize: TextSize.font12(context),
-                              fontWeight: FontWeight.w300,
-                            ),
-                          ),
-                          TextSpan(
-                            text: 'Privacy policy',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.75),
-                              fontSize: TextSize.font12(context),
-                              fontWeight: FontWeight.w500,
-                            ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () async {
-                                await LinkOpener.openLink(context, 'Privacy Policy', AppUrls.privacyPolicyUrl);
-                              },
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            spacing: 6,
+                            children: [
+                              Text(
+                                "Don't have an account?",
+                                style: TextStyle(
+                                  color: AppColors.hintTextColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: TextSize.font14(context),
+                                ),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  context.pushNamed(Routes.onboarding);
+                                },
+                                child: Text(
+                                  'Create an account',
+                                  style: TextStyle(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: TextSize.font16(context),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
-                      )),
+                      ),
+                      const SizedBox(height: 40),
+                      RichText(
+                        text: TextSpan(
+                          text: 'By continuing you agree to our ',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.40),
+                            fontSize: TextSize.font12(context),
+                            fontWeight: FontWeight.w300,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: 'Terms',
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.75),
+                                fontSize: TextSize.font12(context),
+                                fontWeight: FontWeight.w500,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () async {
+                                  // open terms page
+                                  await LinkOpener.openLink(context, 'Terms & Conditions', AppUrls.termsUrl);
+                                },
+                            ),
+                            TextSpan(
+                              text: ' and ',
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.40),
+                                fontSize: TextSize.font12(context),
+                                fontWeight: FontWeight.w300,
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'Privacy policy',
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.75),
+                                fontSize: TextSize.font12(context),
+                                fontWeight: FontWeight.w500,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () async {
+                                  await LinkOpener.openLink(context, 'Privacy Policy', AppUrls.privacyPolicyUrl);
+                                },
+                            ),
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: 12),
                     ],
                   ),
