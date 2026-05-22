@@ -20,11 +20,52 @@ class LoginWithEmailScreen extends ConsumerStatefulWidget {
   const LoginWithEmailScreen({super.key});
 
   @override
-  ConsumerState<LoginWithEmailScreen> createState() => _LoginWithEmailScreenState();
+  ConsumerState<LoginWithEmailScreen> createState() =>
+      _LoginWithEmailScreenState();
+}
+
+enum _EmailLoginMode { password, otp }
+
+class _ModeChip extends StatelessWidget {
+  const _ModeChip({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: isSelected ? AppColors.primary : Colors.transparent,
+      borderRadius: BorderRadius.circular(50),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(50),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : AppColors.textSecondaryLight,
+                fontWeight: FontWeight.w600,
+                fontSize: TextSize.font13(context),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
   late LoginProvider provider;
+  _EmailLoginMode _mode = _EmailLoginMode.password;
 
   @override
   void initState() {
@@ -55,18 +96,17 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
           child: provider.screenStates == LoginScreenStates.loading
               ? const Loading()
               : Column(
-                children: [
-                  const CustomBackAppBar(
-                    backIconBackground: Colors.transparent,
-                  ),
-                  Expanded(child: body()),
-                ],
-              ),
+                  children: [
+                    const CustomBackAppBar(
+                      backIconBackground: Colors.transparent,
+                    ),
+                    Expanded(child: body()),
+                  ],
+                ),
         ),
       ),
     );
   }
-
 
   Widget body() {
     return Container(
@@ -76,15 +116,13 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
         children: [
           SizedBox(height: MediaQuery.sizeOf(context).height * 0.02),
           staticText(),
-
+          SizedBox(height: MediaQuery.sizeOf(context).height * 0.01),
+          modeToggle(),
           SizedBox(height: MediaQuery.sizeOf(context).height * 0.02),
           loginDataField(),
-
           SizedBox(height: MediaQuery.sizeOf(context).height * 0.01),
           loginButton(),
-
           continueWith(),
-
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -118,7 +156,11 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
                               fontSize: TextSize.font16(context),
                             ),
                           ),
-                          const Icon(Icons.arrow_forward_ios,color: AppColors.primary, size:8)
+                          const Icon(
+                            Icons.arrow_forward_ios,
+                            color: AppColors.primary,
+                            size: 8,
+                          ),
                         ],
                       ),
                     ),
@@ -134,48 +176,84 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
   }
 
   Widget staticText() {
-    return Column(spacing: 10, children: [
-      Column(
+    final subtitle = _mode == _EmailLoginMode.password
+        ? 'Enter your registered email and password'
+        : 'Enter your registered email to get an OTP';
+
+    return Column(
+      spacing: 10,
+      children: [
+        Column(
+          children: [
+            Row(
+              spacing: 6,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Login with',
+                  style: TextStyle(
+                    color: AppColors.textPrimaryLight,
+                    fontWeight: FontWeight.bold,
+                    fontSize: TextSize.font28(context),
+                    fontFamily: FontFamily.timesNewRoman,
+                  ),
+                ),
+                Text(
+                  'Email',
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: TextSize.font28(context),
+                    fontFamily: FontFamily.timesNewRoman,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30.0),
+          child: Text(
+            subtitle,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: AppColors.hintTextColor,
+              fontWeight: FontWeight.w400,
+              fontSize: TextSize.font14(context),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget modeToggle() {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(50),
+        border: Border.all(color: AppColors.inputBorderColor),
+      ),
+      child: Row(
         children: [
-          Row(
-            spacing: 6,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Login with',
-                style: TextStyle(
-                  color: AppColors.textPrimaryLight,
-                  fontWeight: FontWeight.bold,
-                  fontSize: TextSize.font28(context),
-                  fontFamily: FontFamily.timesNewRoman,
-                ),
-              ),
-              Text(
-                'Email',
-                style: TextStyle(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: TextSize.font28(context),
-                  fontFamily: FontFamily.timesNewRoman,
-                ),
-              ),
-            ],
+          Expanded(
+            child: _ModeChip(
+              label: 'Password',
+              isSelected: _mode == _EmailLoginMode.password,
+              onTap: () => setState(() => _mode = _EmailLoginMode.password),
+            ),
+          ),
+          Expanded(
+            child: _ModeChip(
+              label: 'OTP',
+              isSelected: _mode == _EmailLoginMode.otp,
+              onTap: () => setState(() => _mode = _EmailLoginMode.otp),
+            ),
           ),
         ],
       ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30.0),
-        child: Text(
-          'Enter your registered email and password',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: AppColors.hintTextColor,
-            fontWeight: FontWeight.w400,
-            fontSize: TextSize.font14(context),
-          ),
-        ),
-      ),
-    ]);
+    );
   }
 
   Widget loginDataField() {
@@ -184,12 +262,14 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
       children: [
         PrimaryTextField(
           controller: provider.mobileNoOrEmailController,
-          headLine: 'Mobile No. / Email address',
+          headLine: 'Email address',
           hintText: 'you@example.com',
           borderRadius: 50,
           prefixIcon: ShowImage(
             imagePath: AppImages.emailSvgIcon,
-            color: provider.mobileNoOrEmailController.text.isEmpty ? AppColors.hintTextColor : AppColors.primary,
+            color: provider.mobileNoOrEmailController.text.isEmpty
+                ? AppColors.hintTextColor
+                : AppColors.primary,
             width: TextSize.font16(context),
             height: TextSize.font16(context),
           ),
@@ -197,69 +277,72 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
           validator: Validators.validateMobileOrEmail,
           onTap: () {},
         ),
-        PrimaryTextField(
-          controller: provider.passwordController,
-          headLine: 'Password',
-          hintText: 'Enter your password',
-          prefixIcon: ShowImage(
-            imagePath: AppImages.lockPasswordSvgIcon,
-            color: provider.passwordController.text.isEmpty ? AppColors.hintTextColor : AppColors.primary,
-            width: TextSize.font16(context),
-            height: TextSize.font16(context),
+        if (_mode == _EmailLoginMode.password) ...[
+          PrimaryTextField(
+            controller: provider.passwordController,
+            headLine: 'Password',
+            hintText: 'Enter your password',
+            prefixIcon: ShowImage(
+              imagePath: AppImages.lockPasswordSvgIcon,
+              color: provider.passwordController.text.isEmpty
+                  ? AppColors.hintTextColor
+                  : AppColors.primary,
+              width: TextSize.font16(context),
+              height: TextSize.font16(context),
+            ),
+            borderRadius: 50,
+            errorText: provider.passwordError,
+            showPassIcon: true,
+            onTap: () {},
           ),
-          borderRadius: 50,
-          errorText: provider.passwordError,
-          showPassIcon: true,
-          onTap: () {},
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              InkWell(
-                onTap: () {
-                  provider.keepMeLoggedIn = !provider.keepMeLoggedIn;
-                  provider.notifyListeners();
-                },
-                child: Row(
-                  children: [
-                    Container(
-                      height: TextSize.font16(context),
-                      width: TextSize.font16(context),
-                      margin: const EdgeInsets.only(right: 6),
-                      decoration: BoxDecoration(
-                        color: provider.keepMeLoggedIn
-                            ? AppColors.primary
-                            : Colors.white,
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                InkWell(
+                  onTap: () {
+                    provider.keepMeLoggedIn = !provider.keepMeLoggedIn;
+                    provider.notifyListeners();
+                  },
+                  child: Row(
+                    children: [
+                      Container(
+                        height: TextSize.font16(context),
+                        width: TextSize.font16(context),
+                        margin: const EdgeInsets.only(right: 6),
+                        decoration: BoxDecoration(
                           color: provider.keepMeLoggedIn
                               ? AppColors.primary
-                              : AppColors.textSecondaryLight,
-                          width: 1,
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(
+                            color: provider.keepMeLoggedIn
+                                ? AppColors.primary
+                                : AppColors.textSecondaryLight,
+                            width: 1,
+                          ),
+                        ),
+                        child: provider.keepMeLoggedIn
+                            ? Icon(
+                                Icons.check,
+                                size: TextSize.font12(context),
+                                color: Colors.white,
+                              )
+                            : null,
+                      ),
+                      Text(
+                        'Keep me logged in',
+                        style: TextStyle(
+                          color: AppColors.textSecondaryLight,
+                          fontWeight: FontWeight.w400,
+                          fontSize: TextSize.font12(context),
                         ),
                       ),
-                      child: provider.keepMeLoggedIn
-                          ? Icon(
-                        Icons.check,
-                        size: TextSize.font12(context),
-                        color: Colors.white,
-                      )
-                          : null,
-                    ),
-                    Text(
-                      'Keep me logged in',
-                      style: TextStyle(
-                        color: AppColors.textSecondaryLight,
-                        fontWeight: FontWeight.w400,
-                        fontSize: TextSize.font12(context),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              InkWell(
+                InkWell(
                   onTap: () {
                     provider.forgotPassword = true;
                     provider.updateViewState();
@@ -272,16 +355,19 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
                       fontWeight: FontWeight.w500,
                       fontSize: TextSize.font13(context),
                     ),
-                  )
-              ),
-            ],
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
+        ],
       ],
     );
   }
 
   Widget loginButton() {
+    final buttonTitle =
+        _mode == _EmailLoginMode.password ? 'Log In' : 'Continue';
     return PrimaryButtons(
       buttonStyle: ButtonsStyle.iconicDynamicButton,
       svgIconPath: AppImages.arrowRightSvgIcon,
@@ -292,10 +378,15 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
       textColor: AppColors.white,
       verticalPadding: 14,
       borderRadius: 50,
-      title: 'Log In',
+      title: buttonTitle,
       onTap: () async {
-        await provider.login(context);
-        //context.push(Paths.yourReligion);
+        provider.forgotPassword = false;
+        provider.updateViewState();
+        if (_mode == _EmailLoginMode.password) {
+          await provider.login(context);
+        } else {
+          await provider.loginWithOtp(context);
+        }
       },
     );
   }
@@ -308,7 +399,11 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
           child: Row(
             children: [
               const Expanded(
-                  child: Divider(color: AppColors.inputBorderColor, thickness: 1)),
+                child: Divider(
+                  color: AppColors.inputBorderColor,
+                  thickness: 1,
+                ),
+              ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
@@ -321,25 +416,28 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
                 ),
               ),
               const Expanded(
-                  child:
-                  Divider(color: AppColors.inputBorderColor, thickness: 1)),
+                child: Divider(
+                  color: AppColors.inputBorderColor,
+                  thickness: 1,
+                ),
+              ),
             ],
           ),
         ),
-
         SizedBox(height: MediaQuery.sizeOf(context).height * 0.02),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           spacing: 16,
           children: [
             InkWell(
-              onTap: (){},
+              onTap: () {},
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white,
-                  border: Border.all(width: 1, color: AppColors.inputBorderColor),
+                  border:
+                      Border.all(width: 1, color: AppColors.inputBorderColor),
                 ),
                 child: const Center(
                   child: ShowImage(
@@ -351,13 +449,16 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
               ),
             ),
             InkWell(
-              onTap: (){},
+              onTap: () {
+                context.push(Paths.loginWithPhone);
+              },
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white,
-                  border: Border.all(width: 1, color: AppColors.inputBorderColor),
+                  border:
+                      Border.all(width: 1, color: AppColors.inputBorderColor),
                 ),
                 child: const Center(
                   child: ShowImage(
@@ -370,13 +471,14 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
               ),
             ),
             InkWell(
-              onTap: (){},
+              onTap: () {},
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white,
-                  border: Border.all(width: 1, color: AppColors.inputBorderColor),
+                  border:
+                      Border.all(width: 1, color: AppColors.inputBorderColor),
                 ),
                 child: const Center(
                   child: ShowImage(
@@ -389,7 +491,7 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
               ),
             ),
           ],
-        )
+        ),
       ],
     );
   }

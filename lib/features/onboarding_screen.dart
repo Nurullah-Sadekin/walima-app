@@ -190,7 +190,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         foregroundColor: Colors.white,
                         icon: Icons.phone_iphone,
                         label: 'Continue with Phone',
-                        onTap: () => context.push(Paths.loginWithEmail),
+                        onTap: () => context.push(Paths.loginWithPhone),
                       ),
                       const SizedBox(height: 10),
                       _CtaButton(
@@ -221,7 +221,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               ),
                               InkWell(
                                 onTap: () {
-                                  context.pushNamed(Routes.onboarding);
+                                  context.pushNamed(Routes.isProfileFor);
                                 },
                                 child: Text(
                                   'Create an account',
