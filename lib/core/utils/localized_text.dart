@@ -121,6 +121,18 @@ class AppTextTranslator {
       'bn': 'আবার চেষ্টা করুন',
       'ar': 'إعادة المحاولة',
     },
+    'Refresh': {
+      'bn': 'রিফ্রেশ',
+      'ar': 'تحديث',
+    },
+    'unread': {
+      'bn': 'অপঠিত',
+      'ar': 'غير مقروء',
+    },
+    'Mark all as read': {
+      'bn': 'সব পঠিত হিসেবে চিহ্নিত করুন',
+      'ar': 'تحديد الكل كمقروء',
+    },
     'Try again': {
       'bn': 'আবার চেষ্টা করুন',
       'ar': 'حاول مرة أخرى',
@@ -228,6 +240,10 @@ class AppTextTranslator {
     'About Walima': {
       'bn': 'Walima সম্পর্কে',
       'ar': 'حول وليمة',
+    },
+    'Profile Created by': {
+      'bn': 'প্রোফাইল তৈরি করেছেন',
+      'ar': 'تم إنشاء الملف بواسطة',
     },
     "Don't have an account?": {
       'bn': 'অ্যাকাউন্ট নেই?',
@@ -642,6 +658,18 @@ class AppTextTranslator {
       'bn': 'ছবির নির্দেশিকা',
       'ar': 'إرشادات الصور',
     },
+    'Download Bio-data': {
+      'bn': 'বায়ো-ডাটা ডাউনলোড করুন',
+      'ar': 'تنزيل السيرة الذاتية',
+    },
+    'Save PDF': {
+      'bn': 'PDF সংরক্ষণ করুন',
+      'ar': 'حفظ PDF',
+    },
+    'Share': {
+      'bn': 'শেয়ার',
+      'ar': 'مشاركة',
+    },
     'Replace File': {
       'bn': 'ফাইল পরিবর্তন করুন',
       'ar': 'استبدال الملف',
@@ -667,7 +695,8 @@ class AppTextTranslator {
       'ar': 'جارٍ الرفع...',
     },
     'Permission denied. Please allow photo library access and try again.': {
-      'bn': 'অনুমতি দেওয়া হয়নি। অনুগ্রহ করে ফটো লাইব্রেরি অ্যাক্সেস দিন এবং আবার চেষ্টা করুন।',
+      'bn':
+          'অনুমতি দেওয়া হয়নি। অনুগ্রহ করে ফটো লাইব্রেরি অ্যাক্সেস দিন এবং আবার চেষ্টা করুন।',
       'ar': 'تم رفض الإذن. اسمح بالوصول إلى مكتبة الصور وحاول مرة أخرى.',
     },
     'Unable to pick the document right now. Please try again.': {
@@ -701,6 +730,20 @@ class AppTextTranslator {
     'No messages yet': {
       'bn': 'এখনও কোনো বার্তা নেই',
       'ar': 'لا توجد رسائل بعد',
+    },
+    'Block': {
+      'bn': 'ব্লক',
+      'ar': 'حظر',
+    },
+    'Are you sure?': {
+      'bn': 'আপনি কি নিশ্চিত?',
+      'ar': 'هل أنت متأكد؟',
+    },
+    'Blocked members cannot view your profile or contact you on walima.com.': {
+      'bn':
+          'ব্লক করা সদস্যরা আপনার প্রোফাইল দেখতে বা walima.com-এ যোগাযোগ করতে পারবে না।',
+      'ar':
+          'الأعضاء المحظورون لا يمكنهم عرض ملفك أو التواصل معك على walima.com.',
     },
     'Type a message': {
       'bn': 'বার্তা লিখুন',
@@ -745,6 +788,30 @@ class AppTextTranslator {
     'No matches found': {
       'bn': 'কোনো ম্যাচ পাওয়া যায়নি',
       'ar': 'لم يتم العثور على مطابقات',
+    },
+    'User information unavailable.': {
+      'bn': 'ব্যবহারকারীর তথ্য পাওয়া যায়নি।',
+      'ar': 'معلومات المستخدم غير متاحة.',
+    },
+    'User information unavailable. Cannot initiate contact.': {
+      'bn': 'ব্যবহারকারীর তথ্য পাওয়া যায়নি। যোগাযোগ শুরু করা যাচ্ছে না।',
+      'ar': 'معلومات المستخدم غير متاحة. لا يمكن بدء التواصل.',
+    },
+    'User id not found': {
+      'bn': 'ইউজার আইডি পাওয়া যায়নি',
+      'ar': 'معرف المستخدم غير موجود',
+    },
+    'You can select up to \$hobbiesSelectionMax hobbies.': {
+      'bn': 'আপনি সর্বোচ্চ \$hobbiesSelectionMax টি শখ নির্বাচন করতে পারবেন।',
+      'ar': 'يمكنك اختيار ما يصل إلى \$hobbiesSelectionMax هوايات.',
+    },
+    'Load more': {
+      'bn': 'আরও দেখুন',
+      'ar': 'تحميل المزيد',
+    },
+    'Whatsapp link is not configured yet': {
+      'bn': 'হোয়াটসঅ্যাপ লিংক এখনো কনফিগার করা হয়নি',
+      'ar': 'رابط واتساب غير مهيأ بعد',
     },
     'Sending...': {
       'bn': 'পাঠানো হচ্ছে...',
@@ -872,8 +939,10 @@ class AppTextTranslator {
     },
     'Watch out for quick commitments or money requests. Keep your financial details private.':
         {
-      'bn': 'দ্রুত প্রতিশ্রুতি বা টাকা চাওয়ার বিষয়ে সতর্ক থাকুন। আপনার আর্থিক তথ্য গোপন রাখুন।',
-      'ar': 'انتبه للالتزامات السريعة أو طلبات المال. حافظ على سرية بياناتك المالية.',
+      'bn':
+          'দ্রুত প্রতিশ্রুতি বা টাকা চাওয়ার বিষয়ে সতর্ক থাকুন। আপনার আর্থিক তথ্য গোপন রাখুন।',
+      'ar':
+          'انتبه للالتزامات السريعة أو طلبات المال. حافظ على سرية بياناتك المالية.',
     },
     'Report': {
       'bn': 'রিপোর্ট করুন',
