@@ -349,9 +349,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
         await showDialog(
           context: context,
           builder: (_) => AlertDialog(
-            title: Text('Block ${participant.displayName}? Are you sure?'),
-            content: const Text(
-              'Blocked members cannot view your profile or contact you on walima.com.',
+            title: Text(
+              '${'Block'.localized(context)} ${participant.displayName}? ${'Are you sure?'.localized(context)}',
+            ),
+            content: Text(
+              'Blocked members cannot view your profile or contact you on walima.com.'
+                  .localized(context),
             ),
             shape: RoundedRectangleBorder(
               borderRadius:
