@@ -3,6 +3,7 @@ import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/global/components/gradient_background.dart';
 import 'package:walima_llc/core/global/components/selection_card.dart';
 import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/recommended_preferences/presentation/providers/recommended_preferences_provider.dart';
 import 'package:walima_llc/core/global/components/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -43,27 +44,29 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
   Widget build(BuildContext context) {
     provider = ref.watch(recommendedPreferencesProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == RecommendedPreferencesScreenStates.preferences,
+      isLoading: provider.loaderState ==
+          RecommendedPreferencesScreenStates.preferences,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == RecommendedPreferencesScreenStates.preferences
+          child: provider.screenStates ==
+                  RecommendedPreferencesScreenStates.preferences
               ? const Loading()
               : Column(
-            children: [
-               UpperLayer(
-                  imagePath: AppImages.recommendedPreferences,
-                  isShowAppbar: true,
-                  isBackButton: true,
-                  isTrailing: true,
-                  trailingText: 'Skip',
-                  onTrailingTap: (){
-                    context.push(Paths.community);
-                  },
-               ),
-               body(),
-            ],
-          ),
+                  children: [
+                    UpperLayer(
+                      imagePath: AppImages.recommendedPreferences,
+                      isShowAppbar: true,
+                      isBackButton: true,
+                      isTrailing: true,
+                      trailingText: 'Skip',
+                      onTrailingTap: () {
+                        context.push(Paths.community);
+                      },
+                    ),
+                    body(),
+                  ],
+                ),
         ),
       ),
     );
@@ -76,10 +79,11 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
         child: Column(
           spacing: 10,
           children: [
-            const StaticTextWidget(
-              title: 'Preference Details',
+            StaticTextWidget(
+              title: 'Preference Details'.localized(context),
               subtitle:
-              'Choose your preferred age, height, and marital status for recommended matches.',
+                  'Choose your preferred age, height, and marital status for recommended matches.'
+                      .localized(context),
             ),
             Expanded(child: view()),
             bottomAction(),
@@ -98,7 +102,7 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Age Range',
+            'Age Range'.localized(context),
             style: TextStyle(
               fontSize: TextSize.font14(context),
               fontWeight: FontWeight.w500,
@@ -118,7 +122,7 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
           ),
           const SizedBox(height: 18),
           Text(
-            'Height Range',
+            'Height Range'.localized(context),
             style: TextStyle(
               fontSize: TextSize.font14(context),
               fontWeight: FontWeight.w500,
@@ -137,7 +141,7 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
             onChanged: provider.setHeightRange,
           ),
           Text(
-            'Martial Status',
+            'Marital Status'.localized(context),
             style: TextStyle(
               fontSize: TextSize.font14(context),
               fontWeight: FontWeight.w500,
@@ -151,7 +155,8 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
                 return Wrap(
                   spacing: spacing,
                   runSpacing: spacing,
-                  children: List.generate(provider.maritalStatusDataList.length, (index) {
+                  children: List.generate(provider.maritalStatusDataList.length,
+                      (index) {
                     final item = provider.maritalStatusDataList[index];
 
                     return SelectionCard(
@@ -182,7 +187,7 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
       verticalPadding: 14,
       borderRadius: 50,
       svgIconPath: AppImages.arrowRightSvgIcon,
-      title: 'Continue',
+      title: 'Continue'.localized(context),
       onTap: () {
         context.push(Paths.community);
       },

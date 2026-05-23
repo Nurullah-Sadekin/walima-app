@@ -253,7 +253,7 @@ class DialogUtils {
               PrimaryButtons(
                 buttonStyle: ButtonsStyle.activePrimaryButton,
                 onTap: onButtonPressed ?? () {},
-                title: buttonText,
+                title: buttonText.localized(context),
               ),
               if (isDisableButton)
                 Column(
@@ -262,7 +262,7 @@ class DialogUtils {
                     PrimaryButtons(
                       buttonStyle: ButtonsStyle.disableButton,
                       onTap: onDisableButtonPressed ?? () {},
-                      title: disableButtonText,
+                      title: disableButtonText?.localized(context),
                     ),
                   ],
                 ),

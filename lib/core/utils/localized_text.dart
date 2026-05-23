@@ -89,6 +89,10 @@ class AppTextTranslator {
       'bn': 'সম্পন্ন',
       'ar': 'تم',
     },
+    'Complete': {
+      'bn': 'সম্পূর্ণ করুন',
+      'ar': 'أكمل',
+    },
     'Back': {
       'bn': 'পেছনে',
       'ar': 'رجوع',
@@ -325,9 +329,9 @@ class AppTextTranslator {
       'bn': 'এখন তৈরি করুন',
       'ar': 'أنشئ الآن',
     },
-    'By continuing you agree to our ': {
-      'bn': 'চালিয়ে গেলে আপনি সম্মত হচ্ছেন আমাদের ',
-      'ar': 'بالمتابعة فإنك توافق على ',
+    'By continuing you agree to our': {
+      'bn': 'চালিয়ে গেলে আপনি সম্মত হচ্ছেন আমাদের',
+      'ar': 'بالمتابعة فإنك توافق على',
     },
     'Terms': {
       'bn': 'শর্তাবলি',
@@ -837,6 +841,10 @@ class AppTextTranslator {
       'bn': 'যোগাযোগ',
       'ar': 'التواصل',
     },
+    'Profile Photos': {
+      'bn': 'প্রোফাইল ছবি',
+      'ar': 'صور الملف الشخصي',
+    },
     'Lifestyle': {
       'bn': 'জীবনধারা',
       'ar': 'نمط الحياة',
@@ -852,6 +860,38 @@ class AppTextTranslator {
     'Education & Career': {
       'bn': 'শিক্ষা ও ক্যারিয়ার',
       'ar': 'التعليم والعمل',
+    },
+    'Interests & Hobbies': {
+      'bn': 'আগ্রহ ও শখ',
+      'ar': 'الاهتمامات والهوايات',
+    },
+    'Hobbies and Interests': {
+      'bn': 'শখ ও আগ্রহ',
+      'ar': 'الهوايات والاهتمامات',
+    },
+    'Appearance': {
+      'bn': 'চেহারা',
+      'ar': 'المظهر',
+    },
+    'Preferences': {
+      'bn': 'পছন্দসমূহ',
+      'ar': 'التفضيلات',
+    },
+    'Basic Profile': {
+      'bn': 'মৌলিক প্রোফাইল',
+      'ar': 'الملف الأساسي',
+    },
+    'Location': {
+      'bn': 'অবস্থান',
+      'ar': 'الموقع',
+    },
+    'Education': {
+      'bn': 'শিক্ষা',
+      'ar': 'التعليم',
+    },
+    'Profession': {
+      'bn': 'পেশা',
+      'ar': 'المهنة',
     },
     'Connect Now': {
       'bn': 'এখন কানেক্ট করুন',
@@ -1202,6 +1242,86 @@ class AppTextTranslator {
       'bn': 'উচ্চতার সীমা',
       'ar': 'نطاق الطول',
     },
+    'Marital Status Preference': {
+      'bn': 'বৈবাহিক অবস্থার পছন্দ',
+      'ar': 'تفضيل الحالة الاجتماعية',
+    },
+    'Education Preference': {
+      'bn': 'শিক্ষাগত পছন্দ',
+      'ar': 'تفضيل التعليم',
+    },
+    'Religion Preference': {
+      'bn': 'ধর্মের পছন্দ',
+      'ar': 'تفضيل الديانة',
+    },
+    'Preferred Location': {
+      'bn': 'পছন্দের স্থান',
+      'ar': 'الموقع المفضل',
+    },
+    'Enter Education Preference': {
+      'bn': 'শিক্ষাগত পছন্দ লিখুন',
+      'ar': 'أدخل تفضيل التعليم',
+    },
+    'Enter Religion Preference': {
+      'bn': 'ধর্মের পছন্দ লিখুন',
+      'ar': 'أدخل تفضيل الديانة',
+    },
+    'Open To All': {
+      'bn': 'সবার জন্য উন্মুক্ত',
+      'ar': 'مفتوح للجميع',
+    },
+    'Never Married': {
+      'bn': 'অবিবাহিত',
+      'ar': 'لم يسبق له الزواج',
+    },
+    'Married': {
+      'bn': 'বিবাহিত',
+      'ar': 'متزوج',
+    },
+    'Divorced': {
+      'bn': 'তালাকপ্রাপ্ত',
+      'ar': 'مطلق',
+    },
+    'Widowed': {
+      'bn': 'বিধবা/বিপত্নীক',
+      'ar': 'أرمل',
+    },
+    'Separated': {
+      'bn': 'আলাদা',
+      'ar': 'منفصل',
+    },
+    'Awaiting Divorce': {
+      'bn': 'তালাক প্রক্রিয়াধীন',
+      'ar': 'بانتظار الطلاق',
+    },
+    'Annulled': {
+      'bn': 'বিবাহ বাতিল',
+      'ar': 'فسخ الزواج',
+    },
+    'Partner Expectations': {
+      'bn': 'সঙ্গীর প্রত্যাশা',
+      'ar': 'توقعات الشريك',
+    },
+    'Diet Preference': {
+      'bn': 'খাদ্যাভ্যাসের পছন্দ',
+      'ar': 'تفضيل النظام الغذائي',
+    },
+    'Smoking': {
+      'bn': 'ধূমপান',
+      'ar': 'التدخين',
+    },
+    'Drinking': {
+      'bn': 'মদ্যপান',
+      'ar': 'شرب الكحول',
+    },
+    'expectation': {
+      'bn': 'প্রত্যাশা',
+      'ar': 'التوقع',
+    },
+    'Write what you expect from your partner': {
+      'bn': 'আপনি আপনার সঙ্গীর কাছ থেকে কী প্রত্যাশা করেন লিখুন',
+      'ar': 'اكتب ما تتوقعه من شريكك',
+    },
     'Religion': {
       'bn': 'ধর্ম',
       'ar': 'الدين',
@@ -1214,6 +1334,10 @@ class AppTextTranslator {
       'bn': 'যে দেশে থাকেন',
       'ar': 'بلد الإقامة',
     },
+    'Select Country': {
+      'bn': 'দেশ নির্বাচন করুন',
+      'ar': 'اختر الدولة',
+    },
     'Working With': {
       'bn': 'যেখানে কাজ করেন',
       'ar': 'جهة العمل',
@@ -1221,6 +1345,14 @@ class AppTextTranslator {
     'Annual Income': {
       'bn': 'বার্ষিক আয়',
       'ar': 'الدخل السنوي',
+    },
+    'Select Annual Income': {
+      'bn': 'বার্ষিক আয় নির্বাচন করুন',
+      'ar': 'اختر الدخل السنوي',
+    },
+    'No cities available for the selected country.': {
+      'bn': 'নির্বাচিত দেশের জন্য কোনো শহর পাওয়া যায়নি।',
+      'ar': 'لا توجد مدن متاحة للدولة المحددة.',
     },
     'Select religion first to load community options.': {
       'bn': 'কমিউনিটি অপশন লোড করতে আগে ধর্ম নির্বাচন করুন।',
@@ -1493,9 +1625,23 @@ class AppTextTranslator {
       'bn': 'মাতৃভাষা নির্বাচন করুন',
       'ar': 'اختر اللغة الأم',
     },
+    'Education Qualification': {
+      'bn': 'শিক্ষাগত যোগ্যতা',
+      'ar': 'المؤهل التعليمي',
+    },
+    'Working As': {
+      'bn': 'কর্মক্ষেত্র',
+      'ar': 'العمل كـ',
+    },
     'Preference Details': {
       'bn': 'পছন্দের বিবরণ',
       'ar': 'تفاصيل التفضيلات',
+    },
+    'Choose your preferred age, height, and marital status for recommended matches.':
+        {
+      'bn':
+          'রেকমেন্ডেড ম্যাচের জন্য আপনার পছন্দের বয়স, উচ্চতা ও বৈবাহিক অবস্থা নির্বাচন করুন।',
+      'ar': 'اختر العمر والطول والحالة الاجتماعية المفضلة للمطابقات المقترحة.',
     },
     'Call Her': {
       'bn': 'তাকে কল করুন',

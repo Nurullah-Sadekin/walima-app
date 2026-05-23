@@ -12,6 +12,7 @@ import 'package:walima_llc/core/global/components/resend_code_timer.dart';
 import 'package:walima_llc/core/global/components/upper_layer.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/registration/presentation/providers/registration_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -30,7 +31,8 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
   late RegistrationProvider provider;
 
   bool get _isDebugOtpFlow {
-    return kDebugMode && widget.fromScreen?.trim() == OtpVerifySignUpScreen.debugOtpFlowSource;
+    return kDebugMode &&
+        widget.fromScreen?.trim() == OtpVerifySignUpScreen.debugOtpFlowSource;
   }
 
   @override
@@ -55,11 +57,13 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(verifyOtpForSignUp);
     return TransparentLoading(
-      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading:
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: screenProvider.screenStates == RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates ==
+                  RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
@@ -70,8 +74,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                       showProgress: true,
                       currentIndexProgress: 9,
                       isTrailing: false,
-                      onTrailingTap: () async {
-                      },
+                      onTrailingTap: () async {},
                     ),
                     body(),
                   ],
@@ -106,10 +109,12 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                       onResend: () async {
                         final screenProvider = ref.read(verifyOtpForSignUp);
                         screenProvider.updateViewState(
-                            loadingState: RegistrationScreenStates.isProfileFor);
+                            loadingState:
+                                RegistrationScreenStates.isProfileFor);
                         await provider.resendOtp(context);
                         screenProvider.updateViewState(
-                          loadingState: RegistrationScreenStates.loadingComplete,
+                          loadingState:
+                              RegistrationScreenStates.loadingComplete,
                         );
                       },
                     ),
@@ -145,7 +150,8 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                                   fontSize: TextSize.font16(context),
                                 ),
                               ),
-                              const Icon(Icons.arrow_forward_ios, color: AppColors.primary, size: 8),
+                              const Icon(Icons.arrow_forward_ios,
+                                  color: AppColors.primary, size: 8),
                             ],
                           ),
                         ),
@@ -202,7 +208,6 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
     );
   }
 
-
   Widget staticText() {
     return Column(spacing: 12, children: [
       Column(
@@ -219,7 +224,9 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
             ),
           ),
           Text(
-           provider.selectedVerificationType.toLowerCase() == 'email' ? 'email address' : 'phone number',
+            provider.selectedVerificationType.toLowerCase() == 'email'
+                ? 'email address'
+                : 'phone number',
             style: TextStyle(
               color: AppColors.primary,
               fontWeight: FontWeight.bold,
@@ -229,7 +236,6 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
           ),
         ],
       ),
-
       Column(
         children: [
           Text(
@@ -246,19 +252,22 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (provider.selectedVerificationType.toLowerCase() == 'email')
-                    Text(
-                      provider.emailController.text,
-                      style: TextStyle(
-                        fontSize: TextSize.font14(context),
-                        color: AppColors.textSecondaryLight,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    )
-                  else
-                    Text(
-                      '+${provider.selectedCountryCodeForNumber} ${provider.phoneController.text}',
-                      style: TextStyle(fontSize: TextSize.font14(context), color: AppColors.textSecondaryLight, fontWeight: FontWeight.w400),
-                    ),
+                Text(
+                  provider.emailController.text,
+                  style: TextStyle(
+                    fontSize: TextSize.font14(context),
+                    color: AppColors.textSecondaryLight,
+                    fontWeight: FontWeight.w400,
+                  ),
+                )
+              else
+                Text(
+                  '+${provider.selectedCountryCodeForNumber} ${provider.phoneController.text}',
+                  style: TextStyle(
+                      fontSize: TextSize.font14(context),
+                      color: AppColors.textSecondaryLight,
+                      fontWeight: FontWeight.w400),
+                ),
               InkWell(
                 onTap: () {
                   context.pushNamed(
@@ -268,7 +277,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                   );
                 },
                 child: Text(
-                  'Edit',
+                  'Edit'.localized(context),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: AppColors.primary,
@@ -283,7 +292,6 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
       )
     ]);
   }
-
 
   Widget loginDataField() {
     // SizeConfig().init(context);
@@ -322,7 +330,10 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
               // Handle paste (multiple chars) and normal single char entry
               if (value.length > 1) {
                 final chars = value.split('');
-                for (var i = 0; i < chars.length && (index + i) < provider.otpControllers.length; i++) {
+                for (var i = 0;
+                    i < chars.length &&
+                        (index + i) < provider.otpControllers.length;
+                    i++) {
                   provider.otpControllers[index + i].text = chars[i];
                 }
                 final next = index + chars.length;
@@ -335,7 +346,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                 setState(() {});
                 return;
               }
-    
+
               if (value.isNotEmpty) {
                 if (index + 1 < provider.otpFocusNodesController.length) {
                   provider.otpFocusNodesController[index + 1].requestFocus();
@@ -368,7 +379,8 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
       onTap: isComplete
           ? () async {
               final screenProvider = ref.read(verifyOtpForSignUp);
-              screenProvider.updateViewState(loadingState: RegistrationScreenStates.isProfileFor);
+              screenProvider.updateViewState(
+                  loadingState: RegistrationScreenStates.isProfileFor);
               final validate = await provider.submitRegistration(
                 context,
                 useDebugTemplate: _isDebugOtpFlow,
@@ -391,7 +403,8 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
 
   void _navigateAfterRegistrationSuccess() {
     provider.cleanAllValue();
-    final destination = _isDebugOtpFlow ? Paths.connectMatches : Paths.photoUpload;
+    final destination =
+        _isDebugOtpFlow ? Paths.connectMatches : Paths.photoUpload;
     context.pushReplacement(destination);
   }
 }

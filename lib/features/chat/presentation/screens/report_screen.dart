@@ -4,6 +4,7 @@ import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/global/components/custom_back_appbar.dart';
 import 'package:walima_llc/core/global/components/selection_card.dart';
 import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:go_router/go_router.dart';
 
 class ReportScreen extends StatefulWidget {
@@ -94,7 +95,8 @@ class _ReportScreenState extends State<ReportScreen> {
       Routes.reportStatus,
       extra: {
         'title': 'Report Successfully!',
-        'subtitle': 'Report submitted successfully. We’ll review it shortly. Thank you for reporting.',
+        'subtitle':
+            'Report submitted successfully. We’ll review it shortly. Thank you for reporting.',
         'buttonText': 'Done',
         'onTapButton': () {
           if (context.canPop()) {
@@ -193,7 +195,6 @@ class _ReportScreenState extends State<ReportScreen> {
                   hintStyle: TextStyle(
                     color: AppColors.textSecondaryLight,
                   ),
-
                   border: InputBorder.none,
                   fillColor: AppColors.white,
                   filled: true,
@@ -235,7 +236,7 @@ class _ReportScreenState extends State<ReportScreen> {
                 side: const BorderSide(color: AppColors.greyLight),
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
-              child: Text(isDetails ? 'Back' : 'Cancel'),
+              child: Text((isDetails ? 'Back' : 'Cancel').localized(context)),
             ),
           ),
           const SizedBox(width: 12),
@@ -252,10 +253,11 @@ class _ReportScreenState extends State<ReportScreen> {
                     },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
-                disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.4),
+                disabledBackgroundColor:
+                    AppColors.primary.withValues(alpha: 0.4),
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
-              child: Text(isDetails ? 'Apply' : 'Next'),
+              child: Text((isDetails ? 'Apply' : 'Next').localized(context)),
             ),
           ),
         ],

@@ -190,4 +190,38 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get about => 'حول';
+
+  @override
+  String get completeYourProfile => 'أكمل ملفك الشخصي';
+
+  @override
+  String profileCompletionPercentage(Object percentage) {
+    return 'ملفك الشخصي مكتمل بنسبة $percentage%';
+  }
+
+  @override
+  String get seeMore => 'عرض المزيد';
+
+  @override
+  String get seeLess => 'عرض أقل';
+
+  @override
+  String completeSectionTitle(Object sectionLabel) {
+    return 'أكمل $sectionLabel';
+  }
+
+  @override
+  String get profileSection => 'قسم الملف الشخصي';
+
+  @override
+  String fieldsLeft(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count حقول متبقية',
+      one: 'حقل واحد متبقٍ',
+      zero: 'لا توجد حقول متبقية',
+    );
+    return '$_temp0';
+  }
 }

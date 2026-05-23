@@ -192,4 +192,38 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get about => 'সম্পর্কে';
+
+  @override
+  String get completeYourProfile => 'আপনার প্রোফাইল সম্পূর্ণ করুন';
+
+  @override
+  String profileCompletionPercentage(Object percentage) {
+    return 'আপনার প্রোফাইল $percentage% সম্পূর্ণ';
+  }
+
+  @override
+  String get seeMore => 'আরও দেখুন';
+
+  @override
+  String get seeLess => 'কম দেখুন';
+
+  @override
+  String completeSectionTitle(Object sectionLabel) {
+    return '$sectionLabel সম্পূর্ণ করুন';
+  }
+
+  @override
+  String get profileSection => 'প্রোফাইল সেকশন';
+
+  @override
+  String fieldsLeft(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countটি ফিল্ড বাকি',
+      one: '১টি ফিল্ড বাকি',
+      zero: 'কোনো ফিল্ড বাকি নেই',
+    );
+    return '$_temp0';
+  }
 }

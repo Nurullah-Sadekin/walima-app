@@ -174,8 +174,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         const SizedBox(height: 40),
                         RichText(
                           text: TextSpan(
-                            text: 'By continuing you agree to our '
-                                .localized(context),
+                            text:
+                                '${'By continuing you agree to our'.localized(context)} ',
                             style: TextStyle(
                               color: Colors.white.withValues(alpha: 0.40),
                               fontSize: TextSize.font12(context),

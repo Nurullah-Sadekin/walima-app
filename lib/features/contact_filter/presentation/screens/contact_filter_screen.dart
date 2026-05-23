@@ -202,7 +202,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
             const SizedBox(height: 12),
           ],
           InfoTile(
-            title: 'Age Range',
+            title: 'Age Range'.localized(context),
             value: provider.ageRangeSummary,
             onTap: () => setState(() => _step = ContactFilterStep.ageRange),
             leadingImagePath: AppImages.calendarSvgIcon,
@@ -210,7 +210,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           ),
           const SizedBox(height: 8),
           InfoTile(
-            title: 'Height Range',
+            title: 'Height Range'.localized(context),
             value: provider.heightRangeSummary,
             onTap: () => setState(() => _step = ContactFilterStep.heightRange),
             leadingImagePath: AppImages.heightSvgIcon,
@@ -218,7 +218,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           ),
           const SizedBox(height: 8),
           InfoTile(
-            title: 'Marital Status',
+            title: 'Marital Status'.localized(context),
             value: provider.maritalStatusSummary,
             onTap: () =>
                 setState(() => _step = ContactFilterStep.maritalStatus),
@@ -227,7 +227,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           ),
           const SizedBox(height: 8),
           InfoTile(
-            title: 'Religion',
+            title: 'Religion'.localized(context),
             value: provider.religionSummary,
             onTap: () => setState(() => _step = ContactFilterStep.religion),
             leadingImagePath: AppImages.quranSvgIcon,
@@ -235,7 +235,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           ),
           const SizedBox(height: 8),
           InfoTile(
-            title: 'Community',
+            title: 'Community'.localized(context),
             value: provider.communitySummary,
             onTap: () => setState(() => _step = ContactFilterStep.community),
             leadingImagePath: AppImages.groupsIcon,
@@ -243,7 +243,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           ),
           const SizedBox(height: 8),
           InfoTile(
-            title: 'Mother Tongue',
+            title: 'Mother Tongue'.localized(context),
             value: provider.motherTongueSummary,
             onTap: () => setState(() => _step = ContactFilterStep.motherTongue),
             leadingImagePath: AppImages.languageSvgIcon,
@@ -251,7 +251,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           ),
           const SizedBox(height: 8),
           InfoTile(
-            title: 'Country Living In',
+            title: 'Country Living In'.localized(context),
             value: provider.countryLivingInSummary,
             onTap: () =>
                 setState(() => _step = ContactFilterStep.countryLivingIn),

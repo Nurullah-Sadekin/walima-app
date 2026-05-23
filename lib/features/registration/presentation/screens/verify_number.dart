@@ -13,6 +13,7 @@ import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:walima_llc/core/global/components/resend_code_timer.dart';
 import 'package:go_router/go_router.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class VerifyNumberScreen extends ConsumerStatefulWidget {
   const VerifyNumberScreen({super.key, this.fromScreen});
@@ -29,7 +30,8 @@ class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
   late RegistrationProvider provider;
 
   bool get _isFromCompleteProfile {
-    return widget.fromScreen?.trim() == VerifyNumberScreen.completeProfileSource;
+    return widget.fromScreen?.trim() ==
+        VerifyNumberScreen.completeProfileSource;
   }
 
   final List<TextEditingController> _otpControllers = List.generate(
@@ -124,7 +126,7 @@ class _VerifyNumberScreenState extends ConsumerState<VerifyNumberScreen> {
                         color: AppColors.primary,
                       ),
                       Text(
-                        'Edit',
+                        'Edit'.localized(context),
                         style: TextStyle(
                           fontSize: TextSize.font14(context),
                           color: AppColors.primary,

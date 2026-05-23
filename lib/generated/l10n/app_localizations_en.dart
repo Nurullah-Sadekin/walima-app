@@ -190,4 +190,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get about => 'About';
+
+  @override
+  String get completeYourProfile => 'Complete Your Profile';
+
+  @override
+  String profileCompletionPercentage(Object percentage) {
+    return 'Your profile is $percentage% complete';
+  }
+
+  @override
+  String get seeMore => 'See More';
+
+  @override
+  String get seeLess => 'See Less';
+
+  @override
+  String completeSectionTitle(Object sectionLabel) {
+    return 'Complete $sectionLabel';
+  }
+
+  @override
+  String get profileSection => 'Profile Section';
+
+  @override
+  String fieldsLeft(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fields left',
+      one: '1 field left',
+      zero: 'No fields left',
+    );
+    return '$_temp0';
+  }
 }
