@@ -4,6 +4,7 @@ import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/utils/clipboard_utils.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 /// Reusable profile info card used in EditProfileScreen.
 /// Supports either a free-form `child` or a list of key/value pairs via `infoList`.
@@ -73,7 +74,7 @@ class ProfileViewCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            title,
+                            title.localized(context),
                             style: TextStyle(
                               color: AppColors.textPrimaryLight,
                               fontSize: TextSize.font14(context),
@@ -81,7 +82,7 @@ class ProfileViewCard extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            subtitle ?? '',
+                            (subtitle ?? '').localized(context),
                             style: TextStyle(
                               color: AppColors.textSecondaryLight,
                               fontSize: TextSize.font12(context),
@@ -97,7 +98,7 @@ class ProfileViewCard extends StatelessWidget {
                     spacing: 6,
                     children: [
                       Text(
-                        title,
+                        title.localized(context),
                         style: TextStyle(
                           color: AppColors.textPrimaryLight,
                           fontSize: TextSize.font14(context),
@@ -185,7 +186,7 @@ class ProfileViewCard extends StatelessWidget {
                         Expanded(
                           flex: 3,
                           child: Text(
-                            '${entry.key}:',
+                            '${entry.key.localized(context)}:',
                             style: TextStyle(
                               color: AppColors.textSecondaryLight,
                               fontSize: TextSize.font12(context),
@@ -212,35 +213,37 @@ class ProfileViewCard extends StatelessWidget {
                 }).toList(),
               ),
             ),
-           if (itemList != null)
-             Padding(
-               padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
-               child: Wrap(
-                 spacing: 8,
-                 runSpacing: 8,
-                 alignment: WrapAlignment.start,
-                 crossAxisAlignment: WrapCrossAlignment.start,
-                 children: itemList!.map((item) {
-                   return Container(
-                     decoration: BoxDecoration(
-                       border: Border.all(color: AppColors.greyLight, width: 1),
-                       borderRadius: BorderRadius.circular(100),
-                     ),
-                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                     child: Text(
-                       item,
-                       maxLines: 2,
-                       overflow: TextOverflow.ellipsis,
-                       style: TextStyle(
-                         color: AppColors.textPrimaryLight,
-                         fontSize: TextSize.font12(context),
-                         fontWeight: FontWeight.w500,
-                       ),
-                     ),
-                   );
-                 }).toList(),
-               ),
-             )
+          if (itemList != null)
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.start,
+                crossAxisAlignment: WrapCrossAlignment.start,
+                children: itemList!.map((item) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppColors.greyLight, width: 1),
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: Text(
+                      item,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: AppColors.textPrimaryLight,
+                        fontSize: TextSize.font12(context),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            )
         ],
       ),
     );

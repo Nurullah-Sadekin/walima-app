@@ -5,6 +5,7 @@ import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/utils/camel_case_utils.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/profile_preview/data/models/profile_compare_response.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -24,7 +25,9 @@ class PreferenceMatchCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userImage = ref.watch(globalProvider).currentUser?.profilePicture?.url ?? matchImage;
+    final userImage =
+        ref.watch(globalProvider).currentUser?.profilePicture?.url ??
+            matchImage;
     final items = data.audit;
     final matchedCount = data.matchedCount ?? 0;
     final totalCount = data.totalCriteria ?? items.length;
@@ -59,7 +62,7 @@ class PreferenceMatchCard extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: Text(
-                'No comparison criteria available.',
+                'No comparison criteria available.'.localized(context),
                 style: TextStyle(
                   fontSize: TextSize.font12(context),
                   color: AppColors.textSecondaryLight,
@@ -75,7 +78,7 @@ class PreferenceMatchCard extends ConsumerWidget {
             child: Text(
               data.compatibilityLevel != null
                   ? ' ${CamelCaseUtils.formatCamelCase(data.compatibilityLevel)} Compatibility'
-                  : 'Compatibility level not available.',
+                  : 'Compatibility level not available.'.localized(context),
               style: TextStyle(
                 fontSize: TextSize.font14(context),
                 color: AppColors.primary,
@@ -87,8 +90,6 @@ class PreferenceMatchCard extends ConsumerWidget {
       ),
     );
   }
-
-
 }
 
 class _Header extends StatelessWidget {
@@ -125,7 +126,7 @@ class _Header extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                title,
+                title.localized(context),
                 style: TextStyle(
                   color: AppColors.textPrimaryLight,
                   fontSize: TextSize.font14(context),
@@ -216,7 +217,7 @@ class _MatchSummary extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  'Matched $matchedCount/$totalCount',
+                  '${'Matched'.localized(context)} $matchedCount/$totalCount',
                   style: TextStyle(
                     fontSize: TextSize.font12(context),
                     fontWeight: FontWeight.w500,
@@ -310,15 +311,17 @@ class _PreferenceInfoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String statusImage = item.isMatched ? AppImages.successCircle : AppImages.cancelCircle ;
-    final Color statusColor = item.isMatched ? AppColors.greenButtonColor.withOpacity(0.1) : AppColors.error.withOpacity(0.1);
+    final String statusImage =
+        item.isMatched ? AppImages.successCircle : AppImages.cancelCircle;
+    final Color statusColor = item.isMatched
+        ? AppColors.greenButtonColor.withOpacity(0.1)
+        : AppColors.error.withOpacity(0.1);
     final label = item.field ?? '-';
     final preferredValue = (item.preferredValue ?? '').trim().isNotEmpty
         ? item.preferredValue!
-        :  '-';
-    final actualValue = (item.actualValue ?? '').trim().isNotEmpty
-        ? item.actualValue!
-        :  '-';
+        : '-';
+    final actualValue =
+        (item.actualValue ?? '').trim().isNotEmpty ? item.actualValue! : '-';
 
     return Container(
       width: double.infinity,
@@ -329,7 +332,7 @@ class _PreferenceInfoTile extends StatelessWidget {
         border: Border.all(color: AppColors.greyLight),
       ),
       child: Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
             child: Column(
@@ -345,7 +348,7 @@ class _PreferenceInfoTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                    CamelCaseUtils.formatCamelCase(actualValue),
+                  CamelCaseUtils.formatCamelCase(actualValue),
                   style: TextStyle(
                     fontSize: TextSize.font12(context),
                     fontWeight: FontWeight.w500,
@@ -355,15 +358,13 @@ class _PreferenceInfoTile extends StatelessWidget {
               ],
             ),
           ),
-
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: ShowImage(
-              imagePath: statusImage,
-              height: TextSize.font18(context),
-              width: TextSize.font18(context),
-            )
-          ),
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: ShowImage(
+                imagePath: statusImage,
+                height: TextSize.font18(context),
+                width: TextSize.font18(context),
+              )),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
