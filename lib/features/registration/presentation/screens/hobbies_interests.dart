@@ -11,6 +11,7 @@ import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -47,8 +48,9 @@ class _HobbiesInterestsScreenState
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(hobbiesInterestsScreenProvider);
     return TransparentLoading(
-      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor ||
-          provider.isLookupDataLoading,
+      isLoading:
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor ||
+              provider.isLookupDataLoading,
       child: Scaffold(
         extendBodyBehindAppBar: true,
         backgroundColor: Colors.transparent,
@@ -58,7 +60,7 @@ class _HobbiesInterestsScreenState
               ? const Loading()
               : Column(
                   children: [
-                     CustomBackAppBar(
+                    CustomBackAppBar(
                       trailingText: 'Skip',
                       isTrailing: true,
                       onTrailingTap: () {
@@ -97,12 +99,13 @@ class _HobbiesInterestsScreenState
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Add Hobbies & Interests',
+              Text('Add Hobbies & Interests'.localized(context),
                   style: TextStyle(
                       fontSize: TextSize.font18(context),
                       color: AppColors.textPrimaryLight,
                       fontWeight: FontWeight.bold)),
-              Text('Helps us suggest more compatible matches',
+              Text(
+                  'Helps us suggest more compatible matches'.localized(context),
                   style: TextStyle(
                       fontSize: TextSize.font14(context),
                       color: AppColors.textSecondaryLight,
@@ -190,16 +193,19 @@ class _HobbiesInterestsScreenState
       buttonStyle: ButtonsStyle.iconicDynamicButton,
       verticalPadding: 14,
       borderRadius: 50,
-      title: 'Save & Continue ($selected/${RegistrationProvider.hobbiesSelectionMax})',
-      onTap: () async{
+      title:
+          '${'Save & Continue'.localized(context)} ($selected/${RegistrationProvider.hobbiesSelectionMax})',
+      onTap: () async {
         // show the save selected hobbies dialog
         final screenProvider = ref.watch(hobbiesInterestsScreenProvider);
-        screenProvider.updateViewState(loadingState:  RegistrationScreenStates.isProfileFor);
+        screenProvider.updateViewState(
+            loadingState: RegistrationScreenStates.isProfileFor);
         log('Selected Hobbies: ${provider.selectedHobbies}');
-         final updated = await provider.updateHobies();
-        screenProvider.updateViewState(loadingState:  RegistrationScreenStates.loadingComplete);
-        if(updated){
-          if(mounted){
+        final updated = await provider.updateHobies();
+        screenProvider.updateViewState(
+            loadingState: RegistrationScreenStates.loadingComplete);
+        if (updated) {
+          if (mounted) {
             context.push(Paths.familyDetails);
           }
         }

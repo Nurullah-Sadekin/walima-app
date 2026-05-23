@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/global/components/selection_card.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/registration/domain/single_string_model.dart';
 
 class HobbiesInterestsCard extends StatelessWidget {
-
   const HobbiesInterestsCard({
     super.key,
     required this.dataList,
@@ -31,7 +31,7 @@ class HobbiesInterestsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            title,
+            title.localized(context),
             style: TextStyle(
               fontSize: TextSize.font13(context),
               color: AppColors.textPrimaryLight,
