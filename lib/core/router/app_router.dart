@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/biodata/presentation/screens/biodata_generator_screen.dart';
 import 'package:walima_llc/features/login/presentation/login_with_email_screen.dart';
 import 'package:walima_llc/features/login/presentation/login_with_phone_screen.dart';
@@ -554,7 +555,7 @@ GoRouter goRouter(Ref ref) {
     ],
     errorBuilder: (context, state) => Scaffold(
       appBar: AppBar(
-        title: const Text('Error'),
+        title: Text('Error'.localized(context)),
       ),
       body: Center(
         child: Column(
@@ -573,7 +574,7 @@ GoRouter goRouter(Ref ref) {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => context.go(Paths.splash),
-              child: const Text('Go to Home'),
+              child: Text('Go to Home'.localized(context)),
             ),
           ],
         ),
