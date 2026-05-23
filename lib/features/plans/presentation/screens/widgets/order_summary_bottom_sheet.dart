@@ -4,6 +4,7 @@ import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/plans/data/models/get_plans_response.dart';
 import 'package:walima_llc/features/plans/data/models/upgrade_quote_response.dart';
 import 'package:intl/intl.dart';
@@ -19,7 +20,8 @@ class OrderSummaryBottomSheet extends StatefulWidget {
   final UpgradeQuoteData? upgradeQuote;
 
   @override
-  State<OrderSummaryBottomSheet> createState() => _OrderSummaryBottomSheetState();
+  State<OrderSummaryBottomSheet> createState() =>
+      _OrderSummaryBottomSheetState();
 }
 
 class _OrderSummaryBottomSheetState extends State<OrderSummaryBottomSheet> {
@@ -43,7 +45,8 @@ class _OrderSummaryBottomSheetState extends State<OrderSummaryBottomSheet> {
 
   int get _baseAmount => _pricing?.actualPrice ?? _pricing?.price ?? 0;
 
-  int get _quoteBaseAmount => widget.upgradeQuote?.baseTargetAmount ?? _baseAmount;
+  int get _quoteBaseAmount =>
+      widget.upgradeQuote?.baseTargetAmount ?? _baseAmount;
 
   int get _creditAmount => widget.upgradeQuote?.creditAmount ?? 0;
 
@@ -58,11 +61,9 @@ class _OrderSummaryBottomSheetState extends State<OrderSummaryBottomSheet> {
 
   int get _totalAmount =>
       (_isUpgradeMode
-              ? widget.upgradeQuote?.payableAmount ?? _quoteBaseAmount
-              : _baseAmount) +
-      (_isUpgradeMode
-          ? 0
-          : (_includeContribution ? _contributionAmount : 0));
+          ? widget.upgradeQuote?.payableAmount ?? _quoteBaseAmount
+          : _baseAmount) +
+      (_isUpgradeMode ? 0 : (_includeContribution ? _contributionAmount : 0));
 
   String _billingCycleLabel(String? billingCycle) {
     switch ((billingCycle ?? '').trim().toLowerCase()) {
@@ -112,7 +113,7 @@ class _OrderSummaryBottomSheetState extends State<OrderSummaryBottomSheet> {
               children: [
                 Expanded(
                   child: Text(
-                    'Order Summary',
+                    'Order Summary'.localized(context),
                     style: TextStyle(
                       color: AppColors.primary,
                       fontSize: TextSize.font20(context),
@@ -212,15 +213,17 @@ class _OrderSummaryBottomSheetState extends State<OrderSummaryBottomSheet> {
                   label: 'Total Amount',
                   amount: _formatMoney(_totalAmount, currency),
                   isTotal: true,
-                  amountColor:
-                      _isUpgradeMode ? AppColors.primary : AppColors.textPrimaryLight,
+                  amountColor: _isUpgradeMode
+                      ? AppColors.primary
+                      : AppColors.textPrimaryLight,
                 ),
                 const SizedBox(height: 34),
                 SizedBox(
                   width: double.infinity,
                   child: PrimaryButtons(
                     buttonStyle: ButtonsStyle.activePrimaryButton,
-                    title: _isUpgradeMode ? 'Continue to Pay' : 'Proceed To Pay',
+                    title:
+                        _isUpgradeMode ? 'Continue to Pay' : 'Proceed To Pay',
                     onTap: () => Navigator.of(context).pop(true),
                   ),
                 ),
@@ -273,7 +276,7 @@ class _SummaryAmountRow extends StatelessWidget {
       children: [
         Expanded(
           child: Text(
-            label,
+            label.localized(context),
             style: baseStyle.copyWith(
               color: labelColor ?? AppColors.textPrimaryLight,
             ),
@@ -316,9 +319,8 @@ class _SummaryAddonTile extends StatelessWidget {
     final titleColor = enabled
         ? AppColors.textPrimaryLight
         : AppColors.textSecondaryLight.withValues(alpha: 0.7);
-    final amountColor = enabled
-        ? AppColors.textPrimaryLight
-        : AppColors.disableText;
+    final amountColor =
+        enabled ? AppColors.textPrimaryLight : AppColors.disableText;
 
     return Material(
       color: Colors.transparent,
@@ -352,7 +354,7 @@ class _SummaryAddonTile extends StatelessWidget {
                   runSpacing: 6,
                   children: [
                     Text(
-                      title,
+                      title.localized(context),
                       style: TextStyle(
                         color: titleColor,
                         fontSize: TextSize.font14(context),
@@ -371,7 +373,7 @@ class _SummaryAddonTile extends StatelessWidget {
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
-                          badge!,
+                          badge!.localized(context),
                           style: TextStyle(
                             color: const Color(0xFF1D3F91),
                             fontSize: TextSize.font12(context),
