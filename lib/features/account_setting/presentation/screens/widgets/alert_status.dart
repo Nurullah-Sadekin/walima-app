@@ -4,10 +4,10 @@ import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/selection_card.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/account_setting/presentation/screens/widgets/card_border.dart';
 
 class AlertStatus extends StatelessWidget {
-
   const AlertStatus({
     super.key,
     required this.alertStatusList,
@@ -31,7 +31,7 @@ class AlertStatus extends StatelessWidget {
             child: Row(
               spacing: 8,
               children: [
-                 CircleAvatar(
+                CircleAvatar(
                   radius: 16,
                   backgroundColor: AppColors.primaryVariant,
                   child: ShowImage(
@@ -46,7 +46,7 @@ class AlertStatus extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        title ??  'Premium Visitors Email',
+                        (title ?? 'Premium Visitors Email').localized(context),
                         style: TextStyle(
                           color: AppColors.textSecondaryLight,
                           fontSize: TextSize.font15(context),
@@ -68,7 +68,9 @@ class AlertStatus extends StatelessWidget {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 2),
                   child: SelectionCard(
-                    buttonStyle: item.isSelected == true ? SelectionStyle.selectedRadio : SelectionStyle.unSelectedRadio ,
+                    buttonStyle: item.isSelected == true
+                        ? SelectionStyle.selectedRadio
+                        : SelectionStyle.unSelectedRadio,
                     noBorder: true,
                     radiaBackgroundColor: AppColors.transparent,
                     onTap: () {
@@ -91,7 +93,6 @@ class AlertStatus extends StatelessWidget {
 
 // Model class for alert status item
 class AlertStatusItem {
-
   AlertStatusItem({
     required this.label,
     this.isSelected = false,
