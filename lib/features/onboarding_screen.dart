@@ -14,6 +14,7 @@ import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/firebase_messaging_service.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:go_router/go_router.dart';
 import 'package:walima_llc/core/utils/link_opener.dart';
 import 'package:walima_llc/features/login/presentation/providers/login_provider.dart';
@@ -26,7 +27,6 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 }
 
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -87,8 +87,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       children: [
                         _PillButton(
                           icon: Icons.language,
-                          label: 'English',
-                          onTap: () {},
+                          label: 'Language',
+                          onTap: () =>
+                              context.pushNamed(Routes.languageSettings),
                         ),
                         _CircleButton(
                           icon: Icons.help_outline,
@@ -106,7 +107,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          'MATCH · MEET · MARRY',
+                          'MATCH · MEET · MARRY'.localized(context),
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.75),
                             fontSize: TextSize.font12(context),
@@ -146,7 +147,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                               spacing: 6,
                               children: [
                                 Text(
-                                  "Don't have an account?",
+                                  "Don't have an account?".localized(context),
                                   style: TextStyle(
                                     color: AppColors.hintTextColor,
                                     fontWeight: FontWeight.w500,
@@ -158,7 +159,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                     context.pushNamed(Routes.isProfileFor);
                                   },
                                   child: Text(
-                                    'Create now',
+                                    'Create now'.localized(context),
                                     style: TextStyle(
                                       color: AppColors.primary,
                                       fontWeight: FontWeight.bold,
@@ -173,7 +174,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         const SizedBox(height: 40),
                         RichText(
                           text: TextSpan(
-                            text: 'By continuing you agree to our ',
+                            text: 'By continuing you agree to our '
+                                .localized(context),
                             style: TextStyle(
                               color: Colors.white.withValues(alpha: 0.40),
                               fontSize: TextSize.font12(context),
@@ -181,7 +183,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             ),
                             children: [
                               TextSpan(
-                                text: 'Terms',
+                                text: 'Terms'.localized(context),
                                 style: TextStyle(
                                   color: Colors.white.withValues(alpha: 0.75),
                                   fontSize: TextSize.font12(context),
@@ -197,7 +199,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                   },
                               ),
                               TextSpan(
-                                text: ' and ',
+                                text: ' and '.localized(context),
                                 style: TextStyle(
                                   color: Colors.white.withValues(alpha: 0.40),
                                   fontSize: TextSize.font12(context),
@@ -205,7 +207,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                 ),
                               ),
                               TextSpan(
-                                text: 'Privacy policy',
+                                text: 'Privacy policy'.localized(context),
                                 style: TextStyle(
                                   color: Colors.white.withValues(alpha: 0.75),
                                   fontSize: TextSize.font12(context),
@@ -300,19 +302,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     ),
                   ),
                   const SizedBox(height: 14),
-                  const Text(
-                    'Need Help?',
-                    style: TextStyle(
+                  Text(
+                    'Need Help?'.localized(context),
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
                       color: Color(0xFF1A1A1A),
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    "We're here to help you on your journey to finding the right match.",
+                  Text(
+                    "We're here to help you on your journey to finding the right match."
+                        .localized(context),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w300,
                       color: Color(0xFF888888),
@@ -372,7 +375,7 @@ class _PillButton extends StatelessWidget {
               Icon(icon, size: 14, color: Colors.white),
               const SizedBox(width: 6),
               Text(
-                label,
+                label.localized(context),
                 style: const TextStyle(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w500,
@@ -420,7 +423,7 @@ class _CtaButton extends StatelessWidget {
               Icon(icon, color: foregroundColor, size: 18),
               const SizedBox(width: 10),
               Text(
-                label,
+                label.localized(context),
                 style: TextStyle(
                   color: foregroundColor,
                   fontSize: TextSize.font15(context),
@@ -488,7 +491,7 @@ class _HelpItem extends StatelessWidget {
               const SizedBox(width: 14),
               Expanded(
                 child: Text(
-                  title,
+                  title.localized(context),
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
