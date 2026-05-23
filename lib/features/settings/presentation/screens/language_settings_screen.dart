@@ -51,6 +51,14 @@ class LanguageSettingsScreen extends ConsumerWidget {
             currentLocale: currentLocale,
             onTap: () => ref.read(localeNotifierProvider.notifier).setBangla(),
           ),
+          const SizedBox(height: 12),
+          _LanguageOptionTile(
+            title: l10n.arabic,
+            subtitle: 'العربية',
+            locale: const Locale('ar'),
+            currentLocale: currentLocale,
+            onTap: () => ref.read(localeNotifierProvider.notifier).setArabic(),
+          ),
         ],
       ),
     );
@@ -87,7 +95,8 @@ class _LanguageOptionTile extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: isSelected ? AppColors.primary : AppColors.inputBorderColor,
+              color:
+                  isSelected ? AppColors.primary : AppColors.inputBorderColor,
             ),
           ),
           child: Row(
