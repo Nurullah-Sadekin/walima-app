@@ -9,6 +9,7 @@ import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/utils/dialog_utils.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/matches/presentation/widgets/tab_bar_widget.dart';
 import 'package:walima_llc/features/profile/data/model/response/dashboard_response.dart';
 import 'package:walima_llc/features/registration/data/models/request/upload_media_request_body.dart';
@@ -275,7 +276,7 @@ class _GovernmentIdVerifyScreenState
             minimumSize: Size.zero,
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
-          child: const Text('Replace File'),
+          child: Text('Replace File'.localized(context)),
         ),
       ],
     );
@@ -315,18 +316,21 @@ class _GovernmentIdVerifyScreenState
     } on PlatformException catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'Permission denied. Please allow photo library access and try again.',
+            'Permission denied. Please allow photo library access and try again.'
+                .localized(context),
           ),
         ),
       );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content:
-              Text('Unable to pick the document right now. Please try again.'),
+        SnackBar(
+          content: Text(
+            'Unable to pick the document right now. Please try again.'
+                .localized(context),
+          ),
         ),
       );
     } finally {
@@ -342,9 +346,9 @@ class _GovernmentIdVerifyScreenState
     final filePath = _selectedFilePath?.trim() ?? '';
     if (filePath.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please upload a document first.'),
-          duration: Duration(seconds: 1),
+        SnackBar(
+          content: Text('Please upload a document first.'.localized(context)),
+          duration: const Duration(seconds: 1),
         ),
       );
       return;
@@ -370,8 +374,8 @@ class _GovernmentIdVerifyScreenState
         DialogUtils.showSuccessDialog(
             context: context,
             title: response.code ?? 'Verify Done',
-            message:
-                response.message ?? 'Verification complete! Instant alerts for matches and profile views are now active.',
+            message: response.message ??
+                'Verification complete! Instant alerts for matches and profile views are now active.',
             autoClose: false,
             onButtonPressed: () {
               Navigator.pop(context);
@@ -390,8 +394,11 @@ class _GovernmentIdVerifyScreenState
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Something went wrong while uploading the document.'),
+        SnackBar(
+          content: Text(
+            'Something went wrong while uploading the document.'
+                .localized(context),
+          ),
         ),
       );
     } finally {
