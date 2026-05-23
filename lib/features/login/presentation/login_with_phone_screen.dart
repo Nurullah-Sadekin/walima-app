@@ -11,6 +11,7 @@ import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/firebase_messaging_service.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/core/utils/validators.dart';
 import 'package:walima_llc/features/login/presentation/providers/login_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -187,7 +188,7 @@ class _LoginWithPhoneScreenState extends ConsumerState<LoginWithPhoneScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Login with',
+                  'Login with'.localized(context),
                   style: TextStyle(
                     color: AppColors.textPrimaryLight,
                     fontWeight: FontWeight.bold,
@@ -196,7 +197,7 @@ class _LoginWithPhoneScreenState extends ConsumerState<LoginWithPhoneScreen> {
                   ),
                 ),
                 Text(
-                  'Phone',
+                  'Phone'.localized(context),
                   style: TextStyle(
                     color: AppColors.primary,
                     fontWeight: FontWeight.bold,
@@ -211,7 +212,7 @@ class _LoginWithPhoneScreenState extends ConsumerState<LoginWithPhoneScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30.0),
           child: Text(
-            subtitle,
+            subtitle.localized(context),
             textAlign: TextAlign.center,
             style: TextStyle(
               color: AppColors.hintTextColor,
@@ -329,7 +330,7 @@ class _LoginWithPhoneScreenState extends ConsumerState<LoginWithPhoneScreen> {
                             : null,
                       ),
                       Text(
-                        'Keep me logged in',
+                        'Keep me logged in'.localized(context),
                         style: TextStyle(
                           color: AppColors.textSecondaryLight,
                           fontWeight: FontWeight.w400,
@@ -346,7 +347,7 @@ class _LoginWithPhoneScreenState extends ConsumerState<LoginWithPhoneScreen> {
                     context.push(Paths.sendOtp);
                   },
                   child: Text(
-                    'Forgot password?',
+                    'Forgot password?'.localized(context),
                     style: TextStyle(
                       color: AppColors.primary,
                       fontWeight: FontWeight.w500,
@@ -404,7 +405,7 @@ class _LoginWithPhoneScreenState extends ConsumerState<LoginWithPhoneScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  'OR CONTINUE WITH',
+                  'OR CONTINUE WITH'.localized(context),
                   style: TextStyle(
                     color: AppColors.hintTextColor,
                     fontSize: TextSize.font12(context),

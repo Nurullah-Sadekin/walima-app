@@ -13,6 +13,7 @@ import 'package:walima_llc/core/global/components/primary_textField.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/firebase_messaging_service.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/login/presentation/providers/login_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -90,7 +91,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   spacing: 6,
                   children: [
                     Text(
-                      "Don't have an account?",
+                      "Don't have an account?".localized(context),
                       style: TextStyle(
                         color: AppColors.hintTextColor,
                         fontWeight: FontWeight.w500,
@@ -106,7 +107,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         spacing: 4,
                         children: [
                           Text(
-                            'Sign Up Free',
+                            'Sign Up Free'.localized(context),
                             style: TextStyle(
                               color: AppColors.primary,
                               fontWeight: FontWeight.bold,
@@ -134,7 +135,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       Column(
         children: [
           Text(
-            'Welcome Back!',
+            'Welcome Back!'.localized(context),
             style: TextStyle(
               color: AppColors.textPrimaryLight,
               fontWeight: FontWeight.bold,
@@ -147,7 +148,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Please',
+                'Please'.localized(context),
                 style: TextStyle(
                   color: AppColors.textPrimaryLight,
                   fontWeight: FontWeight.bold,
@@ -156,7 +157,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
               ),
               Text(
-                'Login',
+                'Login'.localized(context),
                 style: TextStyle(
                   color: AppColors.primary,
                   fontWeight: FontWeight.bold,
@@ -171,7 +172,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30.0),
         child: Text(
-          'Use the same Email or Mobile No. That you used to create your profile on Walima.',
+          'Use the same Email or Mobile No. That you used to create your profile on Walima.'
+              .localized(context),
           textAlign: TextAlign.center,
           style: TextStyle(
             color: AppColors.hintTextColor,
@@ -239,7 +241,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  'OR LOGIN WITH OTP',
+                  'OR LOGIN WITH OTP'.localized(context),
                   style: TextStyle(
                     color: AppColors.hintTextColor,
                     fontSize: TextSize.font12(context),
