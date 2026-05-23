@@ -46,10 +46,17 @@ class LocaleNotifier extends _$LocaleNotifier {
     await setLocale(const Locale('bn'));
   }
 
+  /// Set Arabic locale
+  Future<void> setArabic() async {
+    await setLocale(const Locale('ar'));
+  }
+
   /// Toggle between English and Bangla
   Future<void> toggleLocale() async {
     if (state.languageCode == 'en') {
       await setBangla();
+    } else if (state.languageCode == 'bn') {
+      await setArabic();
     } else {
       await setEnglish();
     }
@@ -60,4 +67,7 @@ class LocaleNotifier extends _$LocaleNotifier {
 
   /// Check if current locale is Bangla
   bool get isBangla => state.languageCode == 'bn';
+
+  /// Check if current locale is Arabic
+  bool get isArabic => state.languageCode == 'ar';
 }
