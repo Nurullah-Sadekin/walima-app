@@ -4,6 +4,7 @@ import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/bottom_sheet_widget/widgets/icon_title_card.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class ContactsViewed extends StatelessWidget {
   const ContactsViewed({
@@ -39,7 +40,8 @@ class ContactsViewed extends StatelessWidget {
           width: 64,
           radius: BorderRadius.circular(100),
         ),
-        Text(name ?? 'N/A',
+        Text(
+          (name ?? 'N/A').localized(context),
           style: TextStyle(
             fontSize: TextSize.font18(context),
             fontWeight: FontWeight.w500,
@@ -47,13 +49,13 @@ class ContactsViewed extends StatelessWidget {
           ),
         ),
         Container(
-          decoration:
-          BoxDecoration(
+          decoration: BoxDecoration(
             color: AppColors.primaryVariant,
             borderRadius: BorderRadius.circular(100),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          child: Text('Profile Created by ${profileCreatedBy ?? 'N/A'}',
+          child: Text(
+            '${'Profile Created by'.localized(context)} ${(profileCreatedBy ?? 'N/A').localized(context)}',
             style: TextStyle(
               fontSize: TextSize.font12(context),
               fontWeight: FontWeight.w500,
@@ -61,7 +63,6 @@ class ContactsViewed extends StatelessWidget {
             ),
           ),
         ),
-
         IconTitleCard(
           title: 'Walima Chat',
           imagePath: AppImages.chatIcon,
@@ -69,9 +70,7 @@ class ContactsViewed extends StatelessWidget {
           iconColor: AppColors.white,
           onTap: onTapShaadi,
         ),
-
       ],
     );
   }
 }
-
