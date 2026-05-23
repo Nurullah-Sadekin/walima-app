@@ -223,7 +223,7 @@ extension _ProfileSectionEditUiFormFieldsPart
             padding: const EdgeInsets.only(top: 12),
             child: TextButton(
               onPressed: onLoadMore,
-              child: const Text('Load more'),
+              child: Text('Load more'.localized(context)),
             ),
           ),
       ],
