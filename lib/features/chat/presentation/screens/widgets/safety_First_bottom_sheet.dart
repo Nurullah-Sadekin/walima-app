@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 import '../../../../../core/utils/image_viewer.dart';
 import 'dismissible_safety_card.dart';
 
 class SafetyFirst extends StatelessWidget {
-
   const SafetyFirst({
     super.key,
     this.onViewMoreTips,
@@ -15,7 +15,6 @@ class SafetyFirst extends StatelessWidget {
   });
   final VoidCallback? onViewMoreTips;
   final List<SafetyTip>? additionalTips;
-
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +34,7 @@ class SafetyFirst extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context) {
     return Text(
-      'Safety First',
+      'Safety First'.localized(context),
       style: TextStyle(
         fontSize: TextSize.font18(context),
         fontWeight: FontWeight.w500,
@@ -48,19 +47,22 @@ class SafetyFirst extends StatelessWidget {
     return const [
       DismissibleSafetyCard(
         title: 'Take Your Time',
-        message: 'Get to know someone well before taking the conversation offline.',
+        message:
+            'Get to know someone well before taking the conversation offline.',
         iconPath: AppImages.lockPasswordSvgIcon,
       ),
       SizedBox(height: 16),
       DismissibleSafetyCard(
         title: 'Stay Alert',
-        message: 'Watch out for quick commitments or money requests. Keep your financial details private.',
+        message:
+            'Watch out for quick commitments or money requests. Keep your financial details private.',
         iconPath: AppImages.alertSvgIcon,
       ),
       SizedBox(height: 16),
       DismissibleSafetyCard(
         title: 'Report',
-        message: 'Report the profile if you encounter offensive messages or anything suspicious.',
+        message:
+            'Report the profile if you encounter offensive messages or anything suspicious.',
         iconPath: AppImages.flagSvgIcon,
       ),
     ];
@@ -69,13 +71,13 @@ class SafetyFirst extends StatelessWidget {
   List<Widget> _buildAdditionalTips() {
     return additionalTips!
         .expand((tip) => [
-      const SizedBox(height: 16),
-      DismissibleSafetyCard(
-        title: tip.title,
-        message: tip.message,
-        iconPath: tip.iconPath,
-      ),
-    ])
+              const SizedBox(height: 16),
+              DismissibleSafetyCard(
+                title: tip.title,
+                message: tip.message,
+                iconPath: tip.iconPath,
+              ),
+            ])
         .toList();
   }
 
@@ -85,7 +87,7 @@ class SafetyFirst extends StatelessWidget {
       child: Row(
         children: [
           Text(
-            'Get More Safety Tips',
+            'Get More Safety Tips'.localized(context),
             style: TextStyle(
               fontSize: TextSize.font16(context),
               fontWeight: FontWeight.w500,
@@ -105,7 +107,6 @@ class SafetyFirst extends StatelessWidget {
 }
 
 class SafetyTip {
-
   const SafetyTip({
     required this.title,
     required this.message,
