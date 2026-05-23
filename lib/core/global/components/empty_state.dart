@@ -3,9 +3,9 @@ import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class EmptyStateWidget extends StatelessWidget {
-
   const EmptyStateWidget({
     super.key,
     required this.title,
@@ -49,7 +49,7 @@ class EmptyStateWidget extends StatelessWidget {
             SizedBox(height: spacing ?? 16),
           ],
           Text(
-            title,
+            title.localized(context),
             textAlign: TextAlign.center,
             style: TextStyle(
               color: AppColors.textPrimaryLight,
@@ -59,7 +59,7 @@ class EmptyStateWidget extends StatelessWidget {
           ),
           SizedBox(height: spacing ?? 8),
           Text(
-            subtitle,
+            subtitle.localized(context),
             textAlign: TextAlign.center,
             style: TextStyle(
               color: AppColors.textSecondaryLight,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class CustomExpansionTile extends StatefulWidget {
   const CustomExpansionTile({
@@ -92,9 +93,9 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
       decoration: BoxDecoration(
         color: _isExpanded ? widget.backgroundColor : AppColors.white,
         border: Border.all(
-            color: (_isExpanded ? widget.borderColor : AppColors.greyLight) ??
-                AppColors.greyLight,
-            width: 1,
+          color: (_isExpanded ? widget.borderColor : AppColors.greyLight) ??
+              AppColors.greyLight,
+          width: 1,
         ),
         borderRadius: BorderRadius.all(
           Radius.circular(widget.borderRadius ?? 8),
@@ -107,7 +108,8 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
         child: ExpansionTile(
           initiallyExpanded: widget.initiallyExpanded,
           onExpansionChanged: (v) => setState(() => _isExpanded = v),
-          collapsedIconColor: widget.collapsedIconColor ?? AppColors.hintTextColor,
+          collapsedIconColor:
+              widget.collapsedIconColor ?? AppColors.hintTextColor,
           iconColor: widget.iconColor ?? AppColors.hintTextColor,
           leading: widget.isLeading
               ? GestureDetector(
@@ -146,7 +148,7 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
                   }
                 : null,
             child: Text(
-              widget.title,
+              widget.title.localized(context),
               style: TextStyle(
                 fontSize: TextSize.font16(context),
                 fontWeight: FontWeight.w500,

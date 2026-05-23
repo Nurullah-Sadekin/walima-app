@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class IsProfileForItemWidget extends StatelessWidget {
   const IsProfileForItemWidget({
@@ -17,7 +18,6 @@ class IsProfileForItemWidget extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
   final bool showIcon;
-
 
   @override
   Widget build(BuildContext context) {
@@ -61,20 +61,22 @@ class IsProfileForItemWidget extends StatelessWidget {
                   : null,
             ),
 
-            if(showIcon)...[
+            if (showIcon) ...[
               const SizedBox(width: 8),
-               ShowImage(
+              ShowImage(
                 imagePath: imagePath,
                 height: TextSize.font20(context),
                 width: TextSize.font20(context),
-                color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
-               )
+                color: isSelected
+                    ? AppColors.primary
+                    : AppColors.textSecondaryLight,
+              )
             ],
             const SizedBox(width: 8),
 
             /// Title
             Text(
-              title,
+              title.localized(context),
               style: TextStyle(
                 fontSize: TextSize.font14(context),
                 fontWeight: FontWeight.w500,

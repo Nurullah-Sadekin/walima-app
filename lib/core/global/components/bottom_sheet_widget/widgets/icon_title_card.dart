@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class IconTitleCard extends StatelessWidget {
-
   const IconTitleCard({
     super.key,
     required this.imagePath,
@@ -60,7 +60,6 @@ class IconTitleCard extends StatelessWidget {
       spacing: spacing,
       children: [
         _buildIconContainer(context),
-
         _buildTitle(context),
       ],
     );
@@ -98,7 +97,7 @@ class IconTitleCard extends StatelessWidget {
 
   Widget _buildTitle(BuildContext context) {
     return Text(
-      title,
+      title.localized(context),
       style: TextStyle(
         fontSize: TextSize.font12(context),
         fontWeight: FontWeight.w400,

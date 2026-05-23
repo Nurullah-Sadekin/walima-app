@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class PrimaryButtons extends StatelessWidget {
   const PrimaryButtons({
@@ -67,13 +68,13 @@ class PrimaryButtons extends StatelessWidget {
     }
   }
 
+  String _title(BuildContext context) => (title ?? '').localized(context);
+
   Widget activePrimaryButton(context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          vertical: 10,horizontal: 16
-        ),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
         decoration: ShapeDecoration(
           color: AppColors.primary,
           shape: RoundedRectangleBorder(
@@ -86,7 +87,7 @@ class PrimaryButtons extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              title ?? '',
+              _title(context),
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
@@ -119,7 +120,7 @@ class PrimaryButtons extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                title ?? '',
+                _title(context),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: AppColors.primary,
@@ -139,14 +140,15 @@ class PrimaryButtons extends StatelessWidget {
       onTap: onTap,
       child: Container(
           alignment: Alignment.center,
-          padding:  EdgeInsets.symmetric(vertical: verticalPadding ?? 10,
+          padding: EdgeInsets.symmetric(
+            vertical: verticalPadding ?? 10,
           ),
           decoration: BoxDecoration(
             color: AppColors.disableBackground,
             borderRadius: BorderRadius.circular(borderRadius ?? 6),
           ),
           child: Text(
-            title ?? '',
+            _title(context),
             style: TextStyle(
                 fontWeight: FontWeight.w500,
                 color: AppColors.disableText,
@@ -169,7 +171,7 @@ class PrimaryButtons extends StatelessWidget {
           border: Border.all(color: AppColors.greyLight, width: 1),
         ),
         child: Text(
-          title ?? '',
+          _title(context),
           style: TextStyle(
               color: AppColors.textPrimaryLight,
               fontWeight: FontWeight.w500,
@@ -183,10 +185,11 @@ class PrimaryButtons extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding:  EdgeInsets.symmetric(vertical: verticalPadding ?? 10),
+        padding: EdgeInsets.symmetric(vertical: verticalPadding ?? 10),
         decoration: BoxDecoration(
           color: bgColor ?? AppColors.primary,
-          border: Border.all(color: borderColor ?? Colors.transparent, width: 1),
+          border:
+              Border.all(color: borderColor ?? Colors.transparent, width: 1),
           borderRadius: BorderRadius.circular(borderRadius ?? 6),
         ),
         child: Row(
@@ -206,7 +209,7 @@ class PrimaryButtons extends StatelessWidget {
                 width: 8,
               ),
             Text(
-              title ?? '',
+              _title(context),
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: textColor ?? Colors.white,
@@ -238,7 +241,8 @@ class PrimaryButtons extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
         decoration: BoxDecoration(
           color: bgColor,
-          border: Border.all(color: borderColor ?? Colors.transparent, width: 1),
+          border:
+              Border.all(color: borderColor ?? Colors.transparent, width: 1),
           borderRadius: BorderRadius.circular(borderRadius ?? 12),
         ),
         child: Row(
@@ -258,7 +262,7 @@ class PrimaryButtons extends StatelessWidget {
               width: 10,
             ),
             Text(
-              title ?? '',
+              _title(context),
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: textColor ?? Colors.white,
@@ -279,7 +283,8 @@ class PrimaryButtons extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 32),
         decoration: BoxDecoration(
           color: bgColor,
-          border: Border.all(color: borderColor ?? Colors.transparent, width: 1),
+          border:
+              Border.all(color: borderColor ?? Colors.transparent, width: 1),
           borderRadius: BorderRadius.circular(borderRadius ?? 12),
         ),
         child: Row(
@@ -295,11 +300,10 @@ class PrimaryButtons extends StatelessWidget {
                     color: svgIconColor,
                   )
                 : const SizedBox.shrink(),
-
             Expanded(
               child: Center(
                 child: Text(
-                  title ?? '',
+                  _title(context),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: textColor ?? Colors.white,

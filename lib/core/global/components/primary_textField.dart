@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/input_border_style.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -114,7 +115,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
           }
 
           DateTime selectedDate =
-          DateTime.now().subtract(const Duration(days: 365 * 19));
+              DateTime.now().subtract(const Duration(days: 365 * 19));
 
           try {
             final existing =
@@ -153,9 +154,9 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
                         children: [
                           CupertinoButton(
                             padding: EdgeInsets.zero,
-                            child: const Text(
-                              'Cancel',
-                              style: TextStyle(
+                            child: Text(
+                              'Cancel'.localized(context),
+                              style: const TextStyle(
                                 color: AppColors.textSecondaryLight,
                               ),
                             ),
@@ -164,7 +165,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
                             },
                           ),
                           Text(
-                            'Select Date',
+                            'Select Date'.localized(context),
                             style: TextStyle(
                               color: AppColors.textPrimaryLight,
                               fontSize: TextSize.font18(context),
@@ -175,16 +176,16 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
                           ),
                           CupertinoButton(
                             padding: EdgeInsets.zero,
-                            child: const Text(
-                              'Done',
-                              style: TextStyle(
+                            child: Text(
+                              'Done'.localized(context),
+                              style: const TextStyle(
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                             onPressed: () {
                               final formatted =
-                              DateFormat('yyyy-MM-dd').format(selectedDate);
+                                  DateFormat('yyyy-MM-dd').format(selectedDate);
 
                               if (widget.controller != null) {
                                 widget.controller!.text = formatted;
@@ -204,7 +205,6 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
                         ],
                       ),
                     ),
-
                     Expanded(
                       child: CupertinoTheme(
                         data: CupertinoThemeData(
@@ -218,7 +218,6 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
                           ),
                           primaryColor: AppColors.primary,
                           applyThemeToAll: true,
-
                         ),
                         child: CupertinoDatePicker(
                           mode: CupertinoDatePickerMode.date,
@@ -244,7 +243,6 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
 
           return;
         }
-
 
         if (widget.onTap != null) widget.onTap!();
       },
@@ -283,7 +281,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
           fontSize: TextSize.font14(context),
           fontWeight: FontWeight.w400,
         ),
-        hintText: widget.hintText ?? 'Your Username',
+        hintText: (widget.hintText ?? 'Your Username').localized(context),
         errorText: widget.errorText == '' ? null : widget.errorText,
         errorMaxLines: 2,
         errorStyle: TextStyle(
@@ -362,7 +360,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
           children: [
             if (widget.headLine != null)
               Text(
-                widget.headLine!,
+                widget.headLine!.localized(context),
                 style: TextStyle(
                     fontSize: TextSize.font14(context),
                     fontWeight: FontWeight.w500,
@@ -381,7 +379,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
               ),
             if (widget.isOptional == true && widget.headLine != null)
               Text(
-                '(optional)',
+                '(optional)'.localized(context),
                 style: TextStyle(
                     fontSize: TextSize.font10(context),
                     fontWeight: FontWeight.w400,

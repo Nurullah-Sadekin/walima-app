@@ -5,6 +5,7 @@ import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class BottomSheetUtils {
   /// Shows a bottom sheet with a list of items for single selection (Dropdown style)
@@ -20,14 +21,12 @@ class BottomSheetUtils {
     // Create a local copy of selected value to manage state
     dynamic tempSelectedValue = selectedValue;
     String searchQuery = '';
-
-    // Calculate dynamic height based on number of items
-    double itemHeight = 70.0; // Approximate height per item
-    double headerHeight = 60.0; // Height of header section
-    double searchHeight = isSearchEnabled ? 72.0 : 0.0;
-    double maxHeight = MediaQuery.of(context).size.height * 0.9; // Max 60% of screen
-    double calculatedHeight = (items.length * itemHeight) + headerHeight + searchHeight;
-    double bottomSheetHeight = calculatedHeight > maxHeight ? maxHeight : calculatedHeight;
+    final itemHeight = 70.0;
+    final headerHeight = 60.0;
+    final searchHeight = isSearchEnabled ? 72.0 : 0.0;
+    final maxHeight = MediaQuery.of(context).size.height * 0.9;
+    final calculatedHeight =
+        (items.length * itemHeight) + headerHeight + searchHeight;
 
     return showModalBottomSheet(
       context: context,
@@ -41,7 +40,9 @@ class BottomSheetUtils {
         final mediaQuery = MediaQuery.of(context);
         final keyboardInset = mediaQuery.viewInsets.bottom;
         final availableHeight = mediaQuery.size.height - keyboardInset;
-        final bottomSheetHeight = keyboardInset > 0 ? availableHeight : (calculatedHeight > maxHeight ? maxHeight : calculatedHeight);
+        final bottomSheetHeight = keyboardInset > 0
+            ? availableHeight
+            : (calculatedHeight > maxHeight ? maxHeight : calculatedHeight);
 
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
@@ -119,7 +120,8 @@ class BottomSheetUtils {
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  borderSide: const BorderSide(color: AppColors.greyLight),
+                                  borderSide: const BorderSide(
+                                      color: AppColors.greyLight),
                                 ),
                                 filled: true,
                                 fillColor: AppColors.greyLight.withOpacity(0.5),
@@ -259,7 +261,7 @@ class BottomSheetUtils {
 
           Expanded(
             child: Text(
-              header,
+              header.localized(context),
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -285,19 +287,19 @@ class BottomSheetUtils {
     Function(dynamic) onItemSelected,
   ) {
     if (items.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.do_not_disturb_outlined,
               size: 30,
               color: AppColors.disableText,
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
-              'No items available',
-              style: TextStyle(
+              'No items available'.localized(context),
+              style: const TextStyle(
                 fontSize: 16,
                 color: Colors.grey,
               ),
@@ -312,7 +314,8 @@ class BottomSheetUtils {
         bottom: 10,
       ), // Remove padding to eliminate extra space
       shrinkWrap: true, // Important: makes ListView take only needed space
-      physics: const AlwaysScrollableScrollPhysics(), // Enable scrolling if needed
+      physics:
+          const AlwaysScrollableScrollPhysics(), // Enable scrolling if needed
       itemCount: items.length,
       separatorBuilder: (context, index) => const Padding(
         padding: EdgeInsets.symmetric(horizontal: 16),
@@ -320,7 +323,8 @@ class BottomSheetUtils {
       itemBuilder: (context, index) {
         final item = items[index];
         final displayText = _display(item);
-        final selectedText = selectedValue != null ? selectedValue.toString() : '';
+        final selectedText =
+            selectedValue != null ? selectedValue.toString() : '';
         final isSelected = displayText == selectedText;
 
         return Container(
