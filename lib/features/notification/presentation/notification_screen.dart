@@ -9,6 +9,7 @@ import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/utils/date_time_utils.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/notification/data/notification_response.dart';
 import 'package:walima_llc/features/notification/presentation/providers/notificaiton_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -37,7 +38,8 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
   Widget build(BuildContext context) {
     provider = ref.watch(notiProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == NotificationScreenStates.transparentLoading,
+      isLoading:
+          provider.loaderState == NotificationScreenStates.transparentLoading,
       child: Scaffold(
         body: GradientBackground(
           child: Column(
@@ -53,7 +55,9 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                 ),
               ),
               Expanded(
-                child: provider.screenStates == NotificationScreenStates.loading ? const Loading() : _body(),
+                child: provider.screenStates == NotificationScreenStates.loading
+                    ? const Loading()
+                    : _body(),
               ),
             ],
           ),
@@ -75,21 +79,23 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
         children: [
-         // _actionBar(),
+          // _actionBar(),
           Expanded(
             child: RefreshIndicator(
               onRefresh: () => provider.getAllNotification(isRefresh: true),
               color: AppColors.primary,
               child: NotificationListener<ScrollNotification>(
                 onNotification: (scrollNotification) {
-                  if (scrollNotification.metrics.pixels >= scrollNotification.metrics.maxScrollExtent - 120) {
+                  if (scrollNotification.metrics.pixels >=
+                      scrollNotification.metrics.maxScrollExtent - 120) {
                     provider.loadMoreNotifications();
                   }
                   return false;
                 },
                 child: ListView.separated(
-                  padding:  EdgeInsets.zero,
-                  itemCount: provider.notifications.length + (provider.isLoadingMore ? 1 : 0),
+                  padding: EdgeInsets.zero,
+                  itemCount: provider.notifications.length +
+                      (provider.isLoadingMore ? 1 : 0),
                   separatorBuilder: (_, __) => const SizedBox(height: 16),
                   itemBuilder: (context, index) {
                     if (index >= provider.notifications.length) {
@@ -105,9 +111,10 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
               ),
             ),
           ),
-           Text(
-            provider.pagination?.page == provider.pagination?.totalPages ?
-            'No more' : 'Swipe down for more',
+          Text(
+            provider.pagination?.page == provider.pagination?.totalPages
+                ? 'No more'
+                : 'Swipe down for more',
             style: const TextStyle(
               color: AppColors.textSecondaryLight,
               fontSize: 12,
@@ -121,14 +128,15 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
   }
 
   Widget _actionBar() {
-    final unreadCount = provider.notifications.where((item) => item.isRead != true).length;
+    final unreadCount =
+        provider.notifications.where((item) => item.isRead != true).length;
     return Padding(
       padding: const EdgeInsets.fromLTRB(10, 0, 10, 12),
       child: Row(
         children: [
           Expanded(
             child: Text(
-              '$unreadCount unread',
+              '$unreadCount ${'unread'.localized(context)}',
               style: TextStyle(
                 color: AppColors.textSecondaryLight,
                 fontSize: TextSize.font12(context),
@@ -140,14 +148,16 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
             onTap: unreadCount == 0
                 ? null
                 : () {
-              provider.markAllNotificationsAsRead();
-            },
-            child: Text('Mark all as read',
-                style: TextStyle(
-                  color: AppColors.primary,
-                  fontSize: TextSize.font12(context),
-                  fontWeight: FontWeight.w600,
-                )),
+                    provider.markAllNotificationsAsRead();
+                  },
+            child: Text(
+              'Mark all as read'.localized(context),
+              style: TextStyle(
+                color: AppColors.primary,
+                fontSize: TextSize.font12(context),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
@@ -156,8 +166,11 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
 
   Widget _notificationCard(NotificationItem item) {
     final senderName = item.sender?.displayName?.trim();
-    final displayName = (senderName?.isNotEmpty ?? false) ? senderName! : 'Walima';
-    final title = (item.title?.trim().isNotEmpty ?? false) ? item.title!.trim() : displayName;
+    final displayName =
+        (senderName?.isNotEmpty ?? false) ? senderName! : 'Walima';
+    final title = (item.title?.trim().isNotEmpty ?? false)
+        ? item.title!.trim()
+        : displayName;
     final message = item.message?.trim() ?? '';
     final isRead = item.isRead == true;
 
@@ -259,18 +272,17 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
       );
     }
     return Container(
-      width: 46,
-      height: 46,
-      padding: const EdgeInsets.all(10),
-      decoration: const BoxDecoration(
-        color: AppColors.greyLight,
-        shape: BoxShape.circle,
-      ),
-      child:  const ShowImage(
-        imagePath: AppImages.notificationSvgIcon,
-        color: AppColors.textSecondaryLight,
-      )
-      );
+        width: 46,
+        height: 46,
+        padding: const EdgeInsets.all(10),
+        decoration: const BoxDecoration(
+          color: AppColors.greyLight,
+          shape: BoxShape.circle,
+        ),
+        child: const ShowImage(
+          imagePath: AppImages.notificationSvgIcon,
+          color: AppColors.textSecondaryLight,
+        ));
   }
 
   Widget _emptyState() {
