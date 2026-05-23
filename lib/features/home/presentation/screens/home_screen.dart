@@ -13,6 +13,7 @@ import 'package:walima_llc/core/utils/date_time_utils.dart';
 import 'package:walima_llc/core/utils/height_utils.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
 import 'package:walima_llc/core/utils/link_opener.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/anchor_point/achore_appbar.dart';
 import 'package:walima_llc/features/drawer/presentation/app_drawer.dart';
 import 'package:walima_llc/features/home/data/model/response/recent_visitors_response.dart';
@@ -35,8 +36,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-
-
   final Key profileImageKey = const ValueKey('home_profile_image');
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _showProfileSummary = true;
@@ -186,7 +185,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _premiumMatches() {
     final provider = ref.watch(homeProvider);
-    final currentPlan = resolvePlanName(ref.watch(profileProvider).dashboard?.profile?.membership);
+    final currentPlan = resolvePlanName(
+        ref.watch(profileProvider).dashboard?.profile?.membership);
     final matches = provider.premiumMatches;
     final isLoading = provider.isLoadingPremiumMatches;
     final errorText = provider.premiumMatchesError;
@@ -226,39 +226,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ],
               ),
               if (currentPlan != 'free')
-              InkWell(
-                borderRadius: BorderRadius.circular(8.0),
-                onTap: () => context.pushNamed(Routes.premiumMatches),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10.0,
-                    vertical: 10.0,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(color: AppColors.greyLight),
-                  ),
-                  child: Row(
-                    children: [
-                      Text(
-                        'View All',
-                        style: TextStyle(
-                          color: AppColors.textSecondaryLight,
-                          fontSize: TextSize.font14(context),
-                          fontWeight: FontWeight.w500,
+                InkWell(
+                  borderRadius: BorderRadius.circular(8.0),
+                  onTap: () => context.pushNamed(Routes.premiumMatches),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                      vertical: 10.0,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(8.0),
+                      border: Border.all(color: AppColors.greyLight),
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          'View All',
+                          style: TextStyle(
+                            color: AppColors.textSecondaryLight,
+                            fontSize: TextSize.font14(context),
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        color: AppColors.textSecondaryLight,
-                        size: TextSize.font12(context),
-                      ),
-                    ],
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          color: AppColors.textSecondaryLight,
+                          size: TextSize.font12(context),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         ),
@@ -306,10 +306,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Row(
                   children: [
                     ...matches.take(2).map(_buildPremiumMatchCard),
-
                     if (currentPlan == 'free')
                       _buildUpgradeWidget(matches.length - 2),
-
                     if (currentPlan != 'free')
                       ...matches.skip(2).map(_buildPremiumMatchCard),
                   ],
@@ -323,7 +321,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildUpgradeWidget(int remainingCount, {bool? isForVisitors}) {
-    String subText = isForVisitors == true ? 'recent visitors' : 'premium matches';
+    String subText =
+        isForVisitors == true ? 'recent visitors' : 'premium matches';
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -343,11 +342,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const SizedBox(height: 8),
           Text(
             'See $remainingCount more $subText',
-            style: TextStyle(fontSize: TextSize.font14(context), color: AppColors.textSecondaryLight),
+            style: TextStyle(
+                fontSize: TextSize.font14(context),
+                color: AppColors.textSecondaryLight),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 12),
-
           InkWell(
             onTap: () => context.pushNamed(
               Routes.upgradePackage,
@@ -361,7 +361,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               child: const Text(
                 'Upgrade Now',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
               ),
             ),
           ),
@@ -383,7 +384,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         width: 300,
         child: ProfileComprehensiveCard(
           onTapCard: () {
-            context.pushNamed(Routes.profilePreview, extra: {'userId': match.id});
+            context
+                .pushNamed(Routes.profilePreview, extra: {'userId': match.id});
           },
           imagePath: imagePath ??
               (match.gender == 'female'
@@ -455,21 +457,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         description: match.connection?.message,
         isDescriptionVisible: false,
         onWalimaChatPressed: match.id == null
-          ? null
-          : () {
-        context.pushNamed(
-          Routes.chatScreen,
-          extra: {
-            'conversationId': match.connection?.conversationId,
-            'participant': {
-              'userId': match.id,
-              'displayName': match.displayName,
-              'profilePictureUrl': match.profilePhoto?.url,
-              'isOnline': match.isOnline,
-            },
-          },
-        );
-      },
+            ? null
+            : () {
+                context.pushNamed(
+                  Routes.chatScreen,
+                  extra: {
+                    'conversationId': match.connection?.conversationId,
+                    'participant': {
+                      'userId': match.id,
+                      'displayName': match.displayName,
+                      'profilePictureUrl': match.profilePhoto?.url,
+                      'isOnline': match.isOnline,
+                    },
+                  },
+                );
+              },
       ),
     );
   }
@@ -510,7 +512,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _recentVisitors() {
     final provider = ref.watch(homeProvider);
     final visitors = provider.recentVisitors;
-    final currentPlan = ref.watch(profileProvider).dashboard?.profile?.membership?.plan?.name;
+    final currentPlan =
+        ref.watch(profileProvider).dashboard?.profile?.membership?.plan?.name;
     final isLoading = provider.isLoadingRecentVisitors;
     final errorText = provider.recentVisitorsError;
     final subtitleText = isLoading
@@ -549,39 +552,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ],
               ),
               if (currentPlan != 'free')
-              InkWell(
-                borderRadius: BorderRadius.circular(8.0),
-                onTap: () => context.pushNamed(Routes.recentVisitors),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10.0,
-                    vertical: 10.0,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(color: AppColors.greyLight),
-                  ),
-                  child: Row(
-                    children: [
-                      Text(
-                        'View All',
-                        style: TextStyle(
-                          color: AppColors.textSecondaryLight,
-                          fontSize: TextSize.font14(context),
-                          fontWeight: FontWeight.w500,
+                InkWell(
+                  borderRadius: BorderRadius.circular(8.0),
+                  onTap: () => context.pushNamed(Routes.recentVisitors),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                      vertical: 10.0,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(8.0),
+                      border: Border.all(color: AppColors.greyLight),
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          'View All',
+                          style: TextStyle(
+                            color: AppColors.textSecondaryLight,
+                            fontSize: TextSize.font14(context),
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        color: AppColors.textSecondaryLight,
-                        size: TextSize.font12(context),
-                      ),
-                    ],
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          color: AppColors.textSecondaryLight,
+                          size: TextSize.font12(context),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         ),
@@ -629,10 +632,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Row(
                   children: [
                     ...visitors.take(2).map(_buildRecentVisitorCard),
-
                     if (currentPlan == 'free')
-                      _buildUpgradeWidget(visitors.length - 2, isForVisitors: true),
-
+                      _buildUpgradeWidget(visitors.length - 2,
+                          isForVisitors: true),
                     if (currentPlan != 'free')
                       ...visitors.skip(2).map(_buildRecentVisitorCard),
                   ],
@@ -660,7 +662,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         width: 300,
         child: ProfileComprehensiveCard(
           onTapCard: () {
-            context.pushNamed(Routes.profilePreview, extra: {'userId': visitor.id});
+            context.pushNamed(Routes.profilePreview,
+                extra: {'userId': visitor.id});
           },
           imagePath: imagePath,
           imageHeight: 250,
@@ -726,19 +729,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onWalimaChatPressed: visitor.id == null
             ? null
             : () {
-          context.pushNamed(
-            Routes.chatScreen,
-            extra: {
-              'conversationId': visitor.connection?.conversationId,
-              'participant': {
-                'userId': visitor.id,
-                'displayName': visitor.displayName,
-                'profilePictureUrl': visitor.profilePhoto?.url,
-                'isOnline': visitor.isOnline,
+                context.pushNamed(
+                  Routes.chatScreen,
+                  extra: {
+                    'conversationId': visitor.connection?.conversationId,
+                    'participant': {
+                      'userId': visitor.id,
+                      'displayName': visitor.displayName,
+                      'profilePictureUrl': visitor.profilePhoto?.url,
+                      'isOnline': visitor.isOnline,
+                    },
+                  },
+                );
               },
-            },
-          );
-        },
       ),
     );
   }
@@ -813,8 +816,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     imagePath: AppImages.whatsappSvgIcon,
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Whatsapp link is not configured yet'),
+                        SnackBar(
+                          content: Text(
+                            'Whatsapp link is not configured yet'
+                                .localized(context),
+                          ),
                         ),
                       );
                     },
