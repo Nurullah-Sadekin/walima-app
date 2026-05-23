@@ -13,6 +13,7 @@ import 'package:walima_llc/core/global/components/selection_card.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/utils/dialog_utils.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:walima_llc/features/home/data/model/response/profile_strength_response.dart';
 import 'package:walima_llc/features/profile/data/model/request/update_profile_section_request_body.dart';
@@ -65,16 +66,24 @@ class ProfileSectionEditScreen extends ConsumerStatefulWidget {
   final List<ProfileStrengthField> strengthFields;
 
   @override
-  ConsumerState<ProfileSectionEditScreen> createState() => _ProfileSectionEditScreenState();
+  ConsumerState<ProfileSectionEditScreen> createState() =>
+      _ProfileSectionEditScreenState();
 }
 
-abstract class _ProfileSectionEditScreenFields extends ConsumerState<ProfileSectionEditScreen> {
-  final ProfileSectionEditDomainRepository _domainRepository = ProfileSectionEditDomainRepositoryImpl();
-  final LocationDataRepositoryImpl _locationRepository = LocationDataRepositoryImpl();
-  final ProfileSectionStrengthFieldsUseCase _strengthFieldsUseCase = const ProfileSectionStrengthFieldsUseCase();
-  final ProfileSectionFieldKeyUseCase _fieldKeyUseCase = const ProfileSectionFieldKeyUseCase();
-  final ProfileSectionProfileValueUseCase _profileValueUseCase = const ProfileSectionProfileValueUseCase();
-  final ProfileSectionLookupSlugCandidatesUseCase _lookupSlugCandidatesUseCase = const ProfileSectionLookupSlugCandidatesUseCase();
+abstract class _ProfileSectionEditScreenFields
+    extends ConsumerState<ProfileSectionEditScreen> {
+  final ProfileSectionEditDomainRepository _domainRepository =
+      ProfileSectionEditDomainRepositoryImpl();
+  final LocationDataRepositoryImpl _locationRepository =
+      LocationDataRepositoryImpl();
+  final ProfileSectionStrengthFieldsUseCase _strengthFieldsUseCase =
+      const ProfileSectionStrengthFieldsUseCase();
+  final ProfileSectionFieldKeyUseCase _fieldKeyUseCase =
+      const ProfileSectionFieldKeyUseCase();
+  final ProfileSectionProfileValueUseCase _profileValueUseCase =
+      const ProfileSectionProfileValueUseCase();
+  final ProfileSectionLookupSlugCandidatesUseCase _lookupSlugCandidatesUseCase =
+      const ProfileSectionLookupSlugCandidatesUseCase();
 
   List<LookupOption> _educationLevelOptions = <LookupOption>[];
   List<LookupOption> _professionOptions = <LookupOption>[];
@@ -88,8 +97,10 @@ abstract class _ProfileSectionEditScreenFields extends ConsumerState<ProfileSect
   List<SingleStringModel> _languageOptions = <SingleStringModel>[];
 
   final Map<String, String> _selectedApiValues = <String, String>{};
-  final Map<String, TextEditingController> _dynamicFieldControllers = <String, TextEditingController>{};
-  final Map<String, List<LookupOption>> _dynamicFieldLookupOptions = <String, List<LookupOption>>{};
+  final Map<String, TextEditingController> _dynamicFieldControllers =
+      <String, TextEditingController>{};
+  final Map<String, List<LookupOption>> _dynamicFieldLookupOptions =
+      <String, List<LookupOption>>{};
   final Map<String, String> _dynamicFieldSelectedApiValues = <String, String>{};
   bool _didInitStrengthFieldMeta = false;
 
@@ -98,32 +109,41 @@ abstract class _ProfileSectionEditScreenFields extends ConsumerState<ProfileSect
   final TextEditingController _managedByController = TextEditingController();
   final TextEditingController _genderController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
-  final TextEditingController _maritalStatusController = TextEditingController();
+  final TextEditingController _maritalStatusController =
+      TextEditingController();
   final TextEditingController _motherTongueController = TextEditingController();
   final TextEditingController _languagesController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
-  final TextEditingController _heightDisplayController = TextEditingController();
+  final TextEditingController _heightDisplayController =
+      TextEditingController();
   final TextEditingController _dietController = TextEditingController();
   final TextEditingController _bloodGroupController = TextEditingController();
   final TextEditingController _healthInfoController = TextEditingController();
   final TextEditingController _disabilityController = TextEditingController();
   final TextEditingController _religionController = TextEditingController();
   final TextEditingController _communityController = TextEditingController();
-  final TextEditingController _religiousBackgroundController = TextEditingController();
+  final TextEditingController _religiousBackgroundController =
+      TextEditingController();
   final TextEditingController _grewUpInController = TextEditingController();
   final TextEditingController _fatherNameController = TextEditingController();
-  final TextEditingController _fatherProfessionController = TextEditingController();
+  final TextEditingController _fatherProfessionController =
+      TextEditingController();
   final TextEditingController _motherNameController = TextEditingController();
-  final TextEditingController _motherProfessionController = TextEditingController();
-  final TextEditingController _familyLocationController = TextEditingController();
+  final TextEditingController _motherProfessionController =
+      TextEditingController();
+  final TextEditingController _familyLocationController =
+      TextEditingController();
   final TextEditingController _brothersController = TextEditingController();
   final TextEditingController _sistersController = TextEditingController();
-  final TextEditingController _familyFinancialController = TextEditingController();
+  final TextEditingController _familyFinancialController =
+      TextEditingController();
   final TextEditingController _familyTypeController = TextEditingController();
   final TextEditingController _familyValuesController = TextEditingController();
   final TextEditingController _aboutFamilyController = TextEditingController();
-  final TextEditingController _marriageTimelineController = TextEditingController();
-  final TextEditingController _highestQualificationController = TextEditingController();
+  final TextEditingController _marriageTimelineController =
+      TextEditingController();
+  final TextEditingController _highestQualificationController =
+      TextEditingController();
   final TextEditingController _collegeController = TextEditingController();
   final TextEditingController _annualIncomeController = TextEditingController();
   final TextEditingController _workingWithController = TextEditingController();
@@ -132,29 +152,41 @@ abstract class _ProfileSectionEditScreenFields extends ConsumerState<ProfileSect
   final TextEditingController _countryController = TextEditingController();
   final TextEditingController _stateController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
-  final TextEditingController _residencyStatusController = TextEditingController();
+  final TextEditingController _residencyStatusController =
+      TextEditingController();
   final TextEditingController _zipController = TextEditingController();
   final TextEditingController _grewUpController = TextEditingController();
   final TextEditingController _prefAgeMinController = TextEditingController();
   final TextEditingController _prefAgeMaxController = TextEditingController();
-  final TextEditingController _prefHeightMinController = TextEditingController();
-  final TextEditingController _prefHeightMaxController = TextEditingController();
+  final TextEditingController _prefHeightMinController =
+      TextEditingController();
+  final TextEditingController _prefHeightMaxController =
+      TextEditingController();
   final TextEditingController _prefReligionController = TextEditingController();
-  final TextEditingController _prefCommunityController = TextEditingController();
-  final TextEditingController _prefMotherTongueController = TextEditingController();
+  final TextEditingController _prefCommunityController =
+      TextEditingController();
+  final TextEditingController _prefMotherTongueController =
+      TextEditingController();
   final TextEditingController _prefMaritalController = TextEditingController();
   final TextEditingController _prefCountryController = TextEditingController();
   final TextEditingController _prefStateController = TextEditingController();
   final TextEditingController _prefCityController = TextEditingController();
-  final TextEditingController _prefEducationController = TextEditingController();
-  final TextEditingController _prefProfessionController = TextEditingController();
-  final TextEditingController _prefWorkingAsController = TextEditingController();
+  final TextEditingController _prefEducationController =
+      TextEditingController();
+  final TextEditingController _prefProfessionController =
+      TextEditingController();
+  final TextEditingController _prefWorkingAsController =
+      TextEditingController();
   final TextEditingController _prefIncomeController = TextEditingController();
-  final TextEditingController _prefProfileManagedByController = TextEditingController();
+  final TextEditingController _prefProfileManagedByController =
+      TextEditingController();
   final TextEditingController _prefDietController = TextEditingController();
-  final TextEditingController _prefPartnerExpectationsController = TextEditingController();
-  final TextEditingController _prefSmokingExpectationsController = TextEditingController();
-  final TextEditingController _prefDrinkingExpectationsController = TextEditingController();
+  final TextEditingController _prefPartnerExpectationsController =
+      TextEditingController();
+  final TextEditingController _prefSmokingExpectationsController =
+      TextEditingController();
+  final TextEditingController _prefDrinkingExpectationsController =
+      TextEditingController();
 
   bool _didPrefill = false;
   bool _didLoadFamilyLookups = false;
@@ -190,8 +222,10 @@ abstract class _ProfileSectionEditScreenFields extends ConsumerState<ProfileSect
 }
 
 class _ProfileSectionEditScreenState extends _ProfileSectionEditScreenFields {
-  static final Map<String, String> _familyEconomicConditionAliases = <String, String>{
-    for (final condition in RegistrationFamilyEconomicCondition.values) condition.label.toLowerCase(): condition.apiValue,
+  static final Map<String, String> _familyEconomicConditionAliases =
+      <String, String>{
+    for (final condition in RegistrationFamilyEconomicCondition.values)
+      condition.label.toLowerCase(): condition.apiValue,
     'elite': RegistrationFamilyEconomicCondition.eliteClass.apiValue,
     'elite class': RegistrationFamilyEconomicCondition.eliteClass.apiValue,
     'high': RegistrationFamilyEconomicCondition.upperClass.apiValue,
@@ -200,7 +234,8 @@ class _ProfileSectionEditScreenState extends _ProfileSectionEditScreenFields {
     'middle class': RegistrationFamilyEconomicCondition.middleClass.apiValue,
     'middle_class': RegistrationFamilyEconomicCondition.middleClass.apiValue,
     'aspiring': RegistrationFamilyEconomicCondition.lowerMiddleClass.apiValue,
-    'lower middle class': RegistrationFamilyEconomicCondition.lowerMiddleClass.apiValue,
+    'lower middle class':
+        RegistrationFamilyEconomicCondition.lowerMiddleClass.apiValue,
   };
 
   static const List<LookupOption> _religionOptions = <LookupOption>[
@@ -266,7 +301,8 @@ class _ProfileSectionEditScreenState extends _ProfileSectionEditScreenFields {
     });
   }
 
-  String get _screenStateKey => '${widget.section.key}:${widget.strengthSectionKey ?? ''}';
+  String get _screenStateKey =>
+      '${widget.section.key}:${widget.strengthSectionKey ?? ''}';
 
   ProfileSectionEditUiState get _uiState => ref.read(
         profileSectionEditUiProvider(_screenStateKey),
@@ -413,7 +449,8 @@ class _StyledRangeSlider extends StatelessWidget {
     const horizontalPadding = 20.0;
     const thumbDiameter = 22.0;
     const sliderTop = 34.0;
-    final availableWidth = MediaQuery.of(context).size.width - 40 - (horizontalPadding * 2);
+    final availableWidth =
+        MediaQuery.of(context).size.width - 40 - (horizontalPadding * 2);
     final startFactor = ((values.start - min) / (max - min)).clamp(0.0, 1.0);
     final endFactor = ((values.end - min) / (max - min)).clamp(0.0, 1.0);
     final startLeft = (availableWidth * startFactor) - 22;

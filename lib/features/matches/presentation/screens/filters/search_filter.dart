@@ -4,6 +4,7 @@ import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/global/components/dropdown_field.dart';
 import 'package:walima_llc/core/global/components/selection_card.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/matches/presentation/provider/search_filter_provider.dart';
 import 'package:walima_llc/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:walima_llc/features/matches/presentation/widgets/setting_switcher_title.dart';
@@ -82,7 +83,7 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
               decoration: InputDecoration(
                 filled: true,
                 fillColor: const Color(0xFFF7F7F7),
-                hintText: 'Enter Profile ID',
+                hintText: 'Enter Profile ID'.localized(context),
                 border: InputBorder.none, // No border
                 enabledBorder: InputBorder.none, // No border when enabled
                 focusedBorder: InputBorder.none, // No border when focused
@@ -484,7 +485,7 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
 
   Widget headLineText(String text, {double? fontSize}) {
     return Text(
-      text,
+      text.localized(context),
       style: TextStyle(
         fontSize: fontSize ?? TextSize.font14(context),
         fontWeight: FontWeight.w500,
@@ -509,9 +510,10 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
               ? <String>[]
               : <String>[provider.communityController.text.trim()],
           'motherTongue': provider.motherTongueController.text.trim(),
-          'countryLivingIn': provider.countryLivingController.text.trim().isEmpty
-              ? <String>[]
-              : <String>[provider.countryLivingController.text.trim()],
+          'countryLivingIn':
+              provider.countryLivingController.text.trim().isEmpty
+                  ? <String>[]
+                  : <String>[provider.countryLivingController.text.trim()],
           'stateLivingIn': provider.stateLivingController.text.trim().isEmpty
               ? <String>[]
               : <String>[provider.stateLivingController.text.trim()],

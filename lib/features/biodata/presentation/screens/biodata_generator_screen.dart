@@ -6,6 +6,7 @@ import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/global/components/custom_back_appbar.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/biodata/domain/model/biodata_document.dart';
 
 class BioDataGeneratorScreen extends ConsumerStatefulWidget {
@@ -96,7 +97,7 @@ class _Content extends StatelessWidget {
     return Column(
       children: [
         CustomBackAppBar(
-          title: const Text('Download Bio-data'),
+          title: Text('Download Bio-data'.localized(context)),
           onBackPressed: () => context.pop(),
         ),
         Expanded(
@@ -134,7 +135,7 @@ class _Content extends StatelessWidget {
                   child: OutlinedButton.icon(
                     onPressed: onSave,
                     icon: const Icon(Icons.download_rounded),
-                    label: const Text('Save PDF'),
+                    label: Text('Save PDF'.localized(context)),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -142,7 +143,7 @@ class _Content extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: onShare,
                     icon: const Icon(Icons.share_rounded),
-                    label: const Text('Share'),
+                    label: Text('Share'.localized(context)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
@@ -706,7 +707,10 @@ class _ErrorState extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(onPressed: onRetry, child: const Text('Try again')),
+            ElevatedButton(
+              onPressed: onRetry,
+              child: Text('Try again'.localized(context)),
+            ),
           ],
         ),
       ),
@@ -742,7 +746,10 @@ class _EmptyState extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(onPressed: onRetry, child: const Text('Refresh')),
+            ElevatedButton(
+              onPressed: onRetry,
+              child: Text('Refresh'.localized(context)),
+            ),
           ],
         ),
       ),

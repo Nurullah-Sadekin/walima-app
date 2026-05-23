@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:walima_llc/core/utils/in_app_webview_screen.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class LinkOpener {
   const LinkOpener._();
@@ -25,7 +26,8 @@ class LinkOpener {
     final uri = Uri.tryParse(url);
     if (uri == null || !uri.hasScheme) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Unable to open $title')),
+        SnackBar(
+            content: Text('${'Unable to open'.localized(context)} $title')),
       );
       return;
     }

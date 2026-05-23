@@ -4,6 +4,7 @@ import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class DialogUtils {
   static Future<void> showSuccessDialog({
@@ -32,7 +33,8 @@ class DialogUtils {
         void localSafeClose() {
           if (dismissed) return;
           dismissed = true;
-          if (Navigator.of(dialogContext, rootNavigator: true).canPop()) Navigator.of(dialogContext, rootNavigator: true).pop();
+          if (Navigator.of(dialogContext, rootNavigator: true).canPop())
+            Navigator.of(dialogContext, rootNavigator: true).pop();
           if (onClose != null) onClose();
         }
 
@@ -43,7 +45,8 @@ class DialogUtils {
           isSuccess: true,
           imagePath: imagePath,
           title: title,
-          message: message ?? 'Purchase done! Instant alerts for matches\nand profile views are now enabled.',
+          message: message ??
+              'Purchase done! Instant alerts for matches\nand profile views are now enabled.',
           buttonText: buttonText,
           onButtonPressed: onButtonPressed ?? localSafeClose,
           onClose: localSafeClose,
@@ -91,7 +94,8 @@ class DialogUtils {
         void localSafeClose() {
           if (dismissed) return;
           dismissed = true;
-          if (Navigator.of(dialogContext, rootNavigator: true).canPop()) Navigator.of(dialogContext, rootNavigator: true).pop();
+          if (Navigator.of(dialogContext, rootNavigator: true).canPop())
+            Navigator.of(dialogContext, rootNavigator: true).pop();
           if (onClose != null) onClose();
         }
 
@@ -102,7 +106,8 @@ class DialogUtils {
           isSuccess: true,
           imagePath: imagePath,
           title: title,
-          message: message ?? 'Purchase done! Instant alerts for matches\nand profile views are now enabled.',
+          message: message ??
+              'Purchase done! Instant alerts for matches\nand profile views are now enabled.',
           buttonText: buttonText, // Always show button now
           onButtonPressed: onButtonPressed ?? localSafeClose,
           onClose: localSafeClose,
@@ -129,13 +134,13 @@ class DialogUtils {
     required BuildContext context,
     required String title,
     String? message,
-    String? buttonText =' Enable Now',
+    String? buttonText = ' Enable Now',
     bool autoClose = false,
     Duration autoCloseDuration = const Duration(seconds: 2),
     VoidCallback? onClose,
     VoidCallback? onButtonPressed,
     String? imagePath = AppImages.alertStatus,
-    String? disableButtonText ='Remind Me Later',
+    String? disableButtonText = 'Remind Me Later',
     bool isDisableButton = true,
     VoidCallback? onDisableButtonPressed,
   }) async {
@@ -151,7 +156,8 @@ class DialogUtils {
         void localSafeClose() {
           if (dismissed) return;
           dismissed = true;
-          if (Navigator.of(dialogContext, rootNavigator: true).canPop()) Navigator.of(dialogContext, rootNavigator: true).pop();
+          if (Navigator.of(dialogContext, rootNavigator: true).canPop())
+            Navigator.of(dialogContext, rootNavigator: true).pop();
           if (onClose != null) onClose();
         }
 
@@ -162,7 +168,8 @@ class DialogUtils {
           isSuccess: true,
           imagePath: imagePath,
           title: title,
-          message: message ?? 'Purchase done! Instant alerts for matches\nand profile views are now enabled.',
+          message: message ??
+              'Purchase done! Instant alerts for matches\nand profile views are now enabled.',
           buttonText: buttonText, // Always show button now
           onButtonPressed: onButtonPressed ?? localSafeClose,
           onClose: localSafeClose,
@@ -213,13 +220,13 @@ class DialogUtils {
           mainAxisSize: MainAxisSize.min,
           children: [
             ShowImage(
-              imagePath: imagePath ??AppImages.successfulStatus,
+              imagePath: imagePath ?? AppImages.successfulStatus,
               width: 80,
               height: 80,
             ),
             const SizedBox(height: 20),
             Text(
-              title,
+              title.localized(context),
               maxLines: 1,
               textHeightBehavior: const TextHeightBehavior(
                 applyHeightToFirstAscent: false,
@@ -248,17 +255,17 @@ class DialogUtils {
                 onTap: onButtonPressed ?? () {},
                 title: buttonText,
               ),
-              if(isDisableButton)
-              Column(
-                children: [
-                  const SizedBox(height: 8),
-                  PrimaryButtons(
-                    buttonStyle: ButtonsStyle.disableButton,
-                    onTap: onDisableButtonPressed ?? () {},
-                    title: disableButtonText,
-                  ),
-                ],
-              ),
+              if (isDisableButton)
+                Column(
+                  children: [
+                    const SizedBox(height: 8),
+                    PrimaryButtons(
+                      buttonStyle: ButtonsStyle.disableButton,
+                      onTap: onDisableButtonPressed ?? () {},
+                      title: disableButtonText,
+                    ),
+                  ],
+                ),
             ],
           ],
         ),
@@ -271,16 +278,17 @@ class DialogUtils {
     final shouldClose = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Exit App'),
-        content: const Text('Are you sure you want to exit the app?'),
+        title: Text('Exit App'.localized(context)),
+        content:
+            Text('Are you sure you want to exit the app?'.localized(context)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false), // Don't close
-            child: const Text('Cancel'),
+            child: Text('Cancel'.localized(context)),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true), // Close
-            child: const Text('Exit'),
+            child: Text('Exit'.localized(context)),
           ),
         ],
       ),
@@ -288,14 +296,15 @@ class DialogUtils {
     return shouldClose ??
         false; // Return false if dialog is dismissed without selection
   }
-  
-  static Future<void> show({required BuildContext context,required Widget child}) async {
+
+  static Future<void> show(
+      {required BuildContext context, required Widget child}) async {
     await showDialog(
       context: context,
       builder: (context) => child,
     );
   }
-  
+
   static Future<void> showFullScreenImage({
     required BuildContext context,
     required String imagePath,
@@ -319,7 +328,7 @@ class DialogUtils {
               radius: BorderRadius.zero,
             ),
             Positioned(
-              top:  MediaQuery.of(context).size.height * 0.25,
+              top: MediaQuery.of(context).size.height * 0.25,
               right: 10,
               child: GestureDetector(
                 onTap: () => Navigator.of(context).pop(),
@@ -337,5 +346,5 @@ class DialogUtils {
         ),
       ),
     );
-}
+  }
 }

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
-class SettingsSwitchTile extends StatelessWidget { // Control switch size
+class SettingsSwitchTile extends StatelessWidget {
+  // Control switch size
 
   const SettingsSwitchTile({
     super.key,
@@ -29,8 +31,6 @@ class SettingsSwitchTile extends StatelessWidget { // Control switch size
   final Color? trailingImageColor;
   final bool? isVisibleSwitcher;
 
-
-
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -47,14 +47,15 @@ class SettingsSwitchTile extends StatelessWidget { // Control switch size
                   height: trailingImageSize ?? TextSize.font20(context),
                   color: trailingImageColor ?? AppColors.textPrimaryLight,
                 ),
-              if (showTrailingImage) const SizedBox(width: 8), // Spacing between image and text
+              if (showTrailingImage)
+                const SizedBox(width: 8), // Spacing between image and text
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: 4,
                   children: [
                     Text(
-                      title,
+                      title.localized(context),
                       textHeightBehavior: const TextHeightBehavior(
                         applyHeightToFirstAscent: false,
                         applyHeightToLastDescent: false,
@@ -67,7 +68,7 @@ class SettingsSwitchTile extends StatelessWidget { // Control switch size
                     ),
                     if (subtitle != null)
                       Text(
-                        subtitle!,
+                        subtitle!.localized(context),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.start,
@@ -90,56 +91,56 @@ class SettingsSwitchTile extends StatelessWidget { // Control switch size
 
         // Right side - Switch and optional trailing image
         if (isVisibleSwitcher ?? true)
-        Transform.scale(
-          scale: switchScale,
-          alignment: Alignment.centerRight,
-          child: Switch(
-            value: value,
-            onChanged: onChanged,
-            activeTrackColor: AppColors.primary,
-            inactiveThumbColor: AppColors.white,
-            inactiveTrackColor: AppColors.greyLight,
-            thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
-                  (Set<MaterialState> states) {
-                if (states.contains(MaterialState.selected)) {
+          Transform.scale(
+            scale: switchScale,
+            alignment: Alignment.centerRight,
+            child: Switch(
+              value: value,
+              onChanged: onChanged,
+              activeTrackColor: AppColors.primary,
+              inactiveThumbColor: AppColors.white,
+              inactiveTrackColor: AppColors.greyLight,
+              thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
+                (Set<MaterialState> states) {
+                  if (states.contains(MaterialState.selected)) {
+                    return Icon(
+                      Icons.circle,
+                      color: AppColors.primary,
+                      size: TextSize.font10(context),
+                    );
+                  }
                   return Icon(
                     Icons.circle,
-                    color: AppColors.primary,
+                    color: AppColors.greyLight,
                     size: TextSize.font10(context),
                   );
-                }
-                return Icon(
-                  Icons.circle,
-                  color: AppColors.greyLight,
-                  size: TextSize.font10(context),
-                );
-              },
+                },
+              ),
+              thumbColor: MaterialStateProperty.resolveWith<Color?>(
+                (Set<MaterialState> states) {
+                  return AppColors.white;
+                },
+              ),
+              trackColor: MaterialStateProperty.resolveWith<Color?>(
+                (Set<MaterialState> states) {
+                  if (states.contains(MaterialState.selected)) {
+                    return AppColors.primary;
+                  }
+                  return AppColors.greyLight;
+                },
+              ),
+              trackOutlineColor: MaterialStateProperty.resolveWith<Color?>(
+                (Set<MaterialState> states) {
+                  if (states.contains(MaterialState.selected)) {
+                    return AppColors.primary;
+                  }
+                  return AppColors.greyLight;
+                },
+              ),
+              padding: EdgeInsets.zero,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-            thumbColor: MaterialStateProperty.resolveWith<Color?>(
-                  (Set<MaterialState> states) {
-                return AppColors.white;
-              },
-            ),
-            trackColor: MaterialStateProperty.resolveWith<Color?>(
-                  (Set<MaterialState> states) {
-                if (states.contains(MaterialState.selected)) {
-                  return AppColors.primary;
-                }
-                return AppColors.greyLight;
-              },
-            ),
-            trackOutlineColor: MaterialStateProperty.resolveWith<Color?>(
-                  (Set<MaterialState> states) {
-                if (states.contains(MaterialState.selected)) {
-                  return AppColors.primary;
-                }
-                return AppColors.greyLight;
-              },
-            ),
-            padding: EdgeInsets.zero,
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
-        ),
       ],
     );
   }

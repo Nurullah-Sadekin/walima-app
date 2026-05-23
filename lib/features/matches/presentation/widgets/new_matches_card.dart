@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
-import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class NewMatchesCard extends StatelessWidget {
   const NewMatchesCard({
@@ -13,7 +13,6 @@ class NewMatchesCard extends StatelessWidget {
     required this.imagePath,
     this.imageHeight,
     this.imageWidth,
-
     required this.name,
     required this.age,
     required this.height,
@@ -21,17 +20,14 @@ class NewMatchesCard extends StatelessWidget {
     this.maritalStatus,
     this.profession,
     this.religion,
-
     this.activeStatusText,
     this.photoCount,
     this.menu,
-
     this.isPremiumConnect = false,
     this.isVerified = false,
     this.viewOnAccept = false,
     this.photoRequest = false,
     this.isSingleButton = false,
-
     this.onTapUpgradeNow,
     this.onTapWalimaChat,
     this.onTapPhoneCall,
@@ -111,7 +107,7 @@ class NewMatchesCard extends StatelessWidget {
                               fit: BoxFit.fitWidth,
                               color: AppColors.white,
                             ),
-                            Text('View on Accept',
+                            Text('View on Accept'.localized(context),
                                 style: TextStyle(
                                   fontSize: TextSize.font14(context),
                                   fontWeight: FontWeight.w500,
@@ -135,8 +131,7 @@ class NewMatchesCard extends StatelessWidget {
                         decoration: const BoxDecoration(
                           color: AppColors.primaryVariant,
                           shape: BoxShape.rectangle,
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(8)),
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
                         ),
                         child: Row(
                           spacing: 8,
@@ -149,7 +144,7 @@ class NewMatchesCard extends StatelessWidget {
                               fit: BoxFit.fill,
                               color: AppColors.primary,
                             ),
-                            Text('Photo Request',
+                            Text('Photo Request'.localized(context),
                                 style: TextStyle(
                                   fontSize: TextSize.font14(context),
                                   fontWeight: FontWeight.w500,
@@ -223,37 +218,36 @@ class NewMatchesCard extends StatelessWidget {
                   child: Column(
                     children: [
                       if (photoCount != null)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 6, horizontal: 6),
-                        decoration: const BoxDecoration(
-                          color: AppColors.disableDark,
-                          shape: BoxShape.rectangle,
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(6)),
-                        ),
-                        child: Column(
-                          spacing: 6,
-                          children: [
-                            ShowImage(
-                              imagePath: AppImages.photoIcon,
-                              width: TextSize.font16(context),
-                              height: TextSize.font16(context),
-                              radius: BorderRadius.circular(8),
-                              fit: BoxFit.fitWidth,
-                              color: AppColors.white,
-                            ),
-                            Text(
-                              '1/$photoCount',
-                              style: TextStyle(
-                                fontSize: TextSize.font10(context),
-                                fontWeight: FontWeight.w400,
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 6, horizontal: 6),
+                          decoration: const BoxDecoration(
+                            color: AppColors.disableDark,
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.all(Radius.circular(6)),
+                          ),
+                          child: Column(
+                            spacing: 6,
+                            children: [
+                              ShowImage(
+                                imagePath: AppImages.photoIcon,
+                                width: TextSize.font16(context),
+                                height: TextSize.font16(context),
+                                radius: BorderRadius.circular(8),
+                                fit: BoxFit.fitWidth,
                                 color: AppColors.white,
                               ),
-                            ),
-                          ],
+                              Text(
+                                '1/$photoCount',
+                                style: TextStyle(
+                                  fontSize: TextSize.font10(context),
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.white,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
                       if (menu == true && photoCount != null)
                         const SizedBox(
                           height: 6,
@@ -261,12 +255,13 @@ class NewMatchesCard extends StatelessWidget {
                       if (menu == true)
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 6, horizontal: 6,),
+                            vertical: 6,
+                            horizontal: 6,
+                          ),
                           decoration: const BoxDecoration(
                             color: AppColors.disableDark,
                             shape: BoxShape.rectangle,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(6)),
+                            borderRadius: BorderRadius.all(Radius.circular(6)),
                           ),
                           child: Icon(
                             Icons.more_vert,
@@ -329,55 +324,56 @@ class NewMatchesCard extends StatelessWidget {
                     ),
                   ),
                   if (religion != null || maritalStatus != null)
-                  Row(
-                    spacing: 4,
-                    children: [
-                      Text(
-                        religion ?? '',
-                        style: TextStyle(
-                          fontSize: TextSize.font16(context),
-                          fontWeight: FontWeight.w400,
+                    Row(
+                      spacing: 4,
+                      children: [
+                        Text(
+                          religion ?? '',
+                          style: TextStyle(
+                            fontSize: TextSize.font16(context),
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.textSecondaryLight,
+                          ),
+                        ),
+                        const Icon(
+                          Icons.circle,
+                          size: 4,
                           color: AppColors.textSecondaryLight,
                         ),
+                        Text(
+                          maritalStatus ?? 'Never Married',
+                          style: TextStyle(
+                            fontSize: TextSize.font16(context),
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.textSecondaryLight,
+                          ),
+                        ),
+                      ],
+                    ),
+                  if (profession != null && location.isNotEmpty)
+                    const SizedBox(
+                      height: 12,
+                    ),
+                  if (profession != null)
+                    Text(
+                      profession ?? '',
+                      style: TextStyle(
+                        fontSize: TextSize.font16(context),
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textPrimaryLight,
                       ),
-                      const Icon(
-                        Icons.circle,
-                        size: 4,
+                    ),
+                  if (location.isNotEmpty)
+                    Text(
+                      location,
+                      style: TextStyle(
+                        fontSize: TextSize.font16(context),
+                        fontWeight: FontWeight.w400,
                         color: AppColors.textSecondaryLight,
                       ),
-                      Text(
-                        maritalStatus ?? 'Never Married',
-                        style: TextStyle(
-                          fontSize: TextSize.font16(context),
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.textSecondaryLight,
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (profession != null && location.isNotEmpty)
-                  const SizedBox(height: 12,),
-                  if (profession != null)
-                  Text(
-                    profession ?? '',
-                    style: TextStyle(
-                      fontSize: TextSize.font16(context),
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.textPrimaryLight,
                     ),
-                  ),
-                  if (location.isNotEmpty)
-                  Text(
-                  location,
-                  style: TextStyle(
-                    fontSize: TextSize.font16(context),
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.textSecondaryLight,
-                  ),
-                ),
                 ],
               ),
-
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 16.0),
                 child: Divider(
@@ -404,7 +400,6 @@ class NewMatchesCard extends StatelessWidget {
                           color: AppColors.textPrimaryLight,
                         ),
                       ),
-
                       InkWell(
                         onTap: onTapUpgradeNow,
                         child: Row(
@@ -426,11 +421,11 @@ class NewMatchesCard extends StatelessWidget {
                             Icon(
                               Icons.arrow_forward_outlined,
                               size: TextSize.font12(context),
-                              color: AppColors.primary,)
+                              color: AppColors.primary,
+                            )
                           ],
                         ),
                       ),
-
                     ],
                   ),
                   Row(
@@ -442,7 +437,8 @@ class NewMatchesCard extends StatelessWidget {
                           spacing: 8,
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 5),
                               decoration: BoxDecoration(
                                 color: AppColors.primary,
                                 borderRadius: BorderRadius.circular(4),
@@ -458,11 +454,10 @@ class NewMatchesCard extends StatelessWidget {
                                     fit: BoxFit.fitWidth,
                                     color: AppColors.white,
                                   ),
-
                                 ],
                               ),
                             ),
-                            Text('Walima Chat',
+                            Text('Walima Chat'.localized(context),
                                 style: TextStyle(
                                   fontSize: TextSize.font12(context),
                                   fontWeight: FontWeight.w400,
@@ -477,7 +472,8 @@ class NewMatchesCard extends StatelessWidget {
                           spacing: 8,
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 5),
                               decoration: BoxDecoration(
                                 color: const Color(0xFF335CFF),
                                 borderRadius: BorderRadius.circular(4),
@@ -493,11 +489,10 @@ class NewMatchesCard extends StatelessWidget {
                                     fit: BoxFit.fitWidth,
                                     color: AppColors.white,
                                   ),
-
                                 ],
                               ),
                             ),
-                            Text('Phone Call',
+                            Text('Phone Call'.localized(context),
                                 style: TextStyle(
                                   fontSize: TextSize.font12(context),
                                   fontWeight: FontWeight.w400,
@@ -512,7 +507,8 @@ class NewMatchesCard extends StatelessWidget {
                           spacing: 8,
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 5),
                               decoration: BoxDecoration(
                                 color: AppColors.greenButtonColor,
                                 borderRadius: BorderRadius.circular(4),
@@ -528,11 +524,10 @@ class NewMatchesCard extends StatelessWidget {
                                     fit: BoxFit.fitWidth,
                                     color: AppColors.white,
                                   ),
-
                                 ],
                               ),
                             ),
-                            Text('Whatsapp',
+                            Text('Whatsapp'.localized(context),
                                 style: TextStyle(
                                   fontSize: TextSize.font12(context),
                                   fontWeight: FontWeight.w400,
@@ -545,7 +540,6 @@ class NewMatchesCard extends StatelessWidget {
                   ),
                 ],
               ),
-
             ],
           ),
         ],

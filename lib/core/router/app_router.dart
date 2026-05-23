@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/biodata/presentation/screens/biodata_generator_screen.dart';
 import 'package:walima_llc/features/login/presentation/login_with_email_screen.dart';
 import 'package:walima_llc/features/login/presentation/login_with_phone_screen.dart';
@@ -43,6 +44,7 @@ import 'package:walima_llc/features/registration/presentation/screens/profile_is
 import 'package:walima_llc/features/registration/presentation/screens/verify_number.dart';
 import 'package:walima_llc/features/registration/presentation/screens/verify_otp_for_sign_up.dart';
 import 'package:walima_llc/features/registration/presentation/screens/your_religion.dart';
+import 'package:walima_llc/features/settings/presentation/screens/language_settings_screen.dart';
 import 'package:walima_llc/features/settings/presentation/screens/settings_screen.dart';
 import 'package:walima_llc/core/connectivity/connectivity_keys.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -89,7 +91,7 @@ GoRouter goRouter(Ref ref) {
         path: Paths.loginWithEmail,
         name: Routes.loginWithEmail,
         builder: (context, state) => const LoginWithEmailScreen(),
-      ),   
+      ),
       GoRoute(
         path: Paths.loginWithPhone,
         name: Routes.loginWithPhone,
@@ -133,6 +135,11 @@ GoRouter goRouter(Ref ref) {
         path: Paths.settings,
         name: Routes.settings,
         builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: Paths.languageSettings,
+        name: Routes.languageSettings,
+        builder: (context, state) => const LanguageSettingsScreen(),
       ),
       GoRoute(
         path: Paths.notifications,
@@ -548,7 +555,7 @@ GoRouter goRouter(Ref ref) {
     ],
     errorBuilder: (context, state) => Scaffold(
       appBar: AppBar(
-        title: const Text('Error'),
+        title: Text('Error'.localized(context)),
       ),
       body: Center(
         child: Column(
@@ -567,7 +574,7 @@ GoRouter goRouter(Ref ref) {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => context.go(Paths.splash),
-              child: const Text('Go to Home'),
+              child: Text('Go to Home'.localized(context)),
             ),
           ],
         ),

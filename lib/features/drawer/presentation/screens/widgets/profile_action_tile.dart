@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class ProfileActionTile extends StatelessWidget {
-
   const ProfileActionTile({
     super.key,
     required this.iconImagePath,
@@ -60,22 +60,24 @@ class ProfileActionTile extends StatelessWidget {
               ),
               // Title Text
               Text(
-                title,
-                style: titleStyle ?? TextStyle(
-                  color: textColor,
-                  fontSize: TextSize.font14(context),
-                  fontWeight: FontWeight.w400,
-                ),
+                title.localized(context),
+                style: titleStyle ??
+                    TextStyle(
+                      color: textColor,
+                      fontSize: TextSize.font14(context),
+                      fontWeight: FontWeight.w400,
+                    ),
               ),
             ],
           ),
           // Trailing Arrow or Custom Widget
           if (showTrailing)
-            trailing ?? Icon(
-              Icons.arrow_forward_ios_rounded,
-              size: TextSize.font14(context),
-              color: arrowColor ?? AppColors.textSecondaryLight,
-            ),
+            trailing ??
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: TextSize.font14(context),
+                  color: arrowColor,
+                ),
         ],
       ),
     );

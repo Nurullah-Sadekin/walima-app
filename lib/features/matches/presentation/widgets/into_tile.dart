@@ -3,8 +3,10 @@ import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
-class InfoTile extends StatelessWidget { // Control leading image visibility
+class InfoTile extends StatelessWidget {
+  // Control leading image visibility
 
   const InfoTile({
     super.key,
@@ -31,7 +33,7 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
   final String title;
   final String? value;
   final String? subtitle;
-  final String? leadingImagePath ; // Optional leading image
+  final String? leadingImagePath; // Optional leading image
   final String? trailingImagePath; // Optional trailing image
   final Color? leadingImageColor;
   final Color? trailingImageColor;
@@ -44,9 +46,9 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
   final double? leadingRadius;
   final double? borderRadius;
   final EdgeInsetsGeometry? padding;
-  final bool showTrailingImage ; // Control trailing image visibility
+  final bool showTrailingImage; // Control trailing image visibility
   final String? trailingText; // Optional trailing text
-  final bool showLeadingImage ;
+  final bool showLeadingImage;
 
   @override
   Widget build(BuildContext context) {
@@ -54,10 +56,11 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        padding: padding ?? const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        padding:
+            padding ?? const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
           color: AppColors.white,
-          borderRadius: BorderRadius.circular( borderRadius ?? 4),
+          borderRadius: BorderRadius.circular(borderRadius ?? 4),
           border: Border.all(color: AppColors.greyLight, width: 1),
         ),
         child: Row(
@@ -72,7 +75,8 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
                   if (showLeadingImage && leadingImagePath != null)
                     CircleAvatar(
                       radius: leadingRadius,
-                      backgroundColor: leadingBackgroundColor ?? AppColors.primaryVariant,
+                      backgroundColor:
+                          leadingBackgroundColor ?? AppColors.primaryVariant,
                       child: ShowImage(
                         imagePath: leadingImagePath!,
                         width: leadingImageSize,
@@ -85,18 +89,26 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          title,
+                          title.localized(context),
                           style: titleStyle ??
                               TextStyle(
-                                color: subtitle != null ?  AppColors.textPrimaryLight : AppColors.textSecondaryLight,
-                                fontSize:  subtitle != null ? TextSize.font14(context) : TextSize.font12(context),
-                                fontWeight: subtitle != null ?  FontWeight.w500: FontWeight.w400,
+                                color: subtitle != null
+                                    ? AppColors.textPrimaryLight
+                                    : AppColors.textSecondaryLight,
+                                fontSize: subtitle != null
+                                    ? TextSize.font14(context)
+                                    : TextSize.font12(context),
+                                fontWeight: subtitle != null
+                                    ? FontWeight.w500
+                                    : FontWeight.w400,
                               ),
                         ),
-                        if(subtitle != null)...[
-                          const SizedBox(height: 4,),
+                        if (subtitle != null) ...[
+                          const SizedBox(
+                            height: 4,
+                          ),
                           Text(
-                            subtitle!,
+                            subtitle!.localized(context),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: titleStyle ??
@@ -120,19 +132,19 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
               spacing: 8,
               children: [
                 if (value != null)
-                Flexible(
-                  child: Text(
-                    value!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: valueStyle ??
-                        TextStyle(
-                          color: AppColors.textPrimaryLight,
-                          fontSize: TextSize.font12(context),
-                          fontWeight: FontWeight.w500,
-                        ),
+                  Flexible(
+                    child: Text(
+                      value!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: valueStyle ??
+                          TextStyle(
+                            color: AppColors.textPrimaryLight,
+                            fontSize: TextSize.font12(context),
+                            fontWeight: FontWeight.w500,
+                          ),
+                    ),
                   ),
-                ),
                 if (showTrailingImage)
                   ShowImage(
                     imagePath: trailingImagePath!,
@@ -141,21 +153,22 @@ class InfoTile extends StatelessWidget { // Control leading image visibility
                     color: trailingImageColor ?? AppColors.primary,
                   ),
                 if (!showTrailingImage && trailingText != null)
-                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryShade200,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    trailingText!,
-                    style: TextStyle(
-                      color: AppColors.primary,
-                      fontSize: TextSize.font8(context),
-                      fontWeight: FontWeight.w500,
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryShade200,
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  ),
-                 )
+                    child: Text(
+                      trailingText!.localized(context),
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontSize: TextSize.font8(context),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  )
               ],
             ),
           ],

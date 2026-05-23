@@ -6,6 +6,7 @@ import 'package:walima_llc/core/global/components/custom_back_appbar.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:walima_llc/core/global/components/selection_card.dart';
 import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/contact_filter/presentation/providers/contact_filter_provider.dart';
 import 'package:walima_llc/features/matches/presentation/widgets/bottom_bordered_widget.dart';
 import 'package:walima_llc/features/matches/presentation/widgets/into_tile.dart';
@@ -76,9 +77,10 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
   PreferredSizeWidget _appBar() {
     return CustomBackAppBar(
       title: Text(
-        _step == ContactFilterStep.contactFilterScreen
-            ? 'Contact Filter'
-            : _getAppBarTitle(_step),
+        (_step == ContactFilterStep.contactFilterScreen
+                ? 'Contact Filter'
+                : _getAppBarTitle(_step))
+            .localized(context),
       ),
       backgroundColor: Colors.transparent,
       onBackPressed: () {
@@ -303,7 +305,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              helperText,
+              helperText.localized(context),
               style: TextStyle(
                 fontSize: TextSize.font12(context),
                 color: AppColors.textSecondaryLight,
@@ -319,12 +321,16 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
             controller: searchController,
             onChanged: (_) => setState(() {}),
             decoration: InputDecoration(
-              hintText: searchHintText ?? 'Search',
+              hintText: (searchHintText ?? 'Search').localized(context),
               hintStyle: TextStyle(
                 fontSize: TextSize.font16(context),
                 color: AppColors.textSecondaryLight,
               ),
-              prefixIcon: Icon(Icons.search,color: AppColors.textSecondaryLight,size: TextSize.font22(context),),
+              prefixIcon: Icon(
+                Icons.search,
+                color: AppColors.textSecondaryLight,
+                size: TextSize.font22(context),
+              ),
               suffixIcon: searchController.text.isEmpty
                   ? null
                   : IconButton(
@@ -335,7 +341,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
                       icon: const Icon(Icons.close),
                     ),
               filled: true,
-              fillColor:  AppColors.greyLight.withOpacity(0.5),
+              fillColor: AppColors.greyLight.withOpacity(0.5),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide.none,
@@ -353,7 +359,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           child: filteredIndexes.isEmpty
               ? Center(
                   child: Text(
-                    'No matching items found',
+                    'No matching items found'.localized(context),
                     style: TextStyle(
                       fontSize: TextSize.font14(context),
                       color: AppColors.textSecondaryLight,
@@ -408,7 +414,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
       children: [
         const SizedBox(height: 6),
         Text(
-          'Age Range: ${provider.ageStart} to ${provider.ageEnd} Years',
+          '${'Age Range'.localized(context)}: ${provider.ageStart} ${'to'.localized(context)} ${provider.ageEnd} ${'Years'.localized(context)}',
           style: TextStyle(
             fontSize: TextSize.font16(context),
             color: AppColors.textPrimaryLight,
@@ -416,7 +422,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           ),
         ),
         Text(
-          'Select a 2-year minimum age range',
+          'Select a 2-year minimum age range'.localized(context),
           style: TextStyle(
             fontSize: TextSize.font12(context),
             color: AppColors.textSecondaryLight,
@@ -446,7 +452,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
       children: [
         const SizedBox(height: 6),
         Text(
-          'Height Range: ${ContactFilterProvider.formatHeight(provider.heightStart)} to ${ContactFilterProvider.formatHeight(provider.heightEnd)}',
+          '${'Height Range'.localized(context)}: ${ContactFilterProvider.formatHeight(provider.heightStart)} ${'to'.localized(context)} ${ContactFilterProvider.formatHeight(provider.heightEnd)}',
           style: TextStyle(
             fontSize: TextSize.font16(context),
             color: AppColors.textPrimaryLight,
@@ -454,7 +460,7 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
           ),
         ),
         Text(
-          'Select a 4-inch minimum height range',
+          'Select a 4-inch minimum height range'.localized(context),
           style: TextStyle(
             fontSize: TextSize.font12(context),
             color: AppColors.textSecondaryLight,

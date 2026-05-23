@@ -11,6 +11,7 @@ import 'package:walima_llc/core/global/components/bottom_sheet.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/inbox/domain/models/menu_item_model.dart';
 import 'package:walima_llc/features/inbox/presentation/providers/inbox_providers.dart';
 import 'package:walima_llc/features/inbox/presentation/widgets/inbox_card.dart';
@@ -65,7 +66,7 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => ref.read(inboxProvider).fetchSentConnections(),
-              child: const Text('Retry'),
+              child: Text('Retry'.localized(context)),
             ),
           ],
         ),
@@ -208,8 +209,8 @@ class _InboxSentTabState extends ConsumerState<InboxSentTab> {
     final profileImagePath = (item?.profilePhoto?.url?.isNotEmpty ?? false)
         ? item!.profilePhoto!.url!
         : (item?.gender ?? '').toLowerCase() == 'female'
-        ? AppImages.womenAvatar
-        : AppImages.manAvatar;
+            ? AppImages.womenAvatar
+            : AppImages.manAvatar;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),

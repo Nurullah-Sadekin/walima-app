@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class TabBarWidget extends StatelessWidget {
   const TabBarWidget({
@@ -70,11 +71,13 @@ class TabBarWidget extends StatelessWidget {
           color: effectiveBackgroundColor,
           borderRadius: BorderRadius.circular(effectiveBorderRadius),
           border: isSelected
-                  ? isBorder ? Border.all(color: effectiveBorderColor, width: 1) : const Border()
-                  : Border.all(
-                      color: effectiveBorderColor,
-                      width: effectiveBorderWidth,
-                    ),
+              ? isBorder
+                  ? Border.all(color: effectiveBorderColor, width: 1)
+                  : const Border()
+              : Border.all(
+                  color: effectiveBorderColor,
+                  width: effectiveBorderWidth,
+                ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -90,7 +93,7 @@ class TabBarWidget extends StatelessWidget {
               ),
             ],
             Text(
-              text,
+              text.localized(context),
               style: TextStyle(
                 color: effectiveTextColor,
                 fontSize: effectiveFontSize,

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 import 'connectivity_keys.dart';
 
@@ -50,9 +51,9 @@ class _ConnectivityMonitorState extends State<ConnectivityMonitor> {
       if (messenger == null) return;
       messenger.removeCurrentSnackBar();
       messenger.showSnackBar(
-        const SnackBar(
-          content: Text('No internet connection'),
-          duration: Duration(days: 1),
+        SnackBar(
+          content: Text('No internet connection'.localized(context)),
+          duration: const Duration(days: 1),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -67,10 +68,13 @@ class _ConnectivityMonitorState extends State<ConnectivityMonitor> {
       if (messenger == null) return;
       messenger.hideCurrentSnackBar();
       messenger.showSnackBar(
-        const SnackBar(
+        SnackBar(
           backgroundColor: Colors.green,
-          content: Text('Back online', style: TextStyle(color: Colors.white)),  
-          duration: Duration(seconds: 2),
+          content: Text(
+            'Back online'.localized(context),
+            style: const TextStyle(color: Colors.white),
+          ),
+          duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
         ),
       );

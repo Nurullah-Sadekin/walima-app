@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class DismissibleSafetyCard extends StatelessWidget {
-
   const DismissibleSafetyCard({
     super.key,
     required this.title,
@@ -40,7 +40,7 @@ class DismissibleSafetyCard extends StatelessWidget {
             spacing: 6,
             children: [
               Text(
-                title,
+                title.localized(context),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -50,7 +50,7 @@ class DismissibleSafetyCard extends StatelessWidget {
                 ),
               ),
               Text(
-                message,
+                message.localized(context),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.start,

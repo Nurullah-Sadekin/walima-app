@@ -9,7 +9,7 @@ class AppLocalizationsBn extends AppLocalizations {
   AppLocalizationsBn([String locale = 'bn']) : super(locale);
 
   @override
-  String get appName => 'ফ্লাটার বয়লারপ্লেট';
+  String get appName => 'Walima';
 
   @override
   String get helloWorld => 'হ্যালো ওয়ার্ল্ড!';
@@ -180,6 +180,9 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get bangla => 'বাংলা';
+
+  @override
+  String get arabic => 'আরবি';
 
   @override
   String get changeLanguage => 'ভাষা পরিবর্তন করুন';

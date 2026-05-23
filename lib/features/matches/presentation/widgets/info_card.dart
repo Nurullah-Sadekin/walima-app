@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class InfoCardWidget extends StatelessWidget {
-
   const InfoCardWidget({
     super.key,
     required this.title,
@@ -41,7 +41,8 @@ class InfoCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      padding:
+          padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
         color: backgroundColor ?? AppColors.primaryVariant,
         borderRadius: BorderRadius.circular(borderRadius ?? 8),
@@ -55,7 +56,7 @@ class InfoCardWidget extends StatelessWidget {
         spacing: spacing ?? 8,
         children: [
           Text(
-            title,
+            title.localized(context),
             style: TextStyle(
               color: titleColor ?? AppColors.textPrimaryLight,
               fontSize: titleFontSize ?? TextSize.font14(context),
@@ -63,7 +64,7 @@ class InfoCardWidget extends StatelessWidget {
             ),
           ),
           Text(
-            description,
+            description.localized(context),
             style: TextStyle(
               color: descriptionColor ?? AppColors.textSecondaryLight,
               fontSize: descriptionFontSize ?? TextSize.font12(context),

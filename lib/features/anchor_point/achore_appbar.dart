@@ -3,11 +3,11 @@ import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/drawer/presentation/app_drawer.dart';
 import 'package:walima_llc/features/notification/presentation/notification_icon_with_badge.dart';
 
 class AnchoredAppBar extends StatelessWidget implements PreferredSizeWidget {
-
   const AnchoredAppBar({
     super.key,
     required this.context,
@@ -54,7 +54,7 @@ class AnchoredAppBar extends StatelessWidget implements PreferredSizeWidget {
         onPressed: onMenuPressed ?? _openDrawerOverNav,
       ),
       title: Text(
-        title,
+        title.localized(context),
         style: TextStyle(
           color: textColor ?? AppColors.textPrimaryLight,
           fontSize: TextSize.font18(context),
@@ -65,8 +65,7 @@ class AnchoredAppBar extends StatelessWidget implements PreferredSizeWidget {
         if (showNotification && tabIndex != 3)
           NotificationIconWithBadge(
             onNotificationPressed: onNotificationPressed,
-         ),
-
+          ),
         if (tabIndex != null && tabIndex == 3)
           InkWell(
             onTap: onSafetyPressed,
@@ -112,8 +111,8 @@ class AnchoredAppBar extends StatelessWidget implements PreferredSizeWidget {
       },
       transitionBuilder: (context, animation, secondaryAnimation, child) {
         final tween =
-        Tween<Offset>(begin: const Offset(-1.0, 0.0), end: Offset.zero)
-            .chain(CurveTween(curve: Curves.easeOut));
+            Tween<Offset>(begin: const Offset(-1.0, 0.0), end: Offset.zero)
+                .chain(CurveTween(curve: Curves.easeOut));
         return SlideTransition(
           position: animation.drive(tween),
           child: child,

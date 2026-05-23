@@ -3,6 +3,7 @@ import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class SelectionCard extends StatelessWidget {
   const SelectionCard({
@@ -10,10 +11,10 @@ class SelectionCard extends StatelessWidget {
     required this.buttonStyle,
     required this.onTap,
     required this.title,
-    this.isSelected ,
+    this.isSelected,
     this.isExpand = false,
     this.noBorder = false,
-    this.radiaBackgroundColor ,
+    this.radiaBackgroundColor,
     this.borderRadius,
   });
 
@@ -26,7 +27,6 @@ class SelectionCard extends StatelessWidget {
   final Color? radiaBackgroundColor;
   final double? borderRadius;
 
-
   @override
   Widget build(BuildContext context) {
     final effectiveSelected = isSelected ?? false;
@@ -34,9 +34,9 @@ class SelectionCard extends StatelessWidget {
       case SelectionStyle.selectedRadio:
         return selectedRadio(effectiveSelected, context);
       case SelectionStyle.unSelectedRadio:
-        return unSelectedRadio( effectiveSelected, context);
+        return unSelectedRadio(effectiveSelected, context);
       case SelectionStyle.selectedItem:
-        return selectedItem( effectiveSelected, context);
+        return selectedItem(effectiveSelected, context);
       case SelectionStyle.unSelectedItem:
         return unSelectedItem(effectiveSelected, context);
       case SelectionStyle.selectedCheckbox:
@@ -46,16 +46,20 @@ class SelectionCard extends StatelessWidget {
     }
   }
 
+  String _title(BuildContext context) => (title ?? '').localized(context);
 
-  Widget selectedRadio( bool isSelected, BuildContext context) {
+  Widget selectedRadio(bool isSelected, BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding:  EdgeInsets.symmetric(vertical: noBorder ? 0 : 12,horizontal: noBorder ? 0 : 12),
+        padding: EdgeInsets.symmetric(
+            vertical: noBorder ? 0 : 12, horizontal: noBorder ? 0 : 12),
         decoration: ShapeDecoration(
           color: radiaBackgroundColor ?? Colors.white,
           shape: RoundedRectangleBorder(
-            side: noBorder ? BorderSide.none : const BorderSide(width: 1, color: AppColors.inputBorderColor),
+            side: noBorder
+                ? BorderSide.none
+                : const BorderSide(width: 1, color: AppColors.inputBorderColor),
             borderRadius: BorderRadius.circular(borderRadius ?? 6),
           ),
         ),
@@ -72,7 +76,7 @@ class SelectionCard extends StatelessWidget {
             ),
             Flexible(
               child: Text(
-                title ?? '',
+                _title(context),
                 style: TextStyle(
                   color: AppColors.textPrimaryLight,
                   fontSize: TextSize.font13(context),
@@ -86,15 +90,18 @@ class SelectionCard extends StatelessWidget {
     );
   }
 
-  Widget unSelectedRadio( bool isSelected, BuildContext context) {
+  Widget unSelectedRadio(bool isSelected, BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding:  EdgeInsets.symmetric(vertical: noBorder ? 0 : 12,horizontal: noBorder ? 0 : 12),
+        padding: EdgeInsets.symmetric(
+            vertical: noBorder ? 0 : 12, horizontal: noBorder ? 0 : 12),
         decoration: ShapeDecoration(
           color: radiaBackgroundColor ?? Colors.white,
           shape: RoundedRectangleBorder(
-            side: noBorder ? BorderSide.none : const BorderSide(width: 1, color: AppColors.inputBorderColor),
+            side: noBorder
+                ? BorderSide.none
+                : const BorderSide(width: 1, color: AppColors.inputBorderColor),
             borderRadius: BorderRadius.circular(borderRadius ?? 6),
           ),
         ),
@@ -111,7 +118,7 @@ class SelectionCard extends StatelessWidget {
             ),
             Flexible(
               child: Text(
-                title ?? '',
+                _title(context),
                 style: TextStyle(
                   color: AppColors.textSecondaryLight,
                   fontSize: TextSize.font13(context),
@@ -125,7 +132,7 @@ class SelectionCard extends StatelessWidget {
     );
   }
 
-  Widget selectedItem( bool isSelected, BuildContext context) {
+  Widget selectedItem(bool isSelected, BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -136,7 +143,7 @@ class SelectionCard extends StatelessWidget {
           border: Border.all(color: AppColors.primary, width: 1),
         ),
         child: Text(
-          title ?? '',
+          _title(context),
           style: TextStyle(
             color: isSelected ? AppColors.primary : AppColors.textPrimaryLight,
             fontSize: TextSize.font12(context),
@@ -157,9 +164,10 @@ class SelectionCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(borderRadius ?? 8),
         ),
         child: Text(
-          title ?? '',
+          _title(context),
           style: TextStyle(
-            color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
+            color:
+                isSelected ? AppColors.primary : AppColors.textSecondaryLight,
             fontSize: TextSize.font12(context),
             fontWeight: FontWeight.w500,
           ),
@@ -168,7 +176,7 @@ class SelectionCard extends StatelessWidget {
     );
   }
 
-  Widget selectedCheckbox( bool isSelected, BuildContext context) {
+  Widget selectedCheckbox(bool isSelected, BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -176,12 +184,16 @@ class SelectionCard extends StatelessWidget {
         decoration: ShapeDecoration(
           color: AppColors.primaryVariant,
           shape: RoundedRectangleBorder(
-            side: BorderSide(width: 1, color: isSelected ? AppColors.primary : AppColors.inputBorderColor),
+            side: BorderSide(
+                width: 1,
+                color: isSelected
+                    ? AppColors.primary
+                    : AppColors.inputBorderColor),
             borderRadius: BorderRadius.circular(borderRadius ?? 6),
           ),
         ),
         child: Row(
-          mainAxisSize: isExpand ? MainAxisSize.max :MainAxisSize.min,
+          mainAxisSize: isExpand ? MainAxisSize.max : MainAxisSize.min,
           children: [
             ShowImage(
               imagePath: AppImages.selectedCheckbox,
@@ -190,7 +202,7 @@ class SelectionCard extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              title ?? '',
+              _title(context),
               style: TextStyle(
                 color: AppColors.textPrimaryLight,
                 fontSize: TextSize.font14(context),
@@ -225,7 +237,7 @@ class SelectionCard extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              title ?? '',
+              _title(context),
               style: TextStyle(
                 color: AppColors.textSecondaryLight,
                 fontSize: TextSize.font14(context),
@@ -237,7 +249,6 @@ class SelectionCard extends StatelessWidget {
       ),
     );
   }
-
 }
 
 enum SelectionStyle {

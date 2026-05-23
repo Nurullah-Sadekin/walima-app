@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomBackAppBar({
@@ -35,7 +36,7 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isBackButton;
   final VoidCallback? backOnTap;
   final bool backCancelMood;
-  final Widget ? trailingWidget;
+  final Widget? trailingWidget;
 
   @override
   Widget build(BuildContext context) {
@@ -53,30 +54,36 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
           color: AppColors.textPrimaryLight,
           fontWeight: FontWeight.w500,
         ),
-        leading: isBackButton ? Padding(
-          padding: EdgeInsets.all(leadingPadding ?? 12.0),
-          child: Material(
-            color: Colors.transparent,
-            child: Ink(
-              decoration: BoxDecoration(
-                color: backIconBackground ?? AppColors.white,
-                shape: BoxShape.circle,
-              ),
-              child: InkWell(
-                onTap: onBackPressed ??
-                    () {
-                      Navigator.pop(context);
-                    },
-                borderRadius: BorderRadius.circular(20),
-                child: Icon(
-                  backCancelMood ? Icons.clear : Icons.arrow_back_ios_new_rounded,
-                  size: backCancelMood== true ? TextSize.font18(context) : iconSize ??  TextSize.font16(context),
-                  color: iconColor ?? AppColors.textSecondaryLight,
+        leading: isBackButton
+            ? Padding(
+                padding: EdgeInsets.all(leadingPadding ?? 12.0),
+                child: Material(
+                  color: Colors.transparent,
+                  child: Ink(
+                    decoration: BoxDecoration(
+                      color: backIconBackground ?? AppColors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: InkWell(
+                      onTap: onBackPressed ??
+                          () {
+                            Navigator.pop(context);
+                          },
+                      borderRadius: BorderRadius.circular(20),
+                      child: Icon(
+                        backCancelMood
+                            ? Icons.clear
+                            : Icons.arrow_back_ios_new_rounded,
+                        size: backCancelMood == true
+                            ? TextSize.font18(context)
+                            : iconSize ?? TextSize.font16(context),
+                        color: iconColor ?? AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
-        ) : null,
+              )
+            : null,
         centerTitle: true,
         actions: isTrailing == true
             ? [
@@ -94,7 +101,7 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
                       spacing: 6,
                       children: [
                         Text(
-                          trailingText ?? '',
+                          (trailingText ?? '').localized(context),
                           style: TextStyle(
                             fontSize: TextSize.font14(context),
                             color: AppColors.textSecondaryLight,
@@ -103,11 +110,11 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
                         ),
                         if (trailingWidget != null) trailingWidget!,
                         if (trailingWidget == null)
-                        Icon(
-                          Icons.arrow_forward_ios,
-                          size: iconSize ?? TextSize.font14(context),
-                          color: iconColor ?? AppColors.textSecondaryLight,
-                        ),
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            size: iconSize ?? TextSize.font14(context),
+                            color: iconColor ?? AppColors.textSecondaryLight,
+                          ),
                       ],
                     ),
                   ),

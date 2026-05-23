@@ -8,6 +8,7 @@ import 'package:walima_llc/core/global/components/primary_textField.dart';
 import 'package:walima_llc/core/network/dio_client.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/utils/camel_case_utils.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/account_setting/data/repository/account_settings_repository.dart';
 import 'package:walima_llc/features/account_setting/presentation/providers/account_setting_provider.dart';
 import 'package:walima_llc/features/account_setting/presentation/screens/widgets/alert_status.dart';
@@ -31,7 +32,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
   late AccountSettingProvider provider;
   AccountSettingStep _step = AccountSettingStep.accountSetting;
 
-  late final bool hasPassword = ref.read(globalProvider).currentUser?.hasPassword ?? false;
+  late final bool hasPassword =
+      ref.read(globalProvider).currentUser?.hasPassword ?? false;
 
   @override
   void initState() {
@@ -60,7 +62,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             child: _body(provider),
           ),
         ),
-        floatingActionButton:_bottomAction(provider),
+        floatingActionButton: _bottomAction(provider),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
@@ -68,7 +70,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
 
   PreferredSizeWidget _appBar() {
     return CustomBackAppBar(
-      title: Text(_titleForStep(_step)),
+      title: Text(_titleForStep(_step).localized(context)),
       backgroundColor: Colors.transparent,
       onBackPressed: () {
         if (_step == AccountSettingStep.accountSetting) {
@@ -153,7 +155,9 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             },
           ),
           ProfileActionTile(
-            iconImagePath: hasPassword ?  AppImages.editSvgIcon : AppImages.lockPasswordSvgIcon,
+            iconImagePath: hasPassword
+                ? AppImages.editSvgIcon
+                : AppImages.lockPasswordSvgIcon,
             title: hasPassword ? 'Change Password' : 'Set Password',
             onTap: () {
               provider.clearPasswordErrors();
@@ -228,7 +232,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                'Current Plan: ',
+                'Current Plan: '.localized(context),
                 style: TextStyle(
                   fontWeight: FontWeight.w500,
                   color: AppColors.textPrimaryLight,
@@ -293,8 +297,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
                 subtitle:
                     'Hiding your profile makes you invisible and disables messages and invitations',
                 value: profileHidden,
-                onChanged: (value) =>
-                    _applyPrivacyUpdate('profileHidden', value ? 'enable' : 'disable'),
+                onChanged: (value) => _applyPrivacyUpdate(
+                    'profileHidden', value ? 'enable' : 'disable'),
               ),
               const SizedBox(
                 height: 16,
@@ -328,14 +332,16 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               const SizedBox(
                 height: 16,
               ),
-              Text('Visibility Preferences',
+              Text('Visibility Preferences'.localized(context),
                   style: TextStyle(
                       fontWeight: FontWeight.w500,
                       color: AppColors.textPrimaryLight,
                       fontSize: TextSize.font16(
                         context,
                       ))),
-              Text('Manage how others discover and connect with you',
+              Text(
+                  'Manage how others discover and connect with you'
+                      .localized(context),
                   style: TextStyle(
                       fontWeight: FontWeight.w400,
                       color: AppColors.textSecondaryLight,
@@ -349,8 +355,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
                 title: 'Shortlist Alerts',
                 subtitle: 'Notify me when someone shortlists my profile',
                 value: shortlistAlerts,
-                onChanged: (value) =>
-                    _applyPrivacyUpdate('shortlistAlert', value ? 'enable' : 'disable'),
+                onChanged: (value) => _applyPrivacyUpdate(
+                    'shortlistAlert', value ? 'enable' : 'disable'),
               ),
               const SizedBox(
                 height: 10,
@@ -359,8 +365,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
                 title: 'Premium Calls',
                 subtitle: 'Allow premium members to call me directly',
                 value: premiumCalls,
-                onChanged: (value) =>
-                    _applyPrivacyUpdate('allowPremiumCalls', value ? 'enable' : 'disable'),
+                onChanged: (value) => _applyPrivacyUpdate(
+                    'allowPremiumCalls', value ? 'enable' : 'disable'),
               ),
             ],
           ),
@@ -374,7 +380,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               const SizedBox(
                 height: 16,
               ),
-              Text('Delete Profile',
+              Text('Delete Profile'.localized(context),
                   style: TextStyle(
                       fontWeight: FontWeight.w500,
                       color: AppColors.textPrimaryLight,
@@ -382,7 +388,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
                         context,
                       ))),
               Text(
-                  'You\'ll permanently lose all profile data, matches, and memberships',
+                  'You\'ll permanently lose all profile data, matches, and memberships'
+                      .localized(context),
                   style: TextStyle(
                       fontWeight: FontWeight.w400,
                       color: AppColors.textSecondaryLight,
@@ -452,7 +459,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           widget: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Contact Display Status',
+              Text('Contact Display Status'.localized(context),
                   style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: TextSize.font16(context),
@@ -505,7 +512,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
 
     final settings = provider.privacySettings;
     if (settings == null) {
-      return const Center(child: Text('No privacy settings available'));
+      return Center(
+          child: Text('No privacy settings available'.localized(context)));
     }
 
     return SingleChildScrollView(
@@ -526,8 +534,18 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               'Display Name',
               'displayNameFormat',
               settings.displayNameFormat ?? 'hide_first_name',
-              ['show_full_name', 'hide_first_name', 'hide_last_name','hide_full_name'],
-              ['Show Full Name', 'Hide First Name', 'Hide Last Name','Hide Full Name'],
+              [
+                'show_full_name',
+                'hide_first_name',
+                'hide_last_name',
+                'hide_full_name'
+              ],
+              [
+                'Show Full Name',
+                'Hide First Name',
+                'Hide Last Name',
+                'Hide Full Name'
+              ],
             ),
           ),
           InfoTile(
@@ -541,8 +559,18 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               'Photo Visibility',
               'photoVisibility',
               settings.photoVisibility ?? 'visible_to_liked_only',
-              ['visible_to_all', 'visible_to_liked_only','visible_on_connect','visible_to_premium_and_liked'],
-              ['Visible to All', 'Visible to Liked Only','Visible on Connect','Visible to Premium and Liked'],
+              [
+                'visible_to_all',
+                'visible_to_liked_only',
+                'visible_on_connect',
+                'visible_to_premium_and_liked'
+              ],
+              [
+                'Visible to All',
+                'Visible to Liked Only',
+                'Visible on Connect',
+                'Visible to Premium and Liked'
+              ],
             ),
           ),
           InfoTile(
@@ -556,8 +584,18 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               'Album Photo Visibility',
               'albumPhotoVisibility',
               settings.albumPhotoVisibility ?? 'visible_to_liked_only',
-              ['visible_to_all', 'visible_to_liked_only','visible_on_connect','visible_to_premium_and_liked'],
-              ['Visible to All', 'Visible to Liked Only','Visible on Connect','Visible to Premium and Liked'],
+              [
+                'visible_to_all',
+                'visible_to_liked_only',
+                'visible_on_connect',
+                'visible_to_premium_and_liked'
+              ],
+              [
+                'Visible to All',
+                'Visible to Liked Only',
+                'Visible on Connect',
+                'Visible to Premium and Liked'
+              ],
             ),
           ),
           InfoTile(
@@ -571,8 +609,18 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               'Phone Number Visibility',
               'phoneVisibility',
               settings.phoneVisibility ?? 'only_premium_members',
-              ['only_premium_members', 'only_premium_members_i_like', 'no_one','all_matches'],
-              ['Only Premium Members', 'Only Premium Members I Like', 'No One','All Matches'],
+              [
+                'only_premium_members',
+                'only_premium_members_i_like',
+                'no_one',
+                'all_matches'
+              ],
+              [
+                'Only Premium Members',
+                'Only Premium Members I Like',
+                'No One',
+                'All Matches'
+              ],
             ),
           ),
           InfoTile(
@@ -586,8 +634,18 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               'Email Visibility',
               'emailVisibility',
               settings.emailVisibility ?? 'visible_to_all_premium_members',
-              ['visible_to_premium_and_wish_to_connect', 'visible_to_all_premium_members', 'hide_email_address','visible_to_all_matches'],
-              ['Visible to Premium and Wish to Connect', 'Visible to All Premium Members', 'Hide Email Address','Visible to All Matches'],
+              [
+                'visible_to_premium_and_wish_to_connect',
+                'visible_to_all_premium_members',
+                'hide_email_address',
+                'visible_to_all_matches'
+              ],
+              [
+                'Visible to Premium and Wish to Connect',
+                'Visible to All Premium Members',
+                'Hide Email Address',
+                'Visible to All Matches'
+              ],
             ),
           ),
           InfoTile(
@@ -622,7 +680,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           ),
           InfoTile(
             title: 'Shortlist Alerts',
-            value: _formatPrivacyValue(settings.shortlistAlert == true ? 'enable' : 'disable'),
+            value: _formatPrivacyValue(
+                settings.shortlistAlert == true ? 'enable' : 'disable'),
             leadingImagePath: AppImages.sortFilter,
             showTrailingImage: true,
             showLeadingImage: true,
@@ -637,7 +696,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           ),
           InfoTile(
             title: 'Allow Premium Calls',
-            value: _formatPrivacyValue(settings.allowPremiumCalls == true ? 'enable' : 'disable'),
+            value: _formatPrivacyValue(
+                settings.allowPremiumCalls == true ? 'enable' : 'disable'),
             leadingImagePath: AppImages.callIcon,
             showTrailingImage: true,
             showLeadingImage: true,
@@ -667,7 +727,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           ),
           InfoTile(
             title: 'Show Online Status',
-            value: _formatPrivacyValue(settings.showOnlineStatus == true ? 'enable' : 'disable'),
+            value: _formatPrivacyValue(
+                settings.showOnlineStatus == true ? 'enable' : 'disable'),
             leadingImagePath: AppImages.contactPreview,
             showTrailingImage: true,
             showLeadingImage: true,
@@ -682,7 +743,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           ),
           InfoTile(
             title: 'Show Last Seen',
-            value: _formatPrivacyValue(settings.showLastSeen == true ? 'enable' : 'disable'),
+            value: _formatPrivacyValue(
+                settings.showLastSeen == true ? 'enable' : 'disable'),
             leadingImagePath: AppImages.contactPreview,
             showTrailingImage: true,
             showLeadingImage: true,
@@ -697,7 +759,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           ),
           InfoTile(
             title: 'Show Activity Status',
-            value: _formatPrivacyValue(settings.showActivityStatus == true ? 'enable' : 'disable'),
+            value: _formatPrivacyValue(
+                settings.showActivityStatus == true ? 'enable' : 'disable'),
             leadingImagePath: AppImages.cardView,
             showTrailingImage: true,
             showLeadingImage: true,
@@ -739,7 +802,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
         ),
         InfoTile(
           title: 'Message on Connect',
-          subtitle:  'This message is sent with your Connect Request when auto-message is enable',
+          subtitle:
+              'This message is sent with your Connect Request when auto-message is enable',
           leadingImagePath: AppImages.contactPreview,
           showTrailingImage: true,
           showLeadingImage: false,
@@ -754,7 +818,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
         ),
         InfoTile(
           title: 'Message on Accept',
-          subtitle:'This message is sent to members upon accepting their Connect request',
+          subtitle:
+              'This message is sent to members upon accepting their Connect request',
           leadingImagePath: AppImages.contactPreview,
           showTrailingImage: true,
           showLeadingImage: false,
@@ -769,7 +834,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
         ),
         InfoTile(
           title: 'Message on Remind',
-          subtitle:  'This message is sent to members when you send them a reminder',
+          subtitle:
+              'This message is sent to members when you send them a reminder',
           leadingImagePath: AppImages.contactPreview,
           showTrailingImage: true,
           showLeadingImage: false,
@@ -807,17 +873,18 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
                   .map(
                     (entry) => AlertStatusItem(
                       label: entry.value.label,
-                      isSelected: provider.isOptionSelected(category, entry.value),
+                      isSelected:
+                          provider.isOptionSelected(category, entry.value),
                     ),
                   )
                   .toList(),
               onStatusTap: (index) async {
-                final response = await provider.selectOptionForCategory(category, index);
+                final response =
+                    await provider.selectOptionForCategory(category, index);
                 if (!mounted) return;
                 _showResponseSnackBar(response);
               },
             ),
-
           CardBorder(
             verticalPadding: 8,
             widget: SettingsSwitchTile(
@@ -826,7 +893,9 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               onChanged: (value) async {
                 provider.profileBlaster = value;
                 provider.notifyListeners();
-                final response = await AccountSettingsRepository.updateNotificationSetting('profileBlaster', value);
+                final response =
+                    await AccountSettingsRepository.updateNotificationSetting(
+                        'profileBlaster', value);
                 if (!mounted) return;
                 _showResponseSnackBar(response);
               },
@@ -840,7 +909,9 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               onChanged: (value) async {
                 provider.smsAlertInvitations = value;
                 provider.notifyListeners();
-                final response = await AccountSettingsRepository.updateNotificationSetting('smsAlertInvitations', value);
+                final response =
+                    await AccountSettingsRepository.updateNotificationSetting(
+                        'smsAlertInvitations', value);
                 if (!mounted) return;
                 _showResponseSnackBar(response);
               },
@@ -854,7 +925,9 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               onChanged: (value) async {
                 provider.smsAlertAccepts = value;
                 provider.notifyListeners();
-                final response = await AccountSettingsRepository.updateNotificationSetting('smsAlertAccepts', value);
+                final response =
+                    await AccountSettingsRepository.updateNotificationSetting(
+                        'smsAlertAccepts', value);
                 if (!mounted) return;
                 _showResponseSnackBar(response);
               },
@@ -907,17 +980,16 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
       spacing: 16,
       children: [
         if (hasPassword)
-        PrimaryTextField(
-          controller: provider.currentPasswordController,
-          headLine: 'Current Password',
-          hintText: 'Enter new password',
-          noPrefix: true,
-          errorText: provider.currentPasswordError,
-          showPassIcon: true,
-          onTap: () {},
-          isRequired: true,
-        ),
-
+          PrimaryTextField(
+            controller: provider.currentPasswordController,
+            headLine: 'Current Password',
+            hintText: 'Enter new password',
+            noPrefix: true,
+            errorText: provider.currentPasswordError,
+            showPassIcon: true,
+            onTap: () {},
+            isRequired: true,
+          ),
         PrimaryTextField(
           controller: provider.newPasswordController,
           headLine: 'New Password',
@@ -1039,7 +1111,6 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     );
   }
 
-
   String _titleForStep(AccountSettingStep step) {
     switch (step) {
       case AccountSettingStep.accountSetting:
@@ -1085,7 +1156,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
       SnackBar(
         duration: const Duration(seconds: 1),
         behavior: SnackBarBehavior.floating,
-        backgroundColor: response.isSuccess ? AppColors.success : AppColors.error,
+        backgroundColor:
+            response.isSuccess ? AppColors.success : AppColors.error,
         content: Text(
           response.isSuccess
               ? (response.message.isNotEmpty
@@ -1112,7 +1184,12 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     final isPrivacySetting = _step == AccountSettingStep.privacyOptions;
     final isHIdeOrDeleteProfile = _step == AccountSettingStep.deleteProfile;
 
-    if (isRoot || isPremium || isContact || isSmsAlerts || isPrivacySetting || isHIdeOrDeleteProfile) {
+    if (isRoot ||
+        isPremium ||
+        isContact ||
+        isSmsAlerts ||
+        isPrivacySetting ||
+        isHIdeOrDeleteProfile) {
       return const SizedBox.shrink();
     }
 
@@ -1124,7 +1201,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
         (isSetPassword && provider.isPasswordChanging);
 
     return BottomBorderedWidget(
-      widget : PrimaryButtons(
+      widget: PrimaryButtons(
         buttonStyle: isSaving
             ? ButtonsStyle.disableButton
             : ButtonsStyle.activePrimaryButton,
@@ -1213,30 +1290,33 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     final selectedValue = await showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: AppColors.white,
-        title: Text(title),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: options.asMap().entries.map((entry) {
-            final index = entry.key;
-            final option = entry.value;
-            final displayOption = displayOptions[index];
-            return RadioListTile<String>(
-              title: Text(displayOption),
-              value: option,
-              groupValue: currentValue,
-              onChanged: (value) {
-                Navigator.of(dialogContext).pop(value);
-              },
-            );
-          }).toList(),
-        ),
-        actions: [
-          PrimaryButtons(buttonStyle: ButtonsStyle.activeSecondaryButton, onTap: () => Navigator.of(dialogContext).pop(), title: 'Cancel'),
-        ],
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),)
-      ),
+          backgroundColor: AppColors.white,
+          title: Text(title.localized(context)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: options.asMap().entries.map((entry) {
+              final index = entry.key;
+              final option = entry.value;
+              final displayOption = displayOptions[index];
+              return RadioListTile<String>(
+                title: Text(displayOption.localized(context)),
+                value: option,
+                groupValue: currentValue,
+                onChanged: (value) {
+                  Navigator.of(dialogContext).pop(value);
+                },
+              );
+            }).toList(),
+          ),
+          actions: [
+            PrimaryButtons(
+                buttonStyle: ButtonsStyle.activeSecondaryButton,
+                onTap: () => Navigator.of(dialogContext).pop(),
+                title: 'Cancel'),
+          ],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          )),
     );
 
     if (selectedValue != null && selectedValue != currentValue) {
@@ -1264,13 +1344,11 @@ class _MessageEditDialog extends StatefulWidget {
   const _MessageEditDialog({
     required this.title,
     this.subtitle,
-    this.textController,
     required this.initialValue,
   });
 
   final String title;
   final String? subtitle;
-  final TextEditingController? textController;
   final String initialValue;
 
   @override
@@ -1293,61 +1371,70 @@ class _MessageEditDialogState extends State<_MessageEditDialog> {
       child: SizedBox(
         width: MediaQuery.of(context).size.width,
         child: AlertDialog(
-          title: Text(widget.title),
+          title: Text(widget.title.localized(context)),
           titlePadding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.subtitle ?? 'Customize the message sent to members.',
+                (widget.subtitle ?? 'Customize the message sent to members.')
+                    .localized(context),
                 style: TextStyle(
                   color: AppColors.textSecondaryLight,
                   fontSize: TextSize.font14(context),
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 8,),
+              const SizedBox(
+                height: 8,
+              ),
               PrimaryTextField(
                 controller: _controller,
                 hintText: 'Type your message here...',
                 noPrefix: true,
                 maxLine: 5,
                 minLine: 4,
-                onTap: () {  },
+                onTap: () {},
               ),
-              const SizedBox(height: 8,),
+              const SizedBox(
+                height: 8,
+              ),
             ],
           ),
           actions: [
             InkWell(
-                onTap: () => Navigator.of(context).pop(),
+              onTap: () => Navigator.of(context).pop(),
+              child: Text(
+                'Cancel'.localized(context),
+                style: TextStyle(
+                  color: AppColors.textSecondaryLight,
+                  fontSize: TextSize.font14(context),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () => Navigator.of(context).pop(_controller.text.trim()),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(6),
+                ),
                 child: Text(
-                  'Cancel',
+                  'Set'.localized(context),
                   style: TextStyle(
-                    color: AppColors.textSecondaryLight,
+                    color: Colors.white,
                     fontSize: TextSize.font14(context),
                     fontWeight: FontWeight.w500,
                   ),
-                ),),
-            InkWell(
-                onTap: () => Navigator.of(context).pop(_controller.text.trim()),
-                child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      'Set',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: TextSize.font14(context),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),),),
+                ),
+              ),
+            ),
           ],
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -1357,7 +1444,3 @@ class _MessageEditDialogState extends State<_MessageEditDialog> {
     );
   }
 }
-
-
-
-

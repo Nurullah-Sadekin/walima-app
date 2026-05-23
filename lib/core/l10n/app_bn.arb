@@ -1,6 +1,6 @@
 {
   "@@locale": "bn",
-  "appName": "ফ্লাটার বয়লারপ্লেট",
+  "appName": "Walima",
   "helloWorld": "হ্যালো ওয়ার্ল্ড!",
   "welcome": "স্বাগতম",
   "home": "হোম",
@@ -57,6 +57,7 @@
   "language": "ভাষা",
   "english": "ইংরেজি",
   "bangla": "বাংলা",
+  "arabic": "আরবি",
   "changeLanguage": "ভাষা পরিবর্তন করুন",
   "changeTheme": "থিম পরিবর্তন করুন",
   "about": "সম্পর্কে"

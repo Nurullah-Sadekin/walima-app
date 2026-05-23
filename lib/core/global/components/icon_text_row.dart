@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class IconTextRow extends StatelessWidget {
   const IconTextRow({
@@ -54,29 +55,33 @@ class IconTextRow extends StatelessWidget {
                   ? AppColors.success
                   : AppColors.primary,
         ),
-
-          Flexible(
-            child: Text(
-              text,
-              textAlign: textAlign,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false, applyHeightToLastDescent: false),
-              style: textStyle ??
-                  TextStyle(
-                    fontSize: textSize ?? TextSize.font12(context),
-                    fontWeight: fontWeight,
-                    decoration: availableOption == false ? TextDecoration.lineThrough : null,
-                    decorationColor: availableOption == false ? AppColors.hintTextColor : null,
-                    decorationThickness: availableOption == false ? 1 : null,
-                    color: availableOption == null
-                        ? AppColors.textSecondaryLight
-                        : availableOption == true
-                        ? AppColors.textPrimaryLight
-                        : AppColors.hintTextColor,
-                  ),
-            ),
+        Flexible(
+          child: Text(
+            text.localized(context),
+            textAlign: textAlign,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textHeightBehavior: const TextHeightBehavior(
+                applyHeightToFirstAscent: false,
+                applyHeightToLastDescent: false),
+            style: textStyle ??
+                TextStyle(
+                  fontSize: textSize ?? TextSize.font12(context),
+                  fontWeight: fontWeight,
+                  decoration: availableOption == false
+                      ? TextDecoration.lineThrough
+                      : null,
+                  decorationColor:
+                      availableOption == false ? AppColors.hintTextColor : null,
+                  decorationThickness: availableOption == false ? 1 : null,
+                  color: availableOption == null
+                      ? AppColors.textSecondaryLight
+                      : availableOption == true
+                          ? AppColors.textPrimaryLight
+                          : AppColors.hintTextColor,
+                ),
           ),
+        ),
       ],
     );
   }

@@ -12,6 +12,7 @@ import 'package:walima_llc/features/registration/presentation/providers/registra
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:go_router/go_router.dart';
 import 'package:walima_llc/features/registration/presentation/widgets/static_text_widget.dart';
 
@@ -29,13 +30,14 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
   void initState() {
     super.initState();
     provider = ref.read(registrationProvider);
-  WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       provider.getInitialData();
       provider.initControllersListener();
       if (provider.aboutYourselfController.text.trim().isEmpty) {
-        provider.aboutYourselfController.text = 'I enjoy spending time with friends and value meaningful relationships. I am seeking a partner who is supportive, family-oriented, and composed in nature. If this aligns with what you are looking for, I would be glad to connect.';
+        provider.aboutYourselfController.text =
+            'I enjoy spending time with friends and value meaningful relationships. I am seeking a partner who is supportive, family-oriented, and composed in nature. If this aligns with what you are looking for, I would be glad to connect.';
       }
-  });
+    });
   }
 
   @override
@@ -60,7 +62,12 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.aboutYourself,totalProgressCount: 10,currentIndexProgress: 8,showProgress: true,),
+                    const UpperLayer(
+                      imagePath: AppImages.aboutYourself,
+                      totalProgressCount: 10,
+                      currentIndexProgress: 8,
+                      showProgress: true,
+                    ),
                     body(),
                   ],
                 ),
@@ -76,8 +83,10 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
         child: Column(
           spacing: 10,
           children: [
-
-            const StaticTextWidget(title: 'About Yourself', subtitle: 'Almost done!\n A well-written bio helps you get 3x more profile views'),
+            const StaticTextWidget(
+                title: 'About Yourself',
+                subtitle:
+                    'Almost done!\n A well-written bio helps you get 3x more profile views'),
             bioTemplateActionButtons(),
             dataInsertField(),
             const SizedBox(height: 20),
@@ -160,7 +169,7 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
                     ),
                   )
                 : const Icon(Icons.auto_fix_high, size: 18),
-            label: const Text('Auto Suggest'),
+            label: Text('Auto Suggest'.localized(context)),
           ),
           OutlinedButton(
             style: smallOutlineStyle,
@@ -180,7 +189,7 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
                   ),
                   const SizedBox(width: 8),
                 ],
-                const Text('Show Templates'),
+                Text('Show Templates'.localized(context)),
               ],
             ),
           ),
@@ -332,15 +341,17 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
 
   Future<void> _handleContinue() async {
     final screenProvider = ref.read(aboutYourselfScreenProvider);
-    if (provider.aboutYourselfController.text.isNotEmpty ) {
+    if (provider.aboutYourselfController.text.isNotEmpty) {
       await provider.signUpViaOtp(context).then((success) {
         if (success) {
-          screenProvider.updateViewState(screenStates: RegistrationScreenStates.loadingComplete);
+          screenProvider.updateViewState(
+              screenStates: RegistrationScreenStates.loadingComplete);
           if (mounted) {
             context.push(Paths.otpVerifyForSignUp);
           }
         } else {
-          screenProvider.updateViewState(loadingState: RegistrationScreenStates.loadingComplete);
+          screenProvider.updateViewState(
+              loadingState: RegistrationScreenStates.loadingComplete);
         }
       });
     }

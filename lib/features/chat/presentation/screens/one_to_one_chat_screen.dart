@@ -8,6 +8,7 @@ import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/dialog_utils.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/chat/presentation/provider/chat_provider.dart';
 import 'package:walima_llc/features/chat/presentation/screens/widgets/profile_avatar_with_name.dart';
 import 'package:walima_llc/features/matches/presentation/widgets/bottom_bordered_widget.dart';
@@ -348,9 +349,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
         await showDialog(
           context: context,
           builder: (_) => AlertDialog(
-            title: Text('Block ${participant.displayName}? Are you sure?'),
-            content: const Text(
-              'Blocked members cannot view your profile or contact you on walima.com.',
+            title: Text(
+              '${'Block'.localized(context)} ${participant.displayName}? ${'Are you sure?'.localized(context)}',
+            ),
+            content: Text(
+              'Blocked members cannot view your profile or contact you on walima.com.'
+                  .localized(context),
             ),
             shape: RoundedRectangleBorder(
               borderRadius:
@@ -438,8 +442,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
             child: Wrap(
               children: [
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 16),
                   child: ViewContactBottomSheet(
                     userId: userId,
                     userName: participant.displayName,
@@ -472,7 +476,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
     final message = provider.messages;
 
     if (message.isEmpty) {
-      return const Center(child: Text('No messages yet'));
+      return Center(child: Text('No messages yet'.localized(context)));
     }
 
     return freeUser == true

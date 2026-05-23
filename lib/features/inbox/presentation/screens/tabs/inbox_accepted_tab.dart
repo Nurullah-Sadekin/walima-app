@@ -6,6 +6,7 @@ import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/camel_case_utils.dart';
 import 'package:walima_llc/core/utils/date_time_utils.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/connections/data/models/response/get_accepted_connection_response.dart'
     as accepted_models;
 import 'package:walima_llc/features/connections/presentation/widgets/view_contact_bottom_sheet.dart';
@@ -60,7 +61,6 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
             controller: _subTabController,
             physics: const NeverScrollableScrollPhysics(),
             children: [
-
               _buildTabBody(
                 context: context,
                 isLoading: provider.isAcceptedLoading,
@@ -68,7 +68,8 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
                 errorMessage: provider.acceptedErrorMessage,
                 items: sentItems,
                 emptyMessage: 'No accepted-by-me requests found',
-                onRetry: () => ref.read(inboxProvider).fetchAcceptedConnections(),
+                onRetry: () =>
+                    ref.read(inboxProvider).fetchAcceptedConnections(),
                 isReceivedDirection: false,
               ),
               _buildTabBody(
@@ -78,7 +79,8 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
                 errorMessage: provider.acceptedErrorMessage,
                 items: receivedItems,
                 emptyMessage: 'No accepted-by-her requests found',
-                onRetry: () => ref.read(inboxProvider).fetchAcceptedConnections(),
+                onRetry: () =>
+                    ref.read(inboxProvider).fetchAcceptedConnections(),
                 isReceivedDirection: true,
               ),
             ],
@@ -117,7 +119,7 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
               const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: onRetry,
-                child: const Text('Retry'),
+                child: Text('Retry'.localized(context)),
               ),
             ],
           ),
@@ -169,7 +171,7 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
                       },
                     );
                   },
-            onTapMiddleBottomItem:() async{
+            onTapMiddleBottomItem: () async {
               if (item.id != null) {
                 await BottomSheetUtils.open(
                   context: context,
@@ -178,7 +180,11 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
                 );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('User information unavailable.')),
+                  SnackBar(
+                    content: Text(
+                      'User information unavailable.'.localized(context),
+                    ),
+                  ),
                 );
               }
             },
@@ -187,19 +193,19 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
               item.location?.state,
               item.location?.country,
             ]
-                .whereType<String>()
-                .where((value) => value.trim().isNotEmpty)
-                .join(', ')
-                .isEmpty
-                  ? 'N/A'
-                  : [
-                      item.location?.city,
-                      item.location?.state,
-                      item.location?.country,
-                    ]
-                        .whereType<String>()
-                        .where((value) => value.trim().isNotEmpty)
-                        .join(', '),
+                    .whereType<String>()
+                    .where((value) => value.trim().isNotEmpty)
+                    .join(', ')
+                    .isEmpty
+                ? 'N/A'
+                : [
+                    item.location?.city,
+                    item.location?.state,
+                    item.location?.country,
+                  ]
+                    .whereType<String>()
+                    .where((value) => value.trim().isNotEmpty)
+                    .join(', '),
             profession: CamelCaseUtils.formatCamelCase(
               item.maritalStatus ?? '',
             ),
@@ -227,8 +233,8 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
     final profileImagePath = (item?.profilePhoto?.url?.isNotEmpty ?? false)
         ? item!.profilePhoto!.url!
         : (item?.gender ?? '').toLowerCase() == 'female'
-        ? AppImages.womenAvatar
-        : AppImages.manAvatar;
+            ? AppImages.womenAvatar
+            : AppImages.manAvatar;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -241,5 +247,4 @@ class _InboxAcceptedTabState extends ConsumerState<InboxAcceptedTab>
       ),
     );
   }
-
 }

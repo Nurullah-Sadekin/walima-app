@@ -213,7 +213,7 @@ extension _ProfileSectionEditLocationPickerActionsPart
                         children: [
                           Expanded(
                             child: Text(
-                              'Select Languages',
+                              'Select Languages'.localized(context),
                               style: TextStyle(
                                 color: AppColors.textPrimaryLight,
                                 fontSize: TextSize.font18(context),
@@ -223,7 +223,7 @@ extension _ProfileSectionEditLocationPickerActionsPart
                           ),
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(),
-                            child: const Text('Cancel'),
+                            child: Text('Cancel'.localized(context)),
                           ),
                         ],
                       ),
@@ -260,7 +260,7 @@ extension _ProfileSectionEditLocationPickerActionsPart
                         child: ElevatedButton(
                           onPressed: () =>
                               Navigator.of(context).pop(draftOptions),
-                          child: const Text('Done'),
+                          child: Text('Done'.localized(context)),
                         ),
                       ),
                     ],

@@ -3,6 +3,7 @@ import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class KnowMoreItemCard extends StatelessWidget {
   const KnowMoreItemCard({
@@ -35,25 +36,24 @@ class KnowMoreItemCard extends StatelessWidget {
       spacing: spacing,
       children: [
         if (isActive != null)
-        ShowImage(
-          imagePath: isActive!
-              ? AppImages.successCircle
-              : AppImages.cancelCircle,
-          height: iconSize ?? TextSize.font18(context),
-          width: iconSize ?? TextSize.font18(context),
-        ),
-        if (isActive == null)
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: iconPadding ?? 2.0),
-          child: Icon(
-            icon,
-            color: iconColor,
-            size: iconSize ?? TextSize.font18(context),
+          ShowImage(
+            imagePath:
+                isActive! ? AppImages.successCircle : AppImages.cancelCircle,
+            height: iconSize ?? TextSize.font18(context),
+            width: iconSize ?? TextSize.font18(context),
           ),
-        ),
+        if (isActive == null)
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: iconPadding ?? 2.0),
+            child: Icon(
+              icon,
+              color: iconColor,
+              size: iconSize ?? TextSize.font18(context),
+            ),
+          ),
         Expanded(
           child: Text(
-            text,
+            text.localized(context),
             maxLines: maxLines,
             overflow: TextOverflow.ellipsis,
             style: textStyle ??

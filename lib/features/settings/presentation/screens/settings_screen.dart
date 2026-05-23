@@ -5,6 +5,7 @@ import 'package:walima_llc/generated/l10n/app_localizations.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/providers/theme_provider.dart';
 import 'package:walima_llc/core/providers/locale_provider.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -33,12 +34,14 @@ class SettingsScreen extends ConsumerWidget {
               children: [
                 RadioListTile<ThemeMode>(
                   title: Text(l10n.lightMode),
-                  subtitle: const Text('Use light theme'),
+                  subtitle: Text('Use light theme'.localized(context)),
                   value: ThemeMode.light,
                   groupValue: themeMode,
                   onChanged: (value) {
                     if (value != null) {
-                      ref.read(themeNotifierProvider.notifier).setThemeMode(value);
+                      ref
+                          .read(themeNotifierProvider.notifier)
+                          .setThemeMode(value);
                     }
                   },
                   secondary: const Icon(Icons.light_mode),
@@ -46,25 +49,29 @@ class SettingsScreen extends ConsumerWidget {
                 const Divider(height: 1),
                 RadioListTile<ThemeMode>(
                   title: Text(l10n.darkMode),
-                  subtitle: const Text('Use dark theme'),
+                  subtitle: Text('Use dark theme'.localized(context)),
                   value: ThemeMode.dark,
                   groupValue: themeMode,
                   onChanged: (value) {
                     if (value != null) {
-                      ref.read(themeNotifierProvider.notifier).setThemeMode(value);
+                      ref
+                          .read(themeNotifierProvider.notifier)
+                          .setThemeMode(value);
                     }
                   },
                   secondary: const Icon(Icons.dark_mode),
                 ),
                 const Divider(height: 1),
                 RadioListTile<ThemeMode>(
-                  title: const Text('System'),
-                  subtitle: const Text('Use system theme'),
+                  title: Text('System'.localized(context)),
+                  subtitle: Text('Use system theme'.localized(context)),
                   value: ThemeMode.system,
                   groupValue: themeMode,
                   onChanged: (value) {
                     if (value != null) {
-                      ref.read(themeNotifierProvider.notifier).setThemeMode(value);
+                      ref
+                          .read(themeNotifierProvider.notifier)
+                          .setThemeMode(value);
                     }
                   },
                   secondary: const Icon(Icons.brightness_auto),
@@ -86,7 +93,9 @@ class SettingsScreen extends ConsumerWidget {
                   groupValue: locale,
                   onChanged: (value) {
                     if (value != null) {
-                      ref.read(localeNotifierProvider.notifier).setLocale(value);
+                      ref
+                          .read(localeNotifierProvider.notifier)
+                          .setLocale(value);
                     }
                   },
                   secondary: const Text('🇬🇧', style: TextStyle(fontSize: 24)),
@@ -99,10 +108,27 @@ class SettingsScreen extends ConsumerWidget {
                   groupValue: locale,
                   onChanged: (value) {
                     if (value != null) {
-                      ref.read(localeNotifierProvider.notifier).setLocale(value);
+                      ref
+                          .read(localeNotifierProvider.notifier)
+                          .setLocale(value);
                     }
                   },
                   secondary: const Text('🇧🇩', style: TextStyle(fontSize: 24)),
+                ),
+                const Divider(height: 1),
+                RadioListTile<Locale>(
+                  title: Text(l10n.arabic),
+                  subtitle: const Text('العربية'),
+                  value: const Locale('ar'),
+                  groupValue: locale,
+                  onChanged: (value) {
+                    if (value != null) {
+                      ref
+                          .read(localeNotifierProvider.notifier)
+                          .setLocale(value);
+                    }
+                  },
+                  secondary: const Text('🇸🇦', style: TextStyle(fontSize: 24)),
                 ),
               ],
             ),
@@ -110,26 +136,26 @@ class SettingsScreen extends ConsumerWidget {
 
           // About Section
           _buildSectionHeader(context, l10n.about),
-          const Card(
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Column(
               children: [
                 ListTile(
-                  leading: Icon(
+                  leading: const Icon(
                     Icons.info_outline,
                     color: AppColors.primary,
                   ),
-                  title: Text('Version'),
-                  subtitle: Text('1.0.0'),
+                  title: Text('Version'.localized(context)),
+                  subtitle: const Text('1.0.0'),
                 ),
-                Divider(height: 1),
+                const Divider(height: 1),
                 ListTile(
-                  leading: Icon(
+                  leading: const Icon(
                     Icons.code,
                     color: AppColors.primary,
                   ),
-                  title: Text('Build Number'),
-                  subtitle: Text('1'),
+                  title: Text('Build Number'.localized(context)),
+                  subtitle: const Text('1'),
                 ),
               ],
             ),

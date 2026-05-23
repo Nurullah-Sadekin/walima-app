@@ -9,6 +9,7 @@ import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/dialog_utils.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/matches/data/models/response/get_matches_response.dart';
 import 'package:walima_llc/features/recommended_preferences/presentation/providers/recommended_preferences_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -82,7 +83,7 @@ class _ConnectMatchesState extends ConsumerState<ConnectMatches> {
               const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: provider.loadConnectMatches,
-                child: const Text('Retry'),
+                child: Text('Retry'.localized(context)),
               ),
             ],
           ),
@@ -91,8 +92,8 @@ class _ConnectMatchesState extends ConsumerState<ConnectMatches> {
     }
 
     if (provider.connectMatches.isEmpty) {
-      return const Center(
-        child: Text('No matches found'),
+      return Center(
+        child: Text('No matches found'.localized(context)),
       );
     }
 
@@ -137,8 +138,8 @@ class _ConnectMatchesState extends ConsumerState<ConnectMatches> {
         title: isBusy
             ? 'Sending...'
             : hasSelection
-            ? 'Send Connection'
-            : 'Select Matches',
+                ? 'Send Connection'
+                : 'Select Matches',
         onTap: () async {
           if (!hasSelection || isBusy) return;
 
@@ -215,7 +216,8 @@ class _ConnectMatchesState extends ConsumerState<ConnectMatches> {
     final parts = <String>[
       if ((location?.city ?? '').trim().isNotEmpty) location!.city!.trim(),
       if ((location?.state ?? '').trim().isNotEmpty) location!.state!.trim(),
-      if ((location?.country ?? '').trim().isNotEmpty) location!.country!.trim(),
+      if ((location?.country ?? '').trim().isNotEmpty)
+        location!.country!.trim(),
     ];
     return parts.isEmpty ? 'Location not available' : parts.join(', ');
   }

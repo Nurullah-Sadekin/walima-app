@@ -12,6 +12,7 @@ import 'package:walima_llc/core/utils/clipboard_utils.dart';
 import 'package:walima_llc/core/utils/dialog_utils.dart';
 import 'package:walima_llc/core/utils/height_utils.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/core/utils/picker_dialog.dart';
 import 'package:walima_llc/features/home/presentation/screens/widgets/profile_info_card.dart';
 import 'package:walima_llc/features/profile/data/model/response/get_complete_profile_response.dart';
@@ -81,7 +82,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   Widget _topBar(BuildContext context) {
     return CustomBackAppBar(
-      title: const Text('Edit Profile'),
+      title: Text('Edit Profile'.localized(context)),
       backIconBackground: AppColors.transparent,
       onBackPressed: () {
         Navigator.pop(context);
@@ -285,9 +286,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           'Languages',
           _valueOrDefault(
             CamelCaseUtils.formatCamelCase(
-              (basic?.languages)
-                  ?.map((e) => e.toString())
-                  .join(', ') ?? '',
+              (basic?.languages)?.map((e) => e.toString()).join(', ') ?? '',
             ),
           ),
         ),
@@ -689,9 +688,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final pictures = profile?.profile?.profilePictures;
     final gender = ref.read(globalProvider).currentUser?.gender;
     if (pictures == null || pictures.isEmpty) {
-      return gender == 'female'
-          ? AppImages.womenAvatar
-          : AppImages.manAvatar;
+      return gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar;
     }
 
     for (final picture in pictures) {

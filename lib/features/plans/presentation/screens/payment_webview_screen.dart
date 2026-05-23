@@ -5,6 +5,7 @@ import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/dialog_utils.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/plans/data/repository/plan_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -23,7 +24,8 @@ class PaymentWebViewScreen extends ConsumerStatefulWidget {
   final String? tranId;
 
   @override
-  ConsumerState<PaymentWebViewScreen> createState() => _PaymentWebViewScreenState();
+  ConsumerState<PaymentWebViewScreen> createState() =>
+      _PaymentWebViewScreenState();
 }
 
 class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
@@ -39,8 +41,7 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
   void initState() {
     super.initState();
     _initialUri = Uri.tryParse(widget.redirectUrl);
-    final isInvalidUrl =
-        _initialUri == null ||
+    final isInvalidUrl = _initialUri == null ||
         _initialUri!.scheme.isEmpty ||
         _initialUri!.host.isEmpty;
 
@@ -70,8 +71,7 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final isInvalidUrl =
-          _initialUri == null ||
+      final isInvalidUrl = _initialUri == null ||
           _initialUri!.scheme.isEmpty ||
           _initialUri!.host.isEmpty;
       if (!isInvalidUrl || !mounted) return;
@@ -135,10 +135,13 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
     final callbackValId = _resolveValId(currentUri);
     final callbackTranId = _resolveCallbackTranId(currentUri);
 
-    if (callbackTransactionId.isEmpty || callbackValId.isEmpty || callbackTranId.isEmpty) {
+    if (callbackTransactionId.isEmpty ||
+        callbackValId.isEmpty ||
+        callbackTranId.isEmpty) {
       await DialogUtils.showErrorDialog(
         context: context,
-        message: 'Payment verification information is incomplete. Please try again.',
+        message:
+            'Payment verification information is incomplete. Please try again.',
       );
       if (!mounted) return;
       _completeFlowAndGoHome();
@@ -170,7 +173,8 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
     await DialogUtils.showSuccessDialog(
       context: context,
       title: 'Subscription Done',
-      message: 'Purchase done! Instant alerts for matches sand profile views are now enabled.',
+      message:
+          'Purchase done! Instant alerts for matches sand profile views are now enabled.',
       autoClose: false,
     );
     if (!mounted) return;
@@ -184,14 +188,21 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
     final path = uri.path.toLowerCase();
     final gateway = _pickQueryParam(uri, const ['gateway']).toLowerCase();
     final valId = _resolveValId(uri);
-    final transactionId = _pickQueryParam(uri, const ['transactionId', 'transaction_id']);
+    final transactionId =
+        _pickQueryParam(uri, const ['transactionId', 'transaction_id']);
 
-    return path.contains('/payment/success') && gateway == 'sslcommerz' && valId.isNotEmpty && transactionId.isNotEmpty;
+    return path.contains('/payment/success') &&
+        gateway == 'sslcommerz' &&
+        valId.isNotEmpty &&
+        transactionId.isNotEmpty;
   }
 
   bool _hasFailureMarker(String url) {
     final normalized = url.toLowerCase();
-    return normalized.contains('fail') || normalized.contains('failed') || normalized.contains('cancel') || normalized.contains('cancelled');
+    return normalized.contains('fail') ||
+        normalized.contains('failed') ||
+        normalized.contains('cancel') ||
+        normalized.contains('cancelled');
   }
 
   String _resolveCallbackTransactionId(Uri currentUri) {
@@ -217,10 +228,12 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
     final fromWidget = widget.tranId?.trim() ?? '';
     if (fromWidget.isNotEmpty) return fromWidget;
 
-    final fromCurrent = _pickQueryParam(currentUri, const ['tran_id', 'tranId']);
+    final fromCurrent =
+        _pickQueryParam(currentUri, const ['tran_id', 'tranId']);
     if (fromCurrent.isNotEmpty) return fromCurrent;
 
-    final fromCurrentTransaction = _pickQueryParam(currentUri, const ['transactionId', 'transaction_id']);
+    final fromCurrentTransaction =
+        _pickQueryParam(currentUri, const ['transactionId', 'transaction_id']);
     if (fromCurrentTransaction.isNotEmpty) return fromCurrentTransaction;
 
     final fromInitial = _pickQueryParam(
@@ -268,7 +281,9 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isInvalidUrl = _initialUri == null || _initialUri!.scheme.isEmpty || _initialUri!.host.isEmpty;
+    final isInvalidUrl = _initialUri == null ||
+        _initialUri!.scheme.isEmpty ||
+        _initialUri!.host.isEmpty;
 
     return PopScope(
       canPop: false,
@@ -278,7 +293,7 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Payment'),
+          title: Text('Payment'.localized(context)),
           centerTitle: true,
           leading: IconButton(
             onPressed: _completeFlowAndGoHome,

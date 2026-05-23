@@ -3,11 +3,11 @@ import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 /// Reusable profile info card used in EditProfileScreen.
 /// Supports either a free-form `child` or a list of key/value pairs via `infoList`.
 class ProfileInfoCard extends StatelessWidget {
-
   const ProfileInfoCard({
     Key? key,
     required this.title,
@@ -15,7 +15,8 @@ class ProfileInfoCard extends StatelessWidget {
     this.onEdit,
     this.child,
     this.infoList,
-  })  : assert(child != null || infoList != null, 'Either child or infoList must be provided'),
+  })  : assert(child != null || infoList != null,
+            'Either child or infoList must be provided'),
         super(key: key);
   final String title;
   final bool showEdit;
@@ -41,7 +42,7 @@ class ProfileInfoCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  title,
+                  title.localized(context),
                   style: TextStyle(
                     color: AppColors.textPrimaryLight,
                     fontSize: TextSize.font14(context),
@@ -52,7 +53,8 @@ class ProfileInfoCard extends StatelessWidget {
                   GestureDetector(
                     onTap: onEdit,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10.0, vertical: 6),
                       decoration: BoxDecoration(
                         color: AppColors.white,
                         borderRadius: BorderRadius.circular(8.0),
@@ -68,7 +70,7 @@ class ProfileInfoCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            'Edit',
+                            'Edit'.localized(context),
                             style: TextStyle(
                               color: AppColors.primary,
                               fontSize: TextSize.font14(context),
@@ -90,7 +92,8 @@ class ProfileInfoCard extends StatelessWidget {
             )
           else if (infoList != null)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: infoList!.map((entry) {
@@ -102,7 +105,7 @@ class ProfileInfoCard extends StatelessWidget {
                         Expanded(
                           flex: 3,
                           child: Text(
-                            '${entry.key}:',
+                            '${entry.key.localized(context)}:',
                             style: TextStyle(
                               color: AppColors.textSecondaryLight,
                               fontSize: TextSize.font12(context),
@@ -134,4 +137,3 @@ class ProfileInfoCard extends StatelessWidget {
     );
   }
 }
-
