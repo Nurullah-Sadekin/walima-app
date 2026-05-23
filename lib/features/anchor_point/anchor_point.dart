@@ -126,8 +126,8 @@ class AnchorPointScreen extends ConsumerWidget {
             children: [
               ShowImage(
                 imagePath: icon,
-                width: 38,
-                height: 38,
+                width: 24,
+                height: 24,
                 color: isActive ? AppColors.primary : AppColors.textSub600,
               ),
               if (badgeCount > 0)

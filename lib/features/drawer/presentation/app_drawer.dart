@@ -303,25 +303,37 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
           iconImagePath: AppImages.customerSupportSvgIcon,
           title: 'Help & Support',
           onTap: () => LinkOpener.openLink(
-              context, 'Help Center', AppUrls.helpCenterUrl),
+            context,
+            'Help Center'.localized(context),
+            AppUrls.helpCenterUrl,
+          ),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.bubbleChatSvgIcon,
           title: 'Be Safe Online',
           onTap: () => LinkOpener.openLink(
-              context, 'Be Safe Online', AppUrls.beSafeOnlineUrl),
+            context,
+            'Be Safe Online'.localized(context),
+            AppUrls.beSafeOnlineUrl,
+          ),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.documentValidationSvgIcon,
           title: 'Privacy Policy',
           onTap: () => LinkOpener.openLink(
-              context, 'Privacy Policy', AppUrls.privacyPolicyUrl),
+            context,
+            'Privacy Policy'.localized(context),
+            AppUrls.privacyPolicyUrl,
+          ),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.safetySvgIcon,
           title: 'Safety',
-          onTap: () =>
-              LinkOpener.openLink(context, 'Safety', AppUrls.safetyUrl),
+          onTap: () => LinkOpener.openLink(
+            context,
+            'Safety'.localized(context),
+            AppUrls.safetyUrl,
+          ),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.starSvgIcon,
@@ -332,7 +344,10 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
           iconImagePath: AppImages.documentValidationSvgIcon,
           title: 'Terms & Conditions',
           onTap: () => LinkOpener.openLink(
-              context, 'Terms & Conditions', AppUrls.termsUrl),
+            context,
+            'Terms & Conditions'.localized(context),
+            AppUrls.termsUrl,
+          ),
         ),
       ],
     );

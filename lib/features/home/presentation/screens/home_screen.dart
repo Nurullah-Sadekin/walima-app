@@ -150,7 +150,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _topBar(BuildContext context) {
     return AnchoredAppBar(
       context: context,
-      title: 'My Walima',
+      title: 'My Walima'.localized(context),
       onNotificationPressed: () => context.pushNamed(Routes.notifications),
     );
   }
@@ -191,8 +191,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final isLoading = provider.isLoadingPremiumMatches;
     final errorText = provider.premiumMatchesError;
     final subtitleText = isLoading
-        ? 'Fetching premium matches'
-        : '${matches.length} Profiles Found';
+        ? 'Fetching premium matches'.localized(context)
+        : '${matches.length} ${'Profiles Found'.localized(context)}';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -208,7 +208,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 spacing: 6,
                 children: [
                   Text(
-                    'Premium Matches',
+                    'Premium Matches'.localized(context),
                     style: TextStyle(
                       color: AppColors.textPrimaryLight,
                       fontSize: TextSize.font18(context),
@@ -242,7 +242,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: Row(
                       children: [
                         Text(
-                          'View All',
+                          'View All'.localized(context),
                           style: TextStyle(
                             color: AppColors.textSecondaryLight,
                             fontSize: TextSize.font14(context),
@@ -290,7 +290,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               if (matches.isEmpty) {
                 return Center(
                   child: Text(
-                    'No premium matches available yet.',
+                    'No premium matches available yet.'.localized(context),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: AppColors.textSecondaryLight,
@@ -321,8 +321,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildUpgradeWidget(int remainingCount, {bool? isForVisitors}) {
-    String subText =
-        isForVisitors == true ? 'recent visitors' : 'premium matches';
+    String subText = isForVisitors == true
+        ? 'recent visitors'.localized(context)
+        : 'premium matches'.localized(context);
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -335,13 +336,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             color: AppColors.primary,
           ),
           const SizedBox(height: 12),
-          const Text(
-            'Upgrade Your Plan',
+          Text(
+            'Upgrade Your Plan'.localized(context),
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
-            'See $remainingCount more $subText',
+            '${'See'.localized(context)} $remainingCount ${'more'.localized(context)} $subText',
             style: TextStyle(
                 fontSize: TextSize.font14(context),
                 color: AppColors.textSecondaryLight),
@@ -359,8 +360,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 color: AppColors.primary,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Text(
-                'Upgrade Now',
+              child: Text(
+                'Upgrade Now'.localized(context),
                 style:
                     TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
               ),
@@ -394,8 +395,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           imageHeight: 250,
           isPremiumConnect: match.isPremium ?? true,
           isVerified: match.profilePhoto?.isVerified ?? false,
-          name: match.displayName ?? 'Walima Member',
-          age: '${match.age ?? 'Undefine'} Yr',
+          name: match.displayName ?? 'Walima Member'.localized(context),
+          age:
+              '${match.age ?? 'Undefine'.localized(context)} ${'Yr'.localized(context)}',
           height: HeightUtils.formatHeight(heightText),
           location: location,
           profession: profession,
@@ -431,7 +433,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ref.read(homeProvider).connect(
                     context,
                     match.id ?? '',
-                    match.displayName ?? 'Unknown',
+                    match.displayName ?? 'Unknown'.localized(context),
                     ConnectionRequestType.match.apiValue,
                   );
             }
@@ -448,7 +450,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: ViewContactBottomSheet(
         userId: match.id ?? '',
-        userName: match.displayName ?? 'Unknown',
+        userName: match.displayName ?? 'Unknown'.localized(context),
         profileImagePath: (match.profilePhoto?.url?.isNotEmpty ?? false)
             ? match.profilePhoto!.url!
             : match.gender == 'female'
@@ -501,12 +503,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   String _activeStatusText(MatchProfile match) {
     if (match.isOnline == true) {
-      return 'Online';
+      return 'Online'.localized(context);
     }
     if (match.lastSeenAt != null && match.lastSeenAt!.isNotEmpty) {
       return DateTimeUtils.formatDate(DateTime.tryParse(match.lastSeenAt!));
     }
-    return 'Offline';
+    return 'Offline'.localized(context);
   }
 
   Widget _recentVisitors() {
@@ -517,8 +519,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final isLoading = provider.isLoadingRecentVisitors;
     final errorText = provider.recentVisitorsError;
     final subtitleText = isLoading
-        ? 'Loading recent visitors'
-        : '${visitors.length} Profiles Found';
+        ? 'Loading recent visitors'.localized(context)
+        : '${visitors.length} ${'Profiles Found'.localized(context)}';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -534,7 +536,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 spacing: 6,
                 children: [
                   Text(
-                    'Recent Visitors',
+                    'Recent Visitors'.localized(context),
                     style: TextStyle(
                       color: AppColors.textPrimaryLight,
                       fontSize: TextSize.font18(context),
@@ -568,7 +570,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: Row(
                       children: [
                         Text(
-                          'View All',
+                          'View All'.localized(context),
                           style: TextStyle(
                             color: AppColors.textSecondaryLight,
                             fontSize: TextSize.font14(context),
@@ -616,7 +618,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               if (visitors.isEmpty) {
                 return Center(
                   child: Text(
-                    'No recent visitors yet.',
+                    'No recent visitors yet.'.localized(context),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: AppColors.textSecondaryLight,
@@ -669,8 +671,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           imageHeight: 250,
           isPremiumConnect: visitor.isPremium ?? false,
           isVerified: visitor.isVerified ?? false,
-          name: visitor.displayName ?? 'Walima Member',
-          age: '${visitor.age?.toInt() ?? 'Undefine'} Yr',
+          name: visitor.displayName ?? 'Walima Member'.localized(context),
+          age:
+              '${visitor.age?.toInt() ?? 'Undefine'.localized(context)} ${'Yr'.localized(context)}',
           height: HeightUtils.formatHeight(visitor.height.toString()),
           location: location,
           leftButtonColor: visitor.connection?.status == 'none'
@@ -703,7 +706,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ref.read(homeProvider).connect(
                     context,
                     visitor.id ?? '',
-                    visitor.displayName ?? 'Unknown',
+                    visitor.displayName ?? 'Unknown'.localized(context),
                     ConnectionRequestType.match.apiValue,
                   );
             }
@@ -718,7 +721,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: ViewContactBottomSheet(
         userId: visitor.id ?? '',
-        userName: visitor.displayName ?? 'Unknown',
+        userName: visitor.displayName ?? 'Unknown'.localized(context),
         profileImagePath: (visitor.profilePhoto?.url?.isNotEmpty ?? false)
             ? visitor.profilePhoto!.url!
             : visitor.gender == 'female'
@@ -776,7 +779,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Follow Us on',
+                'Follow Us on'.localized(context),
                 style: TextStyle(
                   color: AppColors.textPrimaryLight,
                   fontSize: TextSize.font18(context),
@@ -787,7 +790,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 height: 6,
               ),
               Text(
-                'Stay inspired follow us on social media',
+                'Stay inspired follow us on social media'.localized(context),
                 style: TextStyle(
                   color: AppColors.textSecondaryLight,
                   fontSize: TextSize.font14(context),
@@ -802,15 +805,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 children: [
                   SocialMediaIcon(
                     imagePath: AppImages.instagramIcon,
-                    onTap: () => _openLink('Instagram', AppUrls.instagramUrl),
+                    onTap: () => _openLink(
+                      'Instagram'.localized(context),
+                      AppUrls.instagramUrl,
+                    ),
                   ),
                   SocialMediaIcon(
                     imagePath: AppImages.facebookIcon,
-                    onTap: () => _openLink('Facebook', AppUrls.facebookUrl),
+                    onTap: () => _openLink(
+                      'Facebook'.localized(context),
+                      AppUrls.facebookUrl,
+                    ),
                   ),
                   SocialMediaIcon(
                     imagePath: AppImages.twitterIcon,
-                    onTap: () => _openLink('X', AppUrls.xUrl),
+                    onTap: () => _openLink(
+                      'X'.localized(context),
+                      AppUrls.xUrl,
+                    ),
                   ),
                   SocialMediaIcon(
                     imagePath: AppImages.whatsappSvgIcon,
