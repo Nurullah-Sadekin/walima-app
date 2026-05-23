@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appName": "Flutter Boilerplate",
+  "appName": "Walima",
   "helloWorld": "Hello World!",
   "welcome": "Welcome",
   "home": "Home",
@@ -57,6 +57,7 @@
   "language": "Language",
   "english": "English",
   "bangla": "Bangla",
+  "arabic": "Arabic",
   "changeLanguage": "Change Language",
   "changeTheme": "Change Theme",
   "about": "About"
