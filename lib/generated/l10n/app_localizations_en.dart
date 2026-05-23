@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appName => 'Flutter Boilerplate';
+  String get appName => 'Walima';
 
   @override
   String get helloWorld => 'Hello World!';
@@ -178,6 +178,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bangla => 'Bangla';
+
+  @override
+  String get arabic => 'Arabic';
 
   @override
   String get changeLanguage => 'Change Language';
