@@ -6,6 +6,7 @@ import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class ProfileComprehensiveCard extends StatelessWidget {
   const ProfileComprehensiveCard({
@@ -93,7 +94,6 @@ class ProfileComprehensiveCard extends StatelessWidget {
   final VoidCallback? onMenuTap;
   final VoidCallback? onTapCard;
 
-
   final VoidCallback? onTapSingleButton;
   final Color? singleButtonColor;
   final Color? singleButtonTextColor;
@@ -103,7 +103,6 @@ class ProfileComprehensiveCard extends StatelessWidget {
 
   final bool noButton;
   final bool isOnline;
-
 
   @override
   Widget build(BuildContext context) {
@@ -153,7 +152,7 @@ class ProfileComprehensiveCard extends StatelessWidget {
                                 fit: BoxFit.fitWidth,
                                 color: AppColors.white,
                               ),
-                              Text('View on Accept',
+                              Text('View on Accept'.localized(context),
                                   style: TextStyle(
                                     fontSize: TextSize.font14(context),
                                     fontWeight: FontWeight.w500,
@@ -190,7 +189,7 @@ class ProfileComprehensiveCard extends StatelessWidget {
                                 fit: BoxFit.fill,
                                 color: AppColors.primary,
                               ),
-                              Text('Photo Request',
+                              Text('Photo Request'.localized(context),
                                   style: TextStyle(
                                     fontSize: TextSize.font14(context),
                                     fontWeight: FontWeight.w500,
@@ -227,8 +226,8 @@ class ProfileComprehensiveCard extends StatelessWidget {
                     bottom: 10,
                     left: 10,
                     child: Container(
-                      padding:
-                          const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 2, horizontal: 6),
                       decoration: const BoxDecoration(
                         color: AppColors.disableDark,
                         shape: BoxShape.rectangle,
@@ -241,7 +240,9 @@ class ProfileComprehensiveCard extends StatelessWidget {
                             width: TextSize.font8(context),
                             height: TextSize.font8(context),
                             decoration: BoxDecoration(
-                              color: isOnline ? const Color(0XFF1FC16B) : AppColors.disableBackground,
+                              color: isOnline
+                                  ? const Color(0XFF1FC16B)
+                                  : AppColors.disableBackground,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -270,7 +271,8 @@ class ProfileComprehensiveCard extends StatelessWidget {
                             decoration: const BoxDecoration(
                               color: AppColors.disableDark,
                               shape: BoxShape.rectangle,
-                              borderRadius: BorderRadius.all(Radius.circular(6)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(6)),
                             ),
                             child: Column(
                               spacing: 6,
@@ -309,7 +311,8 @@ class ProfileComprehensiveCard extends StatelessWidget {
                               decoration: const BoxDecoration(
                                 color: AppColors.disableDark,
                                 shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.all(Radius.circular(6)),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(6)),
                               ),
                               child: Icon(
                                 Icons.more_vert,
@@ -350,31 +353,31 @@ class ProfileComprehensiveCard extends StatelessWidget {
                       ),
                     ),
                     if (isVerified)
-                    ShowImage(
-                      imagePath: AppImages.verifiedBadgeSvgIcon,
-                      width: TextSize.font20(context),
-                      height: TextSize.font20(context),
-                      radius: BorderRadius.circular(8),
-                      fit: BoxFit.fitWidth,
-                    )
+                      ShowImage(
+                        imagePath: AppImages.verifiedBadgeSvgIcon,
+                        width: TextSize.font20(context),
+                        height: TextSize.font20(context),
+                        radius: BorderRadius.circular(8),
+                        fit: BoxFit.fitWidth,
+                      )
                   ],
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (age != null && height != null)
-                    const SizedBox(
-                      height: 12,
-                    ),
-                    if (age != null && height != null)
-                    Text(
-                      '$age, $height',
-                      style: TextStyle(
-                        fontSize: TextSize.font16(context),
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.textSecondaryLight,
+                      const SizedBox(
+                        height: 12,
                       ),
-                    ),
+                    if (age != null && height != null)
+                      Text(
+                        '$age, $height',
+                        style: TextStyle(
+                          fontSize: TextSize.font16(context),
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.textSecondaryLight,
+                        ),
+                      ),
                     if (religion != null || maritalStatus != null)
                       Row(
                         spacing: 4,
@@ -430,7 +433,12 @@ class ProfileComprehensiveCard extends StatelessWidget {
                       ),
                   ],
                 ),
-                if (noButton == true) const SizedBox() else const SizedBox(height: 16,),
+                if (noButton == true)
+                  const SizedBox()
+                else
+                  const SizedBox(
+                    height: 16,
+                  ),
                 if (isSingleButton && noButton == false)
                   PrimaryButtons(
                       buttonStyle: ButtonsStyle.iconicDynamicButton,
@@ -440,7 +448,7 @@ class ProfileComprehensiveCard extends StatelessWidget {
                       borderColor: singleButtonBorderColor ?? AppColors.primary,
                       textColor: singleButtonTextColor ?? AppColors.primary,
                       title: singleButtonText ?? 'Connect Now'),
-                if (! isSingleButton && noButton == false)
+                if (!isSingleButton && noButton == false)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4.0),
                     child: Row(
@@ -450,7 +458,8 @@ class ProfileComprehensiveCard extends StatelessWidget {
                           child: PrimaryButtons(
                               buttonStyle: ButtonsStyle.iconicDynamicButton,
                               iconLeftPosition: true,
-                              bgColor: leftButtonColor ?? const Color(0XFF1FC16B),
+                              bgColor:
+                                  leftButtonColor ?? const Color(0XFF1FC16B),
                               onTap: onTapLeftButton ?? () {},
                               svgIconColor:
                                   leftButtonIconColor ?? AppColors.white,
@@ -467,7 +476,8 @@ class ProfileComprehensiveCard extends StatelessWidget {
                               onTap: onTapRightButton ?? () {},
                               svgIconColor:
                                   rightButtonIconColor ?? AppColors.primary,
-                              svgIconPath: rightIconPath ?? AppImages.callSvgIcon,
+                              svgIconPath:
+                                  rightIconPath ?? AppImages.callSvgIcon,
                               title: rightButtonText ?? 'Contact',
                               bgColor: rightButtonColor ?? AppColors.white,
                               borderColor:

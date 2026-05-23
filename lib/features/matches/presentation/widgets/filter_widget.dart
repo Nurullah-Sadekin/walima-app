@@ -3,6 +3,7 @@ import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/global/components/selection_card.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class FilterWidget extends StatelessWidget {
   const FilterWidget({
@@ -57,7 +58,7 @@ class FilterWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (title != null)...[
+          if (title != null) ...[
             Row(
               spacing: effectiveSpacing,
               mainAxisAlignment: MainAxisAlignment.start,
@@ -73,7 +74,7 @@ class FilterWidget extends StatelessWidget {
                     color: iconColor ?? effectiveTitleColor,
                   ),
                 Text(
-                  title!,
+                  title!.localized(context),
                   style: TextStyle(
                     fontSize: effectiveTitleFontSize,
                     fontWeight: effectiveTitleFontWeight,
