@@ -12,6 +12,7 @@ import 'package:walima_llc/core/router/app_router.dart';
 import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/dialog_utils.dart';
 import 'package:walima_llc/core/utils/link_opener.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/core/utils/picker_dialog.dart';
 import 'package:walima_llc/features/anchor_point/anchor_point.dart';
 import 'package:walima_llc/features/drawer/presentation/providers/app_drawer_provider.dart';
@@ -35,7 +36,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
     return Drawer(
       width: MediaQuery.of(context).size.width,
       child: TransparentLoading(
-        isLoading: provider.loaderState == DrawerScreenStates.transparentLoading,
+        isLoading:
+            provider.loaderState == DrawerScreenStates.transparentLoading,
         child: Scaffold(
           body: SafeArea(
             child: Padding(
@@ -60,7 +62,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
           ),
           floatingActionButton: BottomBorderedWidget(
             widget: PrimaryButtons(
-              title: 'Log Out',
+              title: 'Log Out'.localized(context),
               titleSize: TextSize.font14(context),
               textColor: AppColors.white,
               bgColor: AppColors.primary,
@@ -86,7 +88,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
               buttonStyle: ButtonsStyle.iconicDynamicButton,
             ),
           ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
         ),
       ),
     );
@@ -104,7 +107,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
           ),
         ),
         Text(
-          'Profile',
+          'Profile'.localized(context),
           style: TextStyle(
             color: AppColors.textPrimaryLight,
             fontSize: TextSize.font18(context),
@@ -121,7 +124,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
     final displayName = resolveDisplayName(profileData);
     final memberId = resolveMemberId(profileData);
     final planName = resolvePlanName(profileData?.membership);
-    final expiryText = formatExpiry(profileData?.membership?.membershipExpiresAt);
+    final expiryText =
+        formatExpiry(profileData?.membership?.membershipExpiresAt);
     final gender = ref.read(globalProvider).currentUser?.gender;
 
     return ProfileSummaryCard(
@@ -129,7 +133,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
       memberId: memberId,
       planName: planName,
       expiryText: expiryText,
-      profileImagePath: profileData?.profilePicture?.url ?? (gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar),
+      profileImagePath: profileData?.profilePicture?.url ??
+          (gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar),
       showTopIcon: profileData?.isVerified ?? true,
       showBottomIcon: true,
       topIconPath: AppImages.verifiedBadgeSvgIcon,
@@ -137,7 +142,10 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
       onTapImage: () async {
         await DialogUtils.showFullScreenImage(
           context: context,
-          imagePath: profileData?.profilePicture?.url ?? (gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar),
+          imagePath: profileData?.profilePicture?.url ??
+              (gender == 'female'
+                  ? AppImages.womenAvatar
+                  : AppImages.manAvatar),
         );
       },
       onBottomIconPressed: () async {
@@ -162,7 +170,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
           height: 4,
         ),
         Text(
-          'ACCOUNT',
+          'ACCOUNT'.localized(context),
           style: TextStyle(
             color: AppColors.textSecondaryLight,
             fontSize: TextSize.font12(context),
@@ -193,7 +201,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
       spacing: 10,
       children: [
         Text(
-          'find your matches'.toUpperCase(),
+          'find your matches'.localized(context).toUpperCase(),
           style: TextStyle(
             color: AppColors.textSecondaryLight,
             fontSize: TextSize.font12(context),
@@ -237,7 +245,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
       spacing: 10,
       children: [
         Text(
-          'options and controls'.toUpperCase(),
+          'options and controls'.localized(context).toUpperCase(),
           style: TextStyle(
             color: AppColors.textSecondaryLight,
             fontSize: TextSize.font12(context),
@@ -278,7 +286,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
       spacing: 10,
       children: [
         Text(
-          'general'.toUpperCase(),
+          'general'.localized(context).toUpperCase(),
           style: TextStyle(
             color: AppColors.textSecondaryLight,
             fontSize: TextSize.font12(context),
@@ -288,27 +296,32 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         ProfileActionTile(
           iconImagePath: AppImages.documentValidationSvgIcon,
           title: 'Language',
-          onTap: () => context.pushNamed(Routes.languageSettings), // navigate to language selection screen when implemented
+          onTap: () => context.pushNamed(Routes
+              .languageSettings), // navigate to language selection screen when implemented
         ),
         ProfileActionTile(
           iconImagePath: AppImages.customerSupportSvgIcon,
           title: 'Help & Support',
-          onTap: () => LinkOpener.openLink(context, 'Help Center', AppUrls.helpCenterUrl),
+          onTap: () => LinkOpener.openLink(
+              context, 'Help Center', AppUrls.helpCenterUrl),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.bubbleChatSvgIcon,
           title: 'Be Safe Online',
-          onTap: () => LinkOpener.openLink(context, 'Be Safe Online', AppUrls.beSafeOnlineUrl),
+          onTap: () => LinkOpener.openLink(
+              context, 'Be Safe Online', AppUrls.beSafeOnlineUrl),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.documentValidationSvgIcon,
           title: 'Privacy Policy',
-          onTap: () => LinkOpener.openLink(context, 'Privacy Policy', AppUrls.privacyPolicyUrl),
+          onTap: () => LinkOpener.openLink(
+              context, 'Privacy Policy', AppUrls.privacyPolicyUrl),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.safetySvgIcon,
           title: 'Safety',
-          onTap: () => LinkOpener.openLink(context, 'Safety', AppUrls.safetyUrl),
+          onTap: () =>
+              LinkOpener.openLink(context, 'Safety', AppUrls.safetyUrl),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.starSvgIcon,
@@ -318,7 +331,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         ProfileActionTile(
           iconImagePath: AppImages.documentValidationSvgIcon,
           title: 'Terms & Conditions',
-          onTap: () => LinkOpener.openLink(context, 'Terms & Conditions', AppUrls.termsUrl),
+          onTap: () => LinkOpener.openLink(
+              context, 'Terms & Conditions', AppUrls.termsUrl),
         ),
       ],
     );
@@ -341,7 +355,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         spacing: 4,
         children: [
           Text(
-            'Copyright© walima.com',
+            'Copyright© walima.com'.localized(context),
             textAlign: TextAlign.center,
             style: TextStyle(
               color: AppColors.textSecondaryLight,
@@ -352,7 +366,11 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
           FutureBuilder<String>(
             future: GlobalRepository().getAppVersion(),
             builder: (context, snapshot) {
-              final versionLabel = snapshot.connectionState == ConnectionState.done && snapshot.hasData ? '${snapshot.data}' : '';
+              final versionLabel =
+                  snapshot.connectionState == ConnectionState.done &&
+                          snapshot.hasData
+                      ? '${snapshot.data}'
+                      : '';
               return Text(
                 versionLabel,
                 textAlign: TextAlign.center,
