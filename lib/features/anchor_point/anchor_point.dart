@@ -5,6 +5,7 @@ import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/utils/dialog_utils.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/chat/presentation/screens/chat_home.dart';
 import 'package:walima_llc/features/home/presentation/screens/home_screen.dart';
 import 'package:walima_llc/features/inbox/presentation/screens/inbox_screen.dart';
@@ -28,7 +29,9 @@ class AnchorPointScreen extends ConsumerWidget {
       const MatchesScreen(),
       const InboxScreen(),
       const ChatScreen(),
-      const UpgradePackageScreen(showAppBar: false,),
+      const UpgradePackageScreen(
+        showAppBar: false,
+      ),
     ];
     return WillPopScope(
       onWillPop: () async {
@@ -43,7 +46,8 @@ class AnchorPointScreen extends ConsumerWidget {
         bottomNavigationBar: Container(
           decoration: const BoxDecoration(
             color: Colors.white,
-            border: Border(top: BorderSide(color: Color(0xFFE5E7EB), width: 0.5)),
+            border:
+                Border(top: BorderSide(color: Color(0xFFE5E7EB), width: 0.5)),
           ),
           child: SafeArea(
             top: false,
@@ -53,30 +57,45 @@ class AnchorPointScreen extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _buildNavItem(
+                    context: context,
                     icon: AppImages.home,
+                    label: 'Home',
                     isActive: currentTab == 0,
-                    onTap: () => ref.read(currentTabProvider.notifier).state = 0,
+                    onTap: () =>
+                        ref.read(currentTabProvider.notifier).state = 0,
                   ),
                   _buildNavItem(
+                    context: context,
                     icon: AppImages.matches,
+                    label: 'Matches',
                     isActive: currentTab == 1,
-                    onTap: () => ref.read(currentTabProvider.notifier).state = 1,
+                    onTap: () =>
+                        ref.read(currentTabProvider.notifier).state = 1,
                   ),
                   _buildNavItem(
+                    context: context,
                     icon: AppImages.inbox,
+                    label: 'Inbox',
                     isActive: currentTab == 2,
-                    onTap: () => ref.read(currentTabProvider.notifier).state = 2,
+                    onTap: () =>
+                        ref.read(currentTabProvider.notifier).state = 2,
                   ),
                   _buildNavItem(
+                    context: context,
                     icon: AppImages.chat,
+                    label: 'Chat',
                     isActive: currentTab == 3,
                     badgeCount: unreadChatCount,
-                    onTap: () => ref.read(currentTabProvider.notifier).state = 3,
+                    onTap: () =>
+                        ref.read(currentTabProvider.notifier).state = 3,
                   ),
                   _buildNavItem(
+                    context: context,
                     icon: AppImages.premium,
+                    label: 'Premium',
                     isActive: currentTab == 4,
-                    onTap: () => ref.read(currentTabProvider.notifier).state = 4,
+                    onTap: () =>
+                        ref.read(currentTabProvider.notifier).state = 4,
                   ),
                 ],
               ),
@@ -88,7 +107,9 @@ class AnchorPointScreen extends ConsumerWidget {
   }
 
   Widget _buildNavItem({
+    required BuildContext context,
     required String icon,
+    required String label,
     required bool isActive,
     required VoidCallback onTap,
     int badgeCount = 0,
@@ -97,41 +118,57 @@ class AnchorPointScreen extends ConsumerWidget {
       onTap: onTap,
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,
-      child: Stack(
-        clipBehavior: Clip.none,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          ShowImage(
-            imagePath: icon,
-            width: 45,
-            height: 45,
-            color: isActive ? AppColors.primary : AppColors.textSub600,
-          ),
-          if (badgeCount > 0)
-            Positioned(
-              top: 0,
-              right: 4,
-              child: Container(
-                constraints: const BoxConstraints(minWidth: 12, minHeight: 12),
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  badgeCount > 99 ? '99+' : '$badgeCount',
-                  textHeightBehavior: const TextHeightBehavior(
-                    applyHeightToFirstAscent: false,
-                    applyHeightToLastDescent: false,
-                  ),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 9,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              ShowImage(
+                imagePath: icon,
+                width: 38,
+                height: 38,
+                color: isActive ? AppColors.primary : AppColors.textSub600,
               ),
+              if (badgeCount > 0)
+                Positioned(
+                  top: -2,
+                  right: -2,
+                  child: Container(
+                    constraints:
+                        const BoxConstraints(minWidth: 12, minHeight: 12),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      badgeCount > 99 ? '99+' : '$badgeCount',
+                      textHeightBehavior: const TextHeightBehavior(
+                        applyHeightToFirstAscent: false,
+                        applyHeightToLastDescent: false,
+                      ),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label.localized(context),
+            style: TextStyle(
+              color: isActive ? AppColors.primary : AppColors.textSub600,
+              fontSize: 11,
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
             ),
+          ),
         ],
       ),
     );
