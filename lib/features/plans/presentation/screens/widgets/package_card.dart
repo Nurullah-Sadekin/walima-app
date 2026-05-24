@@ -7,6 +7,7 @@ import 'package:walima_llc/core/global/components/popular_badge.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:walima_llc/features/plans/data/models/get_plans_response.dart';
 import 'package:intl/intl.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class PackageCard extends StatelessWidget {
   const PackageCard({
@@ -130,32 +131,32 @@ class PackageCard extends StatelessWidget {
     return sorted.take(5).toList();
   }
 
-  String _featureLabel(Features feature) {
+  String _featureLabel(Features feature, BuildContext context) {
     final name = (feature.name ?? '').trim();
     final baseName = name.isEmpty ? 'Feature' : name;
 
     if (feature.included != true) {
-      return baseName;
+      return baseName.localized(context);
     }
 
     final isCounter =
         (feature.valueType ?? '').trim().toLowerCase() == 'counter';
     if (!isCounter) {
-      return baseName;
+      return baseName.localized(context);
     }
 
     final limit = int.tryParse((feature.limit ?? '').trim());
     final unlimited = (feature.isUnlimited ?? false) || limit == -1;
 
     if (unlimited) {
-      return '$baseName Unlimited';
+      return '${baseName.localized(context)} ${'Unlimited'.localized(context)}';
     }
 
     if (limit != null && limit > 0) {
-      return '$baseName up to $limit';
+      return '${baseName.localized(context)} ${'up to'.localized(context)} $limit';
     }
 
-    return baseName;
+    return baseName.localized(context);
   }
 
   _PackagePalette _resolvePalette(String? tag) {
@@ -305,7 +306,7 @@ class PackageCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '${_formatMoneyFromMinor(discountedPerMonth, pricing?.currency)} / month',
+                    '${_formatMoneyFromMinor(discountedPerMonth, pricing?.currency)} / ${'month'.localized(context)}',
                     textHeightBehavior: const TextHeightBehavior(
                       applyHeightToFirstAscent: false,
                       applyHeightToLastDescent: false,
@@ -339,7 +340,7 @@ class PackageCard extends StatelessWidget {
                             padding: const EdgeInsets.only(bottom: 8),
                             child: IconTextRow(
                               imagePath: AppImages.flagSvgIcon,
-                              text: _featureLabel(feature),
+                              text: _featureLabel(feature, context),
                               availableOption: feature.included ?? false,
                             ),
                           ),

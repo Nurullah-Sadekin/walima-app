@@ -19,9 +19,11 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/features/plans/presentation/providers/plans_provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class UpgradePackageScreen extends ConsumerStatefulWidget {
-  const UpgradePackageScreen({super.key, this.fromScreen, this.showAppBar = true});
+  const UpgradePackageScreen(
+      {super.key, this.fromScreen, this.showAppBar = true});
   final String? fromScreen;
   final bool showAppBar;
 
@@ -51,13 +53,15 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
         body: GradientBackground(
           child: Column(
             children: [
-              if (widget.showAppBar)
-              _appbarSection(),
+              if (widget.showAppBar) _appbarSection(),
               if (!widget.showAppBar)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: AnchoredAppBar(context: context, title: 'Welcome, Samira!',
-                    onNotificationPressed: () => context.pushNamed(Routes.notifications),
+                  child: AnchoredAppBar(
+                    context: context,
+                    title: 'Welcome, Samira!',
+                    onNotificationPressed: () =>
+                        context.pushNamed(Routes.notifications),
                   ),
                 ),
               provider.loaderState == UpgradePackageScreenStates.loading
@@ -110,7 +114,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
         ),
         const SizedBox(height: 20),
         Text(
-          'Upgrade to Premium',
+          'Upgrade to Premium'.localized(context),
           style: TextStyle(
             fontSize: TextSize.font24(context),
             fontWeight: FontWeight.w500,
@@ -310,7 +314,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
       children: [
         const SizedBox(height: 40),
         Text(
-          'You Have Questions?',
+          'You Have Questions?'.localized(context),
           style: TextStyle(
             fontSize: TextSize.font18(context),
             fontWeight: FontWeight.w700,
@@ -352,7 +356,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Still Need Help?',
+                'Still Need Help?'.localized(context),
                 style: TextStyle(
                   fontSize: TextSize.font18(context),
                   fontWeight: FontWeight.w500,
@@ -438,6 +442,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
       ],
     );
   }
+
   void openWhatsApp(String number) async {
     final uri = Uri.parse('https://wa.me/88$number'); // BD country code
     if (await canLaunchUrl(uri)) {
@@ -452,5 +457,4 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
-
 }

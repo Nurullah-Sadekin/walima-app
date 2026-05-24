@@ -15,6 +15,7 @@ import 'package:walima_llc/features/matches/presentation/widgets/tab_bar_widget.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key});
@@ -62,7 +63,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   Widget _appbarSection() {
     return AnchoredAppBar(
-      title: 'Chat',
+      title: 'Chat'.localized(context),
       notificationCount: 26,
       context: context,
       tabIndex: 3,
@@ -138,18 +139,18 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       spacing: 8,
       children: [
         TabBarWidget(
-          text: tabs[0],
+          text: tabs[0].localized(context),
           isSelected: provider.selectedTabIndex == 0,
           onTap: () => provider.setSelectedTab(0),
         ),
         TabBarWidget(
-          text: tabs[1],
+          text: tabs[1].localized(context),
           count: provider.unreadCount.toDouble(),
           isSelected: provider.selectedTabIndex == 1,
           onTap: () => provider.setSelectedTab(1),
         ),
         TabBarWidget(
-          text: tabs[2],
+          text: tabs[2].localized(context),
           isSelected: provider.selectedTabIndex == 2,
           selectedBackgroundColor: AppColors.primary,
           onTap: () => provider.setSelectedTab(2),
@@ -176,7 +177,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     return _conversationContent(
       provider: provider,
       conversations: provider.allConversations,
-      emptyMessage: 'No conversations yet',
+      emptyMessage: 'No conversations yet'.localized(context),
     );
   }
 
@@ -195,7 +196,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         final conversation = conversations[index];
         final participant = provider.getConversationCounterpart(conversation);
         final userName = participant?.displayName?.trim();
-        final displayName = (userName?.isNotEmpty ?? false) ? userName! : 'Unknown User';
+        final displayName =
+            (userName?.isNotEmpty ?? false) ? userName! : 'Unknown User';
         final lastMessage = conversation.lastMessage?.trim();
         final isTyping = provider.isConversationTyping(conversation.id);
         final gender = participant?.gender?.toLowerCase();
@@ -203,7 +205,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           padding: const EdgeInsets.only(bottom: 16),
           child: ChatListItem(
             name: displayName,
-            imagePath: participant?.profilePhoto?.url ?? (gender == 'male' ? AppImages.manAvatar : AppImages.womenAvatar),
+            imagePath: participant?.profilePhoto?.url ??
+                (gender == 'male'
+                    ? AppImages.manAvatar
+                    : AppImages.womenAvatar),
             isVerified: participant?.profilePhoto?.isVerified,
             isOnline: participant?.isOnline,
             unReadMessage: conversation.unreadCount != 0,
@@ -293,7 +298,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               ),
               child: ProfileAvatarWithName(
                 name: user.displayName,
-                imagePath: user.profilePhoto?.url ?? (userGender == 'male' ? AppImages.manAvatar : AppImages.womenAvatar),
+                imagePath: user.profilePhoto?.url ??
+                    (userGender == 'male'
+                        ? AppImages.manAvatar
+                        : AppImages.womenAvatar),
                 indicatorColor: user.isOnline == true
                     ? AppColors.greenButtonColor
                     : Colors.red,

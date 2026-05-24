@@ -52,7 +52,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       ),
       floatingActionButton: BottomBorderedWidget(
         widget: PrimaryButtons(
-          title: 'Preview Profile',
+          title: 'Preview Profile'.localized(context),
           titleSize: TextSize.font14(context),
           textColor: AppColors.white,
           bgColor: AppColors.primary,
@@ -169,7 +169,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
-              'ID : ${_valueOrDefault(memberId.isEmpty ? null : memberId, '--')}',
+              '${'ID'.localized(context)} : ${_valueOrDefault(memberId.isEmpty ? null : memberId, '--')}',
               style: TextStyle(
                 color: AppColors.textSecondaryLight,
                 fontSize: TextSize.font12(context),
@@ -191,7 +191,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   Widget _activeStatus(BuildContext context, CompleteProfile? profile) {
     return Text(
-      'Status: ${_valueOrDefault(profile?.user?.status, 'Unknown')}',
+      '${'Status'.localized(context)}: ${_valueOrDefault(profile?.user?.status, 'Unknown')}',
       style: TextStyle(
         color: AppColors.textSecondaryLight,
         fontSize: TextSize.font14(context),
@@ -230,7 +230,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   Widget _aboutMyself(CompleteProfile? profile) {
     return ProfileInfoCard(
-      title: 'About Yourself',
+      title: 'About Yourself'.localized(context),
       showEdit: true,
       onEdit: () => _openSectionEditor(ProfileEditSection.aboutYourself),
       child: Text(
@@ -250,40 +250,46 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final basic = profile?.profile;
 
     return ProfileInfoCard(
-      title: 'Basic Details',
+      title: 'Basic Details'.localized(context),
       showEdit: true,
       onEdit: () => _openSectionEditor(ProfileEditSection.basicDetails),
       infoList: [
         MapEntry(
-          'Profile Managed By',
+          'Profile Managed By'.localized(context),
           _valueOrDefault(
               CamelCaseUtils.formatCamelCase(basic?.profileManagedBy)),
         ),
         MapEntry(
-          'Gender',
+          'Gender'.localized(context),
           _valueOrDefault(CamelCaseUtils.formatCamelCase(basic?.gender)),
         ),
-        MapEntry('Age', _valueOrDefault(basic?.age)),
-        MapEntry('Date of Birth', _formatDate(basic?.dateOfBirth)),
-        MapEntry('Height', _formatHeightCm(appearance?.height)),
+        MapEntry('Age'.localized(context), _valueOrDefault(basic?.age)),
         MapEntry(
-          'Marital Status',
+          'Date of Birth'.localized(context),
+          _formatDate(basic?.dateOfBirth),
+        ),
+        MapEntry(
+          'Height'.localized(context),
+          _formatHeightCm(appearance?.height),
+        ),
+        MapEntry(
+          'Marital Status'.localized(context),
           _valueOrDefault(CamelCaseUtils.formatCamelCase(basic?.maritalStatus)),
         ),
         MapEntry(
-          'Grew up in',
+          'Grew up in'.localized(context),
           _valueOrDefault(
             CamelCaseUtils.formatCamelCase(location?.grewUpIn?.toString()),
           ),
         ),
         MapEntry(
-          'Mother\'s Tough',
+          'Mother\'s Tough'.localized(context),
           _valueOrDefault(
             CamelCaseUtils.formatCamelCase(basic?.motherTongue.toString()),
           ),
         ),
         MapEntry(
-          'Languages',
+          'Languages'.localized(context),
           _valueOrDefault(
             CamelCaseUtils.formatCamelCase(
               (basic?.languages)?.map((e) => e.toString()).join(', ') ?? '',
@@ -291,19 +297,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
         ),
         MapEntry(
-          'Diet',
+          'Diet'.localized(context),
           _valueOrDefault(
             CamelCaseUtils.formatCamelCase(profile?.lifestyle?.dietType),
           ),
         ),
         MapEntry(
-          'Blood Group',
+          'Blood Group'.localized(context),
           _valueOrDefault(
             CamelCaseUtils.formatCamelCase(appearance?.bloodGroup?.toString()),
           ),
         ),
         MapEntry(
-          'Health Information',
+          'Health Information'.localized(context),
           _valueOrDefault(
             CamelCaseUtils.formatCamelCase(
               (appearance?.healthDetails ?? appearance?.healthCondition)
@@ -312,7 +318,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
         ),
         MapEntry(
-          'Disability',
+          'Disability'.localized(context),
           _valueOrDefault(
             CamelCaseUtils.formatCamelCase(
                 appearance?.specialCases?.toString()),
@@ -327,21 +333,21 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final religion = profile?.religion;
 
     return ProfileInfoCard(
-      title: 'Religious Background',
+      title: 'Religious Background'.localized(context),
       showEdit: true,
       onEdit: () => _openSectionEditor(ProfileEditSection.religiousBackground),
       infoList: [
         MapEntry(
-          'Religion',
+          'Religion'.localized(context),
           _valueOrDefault(CamelCaseUtils.formatCamelCase(
               religion?.religion ?? profile?.profile?.religionName)),
         ),
         MapEntry(
-            'Community',
+            'Community'.localized(context),
             _valueOrDefault(
                 CamelCaseUtils.formatCamelCase(religion?.community))),
         MapEntry(
-          'Religious Background',
+          'Religious Background'.localized(context),
           _valueOrDefault(
               CamelCaseUtils.formatCamelCase(religion?.religiousBackground)),
         ),
@@ -353,12 +359,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final family = profile?.family;
 
     return ProfileInfoCard(
-      title: 'Family Details',
+      title: 'Family Details'.localized(context),
       showEdit: true,
       onEdit: () => _openSectionEditor(ProfileEditSection.familyDetails),
       infoList: [
         MapEntry(
-          'Father\'s Details',
+          'Father\'s Details'.localized(context),
           _valueOrDefault(
             _combineNames(
               family?.fatherName,
@@ -367,7 +373,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
         ),
         MapEntry(
-          'Mother\'s Details',
+          'Mother\'s Details'.localized(context),
           _valueOrDefault(
             _combineNames(
               family?.motherName,
@@ -375,17 +381,20 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             ),
           ),
         ),
-        MapEntry('Family Location', _valueOrDefault(family?.familyLocation)),
         MapEntry(
-          'No. of Sisters',
+          'Family Location'.localized(context),
+          _valueOrDefault(family?.familyLocation),
+        ),
+        MapEntry(
+          'No. of Sisters'.localized(context),
           _valueOrDefault(family?.sisters?.toString()),
         ),
         MapEntry(
-          'No. of Brothers',
+          'No. of Brothers'.localized(context),
           _valueOrDefault(family?.brothers?.toString()),
         ),
         MapEntry(
-          'Family Financial Status',
+          'Family Financial Status'.localized(context),
           _valueOrDefault(
             CamelCaseUtils.formatCamelCase(family?.familyEconomicCondition),
           ),
@@ -399,29 +408,29 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final profession = _firstProfession(profile);
 
     return ProfileInfoCard(
-      title: 'Education & Career',
+      title: 'Education & Career'.localized(context),
       showEdit: true,
       onEdit: () => _openSectionEditor(ProfileEditSection.educationCareer),
       infoList: [
         MapEntry(
-          'Highest Qualification',
+          'Highest Qualification'.localized(context),
           _valueOrDefault(CamelCaseUtils.formatCamelCase(
             education?.qualification ?? education?.educationLevel,
           )),
         ),
         MapEntry(
-          'College(s) Attended',
+          'College(s) Attended'.localized(context),
           _valueOrDefault(
               CamelCaseUtils.formatCamelCase(education?.institutionName)),
         ),
         MapEntry(
-          'Annual Income',
+          'Annual Income'.localized(context),
           _valueOrDefault(
             CamelCaseUtils.formatCamelCase(profession?.incomeRange),
           ),
         ),
         MapEntry(
-          'Working with',
+          'Working with'.localized(context),
           _valueOrDefault(
             CamelCaseUtils.formatCamelCase(
               profession?.employmentType?.toString(),
@@ -429,7 +438,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
         ),
         MapEntry(
-          'Working as',
+          'Working as'.localized(context),
           _valueOrDefault(
             CamelCaseUtils.formatCamelCase(
               (profession?.designation ?? profession?.profession)?.toString(),
@@ -437,7 +446,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
         ),
         MapEntry(
-          'Employer Name',
+          'Employer Name'.localized(context),
           _valueOrDefault(CamelCaseUtils.formatCamelCase(profession?.employer)),
         ),
       ],
@@ -448,31 +457,31 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final location = _firstLocation(profile);
 
     return ProfileInfoCard(
-      title: 'Location of Groom',
+      title: 'Location of Groom'.localized(context),
       showEdit: true,
       onEdit: () => _openSectionEditor(ProfileEditSection.location),
       infoList: [
         MapEntry(
-          'Current Location',
+          'Current Location'.localized(context),
           _composeLocation(
             location?.city,
             location?.country,
           ),
         ),
         MapEntry(
-          'State of Residence',
+          'State of Residence'.localized(context),
           _valueOrDefault(
             CamelCaseUtils.formatCamelCase(location?.state?.toString()),
           ),
         ),
         MapEntry(
-          'Residency Status',
+          'Residency Status'.localized(context),
           _valueOrDefault(
             CamelCaseUtils.formatCamelCase(location?.residencyStatus),
           ),
         ),
         MapEntry(
-          'ZIP/Pin code',
+          'ZIP/Pin code'.localized(context),
           _valueOrDefault(location?.zipCode?.toString()),
         ),
       ],
@@ -483,24 +492,24 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final interest = profile?.interest;
 
     return ProfileInfoCard(
-      title: 'Hobbies & Interests',
+      title: 'Hobbies & Interests'.localized(context),
       showEdit: true,
       onEdit: () => _openSectionEditor(ProfileEditSection.hobbiesInterests),
       infoList: [
         MapEntry(
-          'Creative',
+          'Creative'.localized(context),
           _valueOrDefault(_joinPrettyList(interest?.creativePursuits)),
         ),
         MapEntry(
-          'Fun',
+          'Fun'.localized(context),
           _valueOrDefault(_joinPrettyList(interest?.outdoorActivities)),
         ),
         MapEntry(
-          'Fitness',
+          'Fitness'.localized(context),
           _valueOrDefault(_joinPrettyList(interest?.fitnessAndSports)),
         ),
         MapEntry(
-          'Other',
+          'Other'.localized(context),
           _valueOrDefault(
             _joinPrettyList([
               ...?interest?.mediaAndLearning,
@@ -519,7 +528,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       child: Padding(
         padding: const EdgeInsets.only(top: 4, bottom: 2),
         child: Text(
-          'Partner Preferences',
+          'Partner Preferences'.localized(context),
           style: TextStyle(
             color: AppColors.textPrimaryLight,
             fontSize: TextSize.font16(context),
@@ -534,16 +543,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final preference = profile?.preferences;
 
     return ProfileInfoCard(
-      title: 'Basic Info',
+      title: 'Basic Info'.localized(context),
       showEdit: true,
       onEdit: () => _openSectionEditor(ProfileEditSection.preferenceBasicInfo),
       infoList: [
         MapEntry(
-          'Age Range',
+          'Age Range'.localized(context),
           _composeRange(preference?.ageMin, preference?.ageMax),
         ),
         MapEntry(
-          'Height Range',
+          'Height Range'.localized(context),
           _composeRange(
             preference?.heightMin,
             preference?.heightMax,
@@ -551,20 +560,36 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
         ),
         MapEntry(
-          'Religion',
-          _valueOrDefault(_joinPrettyList(preference?.religionPreference)),
+          'Religion'.localized(context),
+          _valueOrDefault(
+            _localizeCommaSeparatedList(
+              _joinPrettyList(preference?.religionPreference),
+            ),
+          ),
         ),
         MapEntry(
-          'Community',
-          _valueOrDefault(_joinPrettyList(preference?.communityPreference)),
+          'Community'.localized(context),
+          _valueOrDefault(
+            _localizeCommaSeparatedList(
+              _joinPrettyList(preference?.communityPreference),
+            ),
+          ),
         ),
         MapEntry(
-          'Mother Tongue',
-          _valueOrDefault(_joinPrettyList(preference?.motherTonguePreference)),
+          'Mother Tongue'.localized(context),
+          _valueOrDefault(
+            _localizeCommaSeparatedList(
+              _joinPrettyList(preference?.motherTonguePreference),
+            ),
+          ),
         ),
         MapEntry(
-          'Marital Status',
-          _valueOrDefault(_joinPrettyList(preference?.maritalStatusPreference)),
+          'Marital Status'.localized(context),
+          _valueOrDefault(
+            _localizeCommaSeparatedList(
+              _joinPrettyList(preference?.maritalStatusPreference),
+            ),
+          ),
         ),
       ],
     );
@@ -574,22 +599,34 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final preference = profile?.preferences;
 
     return ProfileInfoCard(
-      title: 'Location Details',
+      title: 'Location Details'.localized(context),
       showEdit: true,
       onEdit: () =>
           _openSectionEditor(ProfileEditSection.preferenceLocationDetails),
       infoList: [
         MapEntry(
-          'Countries',
-          _valueOrDefault(_joinPrettyList(preference?.preferredCountries)),
+          'Countries'.localized(context),
+          _valueOrDefault(
+            _localizeCommaSeparatedList(
+              _joinPrettyList(preference?.preferredCountries),
+            ),
+          ),
         ),
         MapEntry(
-          'States',
-          _valueOrDefault(_joinPrettyList(preference?.preferredStates)),
+          'States'.localized(context),
+          _valueOrDefault(
+            _localizeCommaSeparatedList(
+              _joinPrettyList(preference?.preferredStates),
+            ),
+          ),
         ),
         MapEntry(
-          'Cities',
-          _valueOrDefault(_joinPrettyList(preference?.preferredCities)),
+          'Cities'.localized(context),
+          _valueOrDefault(
+            _localizeCommaSeparatedList(
+              _joinPrettyList(preference?.preferredCities),
+            ),
+          ),
         ),
       ],
     );
@@ -599,25 +636,25 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final preference = profile?.preferences;
 
     return ProfileInfoCard(
-      title: 'Education & Career',
+      title: 'Education & Career'.localized(context),
       showEdit: true,
       onEdit: () =>
           _openSectionEditor(ProfileEditSection.preferenceEducationCareer),
       infoList: [
         MapEntry(
-          'Education',
+          'Education'.localized(context),
           _valueOrDefault(_joinPrettyList(preference?.educationPreference)),
         ),
         MapEntry(
-          'Profession',
+          'Profession'.localized(context),
           _valueOrDefault(_joinPrettyList(preference?.professionPreference)),
         ),
         MapEntry(
-          'Working As',
+          'Working As'.localized(context),
           _valueOrDefault(_joinPrettyList(preference?.workingAsPreference)),
         ),
         MapEntry(
-          'Annual Income',
+          'Annual Income'.localized(context),
           _valueOrDefault(_joinPrettyList(preference?.annualIncomePreference)),
         ),
       ],
@@ -628,28 +665,42 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final preference = profile?.preferences;
 
     return ProfileInfoCard(
-      title: 'Other Details',
+      title: 'Other Details'.localized(context),
       showEdit: true,
       onEdit: () =>
           _openSectionEditor(ProfileEditSection.preferenceOtherDetails),
       infoList: [
         MapEntry(
-          'Profile Managed By',
+          'Profile Managed By'.localized(context),
           _valueOrDefault(
-            _joinPrettyList(preference?.profileManagedByPreference),
+            _localizeCommaSeparatedList(
+              _joinPrettyList(preference?.profileManagedByPreference),
+            ),
           ),
         ),
         MapEntry(
-          'Diet',
-          _valueOrDefault(_joinPrettyList(preference?.dietPreference)),
+          'Diet'.localized(context),
+          _valueOrDefault(
+            _localizeCommaSeparatedList(
+              _joinPrettyList(preference?.dietPreference),
+            ),
+          ),
         ),
         MapEntry(
-          'Drinking',
-          _valueOrDefault(_joinPrettyList(preference?.drinkingPreference)),
+          'Drinking'.localized(context),
+          _valueOrDefault(
+            _localizeCommaSeparatedList(
+              _joinPrettyList(preference?.drinkingPreference),
+            ),
+          ),
         ),
         MapEntry(
-          'Smoking',
-          _valueOrDefault(_joinPrettyList(preference?.smokingPreference)),
+          'Smoking'.localized(context),
+          _valueOrDefault(
+            _localizeCommaSeparatedList(
+              _joinPrettyList(preference?.smokingPreference),
+            ),
+          ),
         ),
       ],
     );
@@ -681,7 +732,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       return fullName;
     }
 
-    return 'Unknown User';
+    return 'Unknown User'.localized(context);
   }
 
   String _resolveProfileImagePath(CompleteProfile? profile) {
@@ -809,11 +860,25 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   String _valueOrDefault(dynamic value, [String fallback = 'Not Specified']) {
     final normalized = _trimmed(value);
-    return normalized.isEmpty ? fallback : normalized;
+    return normalized.isEmpty ? fallback.localized(context) : normalized;
   }
 
   String _trimmed(dynamic value) {
     if (value == null) return '';
     return value.toString().trim();
+  }
+
+  String _localizeCommaSeparatedList(String value) {
+    final normalized = value.trim();
+    if (normalized.isEmpty) return normalized;
+
+    final parts = normalized
+        .split(',')
+        .map((item) => item.trim())
+        .where((item) => item.isNotEmpty)
+        .map((item) => item.localized(context))
+        .toList(growable: false);
+
+    return parts.join(', ');
   }
 }

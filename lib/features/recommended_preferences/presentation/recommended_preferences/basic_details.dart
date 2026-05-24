@@ -172,7 +172,8 @@ class _BasicDetailsScreenState extends ConsumerState<BasicDetailsScreen> {
                     );
                   }),
                 );
-              });
+              },
+            );
             },
           ),
           SizedBox(height: MediaQuery.sizeOf(context).height * 0.02),

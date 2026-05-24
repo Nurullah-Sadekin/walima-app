@@ -447,7 +447,8 @@ class ProfileComprehensiveCard extends StatelessWidget {
                       onTap: onTapSingleButton ?? () {},
                       borderColor: singleButtonBorderColor ?? AppColors.primary,
                       textColor: singleButtonTextColor ?? AppColors.primary,
-                      title: singleButtonText ?? 'Connect Now'),
+                      title: (singleButtonText ?? 'Connect Now')
+                          .localized(context)),
                 if (!isSingleButton && noButton == false)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -468,7 +469,8 @@ class ProfileComprehensiveCard extends StatelessWidget {
                               borderColor: leftButtonBorderColor ??
                                   const Color(0XFF1FC16B),
                               textColor: leftButtonTextColor ?? AppColors.white,
-                              title: leftButtonText ?? 'Connect'),
+                              title: (leftButtonText ?? 'Connect')
+                                  .localized(context)),
                         ),
                         Expanded(
                           child: PrimaryButtons(
@@ -478,7 +480,8 @@ class ProfileComprehensiveCard extends StatelessWidget {
                                   rightButtonIconColor ?? AppColors.primary,
                               svgIconPath:
                                   rightIconPath ?? AppImages.callSvgIcon,
-                              title: rightButtonText ?? 'Contact',
+                              title: (rightButtonText ?? 'Contact')
+                                  .localized(context),
                               bgColor: rightButtonColor ?? AppColors.white,
                               borderColor:
                                   rightButtonBorderColor ?? AppColors.primary,
