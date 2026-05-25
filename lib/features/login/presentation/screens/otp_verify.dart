@@ -116,8 +116,11 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
                               fontSize: TextSize.font16(context),
                             ),
                           ),
-                          const Icon(Icons.arrow_forward_ios,
-                              color: AppColors.primary, size: 8)
+                          const Icon(
+                            Icons.arrow_forward_ios,
+                            color: AppColors.primary,
+                            size: 8,
+                          ),
                         ],
                       ),
                     ),
@@ -133,69 +136,72 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
   }
 
   Widget staticText() {
-    return Column(spacing: 12, children: [
-      Column(
-        spacing: 6,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Verify your',
-            style: TextStyle(
-              color: AppColors.textPrimaryLight,
-              fontWeight: FontWeight.bold,
-              fontSize: TextSize.font24(context),
-              fontFamily: FontFamily.timesNewRoman,
-            ),
-          ),
-          Text(
-            'phone number',
-            style: TextStyle(
-              color: AppColors.primary,
-              fontWeight: FontWeight.bold,
-              fontSize: TextSize.font24(context),
-              fontFamily: FontFamily.timesNewRoman,
-            ),
-          ),
-        ],
-      ),
-      Column(
-        children: [
-          Text(
-            'We\'ve sent a 6-digit code to',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AppColors.hintTextColor,
-              fontWeight: FontWeight.w400,
-              fontSize: TextSize.font14(context),
-            ),
-          ),
-          Row(
-            spacing: 6,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                '+880 ${provider.mobileNoOrEmailController.text}',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AppColors.textPrimaryLight,
-                  fontWeight: FontWeight.w500,
-                  fontSize: TextSize.font16(context),
-                ),
+    return Column(
+      spacing: 12,
+      children: [
+        Column(
+          spacing: 6,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Verify your',
+              style: TextStyle(
+                color: AppColors.textPrimaryLight,
+                fontWeight: FontWeight.bold,
+                fontSize: TextSize.font24(context),
+                fontFamily: FontFamily.timesNewRoman,
               ),
-              Text(
-                'Edit'.localized(context),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w500,
-                  fontSize: TextSize.font14(context),
-                ),
+            ),
+            Text(
+              'phone number',
+              style: TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
+                fontSize: TextSize.font24(context),
+                fontFamily: FontFamily.timesNewRoman,
               ),
-            ],
-          ),
-        ],
-      )
-    ]);
+            ),
+          ],
+        ),
+        Column(
+          children: [
+            Text(
+              'We\'ve sent a 6-digit code to',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: AppColors.hintTextColor,
+                fontWeight: FontWeight.w400,
+                fontSize: TextSize.font14(context),
+              ),
+            ),
+            Row(
+              spacing: 6,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '+880 ${provider.mobileNoOrEmailController.text}',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.textPrimaryLight,
+                    fontWeight: FontWeight.w500,
+                    fontSize: TextSize.font16(context),
+                  ),
+                ),
+                Text(
+                  'Edit'.localized(context),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w500,
+                    fontSize: TextSize.font14(context),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
   }
 
   Widget contactSupport() {
@@ -223,13 +229,16 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
                 fontSize: TextSize.font14(context),
               ),
             ),
-            Text(
-              'Contact support',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w500,
-                fontSize: TextSize.font14(context),
+            InkWell(
+              onTap: () => context.pushNamed(Routes.contactSupport),
+              child: Text(
+                'Contact support',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w500,
+                  fontSize: TextSize.font14(context),
+                ),
               ),
             ),
           ],

@@ -155,6 +155,8 @@ class AppUrls {
   static const String getBioTemplates = '$baseUrl/public/bio-templates'; //GET
   static const String suggestBioTemplate =
       '$baseUrl/public/bio-templates/suggest'; //POST
+  static const String getConnectMessageTemplates =
+      '$baseUrl/public/connect-message-templates'; //GET
 
   static const String getAllBlogs = '$baseUrl/blogs'; //GET
   static const String getBlogBySlug = '$baseUrl/blogs/{slug}'; //GET

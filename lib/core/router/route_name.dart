@@ -67,6 +67,7 @@ abstract class Paths {
   static const myMatchFilter = '/myMatchFilter';
   static const contactFilter = '/contactFilter';
   static const accountSetting = '/accountSetting';
+  static const contactSupport = '/contactSupport';
 
   // Chat
   static const chatScreen = '/chatScreen';
@@ -146,6 +147,7 @@ abstract class Routes {
   static const myMatchFilter = 'myMatchFilter';
   static const contactFilter = 'contactFilter';
   static const accountSetting = 'accountSetting';
+  static const contactSupport = 'contactSupport';
 
   // Chat
   static const chatHome = 'chatHome';

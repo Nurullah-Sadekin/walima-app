@@ -23,11 +23,11 @@ import 'package:walima_llc/features/registration/data/models/request/sign_up_req
 import 'package:walima_llc/features/registration/data/models/request/upload_media_request_body.dart';
 import 'package:walima_llc/features/registration/data/models/request/update_interests_request_body.dart';
 import 'package:walima_llc/features/registration/data/models/request/update_family_request_body.dart';
-import 'package:walima_llc/features/registration/data/models/bio_template.dart';
+import 'package:walima_llc/features/biodata/domain/model/bio_template.dart';
 import 'package:walima_llc/features/registration/data/models/response/onboarding_response.dart';
 import 'package:walima_llc/features/registration/data/models/response/upload_media_response.dart';
 import 'package:walima_llc/features/registration/data/models/lookup_option.dart';
-import 'package:walima_llc/features/registration/data/repository/bio_template_repository.dart';
+import 'package:walima_llc/features/biodata/data/repository/bio_template_repository.dart';
 import 'package:walima_llc/features/registration/data/repository/interests_repository.dart';
 import 'package:walima_llc/features/registration/data/repository/family_repository.dart';
 import 'package:walima_llc/features/registration/data/repository/lookup_repository.dart';

@@ -46,6 +46,7 @@ import 'package:walima_llc/features/registration/presentation/screens/verify_otp
 import 'package:walima_llc/features/registration/presentation/screens/your_religion.dart';
 import 'package:walima_llc/features/settings/presentation/screens/language_settings_screen.dart';
 import 'package:walima_llc/features/settings/presentation/screens/settings_screen.dart';
+import 'package:walima_llc/features/support/presentation/screens/contact_support_screen.dart';
 import 'package:walima_llc/core/connectivity/connectivity_keys.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -145,6 +146,11 @@ GoRouter goRouter(Ref ref) {
         path: Paths.notifications,
         name: Routes.notifications,
         builder: (context, state) => const NotificationScreen(),
+      ),
+      GoRoute(
+        path: Paths.contactSupport,
+        name: Routes.contactSupport,
+        builder: (context, state) => const ContactSupportScreen(),
       ),
       GoRoute(
         path: Paths.onboarding,

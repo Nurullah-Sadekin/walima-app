@@ -296,17 +296,13 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         ProfileActionTile(
           iconImagePath: AppImages.documentValidationSvgIcon,
           title: 'Language',
-          onTap: () => context.pushNamed(Routes
-              .languageSettings), // navigate to language selection screen when implemented
+          // navigate to language selection screen when implemented
+          onTap: () => context.pushNamed(Routes.languageSettings),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.customerSupportSvgIcon,
           title: 'Help & Support',
-          onTap: () => LinkOpener.openLink(
-            context,
-            'Help Center'.localized(context),
-            AppUrls.helpCenterUrl,
-          ),
+          onTap: () => context.pushNamed(Routes.contactSupport),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.bubbleChatSvgIcon,

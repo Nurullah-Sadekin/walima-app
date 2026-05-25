@@ -331,7 +331,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   _HelpItem(
                     icon: Icons.support_agent_outlined,
                     title: 'Contact Support',
-                    onTap: () => Navigator.of(context).pop(),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      context.pushNamed(Routes.contactSupport);
+                    },
                   ),
                   _HelpItem(
                     icon: Icons.info_outline,
