@@ -197,7 +197,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
               ),
             ),
             InkWell(
-              onTap: () => context.pushNamed(Routes.contactSupport),
+              onTap: () => context.pushNamed(Routes.helpDesk),
               child: Text(
                 'Contact support',
                 textAlign: TextAlign.center,

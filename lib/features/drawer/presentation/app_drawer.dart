@@ -302,7 +302,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         ProfileActionTile(
           iconImagePath: AppImages.customerSupportSvgIcon,
           title: 'Help & Support',
-          onTap: () => context.pushNamed(Routes.contactSupport),
+          onTap: () => context.pushNamed(Routes.helpDesk),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.bubbleChatSvgIcon,

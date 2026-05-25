@@ -333,7 +333,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     title: 'Contact Support',
                     onTap: () {
                       Navigator.of(context).pop();
-                      context.pushNamed(Routes.contactSupport);
+                      context.pushNamed(Routes.helpDesk);
                     },
                   ),
                   _HelpItem(
