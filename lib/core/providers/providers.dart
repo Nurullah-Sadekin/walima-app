@@ -19,6 +19,7 @@ import 'package:walima_llc/features/plans/presentation/providers/plans_provider.
 import 'package:walima_llc/features/account_setting/presentation/providers/account_setting_provider.dart';
 import 'package:walima_llc/features/contact_filter/presentation/providers/contact_filter_provider.dart';
 import 'package:walima_llc/features/support/presentation/provider/support_provider.dart';
+import 'package:walima_llc/features/support/presentation/provider/ai_support_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final loginProvider = ChangeNotifierProvider<LoginProvider>((ref) {
@@ -170,6 +171,10 @@ final contactFilterProvider =
 
 final supportProvider = ChangeNotifierProvider<SupportProvider>((ref) {
   return SupportProvider();
+});
+
+final aiSupportProvider = ChangeNotifierProvider<AiSupportProvider>((ref) {
+  return AiSupportProvider();
 });
 
 final chatProvider = ChangeNotifierProvider<ChatProvider>((ref) {

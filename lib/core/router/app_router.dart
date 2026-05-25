@@ -47,6 +47,8 @@ import 'package:walima_llc/features/registration/presentation/screens/your_relig
 import 'package:walima_llc/features/settings/presentation/screens/language_settings_screen.dart';
 import 'package:walima_llc/features/settings/presentation/screens/settings_screen.dart';
 import 'package:walima_llc/features/support/presentation/screens/contact_support_screen.dart';
+import 'package:walima_llc/features/support/presentation/screens/help_desk_screen.dart';
+import 'package:walima_llc/features/support/presentation/screens/ai_support_chat_screen.dart';
 import 'package:walima_llc/core/connectivity/connectivity_keys.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -112,13 +114,9 @@ GoRouter goRouter(Ref ref) {
         path: Paths.otpVerifyForSignUp,
         name: Routes.otpVerifyForSignUp,
         builder: (context, state) {
-          final fromScreenFromQuery =
-              state.uri.queryParameters['fromScreen']?.trim();
-          final fromScreenFromExtra =
-              state.extra is String ? (state.extra as String).trim() : null;
-          final fromScreen = fromScreenFromQuery?.isNotEmpty == true
-              ? fromScreenFromQuery
-              : fromScreenFromExtra;
+          final fromScreenFromQuery = state.uri.queryParameters['fromScreen']?.trim();
+          final fromScreenFromExtra = state.extra is String ? (state.extra as String).trim() : null;
+          final fromScreen = fromScreenFromQuery?.isNotEmpty == true ? fromScreenFromQuery : fromScreenFromExtra;
           return OtpVerifySignUpScreen(fromScreen: fromScreen);
         },
       ),
@@ -153,6 +151,16 @@ GoRouter goRouter(Ref ref) {
         builder: (context, state) => const ContactSupportScreen(),
       ),
       GoRoute(
+        path: Paths.helpDesk,
+        name: Routes.helpDesk,
+        builder: (context, state) => const HelpDeskScreen(),
+      ),
+      GoRoute(
+        path: Paths.aiSupport,
+        name: Routes.aiSupport,
+        builder: (context, state) => const AiSupportChatScreen(),
+      ),
+      GoRoute(
         path: Paths.onboarding,
         name: Routes.onboarding,
         builder: (context, state) => const OnboardingScreen(),
@@ -181,13 +189,9 @@ GoRouter goRouter(Ref ref) {
         path: Paths.emailPhone,
         name: Routes.emailPhone,
         builder: (context, state) {
-          final fromScreenFromQuery =
-              state.uri.queryParameters['fromScreen']?.trim();
-          final fromScreenFromExtra =
-              state.extra is String ? (state.extra as String).trim() : null;
-          final fromScreen = fromScreenFromQuery?.isNotEmpty == true
-              ? fromScreenFromQuery
-              : fromScreenFromExtra;
+          final fromScreenFromQuery = state.uri.queryParameters['fromScreen']?.trim();
+          final fromScreenFromExtra = state.extra is String ? (state.extra as String).trim() : null;
+          final fromScreen = fromScreenFromQuery?.isNotEmpty == true ? fromScreenFromQuery : fromScreenFromExtra;
           return EmailPhoneScreen(fromScreen: fromScreen);
         },
       ),
@@ -281,8 +285,7 @@ GoRouter goRouter(Ref ref) {
         name: Routes.partnerPreferences,
         builder: (context, state) {
           final extra = state.extra;
-          final isFromDrawer =
-              extra is Map<String, dynamic> && extra['fromDrawer'] == true;
+          final isFromDrawer = extra is Map<String, dynamic> && extra['fromDrawer'] == true;
           return PartnerPreferencesScreen(isFromDrawer: isFromDrawer);
         },
       ),
@@ -334,8 +337,7 @@ GoRouter goRouter(Ref ref) {
           String? sectionKey;
           String? strengthSectionKey;
           String? strengthSectionLabel;
-          List<ProfileStrengthField> strengthFields =
-              const <ProfileStrengthField>[];
+          List<ProfileStrengthField> strengthFields = const <ProfileStrengthField>[];
 
           if (extra is String) {
             sectionKey = extra;
@@ -346,13 +348,11 @@ GoRouter goRouter(Ref ref) {
               sectionKey = rawSection;
             }
             final rawStrengthSectionKey = map['strengthSectionKey'];
-            if (rawStrengthSectionKey is String &&
-                rawStrengthSectionKey.trim().isNotEmpty) {
+            if (rawStrengthSectionKey is String && rawStrengthSectionKey.trim().isNotEmpty) {
               strengthSectionKey = rawStrengthSectionKey.trim();
             }
             final rawStrengthSectionLabel = map['strengthSectionLabel'];
-            if (rawStrengthSectionLabel is String &&
-                rawStrengthSectionLabel.trim().isNotEmpty) {
+            if (rawStrengthSectionLabel is String && rawStrengthSectionLabel.trim().isNotEmpty) {
               strengthSectionLabel = rawStrengthSectionLabel.trim();
             }
             final rawStrengthFields = map['strengthFields'];
@@ -386,8 +386,7 @@ GoRouter goRouter(Ref ref) {
         path: Paths.upgradePackage,
         name: Routes.upgradePackage,
         builder: (context, state) {
-          final fromScreen =
-              state.extra is String ? state.extra as String : null;
+          final fromScreen = state.extra is String ? state.extra as String : null;
           return UpgradePackageScreen(fromScreen: fromScreen);
         },
       ),
@@ -411,8 +410,7 @@ GoRouter goRouter(Ref ref) {
             if (rawUrl is String) {
               redirectUrl = rawUrl;
             }
-            if (rawTransactionId is String &&
-                rawTransactionId.trim().isNotEmpty) {
+            if (rawTransactionId is String && rawTransactionId.trim().isNotEmpty) {
               transactionId = rawTransactionId.trim();
             }
             if (rawTranId is String && rawTranId.trim().isNotEmpty) {
@@ -482,11 +480,8 @@ GoRouter goRouter(Ref ref) {
         builder: (context, state) {
           final extra = state.extra;
           String? imagePath;
-          final fromScreenFromQuery =
-              state.uri.queryParameters['fromScreen']?.trim();
-          String? fromScreen = fromScreenFromQuery?.isNotEmpty == true
-              ? fromScreenFromQuery
-              : null;
+          final fromScreenFromQuery = state.uri.queryParameters['fromScreen']?.trim();
+          String? fromScreen = fromScreenFromQuery?.isNotEmpty == true ? fromScreenFromQuery : null;
 
           if (extra is String) {
             imagePath = extra;
@@ -512,9 +507,7 @@ GoRouter goRouter(Ref ref) {
         path: Paths.chatScreen,
         name: Routes.chatScreen,
         builder: (context, state) {
-          final extra = state.extra is Map<String, dynamic>
-              ? state.extra as Map<String, dynamic>
-              : null;
+          final extra = state.extra is Map<String, dynamic> ? state.extra as Map<String, dynamic> : null;
           return ChatScreen(extra: extra);
         },
       ),
@@ -522,11 +515,8 @@ GoRouter goRouter(Ref ref) {
         path: Paths.report,
         name: Routes.report,
         builder: (context, state) {
-          final extra = state.extra is Map<String, dynamic>
-              ? state.extra as Map<String, dynamic>
-              : null;
-          final userName =
-              extra != null ? (extra['displayName'] as String?) : null;
+          final extra = state.extra is Map<String, dynamic> ? state.extra as Map<String, dynamic> : null;
+          final userName = extra != null ? (extra['displayName'] as String?) : null;
           return ReportScreen(userName: userName);
         },
       ),
@@ -534,16 +524,12 @@ GoRouter goRouter(Ref ref) {
         path: Paths.reportStatus,
         name: Routes.reportStatus,
         builder: (context, state) {
-          final extra = state.extra is Map<String, dynamic>
-              ? state.extra as Map<String, dynamic>
-              : const <String, dynamic>{};
+          final extra = state.extra is Map<String, dynamic> ? state.extra as Map<String, dynamic> : const <String, dynamic>{};
           return StatusScreen(
             title: extra['title'] as String? ?? 'Report submitted',
-            subtitle: extra['subtitle'] as String? ??
-                'Thanks. Your report has been received and will be reviewed.',
+            subtitle: extra['subtitle'] as String? ?? 'Thanks. Your report has been received and will be reviewed.',
             buttonText: extra['buttonText'] as String? ?? 'Done',
-            onTapButton: extra['onTapButton'] as VoidCallback? ??
-                () => Navigator.of(context).maybePop(),
+            onTapButton: extra['onTapButton'] as VoidCallback? ?? () => Navigator.of(context).maybePop(),
           );
         },
       ),
@@ -551,9 +537,7 @@ GoRouter goRouter(Ref ref) {
         path: Paths.profilePreview,
         name: Routes.profilePreview,
         builder: (context, state) {
-          final extra = state.extra is Map<String, dynamic>
-              ? state.extra as Map<String, dynamic>
-              : const <String, dynamic>{};
+          final extra = state.extra is Map<String, dynamic> ? state.extra as Map<String, dynamic> : const <String, dynamic>{};
           final userId = extra['userId']?.toString() ?? '';
           return ProfilePreviewScreen(userId: userId);
         },

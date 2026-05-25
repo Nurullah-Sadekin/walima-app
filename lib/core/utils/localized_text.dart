@@ -1169,6 +1169,105 @@ class AppTextTranslator {
       'bn': 'বার্তা',
       'ar': 'الرسالة',
     },
+    'AI Support': {
+      'bn': 'এআই সাপোর্ট',
+      'ar': 'دعم الذكاء الاصطناعي',
+    },
+    'Live Support Bot': {
+      'bn': 'লাইভ সাপোর্ট বট',
+      'ar': 'روبوت الدعم المباشر',
+    },
+    'active': {
+      'bn': 'সক্রিয়',
+      'ar': 'نشط',
+    },
+    'inactive': {
+      'bn': 'নিষ্ক্রিয়',
+      'ar': 'غير نشط',
+    },
+    'Chat with Walima support': {
+      'bn': 'Walima সাপোর্টের সাথে চ্যাট করুন',
+      'ar': 'تحدث مع دعم وليمة',
+    },
+    'Ask about account issues, payments, verification, or match-related support.':
+        {
+      'bn':
+          'অ্যাকাউন্ট সমস্যা, পেমেন্ট, ভেরিফিকেশন বা ম্যাচ-সম্পর্কিত সাপোর্ট সম্পর্কে জিজ্ঞাসা করুন।',
+      'ar':
+          'اسأل عن مشكلات الحساب أو المدفوعات أو التحقق أو الدعم المتعلق بالمطابقات.',
+    },
+    'Talk to a human': {
+      'bn': 'মানুষের সাথে কথা বলুন',
+      'ar': 'تحدث مع موظف',
+    },
+    'Start with a short description of your issue': {
+      'bn': 'আপনার সমস্যার সংক্ষিপ্ত বর্ণনা দিয়ে শুরু করুন',
+      'ar': 'ابدأ بوصف قصير لمشكلتك',
+    },
+    'Examples: "Why did my payment fail?", "What is my verification status?", or "I need help with a match conversation."':
+        {
+      'bn':
+          'উদাহরণ: "আমার পেমেন্ট কেন ব্যর্থ হলো?", "আমার ভেরিফিকেশন স্ট্যাটাস কী?", অথবা "ম্যাচ কথোপকথনে সাহায্য দরকার।"',
+      'ar':
+          'أمثلة: "لماذا فشل الدفع؟" أو "ما حالة التحقق؟" أو "أحتاج مساعدة في محادثة مع مطابقة."',
+    },
+    'Type your question here...': {
+      'bn': 'এখানে আপনার প্রশ্ন লিখুন...',
+      'ar': 'اكتب سؤالك هنا...',
+    },
+    'Use Shift+Enter for a new line. Your chat is stored with a ticket reference when human support is needed.':
+        {
+      'bn':
+          'নতুন লাইনের জন্য Shift+Enter ব্যবহার করুন। মানুষের সাপোর্ট দরকার হলে আপনার চ্যাট একটি টিকিট রেফারেন্সসহ সংরক্ষণ করা হয়।',
+      'ar':
+          'استخدم Shift+Enter لسطر جديد. يتم حفظ محادثتك مع مرجع تذكرة عند الحاجة لدعم بشري.',
+    },
+    'Send message': {
+      'bn': 'মেসেজ পাঠান',
+      'ar': 'إرسال رسالة',
+    },
+    'Support status': {
+      'bn': 'সাপোর্ট স্ট্যাটাস',
+      'ar': 'حالة الدعم',
+    },
+    'Recent ticket activity and direct contact options.': {
+      'bn': 'সাম্প্রতিক টিকিট কার্যক্রম এবং সরাসরি যোগাযোগের অপশন।',
+      'ar': 'نشاط التذاكر الأخير وخيارات الاتصال المباشر.',
+    },
+    'No ticket created in this session yet. The bot can open one when needed.':
+        {
+      'bn':
+          'এই সেশনে এখনো কোনো টিকিট তৈরি হয়নি। প্রয়োজন হলে বট একটি টিকিট খুলতে পারে।',
+      'ar':
+          'لم يتم إنشاء تذكرة في هذه الجلسة بعد. يمكن للروبوت فتح واحدة عند الحاجة.',
+    },
+    'Ticket reference: \$ticketReference': {
+      'bn': 'টিকিট রেফারেন্স: \$ticketReference',
+      'ar': 'مرجع التذكرة: \$ticketReference',
+    },
+    'My support tickets': {
+      'bn': 'আমার সাপোর্ট টিকিটসমূহ',
+      'ar': 'تذاكر الدعم الخاصة بي',
+    },
+    'Your latest requests, escalations, and ticket references.': {
+      'bn': 'আপনার সর্বশেষ অনুরোধ, এস্কেলেশন এবং টিকিট রেফারেন্স।',
+      'ar': 'أحدث طلباتك وتصعيداتك ومراجع التذاكر.',
+    },
+    'No support tickets yet.': {
+      'bn': 'এখনো কোনো সাপোর্ট টিকিট নেই।',
+      'ar': 'لا توجد تذاكر دعم بعد.',
+    },
+    'Get fast, account-aware support for plans, payments, verification, and match issues. Escalate to a human whenever you need.':
+        {
+      'bn':
+          'প্ল্যান, পেমেন্ট, ভেরিফিকেশন এবং ম্যাচ সমস্যার জন্য দ্রুত, অ্যাকাউন্ট-সচেতন সাপোর্ট পান। প্রয়োজন হলে যেকোনো সময় মানুষকে যুক্ত করুন।',
+      'ar':
+          'احصل على دعم سريع ومدرك للحساب للخطط والمدفوعات والتحقق ومشكلات المطابقات. صعّد إلى دعم بشري متى احتجت.',
+    },
+    'Open email app': {
+      'bn': 'ইমেইল অ্যাপ খুলুন',
+      'ar': 'فتح تطبيق البريد',
+    },
     'Send Connection': {
       'bn': 'কানেকশন পাঠান',
       'ar': 'إرسال طلب تواصل',
