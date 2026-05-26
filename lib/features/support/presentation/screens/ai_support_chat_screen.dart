@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/global/components/custom_back_appbar.dart';
+import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/support/presentation/provider/ai_support_provider.dart';
@@ -22,62 +23,82 @@ class AiSupportChatScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAF9),
-      body: Column(
+      body: Stack(
         children: [
-          CustomBackAppBar(
-            title: Text('AI Support'.localized(context)),
-            onBackPressed: () => context.pop(),
+          Column(
+            children: [
+              CustomBackAppBar(
+                title: Text('AI Support'.localized(context)),
+                onBackPressed: () => context.pop(),
+              ),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                  children: [
+                    const SizedBox(height: 6),
+                    Text(
+                      'Get fast, account-aware support for plans, payments, verification, and match issues. Escalate to a human whenever you need.'
+                          .localized(context),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppColors.textSecondaryLight,
+                        fontWeight: FontWeight.w500,
+                        fontSize: TextSize.font14(context),
+                        height: 1.35,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _HeaderCard(
+                      isActive: true,
+                      onTalkToHuman: provider.isLoading
+                          ? null
+                          : () => ref.read(aiSupportProvider).escalateToHuman(),
+                    ),
+                    const SizedBox(height: 16),
+                    if (provider.errorMessage != null) ...[
+                      _InlineError(message: provider.errorMessage!),
+                      const SizedBox(height: 12),
+                    ],
+                    _ChatArea(
+                      messages: provider.messages,
+                      isThinking: provider.isThinking,
+                    ),
+                    const SizedBox(height: 16),
+                    _Composer(
+                      controller: provider.messageController,
+                      canSend: provider.canSend && !provider.isThinking,
+                      onSend: provider.isLoading || provider.isThinking
+                          ? null
+                          : () => ref.read(aiSupportProvider).sendMessage(),
+                    ),
+                    const SizedBox(height: 22),
+                    _SupportStatus(ticketId: provider.ticketId),
+                    const SizedBox(height: 14),
+                    _ContactCard(
+                      icon: Icons.mail_outline_rounded,
+                      title: 'Email',
+                      subtitle: _email,
+                      onTap: () => _sendEmail(_email),
+                    ),
+                    const SizedBox(height: 10),
+                    _ContactCard(
+                      icon: Icons.call_outlined,
+                      title: 'Phone',
+                      subtitle: '$_phoneBd, $_phoneUs',
+                      onTap: () => _callNumber(_phoneBd),
+                    ),
+                    const SizedBox(height: 18),
+                    const _TicketsCard(ticketCount: 0),
+                  ],
+                ),
+              ),
+            ],
           ),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-              children: [
-                const SizedBox(height: 6),
-                Text(
-                  'Get fast, account-aware support for plans, payments, verification, and match issues. Escalate to a human whenever you need.'
-                      .localized(context),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: AppColors.textSecondaryLight,
-                    fontWeight: FontWeight.w500,
-                    fontSize: TextSize.font14(context),
-                    height: 1.35,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                _HeaderCard(
-                  isActive: true,
-                  onTalkToHuman: ref.read(aiSupportProvider).escalateToHuman,
-                ),
-                const SizedBox(height: 16),
-                _ChatArea(messages: provider.messages),
-                const SizedBox(height: 16),
-                _Composer(
-                  controller: provider.messageController,
-                  canSend: provider.canSend,
-                  onSend: ref.read(aiSupportProvider).sendMessage,
-                ),
-                const SizedBox(height: 22),
-                _SupportStatus(ticketReference: provider.ticketReference),
-                const SizedBox(height: 14),
-                _ContactCard(
-                  icon: Icons.mail_outline_rounded,
-                  title: 'Email',
-                  subtitle: _email,
-                  onTap: () => _sendEmail(_email),
-                ),
-                const SizedBox(height: 10),
-                _ContactCard(
-                  icon: Icons.call_outlined,
-                  title: 'Phone',
-                  subtitle: '$_phoneBd, $_phoneUs',
-                  onTap: () => _callNumber(_phoneBd),
-                ),
-                const SizedBox(height: 18),
-                const _TicketsCard(ticketCount: 0),
-              ],
+          if (provider.isLoading)
+            Container(
+              color: Colors.black.withValues(alpha: 0.08),
+              child: const Center(child: Loading()),
             ),
-          ),
         ],
       ),
     );
@@ -99,10 +120,13 @@ class AiSupportChatScreen extends ConsumerWidget {
 }
 
 class _HeaderCard extends StatelessWidget {
-  const _HeaderCard({required this.isActive, required this.onTalkToHuman});
+  const _HeaderCard({
+    required this.isActive,
+    required this.onTalkToHuman,
+  });
 
   final bool isActive;
-  final VoidCallback onTalkToHuman;
+  final VoidCallback? onTalkToHuman;
 
   @override
   Widget build(BuildContext context) {
@@ -194,9 +218,10 @@ class _HeaderCard extends StatelessWidget {
 }
 
 class _ChatArea extends StatelessWidget {
-  const _ChatArea({required this.messages});
+  const _ChatArea({required this.messages, required this.isThinking});
 
   final List<AiSupportMessage> messages;
+  final bool isThinking;
 
   @override
   Widget build(BuildContext context) {
@@ -260,7 +285,37 @@ class _ChatArea extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           ...messages.map((m) => _MessageBubble(message: m)),
+          if (isThinking)
+            const Padding(
+              padding: EdgeInsets.only(top: 10),
+              child: _ThinkingBubble(),
+            ),
         ],
+      ),
+    );
+  }
+}
+
+class _ThinkingBubble extends StatelessWidget {
+  const _ThinkingBubble();
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF2F6FF),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Text(
+          'AI is thinking...'.localized(context),
+          style: const TextStyle(
+            color: AppColors.textSecondaryLight,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
     );
   }
@@ -313,7 +368,7 @@ class _Composer extends StatelessWidget {
 
   final TextEditingController controller;
   final bool canSend;
-  final VoidCallback onSend;
+  final VoidCallback? onSend;
 
   @override
   Widget build(BuildContext context) {
@@ -377,9 +432,9 @@ class _Composer extends StatelessWidget {
 }
 
 class _SupportStatus extends StatelessWidget {
-  const _SupportStatus({required this.ticketReference});
+  const _SupportStatus({required this.ticketId});
 
-  final String? ticketReference;
+  final String? ticketId;
 
   @override
   Widget build(BuildContext context) {
@@ -421,10 +476,44 @@ class _SupportStatus extends StatelessWidget {
               border: Border.all(color: const Color(0xFFE6ECE9)),
             ),
             child: Text(
-              ticketReference == null
+              ticketId == null
                   ? 'No ticket created in this session yet. The bot can open one when needed.'
                       .localized(context)
-                  : 'Ticket reference: $ticketReference'.localized(context),
+                  : 'Ticket reference: $ticketId'.localized(context),
+              style: TextStyle(
+                color: AppColors.textSecondaryLight,
+                fontWeight: FontWeight.w600,
+                fontSize: TextSize.font13(context),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InlineError extends StatelessWidget {
+  const _InlineError({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFEEF2),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFF0D6DD)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline, color: AppColors.primary),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message.localized(context),
               style: TextStyle(
                 color: AppColors.textSecondaryLight,
                 fontWeight: FontWeight.w600,
