@@ -287,6 +287,25 @@ class AppUrls {
   // Plans
   static const String getAllPlans = '$baseUrl/plans'; //POST
 
+  // --- AI Support Bot ---
+  static const String supportBotConversations =
+      '$baseUrl/support-bot/conversations'; //GET, POST
+  static const String supportBotConversationById =
+      '$baseUrl/support-bot/conversations/{conversationId}'; //GET
+  static const String supportBotMessages =
+      '$baseUrl/support-bot/conversations/{conversationId}'; //GET (paged messages)
+  static const String supportBotSendMessage =
+      '$baseUrl/support-bot/conversations/{conversationId}/messages'; //POST
+  static const String supportBotConfirm =
+      '$baseUrl/support-bot/conversations/{conversationId}/confirm'; //POST
+  static const String supportBotEscalate =
+      '$baseUrl/support-bot/conversations/{conversationId}/escalate'; //POST
+  static const String supportBotTickets = '$baseUrl/support-bot/tickets'; //GET
+  static const String supportBotTicketById =
+      '$baseUrl/support-bot/tickets/{ticketId}'; //GET, DELETE
+  static const String supportBotTicketMessages =
+      '$baseUrl/support-bot/tickets/{ticketId}/messages'; //POST
+
   static const String getPlanById = '$baseUrl/plans/{planId}'; //GET
 
   //------  Account Settings ------
