@@ -184,13 +184,13 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
             context.pushNamed(Routes.editProfile);
           },
         ),
-        ProfileActionTile(
-          iconImagePath: AppImages.shareSvgIcon,
-          title: 'Download & Share profile',
-          onTap: () {
-            context.pushNamed(Routes.biodataGenerator);
-          },
-        ),
+        // ProfileActionTile(
+        //   iconImagePath: AppImages.shareSvgIcon,
+        //   title: 'Download & Share profile',
+        //   onTap: () {
+        //     context.pushNamed(Routes.biodataGenerator);
+        //   },
+        // ),
       ],
     );
   }
