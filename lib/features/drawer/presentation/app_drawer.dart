@@ -16,6 +16,7 @@ import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/core/utils/picker_dialog.dart';
 import 'package:walima_llc/features/anchor_point/anchor_point.dart';
 import 'package:walima_llc/features/drawer/presentation/providers/app_drawer_provider.dart';
+import 'package:walima_llc/features/profile/presentation/providers/profile_provider.dart';
 import 'package:walima_llc/features/profile/presentation/utils/profile_summary_utils.dart';
 import 'package:walima_llc/features/drawer/presentation/screens/widgets/profile_action_tile.dart';
 import 'package:walima_llc/features/matches/presentation/widgets/bottom_bordered_widget.dart';
@@ -32,12 +33,14 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
   @override
   Widget build(BuildContext context) {
     final provider = ref.watch(drawerProvider);
+    final profileProviderState = ref.watch(profileProvider);
     final router = ref.watch(goRouterProvider);
     return Drawer(
       width: MediaQuery.of(context).size.width,
       child: TransparentLoading(
         isLoading:
-            provider.loaderState == DrawerScreenStates.transparentLoading,
+            provider.loaderState == DrawerScreenStates.transparentLoading ||
+                profileProviderState.loaderState == ProfileScreenStates.loading,
         child: Scaffold(
           body: SafeArea(
             child: Padding(
@@ -152,7 +155,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         final String? imagePath = await PickerDialog().imagePicker(context);
         if (!context.mounted) return;
         if (imagePath != null) {
-          await ref.watch(profileProvider).updateProfileImage(
+          await ref.read(profileProvider).updateProfileImage(
                 context: context,
                 filePath: imagePath,
               );

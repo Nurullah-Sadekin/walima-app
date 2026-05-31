@@ -117,6 +117,11 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: 'Crop Image',
+            toolbarColor: AppColors.white,
+            statusBarLight: true,
+            navBarLight: true,
+            toolbarWidgetColor: AppColors.textPrimaryLight,
+            activeControlsWidgetColor: AppColors.primary,
             initAspectRatio: CropAspectRatioPreset.square,
             lockAspectRatio: false,
             hideBottomControls: true,

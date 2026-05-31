@@ -27,6 +27,7 @@ import 'package:walima_llc/features/matches/presentation/widgets/profile_compreh
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:walima_llc/features/profile/data/model/response/dashboard_response.dart';
+import 'package:walima_llc/features/profile/presentation/providers/profile_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -76,9 +77,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isHomeLoading = ref.watch(homeProvider).screenStates ==
+        HomeScreenStates.transparentLoading;
+    final isProfileImageUploading =
+        ref.watch(profileProvider).loaderState == ProfileScreenStates.loading;
+
     return TransparentLoading(
-      isLoading: ref.watch(homeProvider).screenStates ==
-          HomeScreenStates.transparentLoading,
+      isLoading: isHomeLoading || isProfileImageUploading,
       child: Scaffold(
         key: _scaffoldKey,
         drawer: const AppDrawer(),
