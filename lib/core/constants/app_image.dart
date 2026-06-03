@@ -10,6 +10,8 @@ class AppImages {
   static const String manAvatar = 'assets/images/men_avatar.jpg';
   static const String womenAvatar = 'assets/images/women_avatar.jpg';
   static const String saveTime = 'assets/images/save_time.png';
+  static const String check = 'assets/images/check.png';
+
 
 
   // Icon asset paths

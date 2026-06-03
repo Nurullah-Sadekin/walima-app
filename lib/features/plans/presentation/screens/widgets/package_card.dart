@@ -1,3 +1,4 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
@@ -210,146 +211,150 @@ class PackageCard extends StatelessWidget {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          width: MediaQuery.of(context).size.width * 0.75,
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: palette.accentColor, width: 1),
+        DottedBorder(
+          options: RoundedRectDottedBorderOptions(
+            dashPattern: [10, 5],
+            strokeWidth: 2,
+            padding: const EdgeInsets.all(0),
+            color: palette.accentColor,
+            radius: const Radius.circular(8),
           ),
-          child: Column(
-            children: [
-              const SizedBox(height: 50),
-              Column(
-                spacing: 8,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        '$displayName / ',
-                        textHeightBehavior: const TextHeightBehavior(
-                          applyHeightToFirstAscent: false,
-                          applyHeightToLastDescent: false,
-                        ),
-                        style: TextStyle(
-                          fontSize: TextSize.font18(context),
-                          fontWeight: FontWeight.w600,
-                          color: palette.accentColor,
-                        ),
-                      ),
-                      Flexible(
-                        child: Text(
-                          billingCycle,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: TextSize.font16(context),
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textSecondaryLight,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (showOriginalPrice || discountText != null)
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            width: MediaQuery.of(context).size.width * 0.75,
+            child: Column(
+              children: [
+                const SizedBox(height: 50),
+                Column(
+                  spacing: 8,
+                  children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        if (showOriginalPrice)
-                          Text(
-                            _formatMoneyFromMinor(
-                              originalTotal,
-                              pricing?.currency,
-                            ),
+                        Text(
+                          '$displayName / ',
+                          textHeightBehavior: const TextHeightBehavior(
+                            applyHeightToFirstAscent: false,
+                            applyHeightToLastDescent: false,
+                          ),
+                          style: TextStyle(
+                            fontSize: TextSize.font18(context),
+                            fontWeight: FontWeight.w600,
+                            color: palette.accentColor,
+                          ),
+                        ),
+                        Flexible(
+                          child: Text(
+                            billingCycle,
+                            textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: TextSize.font16(context),
                               fontWeight: FontWeight.w500,
                               color: AppColors.textSecondaryLight,
-                              decoration: TextDecoration.lineThrough,
                             ),
                           ),
-                        if (showOriginalPrice && discountText != null)
-                          const SizedBox(width: 8),
-                        if (discountText != null)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFE8F7ED),
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                            child: Text(
-                              discountText,
-                              style: TextStyle(
-                                fontSize: TextSize.font12(context),
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.greenButtonColor,
-                              ),
-                            ),
-                          ),
+                        ),
                       ],
                     ),
-                  Text(
-                    _formatMoneyFromMinor(discountedTotal, pricing?.currency),
-                    textHeightBehavior: const TextHeightBehavior(
-                      applyHeightToFirstAscent: false,
-                      applyHeightToLastDescent: false,
-                    ),
-                    style: TextStyle(
-                      fontSize: TextSize.font36(context),
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimaryLight,
-                    ),
-                  ),
-                  Text(
-                    '${_formatMoneyFromMinor(discountedPerMonth, pricing?.currency)} / ${'month'.localized(context)}',
-                    textHeightBehavior: const TextHeightBehavior(
-                      applyHeightToFirstAscent: false,
-                      applyHeightToLastDescent: false,
-                    ),
-                    style: TextStyle(
-                      fontSize: TextSize.font16(context),
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              PrimaryButtons(
-                buttonStyle: isButtonDisabled
-                    ? ButtonsStyle.disableButton
-                    : ButtonsStyle.activePrimaryButton,
-                onTap: buttonOnTap,
-                title: buttonTitle,
-              ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: summaryFeatures
-                        .map(
-                          (feature) => Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: IconTextRow(
-                              imagePath: AppImages.flagSvgIcon,
-                              text: _featureLabel(feature, context),
-                              availableOption: feature.included ?? false,
+                    if (showOriginalPrice || discountText != null)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (showOriginalPrice)
+                            Text(
+                              _formatMoneyFromMinor(
+                                originalTotal,
+                                pricing?.currency,
+                              ),
+                              style: TextStyle(
+                                fontSize: TextSize.font16(context),
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textSecondaryLight,
+                                decoration: TextDecoration.lineThrough,
+                              ),
                             ),
-                          ),
-                        )
-                        .toList(),
+                          if (showOriginalPrice && discountText != null)
+                            const SizedBox(width: 8),
+                          if (discountText != null)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE8F7ED),
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              child: Text(
+                                discountText,
+                                style: TextStyle(
+                                  fontSize: TextSize.font12(context),
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.greenButtonColor,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    Text(
+                      _formatMoneyFromMinor(discountedTotal, pricing?.currency),
+                      textHeightBehavior: const TextHeightBehavior(
+                        applyHeightToFirstAscent: false,
+                        applyHeightToLastDescent: false,
+                      ),
+                      style: TextStyle(
+                        fontSize: TextSize.font36(context),
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimaryLight,
+                      ),
+                    ),
+                    Text(
+                      '${_formatMoneyFromMinor(discountedPerMonth, pricing?.currency)} / ${'month'.localized(context)}',
+                      textHeightBehavior: const TextHeightBehavior(
+                        applyHeightToFirstAscent: false,
+                        applyHeightToLastDescent: false,
+                      ),
+                      style: TextStyle(
+                        fontSize: TextSize.font16(context),
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                PrimaryButtons(
+                  buttonStyle: isButtonDisabled
+                      ? ButtonsStyle.disableButton
+                      : ButtonsStyle.activePrimaryButton,
+                  onTap: buttonOnTap,
+                  title: buttonTitle,
+                ),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: summaryFeatures
+                          .map(
+                            (feature) => Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: IconTextRow(
+                                imagePath: feature.included ?? false ? AppImages.check : AppImages.cancelSvgIcon,
+                                text: _featureLabel(feature, context),
+                                availableOption: feature.included ?? false,
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         Positioned(
