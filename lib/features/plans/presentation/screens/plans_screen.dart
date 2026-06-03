@@ -109,11 +109,77 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
   Widget _headerSection() {
     return Column(
       children: [
-        const ShowImage(
-          imagePath: AppImages.upgradePremium,
-          width: 140,
-          height: 110,
+        // const ShowImage(
+        //   imagePath: AppImages.upgradePremium,
+        //   width: 140,
+        //   height: 110,
+        // ),
+        Container(
+          width: 100,
+          height: 100,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: [
+                AppColors.primary,
+                AppColors.primaryDark,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                '21'.localized(context),
+                textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false, applyHeightToLastDescent: false),
+                style: TextStyle(
+                  fontSize: TextSize.font36(context),
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Times New Roman',
+                  color: AppColors.white,
+                ),
+              ),
+              Text(
+                'Days'.localized(context),
+                textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false, applyHeightToLastDescent: false),
+                style: TextStyle(
+                  fontSize: TextSize.font16(context),
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Times New Roman',
+                  color: AppColors.white,
+                ),
+              ),
+            ],
+          ),
         ),
+
+        const SizedBox(height: 10),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [
+                AppColors.primary,
+                AppColors.primaryDark,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Text(
+            'MONEY BACK GUARANTEE'.localized(context),
+            style: TextStyle(
+              fontSize: TextSize.font10(context),
+              fontWeight: FontWeight.w500,
+              color: AppColors.white,
+            ),
+          ),
+        ),
+
         const SizedBox(height: 20),
         Text(
           'Upgrade to Premium'.localized(context),
@@ -239,13 +305,12 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
               onTap: () => ref.read(plansProvider).changePage(index),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
-                width: isActive ? 30 : 10,
-                height: 10,
+                width: isActive ? 30 : 16,
+                height: 6,
                 margin: const EdgeInsets.only(right: 4),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10 / 2),
-                  color:
-                      isActive ? AppColors.primary : AppColors.primaryShade300,
+                  borderRadius: BorderRadius.circular(2),
+                  color: isActive ? AppColors.primary : AppColors.primaryShade300,
                 ),
               ),
             );
