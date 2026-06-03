@@ -192,6 +192,59 @@ class PackageCard extends StatelessWidget {
     }
   }
 
+  void _showAllFeaturesDialog(BuildContext context, List<Features> allFeatures) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          backgroundColor: AppColors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          title: Text(
+            'All Features',
+            style: TextStyle(
+              fontSize: TextSize.font18(context),
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimaryLight,
+            ),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: allFeatures
+                  .map(
+                    (feature) => Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: IconTextRow(
+                        imagePath: feature.included ?? false ? AppImages.check : AppImages.cancelSvgIcon,
+                        text: _featureLabel(feature, dialogContext),
+                        availableOption: feature.included ?? false,
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(
+                'Close',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontSize: TextSize.font14(context),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final pricing = _firstPricing();
@@ -338,18 +391,33 @@ class PackageCard extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: summaryFeatures
-                          .map(
-                            (feature) => Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: IconTextRow(
-                                imagePath: feature.included ?? false ? AppImages.check : AppImages.cancelSvgIcon,
-                                text: _featureLabel(feature, context),
-                                availableOption: feature.included ?? false,
+                      children: [
+                        ...summaryFeatures.take(4).map(
+                          (feature) => Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: IconTextRow(
+                              imagePath: feature.included ?? false ? AppImages.check : AppImages.cancelSvgIcon,
+                              text: _featureLabel(feature, context),
+                              availableOption: feature.included ?? false,
+                            ),
+                          ),
+                        ),
+                        if (plan.features!.length > 5)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: InkWell(
+                              onTap: () => _showAllFeaturesDialog(context, plan.features!),
+                              child: Text(
+                                'view all features',
+                                style: TextStyle(
+                                  color: palette.accentColor,
+                                  fontSize: TextSize.font13(context),
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
-                          )
-                          .toList(),
+                          ),
+                      ],
                     ),
                   ),
                 ),
