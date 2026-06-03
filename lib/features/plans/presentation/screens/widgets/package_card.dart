@@ -209,21 +209,23 @@ class PackageCard extends StatelessWidget {
               color: AppColors.textPrimaryLight,
             ),
           ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: allFeatures
-                  .map(
-                    (feature) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: IconTextRow(
-                        imagePath: feature.included ?? false ? AppImages.check : AppImages.cancelSvgIcon,
-                        text: _featureLabel(feature, dialogContext),
-                        availableOption: feature.included ?? false,
+          content: Scrollbar(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: allFeatures
+                    .map(
+                      (feature) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: IconTextRow(
+                          imagePath: feature.included ?? false ? AppImages.check : AppImages.cancelSvgIcon,
+                          text: _featureLabel(feature, dialogContext),
+                          availableOption: feature.included ?? false,
+                        ),
                       ),
-                    ),
-                  )
-                  .toList(),
+                    )
+                    .toList(),
+              ),
             ),
           ),
           actions: [
