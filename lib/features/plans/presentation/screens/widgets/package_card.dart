@@ -415,6 +415,8 @@ class PackageCard extends StatelessWidget {
                                   color: palette.accentColor,
                                   fontSize: TextSize.font13(context),
                                   fontWeight: FontWeight.w500,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: palette.accentColor,
                                 ),
                               ),
                             ),
