@@ -24,7 +24,7 @@ class ProfileComprehensiveCard extends StatelessWidget {
     this.profession,
     this.religion,
     this.leftButtonText = 'Connect',
-    this.rightButtonText = 'Shortlist',
+    this.rightButtonText = 'Contact',
     this.onTapLeftButton,
     this.onTapRightButton,
     this.isPremiumConnect = false,
@@ -520,7 +520,7 @@ class ProfileComprehensiveCard extends StatelessWidget {
           Expanded(
             child: _ProfileActionButton(
               title: rightButtonText ?? 'Contact',
-              iconPath: rightIconPath ?? AppImages.favouriteIcon,
+              iconPath: rightIconPath ?? AppImages.callIcon,
               onTap: onTapRightButton ?? _noop,
               backgroundColor: rightButtonColor ?? AppColors.white,
               borderColor: rightButtonBorderColor ?? _buttonBorderColor,
@@ -577,13 +577,6 @@ class _ProfileActionButton extends StatelessWidget {
             color: backgroundColor,
             borderRadius: BorderRadius.circular(6),
             border: Border.all(color: borderColor, width: 1),
-            // boxShadow: const [
-            //   BoxShadow(
-            //     color: Color(0x0F000000),
-            //     blurRadius: 12,
-            //     offset: Offset(0, 4),
-            //   ),
-            // ],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
