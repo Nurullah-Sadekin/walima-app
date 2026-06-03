@@ -390,8 +390,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         width: 300,
         child: ProfileComprehensiveCard(
           onTapCard: () {
-            context
-                .pushNamed(Routes.profilePreview, extra: {'userId': match.id});
+            context.pushNamed(Routes.profilePreview, extra: {'userId': match.id});
           },
           imagePath: imagePath ??
               (match.gender == 'female'
