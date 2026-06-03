@@ -47,23 +47,14 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
   Widget build(BuildContext context) {
     provider = ref.watch(plansProvider);
     return TransparentLoading(
-      isLoading:
-          provider.screenStates == UpgradePackageScreenStates.transparent,
+      isLoading: provider.screenStates == UpgradePackageScreenStates.transparent,
       child: Scaffold(
         body: GradientBackground(
           child: Column(
             children: [
               if (widget.showAppBar) _appbarSection(),
-              if (!widget.showAppBar)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: AnchoredAppBar(
-                    context: context,
-                    title: 'Welcome, Samira!',
-                    onNotificationPressed: () =>
-                        context.pushNamed(Routes.notifications),
-                  ),
-                ),
+              if (!widget.showAppBar) _anchoredAppBarSection(),
+
               provider.loaderState == UpgradePackageScreenStates.loading
                   ? const Expanded(child: Center(child: Loading()))
                   : _body(),
@@ -87,6 +78,17 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
         }
         context.push(Paths.anchor);
       },
+    );
+  }
+
+  Widget _anchoredAppBarSection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: AnchoredAppBar(
+        context: context,
+        title: 'Premium Plans'.localized(context),
+        onNotificationPressed: () => context.pushNamed(Routes.notifications),
+      ),
     );
   }
 
@@ -327,13 +329,13 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: provider.haveQuestion.entries.map((entry) {
             return CustomExpansionTile(
-              title: entry.key,
+              title: entry.key.localized(context),
               backgroundColor: AppColors.transparent,
               titleBackgroundColor: AppColors.transparent,
               bottomMargin: 16,
               borderColor: AppColors.primary,
               child: Text(
-                entry.value,
+                entry.value.localized(context),
                 style: TextStyle(
                   fontSize: TextSize.font12(context),
                   fontWeight: FontWeight.w400,
@@ -365,7 +367,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
               ),
               const SizedBox(height: 6),
               Text(
-                'We are right here to help you. Give us a call anything between  10am-7pm',
+                'We are right here to help you. Give us a call anything between  10am-7pm'.localized(context),
                 style: TextStyle(
                   fontSize: TextSize.font14(context),
                   fontWeight: FontWeight.w400,

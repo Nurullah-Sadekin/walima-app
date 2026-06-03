@@ -401,11 +401,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           isPremiumConnect: match.isPremium ?? true,
           isVerified: match.profilePhoto?.isVerified ?? false,
           name: match.displayName ?? 'Walima Member'.localized(context),
-          age:
-              '${match.age ?? 'Undefine'.localized(context)} ${'Yr'.localized(context)}',
+          age: '${match.age ?? 'Undefine'.localized(context)} ${'Yr'.localized(context)}',
           height: HeightUtils.formatHeight(heightText),
-          location: location,
-          profession: profession,
+          location: location?.localized(context),
+          profession: profession?.localized(context),
           leftButtonColor: match.connection?.status == 'none'
               ? AppColors.greenButtonColor
               : AppColors.disableBackground,
@@ -420,7 +419,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               : AppColors.disableBackground,
           viewOnAccept:
               match.profilePhoto?.visibilityStatus == 'visible' ? true : false,
-          religion: match.religion,
+          religion: match.religion?.localized(context),
           isOnline: match.isOnline ?? false,
           onTapRightButton: () async {
             await BottomSheetUtils.open(

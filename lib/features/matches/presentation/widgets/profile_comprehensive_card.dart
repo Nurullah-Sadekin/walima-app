@@ -338,7 +338,7 @@ class ProfileComprehensiveCard extends StatelessWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        name,
+                        name.localized(context),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         textHeightBehavior: const TextHeightBehavior(
@@ -383,7 +383,7 @@ class ProfileComprehensiveCard extends StatelessWidget {
                         spacing: 4,
                         children: [
                           Text(
-                            religion ?? '',
+                            religion?.localized(context) ?? '',
                             style: TextStyle(
                               fontSize: TextSize.font16(context),
                               fontWeight: FontWeight.w400,
@@ -396,7 +396,7 @@ class ProfileComprehensiveCard extends StatelessWidget {
                             color: AppColors.textSecondaryLight,
                           ),
                           Text(
-                            maritalStatus ?? 'Never Married',
+                            maritalStatus?.localized(context) ?? 'Never Married',
                             style: TextStyle(
                               fontSize: TextSize.font16(context),
                               fontWeight: FontWeight.w400,
