@@ -308,6 +308,15 @@ class AppUrls {
 
   static const String getPlanById = '$baseUrl/plans/{planId}'; //GET
 
+  // --- Identity Verification (Didit KYC) ---
+  // Flutter talks only to the Walima backend; the backend owns the Didit API key.
+  static const String verificationSession =
+      '$baseUrl/verification/session'; //POST
+  static const String verificationStatus =
+      '$baseUrl/verification/status'; //GET
+  static const String verificationSessions =
+      '$baseUrl/verification/sessions'; //GET
+
   //------  Account Settings ------
   static const String updateNameAndEmail = '$baseUrl/settings/account'; //GET
   static const String contactSettings = '$baseUrl/settings/contact'; //GET, PUT

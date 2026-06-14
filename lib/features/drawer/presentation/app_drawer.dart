@@ -279,6 +279,13 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
             context.pushNamed(Routes.accountSetting);
           },
         ),
+        ProfileActionTile(
+          iconImagePath: AppImages.verifyIcon,
+          title: 'Identity Verification',
+          onTap: () {
+            context.pushNamed(Routes.identityVerification);
+          },
+        ),
       ],
     );
   }

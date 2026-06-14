@@ -17,6 +17,7 @@ import 'package:walima_llc/features/registration/presentation/providers/registra
 import 'package:walima_llc/features/registration/presentation/providers/registration_screen_state_provider.dart';
 import 'package:walima_llc/features/plans/presentation/providers/plans_provider.dart';
 import 'package:walima_llc/features/account_setting/presentation/providers/account_setting_provider.dart';
+import 'package:walima_llc/features/identity_verification/presentation/providers/identity_verification_provider.dart';
 import 'package:walima_llc/features/contact_filter/presentation/providers/contact_filter_provider.dart';
 import 'package:walima_llc/features/support/presentation/provider/support_provider.dart';
 import 'package:walima_llc/features/support/presentation/provider/ai_support_provider.dart';
@@ -162,6 +163,11 @@ final myMatchFilterProvider =
 final accountSettingProvider =
     ChangeNotifierProvider<AccountSettingProvider>((ref) {
   return AccountSettingProvider();
+});
+
+final identityVerificationProvider =
+    ChangeNotifierProvider<IdentityVerificationProvider>((ref) {
+  return IdentityVerificationProvider();
 });
 
 final contactFilterProvider =

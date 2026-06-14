@@ -32,6 +32,8 @@ import 'package:walima_llc/features/plans/presentation/screens/plans_screen.dart
 import 'package:walima_llc/features/plans/presentation/screens/payment_webview_screen.dart';
 import 'package:walima_llc/features/home/presentation/screens/home_view_all_screen.dart';
 import 'package:walima_llc/features/home/presentation/screens/government_id_verify_screen.dart';
+import 'package:walima_llc/features/identity_verification/presentation/screens/identity_verification_screen.dart';
+import 'package:walima_llc/features/identity_verification/presentation/screens/didit_verification_webview_screen.dart';
 import 'package:walima_llc/features/registration/presentation/screens/about_you.dart';
 import 'package:walima_llc/features/registration/presentation/screens/email_phone.dart';
 import 'package:walima_llc/features/registration/presentation/screens/family_details.dart';
@@ -443,6 +445,30 @@ GoRouter goRouter(Ref ref) {
         path: Paths.governmentIdVerify,
         name: Routes.governmentIdVerify,
         builder: (context, state) => const GovernmentIdVerifyScreen(),
+      ),
+      GoRoute(
+        path: Paths.identityVerification,
+        name: Routes.identityVerification,
+        builder: (context, state) => const IdentityVerificationScreen(),
+      ),
+      GoRoute(
+        path: Paths.diditVerificationWebView,
+        name: Routes.diditVerificationWebView,
+        builder: (context, state) {
+          final extra = state.extra;
+          var verificationUrl = '';
+          if (extra is String) {
+            verificationUrl = extra;
+          } else if (extra is Map) {
+            final rawUrl = Map<String, dynamic>.from(extra)['verificationUrl'];
+            if (rawUrl is String) {
+              verificationUrl = rawUrl;
+            }
+          }
+          return DiditVerificationWebViewScreen(
+            verificationUrl: verificationUrl,
+          );
+        },
       ),
       GoRoute(
         path: Paths.matches,

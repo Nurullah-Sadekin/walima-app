@@ -58,6 +58,8 @@ abstract class Paths {
   static const premiumMatches = '/premiumMatches';
   static const recentVisitors = '/recentVisitors';
   static const governmentIdVerify = '/governmentIdVerify';
+  static const identityVerification = '/identityVerification';
+  static const diditVerificationWebView = '/diditVerificationWebView';
 
   //Matches
   static const matches = '/matches';
@@ -139,6 +141,8 @@ abstract class Routes {
   static const premiumMatches = 'premiumMatches';
   static const recentVisitors = 'recentVisitors';
   static const governmentIdVerify = 'governmentIdVerify';
+  static const identityVerification = 'identityVerification';
+  static const diditVerificationWebView = 'diditVerificationWebView';
 
   //Matches
   static const matches = 'matches';
