@@ -402,6 +402,7 @@ class _LoginWithPhoneScreenState extends ConsumerState<LoginWithPhoneScreen> {
     showCountryPicker(
       context: context,
       showPhoneCode: true,
+      useSafeArea: true,
       onSelect: (Country country) {
         setState(() {
           _selectedCountry = country;
