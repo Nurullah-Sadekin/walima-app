@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -504,9 +506,7 @@ class _LoginWithPhoneScreenState extends ConsumerState<LoginWithPhoneScreen> {
           spacing: 16,
           children: [
             InkWell(
-              onTap: () {
-                // context.push(Paths.login);
-              },
+              onTap: () => provider.signInWithGoogle(context),
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -524,6 +524,7 @@ class _LoginWithPhoneScreenState extends ConsumerState<LoginWithPhoneScreen> {
                 ),
               ),
             ),
+            if(Platform.isIOS)
             InkWell(
               onTap: () {},
               child: Container(

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
@@ -431,7 +433,7 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
           spacing: 16,
           children: [
             InkWell(
-              onTap: () {},
+              onTap: () => provider.signInWithGoogle(context),
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -449,6 +451,7 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
                 ),
               ),
             ),
+            if(Platform.isIOS)
             InkWell(
               onTap: () {
                 context.push(Paths.loginWithPhone);
