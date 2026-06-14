@@ -326,20 +326,34 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   _HelpItem(
                     icon: Icons.policy_outlined,
                     title: 'Terms & Privacy',
-                    onTap: () => Navigator.of(context).pop(),
-                  ),
-                  _HelpItem(
-                    icon: Icons.support_agent_outlined,
-                    title: 'Contact Support',
                     onTap: () {
                       Navigator.of(context).pop();
-                      context.pushNamed(Routes.helpDesk);
+                      LinkOpener.openLink(
+                        context,
+                        'Terms & Privacy'.localized(context),
+                        AppUrls.privacyPolicyUrl,
+                      );
                     },
                   ),
+                  // _HelpItem(
+                  //   icon: Icons.support_agent_outlined,
+                  //   title: 'Contact Support',
+                  //   onTap: () {
+                  //     Navigator.of(context).pop();
+                  //     context.pushNamed(Routes.helpDesk);
+                  //   },
+                  // ),
                   _HelpItem(
                     icon: Icons.info_outline,
                     title: 'About Walima',
-                    onTap: () => Navigator.of(context).pop(),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      LinkOpener.openLink(
+                        context,
+                        'About Walima'.localized(context),
+                        AppUrls.domain,
+                      );
+                    },
                   ),
                 ],
               ),
