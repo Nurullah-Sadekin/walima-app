@@ -1,17 +1,16 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
-import 'package:walima_llc/core/config/text_responsive.dart';
-import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/gradient_background.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:walima_llc/core/global/components/primary_textField.dart';
 import 'package:walima_llc/core/global/components/upper_layer.dart';
+import 'package:walima_llc/core/utils/dialog_utils.dart';
 import 'package:walima_llc/core/providers/providers.dart';
-import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/features/login/presentation/providers/login_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 class NewPasswordScreen extends ConsumerStatefulWidget {
   const NewPasswordScreen({super.key});
@@ -72,7 +71,7 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
           children: [
             loginDataField(),
             const Spacer(),
-            bottomAction(),
+      bottomAction(),
             SizedBox(height: MediaQuery.sizeOf(context).height * 0.03),
           ],
         ),
@@ -110,9 +109,36 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
     return PrimaryButtons(
       buttonStyle: ButtonsStyle.activePrimaryButton,
       title: 'Continue',
-      onTap: () {
-        provider.setNewPassword(context);
-        // context.push(Paths.resetPasswordStatus);
+      onTap: () async {
+        final response = await provider.setNewPassword(context);
+        if (!mounted) return;
+
+        provider.hideLoading();
+
+        if (response.code == 'SUCCESS') {
+          final currentContext = context;
+          await DialogUtils.showSuccessDialog(
+            context: currentContext,
+            title: 'Success',
+            message: response.message ?? 'Password changed successfully',
+            buttonText: 'OK',
+            autoClose: false,
+            onClose: () {
+              if (mounted) {
+                Navigator.of(currentContext).pop();
+              }
+            },
+          );
+          return;
+        }
+
+        final currentContext = context;
+        await DialogUtils.showErrorDialog(
+          context: currentContext,
+          title: 'Error',
+          message: response.message ?? 'Unable to set password. Please try again.',
+          buttonText: 'Try again',
+        );
       },
     );
   }

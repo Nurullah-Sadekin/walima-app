@@ -176,11 +176,11 @@ class LoginProvider extends BaseChangeNotifier {
     }
   }
 
-  Future<void> setNewPassword(BuildContext context) async {
+  Future<LoginResponse> setNewPassword(BuildContext context) async {
     _showLoading();
     if (validateNewPassword() == false) {
       _hideLoading();
-      return;
+      return LoginResponse(code: 'FAILED', message: 'Validation failed');
     }
     final body = SetPasswordBody(
       identifier: mobileNoOrEmailController.text,
@@ -189,8 +189,10 @@ class LoginProvider extends BaseChangeNotifier {
       confirmPassword: confirmPasswordController.text,
     );
     final response = await LoginRepository.setNewPassword(body);
-    if (!context.mounted) return;
-    _handleLoginResult(context, response);
+    if (!context.mounted) {
+      return LoginResponse(code: 'FAILED', message: 'Context is no longer available');
+    }
+    return response;
   }
 
   Future<void> resendOtp(BuildContext context) async {
@@ -518,6 +520,10 @@ class LoginProvider extends BaseChangeNotifier {
 
   void _hideLoading() {
     updateViewState(loadingState: LoginScreenStates.defaultState);
+  }
+
+  void hideLoading() {
+    _hideLoading();
   }
 
   void _addListenerSafely(

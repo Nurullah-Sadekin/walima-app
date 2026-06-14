@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:go_router/go_router.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/utils/dialog_utils.dart';
 import 'package:walima_llc/core/utils/localized_text.dart';
 
 /// Hosts the Didit hosted verification page in an in-app webview.
 ///
-/// Flutter never owns verification state — when the user finishes or returns,
+/// Flutter never owns verification state - when the user finishes or returns,
 /// the parent screen re-reads `GET /verification/status` (the source of truth).
 /// This screen only:
 ///  - loads the backend-provided `verificationUrl`,
+///  - grants the webview camera/microphone request when the hosted flow asks,
 ///  - intercepts the Didit callback redirect (`didit=return`) so the localhost
 ///    callback page is never actually loaded on the device, and
 ///  - pops back with `true` when the flow appears complete, `false` otherwise.
@@ -29,7 +30,7 @@ class DiditVerificationWebViewScreen extends StatefulWidget {
 
 class _DiditVerificationWebViewScreenState
     extends State<DiditVerificationWebViewScreen> {
-  WebViewController? _webViewController;
+  InAppWebViewController? _webViewController;
   bool _isPageLoading = true;
   bool _isClosing = false;
   bool _isErrorHandled = false;
@@ -40,23 +41,7 @@ class _DiditVerificationWebViewScreenState
     super.initState();
     _initialUri = Uri.tryParse(widget.verificationUrl.trim());
 
-    if (_hasValidUrl) {
-      _webViewController = WebViewController()
-        ..setJavaScriptMode(JavaScriptMode.unrestricted)
-        ..setNavigationDelegate(
-          NavigationDelegate(
-            onNavigationRequest: _handleNavigationRequest,
-            onPageStarted: (_) {
-              if (mounted) setState(() => _isPageLoading = true);
-            },
-            onPageFinished: (_) {
-              if (mounted) setState(() => _isPageLoading = false);
-            },
-            onWebResourceError: (_) => _handleWebViewError(),
-          ),
-        )
-        ..loadRequest(_initialUri!);
-    } else {
+    if (!_hasValidUrl) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (!mounted) return;
         await DialogUtils.showErrorDialog(
@@ -73,15 +58,25 @@ class _DiditVerificationWebViewScreenState
       _initialUri!.scheme.isNotEmpty &&
       _initialUri!.host.isNotEmpty;
 
-  NavigationDecision _handleNavigationRequest(NavigationRequest request) {
-    if (_isReturnCallback(request.url)) {
-      // The Didit flow finished and is redirecting to the Walima callback URL
-      // (e.g. http://localhost:3000/...?didit=return). That page can't load on
-      // a device, so stop here and let the parent refresh backend status.
+  Future<PermissionResponse?> _onPermissionRequest(
+    InAppWebViewController controller,
+    PermissionRequest permissionRequest,
+  ) async {
+    return PermissionResponse(
+      resources: permissionRequest.resources,
+      action: PermissionResponseAction.GRANT,
+    );
+  }
+
+  NavigationActionPolicy _handleNavigationRequest(
+    NavigationAction navigationAction,
+  ) {
+    final url = navigationAction.request.url;
+    if (url != null && _isReturnCallback(url.toString())) {
       _close(completed: true);
-      return NavigationDecision.prevent;
+      return NavigationActionPolicy.CANCEL;
     }
-    return NavigationDecision.navigate;
+    return NavigationActionPolicy.ALLOW;
   }
 
   /// True when [url] is the post-verification callback the backend configured.
@@ -92,8 +87,6 @@ class _DiditVerificationWebViewScreenState
     final hasReturnMarker = uri.queryParameters['didit'] == 'return';
     final isCallbackPath =
         uri.path.toLowerCase().contains('identity-verification');
-
-    // Don't treat the Didit-hosted verification page itself as a callback.
     final isDiditHost = uri.host.toLowerCase().contains('didit');
 
     return hasReturnMarker || (isCallbackPath && !isDiditHost);
@@ -147,8 +140,31 @@ class _DiditVerificationWebViewScreenState
             ? const SizedBox.shrink()
             : Stack(
                 children: [
-                  if (_webViewController != null)
-                    WebViewWidget(controller: _webViewController!),
+                  InAppWebView(
+                    initialUrlRequest:
+                        URLRequest(url: WebUri(_initialUri!.toString())),
+                    initialSettings: InAppWebViewSettings(
+                      javaScriptEnabled: true,
+                      mediaPlaybackRequiresUserGesture: false,
+                      allowsInlineMediaPlayback: true,
+                    ),
+                    onWebViewCreated: (controller) {
+                      _webViewController = controller;
+                    },
+                    onPermissionRequest: _onPermissionRequest,
+                    shouldOverrideUrlLoading:
+                        (controller, navigationAction) async =>
+                            _handleNavigationRequest(navigationAction),
+                    onLoadStart: (controller, url) {
+                      if (mounted) setState(() => _isPageLoading = true);
+                    },
+                    onLoadStop: (controller, url) {
+                      if (mounted) setState(() => _isPageLoading = false);
+                    },
+                    onReceivedError: (controller, request, error) {
+                      _handleWebViewError();
+                    },
+                  ),
                   if (_isPageLoading)
                     Container(
                       height: double.infinity,

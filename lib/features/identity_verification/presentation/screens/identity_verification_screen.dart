@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/global/components/custom_back_appbar.dart';
@@ -185,6 +186,17 @@ class _IdentityVerificationScreenState
     final provider = ref.read(identityVerificationProvider);
 
     try {
+      final cameraStatus = await Permission.camera.status;
+      if (!cameraStatus.isGranted) {
+        final requested = await Permission.camera.request();
+        if (!requested.isGranted) {
+          _showSnack(
+            'Camera permission is required to complete verification.',
+          );
+          return;
+        }
+      }
+
       var url = resumeUrl?.trim();
 
       if (url == null || url.isEmpty) {

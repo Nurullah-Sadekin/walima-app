@@ -85,7 +85,11 @@ class LoginRepository {
   static Future<LoginResponse> setNewPassword(SetPasswordBody body) async {
     try {
       final response = await DioClient()
-          .post(AppUrls.setPasswordWithOTP, data: body.toJson());
+          .post(
+            AppUrls.setPasswordWithOTP,
+            data: body.toJson(),
+            acceptedStatusCodes: {400},
+          );
       return LoginResponse.fromJson(response.data);
     } catch (e) {
       final errorMessage = e is DioException

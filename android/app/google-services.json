@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "249586231317-d6gtsmki2h34m11b5mue2rdi9vh9n7a4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.walima.matrimony",
+            "certificate_hash": "11f217a837caa30df3b10dfbe66e45cf9230569b"
+          }
+        },
+        {
           "client_id": "249586231317-sftd9fqeoam50fs9t8cblmji32fpihik.apps.googleusercontent.com",
           "client_type": 3
         }

@@ -128,6 +128,13 @@ class FirebaseMessagingService {
 
     try {
       await _ensureFirebaseInitialized();
+      final accessToken = await PrefsHelper.getAccessToken();
+      if (accessToken.trim().isEmpty) {
+        debugPrint(
+          '[FirebaseMessagingService] skipping device token registration: user is logged out',
+        );
+        return;
+      }
       final messaging = FirebaseMessaging.instance;
       final token = (await messaging.getToken())?.trim() ?? (await PrefsHelper.getFcmToken()).trim();
       if (token.isEmpty) {
@@ -162,6 +169,9 @@ class FirebaseMessagingService {
     await _tokenRefreshSubscription?.cancel();
     await _foregroundMessageSubscription?.cancel();
     await _messageOpenedSubscription?.cancel();
+    _tokenRefreshSubscription = null;
+    _foregroundMessageSubscription = null;
+    _messageOpenedSubscription = null;
     _initialized = false;
   }
 
