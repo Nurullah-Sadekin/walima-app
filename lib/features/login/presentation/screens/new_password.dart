@@ -1,12 +1,14 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/gradient_background.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:walima_llc/core/global/components/primary_textField.dart';
 import 'package:walima_llc/core/global/components/upper_layer.dart';
+import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/dialog_utils.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/features/login/presentation/providers/login_provider.dart';
@@ -116,16 +118,15 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
         provider.hideLoading();
 
         if (response.code == 'SUCCESS') {
-          final currentContext = context;
           await DialogUtils.showSuccessDialog(
-            context: currentContext,
+            context: context,
             title: 'Success',
             message: response.message ?? 'Password changed successfully',
             buttonText: 'OK',
             autoClose: false,
             onClose: () {
               if (mounted) {
-                Navigator.of(currentContext).pop();
+                context.go(Paths.onboarding);
               }
             },
           );

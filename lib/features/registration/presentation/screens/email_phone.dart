@@ -38,7 +38,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenProvider = ref.watch(emailPhoneScreenProvider);
+    final screenProvider = ref.watch(registrationScreenStateProvider);
     return TransparentLoading(
       isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
@@ -201,7 +201,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
         if (provider.emailController.text.isEmpty || provider.phoneController.text.isEmpty) {
           return;
         }
-        final screenNotifier = ref.read(emailPhoneScreenProvider);
+        final screenNotifier = ref.read(registrationScreenStateProvider);
         screenNotifier.updateViewState(
           loadingState: RegistrationScreenStates.isProfileFor,
         );

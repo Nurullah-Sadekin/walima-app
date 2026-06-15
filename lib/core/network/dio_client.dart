@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:walima_llc/core/connectivity/connectivity_keys.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:walima_llc/core/constants/app_texts.dart';
@@ -36,18 +35,20 @@ class DioClient {
       ),
     );
 
-    // Add pretty logger interceptor
-    _dio.interceptors.add(
-      PrettyDioLogger(
-        requestHeader: true,
-        requestBody: true,
-        responseBody: true,
-        responseHeader: false,
-        error: true,
-        compact: true,
-        maxWidth: 90,
-      ),
-    );
+    // Add pretty logger interceptor (debug only)
+    if (kDebugMode) {
+      _dio.interceptors.add(
+        PrettyDioLogger(
+          requestHeader: true,
+          requestBody: true,
+          responseBody: true,
+          responseHeader: false,
+          error: true,
+          compact: true,
+          maxWidth: 90,
+        ),
+      );
+    }
 
     // Add custom interceptor for token handling
     _dio.interceptors.add(

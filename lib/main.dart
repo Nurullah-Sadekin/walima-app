@@ -83,15 +83,26 @@ Future<void> main() async {
   );
 }
 
-class MyApp extends ConsumerWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final router = ref.watch(goRouterProvider);
+  ConsumerState<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends ConsumerState<MyApp> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     SizeConfig().init(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final router = ref.watch(goRouterProvider);
     DioClient().setLogoutHandler(() {
       ref.read(chatProvider).clearChatState();
+      ref.read(globalProvider).clearSessionState();
       SocketService.instance.disconnect(reason: 'session expired logout');
       router.go(Paths.onboarding);
     });

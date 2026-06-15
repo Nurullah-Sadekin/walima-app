@@ -41,7 +41,7 @@ class _FamilyDetailsScreenState extends ConsumerState<FamilyDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     provider = ref.watch(registrationProvider);
-    final screenProvider = ref.watch(familyDetailsScreenProvider);
+    final screenProvider = ref.watch(registrationScreenStateProvider);
     return TransparentLoading(
       isLoading:
           screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
@@ -160,7 +160,7 @@ class _FamilyDetailsScreenState extends ConsumerState<FamilyDetailsScreen> {
       title: 'Continue',
       onTap: () async{
         if (!hasAnyValue) return;
-        final screenProvider = ref.read(familyDetailsScreenProvider);
+        final screenProvider = ref.read(registrationScreenStateProvider);
         screenProvider.updateViewState(loadingState: RegistrationScreenStates.isProfileFor);
          final updated = await provider.updateFamilyDetails(context);
         screenProvider.updateViewState(screenStates: RegistrationScreenStates.loadingComplete);

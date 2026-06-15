@@ -10,8 +10,6 @@ import 'package:walima_llc/features/login/data/models/resend_otp_body.dart';
 import 'package:walima_llc/features/login/data/models/set_password_body.dart';
 
 class LoginRepository {
-  late final DioClient dioClient;
-
   static Future<LoginResponse> login(LoginBody body) async {
     try {
       final response =

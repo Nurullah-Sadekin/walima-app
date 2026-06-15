@@ -47,7 +47,7 @@ class _FamilyFinancialStatusScreenState
   @override
   Widget build(BuildContext context) {
     provider = ref.watch(registrationProvider);
-    final screenProvider = ref.watch(familyFinancialStatusScreenProvider);
+    final screenProvider = ref.watch(registrationScreenStateProvider);
     return TransparentLoading(
       isLoading:
           screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
@@ -322,7 +322,7 @@ class _FamilyFinancialStatusScreenState
       title: 'Continue & Submit',
       onTap: () async {
         if (hasAnyValue) return;
-        final screenProvider = ref.read(familyFinancialStatusScreenProvider);
+        final screenProvider = ref.read(registrationScreenStateProvider);
         screenProvider.updateViewState(
             loadingState: RegistrationScreenStates.isProfileFor);
         final updated = await provider.updateFamilyEarning(context);

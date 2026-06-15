@@ -52,6 +52,7 @@ import 'package:walima_llc/features/support/presentation/screens/contact_support
 import 'package:walima_llc/features/support/presentation/screens/help_desk_screen.dart';
 import 'package:walima_llc/features/support/presentation/screens/ai_support_chat_screen.dart';
 import 'package:walima_llc/core/connectivity/connectivity_keys.dart';
+import 'package:walima_llc/core/utils/prefs_helper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -70,12 +71,49 @@ import 'package:walima_llc/features/chat/presentation/screens/report_screen.dart
 import 'package:walima_llc/features/chat/presentation/screens/status_screen.dart';
 part 'app_router.g.dart';
 
+const _publicPaths = {
+  Paths.splash,
+  Paths.onboarding,
+  Paths.login,
+  Paths.loginWithEmail,
+  Paths.loginWithPhone,
+  Paths.sendOtp,
+  Paths.otpVerify,
+  Paths.newPassword,
+  Paths.resetPasswordStatus,
+  // Registration flow
+  Paths.isProfileFor,
+  Paths.aboutYou,
+  Paths.yourReligion,
+  Paths.marriageIntention,
+  Paths.emailPhone,
+  Paths.location,
+  Paths.maritalStatus,
+  Paths.qualification,
+  Paths.profession,
+  Paths.aboutYourself,
+  Paths.verifyNumber,
+  Paths.otpVerifyForSignUp,
+  Paths.photoUpload,
+  Paths.hobbiesInterests,
+  Paths.familyDetails,
+  Paths.financialStatus,
+  Paths.profileCreatedStatus,
+  Paths.cropImage,
+};
+
 @riverpod
 GoRouter goRouter(Ref ref) {
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: Paths.splash,
     debugLogDiagnostics: true,
+    redirect: (context, state) async {
+      if (_publicPaths.contains(state.matchedLocation)) return null;
+      final token = await PrefsHelper.getAccessToken();
+      if (token.trim().isEmpty) return Paths.onboarding;
+      return null;
+    },
     routes: [
       GoRoute(
         path: Paths.splash,

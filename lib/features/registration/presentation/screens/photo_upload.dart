@@ -61,7 +61,7 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
   @override
   Widget build(BuildContext context) {
     provider = ref.watch(registrationProvider);
-    final screenProvider = ref.watch(photoUploadScreenProvider);
+    final screenProvider = ref.watch(registrationScreenStateProvider);
     return TransparentLoading(
       isLoading:
           screenProvider.loaderState == RegistrationScreenStates.isProfileFor ||

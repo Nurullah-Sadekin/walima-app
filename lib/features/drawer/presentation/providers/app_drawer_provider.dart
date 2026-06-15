@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:walima_llc/core/providers/base_change_notifier.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:walima_llc/core/constants/storage_keys.dart';
 import 'package:walima_llc/core/network/dio_client.dart';
 import 'package:walima_llc/core/utils/app_error_reporting_service.dart';
 import 'package:walima_llc/core/utils/firebase_messaging_service.dart';
+import 'package:walima_llc/core/utils/prefs_helper.dart';
 import 'package:walima_llc/features/chat/data/socket/socket_service.dart';
 import 'package:walima_llc/features/drawer/data/repository/logout_repository.dart';
 
@@ -23,9 +22,9 @@ class DrawerProvider extends BaseChangeNotifier {
     await FirebaseMessagingService.instance.dispose();
     DioClient().removeAuthToken();
     await AppErrorReportingService.instance.clearUserContext();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(StorageKeys.refreshToken);
-    await prefs.remove(StorageKeys.accessToken);
+    await PrefsHelper.clearTokens();       // clears access + refresh + FCM token
+    await PrefsHelper.clearMeSnapshot();   // prevents stale user on next cold start
+    await PrefsHelper.clearQuotaSnapshot();
     updateViewState(loadingState: DrawerScreenStates.defaultState);
     onLogout();
   }

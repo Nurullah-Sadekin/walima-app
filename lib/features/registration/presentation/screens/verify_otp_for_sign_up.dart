@@ -55,7 +55,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
   @override
   Widget build(BuildContext context) {
     provider = ref.watch(registrationProvider);
-    final screenProvider = ref.watch(verifyOtpForSignUp);
+    final screenProvider = ref.watch(registrationScreenStateProvider);
     return TransparentLoading(
       isLoading:
           screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
@@ -107,7 +107,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                     const SizedBox(height: 10),
                     ResendCodeTimer(
                       onResend: () async {
-                        final screenProvider = ref.read(verifyOtpForSignUp);
+                        final screenProvider = ref.read(registrationScreenStateProvider);
                         screenProvider.updateViewState(
                           loadingState: RegistrationScreenStates.isProfileFor,
                         );
@@ -388,7 +388,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
       title: 'Done',
       onTap: isComplete
           ? () async {
-              final screenProvider = ref.read(verifyOtpForSignUp);
+              final screenProvider = ref.read(registrationScreenStateProvider);
               screenProvider.updateViewState(
                 loadingState: RegistrationScreenStates.isProfileFor,
               );
