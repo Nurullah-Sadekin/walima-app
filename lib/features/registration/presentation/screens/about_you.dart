@@ -50,7 +50,7 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
   @override
   Widget build(BuildContext context) {
     provider = ref.watch(registrationProvider);
-    final screenProvider = ref.watch(aboutYouScreenProvider);
+    final screenProvider = ref.watch(registrationScreenStateProvider);
     return TransparentLoading(
       isLoading:
           screenProvider.loaderState == RegistrationScreenStates.isProfileFor,

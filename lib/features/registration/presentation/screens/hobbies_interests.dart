@@ -46,7 +46,7 @@ class _HobbiesInterestsScreenState
   @override
   Widget build(BuildContext context) {
     provider = ref.watch(registrationProvider);
-    final screenProvider = ref.watch(hobbiesInterestsScreenProvider);
+    final screenProvider = ref.watch(registrationScreenStateProvider);
     return TransparentLoading(
       isLoading:
           screenProvider.loaderState == RegistrationScreenStates.isProfileFor ||
@@ -197,7 +197,7 @@ class _HobbiesInterestsScreenState
           '${'Save & Continue'.localized(context)} ($selected/${RegistrationProvider.hobbiesSelectionMax})',
       onTap: () async {
         // show the save selected hobbies dialog
-        final screenProvider = ref.watch(hobbiesInterestsScreenProvider);
+        final screenProvider = ref.watch(registrationScreenStateProvider);
         screenProvider.updateViewState(
             loadingState: RegistrationScreenStates.isProfileFor);
         log('Selected Hobbies: ${provider.selectedHobbies}');

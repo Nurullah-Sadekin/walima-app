@@ -12,6 +12,7 @@ import 'package:walima_llc/features/inbox/presentation/screens/tabs/inbox_sent_t
 import 'package:walima_llc/features/matches/presentation/widgets/tab_bar_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class InboxScreen extends ConsumerStatefulWidget {
   const InboxScreen({super.key});
@@ -75,7 +76,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
 
   Widget _appbarSection() {
     return AnchoredAppBar(
-      title: 'Inbox',
+      title: 'Inbox'.localized(context),
       notificationCount: 26,
       context: context,
       onNotificationPressed: () => context.pushNamed(Routes.notifications),
@@ -113,12 +114,12 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
       spacing: 8,
       children: [
         TabBarWidget(
-          text: _primaryTabs[0],
+          text: _primaryTabs[0].localized(context),
           isSelected: _primaryTabController.index == 0,
           onTap: () => _primaryTabController.animateTo(0),
         ),
         TabBarWidget(
-          text: _primaryTabs[1],
+          text: _primaryTabs[1].localized(context),
           isSelected: _primaryTabController.index == 1,
           onTap: () => _primaryTabController.animateTo(1),
         ),
@@ -128,7 +129,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
         //   onTap: () => _primaryTabController.animateTo(2),
         // ),
         TabBarWidget(
-          text: _primaryTabs[2],
+          text: _primaryTabs[2].localized(context),
           isSelected: _primaryTabController.index == 2,
           selectedBackgroundColor: AppColors.primary,
           selectedTextColor: AppColors.white,
@@ -136,7 +137,7 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
           onTap: () => _primaryTabController.animateTo(2),
         ),
         TabBarWidget(
-          text: _primaryTabs[3],
+          text: _primaryTabs[3].localized(context),
           isSelected: _primaryTabController.index == 3,
           selectedBackgroundColor: AppColors.primary,
           selectedTextColor: AppColors.white,

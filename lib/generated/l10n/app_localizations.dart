@@ -465,6 +465,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'About'**
   String get about;
+
+  /// No description provided for @completeYourProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete Your Profile'**
+  String get completeYourProfile;
+
+  /// No description provided for @profileCompletionPercentage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your profile is {percentage}% complete'**
+  String profileCompletionPercentage(Object percentage);
+
+  /// No description provided for @seeMore.
+  ///
+  /// In en, this message translates to:
+  /// **'See More'**
+  String get seeMore;
+
+  /// No description provided for @seeLess.
+  ///
+  /// In en, this message translates to:
+  /// **'See Less'**
+  String get seeLess;
+
+  /// No description provided for @completeSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete {sectionLabel}'**
+  String completeSectionTitle(Object sectionLabel);
+
+  /// No description provided for @profileSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Section'**
+  String get profileSection;
+
+  /// No description provided for @fieldsLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No fields left} =1{1 field left} other{{count} fields left}}'**
+  String fieldsLeft(num count);
 }
 
 class _AppLocalizationsDelegate

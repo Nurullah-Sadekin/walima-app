@@ -1,19 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:walima_llc/core/providers/base_change_notifier.dart';
 import 'package:walima_llc/core/utils/dialog_utils.dart';
-import 'package:walima_llc/features/profile/data/model/request/update_profile_photo_request.dart';
 import 'package:walima_llc/features/profile/data/model/response/dashboard_response.dart';
 import 'package:walima_llc/features/profile/data/model/response/get_complete_profile_response.dart';
+import 'package:walima_llc/features/profile/data/repository/profile_photo_upload_service.dart';
 import 'package:walima_llc/features/profile/data/repository/profile_repository.dart';
-import 'package:walima_llc/features/registration/data/models/request/upload_media_request_body.dart';
-import 'package:walima_llc/features/registration/data/repository/media_repository.dart';
 
 class ProfileProvider extends BaseChangeNotifier {
   ProfileScreenStates screenStates = ProfileScreenStates.defaultState;
-  final MediaRepository _mediaRepository = MediaRepository();
+  final ProfilePhotoUploadService _profilePhotoUploadService =
+      ProfilePhotoUploadService();
   ProfileScreenStates loaderState = ProfileScreenStates.defaultState;
   CompleteProfile? profile;
   DashboardData? dashboard;
+  String profileImageUploadErrorMessage = '';
+  String profileImageUploadStatusMessage = '';
+  bool canRetryProfileImageUpload = false;
+  ProfilePhotoUploadFlowState profileImageUploadFlowState =
+      ProfilePhotoUploadFlowState.idle;
 
   Future<void> getProfile(BuildContext context) async {
     final data = await ProfileRepository.getCompleteProfile();
@@ -21,8 +25,11 @@ class ProfileProvider extends BaseChangeNotifier {
       profile = data.response;
       updateViewState();
     } else {
+      if (!context.mounted) return;
       await DialogUtils.showErrorDialog(
-          context: context, message: data.message ?? 'Failed to load profile');
+        context: context,
+        message: data.message ?? 'Failed to load profile',
+      );
       profile = null;
     }
   }
@@ -49,53 +56,52 @@ class ProfileProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
+  String? validateProfileImageFile(String filePath) {
+    return _profilePhotoUploadService.validateProfileImageFile(filePath);
+  }
+
+  void resetProfileImageUploadFlow({bool notify = true}) {
+    profileImageUploadErrorMessage = '';
+    profileImageUploadStatusMessage = '';
+    canRetryProfileImageUpload = false;
+    profileImageUploadFlowState = ProfilePhotoUploadFlowState.idle;
+    if (notify) notifyListeners();
+  }
+
+  void _handleProfilePhotoUploadProgress(
+    ProfilePhotoUploadProgress progress,
+  ) {
+    profileImageUploadFlowState = progress.state;
+    profileImageUploadStatusMessage = progress.statusMessage;
+    profileImageUploadErrorMessage = progress.errorMessage;
+    canRetryProfileImageUpload = progress.canRetry;
+    notifyListeners();
+  }
+
   Future<void> updateProfileImage({
     required BuildContext context,
     required String filePath,
   }) async {
     updateViewState(loadingState: ProfileScreenStates.loading);
     try {
-      final uploadResponse = await _mediaRepository.uploadMedia(
-        UploadMediaRequestBody(
-          filePath: filePath,
-          alt: 'Profile photo',
-          caption: '',
-          description: '',
-        ),
-      );
-
-      if (uploadResponse.code != 'SUCCESS' ||
-          uploadResponse.response?.data?.id == null) {
-        await DialogUtils.showErrorDialog(
-          context: context,
-          message: uploadResponse.message ?? 'Failed to upload image.',
-        );
-        return;
-      }
-
-      final mediaId = uploadResponse.response!.data!.id!;
-      final photoSizes = <String, String?>{};
-      final originalUrl = uploadResponse.response!.data!.url;
-      if (originalUrl != null && originalUrl.isNotEmpty) {
-        photoSizes['original'] = originalUrl;
-      }
-
-      final photoRequest = UpdateProfilePhotoRequest(
-        mediaId: mediaId,
-        category: 'profile',
-        isPrimary: true,
-        photoOrder: 1,
+      resetProfileImageUploadFlow(notify: false);
+      final result =
+          await _profilePhotoUploadService.uploadAndAttachProfileImage(
+        filePath: filePath,
+        caption: '',
+        description: '',
         visibility: 'connections_only',
-        shouldDelete: false,
-        photoSizes: photoSizes.isEmpty ? null : photoSizes,
+        onProgress: _handleProfilePhotoUploadProgress,
       );
 
-      final updateResponse =
-          await ProfileRepository.updateProfilePhotos([photoRequest]);
-      if (updateResponse.code != 'SUCCESS') {
+      if (!context.mounted) return;
+
+      if (!result.isSuccess) {
         await DialogUtils.showErrorDialog(
           context: context,
-          message: updateResponse.message ?? 'Failed to update profile image.',
+          message: result.errorMessage.isNotEmpty
+              ? result.errorMessage
+              : 'Failed to upload image.',
         );
         return;
       }
@@ -103,6 +109,7 @@ class ProfileProvider extends BaseChangeNotifier {
       await getProfile(context);
       await getDashboard();
     } catch (e) {
+      if (!context.mounted) return;
       await DialogUtils.showErrorDialog(
         context: context,
         message: e.toString(),

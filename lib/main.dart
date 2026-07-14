@@ -83,15 +83,26 @@ Future<void> main() async {
   );
 }
 
-class MyApp extends ConsumerWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final router = ref.watch(goRouterProvider);
+  ConsumerState<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends ConsumerState<MyApp> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     SizeConfig().init(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final router = ref.watch(goRouterProvider);
     DioClient().setLogoutHandler(() {
       ref.read(chatProvider).clearChatState();
+      ref.read(globalProvider).clearSessionState();
       SocketService.instance.disconnect(reason: 'session expired logout');
       router.go(Paths.onboarding);
     });
@@ -136,12 +147,10 @@ class AppRealtimeBootstrap extends ConsumerStatefulWidget {
   final Widget child;
 
   @override
-  ConsumerState<AppRealtimeBootstrap> createState() =>
-      _AppRealtimeBootstrapState();
+  ConsumerState<AppRealtimeBootstrap> createState() => _AppRealtimeBootstrapState();
 }
 
-class _AppRealtimeBootstrapState extends ConsumerState<AppRealtimeBootstrap>
-    with WidgetsBindingObserver {
+class _AppRealtimeBootstrapState extends ConsumerState<AppRealtimeBootstrap> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
@@ -149,18 +158,18 @@ class _AppRealtimeBootstrapState extends ConsumerState<AppRealtimeBootstrap>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ForegroundAlertService.instance.initialize();
       ForegroundAlertService.instance.setAppForeground(true);
-      FirebaseMessagingService.instance.initialize(
-        onNotificationSyncNeeded: () async {
-          await ref.read(notiProvider).getNotificationCount();
-        },
-      );
       ref.read(globalProvider).initialize().then((_) async {
         final accessToken = await PrefsHelper.getAccessToken();
         if (accessToken.trim().isNotEmpty) {
+          FirebaseMessagingService.instance.initialize(
+            onNotificationSyncNeeded: () async {
+              await ref.read(notiProvider).getNotificationCount();
+            },
+          );
           ref.read(globalProvider).refreshCurrentUserAndQuota(silent: true);
+          ref.read(chatProvider).initializeRealtime(token: accessToken);
         }
       });
-      ref.read(chatProvider).initializeRealtime();
     });
   }
 
@@ -172,10 +181,12 @@ class _AppRealtimeBootstrapState extends ConsumerState<AppRealtimeBootstrap>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    ForegroundAlertService.instance
-        .setAppForeground(state == AppLifecycleState.resumed);
+    ForegroundAlertService.instance.setAppForeground(state == AppLifecycleState.resumed);
     if (state == AppLifecycleState.resumed) {
-      ref.read(chatProvider).initializeRealtime();
+      PrefsHelper.getAccessToken().then((accessToken) {
+        if (accessToken.trim().isEmpty) return;
+        ref.read(chatProvider).initializeRealtime(token: accessToken);
+      });
     }
   }
 

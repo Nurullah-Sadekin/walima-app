@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
@@ -63,8 +67,10 @@ class _ModeChip extends StatelessWidget {
 }
 
 class _LoginWithPhoneScreenState extends ConsumerState<LoginWithPhoneScreen> {
+  static const int _phoneNumberMaxLength = 11;
   late LoginProvider provider;
   _PhoneLoginMode _mode = _PhoneLoginMode.otp;
+  Country _selectedCountry = Country.parse('BD');
 
   @override
   void initState() {
@@ -263,16 +269,45 @@ class _LoginWithPhoneScreenState extends ConsumerState<LoginWithPhoneScreen> {
           headLine: 'Mobile No.',
           hintText: '01XXXXXXXXX',
           borderRadius: 50,
-          prefixIcon: ShowImage(
-            imagePath: AppImages.mobile,
-            color: provider.mobileNoOrEmailController.text.isEmpty
-                ? AppColors.hintTextColor
-                : AppColors.primary,
-            width: TextSize.font16(context),
-            height: TextSize.font16(context),
+          isCountryDropdown: true,
+          prefixIcon: InkWell(
+            onTap: _openCountryPicker,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _selectedCountry.flagEmoji,
+                    style: TextStyle(fontSize: TextSize.font18(context)),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '+${_selectedCountry.phoneCode}',
+                    style: TextStyle(
+                      color: AppColors.textPrimaryLight,
+                      fontSize: TextSize.font14(context),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(width: 1),
+                  const Icon(
+                    Icons.arrow_drop_down,
+                    color: AppColors.textSecondaryLight,
+                    size: 20,
+                  ),
+                ],
+              ),
+            ),
           ),
           errorText: provider.mobileOrEmailError,
           validator: Validators.validateMobileOrEmail,
+          keyboardType: TextInputType.phone,
+          length: _phoneNumberMaxLength,
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            LengthLimitingTextInputFormatter(_phoneNumberMaxLength),
+          ],
           onTap: () {},
         ),
         if (_mode == _PhoneLoginMode.password) ...[
@@ -363,6 +398,50 @@ class _LoginWithPhoneScreenState extends ConsumerState<LoginWithPhoneScreen> {
     );
   }
 
+  void _openCountryPicker() async {
+    showCountryPicker(
+      context: context,
+      showPhoneCode: true,
+      useSafeArea: true,
+      onSelect: (Country country) {
+        setState(() {
+          _selectedCountry = country;
+        });
+      },
+      countryListTheme: CountryListThemeData(
+        backgroundColor: Colors.white,
+        textStyle: const TextStyle(
+          color: Colors.black,
+          fontSize: 14,
+        ),
+        searchTextStyle: const TextStyle(
+          color: Colors.black,
+          fontSize: 14,
+        ),
+        inputDecoration: InputDecoration(
+          hintText: 'Search country',
+          hintStyle: TextStyle(
+            fontSize: TextSize.font16(context),
+            color: AppColors.textSecondaryLight,
+          ),
+          prefixIcon: Icon(
+            Icons.search,
+            color: AppColors.textSecondaryLight,
+            size: TextSize.font22(context),
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: AppColors.inputBorderColor),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: AppColors.primary),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget loginButton() {
     final buttonTitle =
         _mode == _PhoneLoginMode.password ? 'Log In' : 'Continue';
@@ -428,9 +507,7 @@ class _LoginWithPhoneScreenState extends ConsumerState<LoginWithPhoneScreen> {
           spacing: 16,
           children: [
             InkWell(
-              onTap: () {
-                // context.push(Paths.login);
-              },
+              onTap: () => provider.signInWithGoogle(context),
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -448,6 +525,7 @@ class _LoginWithPhoneScreenState extends ConsumerState<LoginWithPhoneScreen> {
                 ),
               ),
             ),
+            if(Platform.isIOS)
             InkWell(
               onTap: () {},
               child: Container(

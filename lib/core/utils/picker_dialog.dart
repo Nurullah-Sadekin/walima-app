@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -12,18 +10,37 @@ class PickerDialog {
       return null; // user cancelled the selection
     }
 
-    final ImageSource source = selectedSource == 'camera' ? ImageSource.camera : ImageSource.gallery;
+    final ImageSource source =
+        selectedSource == 'camera' ? ImageSource.camera : ImageSource.gallery;
     final pickedFile = await ImagePicker().pickImage(source: source);
     if (pickedFile == null) return null;
 
     // Crop the selected image. If cropping is cancelled or fails, return the original file path.
     try {
-      final croppedFile = await ImageCropper().cropImage(sourcePath: pickedFile.path);
+      final croppedFile = await ImageCropper().cropImage(
+        sourcePath: pickedFile.path,
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Edit Photo',
+            toolbarColor: AppColors.white,
+            statusBarLight: true,
+            navBarLight: true,
+            toolbarWidgetColor: AppColors.textPrimaryLight,
+            activeControlsWidgetColor: AppColors.primary,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false,
+          ),
+          IOSUiSettings(
+            title: 'Edit Photo',
+          ),
+        ],
+      );
       return croppedFile?.path ?? pickedFile.path;
     } catch (_) {
       return pickedFile.path;
     }
   }
+
   Future<String?> showImageTypeSelector(BuildContext context) async {
     return showModalBottomSheet(
       context: context,
@@ -91,7 +108,8 @@ class PickerDialog {
                             child: Container(
                               height: 100,
                               decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(10)),
                                 color: AppColors.primaryVariant,
                                 border: Border.all(
                                   color: AppColors.primary,
@@ -128,7 +146,8 @@ class PickerDialog {
                             child: Container(
                               height: 100,
                               decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(10)),
                                 color: AppColors.primaryVariant,
                                 border: Border.all(
                                   color: AppColors.primary,
@@ -163,111 +182,12 @@ class PickerDialog {
                     const SizedBox(height: 20),
                   ],
                 ),
-              )
+              ),
             ],
           ),
         );
       },
     );
-    // await BottomSheetUtils.open(
-    //   fullHeight: true,
-    //   context: context,
-    //   child: Padding(
-    //     padding: const EdgeInsets.symmetric(horizontal: 20.0),
-    //     child: Column(
-    //       crossAxisAlignment: CrossAxisAlignment.start,
-    //       mainAxisSize: MainAxisSize.min,
-    //       children: [
-    //         Row(
-    //           children: [
-    //             Text(
-    //               'Select Image Source',
-    //               style: Theme.of(context).textTheme.titleMedium,
-    //             ),
-    //             const Spacer(),
-    //             IconButton(
-    //               onPressed: () => Navigator.pop(context),
-    //               icon: const Icon(Icons.close),
-    //             ),
-    //           ],
-    //         ),
-    //         const SizedBox(height: 15),
-    //         Row(
-    //           children: [
-    //             Expanded(
-    //               child: Container(
-    //                 height: 100,
-    //                 decoration: BoxDecoration(
-    //                   borderRadius: const BorderRadius.all(Radius.circular(10)),
-    //                   color: AppColors.primaryVariant,
-    //                   border: Border.all(
-    //                     color: AppColors.primary,
-    //                   ),
-    //                 ),
-    //                 child: const Center(
-    //                   child: Column(
-    //                     mainAxisAlignment: MainAxisAlignment.center,
-    //                     children: [
-    //                       Text(
-    //                         'Camera',
-    //                         style: TextStyle(
-    //                           color: AppColors.primary,
-    //                           fontSize: 16,
-    //                           fontWeight: FontWeight.w600,
-    //                         ),
-    //                       ),
-    //                       SizedBox(height: 8),
-    //                       Icon(
-    //                         Icons.camera_alt_rounded,
-    //                         color: AppColors.primary,
-    //                         size: 30,
-    //                       ),
-    //                     ],
-    //                   ),
-    //                 ),
-    //               ),
-    //             ),
-    //             const SizedBox(width: 20),
-    //             Expanded(
-    //               child: Container(
-    //                 height: 100,
-    //                 decoration: BoxDecoration(
-    //                   borderRadius: const BorderRadius.all(Radius.circular(10)),
-    //                   color: AppColors.primaryVariant,
-    //                   border: Border.all(
-    //                     color: AppColors.primary,
-    //                   ),
-    //                 ),
-    //                 child: const Center(
-    //                   child: Column(
-    //                     mainAxisAlignment: MainAxisAlignment.center,
-    //                     children: [
-    //                       Text(
-    //                         'Gallery',
-    //                         style: TextStyle(
-    //                           color: AppColors.primary,
-    //                           fontSize: 16,
-    //                           fontWeight: FontWeight.w600,
-    //                         ),
-    //                       ),
-    //                       SizedBox(height: 8),
-    //                       Icon(
-    //                         Icons.photo_library_rounded,
-    //                         color: AppColors.primary,
-    //                         size: 30,
-    //                       ),
-    //                     ],
-    //                   ),
-    //                 ),
-    //               ),
-    //             ),
-    //           ],
-    //         ),
-    //       ],
-    //     ),
-    //   ),
-    // );
-    return null;
   }
 
   // audio picker dialog

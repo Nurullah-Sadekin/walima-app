@@ -328,11 +328,43 @@ extension _ProfileSectionEditLookupDynamicStrengthMetaPart
   bool get _isStrengthDrivenMode => widget.strengthFields.isNotEmpty;
 
   String get _screenTitle {
-    final customTitle = widget.strengthSectionLabel?.trim();
-    if (customTitle != null && customTitle.isNotEmpty) {
-      return 'Complete $customTitle';
+    final strengthTitle = _resolveStrengthSectionTitle()?.trim();
+    if (strengthTitle != null && strengthTitle.isNotEmpty) {
+      return '${'Complete'.localized(context)} ${strengthTitle.localized(context)}';
     }
-    return widget.section.title;
+    return widget.section.title.localized(context);
+  }
+
+  String? _resolveStrengthSectionTitle() {
+    final normalizedKey = widget.strengthSectionKey?.trim().toLowerCase();
+    switch (normalizedKey) {
+      case 'preferences':
+        return 'Preferences';
+      case 'basic_profile':
+        return 'Basic Profile';
+      case 'appearance':
+        return 'Appearance';
+      case 'location':
+        return 'Location';
+      case 'education':
+        return 'Education';
+      case 'profession':
+        return 'Profession';
+      case 'religion':
+        return 'Religion';
+      case 'family':
+        return 'Family';
+      case 'lifestyle':
+        return 'Lifestyle';
+      case 'interests':
+        return 'Interests & Hobbies';
+      case 'contact':
+        return 'Contact';
+    }
+
+    final fallbackLabel = widget.strengthSectionLabel?.trim();
+    if (fallbackLabel == null || fallbackLabel.isEmpty) return null;
+    return fallbackLabel;
   }
 
   List<ProfileStrengthField> get _effectiveStrengthFields {

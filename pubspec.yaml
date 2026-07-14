@@ -33,6 +33,8 @@ dependencies:
   image_picker: ^1.2.1
   image_cropper: ^8.1.0
   webview_flutter: ^4.13.1
+  flutter_inappwebview: ^6.1.5
+  permission_handler: ^11.3.1
   carousel_slider: ^5.1.2
   country_picker: ^2.0.27
   connectivity_plus: ^4.0.0
@@ -52,6 +54,7 @@ dependencies:
   google_sign_in: ^6.2.1
   sign_in_with_apple: ^6.1.4
   crypto: ^3.0.3
+  dotted_border: ^3.1.0
 
 dev_dependencies:
   flutter_test:
@@ -74,7 +77,18 @@ flutter:
      - assets/svgs/
      - assets/svgIcons/
      - assets/nav_icons/
+     - assets/biodata/
      - assets/biodata/thumbnails/
+     - assets/biodata/mainBioData/
+     - assets/biodata/designOne/
+     - assets/biodata/designTwo/
+     - assets/biodata/designThree/
+     - assets/biodata/designFour/
+     - assets/biodata/designFive/
+     - assets/biodata/designSix/
+     - assets/biodata/designSeven/
+     - assets/biodata/designEight/
+     - assets/biodata/designEleven/
      - assets/sounds/chat_sound.mp3
      - lib/features/registration/domain/json/religion_name_options.json
      - lib/features/registration/domain/json/residency_status_options.json

@@ -17,7 +17,10 @@ import 'package:walima_llc/features/registration/presentation/providers/registra
 import 'package:walima_llc/features/registration/presentation/providers/registration_screen_state_provider.dart';
 import 'package:walima_llc/features/plans/presentation/providers/plans_provider.dart';
 import 'package:walima_llc/features/account_setting/presentation/providers/account_setting_provider.dart';
+import 'package:walima_llc/features/identity_verification/presentation/providers/identity_verification_provider.dart';
 import 'package:walima_llc/features/contact_filter/presentation/providers/contact_filter_provider.dart';
+import 'package:walima_llc/features/support/presentation/provider/support_provider.dart';
+import 'package:walima_llc/features/support/presentation/provider/ai_support_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final loginProvider = ChangeNotifierProvider<LoginProvider>((ref) {
@@ -29,82 +32,7 @@ final registrationProvider =
   return RegistrationProvider();
 });
 
-final profileIsForScreenProvider =
-    ChangeNotifierProvider<RegistrationScreenStateProvider>((ref) {
-  return RegistrationScreenStateProvider();
-});
-
-final aboutYouScreenProvider =
-    ChangeNotifierProvider<RegistrationScreenStateProvider>((ref) {
-  return RegistrationScreenStateProvider();
-});
-
-final yourReligionScreenProvider =
-    ChangeNotifierProvider<RegistrationScreenStateProvider>((ref) {
-  return RegistrationScreenStateProvider();
-});
-
-final locationScreenProvider =
-    ChangeNotifierProvider<RegistrationScreenStateProvider>((ref) {
-  return RegistrationScreenStateProvider();
-});
-
-final emailPhoneScreenProvider =
-    ChangeNotifierProvider<RegistrationScreenStateProvider>((ref) {
-  return RegistrationScreenStateProvider();
-});
-
-final maritalStatusScreenProvider =
-    ChangeNotifierProvider<RegistrationScreenStateProvider>((ref) {
-  return RegistrationScreenStateProvider();
-});
-
-final qualificationScreenProvider =
-    ChangeNotifierProvider<RegistrationScreenStateProvider>((ref) {
-  return RegistrationScreenStateProvider();
-});
-
-final professionScreenProvider =
-    ChangeNotifierProvider<RegistrationScreenStateProvider>((ref) {
-  return RegistrationScreenStateProvider();
-});
-
-final aboutYourselfScreenProvider =
-    ChangeNotifierProvider<RegistrationScreenStateProvider>((ref) {
-  return RegistrationScreenStateProvider();
-});
-
-final verifyOtpForSignUp =
-    ChangeNotifierProvider<RegistrationScreenStateProvider>((ref) {
-  return RegistrationScreenStateProvider();
-});
-
-final verifyNumberScreenProvider =
-    ChangeNotifierProvider<RegistrationScreenStateProvider>((ref) {
-  return RegistrationScreenStateProvider();
-});
-
-final photoUploadScreenProvider =
-    ChangeNotifierProvider<RegistrationScreenStateProvider>((ref) {
-  return RegistrationScreenStateProvider();
-});
-
-final hobbiesInterestsScreenProvider =
-    ChangeNotifierProvider<RegistrationScreenStateProvider>((ref) {
-  return RegistrationScreenStateProvider();
-});
-
-final familyDetailsScreenProvider =
-    ChangeNotifierProvider<RegistrationScreenStateProvider>((ref) {
-  return RegistrationScreenStateProvider();
-});
-
-final familyFinancialStatusScreenProvider =
-    ChangeNotifierProvider<RegistrationScreenStateProvider>((ref) {
-  return RegistrationScreenStateProvider();
-});
-
-final profileCreatedStatusScreenProvider =
+final registrationScreenStateProvider =
     ChangeNotifierProvider<RegistrationScreenStateProvider>((ref) {
   return RegistrationScreenStateProvider();
 });
@@ -162,9 +90,22 @@ final accountSettingProvider =
   return AccountSettingProvider();
 });
 
+final identityVerificationProvider =
+    ChangeNotifierProvider<IdentityVerificationProvider>((ref) {
+  return IdentityVerificationProvider();
+});
+
 final contactFilterProvider =
     ChangeNotifierProvider<ContactFilterProvider>((ref) {
   return ContactFilterProvider();
+});
+
+final supportProvider = ChangeNotifierProvider<SupportProvider>((ref) {
+  return SupportProvider();
+});
+
+final aiSupportProvider = ChangeNotifierProvider<AiSupportProvider>((ref) {
+  return AiSupportProvider();
 });
 
 final chatProvider = ChangeNotifierProvider<ChatProvider>((ref) {

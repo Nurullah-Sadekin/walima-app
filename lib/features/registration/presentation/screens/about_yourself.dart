@@ -49,7 +49,7 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
   @override
   Widget build(BuildContext context) {
     provider = ref.watch(registrationProvider);
-    final screenProvider = ref.watch(aboutYourselfScreenProvider);
+    final screenProvider = ref.watch(registrationScreenStateProvider);
     return TransparentLoading(
       isLoading:
           screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
@@ -340,7 +340,7 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
   }
 
   Future<void> _handleContinue() async {
-    final screenProvider = ref.read(aboutYourselfScreenProvider);
+    final screenProvider = ref.read(registrationScreenStateProvider);
     if (provider.aboutYourselfController.text.isNotEmpty) {
       await provider.signUpViaOtp(context).then((success) {
         if (success) {

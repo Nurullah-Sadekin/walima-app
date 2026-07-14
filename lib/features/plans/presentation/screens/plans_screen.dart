@@ -19,9 +19,11 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/features/plans/presentation/providers/plans_provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 
 class UpgradePackageScreen extends ConsumerStatefulWidget {
-  const UpgradePackageScreen({super.key, this.fromScreen, this.showAppBar = true});
+  const UpgradePackageScreen(
+      {super.key, this.fromScreen, this.showAppBar = true});
   final String? fromScreen;
   final bool showAppBar;
 
@@ -45,21 +47,14 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
   Widget build(BuildContext context) {
     provider = ref.watch(plansProvider);
     return TransparentLoading(
-      isLoading:
-          provider.screenStates == UpgradePackageScreenStates.transparent,
+      isLoading: provider.screenStates == UpgradePackageScreenStates.transparent,
       child: Scaffold(
         body: GradientBackground(
           child: Column(
             children: [
-              if (widget.showAppBar)
-              _appbarSection(),
-              if (!widget.showAppBar)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: AnchoredAppBar(context: context, title: 'Welcome, Samira!',
-                    onNotificationPressed: () => context.pushNamed(Routes.notifications),
-                  ),
-                ),
+              if (widget.showAppBar) _appbarSection(),
+              if (!widget.showAppBar) _anchoredAppBarSection(),
+
               provider.loaderState == UpgradePackageScreenStates.loading
                   ? const Expanded(child: Center(child: Loading()))
                   : _body(),
@@ -86,6 +81,17 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
     );
   }
 
+  Widget _anchoredAppBarSection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: AnchoredAppBar(
+        context: context,
+        title: 'Premium Plans'.localized(context),
+        onNotificationPressed: () => context.pushNamed(Routes.notifications),
+      ),
+    );
+  }
+
   Widget _body() {
     return Expanded(
       child: SingleChildScrollView(
@@ -103,14 +109,80 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
   Widget _headerSection() {
     return Column(
       children: [
-        const ShowImage(
-          imagePath: AppImages.upgradePremium,
-          width: 140,
-          height: 110,
+        // const ShowImage(
+        //   imagePath: AppImages.upgradePremium,
+        //   width: 140,
+        //   height: 110,
+        // ),
+        Container(
+          width: 100,
+          height: 100,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: [
+                AppColors.primary,
+                AppColors.primaryDark,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                '21'.localized(context),
+                textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false, applyHeightToLastDescent: false),
+                style: TextStyle(
+                  fontSize: TextSize.font36(context),
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Times New Roman',
+                  color: AppColors.white,
+                ),
+              ),
+              Text(
+                'Days'.localized(context),
+                textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false, applyHeightToLastDescent: false),
+                style: TextStyle(
+                  fontSize: TextSize.font16(context),
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Times New Roman',
+                  color: AppColors.white,
+                ),
+              ),
+            ],
+          ),
         ),
+
+        const SizedBox(height: 10),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [
+                AppColors.primary,
+                AppColors.primaryDark,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Text(
+            'MONEY BACK GUARANTEE'.localized(context),
+            style: TextStyle(
+              fontSize: TextSize.font10(context),
+              fontWeight: FontWeight.w500,
+              color: AppColors.white,
+            ),
+          ),
+        ),
+
         const SizedBox(height: 20),
         Text(
-          'Upgrade to Premium',
+          'Upgrade to Premium'.localized(context),
           style: TextStyle(
             fontSize: TextSize.font24(context),
             fontWeight: FontWeight.w500,
@@ -233,13 +305,12 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
               onTap: () => ref.read(plansProvider).changePage(index),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
-                width: isActive ? 30 : 10,
-                height: 10,
+                width: isActive ? 30 : 16,
+                height: 6,
                 margin: const EdgeInsets.only(right: 4),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10 / 2),
-                  color:
-                      isActive ? AppColors.primary : AppColors.primaryShade300,
+                  borderRadius: BorderRadius.circular(2),
+                  color: isActive ? AppColors.primary : AppColors.primaryShade300,
                 ),
               ),
             );
@@ -310,7 +381,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
       children: [
         const SizedBox(height: 40),
         Text(
-          'You Have Questions?',
+          'You Have Questions?'.localized(context),
           style: TextStyle(
             fontSize: TextSize.font18(context),
             fontWeight: FontWeight.w700,
@@ -323,13 +394,13 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: provider.haveQuestion.entries.map((entry) {
             return CustomExpansionTile(
-              title: entry.key,
+              title: entry.key.localized(context),
               backgroundColor: AppColors.transparent,
               titleBackgroundColor: AppColors.transparent,
               bottomMargin: 16,
               borderColor: AppColors.primary,
               child: Text(
-                entry.value,
+                entry.value.localized(context),
                 style: TextStyle(
                   fontSize: TextSize.font12(context),
                   fontWeight: FontWeight.w400,
@@ -352,7 +423,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Still Need Help?',
+                'Still Need Help?'.localized(context),
                 style: TextStyle(
                   fontSize: TextSize.font18(context),
                   fontWeight: FontWeight.w500,
@@ -361,7 +432,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
               ),
               const SizedBox(height: 6),
               Text(
-                'We are right here to help you. Give us a call anything between  10am-7pm',
+                'We are right here to help you. Give us a call anything between  10am-7pm'.localized(context),
                 style: TextStyle(
                   fontSize: TextSize.font14(context),
                   fontWeight: FontWeight.w400,
@@ -438,6 +509,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
       ],
     );
   }
+
   void openWhatsApp(String number) async {
     final uri = Uri.parse('https://wa.me/88$number'); // BD country code
     if (await canLaunchUrl(uri)) {
@@ -452,5 +524,4 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
-
 }

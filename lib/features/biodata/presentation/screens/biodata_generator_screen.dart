@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
@@ -34,16 +35,6 @@ class _BioDataGeneratorScreenState
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAF9),
-      // appBar: AppBar(
-      //   title: const Text('Download Biodata', style: TextStyle(color: AppColors.t)),
-      //   centerTitle: true,
-      //   backgroundColor: Colors.white,
-      //   surfaceTintColor: Colors.white,
-      //   leading: IconButton(
-      //     onPressed: () => context.pop(),
-      //     icon: const Icon(Icons.arrow_back_ios_new_rounded),
-      //   ),
-      // ),
       body: Stack(
         children: [
           if (provider.isLoading)
@@ -371,14 +362,17 @@ class _BiodataTemplatePreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accent = _templateColor(template);
+    final theme = _previewTheme(template, accent);
     final sections = biodata.sections
         .where((section) => section.items.isNotEmpty)
         .toList(growable: false);
+    final headerOffset = template == BiodataTemplate.designTwo ? 190.0 : 42.0;
+    final bodyOffset = template == BiodataTemplate.designTwo ? 285.0 : 250.0;
+    final previewSections = _firstPageSections(sections);
 
     return Container(
-      constraints: const BoxConstraints(minHeight: 540),
       decoration: BoxDecoration(
-        color: const Color(0xFFECECEC),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: accent.withValues(alpha: 0.28)),
         boxShadow: [
@@ -390,110 +384,373 @@ class _BiodataTemplatePreview extends StatelessWidget {
         ],
       ),
       clipBehavior: Clip.antiAlias,
-      child: Stack(
-        children: [
-          _TemplatePreviewBackground(template: template, accent: accent),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: AspectRatio(
+        aspectRatio: 595 / 842,
+        child: FittedBox(
+          fit: BoxFit.contain,
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+            width: 595,
+            height: 842,
+            child: Stack(
               children: [
-                _PreviewHeader(biodata: biodata, accent: accent),
-                if (biodata.bio.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  _PreviewParagraph(text: biodata.bio),
-                ],
-                const SizedBox(height: 18),
-                ...sections.map(
-                  (section) => Padding(
-                    padding: const EdgeInsets.only(bottom: 18),
-                    child: _PreviewSection(section: section, accent: accent),
+                Positioned.fill(
+                  child: ColoredBox(color: theme.backgroundColor),
+                ),
+                ..._previewDecorations(template),
+                Positioned(
+                  left: 48,
+                  top: headerOffset,
+                  width: template == BiodataTemplate.designTwo ? 440 : 500,
+                  child: _PreviewHeader(
+                    biodata: biodata,
+                    accent: theme.accentColor,
+                    titleColor: theme.titleColor,
+                    subtitleColor: theme.subtitleColor,
+                    contactColor: theme.contactColor,
                   ),
                 ),
-                const SizedBox(height: 18),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    'Walima',
-                    style: TextStyle(
-                      color: Colors.black.withValues(alpha: 0.25),
-                      fontSize: TextSize.font18(context),
-                      fontWeight: FontWeight.w800,
+                if (biodata.bio.isNotEmpty)
+                  Positioned(
+                    left: 48,
+                    top: bodyOffset - 54,
+                    width: 310,
+                    child: _PreviewParagraph(text: biodata.bio),
+                  ),
+                Positioned(
+                  left: 48,
+                  top: bodyOffset,
+                  width: 500,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: previewSections.map((section) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 30),
+                        child: _PreviewSection(
+                          section: section,
+                          accent: theme.accentColor,
+                        ),
+                      );
+                    }).toList(growable: false),
+                  ),
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 24,
+                  child: Center(
+                    child: SvgPicture.asset(
+                      'assets/biodata/walima_logo_bio.svg',
+                      width: 72,
+                      height: 32,
+                      colorFilter: ColorFilter.mode(
+                        Colors.black.withValues(alpha: 0.28),
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 }
 
-class _TemplatePreviewBackground extends StatelessWidget {
-  const _TemplatePreviewBackground({
-    required this.template,
-    required this.accent,
+List<BiodataSection> _firstPageSections(List<BiodataSection> sections) {
+  const preferredTitles = <String>{
+    'Personal Information',
+    'Career & Financial',
+    'Education',
+    'Family Details',
+  };
+  final preferred = sections
+      .where((section) => preferredTitles.contains(section.title))
+      .map((section) {
+    return BiodataSection(
+      title: section.title == 'Education'
+          ? 'Educational Background'
+          : section.title,
+      items: section.items
+          .take(section.title == 'Personal Information' ? 6 : 4)
+          .toList(),
+    );
+  }).toList(growable: false);
+
+  if (preferred.isNotEmpty) return preferred;
+  return sections.take(4).toList(growable: false);
+}
+
+class _PreviewTheme {
+  const _PreviewTheme({
+    required this.backgroundColor,
+    required this.accentColor,
+    required this.titleColor,
+    required this.subtitleColor,
+    required this.contactColor,
   });
 
-  final BiodataTemplate template;
-  final Color accent;
+  final Color backgroundColor;
+  final Color accentColor;
+  final Color titleColor;
+  final Color subtitleColor;
+  final Color contactColor;
+}
+
+_PreviewTheme _previewTheme(BiodataTemplate template, Color fallbackAccent) {
+  switch (template) {
+    case BiodataTemplate.mainBioData:
+      return const _PreviewTheme(
+        backgroundColor: Color(0xFFEFEFEF),
+        accentColor: Color(0xFFFB3748),
+        titleColor: Color(0xFF000000),
+        subtitleColor: Color(0xFF171717),
+        contactColor: Color(0xFF171717),
+      );
+    case BiodataTemplate.designOne:
+      return const _PreviewTheme(
+        backgroundColor: Color(0xFFF6F6F6),
+        accentColor: Color(0xFFD1A590),
+        titleColor: Color(0xFF000000),
+        subtitleColor: Color(0xFF171717),
+        contactColor: Color(0xFFD1A590),
+      );
+    case BiodataTemplate.designTwo:
+      return const _PreviewTheme(
+        backgroundColor: Color(0xFFF8E2E4),
+        accentColor: Color(0xFFFB3748),
+        titleColor: Color(0xFFFFFFFF),
+        subtitleColor: Color(0xFFFFFFFF),
+        contactColor: Color(0xFF171717),
+      );
+    default:
+      return _PreviewTheme(
+        backgroundColor: Colors.white,
+        accentColor: fallbackAccent,
+        titleColor: AppColors.textPrimaryLight,
+        subtitleColor: AppColors.textPrimaryLight,
+        contactColor: fallbackAccent,
+      );
+  }
+}
+
+List<Widget> _previewDecorations(BiodataTemplate template) {
+  switch (template) {
+    case BiodataTemplate.mainBioData:
+      return const [
+        _PreviewSvgDecoration(
+          path: 'assets/biodata/flower_top.svg',
+          top: 0,
+          right: -4,
+          width: 150,
+          height: 108,
+        ),
+        _PreviewSvgDecoration(
+          path: 'assets/biodata/flower_bottom.svg',
+          left: -8,
+          bottom: 0,
+          width: 180,
+          height: 170,
+          opacity: 0.70,
+        ),
+      ];
+    case BiodataTemplate.designOne:
+      return const [
+        _PreviewSvgDecoration(
+          path: 'assets/biodata/designOne/designOneFlowerTop.svg',
+          top: 0,
+          right: -8,
+          width: 184,
+          height: 210,
+        ),
+        _PreviewSvgDecoration(
+          path: 'assets/biodata/designOne/designOneFlowerBottom.svg',
+          left: 0,
+          bottom: 0,
+          width: 240,
+          height: 180,
+        ),
+      ];
+    case BiodataTemplate.designTwo:
+      return const [
+        _PreviewSvgDecoration(
+          path: 'assets/biodata/designTwo/designTop.svg',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 142,
+        ),
+        _PreviewSvgDecoration(
+          path: 'assets/biodata/designTwo/designImage.svg',
+          top: 28,
+          left: 92,
+          width: 34,
+          height: 34,
+        ),
+        _PreviewSvgDecoration(
+          path: 'assets/biodata/designTwo/designBottom.svg',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: 74,
+        ),
+      ];
+    case BiodataTemplate.designThree:
+      return const [
+        _PreviewPngDecoration(
+          path: 'assets/biodata/designThree/designTop.png',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 142,
+        ),
+        _PreviewPngDecoration(
+          path: 'assets/biodata/designThree/designBottom.png',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: 115,
+        ),
+      ];
+    case BiodataTemplate.designFour:
+      return const [
+        _PreviewPngDecoration(
+          path: 'assets/biodata/designFour/designFourFlowerFull.png',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          opacity: 0.72,
+        ),
+      ];
+    case BiodataTemplate.designFive:
+      return const [
+        _PreviewPngDecoration(
+          path: 'assets/biodata/designFive/designFiveFlowerFull.png',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          opacity: 0.72,
+        ),
+      ];
+    case BiodataTemplate.designSeven:
+      return const [
+        _PreviewPngDecoration(
+          path: 'assets/biodata/designSeven/designSevenFullDesign.png',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          opacity: 0.76,
+        ),
+      ];
+    case BiodataTemplate.designEight:
+      return const [
+        _PreviewPngDecoration(
+          path: 'assets/biodata/designEight/designEightFullDesign.png',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          opacity: 0.76,
+        ),
+      ];
+    case BiodataTemplate.designEleven:
+      return const [
+        _PreviewPngDecoration(
+          path: 'assets/biodata/designEleven/designElevenFullDesign.png',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          opacity: 0.76,
+        ),
+      ];
+    default:
+      return [
+        Positioned.fill(
+          child: Image.asset(
+            template.thumbnailPath,
+            fit: BoxFit.cover,
+            alignment: Alignment.topCenter,
+            opacity: const AlwaysStoppedAnimation(0.14),
+          ),
+        ),
+      ];
+  }
+}
+
+class _PreviewPngDecoration extends StatelessWidget {
+  const _PreviewPngDecoration({
+    required this.path,
+    this.left,
+    this.top,
+    this.right,
+    this.bottom,
+    this.height,
+    this.opacity = 1,
+  });
+
+  final String path;
+  final double? left;
+  final double? top;
+  final double? right;
+  final double? bottom;
+  final double? height;
+  final double opacity;
 
   @override
   Widget build(BuildContext context) {
-    return Positioned.fill(
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              template.thumbnailPath,
-              fit: BoxFit.cover,
-              opacity: const AlwaysStoppedAnimation(0.11),
-            ),
-          ),
-          Positioned.fill(
-            child: Container(color: Colors.white.withValues(alpha: 0.88)),
-          ),
-          Positioned(
-            top: -40,
-            right: -34,
-            child: Container(
-              width: 168,
-              height: 118,
-              decoration: BoxDecoration(
-                color: accent,
-                borderRadius: BorderRadius.circular(64),
-              ),
-            ),
-          ),
-          Positioned(
-            right: -18,
-            top: 74,
-            child: Container(
-              width: 86,
-              height: 118,
-              decoration: BoxDecoration(
-                color: accent.withValues(alpha: 0.72),
-                borderRadius: BorderRadius.circular(64),
-              ),
-            ),
-          ),
-          Positioned(
-            left: -24,
-            bottom: -28,
-            child: Container(
-              width: 170,
-              height: 145,
-              decoration: BoxDecoration(
-                color: accent.withValues(alpha: 0.18),
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(92),
-                ),
-              ),
-            ),
-          ),
-        ],
+    return Positioned(
+      left: left,
+      top: top,
+      right: right,
+      bottom: bottom,
+      height: height,
+      child: Opacity(
+        opacity: opacity,
+        child: Image.asset(path, fit: BoxFit.fill),
+      ),
+    );
+  }
+}
+
+class _PreviewSvgDecoration extends StatelessWidget {
+  const _PreviewSvgDecoration({
+    required this.path,
+    this.left,
+    this.top,
+    this.right,
+    this.bottom,
+    this.width,
+    this.height,
+    this.opacity = 1,
+  });
+
+  final String path;
+  final double? left;
+  final double? top;
+  final double? right;
+  final double? bottom;
+  final double? width;
+  final double? height;
+  final double opacity;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: left,
+      top: top,
+      right: right,
+      bottom: bottom,
+      width: width,
+      height: height,
+      child: Opacity(
+        opacity: opacity,
+        child: SvgPicture.asset(path, fit: BoxFit.fill),
       ),
     );
   }
@@ -503,76 +760,94 @@ class _PreviewHeader extends StatelessWidget {
   const _PreviewHeader({
     required this.biodata,
     required this.accent,
+    required this.titleColor,
+    required this.subtitleColor,
+    required this.contactColor,
   });
 
   final BiodataDocument biodata;
   final Color accent;
+  final Color titleColor;
+  final Color subtitleColor;
+  final Color contactColor;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    final profession = _findValue(biodata, 'Profession');
+    final location = _findValue(biodata, 'Present Address');
+    final email = _findValue(biodata, 'Email');
+
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                biodata.fullName.isEmpty ? 'Walima Biodata' : biodata.fullName,
-                style: TextStyle(
-                  color: AppColors.textPrimaryLight,
-                  fontSize: TextSize.font24(context),
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Marriage Biodata',
-                style: TextStyle(
-                  color: AppColors.textPrimaryLight,
-                  fontSize: TextSize.font14(context),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
+        Text(
+          biodata.fullName.isEmpty ? 'Walima Biodata' : biodata.fullName,
+          style: TextStyle(
+            color: titleColor,
+            fontSize: TextSize.font28(context),
+            fontWeight: FontWeight.w700,
           ),
         ),
-        const SizedBox(width: 14),
-        Container(
-          width: 96,
-          height: 118,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.76),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: accent.withValues(alpha: 0.14)),
+        if (profession.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Text(
+            profession,
+            style: TextStyle(
+              color: subtitleColor,
+              fontSize: TextSize.font16(context),
+              fontWeight: FontWeight.w500,
+            ),
           ),
-          clipBehavior: Clip.antiAlias,
-          child: biodata.profileImageUrl.startsWith('http')
-              ? Image.network(
-                  biodata.profileImageUrl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _PreviewImageFallback(
-                    accent: accent,
-                  ),
-                )
-              : _PreviewImageFallback(accent: accent),
-        ),
+        ],
+        const SizedBox(height: 18),
+        if (location.isNotEmpty)
+          _PreviewContactLine(
+            icon: Icons.location_on_rounded,
+            text: location,
+            color: contactColor,
+          ),
+        if (email.isNotEmpty)
+          _PreviewContactLine(
+            icon: Icons.alternate_email_rounded,
+            text: email,
+            color: contactColor,
+          ),
       ],
     );
   }
 }
 
-class _PreviewImageFallback extends StatelessWidget {
-  const _PreviewImageFallback({required this.accent});
+class _PreviewContactLine extends StatelessWidget {
+  const _PreviewContactLine({
+    required this.icon,
+    required this.text,
+    required this.color,
+  });
 
-  final Color accent;
+  final IconData icon;
+  final String text;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
-    return Icon(
-      Icons.person_rounded,
-      color: accent.withValues(alpha: 0.6),
-      size: 42,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        children: [
+          Icon(icon, color: color.withValues(alpha: 0.74), size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: color.withValues(alpha: 0.86),
+                fontSize: TextSize.font14(context),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -610,15 +885,24 @@ class _PreviewSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          section.title,
-          style: TextStyle(
-            color: AppColors.textPrimaryLight,
-            fontSize: TextSize.font16(context),
-            fontWeight: FontWeight.w700,
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: accent.withValues(alpha: 0.20),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+            child: Text(
+              section.title,
+              style: TextStyle(
+                color: AppColors.textPrimaryLight,
+                fontSize: TextSize.font14(context),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
         ...section.items.map(
           (item) => _PreviewInfoRow(item: item, accent: accent),
         ),
@@ -639,39 +923,40 @@ class _PreviewInfoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 9),
+      padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             width: 4,
             height: 4,
-            margin: const EdgeInsets.only(top: 7),
+            margin: const EdgeInsets.only(top: 8),
             decoration: BoxDecoration(
               color: accent,
               shape: BoxShape.circle,
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 9),
           SizedBox(
-            width: 118,
+            width: 126,
             child: Text(
-              item.label,
+              '${item.label}:',
               style: TextStyle(
                 color: AppColors.textPrimaryLight,
                 fontSize: TextSize.font12(context),
+                height: 1.25,
                 fontWeight: FontWeight.w500,
               ),
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
               item.value,
               style: TextStyle(
                 color: AppColors.textPrimaryLight,
                 fontSize: TextSize.font13(context),
-                height: 1.3,
+                height: 1.25,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -680,6 +965,15 @@ class _PreviewInfoRow extends StatelessWidget {
       ),
     );
   }
+}
+
+String _findValue(BiodataDocument biodata, String label) {
+  for (final section in biodata.sections) {
+    for (final item in section.items) {
+      if (item.label == label) return item.value;
+    }
+  }
+  return '';
 }
 
 class _ErrorState extends StatelessWidget {

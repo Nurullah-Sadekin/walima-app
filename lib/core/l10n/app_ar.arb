@@ -60,5 +60,31 @@
   "arabic": "العربية",
   "changeLanguage": "تغيير اللغة",
   "changeTheme": "تغيير المظهر",
-  "about": "حول"
+  "about": "حول",
+  "completeYourProfile": "أكمل ملفك الشخصي",
+  "@completeYourProfile": {},
+  "profileCompletionPercentage": "ملفك الشخصي مكتمل بنسبة {percentage}%",
+  "@profileCompletionPercentage": {
+    "placeholders": {
+      "percentage": {}
+    }
+  },
+  "seeMore": "عرض المزيد",
+  "@seeMore": {},
+  "seeLess": "عرض أقل",
+  "@seeLess": {},
+  "completeSectionTitle": "أكمل {sectionLabel}",
+  "@completeSectionTitle": {
+    "placeholders": {
+      "sectionLabel": {}
+    }
+  },
+  "profileSection": "قسم الملف الشخصي",
+  "@profileSection": {},
+  "fieldsLeft": "{count, plural, =0{لا توجد حقول متبقية} =1{حقل واحد متبقٍ} other{{count} حقول متبقية}}",
+  "@fieldsLeft": {
+    "placeholders": {
+      "count": {}
+    }
+  }
 }

@@ -4,6 +4,8 @@ import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
+import 'package:walima_llc/generated/l10n/app_localizations.dart';
 import 'package:walima_llc/features/home/data/model/response/profile_strength_response.dart';
 import 'package:walima_llc/features/home/presentation/screens/widgets/verification_tile.dart';
 import 'package:walima_llc/features/profile/presentation/screen/profile_edit_section.dart';
@@ -14,19 +16,24 @@ class CompleteProfileSection extends ConsumerStatefulWidget {
   const CompleteProfileSection({super.key});
 
   @override
-  ConsumerState<CompleteProfileSection> createState() => _CompleteProfileSectionState();
+  ConsumerState<CompleteProfileSection> createState() =>
+      _CompleteProfileSectionState();
 }
 
-class _CompleteProfileSectionState extends ConsumerState<CompleteProfileSection> {
+class _CompleteProfileSectionState
+    extends ConsumerState<CompleteProfileSection> {
   bool _isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final provider = ref.watch(homeProvider);
     final profileStrength = provider.profileStrength;
     final completionPercentage = profileStrength?.overallScore ?? 0;
-    final incompleteItems =
-        (profileStrength?.incompleteSections ?? const <ProfileStrengthSection>[]).map(_CompleteProfileTileData.fromStrengthSection).toList();
+    final incompleteItems = (profileStrength?.incompleteSections ??
+            const <ProfileStrengthSection>[])
+        .map(_CompleteProfileTileData.fromStrengthSection)
+        .toList();
 
     if (provider.isLoadingProfileStrength && profileStrength == null) {
       return const Padding(
@@ -37,11 +44,14 @@ class _CompleteProfileSectionState extends ConsumerState<CompleteProfileSection>
       );
     }
 
-    if (completionPercentage >= 100 || incompleteItems.isEmpty || provider.profileStrengthError != null) {
+    if (completionPercentage >= 100 ||
+        incompleteItems.isEmpty ||
+        provider.profileStrengthError != null) {
       return const SizedBox.shrink();
     }
 
-    final itemsToShow = _isExpanded ? incompleteItems : incompleteItems.take(2).toList();
+    final itemsToShow =
+        _isExpanded ? incompleteItems : incompleteItems.take(2).toList();
     final hasMoreItems = incompleteItems.length > 2;
 
     return Padding(
@@ -51,7 +61,7 @@ class _CompleteProfileSectionState extends ConsumerState<CompleteProfileSection>
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Text(
-            'Complete Your Profile',
+            l10n.completeYourProfile,
             style: TextStyle(
               color: AppColors.textPrimaryLight,
               fontSize: TextSize.font18(context),
@@ -59,7 +69,7 @@ class _CompleteProfileSectionState extends ConsumerState<CompleteProfileSection>
             ),
           ),
           Text(
-            'Your profile is $completionPercentage% complete',
+            l10n.profileCompletionPercentage(completionPercentage),
             style: TextStyle(
               color: AppColors.textSecondaryLight,
               fontSize: TextSize.font14(context),
@@ -76,8 +86,13 @@ class _CompleteProfileSectionState extends ConsumerState<CompleteProfileSection>
                 ),
                 child: VerificationTile(
                   iconImagePath: item.iconImagePath,
-                  title: item.title,
-                  statusText: item.statusText,
+                  title: l10n.completeSectionTitle(
+                    item.resolveSectionLabel(context) ?? l10n.profileSection,
+                  ),
+                  statusText: item.remainingFieldCount != null &&
+                          item.remainingFieldCount! > 0
+                      ? l10n.fieldsLeft(item.remainingFieldCount!)
+                      : '${item.completionPercentage ?? 0}%',
                   statusColor: AppColors.primary,
                   statusBackgroundColor: AppColors.primaryVariant,
                   onTap: () => item.open(context),
@@ -94,7 +109,7 @@ class _CompleteProfileSectionState extends ConsumerState<CompleteProfileSection>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'See More',
+                      l10n.seeMore,
                       style: TextStyle(
                         color: AppColors.primary,
                         fontSize: TextSize.font14(context),
@@ -121,7 +136,7 @@ class _CompleteProfileSectionState extends ConsumerState<CompleteProfileSection>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'See Less',
+                      l10n.seeLess,
                       style: TextStyle(
                         color: AppColors.primary,
                         fontSize: TextSize.font14(context),
@@ -146,14 +161,17 @@ class _CompleteProfileSectionState extends ConsumerState<CompleteProfileSection>
 
 class _CompleteProfileTileData {
   const _CompleteProfileTileData({
-    required this.title,
+    required this.sectionKey,
+    required this.sectionLabel,
     required this.iconImagePath,
-    required this.statusText,
+    required this.remainingFieldCount,
+    required this.completionPercentage,
     required this.onTap,
   });
 
   static const String completeProfileSource = 'completeProfile';
-  static const Map<String, List<String>> _requiredFieldsBySection = <String, List<String>>{
+  static const Map<String, List<String>> _requiredFieldsBySection =
+      <String, List<String>>{
     'preferences': <String>[
       'ageRange',
       'heightRange',
@@ -222,27 +240,57 @@ class _CompleteProfileTileData {
     ],
   };
 
-  final String title;
+  final String? sectionKey;
+  final String? sectionLabel;
   final String iconImagePath;
-  final String statusText;
+  final int? remainingFieldCount;
+  final int? completionPercentage;
   final Future<void> Function(BuildContext context) onTap;
 
   Future<void> open(BuildContext context) => onTap(context);
+
+  String? resolveSectionLabel(BuildContext context) {
+    final normalizedKey = sectionKey?.trim().toLowerCase();
+    final mapped = switch (normalizedKey) {
+      'preferences' => 'Preferences',
+      'basic_profile' => 'Basic Profile',
+      'photos' => 'Profile Photos',
+      'family' => 'Family Details',
+      'education' => 'Education',
+      'profession' => 'Profession',
+      'appearance' => 'Appearance',
+      'religion' => 'Religion',
+      'lifestyle' => 'Lifestyle',
+      'location' => 'Location',
+      'interests' => 'Interests & Hobbies',
+      'contact' => 'Contact',
+      _ => null,
+    };
+
+    final effective = (mapped ?? sectionLabel)?.trim();
+    if (effective == null || effective.isEmpty) return null;
+    return effective.localized(context);
+  }
 
   static _CompleteProfileTileData fromStrengthSection(
     ProfileStrengthSection section,
   ) {
     final sectionKey = _normalizeKey(section.key);
-    final strengthFields = section.incompleteFields.isNotEmpty ? section.incompleteFields : (section.fields ?? const <ProfileStrengthField>[]);
-    final fieldKey = section.firstIncompleteFieldKey ?? _requiredFieldsBySection[sectionKey]?.first;
-    final title = 'Complete ${section.label ?? 'Profile Section'}';
-    final statusText = _statusTextFor(section);
+    final strengthFields = section.incompleteFields.isNotEmpty
+        ? section.incompleteFields
+        : (section.fields ?? const <ProfileStrengthField>[]);
+    final fieldKey = section.firstIncompleteFieldKey ??
+        _requiredFieldsBySection[sectionKey]?.first;
+    final remainingFieldCount = section.remainingFieldCount;
+    final completionPercentage = section.completionPercentage;
 
     switch (sectionKey) {
       case 'preferences':
         return _profileEditTile(
-          title: title,
-          statusText: statusText,
+          sectionKey: sectionKey,
+          sectionLabel: section.label,
+          remainingFieldCount: remainingFieldCount,
+          completionPercentage: completionPercentage,
           iconImagePath: AppImages.userLoveSvgIcon,
           section: _preferenceSectionForField(fieldKey),
           strengthSectionKey: sectionKey,
@@ -251,8 +299,10 @@ class _CompleteProfileTileData {
         );
       case 'basic_profile':
         return _profileEditTile(
-          title: title,
-          statusText: statusText,
+          sectionKey: sectionKey,
+          sectionLabel: section.label,
+          remainingFieldCount: remainingFieldCount,
+          completionPercentage: completionPercentage,
           iconImagePath: AppImages.profileSvgIcon,
           section: _basicProfileSectionForField(fieldKey),
           strengthSectionKey: sectionKey,
@@ -261,8 +311,10 @@ class _CompleteProfileTileData {
         );
       case 'appearance':
         return _profileEditTile(
-          title: title,
-          statusText: statusText,
+          sectionKey: sectionKey,
+          sectionLabel: section.label,
+          remainingFieldCount: remainingFieldCount,
+          completionPercentage: completionPercentage,
           iconImagePath: AppImages.person,
           section: _appearanceSectionForField(fieldKey),
           strengthSectionKey: sectionKey,
@@ -271,8 +323,10 @@ class _CompleteProfileTileData {
         );
       case 'location':
         return _profileEditTile(
-          title: title,
-          statusText: statusText,
+          sectionKey: sectionKey,
+          sectionLabel: section.label,
+          remainingFieldCount: remainingFieldCount,
+          completionPercentage: completionPercentage,
           iconImagePath: AppImages.locationSvgIcon,
           section: _locationSectionForField(fieldKey),
           strengthSectionKey: sectionKey,
@@ -281,8 +335,10 @@ class _CompleteProfileTileData {
         );
       case 'education':
         return _profileEditTile(
-          title: title,
-          statusText: statusText,
+          sectionKey: sectionKey,
+          sectionLabel: section.label,
+          remainingFieldCount: remainingFieldCount,
+          completionPercentage: completionPercentage,
           iconImagePath: AppImages.educationSvgIcon,
           section: _educationSectionForField(fieldKey),
           strengthSectionKey: sectionKey,
@@ -291,8 +347,10 @@ class _CompleteProfileTileData {
         );
       case 'profession':
         return _profileEditTile(
-          title: title,
-          statusText: statusText,
+          sectionKey: sectionKey,
+          sectionLabel: section.label,
+          remainingFieldCount: remainingFieldCount,
+          completionPercentage: completionPercentage,
           iconImagePath: AppImages.workSvgIcon,
           section: _professionSectionForField(fieldKey),
           strengthSectionKey: sectionKey,
@@ -301,8 +359,10 @@ class _CompleteProfileTileData {
         );
       case 'religion':
         return _profileEditTile(
-          title: title,
-          statusText: statusText,
+          sectionKey: sectionKey,
+          sectionLabel: section.label,
+          remainingFieldCount: remainingFieldCount,
+          completionPercentage: completionPercentage,
           iconImagePath: AppImages.religionSvgIcon,
           section: ProfileEditSection.religiousBackground,
           strengthSectionKey: sectionKey,
@@ -311,8 +371,10 @@ class _CompleteProfileTileData {
         );
       case 'family':
         return _profileEditTile(
-          title: title,
-          statusText: statusText,
+          sectionKey: sectionKey,
+          sectionLabel: section.label,
+          remainingFieldCount: remainingFieldCount,
+          completionPercentage: completionPercentage,
           iconImagePath: AppImages.groupsIcon,
           section: _familySectionForField(fieldKey),
           strengthSectionKey: sectionKey,
@@ -321,8 +383,10 @@ class _CompleteProfileTileData {
         );
       case 'lifestyle':
         return _profileEditTile(
-          title: title,
-          statusText: statusText,
+          sectionKey: sectionKey,
+          sectionLabel: section.label,
+          remainingFieldCount: remainingFieldCount,
+          completionPercentage: completionPercentage,
           iconImagePath: AppImages.lifeStyleSvgIcon,
           section: _lifestyleSectionForField(fieldKey),
           strengthSectionKey: sectionKey,
@@ -332,15 +396,19 @@ class _CompleteProfileTileData {
       case 'contact':
       case 'contacts':
         return _CompleteProfileTileData(
-          title: title,
-          statusText: statusText,
+          sectionKey: sectionKey,
+          sectionLabel: section.label,
+          remainingFieldCount: remainingFieldCount,
+          completionPercentage: completionPercentage,
           iconImagePath: AppImages.verifyContact,
           onTap: _openVerifyNumber,
         );
       case 'photos':
         return _CompleteProfileTileData(
-          title: title,
-          statusText: statusText,
+          sectionKey: sectionKey,
+          sectionLabel: section.label,
+          remainingFieldCount: remainingFieldCount,
+          completionPercentage: completionPercentage,
           iconImagePath: AppImages.photoIcon,
           onTap: _openPhotoUpload,
         );
@@ -349,8 +417,10 @@ class _CompleteProfileTileData {
       case 'hobbies_interests':
       case 'interest':
         return _profileEditTile(
-          title: title,
-          statusText: statusText,
+          sectionKey: sectionKey,
+          sectionLabel: section.label,
+          remainingFieldCount: remainingFieldCount,
+          completionPercentage: completionPercentage,
           iconImagePath: AppImages.habitsSvgIcon,
           section: _interestsSectionForField(fieldKey),
           strengthSectionKey: sectionKey,
@@ -359,8 +429,10 @@ class _CompleteProfileTileData {
         );
       default:
         return _profileEditTile(
-          title: title,
-          statusText: statusText,
+          sectionKey: sectionKey,
+          sectionLabel: section.label,
+          remainingFieldCount: remainingFieldCount,
+          completionPercentage: completionPercentage,
           iconImagePath: AppImages.profileSvgIcon,
           section: ProfileEditSection.aboutYourself,
           strengthSectionKey: sectionKey,
@@ -371,8 +443,10 @@ class _CompleteProfileTileData {
   }
 
   static _CompleteProfileTileData _profileEditTile({
-    required String title,
-    required String statusText,
+    required String? sectionKey,
+    required String? sectionLabel,
+    required int? remainingFieldCount,
+    required int? completionPercentage,
     required String iconImagePath,
     required ProfileEditSection section,
     String? strengthSectionKey,
@@ -380,20 +454,30 @@ class _CompleteProfileTileData {
     List<ProfileStrengthField>? strengthFields,
   }) {
     return _CompleteProfileTileData(
-      title: title,
-      statusText: statusText,
+      sectionKey: sectionKey,
+      sectionLabel: sectionLabel,
+      remainingFieldCount: remainingFieldCount,
+      completionPercentage: completionPercentage,
       iconImagePath: iconImagePath,
       onTap: (context) async {
-        final resolvedStrengthFields = strengthFields?.where((field) => 
-        field.key?.trim().isNotEmpty ?? false,
-        ).toList(growable: false) ?? const <ProfileStrengthField>[];
+        final resolvedStrengthFields = strengthFields
+                ?.where(
+                  (field) => field.key?.trim().isNotEmpty ?? false,
+                )
+                .toList(growable: false) ??
+            const <ProfileStrengthField>[];
         await context.pushNamed(
           Routes.profileSectionEdit,
           extra: {
             'section': section.key,
-            if (strengthSectionKey != null) 'strengthSectionKey': strengthSectionKey,
-            if (strengthSectionLabel != null) 'strengthSectionLabel': strengthSectionLabel,
-            if (resolvedStrengthFields.isNotEmpty) 'strengthFields': resolvedStrengthFields.map((field) => field.toJson()).toList(growable: false),
+            if (strengthSectionKey != null)
+              'strengthSectionKey': strengthSectionKey,
+            if (strengthSectionLabel != null)
+              'strengthSectionLabel': strengthSectionLabel,
+            if (resolvedStrengthFields.isNotEmpty)
+              'strengthFields': resolvedStrengthFields
+                  .map((field) => field.toJson())
+                  .toList(growable: false),
           },
         );
         if (!context.mounted) return;
@@ -407,15 +491,6 @@ class _CompleteProfileTileData {
 
   static String _normalizeKey(String? value) {
     return value?.trim().toLowerCase() ?? '';
-  }
-
-  static String _statusTextFor(ProfileStrengthSection section) {
-    final remaining = section.remainingFieldCount;
-    if (remaining > 0) {
-      final suffix = remaining == 1 ? 'field left' : 'fields left';
-      return '$remaining $suffix';
-    }
-    return '${section.completionPercentage ?? 0}%';
   }
 
   static ProfileEditSection _basicProfileSectionForField(String? fieldKey) {

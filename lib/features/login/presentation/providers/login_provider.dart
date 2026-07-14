@@ -7,8 +7,7 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/providers/base_change_notifier.dart';
 import 'package:walima_llc/core/router/route_name.dart';
-import 'package:walima_llc/core/utils/app_error_reporting_service.dart';
-import 'package:walima_llc/core/utils/firebase_messaging_service.dart';
+import 'package:walima_llc/core/utils/auth_session_manager.dart';
 import 'package:walima_llc/core/utils/dialog_utils.dart';
 import 'package:walima_llc/core/utils/social_sign_in_service.dart';
 import 'package:walima_llc/core/utils/validators.dart';
@@ -20,10 +19,6 @@ import 'package:walima_llc/features/login/data/models/resend_otp_body.dart';
 import 'package:walima_llc/features/login/data/models/set_password_body.dart';
 import 'package:walima_llc/features/login/data/repository/login_repository.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:walima_llc/core/constants/storage_keys.dart';
-import 'package:walima_llc/core/network/dio_client.dart';
-import 'package:walima_llc/features/chat/data/socket/socket_service.dart';
 
 class LoginProvider extends BaseChangeNotifier {
   static const String _mobileOrEmailRequiredMessage =
@@ -176,11 +171,11 @@ class LoginProvider extends BaseChangeNotifier {
     }
   }
 
-  Future<void> setNewPassword(BuildContext context) async {
+  Future<LoginResponse> setNewPassword(BuildContext context) async {
     _showLoading();
     if (validateNewPassword() == false) {
       _hideLoading();
-      return;
+      return LoginResponse(code: 'FAILED', message: 'Validation failed');
     }
     final body = SetPasswordBody(
       identifier: mobileNoOrEmailController.text,
@@ -189,8 +184,10 @@ class LoginProvider extends BaseChangeNotifier {
       confirmPassword: confirmPasswordController.text,
     );
     final response = await LoginRepository.setNewPassword(body);
-    if (!context.mounted) return;
-    _handleLoginResult(context, response);
+    if (!context.mounted) {
+      return LoginResponse(code: 'FAILED', message: 'Context is no longer available');
+    }
+    return response;
   }
 
   Future<void> resendOtp(BuildContext context) async {
@@ -383,58 +380,19 @@ class LoginProvider extends BaseChangeNotifier {
     BuildContext context,
     LoginResponse response,
   ) async {
-    final hasAuthTokens = _hasAuthTokens(response);
-
-    if (response.code == 'SUCCESS' && hasAuthTokens) {
-      await _persistAuthTokens(response);
-      await AppErrorReportingService.instance.setUserContext(
-        userId: response.response?.user?.id,
-        email: response.response?.user?.email,
-        phone: response.response?.user?.phoneNumber?.toString(),
-      );
-      if (!context.mounted) return;
-      unawaited(FirebaseMessagingService.instance.registerDeviceToken());
-      _handleLoginSuccess(context);
-      return;
+    if (response.code == 'SUCCESS') {
+      final applied = await AuthSessionManager.applyLoginResponse(response);
+      if (applied) {
+        if (!context.mounted) return;
+        _handleLoginSuccess(context);
+        return;
+      }
     }
 
     _handleLoginFailure(
       context,
       response.message ?? 'Login failed. Please try again.',
     );
-  }
-
-  bool _hasAuthTokens(LoginResponse response) {
-    final accessToken = response.response?.accessToken?.trim() ?? '';
-    final refreshToken = response.response?.refreshToken?.trim() ?? '';
-    return accessToken.isNotEmpty && refreshToken.isNotEmpty;
-  }
-
-  Future<void> _persistAuthTokens(LoginResponse response) async {
-    final prefs = await SharedPreferences.getInstance();
-    final accessToken = response.response?.accessToken?.trim() ?? '';
-    final refreshToken = response.response?.refreshToken?.trim() ?? '';
-
-    await _saveAccessToken(prefs, accessToken);
-    await _saveRefreshToken(prefs, refreshToken);
-  }
-
-  Future<void> _saveAccessToken(
-    SharedPreferences prefs,
-    String accessToken,
-  ) async {
-    await prefs.setString(StorageKeys.accessToken, accessToken);
-    try {
-      DioClient().setAuthToken(accessToken);
-    } catch (_) {}
-    await SocketService.instance.connect(token: accessToken);
-  }
-
-  Future<void> _saveRefreshToken(
-    SharedPreferences prefs,
-    String refreshToken,
-  ) async {
-    await prefs.setString(StorageKeys.refreshToken, refreshToken);
   }
 
   void _handleLoginSuccess(BuildContext context) {
@@ -518,6 +476,20 @@ class LoginProvider extends BaseChangeNotifier {
 
   void _hideLoading() {
     updateViewState(loadingState: LoginScreenStates.defaultState);
+  }
+
+  void hideLoading() {
+    _hideLoading();
+  }
+
+  @override
+  void dispose() {
+    disposeOtpFields(notify: false);
+    disposeControllersListener();
+    for (final c in _managedControllers) {
+      c.dispose();
+    }
+    super.dispose();
   }
 
   void _addListenerSafely(

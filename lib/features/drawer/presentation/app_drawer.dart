@@ -16,6 +16,7 @@ import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/core/utils/picker_dialog.dart';
 import 'package:walima_llc/features/anchor_point/anchor_point.dart';
 import 'package:walima_llc/features/drawer/presentation/providers/app_drawer_provider.dart';
+import 'package:walima_llc/features/profile/presentation/providers/profile_provider.dart';
 import 'package:walima_llc/features/profile/presentation/utils/profile_summary_utils.dart';
 import 'package:walima_llc/features/drawer/presentation/screens/widgets/profile_action_tile.dart';
 import 'package:walima_llc/features/matches/presentation/widgets/bottom_bordered_widget.dart';
@@ -32,12 +33,14 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
   @override
   Widget build(BuildContext context) {
     final provider = ref.watch(drawerProvider);
+    final profileProviderState = ref.watch(profileProvider);
     final router = ref.watch(goRouterProvider);
     return Drawer(
       width: MediaQuery.of(context).size.width,
       child: TransparentLoading(
         isLoading:
-            provider.loaderState == DrawerScreenStates.transparentLoading,
+            provider.loaderState == DrawerScreenStates.transparentLoading ||
+                profileProviderState.loaderState == ProfileScreenStates.loading,
         child: Scaffold(
           body: SafeArea(
             child: Padding(
@@ -152,7 +155,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         final String? imagePath = await PickerDialog().imagePicker(context);
         if (!context.mounted) return;
         if (imagePath != null) {
-          await ref.watch(profileProvider).updateProfileImage(
+          await ref.read(profileProvider).updateProfileImage(
                 context: context,
                 filePath: imagePath,
               );
@@ -184,13 +187,13 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
             context.pushNamed(Routes.editProfile);
           },
         ),
-        ProfileActionTile(
-          iconImagePath: AppImages.shareSvgIcon,
-          title: 'Download & Share profile',
-          onTap: () {
-            context.pushNamed(Routes.biodataGenerator);
-          },
-        ),
+        // ProfileActionTile(
+        //   iconImagePath: AppImages.shareSvgIcon,
+        //   title: 'Download & Share profile',
+        //   onTap: () {
+        //     context.pushNamed(Routes.biodataGenerator);
+        //   },
+        // ),
       ],
     );
   }
@@ -276,6 +279,13 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
             context.pushNamed(Routes.accountSetting);
           },
         ),
+        ProfileActionTile(
+          iconImagePath: AppImages.verifyIcon,
+          title: 'Identity Verification',
+          onTap: () {
+            context.pushNamed(Routes.identityVerification);
+          },
+        ),
       ],
     );
   }
@@ -296,32 +306,40 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
         ProfileActionTile(
           iconImagePath: AppImages.documentValidationSvgIcon,
           title: 'Language',
-          onTap: () => context.pushNamed(Routes
-              .languageSettings), // navigate to language selection screen when implemented
+          // navigate to language selection screen when implemented
+          onTap: () => context.pushNamed(Routes.languageSettings),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.customerSupportSvgIcon,
           title: 'Help & Support',
-          onTap: () => LinkOpener.openLink(
-              context, 'Help Center', AppUrls.helpCenterUrl),
+          onTap: () => context.pushNamed(Routes.helpDesk),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.bubbleChatSvgIcon,
           title: 'Be Safe Online',
           onTap: () => LinkOpener.openLink(
-              context, 'Be Safe Online', AppUrls.beSafeOnlineUrl),
+            context,
+            'Be Safe Online'.localized(context),
+            AppUrls.beSafeOnlineUrl,
+          ),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.documentValidationSvgIcon,
           title: 'Privacy Policy',
           onTap: () => LinkOpener.openLink(
-              context, 'Privacy Policy', AppUrls.privacyPolicyUrl),
+            context,
+            'Privacy Policy'.localized(context),
+            AppUrls.privacyPolicyUrl,
+          ),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.safetySvgIcon,
           title: 'Safety',
-          onTap: () =>
-              LinkOpener.openLink(context, 'Safety', AppUrls.safetyUrl),
+          onTap: () => LinkOpener.openLink(
+            context,
+            'Safety'.localized(context),
+            AppUrls.safetyUrl,
+          ),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.starSvgIcon,
@@ -332,7 +350,10 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
           iconImagePath: AppImages.documentValidationSvgIcon,
           title: 'Terms & Conditions',
           onTap: () => LinkOpener.openLink(
-              context, 'Terms & Conditions', AppUrls.termsUrl),
+            context,
+            'Terms & Conditions'.localized(context),
+            AppUrls.termsUrl,
+          ),
         ),
       ],
     );

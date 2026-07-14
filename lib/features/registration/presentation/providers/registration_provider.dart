@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -16,23 +15,20 @@ import 'package:walima_llc/core/utils/firebase_messaging_service.dart';
 import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/core/utils/prefs_helper.dart';
 import 'package:walima_llc/features/login/data/models/resend_otp_body.dart';
-import 'package:walima_llc/features/profile/data/model/request/update_profile_photo_request.dart';
-import 'package:walima_llc/features/profile/data/repository/profile_repository.dart';
+import 'package:walima_llc/features/profile/data/repository/profile_photo_upload_service.dart';
 import 'package:walima_llc/features/registration/data/models/request/sign_up_otp_body.dart';
 import 'package:walima_llc/features/registration/data/models/request/sign_up_request_body.dart';
-import 'package:walima_llc/features/registration/data/models/request/upload_media_request_body.dart';
 import 'package:walima_llc/features/registration/data/models/request/update_interests_request_body.dart';
 import 'package:walima_llc/features/registration/data/models/request/update_family_request_body.dart';
-import 'package:walima_llc/features/registration/data/models/bio_template.dart';
+import 'package:walima_llc/features/biodata/domain/model/bio_template.dart';
 import 'package:walima_llc/features/registration/data/models/response/onboarding_response.dart';
 import 'package:walima_llc/features/registration/data/models/response/upload_media_response.dart';
 import 'package:walima_llc/features/registration/data/models/lookup_option.dart';
-import 'package:walima_llc/features/registration/data/repository/bio_template_repository.dart';
+import 'package:walima_llc/features/biodata/data/repository/bio_template_repository.dart';
 import 'package:walima_llc/features/registration/data/repository/interests_repository.dart';
 import 'package:walima_llc/features/registration/data/repository/family_repository.dart';
 import 'package:walima_llc/features/registration/data/repository/lookup_repository.dart';
 import 'package:walima_llc/features/registration/data/repository/location_data_repository_impl.dart';
-import 'package:walima_llc/features/registration/data/repository/media_repository.dart';
 import 'package:walima_llc/features/registration/data/repository/registration_repository.dart';
 import 'package:walima_llc/features/registration/domain/location_data_model.dart';
 import 'package:walima_llc/features/registration/domain/repository/location_data_repository.dart';
@@ -127,7 +123,8 @@ class RegistrationProvider extends BaseChangeNotifier {
   final LocationDataRepository _locationDataRepository =
       LocationDataRepositoryImpl();
   final LookupRepository _lookupRepository = LookupRepository();
-  final MediaRepository _mediaRepository = MediaRepository();
+  final ProfilePhotoUploadService _profilePhotoUploadService =
+      ProfilePhotoUploadService();
   final InterestsRepository _interestsRepository = InterestsRepository();
   final FamilyRepository _familyRepository = FamilyRepository();
   final BioTemplateRepository _bioTemplateRepository = BioTemplateRepository();
@@ -174,22 +171,6 @@ class RegistrationProvider extends BaseChangeNotifier {
   String profileImageUploadStatusMessage = '';
   bool canRetryProfileImageUpload = false;
   PhotoUploadFlowState photoUploadFlowState = PhotoUploadFlowState.idle;
-
-  static const int _profilePhotoMaxBytes = 5 * 1024 * 1024;
-  static const List<Duration> _temporaryUploadRetryDelays = <Duration>[
-    Duration(seconds: 5),
-    Duration(seconds: 15),
-  ];
-  static const Set<String> _allowedProfilePhotoExtensions = <String>{
-    'jpg',
-    'jpeg',
-    'png',
-    'webp',
-    'gif',
-    'avif',
-    'heic',
-    'heif',
-  };
 
   static const List<LookupOption> _staticReligionOptions = <LookupOption>[
     LookupOption(key: 'islam', label: 'Islam'),
@@ -2172,121 +2153,38 @@ class RegistrationProvider extends BaseChangeNotifier {
   }
 
   String? validateProfileImageFile(String filePath) {
-    final normalizedPath = filePath.trim();
-    if (normalizedPath.isEmpty) {
-      return 'Please select an image to upload.';
-    }
-
-    final extension = normalizedPath.contains('.')
-        ? normalizedPath.split('.').last.toLowerCase()
-        : '';
-    if (!_allowedProfilePhotoExtensions.contains(extension)) {
-      return 'Unsupported image format. Please use JPG, PNG, WEBP, GIF, AVIF, HEIC, or HEIF.';
-    }
-
-    final file = File(normalizedPath);
-    if (!file.existsSync()) {
-      return 'Selected image could not be found. Please choose it again.';
-    }
-
-    final int fileSizeInBytes;
-    try {
-      fileSizeInBytes = file.lengthSync();
-    } catch (_) {
-      return 'Selected image could not be read. Please choose it again.';
-    }
-    if (fileSizeInBytes > _profilePhotoMaxBytes) {
-      return 'This image is too large. Please use a photo under 5 MB.';
-    }
-
-    return null;
+    return _profilePhotoUploadService.validateProfileImageFile(filePath);
   }
 
-  bool _isSuccessfulUploadResponse(UploadMediaResponse response) {
-    final code = (response.code ?? '').toUpperCase();
-    return code == 'SUCCESS' &&
-        response.response?.data != null &&
-        (response.response?.data?.id?.trim().isNotEmpty ?? false);
+  PhotoUploadFlowState _mapProfilePhotoUploadFlowState(
+    ProfilePhotoUploadFlowState state,
+  ) {
+    switch (state) {
+      case ProfilePhotoUploadFlowState.idle:
+        return PhotoUploadFlowState.idle;
+      case ProfilePhotoUploadFlowState.uploadingForAiCheck:
+        return PhotoUploadFlowState.uploadingForAiCheck;
+      case ProfilePhotoUploadFlowState.aiRejected:
+        return PhotoUploadFlowState.aiRejected;
+      case ProfilePhotoUploadFlowState.mediaUploaded:
+        return PhotoUploadFlowState.mediaUploaded;
+      case ProfilePhotoUploadFlowState.attachingToProfile:
+        return PhotoUploadFlowState.attachingToProfile;
+      case ProfilePhotoUploadFlowState.completed:
+        return PhotoUploadFlowState.completed;
+      case ProfilePhotoUploadFlowState.failed:
+        return PhotoUploadFlowState.failed;
+    }
   }
 
-  String _mapProfileImageUploadMessage(String? rawMessage) {
-    final message = rawMessage?.trim();
-    if (message == null || message.isEmpty) {
-      return 'Failed to upload profile image.';
-    }
-
-    final lower = message.toLowerCase();
-    if (lower.contains('ai-generated photos are not allowed')) {
-      return 'This photo looks AI-generated. Please upload a real recent photo.';
-    }
-    if (lower.contains('reused from public websites')) {
-      return 'This looks like a publicly reused image. Upload your own photo.';
-    }
-    if (lower.contains('front-facing photo')) {
-      return 'Please upload a clear front-facing photo.';
-    }
-    if (lower.contains('temporarily busy')) {
-      return 'Photo verification is temporarily busy. Please wait a moment and try again.';
-    }
-    if (lower.contains('too large') || lower.contains('5mb')) {
-      return 'This image is too large. Please use a photo under 5 MB.';
-    }
-    return message;
-  }
-
-  bool _isTemporaryProfileImageFailure(String? rawMessage) {
-    final lower = rawMessage?.toLowerCase() ?? '';
-    return lower.contains('temporarily busy') ||
-        lower.contains('please wait a minute and try again') ||
-        lower.contains('status code: 429') ||
-        lower.contains('status code: 502');
-  }
-
-  bool _isAiRejectedProfileImage(String? rawMessage) {
-    final lower = rawMessage?.toLowerCase() ?? '';
-    return lower.contains('ai-generated photos are not allowed') ||
-        lower.contains('reused from public websites') ||
-        lower.contains('front-facing photo');
-  }
-
-  Future<UploadMediaResponse> _uploadProfileMediaWithRetry(
-    UploadMediaRequestBody requestBody,
-  ) async {
-    for (var attempt = 0;
-        attempt <= _temporaryUploadRetryDelays.length;
-        attempt++) {
-      _setPhotoUploadFlowState(
-        PhotoUploadFlowState.uploadingForAiCheck,
-        statusMessage: 'Checking your photo before upload...',
-        errorMessage: '',
-        canRetry: false,
-      );
-
-      final response = await _mediaRepository.uploadMedia(requestBody);
-      if (_isSuccessfulUploadResponse(response)) {
-        return response;
-      }
-
-      if (!_isTemporaryProfileImageFailure(response.message) ||
-          attempt == _temporaryUploadRetryDelays.length) {
-        return response;
-      }
-
-      final retryDelay = _temporaryUploadRetryDelays[attempt];
-      _setPhotoUploadFlowState(
-        PhotoUploadFlowState.uploadingForAiCheck,
-        statusMessage:
-            'Photo verification is busy. Retrying in ${retryDelay.inSeconds} seconds...',
-        errorMessage: '',
-        canRetry: false,
-      );
-      await Future<void>.delayed(retryDelay);
-    }
-
-    return UploadMediaResponse(
-      code: 'FAILED',
-      message:
-          'Photo verification is temporarily busy. Please wait a moment and try again.',
+  void _handleProfilePhotoUploadProgress(
+    ProfilePhotoUploadProgress progress,
+  ) {
+    _setPhotoUploadFlowState(
+      _mapProfilePhotoUploadFlowState(progress.state),
+      statusMessage: progress.statusMessage,
+      errorMessage: progress.errorMessage,
+      canRetry: progress.canRetry,
     );
   }
 
@@ -2297,106 +2195,24 @@ class RegistrationProvider extends BaseChangeNotifier {
     String description = 'This is my profile photo',
     bool isPrimary = true,
   }) async {
-    final normalizedPath = filePath.trim();
-    final validationError = validateProfileImageFile(normalizedPath);
-    if (validationError != null) {
-      _setPhotoUploadFlowState(
-        PhotoUploadFlowState.failed,
-        errorMessage: validationError,
-        statusMessage: '',
-        canRetry: false,
-      );
-      return false;
-    }
-
     uploadedProfileMedia = null;
     resetPhotoUploadFlow(notify: false);
     notifyListeners();
 
-    final requestBody = UploadMediaRequestBody(
-      filePath: normalizedPath,
+    final result = await _profilePhotoUploadService.uploadAndAttachProfileImage(
+      filePath: filePath,
       alt: alt,
       caption: caption,
       description: description,
       isPrimary: isPrimary,
-      resourceType: 'UserProfile',
-      resource: isPrimary ? 'profile_photo' : 'gallery_photo',
-    );
-
-    final uploadResponse = await _uploadProfileMediaWithRetry(requestBody);
-    final uploadedData = uploadResponse.response?.data;
-    final isSuccess = _isSuccessfulUploadResponse(uploadResponse);
-
-    if (!isSuccess) {
-      final mappedMessage =
-          _mapProfileImageUploadMessage(uploadResponse.message);
-      final failureState = _isAiRejectedProfileImage(uploadResponse.message)
-          ? PhotoUploadFlowState.aiRejected
-          : PhotoUploadFlowState.failed;
-      _setPhotoUploadFlowState(
-        failureState,
-        errorMessage: mappedMessage,
-        statusMessage: '',
-        canRetry: _isTemporaryProfileImageFailure(uploadResponse.message),
-      );
-      return false;
-    }
-
-    _setPhotoUploadFlowState(
-      PhotoUploadFlowState.mediaUploaded,
-      statusMessage: 'Photo accepted. Attaching it to your profile...',
-      errorMessage: '',
-      canRetry: false,
-    );
-
-    final originalUrl = uploadedData?.url?.trim();
-    final photoSizes = <String, String?>{};
-    if (originalUrl != null && originalUrl.isNotEmpty) {
-      photoSizes['original'] = originalUrl;
-    }
-
-    final attachRequest = UpdateProfilePhotoRequest(
-      mediaId: uploadedData!.id!.trim(),
-      category: isPrimary ? 'profile' : 'gallery',
-      isPrimary: isPrimary,
-      photoOrder: isPrimary ? 1 : null,
       visibility: 'public',
-      shouldDelete: false,
-      photoSizes: photoSizes.isEmpty ? null : photoSizes,
+      onProgress: _handleProfilePhotoUploadProgress,
     );
 
-    _setPhotoUploadFlowState(
-      PhotoUploadFlowState.attachingToProfile,
-      statusMessage: 'Updating your profile photo...',
-      errorMessage: '',
-      canRetry: false,
-    );
-
-    final attachResponse = await ProfileRepository.updateProfilePhotos(
-      <UpdateProfilePhotoRequest>[attachRequest],
-    );
-    final attachSucceeded =
-        (attachResponse.code ?? '').toUpperCase() == 'SUCCESS';
-
-    if (!attachSucceeded) {
-      _setPhotoUploadFlowState(
-        PhotoUploadFlowState.failed,
-        errorMessage:
-            attachResponse.message ?? 'Failed to attach photo to your profile.',
-        statusMessage: '',
-        canRetry: false,
-      );
-      return false;
+    if (result.isSuccess) {
+      uploadedProfileMedia = result.uploadedData;
     }
-
-    uploadedProfileMedia = uploadedData;
-    _setPhotoUploadFlowState(
-      PhotoUploadFlowState.completed,
-      statusMessage: 'Photo uploaded successfully.',
-      errorMessage: '',
-      canRetry: false,
-    );
-    return true;
+    return result.isSuccess;
   }
 
   Future<bool> submitRegistration(

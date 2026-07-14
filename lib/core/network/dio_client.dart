@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:walima_llc/core/connectivity/connectivity_keys.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:walima_llc/core/constants/app_texts.dart';
@@ -36,18 +35,20 @@ class DioClient {
       ),
     );
 
-    // Add pretty logger interceptor
-    _dio.interceptors.add(
-      PrettyDioLogger(
-        requestHeader: true,
-        requestBody: true,
-        responseBody: true,
-        responseHeader: false,
-        error: true,
-        compact: true,
-        maxWidth: 90,
-      ),
-    );
+    // Add pretty logger interceptor (debug only)
+    if (kDebugMode) {
+      _dio.interceptors.add(
+        PrettyDioLogger(
+          requestHeader: true,
+          requestBody: true,
+          responseBody: true,
+          responseHeader: false,
+          error: true,
+          compact: true,
+          maxWidth: 90,
+        ),
+      );
+    }
 
     // Add custom interceptor for token handling
     _dio.interceptors.add(
@@ -162,6 +163,7 @@ class DioClient {
   Options _optionsWithTokenFlag(
     Options? options, {
     required bool isTokenRequired,
+    Set<int>? acceptedStatusCodes,
   }) {
     return Options(
       method: options?.method,
@@ -174,13 +176,16 @@ class DioClient {
       headers: options?.headers,
       responseType: options?.responseType,
       contentType: options?.contentType,
-      validateStatus: options?.validateStatus,
       receiveDataWhenStatusError: options?.receiveDataWhenStatusError,
       followRedirects: options?.followRedirects,
       maxRedirects: options?.maxRedirects,
       requestEncoder: options?.requestEncoder,
       responseDecoder: options?.responseDecoder,
       listFormat: options?.listFormat,
+      validateStatus: acceptedStatusCodes == null
+          ? options?.validateStatus
+          : (status) =>
+              status != null && (acceptedStatusCodes.contains(status) || status < 400),
     );
   }
 
@@ -489,13 +494,18 @@ class DioClient {
     Options? options,
     CancelToken? cancelToken,
     bool isTokenRequired = false,
+    Set<int>? acceptedStatusCodes,
   }) async {
     try {
       final response = await _dio.get(
         endpoint,
         queryParameters: queryParameters,
         options:
-            _optionsWithTokenFlag(options, isTokenRequired: isTokenRequired),
+            _optionsWithTokenFlag(
+              options,
+              isTokenRequired: isTokenRequired,
+              acceptedStatusCodes: acceptedStatusCodes,
+            ),
         cancelToken: cancelToken,
       );
       return _handleResponse(response);
@@ -526,6 +536,7 @@ class DioClient {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
     bool isTokenRequired = false,
+    Set<int>? acceptedStatusCodes,
   }) async {
     try {
       final response = await _dio.post(
@@ -533,7 +544,11 @@ class DioClient {
         data: data,
         queryParameters: queryParameters,
         options:
-            _optionsWithTokenFlag(options, isTokenRequired: isTokenRequired),
+            _optionsWithTokenFlag(
+              options,
+              isTokenRequired: isTokenRequired,
+              acceptedStatusCodes: acceptedStatusCodes,
+            ),
         cancelToken: cancelToken,
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
@@ -566,6 +581,7 @@ class DioClient {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
     bool isTokenRequired = false,
+    Set<int>? acceptedStatusCodes,
   }) async {
     try {
       final response = await _dio.put(
@@ -573,7 +589,11 @@ class DioClient {
         data: data,
         queryParameters: queryParameters,
         options:
-            _optionsWithTokenFlag(options, isTokenRequired: isTokenRequired),
+            _optionsWithTokenFlag(
+              options,
+              isTokenRequired: isTokenRequired,
+              acceptedStatusCodes: acceptedStatusCodes,
+            ),
         cancelToken: cancelToken,
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
@@ -606,6 +626,7 @@ class DioClient {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
     bool isTokenRequired = false,
+    Set<int>? acceptedStatusCodes,
   }) async {
     try {
       final response = await _dio.patch(
@@ -613,7 +634,11 @@ class DioClient {
         data: data,
         queryParameters: queryParameters,
         options:
-            _optionsWithTokenFlag(options, isTokenRequired: isTokenRequired),
+            _optionsWithTokenFlag(
+              options,
+              isTokenRequired: isTokenRequired,
+              acceptedStatusCodes: acceptedStatusCodes,
+            ),
         cancelToken: cancelToken,
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,

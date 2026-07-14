@@ -58,6 +58,8 @@ abstract class Paths {
   static const premiumMatches = '/premiumMatches';
   static const recentVisitors = '/recentVisitors';
   static const governmentIdVerify = '/governmentIdVerify';
+  static const identityVerification = '/identityVerification';
+  static const diditVerificationWebView = '/diditVerificationWebView';
 
   //Matches
   static const matches = '/matches';
@@ -67,6 +69,9 @@ abstract class Paths {
   static const myMatchFilter = '/myMatchFilter';
   static const contactFilter = '/contactFilter';
   static const accountSetting = '/accountSetting';
+  static const contactSupport = '/contactSupport';
+  static const helpDesk = '/helpDesk';
+  static const aiSupport = '/aiSupport';
 
   // Chat
   static const chatScreen = '/chatScreen';
@@ -136,6 +141,8 @@ abstract class Routes {
   static const premiumMatches = 'premiumMatches';
   static const recentVisitors = 'recentVisitors';
   static const governmentIdVerify = 'governmentIdVerify';
+  static const identityVerification = 'identityVerification';
+  static const diditVerificationWebView = 'diditVerificationWebView';
 
   //Matches
   static const matches = 'matches';
@@ -146,6 +153,9 @@ abstract class Routes {
   static const myMatchFilter = 'myMatchFilter';
   static const contactFilter = 'contactFilter';
   static const accountSetting = 'accountSetting';
+  static const contactSupport = 'contactSupport';
+  static const helpDesk = 'helpDesk';
+  static const aiSupport = 'aiSupport';
 
   // Chat
   static const chatHome = 'chatHome';

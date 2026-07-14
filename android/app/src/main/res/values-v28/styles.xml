@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Ucrop.CropTheme" parent="@style/UcropCropThemeBase">
+        <item name="android:windowLayoutInDisplayCutoutMode">never</item>
+    </style>
+</resources>

@@ -10,8 +10,6 @@ import 'package:walima_llc/features/login/data/models/resend_otp_body.dart';
 import 'package:walima_llc/features/login/data/models/set_password_body.dart';
 
 class LoginRepository {
-  late final DioClient dioClient;
-
   static Future<LoginResponse> login(LoginBody body) async {
     try {
       final response =
@@ -85,7 +83,11 @@ class LoginRepository {
   static Future<LoginResponse> setNewPassword(SetPasswordBody body) async {
     try {
       final response = await DioClient()
-          .post(AppUrls.setPasswordWithOTP, data: body.toJson());
+          .post(
+            AppUrls.setPasswordWithOTP,
+            data: body.toJson(),
+            acceptedStatusCodes: {400},
+          );
       return LoginResponse.fromJson(response.data);
     } catch (e) {
       final errorMessage = e is DioException

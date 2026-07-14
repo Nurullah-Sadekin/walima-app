@@ -16,7 +16,7 @@ import 'package:uuid/uuid.dart';
 
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  if (kIsWeb || !Platform.isAndroid) return;
+  if (kIsWeb) return;
 
   if (Firebase.apps.isEmpty) {
     await Firebase.initializeApp(
@@ -39,16 +39,26 @@ class FirebaseMessagingService {
     Future<void> Function()? onNotificationSyncNeeded,
   }) async {
     if (_initialized) return;
-    if (kIsWeb || !Platform.isAndroid) {
+    if (kIsWeb) {
       debugPrint(
-        '[FirebaseMessagingService] Skipping Firebase init on this platform.',
+        '[FirebaseMessagingService] Skipping Firebase init on web.',
       );
       return;
     }
 
     await _ensureFirebaseInitialized();
     final messaging = FirebaseMessaging.instance;
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+    if (Platform.isAndroid) {
+      FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    }
+
+    await messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+      provisional: false,
+    );
 
     final token = await messaging.getToken();
     await _persistToken(token);
@@ -102,32 +112,22 @@ class FirebaseMessagingService {
     debugPrint('[FirebaseMessagingService] initialized');
   }
 
-  Future<void> requestPermissionOnce() async {
-    if (kIsWeb || !Platform.isAndroid) return;
-
-    final alreadyAsked = await PrefsHelper.getNotificationPermissionAsked();
-    if (alreadyAsked) return;
-
-    await _ensureFirebaseInitialized();
-    final messaging = FirebaseMessaging.instance;
-    final settings = await messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-      provisional: false,
-    );
-    await PrefsHelper.setNotificationPermissionAsked(true);
-    debugPrint(
-      '[FirebaseMessagingService] notification permission status: '
-      '${settings.authorizationStatus.name}',
-    );
-  }
+  @Deprecated('Permission is now requested inside initialize(). Remove callers.')
+  Future<void> requestPermissionOnce() async {}
 
   Future<void> registerDeviceToken() async {
-    if (kIsWeb || !Platform.isAndroid) return;
+    if (kIsWeb) return;
+    if (!Platform.isAndroid && !Platform.isIOS) return;
 
     try {
       await _ensureFirebaseInitialized();
+      final accessToken = await PrefsHelper.getAccessToken();
+      if (accessToken.trim().isEmpty) {
+        debugPrint(
+          '[FirebaseMessagingService] skipping device token registration: user is logged out',
+        );
+        return;
+      }
       final messaging = FirebaseMessaging.instance;
       final token = (await messaging.getToken())?.trim() ?? (await PrefsHelper.getFcmToken()).trim();
       if (token.isEmpty) {
@@ -162,6 +162,9 @@ class FirebaseMessagingService {
     await _tokenRefreshSubscription?.cancel();
     await _foregroundMessageSubscription?.cancel();
     await _messageOpenedSubscription?.cancel();
+    _tokenRefreshSubscription = null;
+    _foregroundMessageSubscription = null;
+    _messageOpenedSubscription = null;
     _initialized = false;
   }
 
@@ -182,12 +185,25 @@ class FirebaseMessagingService {
   Future<Map<String, dynamic>> _buildDeviceTokenPayload(String token) async {
     final deviceInfoPlugin = DeviceInfoPlugin();
     final packageInfo = await PackageInfo.fromPlatform();
-    final androidInfo = await deviceInfoPlugin.androidInfo;
     final deviceId = await _resolveDeviceId();
+
+    if (Platform.isIOS) {
+      final iosInfo = await deviceInfoPlugin.iosInfo;
+      final deviceName = iosInfo.name.trim();
+      return {
+        'token': token,
+        'platform': 'ios',
+        'deviceId': deviceId,
+        'deviceName': deviceName.isEmpty ? 'iOS Device' : deviceName,
+        'appVersion': packageInfo.version,
+        'osVersion': '${iosInfo.systemName} ${iosInfo.systemVersion}',
+      };
+    }
+
+    final androidInfo = await deviceInfoPlugin.androidInfo;
     final manufacturer = androidInfo.manufacturer.trim();
     final model = androidInfo.model.trim();
     final deviceName = [manufacturer, model].where((value) => value.isNotEmpty).join(' ');
-
     return {
       'token': token,
       'platform': 'android',

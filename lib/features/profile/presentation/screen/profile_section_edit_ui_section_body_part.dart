@@ -396,7 +396,7 @@ extension _ProfileSectionEditUiSectionBodyPreferencePart
     return _buildCard(
       children: [
         _rangeSelector(
-          label: 'Age Range',
+          label: 'Age Range'.localized(context),
           startValue: _prefAgeStart,
           endValue: _prefAgeEnd,
           min: _ProfileSectionEditScreenState._prefAgeMinLimit,
@@ -406,7 +406,7 @@ extension _ProfileSectionEditUiSectionBodyPreferencePart
           onChanged: _setPreferredAgeRange,
         ),
         _rangeSelector(
-          label: 'Height Range',
+          label: 'Height Range'.localized(context),
           startValue: _prefHeightStart,
           endValue: _prefHeightEnd,
           min: _ProfileSectionEditScreenState._prefHeightMinLimit,
@@ -416,15 +416,15 @@ extension _ProfileSectionEditUiSectionBodyPreferencePart
           onChanged: _setPreferredHeightRange,
         ),
         _multiSelectField(
-          label: 'Marital Status',
+          label: 'Marital Status'.localized(context),
           options: _prefMaritalOptions,
           onItemTap: (index) => _toggleOption(_prefMaritalOptions, index),
         ),
         _lookupDropdown(
-          label: 'Religion',
+          label: 'Religion'.localized(context),
           controller: _prefReligionController,
           options: _ProfileSectionEditScreenState._religionOptions,
-          popupHeader: 'Select Religion',
+          popupHeader: 'Select Religion'.localized(context),
           fieldKey: 'prefReligion',
           onSelected: (_) {
             _prefCommunityController.clear();
@@ -435,20 +435,20 @@ extension _ProfileSectionEditUiSectionBodyPreferencePart
           },
         ),
         _lookupDropdown(
-          label: 'Community',
+          label: 'Community'.localized(context),
           controller: _prefCommunityController,
           options: _communityOptions,
-          popupHeader: 'Select Community',
+          popupHeader: 'Select Community'.localized(context),
           fieldKey: 'prefCommunity',
           onTap: () => _loadCommunityOptionsForReligion(
             _prefReligionController.text,
           ),
         ),
         _lookupDropdown(
-          label: 'Mother Tongue',
+          label: 'Mother Tongue'.localized(context),
           controller: _prefMotherTongueController,
           options: _motherTongueOptions,
-          popupHeader: 'Select Mother Tongue',
+          popupHeader: 'Select Mother Tongue'.localized(context),
           fieldKey: 'prefMotherTongue',
           onTap: _loadBasicDetailsLookups,
         ),
@@ -460,19 +460,22 @@ extension _ProfileSectionEditUiSectionBodyPreferencePart
     return _buildCard(
       children: [
         _pickerField(
-          label: 'Country Living In',
+          label: 'Country Living In'.localized(context),
           controller: _prefCountryController,
-          hintText: 'Select Country',
+          hintText: 'Select Country'.localized(context),
           onTap: _openPreferredCountryPicker,
         ),
         if (_prefCountryController.text.trim().isNotEmpty)
           _multiTextSelectionField(
-            label: 'City',
+            label: 'City'.localized(context),
             options: _cityDropdownItems,
             selectedValues: _preferredCitySelections,
             isLoading: _isCityLoading && _cityDropdownItems.isEmpty,
             isLoadingMore: _isCityLoadingMore,
-            emptyText: 'No cities available for the selected country.',
+            emptyText:
+                'No cities available for the selected country.'.localized(
+              context,
+            ),
             onItemTap: _togglePreferredCitySelection,
             onLoadMore: _hasMoreCities ? _loadMorePreferredCities : null,
           ),
@@ -484,28 +487,28 @@ extension _ProfileSectionEditUiSectionBodyPreferencePart
     return _buildCard(
       children: [
         _multiSelectField(
-          label: 'Education Qualification',
+          label: 'Education Qualification'.localized(context),
           options: _prefEducationOptions,
           onItemTap: (index) => _toggleOption(_prefEducationOptions, index),
         ),
         _multiSelectField(
-          label: 'Working As',
+          label: 'Working As'.localized(context),
           options: _prefWorkingAsOptions,
           onItemTap: (index) => _toggleOption(_prefWorkingAsOptions, index),
         ),
         _lookupDropdown(
-          label: 'Profession',
+          label: 'Profession'.localized(context),
           controller: _prefProfessionController,
           options: _professionOptions,
-          popupHeader: 'Select Profession',
+          popupHeader: 'Select Profession'.localized(context),
           fieldKey: 'prefProfession',
           onTap: _loadProfessionAndIncomeLookup,
         ),
         _lookupDropdown(
-          label: 'Annual Income',
+          label: 'Annual Income'.localized(context),
           controller: _prefIncomeController,
           options: _incomeRangeOptions,
-          popupHeader: 'Select Annual Income',
+          popupHeader: 'Select Annual Income'.localized(context),
           fieldKey: 'prefIncome',
           onTap: _loadProfessionAndIncomeLookup,
         ),
@@ -517,32 +520,34 @@ extension _ProfileSectionEditUiSectionBodyPreferencePart
     return _buildCard(
       children: [
         _multiSelectField(
-          label: 'Profile Managed By',
+          label: 'Profile Managed By'.localized(context),
           options: _prefProfileManagedByOptions,
           onItemTap: (index) =>
               _toggleOption(_prefProfileManagedByOptions, index),
         ),
         _multiSelectField(
-          label: 'Diet Preference',
+          label: 'Diet Preference'.localized(context),
           options: _prefDietOptions,
           onItemTap: (index) => _toggleOption(_prefDietOptions, index),
         ),
         _field(
-          label: 'Smoking',
+          label: 'Smoking'.localized(context),
           controller: _prefSmokingExpectationsController,
-          hintText: 'expectation',
+          hintText: 'expectation'.localized(context),
         ),
         _field(
-          label: 'Drinking',
+          label: 'Drinking'.localized(context),
           controller: _prefDrinkingExpectationsController,
-          hintText: 'expectation',
+          hintText: 'expectation'.localized(context),
         ),
         _field(
-          label: 'Partner Expectations',
+          label: 'Partner Expectations'.localized(context),
           controller: _prefPartnerExpectationsController,
           maxLines: 5,
           minLines: 4,
-          hintText: 'Write what you expect from your partner',
+          hintText: 'Write what you expect from your partner'.localized(
+            context,
+          ),
         ),
       ],
     );

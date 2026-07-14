@@ -8,6 +8,7 @@ import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/utils/camel_case_utils.dart';
 import 'package:walima_llc/core/utils/date_time_utils.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/inbox/presentation/providers/inbox_providers.dart';
 import 'package:walima_llc/features/matches/presentation/widgets/filter_widget.dart';
 import 'package:walima_llc/features/matches/presentation/widgets/profile_comprehensive_card.dart';
@@ -69,16 +70,16 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-             EmptyStateWidget(
+            EmptyStateWidget(
               imagePath: AppImages.addTeam,
-              title: 'Error Loading Requests',
-              subtitle: 'Unable to load your connection requests',
-              buttonText: 'Retry',
-              onTap:  () {
+              title: 'Error Loading Requests'.localized(context),
+              subtitle:
+                  'Unable to load your connection requests'.localized(context),
+              buttonText: 'Retry'.localized(context),
+              onTap: () {
                 provider.fetchRequestedConnections();
               },
             ),
-
           ],
         ),
       );
@@ -89,10 +90,11 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
       return Center(
         child: EmptyStateWidget(
           imagePath: AppImages.addTeam,
-          title: 'No Pending Requests!',
+          title: 'No Pending Requests!'.localized(context),
           subtitle:
-              'Take the next step view your accepted matches for better connections',
-          buttonText: 'Explore Accepted Matches',
+              'Take the next step view your accepted matches for better connections'
+                  .localized(context),
+          buttonText: 'Explore Accepted Matches'.localized(context),
           onTap: widget.onExploreAcceptedTap,
         ),
       );
@@ -111,8 +113,9 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
           final state = connection.location?.state ?? '';
           final locationText =
               [city, state].where((s) => s.isNotEmpty).join(', ');
-          final location =
-              locationText.isNotEmpty ? locationText : 'Location: Undefine';
+          final location = locationText.isNotEmpty
+              ? locationText
+              : 'Location: Undefine'.localized(context);
           final profilePhotoUrl =
               connection.profilePhoto?.url ?? AppImages.demoProfile;
           final isVerified = connection.profilePhoto?.isVerified ?? false;

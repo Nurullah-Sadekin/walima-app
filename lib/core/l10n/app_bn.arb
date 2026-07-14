@@ -60,5 +60,31 @@
   "arabic": "আরবি",
   "changeLanguage": "ভাষা পরিবর্তন করুন",
   "changeTheme": "থিম পরিবর্তন করুন",
-  "about": "সম্পর্কে"
+  "about": "সম্পর্কে",
+  "completeYourProfile": "আপনার প্রোফাইল সম্পূর্ণ করুন",
+  "@completeYourProfile": {},
+  "profileCompletionPercentage": "আপনার প্রোফাইল {percentage}% সম্পূর্ণ",
+  "@profileCompletionPercentage": {
+    "placeholders": {
+      "percentage": {}
+    }
+  },
+  "seeMore": "আরও দেখুন",
+  "@seeMore": {},
+  "seeLess": "কম দেখুন",
+  "@seeLess": {},
+  "completeSectionTitle": "{sectionLabel} সম্পূর্ণ করুন",
+  "@completeSectionTitle": {
+    "placeholders": {
+      "sectionLabel": {}
+    }
+  },
+  "profileSection": "প্রোফাইল সেকশন",
+  "@profileSection": {},
+  "fieldsLeft": "{count, plural, =0{কোনো ফিল্ড বাকি নেই} =1{১টি ফিল্ড বাকি} other{{count}টি ফিল্ড বাকি}}",
+  "@fieldsLeft": {
+    "placeholders": {
+      "count": {}
+    }
+  }
 }

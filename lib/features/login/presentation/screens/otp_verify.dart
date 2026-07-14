@@ -11,6 +11,7 @@ import 'package:walima_llc/core/global/components/resend_code_timer.dart';
 import 'package:walima_llc/core/global/components/upper_layer.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/login/presentation/providers/login_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -73,19 +74,15 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
           SizedBox(height: MediaQuery.sizeOf(context).height * 0.02),
           loginDataField(),
           const SizedBox(height: 10),
-
           ResendCodeTimer(
             onResend: () async {
               await provider.resendOtp(context);
             },
           ),
           const SizedBox(height: 10),
-
           bottomAction(),
-
           SizedBox(height: MediaQuery.sizeOf(context).height * 0.01),
           contactSupport(),
-
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -119,7 +116,11 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
                               fontSize: TextSize.font16(context),
                             ),
                           ),
-                          const Icon(Icons.arrow_forward_ios,color: AppColors.primary, size:8)
+                          const Icon(
+                            Icons.arrow_forward_ios,
+                            color: AppColors.primary,
+                            size: 8,
+                          ),
                         ],
                       ),
                     ),
@@ -135,70 +136,72 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
   }
 
   Widget staticText() {
-    return Column(spacing: 12, children: [
-      Column(
-        spacing: 6,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Verify your',
-            style: TextStyle(
-              color: AppColors.textPrimaryLight,
-              fontWeight: FontWeight.bold,
-              fontSize: TextSize.font24(context),
-              fontFamily: FontFamily.timesNewRoman,
-            ),
-          ),
-          Text(
-            'phone number',
-            style: TextStyle(
-              color: AppColors.primary,
-              fontWeight: FontWeight.bold,
-              fontSize: TextSize.font24(context),
-              fontFamily: FontFamily.timesNewRoman,
-            ),
-          ),
-        ],
-      ),
-
-      Column(
-        children: [
-          Text(
-            'We\'ve sent a 6-digit code to',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AppColors.hintTextColor,
-              fontWeight: FontWeight.w400,
-              fontSize: TextSize.font14(context),
-            ),
-          ),
-          Row(
-            spacing: 6,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                '+880 ${provider.mobileNoOrEmailController.text}',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AppColors.textPrimaryLight,
-                  fontWeight: FontWeight.w500,
-                  fontSize: TextSize.font16(context),
-                ),
+    return Column(
+      spacing: 12,
+      children: [
+        Column(
+          spacing: 6,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Verify your',
+              style: TextStyle(
+                color: AppColors.textPrimaryLight,
+                fontWeight: FontWeight.bold,
+                fontSize: TextSize.font24(context),
+                fontFamily: FontFamily.timesNewRoman,
               ),
-              Text(
-                'Edit',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w500,
-                  fontSize: TextSize.font14(context),
-                ),
+            ),
+            Text(
+              'phone number',
+              style: TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
+                fontSize: TextSize.font24(context),
+                fontFamily: FontFamily.timesNewRoman,
               ),
-            ],
-          ),
-        ],
-      )
-    ]);
+            ),
+          ],
+        ),
+        Column(
+          children: [
+            Text(
+              'We\'ve sent a 6-digit code to',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: AppColors.hintTextColor,
+                fontWeight: FontWeight.w400,
+                fontSize: TextSize.font14(context),
+              ),
+            ),
+            Row(
+              spacing: 6,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '+880 ${provider.mobileNoOrEmailController.text}',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.textPrimaryLight,
+                    fontWeight: FontWeight.w500,
+                    fontSize: TextSize.font16(context),
+                  ),
+                ),
+                Text(
+                  'Edit'.localized(context),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w500,
+                    fontSize: TextSize.font14(context),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
   }
 
   Widget contactSupport() {
@@ -226,13 +229,16 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
                 fontSize: TextSize.font14(context),
               ),
             ),
-            Text(
-              'Contact support',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w500,
-                fontSize: TextSize.font14(context),
+            InkWell(
+              onTap: () => context.pushNamed(Routes.helpDesk),
+              child: Text(
+                'Contact support',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w500,
+                  fontSize: TextSize.font14(context),
+                ),
               ),
             ),
           ],
@@ -276,35 +282,44 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: AppColors.greyLight),
+                          borderSide:
+                              const BorderSide(color: AppColors.greyLight),
                         ),
                       ),
                       onChanged: (value) {
                         // Handle paste (multiple chars) and normal single char entry
                         if (value.length > 1) {
                           final chars = value.split('');
-                          for (var i = 0; i < chars.length && (index + i) < provider.otpControllers.length; i++) {
+                          for (var i = 0;
+                              i < chars.length &&
+                                  (index + i) < provider.otpControllers.length;
+                              i++) {
                             provider.otpControllers[index + i].text = chars[i];
                           }
                           final next = index + chars.length;
                           if (next >= provider.otpFocusNodesController.length) {
-                            provider.otpFocusNodesController.last.requestFocus();
+                            provider.otpFocusNodesController.last
+                                .requestFocus();
                             provider.otpFocusNodesController.last.unfocus();
                           } else {
-                            provider.otpFocusNodesController[next].requestFocus();
+                            provider.otpFocusNodesController[next]
+                                .requestFocus();
                           }
                           setState(() {});
                           return;
                         }
 
                         if (value.isNotEmpty) {
-                          if (index + 1 < provider.otpFocusNodesController.length) {
-                            provider.otpFocusNodesController[index + 1].requestFocus();
+                          if (index + 1 <
+                              provider.otpFocusNodesController.length) {
+                            provider.otpFocusNodesController[index + 1]
+                                .requestFocus();
                           } else {
                             provider.otpFocusNodesController[index].unfocus();
                           }
                         } else if (index - 1 >= 0) {
-                          provider.otpFocusNodesController[index - 1].requestFocus();
+                          provider.otpFocusNodesController[index - 1]
+                              .requestFocus();
                         }
                         setState(() {});
                       },
@@ -321,7 +336,8 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
 
   Widget bottomAction() {
     final otpCode = provider.otpControllers.map((c) => c.text).join();
-    final isComplete = otpCode.length == provider.otpControllers.length && provider.otpControllers.isNotEmpty;
+    final isComplete = otpCode.length == provider.otpControllers.length &&
+        provider.otpControllers.isNotEmpty;
     return PrimaryButtons(
       buttonStyle: ButtonsStyle.iconicDynamicButton,
       svgIconPath: AppImages.arrowRightSvgIcon,
@@ -333,9 +349,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
       verticalPadding: 14,
       borderRadius: 50,
       title: 'Verify & Log In',
-      onTap: isComplete
-          ? () => provider.otpValidate(context)
-          : () {},
+      onTap: isComplete ? () => provider.otpValidate(context) : () {},
     );
   }
 }

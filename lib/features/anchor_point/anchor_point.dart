@@ -13,7 +13,6 @@ import 'package:walima_llc/features/matches/presentation/screens/matches.dart';
 import 'package:walima_llc/features/plans/presentation/screens/plans_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// Current tab provider
 final currentTabProvider = StateProvider<int>((ref) => 0);
 
 class AnchorPointScreen extends ConsumerWidget {
@@ -33,6 +32,7 @@ class AnchorPointScreen extends ConsumerWidget {
         showAppBar: false,
       ),
     ];
+
     return WillPopScope(
       onWillPop: () async {
         final shouldClose = await DialogUtils.showAppCloseDiaLog(context);
@@ -59,7 +59,7 @@ class AnchorPointScreen extends ConsumerWidget {
                   _buildNavItem(
                     context: context,
                     icon: AppImages.home,
-                    label: 'Home',
+                    label: 'Home'.localized(context),
                     isActive: currentTab == 0,
                     onTap: () =>
                         ref.read(currentTabProvider.notifier).state = 0,
@@ -67,7 +67,7 @@ class AnchorPointScreen extends ConsumerWidget {
                   _buildNavItem(
                     context: context,
                     icon: AppImages.matches,
-                    label: 'Matches',
+                    label: 'Matches'.localized(context),
                     isActive: currentTab == 1,
                     onTap: () =>
                         ref.read(currentTabProvider.notifier).state = 1,
@@ -75,7 +75,7 @@ class AnchorPointScreen extends ConsumerWidget {
                   _buildNavItem(
                     context: context,
                     icon: AppImages.inbox,
-                    label: 'Inbox',
+                    label: 'Inbox'.localized(context),
                     isActive: currentTab == 2,
                     onTap: () =>
                         ref.read(currentTabProvider.notifier).state = 2,
@@ -83,7 +83,7 @@ class AnchorPointScreen extends ConsumerWidget {
                   _buildNavItem(
                     context: context,
                     icon: AppImages.chat,
-                    label: 'Chat',
+                    label: 'Chat'.localized(context),
                     isActive: currentTab == 3,
                     badgeCount: unreadChatCount,
                     onTap: () =>
@@ -92,7 +92,7 @@ class AnchorPointScreen extends ConsumerWidget {
                   _buildNavItem(
                     context: context,
                     icon: AppImages.premium,
-                    label: 'Premium',
+                    label: 'Premium'.localized(context),
                     isActive: currentTab == 4,
                     onTap: () =>
                         ref.read(currentTabProvider.notifier).state = 4,
@@ -126,8 +126,8 @@ class AnchorPointScreen extends ConsumerWidget {
             children: [
               ShowImage(
                 imagePath: icon,
-                width: 38,
-                height: 38,
+                width: 24,
+                height: 24,
                 color: isActive ? AppColors.primary : AppColors.textSub600,
               ),
               if (badgeCount > 0)

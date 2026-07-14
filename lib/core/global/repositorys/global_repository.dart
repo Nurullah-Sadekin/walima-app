@@ -12,11 +12,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 class GlobalRepository {
   Future<String> getAppVersion() async {
-    await Future.delayed(const Duration(seconds: 1));
-      final packageInfo = await PackageInfo.fromPlatform();
-      final versionText = 'Version: ${packageInfo.version}.${packageInfo.buildNumber}';
-      return versionText;
-
+    final packageInfo = await PackageInfo.fromPlatform();
+    return 'Version: ${packageInfo.version}.${packageInfo.buildNumber}';
   }
 
   Future<GetMeResponseBody> fetchMe() async {
