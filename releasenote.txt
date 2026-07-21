@@ -1,2 +1,5 @@
-Environment: Development
-Release Update Groups for QA
+Walima QA 0.0.2 (build 2)
+
+- Expanded Bengali and Arabic localization across profile, plans, inbox, matches, registration, and other core screens.
+- Added Didit identity verification, including the verification flow, camera permission handling, and improved in-app webview behavior.
+- Refactored registration state and providers for a more reliable sign-up and OTP verification flow.
