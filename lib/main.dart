@@ -21,9 +21,12 @@ import 'package:walima_llc/core/utils/prefs_helper.dart';
 import 'package:walima_llc/core/utils/firebase_messaging_service.dart';
 import 'package:walima_llc/core/utils/foreground_alert_service.dart';
 import 'package:walima_llc/features/chat/data/socket/socket_service.dart';
+import 'core/config/app_flavor.dart';
 import 'core/config/size_config.dart';
 
 Future<void> main() async {
+  AppConfig.initialize(); // Set the desired flavor here
+
   runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();

@@ -1,336 +1,335 @@
+import 'package:walima_llc/core/config/app_flavor.dart';
+
 class AppUrls {
-  static const String domain = 'https://dev.walima.app/';
+  static final String domain = AppConfig.instance.imageBaseUrl;
   static const String apiVersion = 'api/v1';
-  static const String baseUrl = '$domain$apiVersion';
-  static const String login = '$baseUrl/auth/signin-with-password';
-  static const String getMe = '$baseUrl/auth/me';
-  static const String register = '$baseUrl/auth/register';
-  static const String loginWithOTP = '$baseUrl/auth/signin-with-otp';
-  static const String signUpWithOTP = '$baseUrl/auth/sign-up-with-otp';
-  static const String verifyOTP = '$baseUrl/auth/verify-otp';
-  static const String resendOTP = '$baseUrl/auth/resend-otp';
-  static const String forgotPassword = '$baseUrl/auth/forgot-password';
-  static const String setPasswordWithOTP =
+  static final String baseUrl = AppConfig.instance.apiBaseUrl;
+  static final String login = '$baseUrl/auth/signin-with-password';
+  static final String getMe = '$baseUrl/auth/me';
+  static final String register = '$baseUrl/auth/register';
+  static final String loginWithOTP = '$baseUrl/auth/signin-with-otp';
+  static final String signUpWithOTP = '$baseUrl/auth/sign-up-with-otp';
+  static final String verifyOTP = '$baseUrl/auth/verify-otp';
+  static final String resendOTP = '$baseUrl/auth/resend-otp';
+  static final String forgotPassword = '$baseUrl/auth/forgot-password';
+  static final String setPasswordWithOTP =
       '$baseUrl/auth/set-password-with-otp';
-  static const String createPassword = '$baseUrl/auth/create-password';
-  static const String changePassword = '$baseUrl/auth/change-password';
-  static const String getAccessToken = '$baseUrl/auth/refresh-token';
-  static const String logout = '$baseUrl/auth/logout';
-  static const String googleSignin = '$baseUrl/auth/google/signin';
-  static const String appleSignin = '$baseUrl/auth/apple/signin';
-  static const String signUpCreateUserProfile = '$baseUrl/users/onboarding';
-  static const String checkUserNameAvailability =
+  static final String createPassword = '$baseUrl/auth/create-password';
+  static final String changePassword = '$baseUrl/auth/change-password';
+  static final String getAccessToken = '$baseUrl/auth/refresh-token';
+  static final String logout = '$baseUrl/auth/logout';
+  static final String googleSignin = '$baseUrl/auth/google/signin';
+  static final String appleSignin = '$baseUrl/auth/apple/signin';
+  static final String signUpCreateUserProfile = '$baseUrl/users/onboarding';
+  static final String checkUserNameAvailability =
       '$baseUrl/users/check-username';
-  static const String checkEmailAvailability = '$baseUrl/users/check-email';
-  static const String checkNumberAvailability = '$baseUrl/users/check-phone';
-  static const String uploadMedia = '$baseUrl/media/upload';
-  static const String getAllCountry = '$baseUrl/countries';
-  static const String getCityByCountry = '$baseUrl/cities';
-  static const String getPlans = '$baseUrl/plans';
-  static const String updateHobbiesInterest =
+  static final String checkEmailAvailability = '$baseUrl/users/check-email';
+  static final String checkNumberAvailability = '$baseUrl/users/check-phone';
+  static final String uploadMedia = '$baseUrl/media/upload';
+  static final String getAllCountry = '$baseUrl/countries';
+  static final String getCityByCountry = '$baseUrl/cities';
+  static final String getPlans = '$baseUrl/plans';
+  static final String updateHobbiesInterest =
       '$baseUrl/users/profile/interests';
-  static const String updateFamily = '$baseUrl/users/profile/family';
-  static const String updatePreferences = '$baseUrl/users/profile/preferences';
+  static final String updateFamily = '$baseUrl/users/profile/family';
+  static final String updatePreferences = '$baseUrl/users/profile/preferences';
 
   // Engagement Endpoints
-  static const String getRecentVisitors =
+  static final String getRecentVisitors =
       '$baseUrl/engagement/recent-visitors'; //GET
 
   // User Profile Endpoints
-  static const String getCompleteProfile = '$baseUrl/users/profile'; //GET
-  static const String getProfileStrength =
+  static final String getCompleteProfile = '$baseUrl/users/profile'; //GET
+  static final String getProfileStrength =
       '$baseUrl/users/profile/strength'; //GET
-  static const String getProfilePreview =
+  static final String getProfilePreview =
       '$baseUrl/users/profile/preview'; //GET
-  static const String getBasicProfile = '$baseUrl/users/profile/basic'; //GET
-  static const String getAppearanceProfile =
+  static final String getBasicProfile = '$baseUrl/users/profile/basic'; //GET
+  static final String getAppearanceProfile =
       '$baseUrl/users/profile/appearance'; //GET
-  static const String getProfileLocations =
+  static final String getProfileLocations =
       '$baseUrl/users/profile/locations'; //GET
-  static const String getEducationProfile =
+  static final String getEducationProfile =
       '$baseUrl/users/profile/education'; //GET
-  static const String getProfessionProfile =
+  static final String getProfessionProfile =
       '$baseUrl/users/profile/profession'; //GET
-  static const String getFamilyProfile = '$baseUrl/users/profile/family'; //GET
-  static const String getReligionProfile =
+  static final String getFamilyProfile = '$baseUrl/users/profile/family'; //GET
+  static final String getReligionProfile =
       '$baseUrl/users/profile/religion'; //GET
-  static const String getLifestyleProfile =
+  static final String getLifestyleProfile =
       '$baseUrl/users/profile/lifestyle'; //GET
-  static const String getProfilePreferences =
+  static final String getProfilePreferences =
       '$baseUrl/users/profile/preferences'; //GET
-  static const String getProfileContacts =
+  static final String getProfileContacts =
       '$baseUrl/users/profile/contacts'; //GET
-  static const String getProfilePhotos =
+  static final String getProfilePhotos =
       '$baseUrl/users/profile/photos'; //GET  // need to put after image upload
-  static const String getProfilePhotoById =
+  static final String getProfilePhotoById =
       '$baseUrl/users/profile/photo/{photoId}'; //GET
-  static const String getProfileInterests =
+  static final String getProfileInterests =
       '$baseUrl/users/profile/interests'; //GET
-  static const String createProfile = '$baseUrl/users/profile'; //POST
+  static final String createProfile = '$baseUrl/users/profile'; //POST
 
   //Profile Update & Delete Endpoints
-  static const String deleteAppearance =
+  static final String deleteAppearance =
       '$baseUrl/users/profile/appearance'; //DELETE
-  static const String deleteFamily = '$baseUrl/users/profile/family'; //DELETE
-  static const String deleteReligion =
+  static final String deleteFamily = '$baseUrl/users/profile/family'; //DELETE
+  static final String deleteReligion =
       '$baseUrl/users/profile/religion'; //DELETE
-  static const String deleteLifestyle =
+  static final String deleteLifestyle =
       '$baseUrl/users/profile/lifestyle'; //DELETE
-  static const String deletePreferences =
+  static final String deletePreferences =
       '$baseUrl/users/profile/preferences'; //DELETE
-  static const String deleteEducationEntry =
+  static final String deleteEducationEntry =
       '$baseUrl/users/profile/education/{educationId}'; //DELETE
-  static const String deleteProfessionProfile =
+  static final String deleteProfessionProfile =
       '$baseUrl/users/profile/profession/{professionId}'; //DELETE
-  static const String deleteSpecificLocation =
+  static final String deleteSpecificLocation =
       '$baseUrl/users/profile/locations/{locationId}'; //DELETE
-  static const String deleteSpecificContact =
+  static final String deleteSpecificContact =
       '$baseUrl/users/profile/contacts/{contactId}'; //DELETE
-  static const String deleteSpecificPhoto =
+  static final String deleteSpecificPhoto =
       '$baseUrl/users/profile/photos/{photoId}'; //DELETE
-  static const String deleteSpecificInterest =
+  static final String deleteSpecificInterest =
       '$baseUrl/users/profile/interests/{interestId}'; //DELETE
 
-  static const String updateBasicProfile = '$baseUrl/users/profile/basic'; //PUT
-  static const String updateAppearanceProfile =
+  static final String updateBasicProfile = '$baseUrl/users/profile/basic'; //PUT
+  static final String updateAppearanceProfile =
       '$baseUrl/users/profile/appearance'; //PUT
-  static const String updateProfileLocations =
+  static final String updateProfileLocations =
       '$baseUrl/users/profile/locations'; //PUT
-  static const String updateFamilyProfile =
+  static final String updateFamilyProfile =
       '$baseUrl/users/profile/family'; //PUT
-  static const String updateReligionProfile =
+  static final String updateReligionProfile =
       '$baseUrl/users/profile/religion'; //PUT
-  static const String updateLifestyleProfile =
+  static final String updateLifestyleProfile =
       '$baseUrl/users/profile/lifestyle'; //PUT
-  static const String updateProfilePreferences =
+  static final String updateProfilePreferences =
       '$baseUrl/users/profile/preferences'; //PUT
-  static const String updateProfileContacts =
+  static final String updateProfileContacts =
       '$baseUrl/users/profile/contacts'; //PUT
-  static const String updateProfilePhotos =
+  static final String updateProfilePhotos =
       '$baseUrl/users/profile/photos'; //PUT
-  static const String updateProfileInterests =
+  static final String updateProfileInterests =
       '$baseUrl/users/profile/interests'; //PUT
-  static const String universalProfileUpdate =
+  static final String universalProfileUpdate =
       '$baseUrl/users/profile/update'; //PUT
-  static const String updateEducationProfile =
+  static final String updateEducationProfile =
       '$baseUrl/users/profile/educations'; //PUT
-  static const String updateProfessionProfile =
+  static final String updateProfessionProfile =
       '$baseUrl/users/profile/professions'; //PUT
 
   //General User Endpoints
 
-  static const String getCurrentUserInfo = '$baseUrl/users'; //GET
-  static const String getLookups = '$baseUrl/lookups'; //GET
-  static const String getUserDashboard = '$baseUrl/users/dashboard'; //GET
-  static const String checkUsername = '$baseUrl/users/check-username'; //GET
-  static const String checkEmail = '$baseUrl/users/check-email'; //GET
-  static const String checkPhone = '$baseUrl/users/check-phone'; //GET
-  static const String createUserOnboarding = '$baseUrl/users/onboarding'; //POST
+  static final String getCurrentUserInfo = '$baseUrl/users'; //GET
+  static final String getLookups = '$baseUrl/lookups'; //GET
+  static final String getUserDashboard = '$baseUrl/users/dashboard'; //GET
+  static final String checkUsername = '$baseUrl/users/check-username'; //GET
+  static final String checkEmail = '$baseUrl/users/check-email'; //GET
+  static final String checkPhone = '$baseUrl/users/check-phone'; //GET
+  static final String createUserOnboarding = '$baseUrl/users/onboarding'; //POST
 
   //Add-Ons & AI Services
 
-  static const String purchaseAddOn = '$baseUrl/user/add-ons/purchase'; //POST
-  static const String useAddOn = '$baseUrl/user/add-ons/use'; //POST
+  static final String purchaseAddOn = '$baseUrl/user/add-ons/purchase'; //POST
+  static final String useAddOn = '$baseUrl/user/add-ons/use'; //POST
 
-  static const String getAiModels = '$baseUrl/ai/models'; //GET
-  static const String getAiProviders = '$baseUrl/ai/providers'; //GET
-  static const String generateChatCompletion = '$baseUrl/ai/chat'; //POST
-  static const String generateTextCompletion =
+  static final String getAiModels = '$baseUrl/ai/models'; //GET
+  static final String getAiProviders = '$baseUrl/ai/providers'; //GET
+  static final String generateChatCompletion = '$baseUrl/ai/chat'; //POST
+  static final String generateTextCompletion =
       '$baseUrl/ai/text-completion'; //POST
-  static const String generateImage = '$baseUrl/ai/image'; //POST
-  static const String createEmbedding = '$baseUrl/ai/embeddings'; //POST
-  static const String moderateContent = '$baseUrl/ai/moderate'; //POST
+  static final String generateImage = '$baseUrl/ai/image'; //POST
+  static final String createEmbedding = '$baseUrl/ai/embeddings'; //POST
+  static final String moderateContent = '$baseUrl/ai/moderate'; //POST
 
   //Uploads (AWS S3)
-  static const String getSignedUrl = '$baseUrl/uploads/signed-url'; //GET
-  static const String uploadUserImage = '$baseUrl/uploads/usersphoto'; //POST
-  static const String uploadPhotoIdFile =
+  static final String getSignedUrl = '$baseUrl/uploads/signed-url'; //GET
+  static final String uploadUserImage = '$baseUrl/uploads/usersphoto'; //POST
+  static final String uploadPhotoIdFile =
       '$baseUrl/uploads/usersphotoid'; //POST
-  static const String postPhotoFile = '$baseUrl/uploads/postphoto'; //POST
+  static final String postPhotoFile = '$baseUrl/uploads/postphoto'; //POST
 
   //Biodata & Blogs
-  static const String getBiodataProfile = '$baseUrl/biodata'; //GET
-  static const String createOrUpdateBiodataDraft = '$baseUrl/biodata'; //POST
-  static const String updateBiodata = '$baseUrl/biodata'; //PUT
-  static const String getBioTemplates = '$baseUrl/public/bio-templates'; //GET
-  static const String suggestBioTemplate =
+  static final String getBiodataProfile = '$baseUrl/biodata'; //GET
+  static final String createOrUpdateBiodataDraft = '$baseUrl/biodata'; //POST
+  static final String updateBiodata = '$baseUrl/biodata'; //PUT
+  static final String getBioTemplates = '$baseUrl/public/bio-templates'; //GET
+  static final String suggestBioTemplate =
       '$baseUrl/public/bio-templates/suggest'; //POST
-  static const String getConnectMessageTemplates =
+  static final String getConnectMessageTemplates =
       '$baseUrl/public/connect-message-templates'; //GET
 
-  static const String getAllBlogs = '$baseUrl/blogs'; //GET
-  static const String getBlogBySlug = '$baseUrl/blogs/{slug}'; //GET
-  static const String downloadBlogFile = '$baseUrl/blogs/{slug}/file'; //GET
+  static final String getAllBlogs = '$baseUrl/blogs'; //GET
+  static final String getBlogBySlug = '$baseUrl/blogs/{slug}'; //GET
+  static final String downloadBlogFile = '$baseUrl/blogs/{slug}/file'; //GET
 
   //Chat & Connections
-  static const String getConnectableUsers = '$baseUrl/chat/conversations'; //GET
-  static const String getUserConversations =
+  static final String getConnectableUsers = '$baseUrl/chat/conversations'; //GET
+  static final String getUserConversations =
       '$baseUrl/chat/conversations'; //GET
-  static const String getConversationMessages =
+  static final String getConversationMessages =
       '$baseUrl/chat/conversations/{conversationId}/messages'; //GET
-  static const String getMessageById =
+  static final String getMessageById =
       '$baseUrl/chat/message/{messageId}'; //GET
-  static const String sendMessage = '$baseUrl/chat/send-message'; //POST
-  static const String markMessageDelivered =
+  static final String sendMessage = '$baseUrl/chat/send-message'; //POST
+  static final String markMessageDelivered =
       '$baseUrl/chat/message/{messageId}/mark-delivered'; //POST
-  static const String markMessageRead =
+  static final String markMessageRead =
       '$baseUrl/chat/message/{messageId}/mark-read'; //POST
-  static const String markConversationRead =
+  static final String markConversationRead =
       '$baseUrl/chat/conversation/{conversationId}/mark-read'; //POST
 
-  static const String deleteConnection = '$baseUrl/connections/{id}'; //DELETE
-  static const String getConnections = '$baseUrl/connections'; //GET
-  static const String getRequestedConnections =
+  static final String deleteConnection = '$baseUrl/connections/{id}'; //DELETE
+  static final String getConnections = '$baseUrl/connections'; //GET
+  static final String getRequestedConnections =
       '$baseUrl/connections/requested'; //GET
-  static const String getAcceptedConnections =
+  static final String getAcceptedConnections =
       '$baseUrl/connections/accepted'; //GET
-  static const String getSentConnections = '$baseUrl/connections/sent'; //GET
-  static const String getBlockedConnections =
+  static final String getSentConnections = '$baseUrl/connections/sent'; //GET
+  static final String getBlockedConnections =
       '$baseUrl/connections/blocked'; //GET
-  static const String getDeletedConnections =
+  static final String getDeletedConnections =
       '$baseUrl/connections/deleted'; //GET
-  static const String getConnectionById = '$baseUrl/connections/{id}'; //GET
-  static const String getConnectionStats = '$baseUrl/connections/stats'; //GET
-  static const String viewContact = '$baseUrl/connections/view-contact/'; //GET
+  static final String getConnectionById = '$baseUrl/connections/{id}'; //GET
+  static final String getConnectionStats = '$baseUrl/connections/stats'; //GET
+  static final String viewContact = '$baseUrl/connections/view-contact/'; //GET
   static String performConnectionAction(String id) =>
       '$baseUrl/connections/$id/action'; //PATCH
-  static const String createConnection = '$baseUrl/connections'; //POST
-  static const String bulkSendConnectionRequests =
+  static final String createConnection = '$baseUrl/connections'; //POST
+  static final String bulkSendConnectionRequests =
       '$baseUrl/connections/bulk-send'; //POST
-  static const String sendReminder = '$baseUrl/connections/{id}/remind'; //POST
-  static const String updateConnection = '$baseUrl/connections/{id}'; //PUT
+  static final String sendReminder = '$baseUrl/connections/{id}/remind'; //POST
+  static final String updateConnection = '$baseUrl/connections/{id}'; //PUT
   //
 
   // --- Matches & Compatibility ---
-  static const String getMatches = '$baseUrl/matches'; //GET
-  static const String getPublicMatches = '$baseUrl/matches/public'; //GET
-  static const String getMatchesStats = '$baseUrl/matches/stats'; //GET
-  static const String getTopMatches = '$baseUrl/matches/top-matches'; //GET
-  static const String getHomepageTopMatches =
+  static final String getMatches = '$baseUrl/matches'; //GET
+  static final String getPublicMatches = '$baseUrl/matches/public'; //GET
+  static final String getMatchesStats = '$baseUrl/matches/stats'; //GET
+  static final String getTopMatches = '$baseUrl/matches/top-matches'; //GET
+  static final String getHomepageTopMatches =
       '$baseUrl/matches/homepage/top'; //GET
-  static const String getCompatibilityResult =
+  static final String getCompatibilityResult =
       '$baseUrl/matches/compatibility/{userId}'; //GET
-  static const String getMatchPreview =
+  static final String getMatchPreview =
       '$baseUrl/matches/preview/{userId}'; //GET
-  static const String getMatchCompare =
+  static final String getMatchCompare =
       '$baseUrl/matches/compare/{userId}'; //GET
 
   // --- Plans & Subscriptions ---
-  static const String getActivePlan = '$baseUrl/plans/active-plan'; //GET
-  static const String getAvailablePlans =
+  static final String getActivePlan = '$baseUrl/plans/active-plan'; //GET
+  static final String getAvailablePlans =
       '$baseUrl/plans/available-plans'; //GET
-  static const String getSubscriptionHistory =
+  static final String getSubscriptionHistory =
       '$baseUrl/plans/subscription-history'; //GET
-  static const String cancelSubscription =
+  static final String cancelSubscription =
       '$baseUrl/plans/cancel-subscription'; //POST
-  static const String purchasePlan = '$baseUrl/plans/purchase'; //POST
-  static const String paymentsUpgradeQuote =
+  static final String purchasePlan = '$baseUrl/plans/purchase'; //POST
+  static final String paymentsUpgradeQuote =
       '$baseUrl/payments/upgrade-quote'; //POST
-  static const String paymentsInitiate = '$baseUrl/payments/initiate'; //POST
-  static const String paymentsInitiateUpgrade =
+  static final String paymentsInitiate = '$baseUrl/payments/initiate'; //POST
+  static final String paymentsInitiateUpgrade =
       '$baseUrl/payments/initiate-upgrade'; //POST
-  static const String paymentsSslCommerzWebhook =
+  static final String paymentsSslCommerzWebhook =
       '$baseUrl/payments/webhook/sslcommerz'; //POST
-  static const String paymentsSslCommerzCallback =
+  static final String paymentsSslCommerzCallback =
       '$baseUrl/payments/callback/sslcommerz'; //GET
-  static const String paymentsSubscription =
+  static final String paymentsSubscription =
       '$baseUrl/payments/subscription'; //GET
 
   // --- Activities & Interactions ---
-  static const String getProfileVisitors = '$baseUrl/activities/visitors'; //GET
+  static final String getProfileVisitors = '$baseUrl/activities/visitors'; //GET
 
   // --- Settings ---
-  static const String contactFilters =
+  static final String contactFilters =
       '$baseUrl/settings/contact-filters'; //GET,PUT
-  static const String getShortlistedUsers =
+  static final String getShortlistedUsers =
       '$baseUrl/activities/shortlist'; //GET
-  static const String addToShortlist = '$baseUrl/activities/shortlist'; //POST
-  static const String removeFromShortlist =
+  static final String addToShortlist = '$baseUrl/activities/shortlist'; //POST
+  static final String removeFromShortlist =
       '$baseUrl/activities/shortlist/{userId}'; //DELETE
-  static const String getBlockedUsers = '$baseUrl/interactions/blocks'; //GET
-  static const String getReports = '$baseUrl/interactions/reports'; //GET
-  static const String blockUser = '$baseUrl/interactions/block'; //POST
-  static const String reportUser = '$baseUrl/interactions/report'; //POST
-  static const String unblockUser = '$baseUrl/interactions/unblock'; //POST
+  static final String getBlockedUsers = '$baseUrl/interactions/blocks'; //GET
+  static final String getReports = '$baseUrl/interactions/reports'; //GET
+  static final String blockUser = '$baseUrl/interactions/block'; //POST
+  static final String reportUser = '$baseUrl/interactions/report'; //POST
+  static final String unblockUser = '$baseUrl/interactions/unblock'; //POST
 
   // --- Public Profiles & Search ---
-  static const String getPublicProfile =
+  static final String getPublicProfile =
       '$baseUrl/public/profile/{userId}'; //GET
-  static const String getPublicProfilePhotos =
+  static final String getPublicProfilePhotos =
       '$baseUrl/public/profile/{userId}/photos'; //GET
-  static const String searchUsers = '$baseUrl/public/search'; //POST
+  static final String searchUsers = '$baseUrl/public/search'; //POST
 
   // --- Notifications ---
-  static const String getNotifications = '$baseUrl/notifications'; //GET
-  static const String getUnreadNotificationCount =
+  static final String getNotifications = '$baseUrl/notifications'; //GET
+  static final String getUnreadNotificationCount =
       '$baseUrl/notifications/unread-count'; //GET
-  static const String bulkReadNotifications =
+  static final String bulkReadNotifications =
       '$baseUrl/notifications/bulk-read'; //PATCH
-  static const String markNotificationAsRead =
+  static final String markNotificationAsRead =
       '$baseUrl/notifications/{id}/read'; //PATCH
-  static const String markAllNotificationsAsRead =
+  static final String markAllNotificationsAsRead =
       '$baseUrl/notifications/read-all'; //POST
-  static const String registerDeviceToken =
+  static final String registerDeviceToken =
       '$baseUrl/notifications/device-tokens/register'; //PATCH
-  static const String deleteNotification =
+  static final String deleteNotification =
       '$baseUrl/notifications/{id}'; //DELETE
 
   // --- Settings & Add-Ons ---
-  static const String getNotificationSettings =
+  static final String getNotificationSettings =
       '$baseUrl/settings/notifications'; //GET
-  static const String getPrivacySettings = '$baseUrl/settings/privacy'; //GET
-  static const String updateNotificationSettings =
+  static final String getPrivacySettings = '$baseUrl/settings/privacy'; //GET
+  static final String updateNotificationSettings =
       '$baseUrl/settings/notifications'; //PUT
-  static const String updatePrivacySettings = '$baseUrl/settings/privacy'; //PUT
-  static const String submitFeedback = '$baseUrl/settings/feedback'; //POST
-  static const String contactSupport = '$baseUrl/settings/support'; //POST
+  static final String updatePrivacySettings = '$baseUrl/settings/privacy'; //PUT
+  static final String submitFeedback = '$baseUrl/settings/feedback'; //POST
+  static final String contactSupport = '$baseUrl/settings/support'; //POST
   // Plans
-  static const String getAllPlans = '$baseUrl/plans'; //POST
+  static final String getAllPlans = '$baseUrl/plans'; //POST
 
   // --- AI Support Bot ---
-  static const String supportBotConversations =
+  static final String supportBotConversations =
       '$baseUrl/support-bot/conversations'; //GET, POST
-  static const String supportBotConversationById =
+  static final String supportBotConversationById =
       '$baseUrl/support-bot/conversations/{conversationId}'; //GET
-  static const String supportBotMessages =
+  static final String supportBotMessages =
       '$baseUrl/support-bot/conversations/{conversationId}'; //GET (paged messages)
-  static const String supportBotSendMessage =
+  static final String supportBotSendMessage =
       '$baseUrl/support-bot/conversations/{conversationId}/messages'; //POST
-  static const String supportBotConfirm =
+  static final String supportBotConfirm =
       '$baseUrl/support-bot/conversations/{conversationId}/confirm'; //POST
-  static const String supportBotEscalate =
+  static final String supportBotEscalate =
       '$baseUrl/support-bot/conversations/{conversationId}/escalate'; //POST
-  static const String supportBotTickets = '$baseUrl/support-bot/tickets'; //GET
-  static const String supportBotTicketById =
+  static final String supportBotTickets = '$baseUrl/support-bot/tickets'; //GET
+  static final String supportBotTicketById =
       '$baseUrl/support-bot/tickets/{ticketId}'; //GET, DELETE
-  static const String supportBotTicketMessages =
+  static final String supportBotTicketMessages =
       '$baseUrl/support-bot/tickets/{ticketId}/messages'; //POST
 
-  static const String getPlanById = '$baseUrl/plans/{planId}'; //GET
+  static final String getPlanById = '$baseUrl/plans/{planId}'; //GET
 
   // --- Identity Verification (Didit KYC) ---
   // Flutter talks only to the Walima backend; the backend owns the Didit API key.
-  static const String verificationSession =
+  static final String verificationSession =
       '$baseUrl/verification/session'; //POST
-  static const String verificationStatus =
-      '$baseUrl/verification/status'; //GET
-  static const String verificationSessions =
+  static final String verificationStatus = '$baseUrl/verification/status'; //GET
+  static final String verificationSessions =
       '$baseUrl/verification/sessions'; //GET
 
   //------  Account Settings ------
-  static const String updateNameAndEmail = '$baseUrl/settings/account'; //GET
-  static const String contactSettings = '$baseUrl/settings/contact'; //GET, PUT
-  static const String premiumSettings = '$baseUrl/settings/premium'; //GET, PUT
-  static const String messagesSettings = '$baseUrl/settings/messages'; //GET
+  static final String updateNameAndEmail = '$baseUrl/settings/account'; //GET
+  static final String contactSettings = '$baseUrl/settings/contact'; //GET, PUT
+  static final String premiumSettings = '$baseUrl/settings/premium'; //GET, PUT
+  static final String messagesSettings = '$baseUrl/settings/messages'; //GET
 
   // ---- External Links ----
-  static const String helpCenterUrl =
-      'https://dev.walima.app/en/account/help-desk';
-  static const String beSafeOnlineUrl =
-      'https://dev.walima.app/en/be-safe-online';
-  static const String privacyPolicyUrl = 'https://dev.walima.app/en/privacy';
-  static const String safetyUrl = 'https://dev.walima.app/en/safety';
-  static const String termsUrl = 'https://dev.walima.app/en/terms';
+  static final String helpCenterUrl = '${domain}en/account/help-desk';
+  static final String beSafeOnlineUrl = '${domain}en/be-safe-online';
+  static final String privacyPolicyUrl = '${domain}en/privacy';
+  static final String safetyUrl = '${domain}en/safety';
+  static final String termsUrl = '${domain}en/terms';
   static const String facebookUrl = 'https://www.facebook.com/WalimaApp';
   static const String instagramUrl = 'https://www.instagram.com/walima.app';
   static const String xUrl = 'https://x.com/WalimaApp';

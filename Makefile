@@ -12,17 +12,26 @@ FIREBASE_GROUPS ?= $(shell test -f "$(RELEASE_GROUP_FILE)" && tr -d '\n\r' < "$(
 FIREBASE_TESTERS ?=
 RELEASE_NOTES ?= $(shell test -f "$(RELEASE_NOTE_FILE)" && cat "$(RELEASE_NOTE_FILE)" || echo "Walima release APK from $$(git rev-parse --short HEAD 2>/dev/null || echo local-build)")
 
+APP_FLAVOR ?= dev
+BUILD_DEFINES = --dart-define=APP_FLAVOR=$(APP_FLAVOR)
 BUILD_ARGS ?= --release
 APK_PATH ?= build/app/outputs/flutter-apk/app-release.apk
 
 .PHONY: help clean pub-get release-apk upload-firebase release-apk-upload release \
-	build-apk apptester apptester-upload firebase-upload
+	build-apk apptester apptester-upload firebase-upload run-dev run-prod \
+	build-dev-apk build-prod-apk build-prod-aab build-prod-ipa
 
 help:
 	@echo "Available targets:"
 	@echo "  make release-apk-upload  Clean, fetch packages, build, and upload Walima to Firebase App Distribution"
 	@echo "  make release-apk         Build the Walima release APK only"
 	@echo "  make upload-firebase     Upload the existing release APK only"
+	@echo "  make run-dev             Run against the development environment"
+	@echo "  make run-prod            Run against the production environment"
+	@echo "  make build-dev-apk       Build a development release APK"
+	@echo "  make build-prod-apk      Build a production release APK"
+	@echo "  make build-prod-aab      Build a production Android App Bundle"
+	@echo "  make build-prod-ipa      Build a production iOS archive"
 	@echo "  make apptester           Alias for release-apk-upload"
 	@echo "  make apptester-upload    Alias for upload-firebase"
 	@echo "  make release             Alias for release-apk-upload"
@@ -32,6 +41,7 @@ help:
 	@echo "  releasenote.txt          Release notes for the upload"
 	@echo "  FIREBASE_TESTERS=...     Optional comma-separated tester emails"
 	@echo "  APK_PATH=...             Optional path to an existing APK"
+	@echo "  APP_FLAVOR=dev|prod      App environment (defaults to dev)"
 
 clean:
 	$(FLUTTER) clean
@@ -40,8 +50,26 @@ pub-get:
 	$(FLUTTER) pub get
 
 release-apk:
-	$(FLUTTER) build apk $(BUILD_ARGS)
+	$(FLUTTER) build apk $(BUILD_ARGS) $(BUILD_DEFINES)
 	@test -f "$(APK_PATH)"
+
+run-dev:
+	$(FLUTTER) run --dart-define=APP_FLAVOR=dev
+
+run-prod:
+	$(FLUTTER) run --dart-define=APP_FLAVOR=prod
+
+build-dev-apk:
+	$(FLUTTER) build apk --release --dart-define=APP_FLAVOR=dev
+
+build-prod-apk:
+	$(FLUTTER) build apk --release --dart-define=APP_FLAVOR=prod
+
+build-prod-aab:
+	$(FLUTTER) build appbundle --release --dart-define=APP_FLAVOR=prod
+
+build-prod-ipa:
+	$(FLUTTER) build ipa --release --dart-define=APP_FLAVOR=prod
 
 upload-firebase:
 	@test -f "$(APK_PATH)" || { \
@@ -66,7 +94,7 @@ upload-firebase:
 release-apk-upload:
 	$(MAKE) clean
 	$(MAKE) pub-get
-	$(MAKE) release-apk
+	$(MAKE) release-apk APP_FLAVOR=prod
 	$(MAKE) upload-firebase
 
 release: release-apk-upload

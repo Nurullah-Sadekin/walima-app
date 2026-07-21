@@ -82,12 +82,37 @@ flutter pub run build_runner build --delete-conflicting-outputs
 ### Run the app
 
 ```bash
-flutter run
+flutter run --dart-define=APP_FLAVOR=dev
+```
+
+The environment is selected at compile time. Development is the safe default;
+production must be selected explicitly:
+
+```bash
+flutter run --dart-define=APP_FLAVOR=dev
+flutter run --dart-define=APP_FLAVOR=prod
+flutter build apk --release --dart-define=APP_FLAVOR=dev
+flutter build apk --release --dart-define=APP_FLAVOR=prod
+flutter build appbundle --release --dart-define=APP_FLAVOR=prod
+flutter build ipa --release --dart-define=APP_FLAVOR=prod
+```
+
+Equivalent Make targets are also available:
+
+```bash
+make run-dev
+make run-prod
+make build-dev-apk
+make build-prod-apk
+make build-prod-aab
+make build-prod-ipa
 ```
 
 ## Configuration Notes
 
-- The app currently points to the development API domain configured in [lib/core/network/app_urls.dart](/Volumes/development/freelance/walima/lib/core/network/app_urls.dart:1).
+- `APP_FLAVOR` accepts only `dev` or `prod`; unsupported values stop startup with a clear error.
+- API and web/image URLs are centralized in `lib/core/config/app_flavor.dart`.
+- Dev uses `https://dev.walima.app`; prod uses `https://walima.app`.
 - Firebase initialization is handled in [lib/main.dart](/Volumes/development/freelance/walima/lib/main.dart:1) and platform configuration files.
 - Push notification, crash reporting, connectivity monitoring, and realtime bootstrap logic are also initialized from `main.dart`.
 - The package name still contains legacy `walima_llc` references in code imports and `pubspec.yaml`, even though the app branding is Walima.

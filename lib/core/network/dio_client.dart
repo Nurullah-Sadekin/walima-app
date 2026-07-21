@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:walima_llc/core/config/app_flavor.dart';
 import 'package:walima_llc/core/connectivity/connectivity_keys.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:walima_llc/core/constants/app_texts.dart';
@@ -19,7 +20,7 @@ class DioClient {
   DioClient._internal() {
     _dio = Dio(
       BaseOptions(
-        baseUrl: AppTexts.baseUrl,
+        baseUrl: AppConfig.instance.apiBaseUrl,
         connectTimeout: const Duration(seconds: 60),
         receiveTimeout: const Duration(seconds: 60),
         sendTimeout: const Duration(seconds: 60),

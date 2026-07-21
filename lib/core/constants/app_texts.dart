@@ -90,8 +90,4 @@ class AppTexts {
   static const String today = 'Today';
   static const String yesterday = 'Yesterday';
   static const String tomorrow = 'Tomorrow';
-
-  // API Endpoints (Base paths)
-  static const String baseUrl = 'https://api.example.com';
-  static const String apiVersion = 'v1';
 }
