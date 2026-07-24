@@ -107,14 +107,17 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
           prefixIcon: InkWell(
             onTap: _openCountryPicker,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               child: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     provider.selectedCountry.flagEmoji,
-                    style: TextStyle(fontSize: TextSize.font18(context)),
+                    style: TextStyle(fontSize: TextSize.font16(context)),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 4),
                   Text(
                     '+${provider.selectedCountry.phoneCode}',
                     style: TextStyle(
@@ -122,7 +125,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
                       fontSize: TextSize.font14(context),
                     ),
                   ),
-                  const Icon(Icons.arrow_drop_down, color: Colors.grey, size: 20),
+                  Icon(Icons.arrow_drop_down, color: Colors.grey, size: TextSize.font20(context)),
                 ],
               ),
             ),
