@@ -8,6 +8,7 @@ import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:walima_llc/core/constants/app_texts.dart';
 import 'package:walima_llc/core/global/repositorys/global_repository.dart';
 import 'package:walima_llc/core/network/app_urls.dart';
+import 'package:walima_llc/core/network/api_response_message.dart';
 import 'package:walima_llc/core/utils/app_error_reporting_service.dart';
 import 'package:walima_llc/core/utils/dialog_utils.dart';
 import 'package:walima_llc/core/utils/prefs_helper.dart';
@@ -186,7 +187,8 @@ class DioClient {
       validateStatus: acceptedStatusCodes == null
           ? options?.validateStatus
           : (status) =>
-              status != null && (acceptedStatusCodes.contains(status) || status < 400),
+              status != null &&
+              (acceptedStatusCodes.contains(status) || status < 400),
     );
   }
 
@@ -369,74 +371,34 @@ class DioClient {
 
   /// Handle response based on status code
   ApiResponse _handleResponse(Response response) {
-    switch (response.statusCode) {
-      case 200:
-        return ApiResponse.success(
-          data: response.data,
-          message: 'Success',
-          statusCode: 200,
-        );
-      case 201:
-        return ApiResponse.success(
-          data: response.data,
-          message: 'Created successfully',
-          statusCode: 201,
-        );
-      case 204:
-        return ApiResponse.success(
-          data: null,
-          message: 'No content',
-          statusCode: 204,
-        );
-      case 400:
-        return ApiResponse.error(
-          message: response.data?['message'] ?? 'Bad request',
-          statusCode: 400,
-          data: response.data,
-        );
-      case 401:
-        return ApiResponse.error(
-          message: response.data?['message'] ?? AppTexts.unauthorized,
-          statusCode: 401,
-          data: response.data,
-        );
-      case 402:
-        return ApiResponse.error(
-          message: response.data?['message'] ?? 'Payment required',
-          statusCode: 402,
-          data: response.data,
-        );
-      case 403:
-        return ApiResponse.error(
-          message: response.data?['message'] ?? 'Forbidden',
-          statusCode: 403,
-          data: response.data,
-        );
-      case 404:
-        return ApiResponse.error(
-          message: response.data?['message'] ?? AppTexts.notFound,
-          statusCode: 404,
-          data: response.data,
-        );
-      case 422:
-        return ApiResponse.error(
-          message: response.data?['message'] ?? 'Unprocessable entity',
-          statusCode: 422,
-          data: response.data,
-        );
-      case 429:
-        return ApiResponse.error(
-          message: response.data?['message'] ?? 'Too many requests',
-          statusCode: 429,
-          data: response.data,
-        );
-      default:
-        return ApiResponse.error(
-          message: response.data?['message'] ?? AppTexts.unknownError,
-          statusCode: response.statusCode ?? 0,
-          data: response.data,
-        );
+    final statusCode = response.statusCode ?? 0;
+    final message = ApiResponseMessage.extract(
+      data: response.data,
+      contentType: response.headers.value(Headers.contentTypeHeader),
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+    );
+    final isSuccess = statusCode >= 200 && statusCode < 300;
+
+    if (isSuccess) {
+      return ApiResponse.success(
+        data: statusCode == 204 ? null : response.data,
+        message: message,
+        statusCode: statusCode,
+      );
     }
+
+    final errorData = ApiResponseMessage.normalizeErrorData(
+      data: response.data,
+      message: message,
+      statusCode: statusCode,
+    );
+
+    return ApiResponse.error(
+      message: message,
+      statusCode: statusCode,
+      data: errorData,
+    );
   }
 
   /// Handle errors
@@ -501,12 +463,11 @@ class DioClient {
       final response = await _dio.get(
         endpoint,
         queryParameters: queryParameters,
-        options:
-            _optionsWithTokenFlag(
-              options,
-              isTokenRequired: isTokenRequired,
-              acceptedStatusCodes: acceptedStatusCodes,
-            ),
+        options: _optionsWithTokenFlag(
+          options,
+          isTokenRequired: isTokenRequired,
+          acceptedStatusCodes: acceptedStatusCodes,
+        ),
         cancelToken: cancelToken,
       );
       return _handleResponse(response);
@@ -544,12 +505,11 @@ class DioClient {
         endpoint,
         data: data,
         queryParameters: queryParameters,
-        options:
-            _optionsWithTokenFlag(
-              options,
-              isTokenRequired: isTokenRequired,
-              acceptedStatusCodes: acceptedStatusCodes,
-            ),
+        options: _optionsWithTokenFlag(
+          options,
+          isTokenRequired: isTokenRequired,
+          acceptedStatusCodes: acceptedStatusCodes,
+        ),
         cancelToken: cancelToken,
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
@@ -589,12 +549,11 @@ class DioClient {
         endpoint,
         data: data,
         queryParameters: queryParameters,
-        options:
-            _optionsWithTokenFlag(
-              options,
-              isTokenRequired: isTokenRequired,
-              acceptedStatusCodes: acceptedStatusCodes,
-            ),
+        options: _optionsWithTokenFlag(
+          options,
+          isTokenRequired: isTokenRequired,
+          acceptedStatusCodes: acceptedStatusCodes,
+        ),
         cancelToken: cancelToken,
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
@@ -634,12 +593,11 @@ class DioClient {
         endpoint,
         data: data,
         queryParameters: queryParameters,
-        options:
-            _optionsWithTokenFlag(
-              options,
-              isTokenRequired: isTokenRequired,
-              acceptedStatusCodes: acceptedStatusCodes,
-            ),
+        options: _optionsWithTokenFlag(
+          options,
+          isTokenRequired: isTokenRequired,
+          acceptedStatusCodes: acceptedStatusCodes,
+        ),
         cancelToken: cancelToken,
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
