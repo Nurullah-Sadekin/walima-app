@@ -175,7 +175,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
     return Column(
       children: [
         Text(
-          'Did\'nt receive the SMS?',
+          'Didn\'t receive the SMS?',
           textAlign: TextAlign.center,
           style: TextStyle(
             color: AppColors.hintTextColor,
