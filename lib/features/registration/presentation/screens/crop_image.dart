@@ -36,11 +36,9 @@ class _CropImageScreenState extends ConsumerState<CropImageScreen> {
   }
 
   bool get _isUploading {
-    return provider.photoUploadFlowState ==
-            PhotoUploadFlowState.uploadingForAiCheck ||
+    return provider.photoUploadFlowState == PhotoUploadFlowState.uploadingForAiCheck ||
         provider.photoUploadFlowState == PhotoUploadFlowState.mediaUploaded ||
-        provider.photoUploadFlowState ==
-            PhotoUploadFlowState.attachingToProfile;
+        provider.photoUploadFlowState == PhotoUploadFlowState.attachingToProfile;
   }
 
   @override
@@ -68,18 +66,23 @@ class _CropImageScreenState extends ConsumerState<CropImageScreen> {
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(registrationScreenStateProvider);
     return TransparentLoading(
-      isLoading:
-          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: screenProvider.screenStates ==
-                  RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates == RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
-                    const CustomBackAppBar(),
+                    CustomBackAppBar(
+                      isTrailing: true,
+                      trailingText: 'Skip',
+                      onTrailingTap: () {
+                        provider.resetPhotoUploadFlow();
+                        context.push(Paths.hobbiesInterests);
+                      },
+                    ),
                     body(),
                     finallyUploadTheCroppedImage(),
                     const SizedBox(height: 30),
@@ -131,8 +134,7 @@ class _CropImageScreenState extends ConsumerState<CropImageScreen> {
   }
 
   Future<void> _handleContinue() async {
-    
-    if(provider.profileImageUploadErrorMessage.isNotEmpty) {
+    if (provider.profileImageUploadErrorMessage.isNotEmpty) {
       provider.resetPhotoUploadFlow();
       context.pop();
       return;
@@ -146,10 +148,9 @@ class _CropImageScreenState extends ConsumerState<CropImageScreen> {
       return;
     }
     if (_isUploading) return;
-     
+
     provider.resetPhotoUploadFlow();
-    final isUploaded =
-        await provider.uploadAndAttachProfileImage(filePath: imagePath);
+    final isUploaded = await provider.uploadAndAttachProfileImage(filePath: imagePath);
 
     if (!mounted) return;
 
@@ -164,9 +165,7 @@ class _CropImageScreenState extends ConsumerState<CropImageScreen> {
     }
     DialogUtils.showErrorDialog(
       context: context,
-      message: provider.profileImageUploadErrorMessage.isNotEmpty
-          ? provider.profileImageUploadErrorMessage
-          : 'Failed to upload profile image.',
+      message: provider.profileImageUploadErrorMessage.isNotEmpty ? provider.profileImageUploadErrorMessage : 'Failed to upload profile image.',
       buttonText: provider.canRetryProfileImageUpload ? 'Retry Upload' : 'Try again',
       onButtonPressed: () {
         Navigator.of(context, rootNavigator: true).pop();
@@ -193,9 +192,7 @@ class _CropImageScreenState extends ConsumerState<CropImageScreen> {
           const SizedBox(width: 10),
           Flexible(
             child: Text(
-              provider.profileImageUploadStatusMessage.isNotEmpty
-                  ? provider.profileImageUploadStatusMessage
-                  : 'Uploading your photo...',
+              provider.profileImageUploadStatusMessage.isNotEmpty ? provider.profileImageUploadStatusMessage : 'Uploading your photo...',
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppColors.textSecondaryLight),
             ),
@@ -223,10 +220,12 @@ class _CropImageScreenState extends ConsumerState<CropImageScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: PrimaryButtons(
         buttonStyle:
-            (_selectedImagePath?.trim().isNotEmpty ?? false) && !_isUploading
-                ? ButtonsStyle.activePrimaryButton
-                : ButtonsStyle.disableButton,
-        title: _isUploading ? 'Verifying Photo...' : provider.profileImageUploadErrorMessage.isNotEmpty ? 'Try again' : 'Upload Image',
+            (_selectedImagePath?.trim().isNotEmpty ?? false) && !_isUploading ? ButtonsStyle.activePrimaryButton : ButtonsStyle.disableButton,
+        title: _isUploading
+            ? 'Verifying Photo...'
+            : provider.profileImageUploadErrorMessage.isNotEmpty
+                ? 'Try again'
+                : 'Upload Image',
         onTap: _isUploading ? () {} : _handleContinue,
       ),
     );

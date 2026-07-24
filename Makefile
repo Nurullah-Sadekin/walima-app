@@ -19,7 +19,7 @@ APK_PATH ?= build/app/outputs/flutter-apk/app-release.apk
 
 .PHONY: help clean pub-get release-apk upload-firebase release-apk-upload release \
 	build-apk apptester apptester-upload firebase-upload run-dev run-prod \
-	build-dev-apk build-prod-apk build-prod-aab build-prod-ipa
+	build-dev-apk build-prod-apk build-prod-aab build-prod-ipa apptester-dev
 
 help:
 	@echo "Available targets:"
@@ -32,6 +32,7 @@ help:
 	@echo "  make build-prod-apk      Build a production release APK"
 	@echo "  make build-prod-aab      Build a production Android App Bundle"
 	@echo "  make build-prod-ipa      Build a production iOS archive"
+	@echo "  make apptester-dev       Build dev APK and upload it to Firebase App Distribution"
 	@echo "  make apptester           Alias for release-apk-upload"
 	@echo "  make apptester-upload    Alias for upload-firebase"
 	@echo "  make release             Alias for release-apk-upload"
@@ -95,6 +96,12 @@ release-apk-upload:
 	$(MAKE) clean
 	$(MAKE) pub-get
 	$(MAKE) release-apk APP_FLAVOR=prod
+	$(MAKE) upload-firebase
+
+apptester-dev:
+	$(MAKE) clean
+	$(MAKE) pub-get
+	$(MAKE) release-apk APP_FLAVOR=dev
 	$(MAKE) upload-firebase
 
 release: release-apk-upload
