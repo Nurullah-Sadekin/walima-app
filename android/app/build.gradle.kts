@@ -15,7 +15,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.walima.matrimony"
+    namespace = "com.krybon"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "29.0.14033849"
 
@@ -30,7 +30,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.walima.matrimony"
+        applicationId = "com.krybon"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

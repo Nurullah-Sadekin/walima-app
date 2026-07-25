@@ -39,6 +39,10 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class RegistrationProvider extends BaseChangeNotifier {
+  RegistrationProvider() {
+    _applyDefaultIncomePeriod();
+  }
+
   VoidCallback? _controllersListener;
   Timer? _persistDebounce;
   bool _isDraftInitialized = false;
@@ -476,6 +480,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     _clearSelectedValues();
     _clearAllControllers();
     _resetAllSelections();
+    _applyDefaultIncomePeriod();
     selectedHobbies.clear();
     verificationDone = false;
     phoneAvailabilityErrorMessage = '';
@@ -563,6 +568,16 @@ class RegistrationProvider extends BaseChangeNotifier {
   ) {
     for (final item in list) {
       applySelection(item, false);
+    }
+  }
+
+  void _applyDefaultIncomePeriod() {
+    const defaultIncomePeriod = 'Monthly';
+    selectedIncomePeriodStatus = defaultIncomePeriod;
+
+    for (final item in incomePeriodDataList) {
+      item.isSelected =
+          item.name.toLowerCase() == defaultIncomePeriod.toLowerCase();
     }
   }
 
@@ -1571,7 +1586,7 @@ class RegistrationProvider extends BaseChangeNotifier {
           _asStringOrNull(decoded['selectedIsWithFamilyStatus']);
       selectedDietStatus = _asStringOrNull(decoded['selectedDietStatus']);
       selectedIncomePeriodStatus =
-          _asStringOrNull(decoded['selectedIncomePeriodStatus']);
+          _asStringOrNull(decoded['selectedIncomePeriodStatus']) ?? 'Monthly';
       selectedIncomeRange = _asStringOrNull(decoded['selectedIncomeRange']) ??
           incomeRangeController.text;
       selectedYourWork = _asStringOrNull(decoded['selectedYourWork']) ??
