@@ -19,7 +19,8 @@ APK_PATH ?= build/app/outputs/flutter-apk/app-release.apk
 
 .PHONY: help clean pub-get release-apk upload-firebase release-apk-upload release \
 	build-apk apptester apptester-upload firebase-upload run-dev run-prod \
-	build-dev-apk build-prod-apk build-prod-aab build-prod-ipa apptester-dev
+	build-dev-apk build-dev-ipa build-prod-apk build-prod-aab build-prod-ipa \
+	apptester-dev
 
 help:
 	@echo "Available targets:"
@@ -29,6 +30,7 @@ help:
 	@echo "  make run-dev             Run against the development environment"
 	@echo "  make run-prod            Run against the production environment"
 	@echo "  make build-dev-apk       Build a development release APK"
+	@echo "  make build-dev-ipa       Build a development release IPA"
 	@echo "  make build-prod-apk      Build a production release APK"
 	@echo "  make build-prod-aab      Build a production Android App Bundle"
 	@echo "  make build-prod-ipa      Build a production iOS archive"
@@ -62,6 +64,9 @@ run-prod:
 
 build-dev-apk:
 	$(FLUTTER) build apk --release --dart-define=APP_FLAVOR=dev
+
+build-dev-ipa:
+	$(FLUTTER) build ipa --release --dart-define=APP_FLAVOR=dev
 
 build-prod-apk:
 	$(FLUTTER) build apk --release --dart-define=APP_FLAVOR=prod
