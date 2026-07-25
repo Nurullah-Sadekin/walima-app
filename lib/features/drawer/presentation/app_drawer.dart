@@ -72,21 +72,17 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
               svgIconPath: AppImages.logOutSvgIcon,
               svgIconColor: AppColors.white,
               onTap: () async {
-                await provider.logout(
-                  () {
-                    router.go(Paths.onboarding);
-                  },
-                  onBeforeLogout: () {
-                    ref.invalidate(homeProvider);
-                    ref.invalidate(currentTabProvider);
-                    ref.invalidate(profileProvider);
-                    ref.invalidate(matchesProvider);
-                    ref.invalidate(inboxProvider);
-                    ref.invalidate(chatProvider);
-                    ref.invalidate(globalProvider);
-                    ref.read(chatProvider).clearChatState();
-                  },
-                );
+                await provider.logout(() {
+                  ref.read(chatProvider).clearChatState(notify: false);
+                  ref.invalidate(homeProvider);
+                  ref.invalidate(currentTabProvider);
+                  ref.invalidate(profileProvider);
+                  ref.invalidate(matchesProvider);
+                  ref.invalidate(inboxProvider);
+                  ref.invalidate(chatProvider);
+                  ref.invalidate(globalProvider);
+                  router.go(Paths.onboarding);
+                });
               },
               buttonStyle: ButtonsStyle.iconicDynamicButton,
             ),

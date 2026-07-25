@@ -63,6 +63,17 @@ class DioClient {
           options.extra[_requestStartAtKey] = DateTime.now().toIso8601String();
 
           if (isTokenRequired) {
+            if (!_authenticatedRequestsEnabled) {
+              handler.reject(
+                DioException(
+                  requestOptions: options,
+                  type: DioExceptionType.cancel,
+                  message: 'Authenticated request blocked after logout.',
+                ),
+              );
+              return;
+            }
+
             final accessToken = (_authToken?.isNotEmpty ?? false)
                 ? _authToken!
                 : await PrefsHelper.getAccessToken();
@@ -93,6 +104,7 @@ class DioClient {
               error.requestOptions.extra[_isTokenKey] == true;
 
           if ((statusCode == 403 || statusCode == 401) &&
+              _authenticatedRequestsEnabled &&
               isTokenRequired &&
               !isRefreshRequest &&
               !isRetried) {
@@ -130,6 +142,7 @@ class DioClient {
   Completer<bool>? _refreshCompleter;
   VoidCallback? _onLogout;
   String? _authToken;
+  bool _authenticatedRequestsEnabled = true;
   bool _isShowingTimeoutDialog = false;
   int _requestCounter = 0;
 
@@ -149,11 +162,13 @@ class DioClient {
   /// Set authentication token
   void setAuthToken(String token) {
     _authToken = token;
+    _authenticatedRequestsEnabled = token.trim().isNotEmpty;
   }
 
   /// Remove authentication token
   void removeAuthToken() {
     _authToken = null;
+    _authenticatedRequestsEnabled = false;
     _dio.options.headers.remove('Authorization');
   }
 

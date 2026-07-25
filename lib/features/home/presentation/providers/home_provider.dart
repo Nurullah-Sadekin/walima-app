@@ -15,20 +15,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeProvider extends BaseChangeNotifier {
-  HomeProvider() {
-    _loadInitialData();
-  }
   HomeScreenStates screenStates = HomeScreenStates.defaultState;
   HomeScreenStates loaderState = HomeScreenStates.defaultState;
   MatchesRepository matchesRepository = MatchesRepository();
-
-  void _loadInitialData() {
-    Future.microtask(() async {
-      await loadProfileStrength();
-      await loadPremiumMatches();
-      await loadRecentVisitors();
-    });
-  }
 
   final List<MatchProfile> premiumMatches = [];
   bool isLoadingPremiumMatches = false;

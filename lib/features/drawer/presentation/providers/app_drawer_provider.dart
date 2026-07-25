@@ -11,19 +11,16 @@ class DrawerProvider extends BaseChangeNotifier {
   DrawerScreenStates screenStates = DrawerScreenStates.defaultState;
   DrawerScreenStates loaderState = DrawerScreenStates.defaultState;
 
-  Future<void> logout(
-    VoidCallback onLogout, {
-    VoidCallback? onBeforeLogout,
-  }) async {
-    updateViewState(loadingState: DrawerScreenStates.loading);
-    onBeforeLogout?.call();
+  Future<void> logout(VoidCallback onLogout) async {
+    updateViewState(loadingState: DrawerScreenStates.transparentLoading);
     await LogoutRepository.logout();
+    DioClient().removeAuthToken();
     SocketService.instance.disconnect(reason: 'user logout');
     await FirebaseMessagingService.instance.dispose();
-    DioClient().removeAuthToken();
     await AppErrorReportingService.instance.clearUserContext();
-    await PrefsHelper.clearTokens();       // clears access + refresh + FCM token
-    await PrefsHelper.clearMeSnapshot();   // prevents stale user on next cold start
+    await PrefsHelper.clearTokens(); // clears access + refresh + FCM token
+    await PrefsHelper
+        .clearMeSnapshot(); // prevents stale user on next cold start
     await PrefsHelper.clearQuotaSnapshot();
     updateViewState(loadingState: DrawerScreenStates.defaultState);
     onLogout();
