@@ -100,6 +100,15 @@ class CurrentSubscriptionData {
   String? createdAt;
   String? updatedAt;
 
+  bool get hasPaidPlan {
+    final resolvedPlanId = (planId ?? plan?.id ?? '').trim();
+    if (plan == null || resolvedPlanId.isEmpty) return false;
+
+    final slug = (plan?.slug ?? '').trim().toLowerCase();
+    final name = (plan?.name ?? '').trim().toLowerCase();
+    return slug != 'free' && name != 'free';
+  }
+
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['id'] = id;

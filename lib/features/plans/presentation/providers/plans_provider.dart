@@ -32,7 +32,7 @@ class PlansProvider extends BaseChangeNotifier {
 
   int? get currentPlanRanking => currentSubscription?.plan?.ranking;
 
-  bool get hasCurrentSubscription => currentPlanId?.isNotEmpty == true && currentSubscription?.plan?.slug != 'free';
+  bool get hasCurrentSubscription => currentSubscription?.hasPaidPlan == true;
 
   bool get hasResolvedCurrentSubscription => _subscriptionResolved;
 
@@ -161,19 +161,40 @@ class PlansProvider extends BaseChangeNotifier {
       );
     }
 
-    final quoteData = _hasMatchingLatestQuote(purchaseInput)
-        ? latestUpgradeQuote
-        : await _fetchAndValidateQuote(
-            context: context,
-            purchaseInput: purchaseInput,
-          );
-    if (quoteData == null) {
+    if (!hasResolvedCurrentSubscription || !hasSubscriptionFetchSucceeded) {
+      await fetchCurrentSubscription(forceRefresh: true);
+    }
+
+    if (!context.mounted) {
+      updateViewState(screenStates: UpgradePackageScreenStates.complete);
       return null;
+    }
+
+    if (!hasSubscriptionFetchSucceeded) {
+      return _handleOrderSummaryError(
+        context,
+        'Unable to verify current plan. Please try again.',
+      );
+    }
+
+    final hasExistingPlan = hasCurrentSubscription;
+    UpgradeQuoteData? quoteData;
+
+    if (hasExistingPlan) {
+      quoteData = _hasMatchingLatestQuote(purchaseInput)
+          ? latestUpgradeQuote
+          : await _fetchAndValidateQuote(
+              context: context,
+              purchaseInput: purchaseInput,
+            );
+      if (quoteData == null) return null;
+    } else {
+      latestUpgradeQuote = null;
     }
 
     updateViewState(screenStates: UpgradePackageScreenStates.complete);
     return PlanOrderSummaryPreview(
-      isUpgrade: true,
+      isUpgrade: hasExistingPlan,
       upgradeQuote: quoteData,
     );
   }
