@@ -22,7 +22,7 @@ class LookupRepository {
     try {
       final response = await DioClient().get(
         AppUrls.getLookups,
-        isTokenRequired: true,
+        isTokenRequired: false,
         queryParameters: <String, dynamic>{
           'categorySlug': categorySlug,
           if (search != null && search.trim().isNotEmpty) 'search': search,
@@ -49,8 +49,10 @@ class LookupRepository {
       return items
           .whereType<Map>()
           .map((item) => LookupOption.fromJson(Map<String, dynamic>.from(item)))
-          .where((item) =>
-              item.key.trim().isNotEmpty && item.label.trim().isNotEmpty)
+          .where(
+            (item) =>
+                item.key.trim().isNotEmpty && item.label.trim().isNotEmpty,
+          )
           .toList(growable: false);
     } catch (e) {
       final message = e is DioException

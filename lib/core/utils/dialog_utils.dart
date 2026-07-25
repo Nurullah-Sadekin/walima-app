@@ -112,6 +112,7 @@ class DialogUtils {
           onButtonPressed: onButtonPressed ?? localSafeClose,
           onClose: localSafeClose,
           showIcon: true,
+          showCloseButton: !hideCloseButton,
           disableButtonText: disableButtonText,
           isDisableButton: isDisableButton,
           onDisableButtonPressed: onDisableButtonPressed,
@@ -202,6 +203,7 @@ class DialogUtils {
     VoidCallback? onButtonPressed,
     VoidCallback? onClose,
     bool showIcon = true,
+    bool showCloseButton = false,
     String? disableButtonText,
     bool isDisableButton = false,
     VoidCallback? onDisableButtonPressed,
@@ -216,57 +218,73 @@ class DialogUtils {
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+        child: Stack(
+          clipBehavior: Clip.none,
           children: [
-            ShowImage(
-              imagePath: imagePath ?? AppImages.successfulStatus,
-              width: 80,
-              height: 80,
-            ),
-            const SizedBox(height: 20),
-            Text(
-              title.localized(context),
-              maxLines: 1,
-              textHeightBehavior: const TextHeightBehavior(
-                applyHeightToFirstAscent: false,
-                applyHeightToLastDescent: false,
-              ),
-              style: TextStyle(
-                fontSize: TextSize.font20(context),
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimaryLight,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: TextSize.font14(context),
-                fontWeight: FontWeight.w400,
-                color: AppColors.textSecondaryLight,
-              ),
-            ),
-            const SizedBox(height: 20),
-            if (buttonText != null) ...[
-              PrimaryButtons(
-                buttonStyle: ButtonsStyle.activePrimaryButton,
-                onTap: onButtonPressed ?? () {},
-                title: buttonText.localized(context),
-              ),
-              if (isDisableButton)
-                Column(
-                  children: [
-                    const SizedBox(height: 8),
-                    PrimaryButtons(
-                      buttonStyle: ButtonsStyle.disableButton,
-                      onTap: onDisableButtonPressed ?? () {},
-                      title: disableButtonText?.localized(context),
-                    ),
-                  ],
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ShowImage(
+                  imagePath: imagePath ?? AppImages.successfulStatus,
+                  width: 80,
+                  height: 80,
                 ),
-            ],
+                const SizedBox(height: 20),
+                Text(
+                  title.localized(context),
+                  maxLines: 1,
+                  textHeightBehavior: const TextHeightBehavior(
+                    applyHeightToFirstAscent: false,
+                    applyHeightToLastDescent: false,
+                  ),
+                  style: TextStyle(
+                    fontSize: TextSize.font20(context),
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimaryLight,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: TextSize.font14(context),
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                if (buttonText != null) ...[
+                  PrimaryButtons(
+                    buttonStyle: ButtonsStyle.activePrimaryButton,
+                    onTap: onButtonPressed ?? () {},
+                    title: buttonText.localized(context),
+                  ),
+                  if (isDisableButton)
+                    Column(
+                      children: [
+                        const SizedBox(height: 8),
+                        PrimaryButtons(
+                          buttonStyle: ButtonsStyle.disableButton,
+                          onTap: onDisableButtonPressed ?? () {},
+                          title: disableButtonText?.localized(context),
+                        ),
+                      ],
+                    ),
+                ],
+              ],
+            ),
+            if (showCloseButton)
+              Positioned(
+                top: -20,
+                right: -12,
+                child: IconButton(
+                  tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                  onPressed: onClose,
+                  icon: const Icon(Icons.close),
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
           ],
         ),
       ),

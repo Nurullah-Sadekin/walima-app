@@ -2514,13 +2514,22 @@ class RegistrationProvider extends BaseChangeNotifier {
       // cleanAllValue();
       return true;
     } else {
+      if (!context.mounted) return false;
+
+      final isAccountExistsError = response.isAccountExistsError;
+
       await DialogUtils.showErrorDialog(
-          context: context,
-          message: response.message ?? 'Failed to send OTP',
-          onButtonPressed: () {
-            context.pushReplacement(Paths.login);
-          },
-          buttonText: 'Go to Login');
+        context: context,
+        message: response.message ?? 'Failed to send OTP',
+        buttonText: isAccountExistsError ? 'Go to Login' : 'OK',
+        hideCloseButton: isAccountExistsError,
+        onButtonPressed: isAccountExistsError
+            ? () {
+                Navigator.of(context, rootNavigator: true).pop();
+                context.pushReplacement(Paths.login);
+              }
+            : null,
+      );
       return false;
     }
   }

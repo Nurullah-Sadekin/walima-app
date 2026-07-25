@@ -89,7 +89,7 @@ class LocationDataRepositoryImpl implements LocationDataRepository {
           'sortBy': 'id',
           'sortOrder': 'ASC',
         },
-        isTokenRequired: true,
+        isTokenRequired: false,
       );
 
       if (!response.isSuccess) {
@@ -143,7 +143,7 @@ class LocationDataRepositoryImpl implements LocationDataRepository {
         'sortOrder': 'ASC',
         if (normalizedKeyword.isNotEmpty) 'keyword': normalizedKeyword,
       },
-      isTokenRequired: true,
+      isTokenRequired: false,
     );
 
     if (!response.isSuccess) {
@@ -261,7 +261,7 @@ class LocationDataRepositoryImpl implements LocationDataRepository {
         'countries': normalized,
         if (normalizedKeyword.isNotEmpty) 'keyword': normalizedKeyword,
       },
-      isTokenRequired: true,
+      isTokenRequired: false,
     );
 
     if (!response.isSuccess) {
