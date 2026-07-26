@@ -27,6 +27,7 @@ class EmailPhoneScreen extends ConsumerStatefulWidget {
 class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
   static const String _otpEditFlowSource = 'otpScreen';
   static const String _debugOtpFlowSource = 'debugOtpSignup';
+  static const String _aboutYourselfEditFlowSource = 'aboutYourself';
 
   @override
   void initState() {
@@ -40,16 +41,23 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
   Widget build(BuildContext context) {
     final screenProvider = ref.watch(registrationScreenStateProvider);
     return TransparentLoading(
-      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
+      isLoading:
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: screenProvider.screenStates == RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates ==
+                  RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.emailPhone, totalProgressCount: 10, currentIndexProgress: 3, showProgress: true),
+                    const UpperLayer(
+                      imagePath: AppImages.emailPhone,
+                      totalProgressCount: 10,
+                      currentIndexProgress: 3,
+                      showProgress: true,
+                    ),
                     Expanded(child: body()),
                   ],
                 ),
@@ -69,7 +77,11 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
               child: Column(
                 spacing: 10,
                 children: [
-                  const StaticTextWidget(title: 'Contact Details', subtitle: 'We\'ll use these to verify and secure your account'),
+                  const StaticTextWidget(
+                    title: 'Contact Details',
+                    subtitle:
+                        'We\'ll use these to verify and secure your account',
+                  ),
                   dataInsertField(),
                   const Spacer(),
                   bottomAction(),
@@ -98,7 +110,9 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
             imagePath: AppImages.emailSvgIcon,
             width: TextSize.font18(context),
             height: TextSize.font18(context),
-            color: provider.emailController.text.isNotEmpty ? AppColors.primary : AppColors.hintTextColor,
+            color: provider.emailController.text.isNotEmpty
+                ? AppColors.primary
+                : AppColors.hintTextColor,
           ),
           errorText: provider.emailAvailabilityErrorMessage,
           onTap: () {},
@@ -125,7 +139,11 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
                       fontSize: TextSize.font14(context),
                     ),
                   ),
-                  Icon(Icons.arrow_drop_down, color: Colors.grey, size: TextSize.font20(context)),
+                  Icon(
+                    Icons.arrow_drop_down,
+                    color: Colors.grey,
+                    size: TextSize.font20(context),
+                  ),
                 ],
               ),
             ),
@@ -172,7 +190,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
             size: TextSize.font22(context),
           ),
           filled: true,
-          fillColor: AppColors.greyLight.withOpacity(0.5),
+          fillColor: AppColors.greyLight.withValues(alpha: 0.5),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
@@ -193,7 +211,8 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
   Widget bottomAction() {
     final provider = ref.watch(registrationProvider);
     return PrimaryButtons(
-      buttonStyle: provider.emailController.text.isNotEmpty && provider.phoneController.text.isNotEmpty
+      buttonStyle: provider.emailController.text.isNotEmpty &&
+              provider.phoneController.text.isNotEmpty
           ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
       verticalPadding: 14,
@@ -201,7 +220,8 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
       svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
       onTap: () async {
-        if (provider.emailController.text.isEmpty || provider.phoneController.text.isEmpty) {
+        if (provider.emailController.text.isEmpty ||
+            provider.phoneController.text.isEmpty) {
           return;
         }
         final screenNotifier = ref.read(registrationScreenStateProvider);
@@ -216,6 +236,11 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
           );
 
           if (isAvailable && mounted) {
+            if (widget.fromScreen == _aboutYourselfEditFlowSource) {
+              context.pop();
+              return;
+            }
+
             if (widget.fromScreen == _otpEditFlowSource) {
               final otpSent = await provider.signUpViaOtp(context);
               if (otpSent && mounted) {

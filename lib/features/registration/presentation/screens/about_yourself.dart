@@ -3,7 +3,6 @@ import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/global/components/gradient_background.dart';
 import 'package:walima_llc/core/global/components/primary_textField.dart';
-import 'package:walima_llc/core/global/components/selection_card.dart';
 import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/global/components/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,6 +23,8 @@ class AboutYourselfScreen extends ConsumerStatefulWidget {
 }
 
 class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
+  static const String _contactEditFlowSource = 'aboutYourself';
+
   late RegistrationProvider provider;
 
   @override
@@ -78,61 +79,165 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
 
   Widget body() {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-        child: Column(
-          spacing: 10,
-          children: [
-            const StaticTextWidget(
-                title: 'About Yourself',
-                subtitle:
-                    'Almost done!\n A well-written bio helps you get 3x more profile views'),
-            bioTemplateActionButtons(),
-            dataInsertField(),
-            const SizedBox(height: 20),
-            Column(
-              spacing: 10,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Verification Type',
-                  style: TextStyle(
-                    fontSize: TextSize.font14(context),
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textSecondaryLight,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Column(
+                  spacing: 10,
+                  children: [
+                    const StaticTextWidget(
+                      title: 'About Yourself',
+                      subtitle:
+                          'Almost done!\n A well-written bio helps you get 3x more profile views',
+                    ),
+                    bioTemplateActionButtons(),
+                    dataInsertField(),
+                    const SizedBox(height: 20),
+                    verificationTypes(),
+                    const Spacer(),
+                    bottomAction(),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget verificationTypes() {
+    return Column(
+      spacing: 10,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Verification Type'.localized(context),
+          style: TextStyle(
+            fontSize: TextSize.font14(context),
+            fontWeight: FontWeight.w500,
+            color: AppColors.textSecondaryLight,
+          ),
+        ),
+        ...List.generate(provider.verificationList.length, (index) {
+          final verificationType = provider.verificationList[index];
+          final isMobile = verificationType.name.toLowerCase() == 'mobile';
+          final contactValue = isMobile
+              ? _formattedPhoneNumber()
+              : _valueOrPlaceholder(provider.emailController.text);
+
+          return Material(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            child: InkWell(
+              key: ValueKey('verification-${verificationType.name}'),
+              borderRadius: BorderRadius.circular(10),
+              onTap: () => provider.selectedVerificationTypeIndex(index),
+              child: Container(
+                width: double.infinity,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: verificationType.isSelected
+                        ? AppColors.primary
+                        : AppColors.inputBorderColor,
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  spacing: 10,
-                  children:
-                      List.generate(provider.verificationList.length, (index) {
-                    final verificationType = provider.verificationList[index];
-                    double screenWidth = MediaQuery.of(context).size.width - 40;
-                    double itemWidth = (screenWidth - 10) / 3;
-                    return SizedBox(
-                      width: itemWidth,
-                      child: SelectionCard(
-                        buttonStyle: verificationType.isSelected
-                            ? SelectionStyle.selectedRadio
-                            : SelectionStyle.unSelectedRadio,
-                        onTap: () {
-                          provider.selectedVerificationTypeIndex(index);
-                        },
-                        isSelected: verificationType.isSelected,
-                        title: verificationType.name,
+                child: Row(
+                  children: [
+                    Icon(
+                      verificationType.isSelected
+                          ? Icons.radio_button_checked
+                          : Icons.radio_button_unchecked,
+                      size: TextSize.font20(context),
+                      color: verificationType.isSelected
+                          ? AppColors.primary
+                          : AppColors.hintTextColor,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            verificationType.name.localized(context),
+                            style: TextStyle(
+                              color: AppColors.textPrimaryLight,
+                              fontSize: TextSize.font13(context),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            contactValue,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: AppColors.textSecondaryLight,
+                              fontSize: TextSize.font12(context),
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
                       ),
-                    );
-                  }),
+                    ),
+                    TextButton.icon(
+                      key: ValueKey('edit-${verificationType.name}'),
+                      onPressed: _openContactDetails,
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 6,
+                        ),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      icon: const Icon(Icons.edit_outlined, size: 16),
+                      label: Text(
+                        'Edit'.localized(context),
+                        style: TextStyle(
+                          fontSize: TextSize.font12(context),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-            const Spacer(),
-            bottomAction(),
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
+          );
+        }),
+      ],
+    );
+  }
+
+  String _formattedPhoneNumber() {
+    final phone = provider.phoneController.text.trim();
+    if (phone.isEmpty) return 'Not added'.localized(context);
+    if (phone.startsWith('+')) return phone;
+
+    final dialCode = provider.selectedCountry.phoneCode.trim();
+    return dialCode.isEmpty ? phone : '+$dialCode $phone';
+  }
+
+  String _valueOrPlaceholder(String value) {
+    final normalized = value.trim();
+    return normalized.isEmpty ? 'Not added'.localized(context) : normalized;
+  }
+
+  Future<void> _openContactDetails() async {
+    await context.pushNamed(
+      Routes.emailPhone,
+      queryParameters: const {'fromScreen': _contactEditFlowSource},
+      extra: _contactEditFlowSource,
     );
   }
 
@@ -345,13 +450,15 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
       await provider.signUpViaOtp(context).then((success) {
         if (success) {
           screenProvider.updateViewState(
-              screenStates: RegistrationScreenStates.loadingComplete);
+            screenStates: RegistrationScreenStates.loadingComplete,
+          );
           if (mounted) {
             context.push(Paths.otpVerifyForSignUp);
           }
         } else {
           screenProvider.updateViewState(
-              loadingState: RegistrationScreenStates.loadingComplete);
+            loadingState: RegistrationScreenStates.loadingComplete,
+          );
         }
       });
     }
