@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_use_of_protected_member
+
 part of 'profile_section_edit_screen.dart';
 
 extension _ProfileSectionEditLookupDynamicPart
@@ -320,92 +322,5 @@ extension _ProfileSectionEditLookupDynamicPart
       _prefCommunityController.text = match.label;
       _selectedApiValues['prefCommunity'] = match.key;
     });
-  }
-}
-
-extension _ProfileSectionEditLookupDynamicStrengthMetaPart
-    on _ProfileSectionEditScreenState {
-  bool get _isStrengthDrivenMode => widget.strengthFields.isNotEmpty;
-
-  String get _screenTitle {
-    final strengthTitle = _resolveStrengthSectionTitle()?.trim();
-    if (strengthTitle != null && strengthTitle.isNotEmpty) {
-      return '${'Complete'.localized(context)} ${strengthTitle.localized(context)}';
-    }
-    return widget.section.title.localized(context);
-  }
-
-  String? _resolveStrengthSectionTitle() {
-    final normalizedKey = widget.strengthSectionKey?.trim().toLowerCase();
-    switch (normalizedKey) {
-      case 'preferences':
-        return 'Preferences';
-      case 'basic_profile':
-        return 'Basic Profile';
-      case 'appearance':
-        return 'Appearance';
-      case 'location':
-        return 'Location';
-      case 'education':
-        return 'Education';
-      case 'profession':
-        return 'Profession';
-      case 'religion':
-        return 'Religion';
-      case 'family':
-        return 'Family';
-      case 'lifestyle':
-        return 'Lifestyle';
-      case 'interests':
-        return 'Interests & Hobbies';
-      case 'contact':
-        return 'Contact';
-    }
-
-    final fallbackLabel = widget.strengthSectionLabel?.trim();
-    if (fallbackLabel == null || fallbackLabel.isEmpty) return null;
-    return fallbackLabel;
-  }
-
-  List<ProfileStrengthField> get _effectiveStrengthFields {
-    if (!_isStrengthDrivenMode) {
-      return const <ProfileStrengthField>[];
-    }
-    return _strengthFieldsUseCase.resolveEffectiveFields(widget.strengthFields);
-  }
-
-  Future<void> _initializeStrengthFieldMeta(CompleteProfile? profile) async {
-    if (!_isStrengthDrivenMode || _didInitStrengthFieldMeta) {
-      return;
-    }
-    _didInitStrengthFieldMeta = true;
-
-    final knownKeys = _knownFieldKeysForSection(widget.section);
-    for (final field in _effectiveStrengthFields) {
-      final key = field.key!.trim();
-      final normalized = _fieldKeyUseCase.normalize(key);
-
-      if (!knownKeys.contains(normalized)) {
-        final controller = TextEditingController();
-        controller.text = _profileValueUseCase.resolveValueByNormalizedKey(
-          profile,
-          _fieldKeyUseCase.normalize(key),
-          _fieldKeyUseCase.normalize,
-        );
-        _dynamicFieldControllers[key] = controller;
-      }
-
-      final options = await _loadLookupOptionsForStrengthField(key);
-      _dynamicFieldLookupOptions[key] = options;
-      if (options.isNotEmpty && _dynamicFieldControllers.containsKey(key)) {
-        final controller = _dynamicFieldControllers[key]!;
-        final currentValue = controller.text.trim();
-        final match = _findLookupOption(options, currentValue);
-        if (match != null) {
-          _dynamicFieldSelectedApiValues[key] = match.key;
-          controller.text = match.label;
-        }
-      }
-    }
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
@@ -39,6 +41,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final Key profileImageKey = const ValueKey('home_profile_image');
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  ProviderSubscription<String>? _userSubscription;
   bool _showProfileSummary = true;
 
   Future<void> _openLink(String title, String url) {
@@ -52,11 +55,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _userSubscription = ref.listenManual<String>(
+      globalProvider.select((provider) => provider.currentUserId),
+      (previous, next) {
+        final home = ref.read(homeProvider);
+        home.setAuthenticatedUser(next);
+        if (next.isNotEmpty) {
+          unawaited(home.loadProfileStrength(force: true));
+        }
+      },
+      fireImmediately: true,
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(profileProvider).getProfile(context);
       ref.read(profileProvider).getDashboard();
       ref.read(homeProvider).ensureHomeDataLoaded();
     });
+  }
+
+  @override
+  void dispose() {
+    _userSubscription?.close();
+    super.dispose();
   }
 
   bool _onBodyUserScroll(UserScrollNotification notification) {
@@ -163,20 +183,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _bodySection() {
     final provider = ref.read(homeProvider);
     return Expanded(
-      child: NotificationListener<UserScrollNotification>(
-        onNotification: _onBodyUserScroll,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const CompleteProfileSection(),
-              _premiumMatches(),
-              if (provider.recentVisitors.isNotEmpty) _recentVisitors(),
-              _followUpSection(),
-            ],
+      child: RefreshIndicator(
+        onRefresh: _refreshHome,
+        color: AppColors.primary,
+        child: NotificationListener<UserScrollNotification>(
+          onNotification: _onBodyUserScroll,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              children: [
+                const CompleteProfileSection(),
+                _premiumMatches(),
+                if (provider.recentVisitors.isNotEmpty) _recentVisitors(),
+                _followUpSection(),
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _refreshHome() async {
+    await Future.wait<void>([
+      ref.read(homeProvider).loadProfileStrength(force: true),
+      ref.read(homeProvider).loadPremiumMatches(force: true),
+      ref.read(homeProvider).loadRecentVisitors(force: true),
+      ref.read(profileProvider).getProfile(context),
+      ref.read(profileProvider).getDashboard(),
+    ]);
   }
 
   @override

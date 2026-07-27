@@ -52,19 +52,27 @@ class HomeRepository {
   }
 
   static Future<ProfileStrengthResponse> getProfileStrength() async {
+    dynamic rawResponseData;
     try {
       final response = await DioClient().get(
         AppUrls.getProfileStrength,
         isTokenRequired: true,
       );
-      return ProfileStrengthResponse.fromJson(response.data);
+      rawResponseData = response.data;
+      return ProfileStrengthResponse.fromJson(rawResponseData);
     } catch (e) {
-      final errorMessage = e is DioException
-          ? e.response?.data['message'] ?? e.message
-          : e.toString();
+      final responseData =
+          e is DioException ? e.response?.data : rawResponseData;
+      final responseMap = responseData is Map
+          ? Map<String, dynamic>.from(responseData)
+          : const <String, dynamic>{};
+      final errorMessage = responseMap['message']?.toString() ??
+          (e is DioException ? e.message : null) ??
+          e.toString();
       return ProfileStrengthResponse(
         code: 'FAILED',
-        message: errorMessage,
+        message: errorMessage.toString(),
+        traceId: responseMap['traceId']?.toString(),
       );
     }
   }

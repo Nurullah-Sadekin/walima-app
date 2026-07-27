@@ -62,6 +62,18 @@ extension _ProfileSectionEditPrefillMainPart on _ProfileSectionEditScreenState {
       values: RegistrationDiet.values,
       fieldKey: 'diet',
     );
+    _prefillEnum<DrinkingHabits>(
+      controller: _drinkingHabitsController,
+      raw: lifestyle?.drinkingHabits?.toString(),
+      values: DrinkingHabits.values,
+      fieldKey: 'drinkingHabits',
+    );
+    _prefillEnum<SmokingHabits>(
+      controller: _smokingHabitsController,
+      raw: lifestyle?.smokingHabits?.toString(),
+      values: SmokingHabits.values,
+      fieldKey: 'smokingHabits',
+    );
     _prefillEnum<BloodGroup>(
       controller: _bloodGroupController,
       raw: appearance?.bloodGroup?.toString(),
@@ -163,6 +175,7 @@ extension _ProfileSectionEditPrefillMainPart on _ProfileSectionEditScreenState {
       fieldKey: 'highestQualification',
     );
     _collegeController.text = education?.institutionName?.toString() ?? '';
+    _fieldOfStudyController.text = education?.fieldOfStudy?.toString() ?? '';
     _prefillLookup(
       controller: _annualIncomeController,
       raw: profession?.incomeRange,

@@ -9,7 +9,7 @@ import 'package:walima_llc/features/account_setting/presentation/screens/account
 import 'package:walima_llc/features/profile/presentation/screen/edit_profile.dart';
 import 'package:walima_llc/features/profile/presentation/screen/profile_edit_section.dart';
 import 'package:walima_llc/features/profile/presentation/screen/profile_section_edit_screen.dart';
-import 'package:walima_llc/features/home/data/model/response/profile_strength_response.dart';
+import 'package:walima_llc/features/profile/presentation/screen/contact_information_screen.dart';
 import 'package:walima_llc/features/login/presentation/screens/new_password.dart';
 import 'package:walima_llc/features/login/presentation/screens/otp_verify.dart';
 import 'package:walima_llc/features/login/presentation/screens/reset_pssword_status.dart';
@@ -375,9 +375,6 @@ GoRouter goRouter(Ref ref) {
         builder: (context, state) {
           final extra = state.extra;
           String? sectionKey;
-          String? strengthSectionKey;
-          String? strengthSectionLabel;
-          List<ProfileStrengthField> strengthFields = const <ProfileStrengthField>[];
 
           if (extra is String) {
             sectionKey = extra;
@@ -387,35 +384,16 @@ GoRouter goRouter(Ref ref) {
             if (rawSection is String) {
               sectionKey = rawSection;
             }
-            final rawStrengthSectionKey = map['strengthSectionKey'];
-            if (rawStrengthSectionKey is String && rawStrengthSectionKey.trim().isNotEmpty) {
-              strengthSectionKey = rawStrengthSectionKey.trim();
-            }
-            final rawStrengthSectionLabel = map['strengthSectionLabel'];
-            if (rawStrengthSectionLabel is String && rawStrengthSectionLabel.trim().isNotEmpty) {
-              strengthSectionLabel = rawStrengthSectionLabel.trim();
-            }
-            final rawStrengthFields = map['strengthFields'];
-            if (rawStrengthFields is List) {
-              strengthFields = rawStrengthFields
-                  .whereType<Map>()
-                  .map(
-                    (item) => ProfileStrengthField.fromJson(
-                      Map<String, dynamic>.from(item),
-                    ),
-                  )
-                  .toList(growable: false);
-            }
           }
 
           final section = ProfileEditSectionX.fromKey(sectionKey);
-          return ProfileSectionEditScreen(
-            section: section,
-            strengthSectionKey: strengthSectionKey,
-            strengthSectionLabel: strengthSectionLabel,
-            strengthFields: strengthFields,
-          );
+          return ProfileSectionEditScreen(section: section);
         },
+      ),
+      GoRoute(
+        path: Paths.contactInformation,
+        name: Routes.contactInformation,
+        builder: (context, state) => const ContactInformationScreen(),
       ),
       GoRoute(
         path: Paths.biodataGenerator,

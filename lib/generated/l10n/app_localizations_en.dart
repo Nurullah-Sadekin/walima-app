@@ -224,4 +224,122 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get profileStrengthTitle => 'Profile Strength';
+
+  @override
+  String get profileStrengthCompleted => 'Completed';
+
+  @override
+  String get profileStrengthTips => 'Tips to improve';
+
+  @override
+  String get profileStrengthUnavailable =>
+      'Profile strength is unavailable right now.';
+
+  @override
+  String get profileStrengthRefreshFailed =>
+      'Could not refresh profile strength.';
+
+  @override
+  String get profileStrengthCompletedStatus => 'completed';
+
+  @override
+  String get profileStrengthIncompleteStatus => 'incomplete';
+
+  @override
+  String profileStrengthSemantics(Object percentage) {
+    return 'Profile strength $percentage percent.';
+  }
+
+  @override
+  String profileStrengthSectionSemantics(
+      Object sectionLabel, Object percentage, Object status) {
+    return '$sectionLabel, $percentage percent, $status.';
+  }
+
+  @override
+  String get profileStrengthPreferences => 'Partner Preferences';
+
+  @override
+  String get profileStrengthBasicProfile => 'Basic Profile';
+
+  @override
+  String get profileStrengthPhotos => 'Profile Photos';
+
+  @override
+  String get profileStrengthFamily => 'Family Details';
+
+  @override
+  String get profileStrengthEducation => 'Education';
+
+  @override
+  String get profileStrengthProfession => 'Profession';
+
+  @override
+  String get profileStrengthAppearance => 'Appearance';
+
+  @override
+  String get profileStrengthReligion => 'Religion';
+
+  @override
+  String get profileStrengthLifestyle => 'Lifestyle';
+
+  @override
+  String get profileStrengthLocation => 'Location';
+
+  @override
+  String get profileStrengthInterests => 'Interests & Hobbies';
+
+  @override
+  String get profileStrengthContact => 'Contact Information';
+
+  @override
+  String get profileStrengthTipPreferences =>
+      'Complete your Partner Preferences to improve match quality';
+
+  @override
+  String get profileStrengthTipBasic =>
+      'Fill in your basic profile details to help others know you better';
+
+  @override
+  String get profileStrengthTipPhotos =>
+      'Add your profile photo to improve visibility';
+
+  @override
+  String get profileStrengthTipFamily =>
+      'Adding family details helps build trust with potential matches';
+
+  @override
+  String get profileStrengthTipEducation =>
+      'Share your education background to find compatible matches';
+
+  @override
+  String get profileStrengthTipProfession =>
+      'Adding your profession details improves match relevance';
+
+  @override
+  String get profileStrengthTipAppearance =>
+      'Complete your appearance details for better matching accuracy';
+
+  @override
+  String get profileStrengthTipReligion =>
+      'Specify your religious background for compatible matches';
+
+  @override
+  String get profileStrengthTipLifestyle =>
+      'Share your lifestyle choices to find like-minded matches';
+
+  @override
+  String get profileStrengthTipLocation =>
+      'Add your location to find matches nearby';
+
+  @override
+  String get profileStrengthTipInterests =>
+      'Share your interests and hobbies to find common ground';
+
+  @override
+  String get profileStrengthTipContact =>
+      'Add contact information so matches can reach you';
 }

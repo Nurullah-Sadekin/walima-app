@@ -507,6 +507,205 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =0{No fields left} =1{1 field left} other{{count} fields left}}'**
   String fieldsLeft(num count);
+
+  /// No description provided for @profileStrengthTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Strength'**
+  String get profileStrengthTitle;
+
+  /// No description provided for @profileStrengthCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get profileStrengthCompleted;
+
+  /// No description provided for @profileStrengthTips.
+  ///
+  /// In en, this message translates to:
+  /// **'Tips to improve'**
+  String get profileStrengthTips;
+
+  /// No description provided for @profileStrengthUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile strength is unavailable right now.'**
+  String get profileStrengthUnavailable;
+
+  /// No description provided for @profileStrengthRefreshFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not refresh profile strength.'**
+  String get profileStrengthRefreshFailed;
+
+  /// No description provided for @profileStrengthCompletedStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'completed'**
+  String get profileStrengthCompletedStatus;
+
+  /// No description provided for @profileStrengthIncompleteStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'incomplete'**
+  String get profileStrengthIncompleteStatus;
+
+  /// No description provided for @profileStrengthSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile strength {percentage} percent.'**
+  String profileStrengthSemantics(Object percentage);
+
+  /// No description provided for @profileStrengthSectionSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'{sectionLabel}, {percentage} percent, {status}.'**
+  String profileStrengthSectionSemantics(
+      Object sectionLabel, Object percentage, Object status);
+
+  /// No description provided for @profileStrengthPreferences.
+  ///
+  /// In en, this message translates to:
+  /// **'Partner Preferences'**
+  String get profileStrengthPreferences;
+
+  /// No description provided for @profileStrengthBasicProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic Profile'**
+  String get profileStrengthBasicProfile;
+
+  /// No description provided for @profileStrengthPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Photos'**
+  String get profileStrengthPhotos;
+
+  /// No description provided for @profileStrengthFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Family Details'**
+  String get profileStrengthFamily;
+
+  /// No description provided for @profileStrengthEducation.
+  ///
+  /// In en, this message translates to:
+  /// **'Education'**
+  String get profileStrengthEducation;
+
+  /// No description provided for @profileStrengthProfession.
+  ///
+  /// In en, this message translates to:
+  /// **'Profession'**
+  String get profileStrengthProfession;
+
+  /// No description provided for @profileStrengthAppearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get profileStrengthAppearance;
+
+  /// No description provided for @profileStrengthReligion.
+  ///
+  /// In en, this message translates to:
+  /// **'Religion'**
+  String get profileStrengthReligion;
+
+  /// No description provided for @profileStrengthLifestyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Lifestyle'**
+  String get profileStrengthLifestyle;
+
+  /// No description provided for @profileStrengthLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get profileStrengthLocation;
+
+  /// No description provided for @profileStrengthInterests.
+  ///
+  /// In en, this message translates to:
+  /// **'Interests & Hobbies'**
+  String get profileStrengthInterests;
+
+  /// No description provided for @profileStrengthContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Information'**
+  String get profileStrengthContact;
+
+  /// No description provided for @profileStrengthTipPreferences.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete your Partner Preferences to improve match quality'**
+  String get profileStrengthTipPreferences;
+
+  /// No description provided for @profileStrengthTipBasic.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in your basic profile details to help others know you better'**
+  String get profileStrengthTipBasic;
+
+  /// No description provided for @profileStrengthTipPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your profile photo to improve visibility'**
+  String get profileStrengthTipPhotos;
+
+  /// No description provided for @profileStrengthTipFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Adding family details helps build trust with potential matches'**
+  String get profileStrengthTipFamily;
+
+  /// No description provided for @profileStrengthTipEducation.
+  ///
+  /// In en, this message translates to:
+  /// **'Share your education background to find compatible matches'**
+  String get profileStrengthTipEducation;
+
+  /// No description provided for @profileStrengthTipProfession.
+  ///
+  /// In en, this message translates to:
+  /// **'Adding your profession details improves match relevance'**
+  String get profileStrengthTipProfession;
+
+  /// No description provided for @profileStrengthTipAppearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete your appearance details for better matching accuracy'**
+  String get profileStrengthTipAppearance;
+
+  /// No description provided for @profileStrengthTipReligion.
+  ///
+  /// In en, this message translates to:
+  /// **'Specify your religious background for compatible matches'**
+  String get profileStrengthTipReligion;
+
+  /// No description provided for @profileStrengthTipLifestyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share your lifestyle choices to find like-minded matches'**
+  String get profileStrengthTipLifestyle;
+
+  /// No description provided for @profileStrengthTipLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your location to find matches nearby'**
+  String get profileStrengthTipLocation;
+
+  /// No description provided for @profileStrengthTipInterests.
+  ///
+  /// In en, this message translates to:
+  /// **'Share your interests and hobbies to find common ground'**
+  String get profileStrengthTipInterests;
+
+  /// No description provided for @profileStrengthTipContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Add contact information so matches can reach you'**
+  String get profileStrengthTipContact;
 }
 
 class _AppLocalizationsDelegate

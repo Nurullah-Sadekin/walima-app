@@ -112,11 +112,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             onEdit: () async {
               final String? imagePath =
                   await PickerDialog().imagePicker(context);
+              if (!context.mounted) return;
               if (imagePath != null) {
-                await ref.watch(profileProvider).updateProfileImage(
+                await ref.read(profileProvider).updateProfileImage(
                       context: context,
                       filePath: imagePath,
                     );
+                if (!context.mounted) return;
+                await ref
+                    .read(homeProvider)
+                    .invalidateAndRefreshProfileStrength();
               }
             },
           ),
@@ -714,6 +719,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (!mounted) return;
     if (result == true) {
       await ref.read(profileProvider).getProfile(context);
+      if (!mounted) return;
+      await ref.read(homeProvider).invalidateAndRefreshProfileStrength();
       if (!mounted) return;
       setState(() {});
     }

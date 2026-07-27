@@ -50,39 +50,6 @@ extension _ProfileSectionEditSavePrefillUtilsPart
     );
   }
 
-  Future<bool> _addUnknownPayloadValue({
-    required Map<String, dynamic> payload,
-    required String rawKey,
-    required String normalizedKey,
-    required String value,
-  }) async {
-    switch (normalizedKey) {
-      case 'weight':
-        final weight = int.tryParse(value);
-        if (weight == null) {
-          await _showError('Please enter a valid weight.');
-          return false;
-        }
-        if (weight > 200) {
-          await _showError('Weight must not be greater than 200.');
-          return false;
-        }
-        payload[rawKey] = weight;
-        return true;
-      case 'bodytype':
-        final bodyType = _resolveBodyTypeValue(value);
-        if (bodyType == null) {
-          await _showError('Please select a valid body type.');
-          return false;
-        }
-        payload[rawKey] = bodyType;
-        return true;
-      default:
-        payload[rawKey] = value;
-        return true;
-    }
-  }
-
   void _prefillEnum<T extends ApiUiEnum>({
     required TextEditingController controller,
     required String? raw,
@@ -247,10 +214,6 @@ extension _ProfileSectionEditSavePrefillUtilsPart
       return tracked;
     }
     return _toTrimmedOrNull(controller);
-  }
-
-  String? _resolveBodyTypeValue(String value) {
-    return _findEnumByLabelOrValue(BodyType.values, value)?.apiValue;
   }
 
   String? _resolveEducationLevelValue(TextEditingController controller) {

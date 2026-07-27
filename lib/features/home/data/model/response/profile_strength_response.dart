@@ -7,188 +7,211 @@ String profileStrengthResponseToJson(ProfileStrengthResponse data) =>
     json.encode(data.toJson());
 
 class ProfileStrengthResponse {
-  ProfileStrengthResponse({
-    this.code,
-    this.message,
+  const ProfileStrengthResponse({
+    required this.code,
+    required this.message,
     this.response,
     this.traceId,
   });
 
-  ProfileStrengthResponse.fromJson(dynamic json) {
-    code = json['code'];
-    message = json['message'];
-    response = json['response'] != null
-        ? ProfileStrengthData.fromJson(json['response'])
-        : null;
-    traceId = json['traceId'];
+  factory ProfileStrengthResponse.fromJson(dynamic json) {
+    final map = _asStringMap(json, 'profile strength envelope');
+    final code = map['code']?.toString() ?? '';
+    final message = map['message']?.toString() ?? '';
+    final traceId = map['traceId']?.toString();
+
+    if (code != 'SUCCESS') {
+      return ProfileStrengthResponse(
+        code: code,
+        message: message,
+        traceId: traceId,
+      );
+    }
+
+    final payload = map['response'];
+    if (payload == null) {
+      throw const FormatException('Profile strength response is missing.');
+    }
+
+    return ProfileStrengthResponse(
+      code: code,
+      message: message,
+      response: ProfileStrengthData.fromJson(payload),
+      traceId: traceId,
+    );
   }
 
-  String? code;
-  String? message;
-  ProfileStrengthData? response;
-  String? traceId;
+  final String code;
+  final String message;
+  final ProfileStrengthData? response;
+  final String? traceId;
 
   bool get isSuccess => code == 'SUCCESS' && response != null;
 
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['code'] = code;
-    map['message'] = message;
-    if (response != null) {
-      map['response'] = response?.toJson();
-    }
-    map['traceId'] = traceId;
-    return map;
-  }
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'code': code,
+        'message': message,
+        if (response != null) 'response': response!.toJson(),
+        if (traceId != null) 'traceId': traceId,
+      };
 }
 
 class ProfileStrengthData {
-  ProfileStrengthData({
-    this.overallScore,
-    this.sections,
-    this.tips,
+  const ProfileStrengthData({
+    required this.overallScore,
+    required this.sections,
+    required this.tips,
   });
 
-  ProfileStrengthData.fromJson(dynamic json) {
-    overallScore = _toInt(json['overallScore']);
-    sections = json['sections'] != null
-        ? List<ProfileStrengthSection>.from(
-            json['sections'].map(ProfileStrengthSection.fromJson),
-          )
-        : [];
-    tips = json['tips'] != null ? List<String>.from(json['tips']) : [];
+  factory ProfileStrengthData.fromJson(dynamic json) {
+    final map = _asStringMap(json, 'profile strength response');
+    final rawSections = map['sections'];
+    final rawTips = map['tips'];
+
+    if (rawSections is! List) {
+      throw const FormatException('Profile strength sections are missing.');
+    }
+    if (rawTips is! List) {
+      throw const FormatException('Profile strength tips are missing.');
+    }
+
+    return ProfileStrengthData(
+      overallScore: _requiredInt(map['overallScore'], 'overallScore'),
+      sections: rawSections
+          .map(ProfileStrengthSection.fromJson)
+          .toList(growable: false),
+      tips: rawTips.map((tip) {
+        if (tip is! String) {
+          throw const FormatException('A profile strength tip is invalid.');
+        }
+        return tip;
+      }).toList(growable: false),
+    );
   }
 
-  int? overallScore;
-  List<ProfileStrengthSection>? sections;
-  List<String>? tips;
+  final int overallScore;
+  final List<ProfileStrengthSection> sections;
+  final List<String> tips;
 
-  List<ProfileStrengthSection> get incompleteSections =>
-      (sections ?? const <ProfileStrengthSection>[])
-          .where((section) => section.completed != true)
-          .toList(growable: false);
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['overallScore'] = overallScore;
-    map['sections'] = sections?.map((section) => section.toJson()).toList();
-    map['tips'] = tips;
-    return map;
-  }
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'overallScore': overallScore,
+        'sections': sections.map((section) => section.toJson()).toList(),
+        'tips': tips,
+      };
 }
 
 class ProfileStrengthSection {
-  ProfileStrengthSection({
-    this.key,
-    this.label,
-    this.weight,
-    this.score,
-    this.completionPercentage,
-    this.completed,
-    this.fields,
+  const ProfileStrengthSection({
+    required this.key,
+    required this.label,
+    required this.weight,
+    required this.score,
+    required this.completionPercentage,
+    required this.completed,
+    required this.fields,
   });
 
-  ProfileStrengthSection.fromJson(dynamic json) {
-    key = json['key'];
-    label = json['label'];
-    weight = _toDouble(json['weight']);
-    score = _toDouble(json['score']);
-    completionPercentage = _toInt(json['completionPercentage']);
-    completed = _toBool(json['completed']);
-    fields = json['fields'] != null
-        ? List<ProfileStrengthField>.from(
-            json['fields'].map(ProfileStrengthField.fromJson),
-          )
-        : [];
+  factory ProfileStrengthSection.fromJson(dynamic json) {
+    final map = _asStringMap(json, 'profile strength section');
+    final rawFields = map['fields'];
+    if (rawFields is! List) {
+      throw const FormatException(
+        'Profile strength section fields are missing.',
+      );
+    }
+
+    return ProfileStrengthSection(
+      key: _requiredString(map['key'], 'section.key'),
+      label: _requiredString(map['label'], 'section.label'),
+      weight: _requiredDouble(map['weight'], 'section.weight'),
+      score: _requiredDouble(map['score'], 'section.score'),
+      completionPercentage: _requiredInt(
+        map['completionPercentage'],
+        'section.completionPercentage',
+      ),
+      completed: _requiredBool(map['completed'], 'section.completed'),
+      fields:
+          rawFields.map(ProfileStrengthField.fromJson).toList(growable: false),
+    );
   }
 
-  String? key;
-  String? label;
-  double? weight;
-  double? score;
-  int? completionPercentage;
-  bool? completed;
-  List<ProfileStrengthField>? fields;
+  final String key;
+  final String label;
+  final double weight;
+  final double score;
+  final int completionPercentage;
+  final bool completed;
+  final List<ProfileStrengthField> fields;
 
-  List<ProfileStrengthField> get incompleteFields =>
-      (fields ?? const <ProfileStrengthField>[])
-          .where((field) => field.completed != true)
-          .toList(growable: false);
-
-  int get remainingFieldCount => incompleteFields.length;
-
-  String? get firstIncompleteFieldKey {
-    for (final field in incompleteFields) {
-      if (field.completed != true) {
-        return field.key;
-      }
+  ProfileStrengthField? get firstIncompleteField {
+    for (final field in fields) {
+      if (!field.completed) return field;
     }
     return null;
   }
 
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['key'] = key;
-    map['label'] = label;
-    map['weight'] = weight;
-    map['score'] = score;
-    map['completionPercentage'] = completionPercentage;
-    map['completed'] = completed;
-    map['fields'] = fields?.map((field) => field.toJson()).toList();
-    return map;
-  }
+  String? get firstIncompleteFieldKey => firstIncompleteField?.key;
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'key': key,
+        'label': label,
+        'weight': weight,
+        'score': score,
+        'completionPercentage': completionPercentage,
+        'completed': completed,
+        'fields': fields.map((field) => field.toJson()).toList(),
+      };
 }
 
 class ProfileStrengthField {
-  ProfileStrengthField({
-    this.key,
-    this.label,
-    this.completed,
+  const ProfileStrengthField({
+    required this.key,
+    required this.label,
+    required this.completed,
   });
 
-  ProfileStrengthField.fromJson(dynamic json) {
-    key = json['key'];
-    label = json['label'];
-    completed = _toBool(json['completed']);
+  factory ProfileStrengthField.fromJson(dynamic json) {
+    final map = _asStringMap(json, 'profile strength field');
+    return ProfileStrengthField(
+      key: _requiredString(map['key'], 'field.key'),
+      label: _requiredString(map['label'], 'field.label'),
+      completed: _requiredBool(map['completed'], 'field.completed'),
+    );
   }
 
-  String? key;
-  String? label;
-  bool? completed;
+  final String key;
+  final String label;
+  final bool completed;
 
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['key'] = key;
-    map['label'] = label;
-    map['completed'] = completed;
-    return map;
-  }
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'key': key,
+        'label': label,
+        'completed': completed,
+      };
 }
 
-int? _toInt(dynamic value) {
-  if (value == null) return null;
-  if (value is int) return value;
+Map<String, dynamic> _asStringMap(dynamic value, String name) {
+  if (value is Map<String, dynamic>) return value;
+  if (value is Map) return Map<String, dynamic>.from(value);
+  throw FormatException('Invalid $name.');
+}
+
+String _requiredString(dynamic value, String name) {
+  if (value is String && value.trim().isNotEmpty) return value;
+  throw FormatException('Invalid $name.');
+}
+
+int _requiredInt(dynamic value, String name) {
   if (value is num) return value.round();
-  return int.tryParse(value.toString());
+  throw FormatException('Invalid $name.');
 }
 
-double? _toDouble(dynamic value) {
-  if (value == null) return null;
-  if (value is double) return value;
+double _requiredDouble(dynamic value, String name) {
   if (value is num) return value.toDouble();
-  return double.tryParse(value.toString());
+  throw FormatException('Invalid $name.');
 }
 
-bool? _toBool(dynamic value) {
-  if (value == null) return null;
+bool _requiredBool(dynamic value, String name) {
   if (value is bool) return value;
-
-  final normalized = value.toString().trim().toLowerCase();
-  if (normalized == 'true' || normalized == '1' || normalized == 'yes') {
-    return true;
-  }
-  if (normalized == 'false' || normalized == '0' || normalized == 'no') {
-    return false;
-  }
-  return null;
+  throw FormatException('Invalid $name.');
 }

@@ -155,6 +155,9 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                 context: context,
                 filePath: imagePath,
               );
+          await ref
+              .read(homeProvider)
+              .invalidateAndRefreshProfileStrength();
         }
       },
     );

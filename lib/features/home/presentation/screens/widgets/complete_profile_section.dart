@@ -1,156 +1,488 @@
 import 'package:flutter/material.dart';
-import 'package:walima_llc/core/config/text_responsive.dart';
-import 'package:walima_llc/core/constants/app_colors.dart';
-import 'package:walima_llc/core/constants/app_image.dart';
-import 'package:walima_llc/core/providers/providers.dart';
-import 'package:walima_llc/core/router/route_name.dart';
-import 'package:walima_llc/core/utils/localized_text.dart';
-import 'package:walima_llc/generated/l10n/app_localizations.dart';
-import 'package:walima_llc/features/home/data/model/response/profile_strength_response.dart';
-import 'package:walima_llc/features/home/presentation/screens/widgets/verification_tile.dart';
-import 'package:walima_llc/features/profile/presentation/screen/profile_edit_section.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
+import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/router/route_name.dart';
+import 'package:walima_llc/features/home/data/model/response/profile_strength_response.dart';
+import 'package:walima_llc/features/home/presentation/models/profile_strength_view_data.dart';
+import 'package:walima_llc/features/profile/presentation/screen/profile_edit_section.dart';
+import 'package:walima_llc/generated/l10n/app_localizations.dart';
 
-class CompleteProfileSection extends ConsumerStatefulWidget {
-  const CompleteProfileSection({super.key});
-
-  @override
-  ConsumerState<CompleteProfileSection> createState() =>
-      _CompleteProfileSectionState();
+enum ProfileStrengthNavigationKind {
+  typedEditor,
+  photos,
+  contacts,
+  genericEditor,
 }
 
-class _CompleteProfileSectionState
-    extends ConsumerState<CompleteProfileSection> {
-  bool _isExpanded = false;
+@immutable
+class ProfileStrengthNavigationTarget {
+  const ProfileStrengthNavigationTarget(this.kind, [this.section]);
+
+  final ProfileStrengthNavigationKind kind;
+  final ProfileEditSection? section;
+}
+
+ProfileStrengthNavigationTarget resolveProfileStrengthNavigationTarget(
+  ProfileStrengthSection strengthSection,
+) {
+  final sectionKey = strengthSection.key.trim().toLowerCase();
+  final fieldKey =
+      strengthSection.firstIncompleteFieldKey?.trim().toLowerCase();
+
+  switch (sectionKey) {
+    case 'photos':
+      return const ProfileStrengthNavigationTarget(
+        ProfileStrengthNavigationKind.photos,
+      );
+    case 'contact':
+    case 'contacts':
+      return const ProfileStrengthNavigationTarget(
+        ProfileStrengthNavigationKind.contacts,
+      );
+    case 'preferences':
+      final section = switch (fieldKey) {
+        'locationpreference' => ProfileEditSection.preferenceLocationDetails,
+        'educationpreference' => ProfileEditSection.preferenceEducationCareer,
+        'dietpreference' => ProfileEditSection.preferenceOtherDetails,
+        _ => ProfileEditSection.preferenceBasicInfo,
+      };
+      return ProfileStrengthNavigationTarget(
+        ProfileStrengthNavigationKind.typedEditor,
+        section,
+      );
+    case 'basic_profile':
+      return ProfileStrengthNavigationTarget(
+        ProfileStrengthNavigationKind.typedEditor,
+        fieldKey == 'bio'
+            ? ProfileEditSection.aboutYourself
+            : ProfileEditSection.basicDetails,
+      );
+    case 'family':
+      return const ProfileStrengthNavigationTarget(
+        ProfileStrengthNavigationKind.typedEditor,
+        ProfileEditSection.familyDetails,
+      );
+    case 'education':
+    case 'profession':
+      return const ProfileStrengthNavigationTarget(
+        ProfileStrengthNavigationKind.typedEditor,
+        ProfileEditSection.educationCareer,
+      );
+    case 'appearance':
+    case 'lifestyle':
+      return const ProfileStrengthNavigationTarget(
+        ProfileStrengthNavigationKind.typedEditor,
+        ProfileEditSection.basicDetails,
+      );
+    case 'religion':
+      return const ProfileStrengthNavigationTarget(
+        ProfileStrengthNavigationKind.typedEditor,
+        ProfileEditSection.religiousBackground,
+      );
+    case 'location':
+      return const ProfileStrengthNavigationTarget(
+        ProfileStrengthNavigationKind.typedEditor,
+        ProfileEditSection.location,
+      );
+    case 'interests':
+      return const ProfileStrengthNavigationTarget(
+        ProfileStrengthNavigationKind.typedEditor,
+        ProfileEditSection.hobbiesInterests,
+      );
+    default:
+      return const ProfileStrengthNavigationTarget(
+        ProfileStrengthNavigationKind.genericEditor,
+      );
+  }
+}
+
+class CompleteProfileSection extends ConsumerWidget {
+  const CompleteProfileSection({super.key});
+
+  static const String _profileStrengthSource = 'completeProfile';
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final provider = ref.watch(homeProvider);
+    final data = provider.profileStrength;
+
+    if (data == null && provider.profileStrengthError == null) {
+      return const _ProfileStrengthSkeleton();
+    }
+
+    if (data == null) {
+      return _ProfileStrengthErrorCard(
+        isRetrying: provider.isLoadingProfileStrength,
+        onRetry: () =>
+            ref.read(homeProvider).invalidateAndRefreshProfileStrength(),
+      );
+    }
+
+    if (data.overallScore == 100) return const SizedBox.shrink();
+
+    final viewData = ProfileStrengthViewData.fromDomain(data);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.greyLight),
+          boxShadow: const <BoxShadow>[
+            BoxShadow(
+              color: Color(0x080A0D14),
+              blurRadius: 4,
+              offset: Offset(0, 1),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (provider.isLoadingProfileStrength)
+                const LinearProgressIndicator(
+                  minHeight: 2,
+                  color: AppColors.primary,
+                  backgroundColor: AppColors.primaryVariant,
+                ),
+              _ProfileStrengthHeader(score: viewData.overallScore),
+              if (provider.profileStrengthError != null)
+                _StaleRefreshError(
+                  isRetrying: provider.isLoadingProfileStrength,
+                  onRetry: () => ref
+                      .read(homeProvider)
+                      .invalidateAndRefreshProfileStrength(),
+                ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 8, 10, 12),
+                child: Column(
+                  children: [
+                    for (final section in viewData.incomplete)
+                      _ProfileStrengthRow(
+                        section: section,
+                        onTap: () => _openSection(context, ref, section),
+                      ),
+                    if (viewData.incomplete.isNotEmpty &&
+                        viewData.completed.isNotEmpty)
+                      const _CompletedDivider(),
+                    for (final section in viewData.completed)
+                      _ProfileStrengthRow(
+                        section: section,
+                        onTap: () => _openSection(context, ref, section),
+                      ),
+                  ],
+                ),
+              ),
+              if (viewData.tips.isNotEmpty) _TipsPanel(tips: viewData.tips),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  static Future<void> _openSection(
+    BuildContext context,
+    WidgetRef ref,
+    ProfileStrengthSection section,
+  ) async {
+    final sectionKey = section.key.trim().toLowerCase();
+    final target = resolveProfileStrengthNavigationTarget(section);
+
+    if (target.kind == ProfileStrengthNavigationKind.photos) {
+      await context.pushNamed(
+        Routes.photoUpload,
+        extra: const <String, String>{
+          'fromScreen': _profileStrengthSource,
+        },
+      );
+      if (!context.mounted) return;
+      await ref.read(homeProvider).invalidateAndRefreshProfileStrength();
+      return;
+    }
+
+    if (target.kind == ProfileStrengthNavigationKind.contacts) {
+      final changed = await context.pushNamed(Routes.contactInformation);
+      if (changed == true && context.mounted) {
+        await ref.read(homeProvider).invalidateAndRefreshProfileStrength();
+      }
+      return;
+    }
+
+    if (target.kind == ProfileStrengthNavigationKind.genericEditor) {
+      debugPrint(
+        'Unknown profile strength section "$sectionKey"; '
+        'opening the generic profile editor.',
+      );
+      await context.pushNamed(Routes.editProfile);
+      return;
+    }
+
+    final changed = await context.pushNamed(
+      Routes.profileSectionEdit,
+      extra: target.section!.key,
+    );
+    if (changed == true && context.mounted) {
+      await ref.read(homeProvider).invalidateAndRefreshProfileStrength();
+    }
+  }
+}
+
+class _ProfileStrengthHeader extends StatelessWidget {
+  const _ProfileStrengthHeader({required this.score});
+
+  final int score;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final provider = ref.watch(homeProvider);
-    final profileStrength = provider.profileStrength;
-    final completionPercentage = profileStrength?.overallScore ?? 0;
-    final incompleteItems = (profileStrength?.incompleteSections ??
-            const <ProfileStrengthSection>[])
-        .map(_CompleteProfileTileData.fromStrengthSection)
-        .toList();
-
-    if (provider.isLoadingProfileStrength && profileStrength == null) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
-        child: Center(
-          child: CircularProgressIndicator(color: AppColors.primary),
-        ),
-      );
-    }
-
-    if (completionPercentage >= 100 ||
-        incompleteItems.isEmpty ||
-        provider.profileStrengthError != null) {
-      return const SizedBox.shrink();
-    }
-
-    final itemsToShow =
-        _isExpanded ? incompleteItems : incompleteItems.take(2).toList();
-    final hasMoreItems = incompleteItems.length > 2;
-
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisAlignment: MainAxisAlignment.start,
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+      child: Row(
         children: [
-          Text(
-            l10n.completeYourProfile,
-            style: TextStyle(
-              color: AppColors.textPrimaryLight,
-              fontSize: TextSize.font18(context),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          Text(
-            l10n.profileCompletionPercentage(completionPercentage),
-            style: TextStyle(
-              color: AppColors.textSecondaryLight,
-              fontSize: TextSize.font14(context),
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          const SizedBox(height: 12),
-          if (incompleteItems.isNotEmpty)
-            ...List.generate(itemsToShow.length, (index) {
-              final item = itemsToShow[index];
-              return Padding(
-                padding: EdgeInsets.only(
-                  bottom: index == itemsToShow.length - 1 ? 0 : 10,
-                ),
-                child: VerificationTile(
-                  iconImagePath: item.iconImagePath,
-                  title: l10n.completeSectionTitle(
-                    item.resolveSectionLabel(context) ?? l10n.profileSection,
-                  ),
-                  statusText: item.remainingFieldCount != null &&
-                          item.remainingFieldCount! > 0
-                      ? l10n.fieldsLeft(item.remainingFieldCount!)
-                      : '${item.completionPercentage ?? 0}%',
-                  statusColor: AppColors.primary,
-                  statusBackgroundColor: AppColors.primaryVariant,
-                  onTap: () => item.open(context),
-                ),
-              );
-            }),
-
-          if (hasMoreItems && !_isExpanded)
-            Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: InkWell(
-                onTap: () => setState(() => _isExpanded = true),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      l10n.seeMore,
-                      style: TextStyle(
-                        color: AppColors.primary,
-                        fontSize: TextSize.font14(context),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(
-                      Icons.expand_more,
-                      color: AppColors.primary,
-                      size: TextSize.font18(context),
-                    ),
-                  ],
-                ),
+          Expanded(
+            child: Text(
+              l10n.profileStrengthTitle,
+              style: TextStyle(
+                color: AppColors.textPrimaryLight,
+                fontSize: TextSize.font18(context),
+                fontWeight: FontWeight.w600,
               ),
             ),
-          // Show "See Less" button if expanded
-          if (hasMoreItems && _isExpanded)
+          ),
+          _OverallScore(score: score),
+        ],
+      ),
+    );
+  }
+}
+
+class _OverallScore extends StatelessWidget {
+  const _OverallScore({required this.score});
+
+  final int score;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final visualScore = score.clamp(0, 100);
+    final color = profileStrengthColor(visualScore);
+    return Semantics(
+      label: l10n.profileStrengthSemantics(score),
+      excludeSemantics: true,
+      child: SizedBox.square(
+        dimension: 52,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            SizedBox.square(
+              dimension: 48,
+              child: CircularProgressIndicator(
+                value: visualScore / 100,
+                strokeWidth: 4,
+                strokeCap: StrokeCap.round,
+                color: color,
+                backgroundColor: const Color(0xFFF3F4F6),
+              ),
+            ),
+            Text(
+              '$score',
+              style: TextStyle(
+                color: color,
+                fontSize: TextSize.font14(context),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileStrengthRow extends StatelessWidget {
+  const _ProfileStrengthRow({
+    required this.section,
+    required this.onTap,
+  });
+
+  final ProfileStrengthSection section;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final label = localizedProfileStrengthSectionLabel(l10n, section);
+    final visualPercent = section.completionPercentage.clamp(0, 100);
+    final color = profileStrengthColor(visualPercent);
+    final status = section.completed
+        ? l10n.profileStrengthCompletedStatus
+        : l10n.profileStrengthIncompleteStatus;
+
+    return Semantics(
+      button: true,
+      label: l10n.profileStrengthSectionSemantics(
+        label,
+        section.completionPercentage,
+        status,
+      ),
+      excludeSemantics: true,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              label,
+                              style: TextStyle(
+                                color: AppColors.textPrimaryLight,
+                                fontSize: TextSize.font14(context),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '${section.completionPercentage}%',
+                            style: TextStyle(
+                              color: color,
+                              fontSize: TextSize.font12(context),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 7),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: LinearProgressIndicator(
+                          value: visualPercent / 100,
+                          minHeight: 6,
+                          color: color,
+                          backgroundColor: const Color(0xFFF3F4F6),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                if (section.completed)
+                  const Icon(
+                    Icons.check_circle_outline,
+                    color: Color(0xFF10B981),
+                    size: 20,
+                  )
+                else
+                  Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    color: AppColors.hintTextColor,
+                    size: TextSize.font14(context),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CompletedDivider extends StatelessWidget {
+  const _CompletedDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    final label = AppLocalizations.of(context).profileStrengthCompleted;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      child: Row(
+        children: [
+          const Expanded(child: Divider(color: Color(0xFFF3F4F6))),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              label,
+              style: TextStyle(
+                color: AppColors.hintTextColor,
+                fontSize: TextSize.font12(context),
+              ),
+            ),
+          ),
+          const Expanded(child: Divider(color: Color(0xFFF3F4F6))),
+        ],
+      ),
+    );
+  }
+}
+
+class _TipsPanel extends StatelessWidget {
+  const _TipsPanel({required this.tips});
+
+  final List<String> tips;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFBEB),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.profileStrengthTips,
+            style: TextStyle(
+              color: const Color(0xFFB45309),
+              fontSize: TextSize.font12(context),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 6),
+          for (final tip in tips)
             Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: InkWell(
-                onTap: () => setState(() => _isExpanded = false),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      l10n.seeLess,
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '•',
+                    style: TextStyle(
+                      color: const Color(0xFFD97706),
+                      fontSize: TextSize.font12(context),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      localizedProfileStrengthTip(l10n, tip),
                       style: TextStyle(
-                        color: AppColors.primary,
-                        fontSize: TextSize.font14(context),
-                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFFD97706),
+                        fontSize: TextSize.font12(context),
                       ),
                     ),
-                    const SizedBox(width: 4),
-                    Icon(
-                      Icons.expand_less,
-                      color: AppColors.primary,
-                      size: TextSize.font18(context),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
         ],
@@ -159,474 +491,240 @@ class _CompleteProfileSectionState
   }
 }
 
-class _CompleteProfileTileData {
-  const _CompleteProfileTileData({
-    required this.sectionKey,
-    required this.sectionLabel,
-    required this.iconImagePath,
-    required this.remainingFieldCount,
-    required this.completionPercentage,
-    required this.onTap,
+class _ProfileStrengthErrorCard extends StatelessWidget {
+  const _ProfileStrengthErrorCard({
+    required this.isRetrying,
+    required this.onRetry,
   });
 
-  static const String completeProfileSource = 'completeProfile';
-  static const Map<String, List<String>> _requiredFieldsBySection =
-      <String, List<String>>{
-    'preferences': <String>[
-      'ageRange',
-      'heightRange',
-      'maritalStatusPreference',
-      'educationPreference',
-      'religionPreference',
-      'locationPreference',
-      'partnerExpectations',
-      'dietPreference',
-    ],
-    'basic_profile': <String>[
-      'dateOfBirth',
-      'maritalStatus',
-      'bio',
-      'motherTongue',
-      'languages',
-      'displayName',
-    ],
-    'photos': <String>[
-      'hasPhoto',
-      'hasPrimaryPhoto',
-      'hasMultiplePhotos',
-    ],
-    'family': <String>[
-      'familyType',
-      'familyValues',
-      'parentInfo',
-      'aboutFamily',
-      'marriageTimeline',
-    ],
-    'education': <String>[
-      'hasEducation',
-      'educationLevel',
-      'fieldOfStudy',
-    ],
-    'profession': <String>[
-      'hasProfession',
-      'profession',
-      'incomeRange',
-    ],
-    'appearance': <String>[
-      'height',
-      'weight',
-      'bodyType',
-    ],
-    'religion': <String>[
-      'religion',
-      'community',
-      'religiousBackground',
-    ],
-    'lifestyle': <String>[
-      'dietType',
-      'drinkingHabits',
-      'smokingHabits',
-    ],
-    'location': <String>[
-      'hasLocation',
-      'country',
-      'city',
-    ],
-    'interests': <String>[
-      'hasInterests',
-    ],
-    'contact': <String>[
-      'hasContact',
-    ],
+  final bool isRetrying;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.greyLight),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.profileStrengthTitle,
+              style: TextStyle(
+                color: AppColors.textPrimaryLight,
+                fontSize: TextSize.font18(context),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              l10n.profileStrengthUnavailable,
+              style: TextStyle(
+                color: AppColors.textSecondaryLight,
+                fontSize: TextSize.font14(context),
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextButton.icon(
+              onPressed: isRetrying ? null : onRetry,
+              icon: isRetrying
+                  ? const SizedBox.square(
+                      dimension: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.refresh_rounded),
+              label: Text(l10n.retry),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StaleRefreshError extends StatelessWidget {
+  const _StaleRefreshError({
+    required this.isRetrying,
+    required this.onRetry,
+  });
+
+  final bool isRetrying;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Material(
+      color: const Color(0xFFFFF1F2),
+      child: InkWell(
+        onTap: isRetrying ? null : onRetry,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.info_outline,
+                size: 16,
+                color: Color(0xFFE11D48),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l10n.profileStrengthRefreshFailed,
+                  style: TextStyle(
+                    color: const Color(0xFFBE123C),
+                    fontSize: TextSize.font12(context),
+                  ),
+                ),
+              ),
+              Text(
+                l10n.retry,
+                style: TextStyle(
+                  color: const Color(0xFFBE123C),
+                  fontSize: TextSize.font12(context),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileStrengthSkeleton extends StatelessWidget {
+  const _ProfileStrengthSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Shimmer.fromColors(
+        baseColor: const Color(0xFFE5E7EB),
+        highlightColor: const Color(0xFFF9FAFB),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  const _SkeletonBox(width: 150, height: 22),
+                  const Spacer(),
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: const BoxDecoration(
+                      color: AppColors.white,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              for (var index = 0; index < 5; index++) ...[
+                const Row(
+                  children: [
+                    _SkeletonBox(width: 130, height: 14),
+                    Spacer(),
+                    _SkeletonBox(width: 34, height: 14),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                const _SkeletonBox(width: double.infinity, height: 6),
+                if (index < 4) const SizedBox(height: 18),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SkeletonBox extends StatelessWidget {
+  const _SkeletonBox({required this.width, required this.height});
+
+  final double width;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(8),
+      ),
+    );
+  }
+}
+
+Color profileStrengthColor(int score) {
+  if (score >= 80) return const Color(0xFF10B981);
+  if (score >= 50) return const Color(0xFFF59E0B);
+  return const Color(0xFFF43F5E);
+}
+
+String localizedProfileStrengthSectionLabel(
+  AppLocalizations l10n,
+  ProfileStrengthSection section,
+) {
+  return switch (section.key.trim().toLowerCase()) {
+    'preferences' => l10n.profileStrengthPreferences,
+    'basic_profile' => l10n.profileStrengthBasicProfile,
+    'photos' => l10n.profileStrengthPhotos,
+    'family' => l10n.profileStrengthFamily,
+    'education' => l10n.profileStrengthEducation,
+    'profession' => l10n.profileStrengthProfession,
+    'appearance' => l10n.profileStrengthAppearance,
+    'religion' => l10n.profileStrengthReligion,
+    'lifestyle' => l10n.profileStrengthLifestyle,
+    'location' => l10n.profileStrengthLocation,
+    'interests' => l10n.profileStrengthInterests,
+    'contact' || 'contacts' => l10n.profileStrengthContact,
+    _ => section.label,
   };
+}
 
-  final String? sectionKey;
-  final String? sectionLabel;
-  final String iconImagePath;
-  final int? remainingFieldCount;
-  final int? completionPercentage;
-  final Future<void> Function(BuildContext context) onTap;
-
-  Future<void> open(BuildContext context) => onTap(context);
-
-  String? resolveSectionLabel(BuildContext context) {
-    final normalizedKey = sectionKey?.trim().toLowerCase();
-    final mapped = switch (normalizedKey) {
-      'preferences' => 'Preferences',
-      'basic_profile' => 'Basic Profile',
-      'photos' => 'Profile Photos',
-      'family' => 'Family Details',
-      'education' => 'Education',
-      'profession' => 'Profession',
-      'appearance' => 'Appearance',
-      'religion' => 'Religion',
-      'lifestyle' => 'Lifestyle',
-      'location' => 'Location',
-      'interests' => 'Interests & Hobbies',
-      'contact' => 'Contact',
-      _ => null,
-    };
-
-    final effective = (mapped ?? sectionLabel)?.trim();
-    if (effective == null || effective.isEmpty) return null;
-    return effective.localized(context);
-  }
-
-  static _CompleteProfileTileData fromStrengthSection(
-    ProfileStrengthSection section,
-  ) {
-    final sectionKey = _normalizeKey(section.key);
-    final strengthFields = section.incompleteFields.isNotEmpty
-        ? section.incompleteFields
-        : (section.fields ?? const <ProfileStrengthField>[]);
-    final fieldKey = section.firstIncompleteFieldKey ??
-        _requiredFieldsBySection[sectionKey]?.first;
-    final remainingFieldCount = section.remainingFieldCount;
-    final completionPercentage = section.completionPercentage;
-
-    switch (sectionKey) {
-      case 'preferences':
-        return _profileEditTile(
-          sectionKey: sectionKey,
-          sectionLabel: section.label,
-          remainingFieldCount: remainingFieldCount,
-          completionPercentage: completionPercentage,
-          iconImagePath: AppImages.userLoveSvgIcon,
-          section: _preferenceSectionForField(fieldKey),
-          strengthSectionKey: sectionKey,
-          strengthSectionLabel: section.label,
-          strengthFields: strengthFields,
-        );
-      case 'basic_profile':
-        return _profileEditTile(
-          sectionKey: sectionKey,
-          sectionLabel: section.label,
-          remainingFieldCount: remainingFieldCount,
-          completionPercentage: completionPercentage,
-          iconImagePath: AppImages.profileSvgIcon,
-          section: _basicProfileSectionForField(fieldKey),
-          strengthSectionKey: sectionKey,
-          strengthSectionLabel: section.label,
-          strengthFields: strengthFields,
-        );
-      case 'appearance':
-        return _profileEditTile(
-          sectionKey: sectionKey,
-          sectionLabel: section.label,
-          remainingFieldCount: remainingFieldCount,
-          completionPercentage: completionPercentage,
-          iconImagePath: AppImages.person,
-          section: _appearanceSectionForField(fieldKey),
-          strengthSectionKey: sectionKey,
-          strengthSectionLabel: section.label,
-          strengthFields: strengthFields,
-        );
-      case 'location':
-        return _profileEditTile(
-          sectionKey: sectionKey,
-          sectionLabel: section.label,
-          remainingFieldCount: remainingFieldCount,
-          completionPercentage: completionPercentage,
-          iconImagePath: AppImages.locationSvgIcon,
-          section: _locationSectionForField(fieldKey),
-          strengthSectionKey: sectionKey,
-          strengthSectionLabel: section.label,
-          strengthFields: strengthFields,
-        );
-      case 'education':
-        return _profileEditTile(
-          sectionKey: sectionKey,
-          sectionLabel: section.label,
-          remainingFieldCount: remainingFieldCount,
-          completionPercentage: completionPercentage,
-          iconImagePath: AppImages.educationSvgIcon,
-          section: _educationSectionForField(fieldKey),
-          strengthSectionKey: sectionKey,
-          strengthSectionLabel: section.label,
-          strengthFields: strengthFields,
-        );
-      case 'profession':
-        return _profileEditTile(
-          sectionKey: sectionKey,
-          sectionLabel: section.label,
-          remainingFieldCount: remainingFieldCount,
-          completionPercentage: completionPercentage,
-          iconImagePath: AppImages.workSvgIcon,
-          section: _professionSectionForField(fieldKey),
-          strengthSectionKey: sectionKey,
-          strengthSectionLabel: section.label,
-          strengthFields: strengthFields,
-        );
-      case 'religion':
-        return _profileEditTile(
-          sectionKey: sectionKey,
-          sectionLabel: section.label,
-          remainingFieldCount: remainingFieldCount,
-          completionPercentage: completionPercentage,
-          iconImagePath: AppImages.religionSvgIcon,
-          section: ProfileEditSection.religiousBackground,
-          strengthSectionKey: sectionKey,
-          strengthSectionLabel: section.label,
-          strengthFields: strengthFields,
-        );
-      case 'family':
-        return _profileEditTile(
-          sectionKey: sectionKey,
-          sectionLabel: section.label,
-          remainingFieldCount: remainingFieldCount,
-          completionPercentage: completionPercentage,
-          iconImagePath: AppImages.groupsIcon,
-          section: _familySectionForField(fieldKey),
-          strengthSectionKey: sectionKey,
-          strengthSectionLabel: section.label,
-          strengthFields: strengthFields,
-        );
-      case 'lifestyle':
-        return _profileEditTile(
-          sectionKey: sectionKey,
-          sectionLabel: section.label,
-          remainingFieldCount: remainingFieldCount,
-          completionPercentage: completionPercentage,
-          iconImagePath: AppImages.lifeStyleSvgIcon,
-          section: _lifestyleSectionForField(fieldKey),
-          strengthSectionKey: sectionKey,
-          strengthSectionLabel: section.label,
-          strengthFields: strengthFields,
-        );
-      case 'contact':
-      case 'contacts':
-        return _CompleteProfileTileData(
-          sectionKey: sectionKey,
-          sectionLabel: section.label,
-          remainingFieldCount: remainingFieldCount,
-          completionPercentage: completionPercentage,
-          iconImagePath: AppImages.verifyContact,
-          onTap: _openVerifyNumber,
-        );
-      case 'photos':
-        return _CompleteProfileTileData(
-          sectionKey: sectionKey,
-          sectionLabel: section.label,
-          remainingFieldCount: remainingFieldCount,
-          completionPercentage: completionPercentage,
-          iconImagePath: AppImages.photoIcon,
-          onTap: _openPhotoUpload,
-        );
-      case 'interests':
-      case 'hobbies':
-      case 'hobbies_interests':
-      case 'interest':
-        return _profileEditTile(
-          sectionKey: sectionKey,
-          sectionLabel: section.label,
-          remainingFieldCount: remainingFieldCount,
-          completionPercentage: completionPercentage,
-          iconImagePath: AppImages.habitsSvgIcon,
-          section: _interestsSectionForField(fieldKey),
-          strengthSectionKey: sectionKey,
-          strengthSectionLabel: section.label,
-          strengthFields: strengthFields,
-        );
-      default:
-        return _profileEditTile(
-          sectionKey: sectionKey,
-          sectionLabel: section.label,
-          remainingFieldCount: remainingFieldCount,
-          completionPercentage: completionPercentage,
-          iconImagePath: AppImages.profileSvgIcon,
-          section: ProfileEditSection.aboutYourself,
-          strengthSectionKey: sectionKey,
-          strengthSectionLabel: section.label,
-          strengthFields: strengthFields,
-        );
-    }
-  }
-
-  static _CompleteProfileTileData _profileEditTile({
-    required String? sectionKey,
-    required String? sectionLabel,
-    required int? remainingFieldCount,
-    required int? completionPercentage,
-    required String iconImagePath,
-    required ProfileEditSection section,
-    String? strengthSectionKey,
-    String? strengthSectionLabel,
-    List<ProfileStrengthField>? strengthFields,
-  }) {
-    return _CompleteProfileTileData(
-      sectionKey: sectionKey,
-      sectionLabel: sectionLabel,
-      remainingFieldCount: remainingFieldCount,
-      completionPercentage: completionPercentage,
-      iconImagePath: iconImagePath,
-      onTap: (context) async {
-        final resolvedStrengthFields = strengthFields
-                ?.where(
-                  (field) => field.key?.trim().isNotEmpty ?? false,
-                )
-                .toList(growable: false) ??
-            const <ProfileStrengthField>[];
-        await context.pushNamed(
-          Routes.profileSectionEdit,
-          extra: {
-            'section': section.key,
-            if (strengthSectionKey != null)
-              'strengthSectionKey': strengthSectionKey,
-            if (strengthSectionLabel != null)
-              'strengthSectionLabel': strengthSectionLabel,
-            if (resolvedStrengthFields.isNotEmpty)
-              'strengthFields': resolvedStrengthFields
-                  .map((field) => field.toJson())
-                  .toList(growable: false),
-          },
-        );
-        if (!context.mounted) return;
-        await ProviderScope.containerOf(
-          context,
-          listen: false,
-        ).read(homeProvider).loadProfileStrength(force: true);
-      },
-    );
-  }
-
-  static String _normalizeKey(String? value) {
-    return value?.trim().toLowerCase() ?? '';
-  }
-
-  static ProfileEditSection _basicProfileSectionForField(String? fieldKey) {
-    switch (_normalizeKey(fieldKey)) {
-      case 'bio':
-        return ProfileEditSection.aboutYourself;
-      case 'mothertongue':
-      case 'languages':
-      case 'dateofbirth':
-      case 'maritalstatus':
-      case 'displayname':
-        return ProfileEditSection.basicDetails;
-      default:
-        return ProfileEditSection.basicDetails;
-    }
-  }
-
-  static ProfileEditSection _preferenceSectionForField(String? fieldKey) {
-    switch (_normalizeKey(fieldKey)) {
-      case 'locationpreference':
-        return ProfileEditSection.preferenceLocationDetails;
-      case 'educationpreference':
-      case 'professionpreference':
-      case 'workingaspreference':
-      case 'annualincomepreference':
-        return ProfileEditSection.preferenceEducationCareer;
-      case 'partnerexpectations':
-      case 'expectationsfromlifepartner':
-      case 'dietpreference':
-      case 'drinkingpreference':
-      case 'smokingpreference':
-      case 'profilemanagedbypreference':
-        return ProfileEditSection.preferenceOtherDetails;
-      case 'agerange':
-      case 'heightrange':
-      case 'maritalstatuspreference':
-      case 'religionpreference':
-      case 'communitypreference':
-      case 'mothertonguepreference':
-      case 'languagepreference':
-      default:
-        return ProfileEditSection.preferenceBasicInfo;
-    }
-  }
-
-  static ProfileEditSection _familySectionForField(String? fieldKey) {
-    switch (_normalizeKey(fieldKey)) {
-      case 'familytype':
-      case 'familyvalues':
-      case 'parentinfo':
-      case 'aboutfamily':
-      case 'marriagetimeline':
-      default:
-        return ProfileEditSection.familyDetails;
-    }
-  }
-
-  static ProfileEditSection _appearanceSectionForField(String? fieldKey) {
-    switch (_normalizeKey(fieldKey)) {
-      case 'height':
-      case 'weight':
-      case 'bodytype':
-      default:
-        return ProfileEditSection.basicDetails;
-    }
-  }
-
-  static ProfileEditSection _lifestyleSectionForField(String? fieldKey) {
-    switch (_normalizeKey(fieldKey)) {
-      case 'diettype':
-      case 'drinkinghabits':
-      case 'smokinghabits':
-      default:
-        return ProfileEditSection.basicDetails;
-    }
-  }
-
-  static ProfileEditSection _educationSectionForField(String? fieldKey) {
-    switch (_normalizeKey(fieldKey)) {
-      case 'haseducation':
-      case 'educationlevel':
-      case 'fieldofstudy':
-      default:
-        return ProfileEditSection.educationCareer;
-    }
-  }
-
-  static ProfileEditSection _professionSectionForField(String? fieldKey) {
-    switch (_normalizeKey(fieldKey)) {
-      case 'hasprofession':
-      case 'profession':
-      case 'incomerange':
-      default:
-        return ProfileEditSection.educationCareer;
-    }
-  }
-
-  static ProfileEditSection _locationSectionForField(String? fieldKey) {
-    switch (_normalizeKey(fieldKey)) {
-      case 'haslocation':
-      case 'country':
-      case 'city':
-      default:
-        return ProfileEditSection.location;
-    }
-  }
-
-  static ProfileEditSection _interestsSectionForField(String? fieldKey) {
-    switch (_normalizeKey(fieldKey)) {
-      case 'hasinterests':
-      default:
-        return ProfileEditSection.hobbiesInterests;
-    }
-  }
-
-  static Future<void> _openVerifyNumber(BuildContext context) async {
-    await context.pushNamed(
-      Routes.verifyNumber,
-      extra: {'fromScreen': completeProfileSource},
-    );
-    if (!context.mounted) return;
-    await ProviderScope.containerOf(
-      context,
-      listen: false,
-    ).read(homeProvider).loadProfileStrength(force: true);
-  }
-
-  static Future<void> _openPhotoUpload(BuildContext context) async {
-    await context.pushNamed(
-      Routes.photoUpload,
-      extra: {'fromScreen': completeProfileSource},
-    );
-    if (!context.mounted) return;
-    await ProviderScope.containerOf(
-      context,
-      listen: false,
-    ).read(homeProvider).loadProfileStrength(force: true);
-  }
+String localizedProfileStrengthTip(AppLocalizations l10n, String tip) {
+  return switch (tip) {
+    'Complete your Partner Preferences to improve match quality' =>
+      l10n.profileStrengthTipPreferences,
+    'Fill in your basic profile details to help others know you better' =>
+      l10n.profileStrengthTipBasic,
+    'Add your profile photo to improve visibility' =>
+      l10n.profileStrengthTipPhotos,
+    'Adding family details helps build trust with potential matches' =>
+      l10n.profileStrengthTipFamily,
+    'Share your education background to find compatible matches' =>
+      l10n.profileStrengthTipEducation,
+    'Adding your profession details improves match relevance' =>
+      l10n.profileStrengthTipProfession,
+    'Complete your appearance details for better matching accuracy' =>
+      l10n.profileStrengthTipAppearance,
+    'Specify your religious background for compatible matches' =>
+      l10n.profileStrengthTipReligion,
+    'Share your lifestyle choices to find like-minded matches' =>
+      l10n.profileStrengthTipLifestyle,
+    'Add your location to find matches nearby' =>
+      l10n.profileStrengthTipLocation,
+    'Share your interests and hobbies to find common ground' =>
+      l10n.profileStrengthTipInterests,
+    'Add contact information so matches can reach you' =>
+      l10n.profileStrengthTipContact,
+    _ => tip,
+  };
 }

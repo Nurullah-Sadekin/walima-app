@@ -93,6 +93,7 @@ extension _ProfileSectionEditSaveSectionsPrimaryPart
         'educationLevel': _resolveEducationLevelValue(
           _highestQualificationController,
         ),
+        'fieldOfStudy': _toTrimmedOrNull(_fieldOfStudyController),
         'institutionName': _toTrimmedOrNull(_collegeController),
       },
     );
@@ -182,12 +183,22 @@ extension _ProfileSectionEditSaveSectionsPrimaryPart
         'appearance': <String, dynamic>{
           'height': _toIntOrNull(_heightController),
           'bloodGroup': _apiValueOrText('bloodGroup', _bloodGroupController),
+          'healthCondition':
+              _apiValueOrText('healthDetails', _healthInfoController),
           'healthDetails':
               _apiValueOrText('healthDetails', _healthInfoController),
           'specialCases': _toTrimmedOrNull(_disabilityController),
         },
         'lifestyle': <String, dynamic>{
           'dietType': _apiValueOrText('diet', _dietController),
+          'drinkingHabits': _apiValueOrText(
+            'drinkingHabits',
+            _drinkingHabitsController,
+          ),
+          'smokingHabits': _apiValueOrText(
+            'smokingHabits',
+            _smokingHabitsController,
+          ),
         },
         if (locationPayload != null)
           'locations': <Map<String, dynamic>>[

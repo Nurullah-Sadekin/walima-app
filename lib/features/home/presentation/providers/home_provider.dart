@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/cupertino.dart';
 import 'package:walima_llc/core/global/components/bottom_sheet.dart';
 import 'package:walima_llc/core/global/components/limit_over.dart';
@@ -15,6 +17,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeProvider extends BaseChangeNotifier {
+  HomeProvider({
+    Future<ProfileStrengthResponse> Function()? profileStrengthLoader,
+  }) : _profileStrengthLoader =
+            profileStrengthLoader ?? HomeRepository.getProfileStrength;
+
+  final Future<ProfileStrengthResponse> Function() _profileStrengthLoader;
+
   HomeScreenStates screenStates = HomeScreenStates.defaultState;
   HomeScreenStates loaderState = HomeScreenStates.defaultState;
   MatchesRepository matchesRepository = MatchesRepository();
@@ -32,28 +41,115 @@ class HomeProvider extends BaseChangeNotifier {
   ProfileStrengthData? profileStrength;
   bool isLoadingProfileStrength = false;
   String? profileStrengthError;
+  String? profileStrengthTraceId;
   bool _hasLoadedProfileStrength = false;
+  Future<void>? _activeProfileStrengthLoad;
+  int _profileStrengthRequestVersion = 0;
+  String? _profileStrengthUserId;
+
+  void setAuthenticatedUser(String? userId) {
+    final normalized = userId?.trim();
+    final nextUserId =
+        normalized == null || normalized.isEmpty ? null : normalized;
+    if (_profileStrengthUserId == nextUserId) return;
+
+    _profileStrengthUserId = nextUserId;
+    _resetProfileStrengthState();
+    notifyListeners();
+  }
 
   Future<void> loadProfileStrength({bool force = false}) async {
-    if (_hasLoadedProfileStrength && !force) return;
+    if (!force) {
+      if (_hasLoadedProfileStrength) return;
+      final active = _activeProfileStrengthLoad;
+      if (active != null) return active;
+    }
+
+    final requestVersion = ++_profileStrengthRequestVersion;
+    final request = _performProfileStrengthLoad(requestVersion);
+    _activeProfileStrengthLoad = request;
+    try {
+      await request;
+    } finally {
+      if (identical(_activeProfileStrengthLoad, request)) {
+        _activeProfileStrengthLoad = null;
+      }
+    }
+  }
+
+  Future<void> _performProfileStrengthLoad(int requestVersion) async {
     isLoadingProfileStrength = true;
     profileStrengthError = null;
     notifyListeners();
 
-    final response = await HomeRepository.getProfileStrength();
+    final response = await _profileStrengthLoader();
+    if (requestVersion != _profileStrengthRequestVersion) return;
 
-    isLoadingProfileStrength = false;
+    final data = response.response;
+    final isMalformedSuccess =
+        response.isSuccess && (data == null || data.sections.isEmpty);
 
-    if (response.isSuccess) {
-      profileStrength = response.response;
+    if (response.isSuccess && !isMalformedSuccess) {
+      profileStrength = data;
+      profileStrengthTraceId = response.traceId;
       _hasLoadedProfileStrength = true;
+      _logOutOfRangeValues(data!);
     } else {
-      profileStrength = null;
-      profileStrengthError =
-          response.message ?? 'Unable to load profile completion details.';
+      profileStrengthError = isMalformedSuccess
+          ? 'Profile strength details are unavailable.'
+          : response.message.isNotEmpty
+              ? response.message
+              : 'Unable to load profile strength.';
+      profileStrengthTraceId = response.traceId;
+      developer.log(
+        'Profile strength load failed: $profileStrengthError',
+        name: 'ProfileStrength',
+        error: response.traceId == null ? null : 'traceId=${response.traceId}',
+      );
     }
 
+    isLoadingProfileStrength = false;
     notifyListeners();
+  }
+
+  Future<void> invalidateAndRefreshProfileStrength() {
+    _hasLoadedProfileStrength = false;
+    return loadProfileStrength(force: true);
+  }
+
+  void clearProfileStrength() {
+    _profileStrengthUserId = null;
+    _resetProfileStrengthState();
+    notifyListeners();
+  }
+
+  void _resetProfileStrengthState() {
+    _profileStrengthRequestVersion++;
+    _activeProfileStrengthLoad = null;
+    profileStrength = null;
+    profileStrengthError = null;
+    profileStrengthTraceId = null;
+    isLoadingProfileStrength = false;
+    _hasLoadedProfileStrength = false;
+  }
+
+  void _logOutOfRangeValues(ProfileStrengthData data) {
+    if (data.overallScore < 0 || data.overallScore > 100) {
+      developer.log(
+        'Out-of-range overall score: ${data.overallScore}',
+        name: 'ProfileStrength',
+      );
+    }
+    for (final section in data.sections) {
+      if (section.completionPercentage < 0 ||
+          section.completionPercentage > 100) {
+        developer.log(
+          'Out-of-range percentage for ${section.key}: '
+          '${section.completionPercentage}',
+          name: 'ProfileStrength',
+        );
+      }
+    }
   }
 
   Future<void> loadPremiumMatches({bool force = false}) async {

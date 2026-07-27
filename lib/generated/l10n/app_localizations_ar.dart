@@ -224,4 +224,119 @@ class AppLocalizationsAr extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get profileStrengthTitle => 'اكتمال الملف الشخصي';
+
+  @override
+  String get profileStrengthCompleted => 'مكتمل';
+
+  @override
+  String get profileStrengthTips => 'نصائح للتحسين';
+
+  @override
+  String get profileStrengthUnavailable =>
+      'بيانات اكتمال الملف الشخصي غير متاحة الآن.';
+
+  @override
+  String get profileStrengthRefreshFailed => 'تعذر تحديث اكتمال الملف الشخصي.';
+
+  @override
+  String get profileStrengthCompletedStatus => 'مكتمل';
+
+  @override
+  String get profileStrengthIncompleteStatus => 'غير مكتمل';
+
+  @override
+  String profileStrengthSemantics(Object percentage) {
+    return 'اكتمال الملف الشخصي $percentage بالمائة.';
+  }
+
+  @override
+  String profileStrengthSectionSemantics(
+      Object sectionLabel, Object percentage, Object status) {
+    return '$sectionLabel، $percentage بالمائة، $status.';
+  }
+
+  @override
+  String get profileStrengthPreferences => 'تفضيلات شريك الحياة';
+
+  @override
+  String get profileStrengthBasicProfile => 'الملف الشخصي الأساسي';
+
+  @override
+  String get profileStrengthPhotos => 'صور الملف الشخصي';
+
+  @override
+  String get profileStrengthFamily => 'تفاصيل العائلة';
+
+  @override
+  String get profileStrengthEducation => 'التعليم';
+
+  @override
+  String get profileStrengthProfession => 'المهنة';
+
+  @override
+  String get profileStrengthAppearance => 'المظهر';
+
+  @override
+  String get profileStrengthReligion => 'الدين';
+
+  @override
+  String get profileStrengthLifestyle => 'نمط الحياة';
+
+  @override
+  String get profileStrengthLocation => 'الموقع';
+
+  @override
+  String get profileStrengthInterests => 'الاهتمامات والهوايات';
+
+  @override
+  String get profileStrengthContact => 'معلومات الاتصال';
+
+  @override
+  String get profileStrengthTipPreferences =>
+      'أكمل تفضيلات شريك الحياة لتحسين جودة المطابقات';
+
+  @override
+  String get profileStrengthTipBasic =>
+      'أكمل تفاصيل ملفك الأساسية لمساعدة الآخرين على معرفتك بشكل أفضل';
+
+  @override
+  String get profileStrengthTipPhotos => 'أضف صورة ملفك الشخصي لتحسين ظهورك';
+
+  @override
+  String get profileStrengthTipFamily =>
+      'تساعد إضافة تفاصيل العائلة على بناء الثقة مع المطابقات المحتملة';
+
+  @override
+  String get profileStrengthTipEducation =>
+      'شارك خلفيتك التعليمية للعثور على مطابقات متوافقة';
+
+  @override
+  String get profileStrengthTipProfession =>
+      'تؤدي إضافة تفاصيل مهنتك إلى تحسين صلة المطابقات';
+
+  @override
+  String get profileStrengthTipAppearance =>
+      'أكمل تفاصيل مظهرك لتحسين دقة المطابقة';
+
+  @override
+  String get profileStrengthTipReligion =>
+      'حدد خلفيتك الدينية للعثور على مطابقات متوافقة';
+
+  @override
+  String get profileStrengthTipLifestyle =>
+      'شارك خيارات نمط حياتك للعثور على مطابقات متشابهة';
+
+  @override
+  String get profileStrengthTipLocation => 'أضف موقعك للعثور على مطابقات قريبة';
+
+  @override
+  String get profileStrengthTipInterests =>
+      'شارك اهتماماتك وهواياتك للعثور على نقاط مشتركة';
+
+  @override
+  String get profileStrengthTipContact =>
+      'أضف معلومات الاتصال حتى تتمكن المطابقات من الوصول إليك';
 }

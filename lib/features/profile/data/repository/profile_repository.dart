@@ -130,4 +130,36 @@ class ProfileRepository {
       );
     }
   }
+
+  static Future<UpdateProfileSectionResponse> updateProfileContacts(
+    List<Map<String, dynamic>> contacts,
+  ) async {
+    try {
+      final response = await DioClient().put(
+        AppUrls.updateProfileContacts,
+        data: contacts,
+        isTokenRequired: true,
+      );
+      final data = response.data;
+      if (data is Map) {
+        final normalized = Map<String, dynamic>.from(data);
+        normalized['code'] = normalized['code']?.toString() ?? 'SUCCESS';
+        normalized['response'] = normalized['response'] ?? normalized['data'];
+        return UpdateProfileSectionResponse.fromJson(normalized);
+      }
+      return UpdateProfileSectionResponse(
+        code: 'FAILED',
+        message: 'Failed to update contact information',
+      );
+    } catch (e) {
+      final responseData = e is DioException ? e.response?.data : null;
+      final message =
+          responseData is Map ? responseData['message']?.toString() : null;
+      return UpdateProfileSectionResponse(
+        code: 'FAILED',
+        message:
+            message ?? (e is DioException ? e.message : null) ?? e.toString(),
+      );
+    }
+  }
 }

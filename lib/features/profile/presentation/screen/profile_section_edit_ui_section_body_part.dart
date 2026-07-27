@@ -3,10 +3,6 @@ part of 'profile_section_edit_screen.dart';
 extension _ProfileSectionEditUiSectionBodyPart
     on _ProfileSectionEditScreenState {
   Widget _buildSectionBody() {
-    if (_isStrengthDrivenMode) {
-      return _buildStrengthDrivenSectionBody();
-    }
-
     switch (widget.section) {
       case ProfileEditSection.aboutYourself:
         return _buildAboutYourselfSectionBody();
@@ -145,6 +141,20 @@ extension _ProfileSectionEditUiSectionBodyPart
           values: RegistrationDiet.values,
           popupHeader: 'Select Diet',
           fieldKey: 'diet',
+        ),
+        _enumDropdown<DrinkingHabits>(
+          label: 'Drinking Habits',
+          controller: _drinkingHabitsController,
+          values: DrinkingHabits.values,
+          popupHeader: 'Select Drinking Habits',
+          fieldKey: 'drinkingHabits',
+        ),
+        _enumDropdown<SmokingHabits>(
+          label: 'Smoking Habits',
+          controller: _smokingHabitsController,
+          values: SmokingHabits.values,
+          popupHeader: 'Select Smoking Habits',
+          fieldKey: 'smokingHabits',
         ),
         _enumDropdown<BloodGroup>(
           label: 'Blood Group',
@@ -297,6 +307,10 @@ extension _ProfileSectionEditUiSectionBodyPreferencePart
           onTap: _loadEducationLevelLookup,
         ),
         _field(label: 'College', controller: _collegeController),
+        _field(
+          label: 'Field of Study',
+          controller: _fieldOfStudyController,
+        ),
         _lookupDropdown(
           label: 'Annual Income',
           controller: _annualIncomeController,

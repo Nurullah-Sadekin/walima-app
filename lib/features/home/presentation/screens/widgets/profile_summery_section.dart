@@ -48,11 +48,15 @@ class ProfileSummerySection extends ConsumerWidget {
           },
           onBottomIconPressed: () async {
             final String? imagePath = await PickerDialog().imagePicker(context);
+            if (!context.mounted) return;
             if (imagePath != null) {
               await provider.updateProfileImage(
                 context: context,
                 filePath: imagePath,
               );
+              await ref
+                  .read(homeProvider)
+                  .invalidateAndRefreshProfileStrength();
             }
           },
         ),

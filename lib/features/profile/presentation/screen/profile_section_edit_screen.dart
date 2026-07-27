@@ -15,15 +15,9 @@ import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/utils/dialog_utils.dart';
 import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/matches/presentation/widgets/bottom_bordered_widget.dart';
-import 'package:walima_llc/features/home/data/model/response/profile_strength_response.dart';
 import 'package:walima_llc/features/profile/data/model/request/update_profile_section_request_body.dart';
 import 'package:walima_llc/features/profile/data/model/response/get_complete_profile_response.dart';
-import 'package:walima_llc/features/profile/domain/model/profile_section_edit_ui_model.dart';
 import 'package:walima_llc/features/profile/domain/repository/profile_section_edit_domain_repository.dart';
-import 'package:walima_llc/features/profile/domain/usecase/profile_section_field_key_usecase.dart';
-import 'package:walima_llc/features/profile/domain/usecase/profile_section_lookup_slug_candidates_usecase.dart';
-import 'package:walima_llc/features/profile/domain/usecase/profile_section_profile_value_usecase.dart';
-import 'package:walima_llc/features/profile/domain/usecase/profile_section_strength_fields_usecase.dart';
 import 'package:walima_llc/features/profile/presentation/screen/profile_edit_section.dart';
 import 'package:walima_llc/features/profile/presentation/screen/profile_section_edit_ui_state.dart';
 import 'package:walima_llc/features/recommended_preferences/data/models/request/update_preferences_request_body.dart';
@@ -38,9 +32,6 @@ import 'package:intl/intl.dart' show DateFormat;
 
 part 'profile_section_edit_lookup_dynamic_part.dart';
 part 'profile_section_edit_ui_section_body_part.dart';
-part 'profile_section_edit_ui_strength_part.dart';
-part 'profile_section_edit_ui_binding_part.dart';
-part 'profile_section_edit_ui_known_fields_part.dart';
 part 'profile_section_edit_ui_form_fields_part.dart';
 part 'profile_section_edit_ui_dropdown_helpers_part.dart';
 part 'profile_section_edit_location_picker_actions_part.dart';
@@ -55,15 +46,9 @@ class ProfileSectionEditScreen extends ConsumerStatefulWidget {
   const ProfileSectionEditScreen({
     super.key,
     required this.section,
-    this.strengthSectionKey,
-    this.strengthSectionLabel,
-    this.strengthFields = const <ProfileStrengthField>[],
   });
 
   final ProfileEditSection section;
-  final String? strengthSectionKey;
-  final String? strengthSectionLabel;
-  final List<ProfileStrengthField> strengthFields;
 
   @override
   ConsumerState<ProfileSectionEditScreen> createState() =>
@@ -76,14 +61,6 @@ abstract class _ProfileSectionEditScreenFields
       ProfileSectionEditDomainRepositoryImpl();
   final LocationDataRepositoryImpl _locationRepository =
       LocationDataRepositoryImpl();
-  final ProfileSectionStrengthFieldsUseCase _strengthFieldsUseCase =
-      const ProfileSectionStrengthFieldsUseCase();
-  final ProfileSectionFieldKeyUseCase _fieldKeyUseCase =
-      const ProfileSectionFieldKeyUseCase();
-  final ProfileSectionProfileValueUseCase _profileValueUseCase =
-      const ProfileSectionProfileValueUseCase();
-  final ProfileSectionLookupSlugCandidatesUseCase _lookupSlugCandidatesUseCase =
-      const ProfileSectionLookupSlugCandidatesUseCase();
 
   List<LookupOption> _educationLevelOptions = <LookupOption>[];
   List<LookupOption> _professionOptions = <LookupOption>[];
@@ -97,12 +74,6 @@ abstract class _ProfileSectionEditScreenFields
   List<SingleStringModel> _languageOptions = <SingleStringModel>[];
 
   final Map<String, String> _selectedApiValues = <String, String>{};
-  final Map<String, TextEditingController> _dynamicFieldControllers =
-      <String, TextEditingController>{};
-  final Map<String, List<LookupOption>> _dynamicFieldLookupOptions =
-      <String, List<LookupOption>>{};
-  final Map<String, String> _dynamicFieldSelectedApiValues = <String, String>{};
-  bool _didInitStrengthFieldMeta = false;
 
   final TextEditingController _aboutController = TextEditingController();
   final TextEditingController _displayNameController = TextEditingController();
@@ -117,6 +88,10 @@ abstract class _ProfileSectionEditScreenFields
   final TextEditingController _heightDisplayController =
       TextEditingController();
   final TextEditingController _dietController = TextEditingController();
+  final TextEditingController _drinkingHabitsController =
+      TextEditingController();
+  final TextEditingController _smokingHabitsController =
+      TextEditingController();
   final TextEditingController _bloodGroupController = TextEditingController();
   final TextEditingController _healthInfoController = TextEditingController();
   final TextEditingController _disabilityController = TextEditingController();
@@ -144,6 +119,7 @@ abstract class _ProfileSectionEditScreenFields
       TextEditingController();
   final TextEditingController _highestQualificationController =
       TextEditingController();
+  final TextEditingController _fieldOfStudyController = TextEditingController();
   final TextEditingController _collegeController = TextEditingController();
   final TextEditingController _annualIncomeController = TextEditingController();
   final TextEditingController _workingWithController = TextEditingController();
@@ -294,15 +270,13 @@ class _ProfileSectionEditScreenState extends _ProfileSectionEditScreenFields {
         return;
       }
       _prefill(provider.profile);
-      await _initializeStrengthFieldMeta(provider.profile);
       if (mounted) {
         setState(() {});
       }
     });
   }
 
-  String get _screenStateKey =>
-      '${widget.section.key}:${widget.strengthSectionKey ?? ''}';
+  String get _screenStateKey => widget.section.key;
 
   ProfileSectionEditUiState get _uiState => ref.read(
         profileSectionEditUiProvider(_screenStateKey),
@@ -317,9 +291,6 @@ class _ProfileSectionEditScreenState extends _ProfileSectionEditScreenFields {
   @override
   void dispose() {
     for (final controller in _allControllers) {
-      controller.dispose();
-    }
-    for (final controller in _dynamicFieldControllers.values) {
       controller.dispose();
     }
     super.dispose();
@@ -337,6 +308,8 @@ class _ProfileSectionEditScreenState extends _ProfileSectionEditScreenFields {
         _heightController,
         _heightDisplayController,
         _dietController,
+        _drinkingHabitsController,
+        _smokingHabitsController,
         _bloodGroupController,
         _healthInfoController,
         _disabilityController,
@@ -357,6 +330,7 @@ class _ProfileSectionEditScreenState extends _ProfileSectionEditScreenFields {
         _aboutFamilyController,
         _marriageTimelineController,
         _highestQualificationController,
+        _fieldOfStudyController,
         _collegeController,
         _annualIncomeController,
         _workingWithController,
@@ -400,7 +374,7 @@ class _ProfileSectionEditScreenState extends _ProfileSectionEditScreenFields {
           child: Column(
             children: [
               CustomBackAppBar(
-                title: Text(_screenTitle),
+                title: Text(widget.section.title.localized(context)),
                 backIconBackground: AppColors.transparent,
               ),
               Expanded(

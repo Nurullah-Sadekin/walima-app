@@ -226,4 +226,122 @@ class AppLocalizationsBn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get profileStrengthTitle => 'প্রোফাইলের পূর্ণতা';
+
+  @override
+  String get profileStrengthCompleted => 'সম্পন্ন';
+
+  @override
+  String get profileStrengthTips => 'উন্নতির পরামর্শ';
+
+  @override
+  String get profileStrengthUnavailable =>
+      'প্রোফাইলের পূর্ণতার তথ্য এখন পাওয়া যাচ্ছে না।';
+
+  @override
+  String get profileStrengthRefreshFailed =>
+      'প্রোফাইলের পূর্ণতার তথ্য হালনাগাদ করা যায়নি।';
+
+  @override
+  String get profileStrengthCompletedStatus => 'সম্পন্ন';
+
+  @override
+  String get profileStrengthIncompleteStatus => 'অসম্পূর্ণ';
+
+  @override
+  String profileStrengthSemantics(Object percentage) {
+    return 'প্রোফাইলের পূর্ণতা $percentage শতাংশ।';
+  }
+
+  @override
+  String profileStrengthSectionSemantics(
+      Object sectionLabel, Object percentage, Object status) {
+    return '$sectionLabel, $percentage শতাংশ, $status।';
+  }
+
+  @override
+  String get profileStrengthPreferences => 'জীবনসঙ্গীর পছন্দ';
+
+  @override
+  String get profileStrengthBasicProfile => 'প্রাথমিক প্রোফাইল';
+
+  @override
+  String get profileStrengthPhotos => 'প্রোফাইল ছবি';
+
+  @override
+  String get profileStrengthFamily => 'পারিবারিক তথ্য';
+
+  @override
+  String get profileStrengthEducation => 'শিক্ষা';
+
+  @override
+  String get profileStrengthProfession => 'পেশা';
+
+  @override
+  String get profileStrengthAppearance => 'শারীরিক বিবরণ';
+
+  @override
+  String get profileStrengthReligion => 'ধর্ম';
+
+  @override
+  String get profileStrengthLifestyle => 'জীবনযাপন';
+
+  @override
+  String get profileStrengthLocation => 'অবস্থান';
+
+  @override
+  String get profileStrengthInterests => 'আগ্রহ ও শখ';
+
+  @override
+  String get profileStrengthContact => 'যোগাযোগের তথ্য';
+
+  @override
+  String get profileStrengthTipPreferences =>
+      'উন্নত ম্যাচ পেতে জীবনসঙ্গীর পছন্দগুলো পূরণ করুন';
+
+  @override
+  String get profileStrengthTipBasic =>
+      'অন্যরা আপনাকে ভালোভাবে জানতে প্রাথমিক প্রোফাইলের তথ্য পূরণ করুন';
+
+  @override
+  String get profileStrengthTipPhotos =>
+      'আরও দৃশ্যমান হতে আপনার প্রোফাইল ছবি যোগ করুন';
+
+  @override
+  String get profileStrengthTipFamily =>
+      'পারিবারিক তথ্য যোগ করলে সম্ভাব্য ম্যাচের আস্থা বাড়ে';
+
+  @override
+  String get profileStrengthTipEducation =>
+      'উপযুক্ত ম্যাচ পেতে আপনার শিক্ষাগত পটভূমি শেয়ার করুন';
+
+  @override
+  String get profileStrengthTipProfession =>
+      'পেশাগত তথ্য যোগ করলে ম্যাচের প্রাসঙ্গিকতা বাড়ে';
+
+  @override
+  String get profileStrengthTipAppearance =>
+      'আরও নির্ভুল ম্যাচের জন্য শারীরিক বিবরণ পূরণ করুন';
+
+  @override
+  String get profileStrengthTipReligion =>
+      'উপযুক্ত ম্যাচের জন্য আপনার ধর্মীয় পটভূমি উল্লেখ করুন';
+
+  @override
+  String get profileStrengthTipLifestyle =>
+      'সমমনা ম্যাচ পেতে আপনার জীবনযাপনের পছন্দগুলো শেয়ার করুন';
+
+  @override
+  String get profileStrengthTipLocation =>
+      'কাছাকাছি ম্যাচ পেতে আপনার অবস্থান যোগ করুন';
+
+  @override
+  String get profileStrengthTipInterests =>
+      'মিল খুঁজে পেতে আপনার আগ্রহ ও শখ শেয়ার করুন';
+
+  @override
+  String get profileStrengthTipContact =>
+      'ম্যাচ যেন আপনার সঙ্গে যোগাযোগ করতে পারে, সে জন্য যোগাযোগের তথ্য যোগ করুন';
 }
