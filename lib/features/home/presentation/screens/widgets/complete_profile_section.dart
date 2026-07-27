@@ -100,13 +100,24 @@ ProfileStrengthNavigationTarget resolveProfileStrengthNavigationTarget(
   }
 }
 
-class CompleteProfileSection extends ConsumerWidget {
+class CompleteProfileSection extends ConsumerStatefulWidget {
   const CompleteProfileSection({super.key});
 
   static const String _profileStrengthSource = 'completeProfile';
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CompleteProfileSection> createState() =>
+      _CompleteProfileSectionState();
+}
+
+class _CompleteProfileSectionState
+    extends ConsumerState<CompleteProfileSection> {
+  static const int _collapsedItemCount = 2;
+
+  bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
     final provider = ref.watch(homeProvider);
     final data = provider.profileStrength;
 
@@ -125,6 +136,21 @@ class CompleteProfileSection extends ConsumerWidget {
     if (data.overallScore == 100) return const SizedBox.shrink();
 
     final viewData = ProfileStrengthViewData.fromDomain(data);
+    final allSections = <ProfileStrengthSection>[
+      ...viewData.incomplete,
+      ...viewData.completed,
+    ];
+    final visibleSections = _isExpanded
+        ? allSections
+        : allSections.take(_collapsedItemCount).toList(growable: false);
+    final visibleIncomplete = visibleSections
+        .where((section) => !section.completed)
+        .toList(growable: false);
+    final visibleCompleted = visibleSections
+        .where((section) => section.completed)
+        .toList(growable: false);
+    final hasMoreSections = allSections.length > _collapsedItemCount;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: DecoratedBox(
@@ -163,18 +189,25 @@ class CompleteProfileSection extends ConsumerWidget {
                 padding: const EdgeInsets.fromLTRB(10, 8, 10, 12),
                 child: Column(
                   children: [
-                    for (final section in viewData.incomplete)
+                    for (final section in visibleIncomplete)
                       _ProfileStrengthRow(
                         section: section,
                         onTap: () => _openSection(context, ref, section),
                       ),
-                    if (viewData.incomplete.isNotEmpty &&
-                        viewData.completed.isNotEmpty)
+                    if (visibleIncomplete.isNotEmpty &&
+                        visibleCompleted.isNotEmpty)
                       const _CompletedDivider(),
-                    for (final section in viewData.completed)
+                    for (final section in visibleCompleted)
                       _ProfileStrengthRow(
                         section: section,
                         onTap: () => _openSection(context, ref, section),
+                      ),
+                    if (hasMoreSections)
+                      _ProfileStrengthExpansionControl(
+                        isExpanded: _isExpanded,
+                        onTap: () => setState(
+                          () => _isExpanded = !_isExpanded,
+                        ),
                       ),
                   ],
                 ),
@@ -199,7 +232,7 @@ class CompleteProfileSection extends ConsumerWidget {
       await context.pushNamed(
         Routes.photoUpload,
         extra: const <String, String>{
-          'fromScreen': _profileStrengthSource,
+          'fromScreen': CompleteProfileSection._profileStrengthSource,
         },
       );
       if (!context.mounted) return;
@@ -398,6 +431,48 @@ class _ProfileStrengthRow extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileStrengthExpansionControl extends StatelessWidget {
+  const _ProfileStrengthExpansionControl({
+    required this.isExpanded,
+    required this.onTap,
+  });
+
+  final bool isExpanded;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final label = isExpanded ? l10n.seeLess : l10n.seeMore;
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: TextButton(
+        key: const ValueKey<String>('profile-strength-expansion-control'),
+        onPressed: onTap,
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.primary,
+          textStyle: TextStyle(
+            fontSize: TextSize.font14(context),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(label),
+            const SizedBox(width: 4),
+            Icon(
+              isExpanded ? Icons.expand_less : Icons.expand_more,
+              size: TextSize.font18(context),
+            ),
+          ],
         ),
       ),
     );

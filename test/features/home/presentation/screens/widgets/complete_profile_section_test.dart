@@ -110,7 +110,7 @@ void main() {
     expect(find.textContaining('0%'), findsNothing);
   });
 
-  testWidgets('renders every section, completed divider, and all tips',
+  testWidgets('shows two sections initially and expands or closes the rest',
       (tester) async {
     final provider = HomeProvider(
       profileStrengthLoader: () async => _response(score: 72),
@@ -121,14 +121,33 @@ void main() {
 
     expect(find.text('Partner Preferences'), findsOneWidget);
     expect(find.text('Basic Profile'), findsOneWidget);
-    expect(find.text('Profile Photos'), findsOneWidget);
-    expect(find.text('Contact Information'), findsOneWidget);
-    expect(find.text('Completed'), findsOneWidget);
+    expect(find.text('Profile Photos'), findsNothing);
+    expect(find.text('Contact Information'), findsNothing);
+    expect(find.text('Completed'), findsNothing);
+    expect(find.text('See More'), findsOneWidget);
     expect(find.text('Tips to improve'), findsOneWidget);
     expect(find.text('First returned tip'), findsOneWidget);
     expect(find.text('Second returned tip'), findsOneWidget);
     expect(find.text('57%'), findsOneWidget);
+    expect(find.text('100%'), findsNothing);
+
+    await tester.tap(find.text('See More'));
+    await tester.pump();
+
+    expect(find.text('Profile Photos'), findsOneWidget);
+    expect(find.text('Contact Information'), findsOneWidget);
+    expect(find.text('Completed'), findsOneWidget);
+    expect(find.text('See Less'), findsOneWidget);
     expect(find.text('100%'), findsNWidgets(2));
+
+    await tester.ensureVisible(find.text('See Less'));
+    await tester.tap(find.text('See Less'));
+    await tester.pump();
+
+    expect(find.text('Profile Photos'), findsNothing);
+    expect(find.text('Contact Information'), findsNothing);
+    expect(find.text('Completed'), findsNothing);
+    expect(find.text('See More'), findsOneWidget);
   });
 
   testWidgets('hides the card only for a valid 100 score', (tester) async {
@@ -148,10 +167,10 @@ Widget _app(HomeProvider provider) {
     overrides: <Override>[
       homeProvider.overrideWith((ref) => provider),
     ],
-    child: MaterialApp(
+    child: const MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: const Scaffold(
+      home: Scaffold(
         body: SingleChildScrollView(child: CompleteProfileSection()),
       ),
     ),
