@@ -90,7 +90,9 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
 
     return Column(
       children: [
-        widget.hideHeadline != null && true ? const SizedBox.shrink() : _headLine(),
+        widget.hideHeadline != null && true
+            ? const SizedBox.shrink()
+            : _headLine(),
         _inputField(screenWidth, screenHeight),
       ],
     );
@@ -102,7 +104,9 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
       controller: widget.controller ?? _internalController,
       minLines: widget.minLine ?? 1,
       maxLines: widget.maxLine ?? 1,
-      obscureText: widget.showPassIcon != null ? viewPassword : widget.obscureText ?? false,
+      obscureText: widget.showPassIcon != null
+          ? viewPassword
+          : widget.obscureText ?? false,
       keyboardType: widget.keyboardType,
       maxLength: widget.length,
       inputFormatters: widget.inputFormatters,
@@ -114,10 +118,12 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
             setState(() {});
           }
 
-          DateTime selectedDate = DateTime.now().subtract(const Duration(days: 365 * 19));
+          DateTime selectedDate =
+              DateTime.now().subtract(const Duration(days: 365 * 19));
 
           try {
-            final existing = widget.controller?.text ?? _internalController?.text ?? '';
+            final existing =
+                widget.controller?.text ?? _internalController?.text ?? '';
 
             if (existing.isNotEmpty) {
               try {
@@ -134,7 +140,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
               return Container(
                 height: 320,
                 decoration: const BoxDecoration(
-                  color: Colors.white,
+                  color: Color(0xFF21161A),
                   borderRadius: BorderRadius.vertical(
                     top: Radius.circular(24),
                   ),
@@ -155,7 +161,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
                             child: Text(
                               'Cancel'.localized(context),
                               style: const TextStyle(
-                                color: AppColors.textSecondaryLight,
+                                color: Color(0xFFB9ADB1),
                               ),
                             ),
                             onPressed: () {
@@ -165,7 +171,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
                           Text(
                             'Select Date'.localized(context),
                             style: TextStyle(
-                              color: AppColors.textPrimaryLight,
+                              color: Colors.white,
                               fontSize: TextSize.font18(context),
                               fontWeight: FontWeight.w500,
                               fontFamily: 'Inter',
@@ -182,7 +188,8 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
                               ),
                             ),
                             onPressed: () {
-                              final formatted = DateFormat('yyyy-MM-dd').format(selectedDate);
+                              final formatted =
+                                  DateFormat('yyyy-MM-dd').format(selectedDate);
 
                               if (widget.controller != null) {
                                 widget.controller!.text = formatted;
@@ -205,10 +212,10 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
                     Expanded(
                       child: CupertinoTheme(
                         data: CupertinoThemeData(
-                          brightness: Brightness.light,
+                          brightness: Brightness.dark,
                           textTheme: CupertinoTextThemeData(
                             dateTimePickerTextStyle: TextStyle(
-                              color: AppColors.textPrimaryLight,
+                              color: Colors.white,
                               fontSize: TextSize.font18(context),
                               fontWeight: FontWeight.w400,
                             ),
@@ -243,7 +250,8 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
 
         if (widget.onTap != null) widget.onTap!();
       },
-      onChanged: (value) => widget.onChanged != null ? widget.onChanged!(value) : null,
+      onChanged: (value) =>
+          widget.onChanged != null ? widget.onChanged!(value) : null,
       validator: widget.validator,
       onTapOutside: (event) {
         FocusManager.instance.primaryFocus?.unfocus();
@@ -256,15 +264,21 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
       decoration: InputDecoration(
         isDense: true,
         counterText: '',
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         prefix: _getPrefix(),
         prefixIcon: _getPrefixIcon(),
-        border: InputBorderStyle.border(widget.borderRadius ?? 6, borderColor: widget.borderColor),
+        border: InputBorderStyle.border(widget.borderRadius ?? 6,
+            borderColor: widget.borderColor),
         focusedBorder: InputBorderStyle.focusedBorder(widget.borderRadius ?? 6),
-        enabledBorder: (widget.controller?.text ?? _internalController?.text ?? '').isNotEmpty
-            ? InputBorderStyle.validBorder(widget.borderRadius ?? 6, borderColor: widget.borderColor)
-            : InputBorderStyle.border(widget.borderRadius ?? 6),
-        focusedErrorBorder: InputBorderStyle.focusedErrorBorder(widget.borderRadius ?? 6),
+        enabledBorder:
+            (widget.controller?.text ?? _internalController?.text ?? '')
+                    .isNotEmpty
+                ? InputBorderStyle.validBorder(widget.borderRadius ?? 6,
+                    borderColor: widget.borderColor)
+                : InputBorderStyle.border(widget.borderRadius ?? 6),
+        focusedErrorBorder:
+            InputBorderStyle.focusedErrorBorder(widget.borderRadius ?? 6),
         errorBorder: InputBorderStyle.errorBorder(widget.borderRadius ?? 6),
         hintStyle: TextStyle(
           color: const Color(0xFFA3A3A3),
@@ -357,20 +371,29 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
             if (widget.headLine != null)
               Text(
                 widget.headLine!.localized(context),
-                style: TextStyle(fontSize: TextSize.font14(context), 
-                    fontWeight: FontWeight.w500, color: AppColors.textSecondaryLight),
+                style: TextStyle(
+                    fontSize: TextSize.font14(context),
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textSecondaryLight),
               ),
             if (widget.headLineInfoIcon == true && widget.headLine != null)
-              Icon(Icons.info, size: TextSize.font13(context), color: AppColors.disableText),
+              Icon(Icons.info,
+                  size: TextSize.font13(context), color: AppColors.disableText),
             if (widget.isRequired == true && widget.headLine != null)
               Text(
                 '*',
-                style: TextStyle(fontSize: TextSize.font14(context), fontWeight: FontWeight.w600, color: Colors.redAccent),
+                style: TextStyle(
+                    fontSize: TextSize.font14(context),
+                    fontWeight: FontWeight.w600,
+                    color: Colors.redAccent),
               ),
             if (widget.isOptional == true && widget.headLine != null)
               Text(
                 '(optional)'.localized(context),
-                style: TextStyle(fontSize: TextSize.font10(context), fontWeight: FontWeight.w400, color: AppColors.hintTextColor),
+                style: TextStyle(
+                    fontSize: TextSize.font10(context),
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.hintTextColor),
               ),
           ],
         ),
@@ -386,8 +409,12 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
           setState(() {});
         },
         child: Icon(
-          viewPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-          color: viewPassword ? AppColors.inputBorderColor : AppColors.competeBorderColor,
+          viewPassword
+              ? Icons.visibility_off_outlined
+              : Icons.visibility_outlined,
+          color: viewPassword
+              ? AppColors.inputBorderColor
+              : AppColors.competeBorderColor,
           size: screenWidth * 0.05,
         ));
   }

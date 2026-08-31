@@ -8,7 +8,6 @@ import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
-import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:walima_llc/core/network/app_urls.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/router/route_name.dart';
@@ -87,7 +86,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       children: [
                         _PillButton(
                           icon: Icons.language,
-                          label: 'Language',
+                          label: 'English',
                           onTap: () =>
                               context.pushNamed(Routes.languageSettings),
                         ),
@@ -239,30 +238,25 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   Widget continueWithButton(LoginProvider authProvider) {
-    return Column(
-      spacing: 12,
+    final showApple = !kIsWeb && Platform.isIOS;
+    return Row(
       children: [
-        if (!kIsWeb && Platform.isIOS)
-          PrimaryButtons(
-            buttonStyle: ButtonsStyle.authButton,
-            svgIconPath: AppImages.apple,
-            svgIconColor: AppColors.textPrimaryLight,
-            textColor: AppColors.textPrimaryLight,
-            borderRadius: 50,
-            borderColor: AppColors.inputBorderColor,
-            bgColor: Colors.white,
-            onTap: () => authProvider.signInWithApple(context),
-            title: 'Continue with Apple',
+        if (showApple) ...[
+          Expanded(
+            child: _SocialButton(
+              svgIconPath: AppImages.apple,
+              label: 'Apple',
+              onTap: () => authProvider.signInWithApple(context),
+            ),
           ),
-        PrimaryButtons(
-          buttonStyle: ButtonsStyle.authButton,
-          svgIconPath: AppImages.google,
-          textColor: AppColors.textPrimaryLight,
-          borderRadius: 50,
-          borderColor: AppColors.inputBorderColor,
-          bgColor: Colors.white,
-          onTap: () => authProvider.signInWithGoogle(context),
-          title: 'Continue with Google',
+          const SizedBox(width: 10),
+        ],
+        Expanded(
+          child: _SocialButton(
+            svgIconPath: AppImages.google,
+            label: 'Google',
+            onTap: () => authProvider.signInWithGoogle(context),
+          ),
         ),
       ],
     );
@@ -324,6 +318,22 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   ),
                   const SizedBox(height: 16),
                   _HelpItem(
+                    icon: Icons.password_outlined,
+                    title: 'Trouble with OTP?',
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      context.pushNamed(Routes.helpDesk);
+                    },
+                  ),
+                  _HelpItem(
+                    icon: Icons.support_agent_outlined,
+                    title: 'Contact Support',
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      context.pushNamed(Routes.helpDesk);
+                    },
+                  ),
+                  _HelpItem(
                     icon: Icons.policy_outlined,
                     title: 'Terms & Privacy',
                     onTap: () {
@@ -361,6 +371,54 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           ),
         );
       },
+    );
+  }
+}
+
+class _SocialButton extends StatelessWidget {
+  const _SocialButton({
+    required this.svgIconPath,
+    required this.label,
+    required this.onTap,
+  });
+
+  final String svgIconPath;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(50),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(50),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ShowImage(
+                imagePath: svgIconPath,
+                width: 20,
+                height: 20,
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  label.localized(context),
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFF1A1A1A),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

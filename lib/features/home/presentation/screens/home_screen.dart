@@ -28,6 +28,7 @@ import 'package:walima_llc/features/connections/presentation/widgets/view_contac
 import 'package:walima_llc/features/matches/presentation/widgets/profile_comprehensive_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:walima_llc/features/profile/data/model/response/dashboard_response.dart';
 import 'package:walima_llc/features/profile/presentation/providers/profile_provider.dart';
 
@@ -61,7 +62,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         final home = ref.read(homeProvider);
         home.setAuthenticatedUser(next);
         if (next.isNotEmpty) {
-          unawaited(home.loadProfileStrength(force: true));
+          unawaited(home.ensureHomeDataLoaded());
         }
       },
       fireImmediately: true,
@@ -181,7 +182,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _bodySection() {
-    final provider = ref.read(homeProvider);
+    ref.watch(homeProvider);
     return Expanded(
       child: RefreshIndicator(
         onRefresh: _refreshHome,
@@ -194,7 +195,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               children: [
                 const CompleteProfileSection(),
                 _premiumMatches(),
-                if (provider.recentVisitors.isNotEmpty) _recentVisitors(),
+                _recentlyViewed(),
+                _recentVisitors(),
                 _followUpSection(),
               ],
             ),
@@ -209,6 +211,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ref.read(homeProvider).loadProfileStrength(force: true),
       ref.read(homeProvider).loadPremiumMatches(force: true),
       ref.read(homeProvider).loadRecentVisitors(force: true),
+      ref.read(homeProvider).loadRecentlyViewed(force: true),
       ref.read(profileProvider).getProfile(context),
       ref.read(profileProvider).getDashboard(),
     ]);
@@ -226,13 +229,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _premiumMatches() {
     final provider = ref.watch(homeProvider);
     final currentPlan = resolvePlanName(
-        ref.watch(profileProvider).dashboard?.profile?.membership);
+      ref.watch(profileProvider).dashboard?.profile?.membership,
+    );
     final matches = provider.premiumMatches;
     final isLoading = provider.isLoadingPremiumMatches;
     final errorText = provider.premiumMatchesError;
     final subtitleText = isLoading
         ? 'Fetching premium matches'.localized(context)
-        : '${matches.length} ${'Profiles Found'.localized(context)}';
+        : '${provider.premiumMatchesTotal} ${'Profiles Found'.localized(context)}';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -308,22 +312,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Builder(
             builder: (_) {
               if (isLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
+                return _matchSectionSkeleton();
               }
 
               if (errorText != null && matches.isEmpty) {
-                return Center(
-                  child: Text(
-                    errorText,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColors.textSecondaryLight,
-                      fontSize: TextSize.font16(context),
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
+                return _sectionError(
+                  errorText,
+                  () => ref.read(homeProvider).loadPremiumMatches(force: true),
                 );
               }
 
@@ -378,14 +373,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const SizedBox(height: 12),
           Text(
             'Upgrade Your Plan'.localized(context),
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
             '${'See'.localized(context)} $remainingCount ${'more'.localized(context)} $subText',
             style: TextStyle(
-                fontSize: TextSize.font14(context),
-                color: AppColors.textSecondaryLight),
+              fontSize: TextSize.font14(context),
+              color: AppColors.textSecondaryLight,
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 12),
@@ -402,8 +398,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               child: Text(
                 'Upgrade Now'.localized(context),
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
@@ -425,36 +423,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         width: 300,
         child: ProfileComprehensiveCard(
           onTapCard: () {
-            context.pushNamed(Routes.profilePreview, extra: {'userId': match.id});
+            context.pushNamed(
+              Routes.profilePreview,
+              extra: {'userId': match.userReference ?? match.id},
+            );
           },
           imagePath: imagePath ??
               (match.gender == 'female'
                   ? AppImages.womenAvatar
                   : AppImages.manAvatar),
           imageHeight: 250,
-          isPremiumConnect: match.isPremium ?? true,
+          isPremiumConnect: match.isPremium == true,
           isVerified: match.profilePhoto?.isVerified ?? false,
           name: match.displayName ?? 'Walima Member'.localized(context),
-          age: '${match.age ?? 'Undefine'.localized(context)} ${'Yr'.localized(context)}',
+          age:
+              '${match.age ?? 'Undefine'.localized(context)} ${'Yr'.localized(context)}',
           height: HeightUtils.formatHeight(heightText),
           location: location?.localized(context),
           profession: profession?.localized(context),
-          leftButtonColor: match.connection?.status == 'none'
+          leftButtonColor: match.canConnect
               ? AppColors.greenButtonColor
               : AppColors.disableBackground,
-          leftButtonTextColor: match.connection?.status == 'none'
-              ? AppColors.white
-              : AppColors.disableText,
-          leftButtonIconColor: match.connection?.status == 'none'
-              ? AppColors.white
-              : AppColors.disableText,
-          leftButtonBorderColor: match.connection?.status == 'none'
+          leftButtonTextColor:
+              match.canConnect ? AppColors.white : AppColors.disableText,
+          leftButtonIconColor:
+              match.canConnect ? AppColors.white : AppColors.disableText,
+          leftButtonBorderColor: match.canConnect
               ? AppColors.greenButtonColor
               : AppColors.disableBackground,
           viewOnAccept:
               match.profilePhoto?.visibilityStatus == 'visible' ? true : false,
           religion: match.religion?.localized(context),
           isOnline: match.isOnline ?? false,
+          showLeftButton: match.canConnect,
           onTapRightButton: () async {
             await BottomSheetUtils.open(
               context: context,
@@ -466,17 +467,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             );
           },
-          onTapLeftButton: () {
-            if (match.connection?.status == 'none') {
-              ref.read(homeProvider).connect(
-                    context,
-                    match.id ?? '',
-                    match.displayName ?? 'Unknown'.localized(context),
-                    ConnectionRequestType.match.apiValue,
-                  );
-            }
-            // print('Left button tapped for ${match.displayName}');
-          },
+          onTapLeftButton: match.canConnect
+              ? () {
+                  ref.read(homeProvider).connect(
+                        context,
+                        match.id ?? '',
+                        match.displayName ?? 'Unknown'.localized(context),
+                        ConnectionRequestType.match.apiValue,
+                      );
+                }
+              : null,
           activeStatusText: activeStatus,
         ),
       ),
@@ -552,13 +552,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _recentVisitors() {
     final provider = ref.watch(homeProvider);
     final visitors = provider.recentVisitors;
-    final currentPlan =
-        ref.watch(profileProvider).dashboard?.profile?.membership?.plan?.name;
     final isLoading = provider.isLoadingRecentVisitors;
     final errorText = provider.recentVisitorsError;
     final subtitleText = isLoading
         ? 'Loading recent visitors'.localized(context)
-        : '${visitors.length} ${'Profiles Found'.localized(context)}';
+        : '${provider.recentVisitorsTotal} ${'Profiles Found'.localized(context)}';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -591,7 +589,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
               ),
-              if (currentPlan != 'free')
+              if (!isLoading)
                 InkWell(
                   borderRadius: BorderRadius.circular(8.0),
                   onTap: () => context.pushNamed(Routes.recentVisitors),
@@ -634,22 +632,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Builder(
             builder: (_) {
               if (isLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
+                return _matchSectionSkeleton();
               }
 
               if (errorText != null && visitors.isEmpty) {
-                return Center(
-                  child: Text(
-                    errorText,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColors.textSecondaryLight,
-                      fontSize: TextSize.font16(context),
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
+                return _sectionError(
+                  errorText,
+                  () => ref.read(homeProvider).loadRecentVisitors(force: true),
                 );
               }
 
@@ -671,12 +660,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    ...visitors.take(2).map(_buildRecentVisitorCard),
-                    if (currentPlan == 'free')
-                      _buildUpgradeWidget(visitors.length - 2,
-                          isForVisitors: true),
-                    if (currentPlan != 'free')
-                      ...visitors.skip(2).map(_buildRecentVisitorCard),
+                    for (var index = 0; index < visitors.length; index++)
+                      _buildRecentVisitorCard(
+                        visitors[index],
+                        isLocked: provider.isRecentVisitorLockedAt(index),
+                      ),
                   ],
                 ),
               );
@@ -687,7 +675,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildRecentVisitorCard(Data visitor) {
+  Widget _buildRecentVisitorCard(
+    Data visitor, {
+    bool isLocked = false,
+    bool recentlyViewed = false,
+  }) {
     final location = _formatRecentVisitorLocation(visitor.location);
     final imageUrl = visitor.profilePhoto?.url?.toString();
     final imagePath = (imageUrl?.isNotEmpty ?? false)
@@ -699,11 +691,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Padding(
       padding: const EdgeInsets.only(right: 10.0),
       child: SizedBox(
+        key: ValueKey(visitor.id ?? visitor.userReference),
         width: 300,
         child: ProfileComprehensiveCard(
           onTapCard: () {
-            context.pushNamed(Routes.profilePreview,
-                extra: {'userId': visitor.id});
+            if (isLocked) {
+              context.pushNamed(Routes.upgradePackage, extra: Routes.anchor);
+            } else {
+              context.pushNamed(
+                Routes.profilePreview,
+                extra: {'userId': visitor.userReference ?? visitor.id},
+              );
+            }
           },
           imagePath: imagePath,
           imageHeight: 250,
@@ -712,43 +711,49 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           name: visitor.displayName ?? 'Walima Member'.localized(context),
           age:
               '${visitor.age?.toInt() ?? 'Undefine'.localized(context)} ${'Yr'.localized(context)}',
-          height: HeightUtils.formatHeight(visitor.height.toString()),
+          height: visitor.height == null
+              ? null
+              : HeightUtils.formatHeight(visitor.height.toString()),
           location: location,
-          leftButtonColor: visitor.connection?.status == 'none'
+          leftButtonColor: visitor.canConnect
               ? AppColors.greenButtonColor
               : AppColors.disableBackground,
-          leftButtonTextColor: visitor.connection?.status == 'none'
-              ? AppColors.white
-              : AppColors.disableText,
-          leftButtonIconColor: visitor.connection?.status == 'none'
-              ? AppColors.white
-              : AppColors.disableText,
-          leftButtonBorderColor: visitor.connection?.status == 'none'
+          leftButtonTextColor:
+              visitor.canConnect ? AppColors.white : AppColors.disableText,
+          leftButtonIconColor:
+              visitor.canConnect ? AppColors.white : AppColors.disableText,
+          leftButtonBorderColor: visitor.canConnect
               ? AppColors.greenButtonColor
               : AppColors.disableBackground,
           viewOnAccept: visitor.profilePhoto?.visibilityStatus == 'visible',
-          activeStatusText: _recentVisitorStatus(visitor),
-          onTapRightButton: () async {
-            await BottomSheetUtils.open(
-              context: context,
-              fullHeight: false,
-              child: Consumer(
-                builder: (context, ref, _) {
-                  return _contactVisitorBottomSheet(visitor);
-                },
-              ),
-            );
-          },
-          onTapLeftButton: () {
-            if (visitor.connection?.status == 'none') {
-              ref.read(homeProvider).connect(
-                    context,
-                    visitor.id ?? '',
-                    visitor.displayName ?? 'Unknown'.localized(context),
-                    ConnectionRequestType.match.apiValue,
+          activeStatusText: recentlyViewed
+              ? _recentlyViewedStatus(visitor)
+              : _recentVisitorStatus(visitor),
+          isLocked: isLocked,
+          showLeftButton: visitor.canConnect,
+          onTapRightButton: isLocked
+              ? null
+              : () async {
+                  await BottomSheetUtils.open(
+                    context: context,
+                    fullHeight: false,
+                    child: Consumer(
+                      builder: (context, ref, _) {
+                        return _contactVisitorBottomSheet(visitor);
+                      },
+                    ),
                   );
-            }
-          },
+                },
+          onTapLeftButton: !isLocked && visitor.canConnect
+              ? () {
+                  ref.read(homeProvider).connect(
+                        context,
+                        visitor.id ?? '',
+                        visitor.displayName ?? 'Unknown'.localized(context),
+                        ConnectionRequestType.match.apiValue,
+                      );
+                }
+              : null,
         ),
       ),
     );
@@ -804,6 +809,134 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final visitedAt =
         DateTimeUtils.formatDate(DateTime.tryParse(visitor.visitedAt ?? ''));
     return visitedAt;
+  }
+
+  String _recentlyViewedStatus(Data visitor) {
+    return DateTimeUtils.formatDate(
+      DateTime.tryParse(visitor.viewedAt ?? ''),
+    );
+  }
+
+  Widget _recentlyViewed() {
+    final provider = ref.watch(homeProvider);
+    final profiles = provider.recentlyViewed;
+    final isLoading = provider.isLoadingRecentlyViewed;
+    final errorText = provider.recentlyViewedError;
+    final subtitle = isLoading
+        ? 'Loading recently viewed profiles'.localized(context)
+        : '${provider.recentlyViewedTotal} ${'Profiles Found'.localized(context)}';
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Recently Viewed'.localized(context),
+                  style: TextStyle(
+                    color: AppColors.textPrimaryLight,
+                    fontSize: TextSize.font18(context),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    color: AppColors.textSecondaryLight,
+                    fontSize: TextSize.font14(context),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.only(left: 20),
+            child: Builder(
+              builder: (_) {
+                if (isLoading) {
+                  return _matchSectionSkeleton();
+                }
+                if (errorText != null && profiles.isEmpty) {
+                  return _sectionError(
+                    errorText,
+                    () =>
+                        ref.read(homeProvider).loadRecentlyViewed(force: true),
+                  );
+                }
+                if (profiles.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'No recently viewed profiles yet.'.localized(context),
+                    ),
+                  );
+                }
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: profiles
+                        .map(
+                          (profile) => _buildRecentVisitorCard(
+                            profile,
+                            recentlyViewed: true,
+                          ),
+                        )
+                        .toList(growable: false),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _matchSectionSkeleton() {
+    return Shimmer.fromColors(
+      baseColor: AppColors.disableBackground,
+      highlightColor: AppColors.white,
+      child: Row(
+        children: List.generate(
+          2,
+          (index) => Container(
+            width: 300,
+            height: 380,
+            margin: const EdgeInsets.only(right: 10),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _sectionError(String message, VoidCallback retry) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: AppColors.textSecondaryLight,
+              fontSize: TextSize.font16(context),
+            ),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton(onPressed: retry, child: const Text('Retry')),
+        ],
+      ),
+    );
   }
 
   Widget _followUpSection() {

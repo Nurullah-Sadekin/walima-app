@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
@@ -6,7 +8,6 @@ import 'package:walima_llc/core/global/components/icon_text_row.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
 
 class PreferenceConnectCard extends StatelessWidget {
-
   const PreferenceConnectCard({
     super.key,
     required this.isSelected,
@@ -18,6 +19,7 @@ class PreferenceConnectCard extends StatelessWidget {
     required this.religion,
     required this.location,
     this.profession,
+    this.blurPhoto = false,
   });
 
   final bool isSelected;
@@ -29,7 +31,7 @@ class PreferenceConnectCard extends StatelessWidget {
   final String religion;
   final String location;
   final String? profession;
-
+  final bool blurPhoto;
 
   @override
   Widget build(BuildContext context) {
@@ -42,19 +44,29 @@ class PreferenceConnectCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primaryVariant : AppColors.white,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: isSelected ? AppColors.primary : AppColors.greyLight, width: 1),
+          border: Border.all(
+              color: isSelected ? AppColors.primary : AppColors.greyLight,
+              width: 1),
         ),
         child: IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ShowImage(
-                imagePath: imagePath,
-                width: imageSize,
-                height: imageSize,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: ImageFiltered(
+                  imageFilter: ImageFilter.blur(
+                    sigmaX: blurPhoto ? 12 : 0,
+                    sigmaY: blurPhoto ? 12 : 0,
+                  ),
+                  child: ShowImage(
+                    imagePath: imagePath,
+                    width: imageSize,
+                    height: imageSize,
+                  ),
+                ),
               ),
               const SizedBox(width: 10),
-
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

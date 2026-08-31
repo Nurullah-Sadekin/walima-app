@@ -1,4 +1,7 @@
+import 'dart:developer' as developer;
+
 import 'package:walima_llc/core/providers/base_change_notifier.dart';
+import 'package:walima_llc/core/global/enums/enums.dart';
 import 'package:walima_llc/features/matches/domain/enums/match_filter_type.dart';
 import 'package:walima_llc/features/matches/data/models/request/get_matches_query_params.dart';
 import 'package:walima_llc/features/matches/data/models/response/get_matches_response.dart';
@@ -7,8 +10,10 @@ import 'package:walima_llc/features/matches/domain/enums/match_sort_by.dart';
 import 'package:walima_llc/features/registration/domain/single_string_model.dart';
 
 class MatchesProvider extends BaseChangeNotifier {
-  MatchesProviderScreenStates screenStates = MatchesProviderScreenStates.defaultLoading;
-  MatchesProviderScreenStates loaderState = MatchesProviderScreenStates.defaultLoading;
+  MatchesProviderScreenStates screenStates =
+      MatchesProviderScreenStates.defaultLoading;
+  MatchesProviderScreenStates loaderState =
+      MatchesProviderScreenStates.defaultLoading;
 
   List<SingleStringModel> sortByDataList = sortByListDataInserted;
   final List<MatchProfile> matches = [];
@@ -16,13 +21,29 @@ class MatchesProvider extends BaseChangeNotifier {
 
   GetMatchesResponse? matchesResponse;
   int selectedTabIndex = 0;
+  MatchType moreMatchesType = MatchType.suggestedMembers;
   bool isLoadingMatches = false;
+  bool isLoadingMoreMatches = false;
   String? matchesError;
   String? apiError;
+  String? matchesTraceId;
+  int _requestVersion = 0;
+
+  int get matchesTotal => matchesResponse?.pagination?.total ?? matches.length;
+
+  bool get canLoadMoreMatches =>
+      matchesResponse?.pagination?.hasNextPage == true && !isLoadingMoreMatches;
 
   Future<void> setSelectedTab(int index) async {
     if (index < 0 || index == selectedTabIndex) return;
     selectedTabIndex = index;
+    notifyListeners();
+    await loadMatchesForSelectedTab(force: true);
+  }
+
+  Future<void> setMoreMatchesType(MatchType type) async {
+    if (type == moreMatchesType) return;
+    moreMatchesType = type;
     notifyListeners();
     await loadMatchesForSelectedTab(force: true);
   }
@@ -70,7 +91,8 @@ class MatchesProvider extends BaseChangeNotifier {
   Future<void> applyMoreMatchesFilters(Map<String, dynamic> filters) async {
     _tabFilters[5] = {
       ...filters,
-      if (filters['applied'] == true) 'matchFilterType': MatchFilterType.twoWayMatches.apiValue,
+      if (filters['applied'] == true)
+        'matchFilterType': MatchFilterType.twoWayMatches.apiValue,
     };
     await loadMatchesForSelectedTab(force: true);
   }
@@ -94,50 +116,87 @@ class MatchesProvider extends BaseChangeNotifier {
       case 4:
         return 'Near Me';
       case 5:
-        return 'More Matches';
+        return moreMatchesType.label;
       default:
         return 'Matches';
     }
   }
 
-  Future<void> loadMatchesForSelectedTab({bool force = false}) async {
+  Future<void> loadMatchesForSelectedTab({
+    bool force = false,
+    int page = 1,
+  }) async {
+    final requestedPage = force ? 1 : page;
     if (isLoadingMatches && !force) return;
+    if (requestedPage > 1 && !canLoadMoreMatches) return;
 
-    isLoadingMatches = true;
+    if (requestedPage == 1) {
+      _requestVersion++;
+      isLoadingMatches = true;
+      isLoadingMoreMatches = false;
+    } else {
+      isLoadingMoreMatches = true;
+    }
+    final requestVersion = _requestVersion;
     matchesError = null;
     apiError = null;
     notifyListeners();
 
     final response = await MatchesRepository.getMatches(
-      _buildQueryParams(selectedTabIndex),
+      _buildQueryParams(selectedTabIndex, page: requestedPage),
     );
 
-    matchesResponse = response;
-    isLoadingMatches = false;
+    if (requestVersion != _requestVersion) return;
 
-    final isSuccess = response.code == 'SUCCESS' || (response.statusCode != null && response.statusCode! >= 200 && response.statusCode! < 300);
+    matchesResponse = response;
+    matchesTraceId = response.traceId;
+    if (requestedPage == 1) {
+      isLoadingMatches = false;
+    } else {
+      isLoadingMoreMatches = false;
+    }
+
+    final isSuccess = response.isSuccess;
 
     if (isSuccess) {
-      matches
-        ..clear()
-        ..addAll(response.data ?? []);
+      if (requestedPage == 1) matches.clear();
+      _appendUniqueMatches(response.data ?? const <MatchProfile>[]);
       matchesError = matches.isEmpty ? 'No matches found.' : null;
       apiError = null;
     } else {
-      matches.clear();
-      apiError = response.errors?.entries.map((e) => '${e.key}: ${e.value.join(', ')}').join('\n');
+      if (requestedPage == 1) matches.clear();
+      apiError = response.errors?.entries
+          .map((e) => '${e.key}: ${e.value.join(', ')}')
+          .join('\n');
       matchesError = response.message ?? 'Unable to load matches.';
+      developer.log(
+        'Matches load failed: $matchesError',
+        name: 'MoreMatches',
+        error: matchesTraceId == null ? null : 'traceId=$matchesTraceId',
+      );
     }
     updateViewState(screenStates: MatchesProviderScreenStates.loadingComplete);
   }
 
-  GetMatchesQueryParams _buildQueryParams(int tabIndex) {
+  Future<void> loadMoreMatches() async {
+    final nextPage = (matchesResponse?.pagination?.page ?? 1) + 1;
+    await loadMatchesForSelectedTab(page: nextPage);
+  }
+
+  void _appendUniqueMatches(Iterable<MatchProfile> incoming) {
+    final ids = matches.map((item) => item.id).whereType<String>().toSet();
+    for (final item in incoming) {
+      if (item.id == null || ids.add(item.id!)) matches.add(item);
+    }
+  }
+
+  GetMatchesQueryParams _buildQueryParams(int tabIndex, {int page = 1}) {
     final tabFilters = _tabFilters[tabIndex] ?? const <String, dynamic>{};
 
     return GetMatchesQueryParams(
       type: _tabType(tabIndex),
       responseFormat: 'short',
-      page: 1,
+      page: page,
       size: 20,
       sortBy: selectedSortBy.apiValue,
       maxDistance: tabIndex == 4 ? 50 : null,
@@ -168,9 +227,12 @@ class MatchesProvider extends BaseChangeNotifier {
       activeMembers: tabFilters['activeMembers'] as String?,
       searchTitle: tabFilters['searchTitle'] as String?,
       extraParams: {
-        if (tabFilters['profileId'] != null) 'profileId': tabFilters['profileId'],
-        if (tabFilters['includeFilteredProfiles'] != null) 'includeFilteredProfiles': tabFilters['includeFilteredProfiles'],
-        if (tabFilters['includeViewedProfiles'] != null) 'includeViewedProfiles': tabFilters['includeViewedProfiles'],
+        if (tabFilters['profileId'] != null)
+          'profileId': tabFilters['profileId'],
+        if (tabFilters['includeFilteredProfiles'] != null)
+          'includeFilteredProfiles': tabFilters['includeFilteredProfiles'],
+        if (tabFilters['includeViewedProfiles'] != null)
+          'includeViewedProfiles': tabFilters['includeViewedProfiles'],
       },
     );
   }
@@ -188,7 +250,7 @@ class MatchesProvider extends BaseChangeNotifier {
       case 4:
         return 'near_me';
       case 5:
-        return 'suggested_members';
+        return moreMatchesType.apiValue;
       default:
         return 'recommendations';
     }

@@ -37,6 +37,8 @@ class AppUrls {
   // Engagement Endpoints
   static final String getRecentVisitors =
       '$baseUrl/engagement/recent-visitors'; //GET
+  static final String getRecentlyViewed =
+      '$baseUrl/engagement/recently-viewed'; //GET
 
   // User Profile Endpoints
   static final String getCompleteProfile = '$baseUrl/users/profile'; //GET

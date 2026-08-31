@@ -53,6 +53,10 @@ class ProfileComprehensiveCard extends StatelessWidget {
     this.onMenuTap,
     this.noButton = false,
     this.isOnline = false,
+    this.isLocked = false,
+    this.lockedText = 'Upgrade to view this visitor',
+    this.showLeftButton = true,
+    this.showRightButton = true,
   });
 
   static const _cardPadding = EdgeInsets.all(10);
@@ -117,19 +121,29 @@ class ProfileComprehensiveCard extends StatelessWidget {
 
   final bool noButton;
   final bool isOnline;
+  final bool isLocked;
+  final String lockedText;
+  final bool showLeftButton;
+  final bool showRightButton;
 
   bool get _hasAgeAndHeight => age != null && height != null;
   bool get _hasLocation => location?.isNotEmpty ?? false;
   bool get _hasMenu => menu == true;
   bool get _hasPhotoCount => photoCount != null;
-  bool get _hasActionButtons => !noButton;
+  bool get _hasActionButtons =>
+      !noButton && (showLeftButton || showRightButton);
 
   static void _noop() {}
 
   @override
   Widget build(BuildContext context) {
     final metrics = _ProfileCardMetrics.from(context);
-    final resolvedImageHeight = imageHeight ?? MediaQuery.sizeOf(context).height * 0.4;
+    final resolvedImageHeight =
+        imageHeight ?? MediaQuery.sizeOf(context).height * 0.4;
+
+    if (isLocked) {
+      return _buildLockedCard(context, metrics, resolvedImageHeight);
+    }
 
     return GestureDetector(
       onTap: onTapCard,
@@ -147,6 +161,52 @@ class ProfileComprehensiveCard extends StatelessWidget {
             const SizedBox(height: 16),
             _buildProfileContent(context, metrics),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLockedCard(
+    BuildContext context,
+    _ProfileCardMetrics metrics,
+    double resolvedImageHeight,
+  ) {
+    return Semantics(
+      button: true,
+      label: lockedText.localized(context),
+      child: InkWell(
+        onTap: onTapCard,
+        borderRadius: _cardRadius,
+        child: Container(
+          width: double.infinity,
+          height: resolvedImageHeight + 112,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: AppColors.disableBackground,
+            borderRadius: _cardRadius,
+            border: Border.all(color: AppColors.greyLight),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ShowImage(
+                imagePath: AppImages.premiumSvgIcon,
+                width: metrics.font48,
+                height: metrics.font48,
+                color: AppColors.primary,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                lockedText.localized(context),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: AppColors.textPrimaryLight,
+                  fontSize: metrics.font18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -300,7 +360,8 @@ class ProfileComprehensiveCard extends StatelessWidget {
               width: metrics.font8,
               height: metrics.font8,
               decoration: BoxDecoration(
-                color: isOnline ? _greenStatusColor : AppColors.disableBackground,
+                color:
+                    isOnline ? _greenStatusColor : AppColors.disableBackground,
                 shape: BoxShape.circle,
               ),
             ),
@@ -435,7 +496,8 @@ class ProfileComprehensiveCard extends StatelessWidget {
       children: [
         if (_hasAgeAndHeight) const SizedBox(height: 12),
         if (_hasAgeAndHeight) _buildSecondaryText('$age, $height', metrics),
-        if (religion != null || maritalStatus != null) _buildReligionStatusRow(context, metrics),
+        if (religion != null || maritalStatus != null)
+          _buildReligionStatusRow(context, metrics),
         if (profession != null && _hasLocation) const SizedBox(height: 12),
         if (profession != null) _buildPrimaryText(profession ?? '', metrics),
         if (_hasLocation) _buildSecondaryText(location ?? '', metrics),
@@ -517,28 +579,30 @@ class ProfileComprehensiveCard extends StatelessWidget {
       child: Row(
         spacing: 16,
         children: [
-          Expanded(
-            child: _ProfileActionButton(
-              title: rightButtonText ?? 'Contact',
-              iconPath: rightIconPath ?? AppImages.callIcon,
-              onTap: onTapRightButton ?? _noop,
-              backgroundColor: rightButtonColor ?? AppColors.white,
-              borderColor: rightButtonBorderColor ?? _buttonBorderColor,
-              iconColor: rightButtonIconColor ?? _shortlistColor,
-              textColor: rightButtonTextColor ?? AppColors.textPrimaryLight,
+          if (showRightButton)
+            Expanded(
+              child: _ProfileActionButton(
+                title: rightButtonText ?? 'Contact',
+                iconPath: rightIconPath ?? AppImages.callIcon,
+                onTap: onTapRightButton ?? _noop,
+                backgroundColor: rightButtonColor ?? AppColors.white,
+                borderColor: rightButtonBorderColor ?? _buttonBorderColor,
+                iconColor: rightButtonIconColor ?? _shortlistColor,
+                textColor: rightButtonTextColor ?? AppColors.textPrimaryLight,
+              ),
             ),
-          ),
-          Expanded(
-            child: _ProfileActionButton(
-              title: leftButtonText ?? 'Connect',
-              iconPath: AppImages.chatSvgIcon,
-              onTap: onTapLeftButton ?? _noop,
-              backgroundColor: leftButtonColor ?? _connectButtonColor,
-              borderColor: leftButtonBorderColor ?? _connectButtonColor,
-              iconColor: leftButtonIconColor ?? AppColors.white,
-              textColor: leftButtonTextColor ?? AppColors.white,
+          if (showLeftButton)
+            Expanded(
+              child: _ProfileActionButton(
+                title: leftButtonText ?? 'Connect',
+                iconPath: AppImages.chatSvgIcon,
+                onTap: onTapLeftButton ?? _noop,
+                backgroundColor: leftButtonColor ?? _connectButtonColor,
+                borderColor: leftButtonBorderColor ?? _connectButtonColor,
+                iconColor: leftButtonIconColor ?? AppColors.white,
+                textColor: leftButtonTextColor ?? AppColors.white,
+              ),
             ),
-          ),
         ],
       ),
     );

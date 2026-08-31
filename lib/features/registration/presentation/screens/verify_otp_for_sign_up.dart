@@ -107,7 +107,8 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                     const SizedBox(height: 10),
                     ResendCodeTimer(
                       onResend: () async {
-                        final screenProvider = ref.read(registrationScreenStateProvider);
+                        final screenProvider =
+                            ref.read(registrationScreenStateProvider);
                         screenProvider.updateViewState(
                           loadingState: RegistrationScreenStates.isProfileFor,
                         );
@@ -172,10 +173,11 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
   }
 
   Widget contactSupport() {
+    final isEmail = provider.selectedVerificationType.toLowerCase() == 'email';
     return Column(
       children: [
         Text(
-          'Didn\'t receive the SMS?',
+          isEmail ? 'Didn\'t receive the email?' : 'Didn\'t receive the SMS?',
           textAlign: TextAlign.center,
           style: TextStyle(
             color: AppColors.hintTextColor,
@@ -188,7 +190,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Check your number or',
+              isEmail ? 'Check your inbox or' : 'Check your number or',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: AppColors.hintTextColor,
@@ -261,7 +263,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
               children: [
                 if (provider.selectedVerificationType.toLowerCase() == 'email')
                   Text(
-                    provider.emailController.text,
+                    _maskEmail(provider.emailController.text),
                     style: TextStyle(
                       fontSize: TextSize.font14(context),
                       color: AppColors.textSecondaryLight,
@@ -301,6 +303,13 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
         ),
       ],
     );
+  }
+
+  String _maskEmail(String email) {
+    final parts = email.trim().split('@');
+    if (parts.length != 2 || parts.first.isEmpty) return email;
+    final visible = parts.first.substring(0, 1);
+    return '$visible***@${parts.last}';
   }
 
   Widget loginDataField() {

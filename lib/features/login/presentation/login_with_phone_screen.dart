@@ -79,6 +79,7 @@ class _LoginWithPhoneScreenState extends ConsumerState<LoginWithPhoneScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider.getInitialData();
       provider.initControllersListener();
+      provider.setPhoneDialCode('+${_selectedCountry.phoneCode}');
       FirebaseMessagingService.instance.requestPermissionOnce();
     });
   }
@@ -407,6 +408,7 @@ class _LoginWithPhoneScreenState extends ConsumerState<LoginWithPhoneScreen> {
         setState(() {
           _selectedCountry = country;
         });
+        provider.setPhoneDialCode('+${country.phoneCode}');
       },
       countryListTheme: CountryListThemeData(
         backgroundColor: Colors.white,
@@ -525,27 +527,27 @@ class _LoginWithPhoneScreenState extends ConsumerState<LoginWithPhoneScreen> {
                 ),
               ),
             ),
-            if(Platform.isIOS)
-            InkWell(
-              onTap: () {},
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                  border:
-                      Border.all(width: 1, color: AppColors.inputBorderColor),
-                ),
-                child: const Center(
-                  child: ShowImage(
-                    imagePath: AppImages.apple,
-                    color: AppColors.black,
-                    width: 24,
-                    height: 24,
+            if (Platform.isIOS)
+              InkWell(
+                onTap: () {},
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                    border:
+                        Border.all(width: 1, color: AppColors.inputBorderColor),
+                  ),
+                  child: const Center(
+                    child: ShowImage(
+                      imagePath: AppImages.apple,
+                      color: AppColors.black,
+                      width: 24,
+                      height: 24,
+                    ),
                   ),
                 ),
               ),
-            ),
             InkWell(
               onTap: () {
                 context.push(Paths.loginWithEmail);

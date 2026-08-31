@@ -1,4 +1,3 @@
-
 import 'package:walima_llc/core/global/enums/enums.dart';
 
 class SingleStringModel {
@@ -26,12 +25,14 @@ class SingleStringModel {
 }
 
 List<SingleStringModel> dietDataListInserted = [
-  ...RegistrationDiet.values.map(
-    (diet) => SingleStringModel(
-      name: diet.label,
-      value: diet.apiValue,
-    ),
-  ),
+  ...RegistrationDiet.values
+      .where((diet) => diet != RegistrationDiet.jainVegetarian)
+      .map(
+        (diet) => SingleStringModel(
+          name: diet.label,
+          value: diet.apiValue,
+        ),
+      ),
 ];
 
 List<SingleStringModel> incomeRangeListInserted = [
@@ -131,8 +132,6 @@ List<SingleStringModel> motherDetailsItemListDataInserted = [
   SingleStringModel(name: 'NGO worker'),
   SingleStringModel(name: 'Business'),
   SingleStringModel(name: 'Other'),
-
-
 ];
 
 List<SingleStringModel> fatherDetailsItemListDataInserted = [
@@ -143,16 +142,20 @@ List<SingleStringModel> fatherDetailsItemListDataInserted = [
   SingleStringModel(name: 'Retired'),
   SingleStringModel(name: 'Government job'),
   SingleStringModel(name: 'Other'),
-
 ];
 
 List<SingleStringModel> siblingCountListDataInserted = [
-  SingleStringModel(name: '0'),
+  SingleStringModel(name: 'None', value: '0'),
   SingleStringModel(name: '1'),
   SingleStringModel(name: '2'),
   SingleStringModel(name: '3'),
   SingleStringModel(name: '4'),
-  SingleStringModel(name: '5 or more'),
+  SingleStringModel(name: '5'),
+  SingleStringModel(name: '6'),
+  SingleStringModel(name: '7'),
+  SingleStringModel(name: '8'),
+  SingleStringModel(name: '9'),
+  SingleStringModel(name: '10+', value: '10'),
 ];
 
 List<SingleStringModel> maritalStatusListDataInserted = [
@@ -175,7 +178,6 @@ List<SingleStringModel> countryListDataInserted = [
   SingleStringModel(name: 'China'),
   SingleStringModel(name: 'Italy'),
   SingleStringModel(name: 'Spain'),
-
 ];
 
 List<SingleStringModel> communityListDataInserted = [
@@ -189,7 +191,6 @@ List<SingleStringModel> communityListDataInserted = [
   SingleStringModel(name: 'Christian'),
   SingleStringModel(name: 'Jain'),
   SingleStringModel(name: 'Other'),
-
 ];
 
 List<SingleStringModel> verificationTypeList = [

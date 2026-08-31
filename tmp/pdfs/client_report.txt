@@ -1,0 +1,441 @@
+WALIMA — App Onboarding Flow
+
+Developer Reference | May 2026
+
+
+
+   Onboarding
+
+
+Welcome Screen (Login)
+   Full-screen couple photo background with Walima logo
+
+   4 login buttons: Continue with Phone (primary pink), Continue with Email (glass),
+   Apple + Google (side by side)
+
+   Help modal: “Trouble with OTP?” + “Contact support”
+
+   Language selector: English
+
+
+
+
+OTP / Email Verify
+   Phone OTP: WhatsApp first → SMS fallback, 6-digit input, 30s timer, auto-focus + paste
+   support
+
+   Email OTP: Same 6-digit layout, masked email, 30s timer
+
+   Verify & Log In button
+
+
+
+
+Step 1 — Profile For + Gender
+   Profile For (single select chips): Myself, Son, Daughter, Brother, Sister, Friend, Relative
+
+   Gender (single select chips): Male, Female
+
+
+
+
+Step 2 — Name + DOB
+   First Name — text input
+   Last Name — text input
+
+   Date of Birth — custom dark modal picker (Day / Month / Year scrollers), auto age
+   calculation, 18+ validation
+
+
+
+
+Step 3 — Religion + Country + City
+   Religion (dropdown): Open To All, Islam, Hinduism, Christianity, Buddhism, Others
+
+   Country (dropdown, searchable): Bangladesh default + 20+ countries
+
+   City (dropdown, searchable, dynamic): Changes based on country. Bangladesh = 64
+   districts
+
+
+
+
+Step 3B — Religious Practice (NEW, after Religion)
+   Title: “How important is faith in your daily life?”
+
+   5 options (radio cards):
+
+       Very religious — “I pray 5 times, fast regularly, and follow my faith strictly every day”
+
+       Moderately religious — “I try to pray and follow my faith but sometimes I miss”
+
+       Somewhat religious — “I practise mainly during Ramadan, Eid, and other special
+       occasions”
+
+       Not very religious — “I believe in my faith but don’t actively practise”
+
+       Prefer not to say — “I’d rather keep this private”
+
+   Skip option. Auto-skip if “Open To All” religion selected
+
+
+
+
+Step 3C — Marriage Intention (NEW, after Religious Practice)
+   Title: “What are your plans for marriage?”
+
+   Q1: “I’d like to know someone on Walima for” — 1-3 months, 3-6 months, 6-12 months,
+   1-2 years
+
+   Q2: “I’d like to get married within” — Within 6 months, 6-12 months, 1-2 years, 2-3
+   years, No rush, Decide together
+
+   Both required to continue. Skip option available
+Step 4 — Email + Phone
+   Email Address — text input, email validation
+
+   Phone Number — country code selector (42 countries with flags, BD +880 default) +
+   phone input
+
+
+
+
+Step 5 — Family (Yes/No) + Residency
+   You Live with Your Family — Yes / No toggle
+
+   Residency Status (dropdown): Citizen, Permanent Resident, Work Visa, Student Visa,
+   Temporary Visa, Other
+
+
+
+
+Step 6 — Marital Status + Height + Diet
+   Marital Status (dropdown): Never Married, Married, Divorced, Widowed, Separated
+
+   Height (dropdown, scrollable): 4ft 6in to 7ft 0in (shows ft/in + cm)
+
+   Dietary Preference (chips, optional): Halal Only, Non Vegetarian, Vegetarian, Vegan,
+   Occasionally Non-Veg
+
+
+
+
+Step 7 — Education + Institute
+   Highest Qualification (dropdown): Below SSC, SSC/O-Level, HSC/A-Level, Diploma,
+   Bachelor’s/Honours, Master’s, PhD/Doctorate, Professional Degree, Hafez/Islamic
+   Studies, Other
+
+   Institute / University — text input
+
+   Additional Institute — text input (optional)
+
+
+
+
+Step 8 — Income + Work Sector + Profession + Company
+   Annual Income (optional): Yearly/Monthly toggle, income range dropdown (dynamic
+   BDT ranges), hide income toggle
+
+   Work Sector (dropdown): Private Company, Government, Self-employed, Business
+   Owner, Freelance, NGO, Not Working, Student, Retired, Other
+   Profession (dropdown, searchable): 18 options — Banker/Finance, IT/Software, Doctor,
+   Engineer, Lawyer, Accountant, Businessman, Teacher, Architect, Journalist, Government
+   Officer, Military, Pharmacist, Nurse, Freelancer, Student, Homemaker, Other
+
+   Company / Organisation — text input (optional)
+
+
+
+
+Step 9 — About Yourself (bio)
+   Bio textarea — max 500 chars, min 20 chars, character counter
+
+   Quick add chips: “Family oriented.” “Practicing Muslim.” “Love to travel.” “Career
+   focused.” “Simple and humble.” “Looking for a life partner who shares my values.”
+
+   Helper: “A well-written bio helps you get 3x more profile views”
+
+
+
+
+Photo Upload
+   Upload area: dashed circle + “Upload Image” + “Use Camera”
+
+   Photo preview with X remove
+
+   Photo Guidelines accordion (Good: Close Up, Half View, Full View / Bad: Side Face,
+   Group, Unclear)
+
+   Know More accordion (formats, size limits, rules)
+
+   Skip: “Add Photos Later >”
+
+
+
+
+Hobbies & Interests
+   Minimum 5 selections required
+
+   10 categories (86+ items total):
+
+   1. Creative (15) — Writing, Cooking, Singing, Photography, Painting, etc.
+
+   2. Reading & Learning (8) — Books, Podcasts, Online courses, etc.
+
+   3. Outdoor Activities (10) — Hiking, Camping, Swimming, etc.
+
+   4. Fitness & Sports (15) — Running, Yoga, Cricket, Football, etc.
+
+   5. Travel & Leisure (9) — Solo travel, Road trips, Adventure, etc.
+
+   6. Food & Lifestyle (7) — Cooking, Baking, Street food, etc.
+   7. Faith & Community (7) — Quran recitation, Volunteering, Charity, etc.
+
+   8. Technology & Gaming (7) — Coding, Gaming, AI & Tech, etc.
+
+   9. Entertainment (8) — Movies, TV series, Board games, etc.
+
+  10. Social & Lifestyle (8) — Socializing, Shopping, Fashion, etc.
+
+   Skip option available
+
+
+
+
+Family Details (optional)
+   Father’s Status (dropdown): Employed, Self-employed/Business, Retired, Not
+   Employed, Deceased, Prefer not to say
+
+   Mother’s Status (dropdown): Homemaker, Employed, Self-employed/Business, Retired,
+   Deceased, Prefer not to say
+
+   No. of Brothers + Sisters (side by side dropdowns): None to 10+
+
+   Family Type (dropdown): Joint Family, Nuclear Family, Other
+
+   All optional. Skip button available
+
+
+
+
+Financial Status (optional)
+   4 options (radio cards):
+
+      Wealthy — “Affluent family with significant assets”
+
+      Upper Middle Class — “Comfortable lifestyle with good income”
+
+      Middle Class — “Stable family with moderate income”
+
+      Prefer not to say — “Keep this information private”
+
+   Skip button available
+
+
+
+
+   Profile Complete
+   Animated checkmark + confetti
+
+   “Well done!” message
+
+   Continue button → Partner Preferences
+   Partner Preferences
+
+
+Intro Screen
+   Heart + person icon
+
+   “Partner Preferences” title
+
+   3 benefits: Smarter Matches, Save Time, You’re in Control
+
+   Skip + Continue
+
+
+
+
+Age Range + Height Range + Marital Status
+   Age Range — dual slider, 18-60, default 25-35
+
+   Height Range — dual slider, 4’0”-7’0”, default 5’0”-5’11”
+
+   Marital Status (multi-select chips): Open To All, Never Married, Divorced, Widowed,
+   Separated
+
+
+
+
+Religion + Mother Tongue
+   Religion (dropdown): Open To All, Islam, Hinduism, Christianity, Buddhism, Others
+
+   Mother Tongue (dropdown): Open To All, Bangla, English, Hindi, Urdu, Arabic, Malay,
+   Turkish, Persian, French, Other
+
+
+
+
+Country + City
+   Country (dropdown, searchable): 24 countries + “Open To All”
+
+   City (dropdown, searchable, dynamic): “Open To All — Any City” first, then   Top
+   Cities, then all cities. Changes based on country
+
+
+
+
+Education Qualification
+  Education (dropdown, multi-select, searchable): Open To All, SSC/O-Level, HSC/A-
+  Level, Diploma, Bachelor’s/Honours, Master’s, PhD/Doctorate, MBBS/Medical, BDS
+  (Dental), Engineering (BSc/B.Tech), BBA/MBA, Law (LLB/LLM), CA/ACCA/CMA,
+  Pharmacy (B.Pharm), Nursing, Hafez/Islamic Studies
+
+  Selected items show as pink tags with ✕ remove
+
+
+
+
+Work Sector + Profession + Income
+  Work Sector (dropdown): Open To All + 8 sectors
+
+  Profession (dropdown, searchable): Open To All + 28 professions
+
+  Annual Income (dropdown): Open To All, Under ৳3,00,000 to Above ৳50,00,000, Prefer
+  not to say
+
+
+
+
+   Post-Preferences
+
+
+Suggested Matches
+  Compact list cards: photo left, info right (Name   , Age/Height, Religion·Marital,
+  Profession bold, Location)
+
+  Some photos clear, some blurred (premium)
+
+  All pre-selected. Checkbox to toggle
+
+  “Select Matches (X)” button → “Connections Sent!” modal
+
+
+
+
+Premium Plans
+  21-Day Money Back Guarantee badge
+
+  5 swipeable plans:
+
+
+ Plan                    Duration                Price                  /month
+
+ Harmony                 3 mo                    ৳2,925                 ৳975
+ Promise                   3 mo                ৳4,050                       ৳1,350
+
+ Soulmate                  6 mo                ৳6,300                       ৳1,050
+
+ Forever                   6 mo                ৳11,250                      ৳1,875
+
+ Destiny                   12 mo               ৳40,000                      ৳3,333
+
+
+  Features: Contact views (30→500), Daily matches (15→100), WhatsApp Connect,
+  Family contact info, Handpicked matches, Personal matchmaker, Premium badge,
+  Walima Events
+
+  6 FAQ accordions
+
+  Support:         01305-455665 |   WhatsApp 01305-455665
+
+
+
+
+→ Dashboard / Home
+
+
+
+
+   Removed (Duplicate Fields)
+
+ Field                              Kept In              Removed From
+
+ City                               Step 3               Step 5
+
+ Marital Status                     Step 6               Step 5
+
+ Live with Family                   Step 5               Financial Status
+
+ Verification Type                  OTP flow             Step 9
+
+ Profile Manage by                  Step 1               Separate screen
+
+ Jain Vegetarian                    —                    Diet (BD irrelevant)
+
+ Partner Community                  —                    PP2
+
+
+
+
+   All 29 App Screen Files
+1. walima-welcome-screen.html
+ 2. walima-login-screen.html
+
+ 3. walima-email-login-screen.html
+
+ 4. walima-otp-verify-screen.html
+
+ 5. walima-profile-step1-screen.html
+
+ 6. walima-profile-step2-screen.html
+
+ 7. walima-profile-step3-screen.html
+
+ 8. walima-religious-practice.html
+
+ 9. walima-marriage-intention.html
+
+10. walima-profile-step4-screen.html
+
+11. walima-profile-step5-screen.html
+
+12. walima-profile-step6-screen.html
+
+13. walima-profile-step7-screen.html
+
+14. walima-profile-step8-screen.html
+
+15. walima-profile-step9-about.html
+
+16. walima-profile-step9-screen.html (Photo Upload)
+
+17. walima-profile-step10-screen.html (Hobbies)
+
+18. walima-verify-email-reg.html
+
+19. walima-profile-family-details.html
+
+20. walima-profile-family-financial.html
+
+21. walima-profile-complete.html
+
+22. walima-partner-pref-intro.html
+
+23. walima-partner-pref-screen.html
+
+24. walima-partner-pref-screen2.html
+
+25. walima-partner-pref-screen3.html
+
+26. walima-partner-pref-screen4.html
+
+27. walima-partner-pref-screen5.html
+28. walima-suggested-matches.html
+
+29. walima-premium-plans.html
+
+
+
+
+Support: +8801305455665 | hello@walima.app
+

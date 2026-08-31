@@ -19,6 +19,18 @@ class CommunityScreen extends ConsumerStatefulWidget {
 }
 
 class _CommunityScreenState extends ConsumerState<CommunityScreen> {
+  static const List<String> _motherTongues = <String>[
+    'Bangla',
+    'English',
+    'Hindi',
+    'Urdu',
+    'Arabic',
+    'Malay',
+    'Turkish',
+    'Persian',
+    'French',
+    'Other',
+  ];
   late RecommendedPreferencesProvider provider;
 
   @override
@@ -41,27 +53,29 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
   Widget build(BuildContext context) {
     provider = ref.watch(recommendedPreferencesProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == RecommendedPreferencesScreenStates.preferences,
+      isLoading: provider.loaderState ==
+          RecommendedPreferencesScreenStates.preferences,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == RecommendedPreferencesScreenStates.preferences
+          child: provider.screenStates ==
+                  RecommendedPreferencesScreenStates.preferences
               ? const Loading()
               : Column(
-            children: [
-               UpperLayer(
-                  imagePath: AppImages.recommendedPreferences,
-                  isShowAppbar: true,
-                  isBackButton: true,
-                isTrailing: true,
-                trailingText: 'Skip',
-                onTrailingTap: (){
-                  context.push(Paths.preferenceLocation);
-                },
-              ),
-              body(),
-            ],
-          ),
+                  children: [
+                    UpperLayer(
+                      imagePath: AppImages.recommendedPreferences,
+                      isShowAppbar: true,
+                      isBackButton: true,
+                      isTrailing: true,
+                      trailingText: 'Skip',
+                      onTrailingTap: () {
+                        context.push(Paths.preferenceLocation);
+                      },
+                    ),
+                    body(),
+                  ],
+                ),
         ),
       ),
     );
@@ -77,7 +91,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
             const StaticTextWidget(
               title: 'Preference Religion',
               subtitle:
-              'Choose your preferred religion, community, and mother tongue to help us find better matches for you.',
+                  'Choose your preferred religion, community, and mother tongue to help us find better matches for you.',
             ),
             dropdownSelection(),
             const Spacer(),
@@ -108,23 +122,21 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
         provider.religionPreferenceController.text.isEmpty
             ? const SizedBox.shrink()
             : DropDownField(
-          headLine: 'Partner Community',
-          hintText: 'Select',
-          popUpHeader: 'Select Community',
-          items: provider.communityDropdownItems,
-          controller: provider.communityPreferenceController,
-          onTap: () {},
-          onConfirm: (value) =>
-              provider.onCommunityPreferenceSelected(value?.toString()),
-          isSearch: true,
-        ),
-        provider.religionPreferenceController.text.isEmpty || provider.communityPreferenceController.text.isEmpty
-            ? const SizedBox.shrink()
-            : DropDownField(
+                headLine: 'Partner Community',
+                hintText: 'Select',
+                popUpHeader: 'Select Community',
+                items: provider.communityDropdownItems,
+                controller: provider.communityPreferenceController,
+                onTap: () {},
+                onConfirm: (value) =>
+                    provider.onCommunityPreferenceSelected(value?.toString()),
+                isSearch: true,
+              ),
+        DropDownField(
           headLine: 'Partner Mother Tongue',
           hintText: 'Select',
           popUpHeader: 'Select Mother Tongue',
-          items: const ['Bangla', 'English', 'Dutch', 'Hindi'],
+          items: _motherTongues,
           controller: provider.motherTonguePreferenceController,
           onTap: () {},
           isSearch: true,
@@ -136,8 +148,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
   Widget bottomAction() {
     return PrimaryButtons(
       buttonStyle: provider.religionPreferenceController.text.isNotEmpty &&
-          provider.communityPreferenceController.text.isNotEmpty &&
-          provider.motherTonguePreferenceController.text.isNotEmpty
+              provider.motherTonguePreferenceController.text.isNotEmpty
           ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
       verticalPadding: 14,
@@ -146,7 +157,6 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       title: 'Continue',
       onTap: () {
         if (provider.religionPreferenceController.text.isEmpty ||
-            provider.communityPreferenceController.text.isEmpty ||
             provider.motherTonguePreferenceController.text.isEmpty) {
           return;
         }
@@ -154,5 +164,4 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       },
     );
   }
-
 }

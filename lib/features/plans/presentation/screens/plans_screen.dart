@@ -47,14 +47,14 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
   Widget build(BuildContext context) {
     provider = ref.watch(plansProvider);
     return TransparentLoading(
-      isLoading: provider.screenStates == UpgradePackageScreenStates.transparent,
+      isLoading:
+          provider.screenStates == UpgradePackageScreenStates.transparent,
       child: Scaffold(
         body: GradientBackground(
           child: Column(
             children: [
               if (widget.showAppBar) _appbarSection(),
               if (!widget.showAppBar) _anchoredAppBarSection(),
-
               provider.loaderState == UpgradePackageScreenStates.loading
                   ? const Expanded(child: Center(child: Loading()))
                   : _body(),
@@ -134,7 +134,9 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
             children: [
               Text(
                 '21'.localized(context),
-                textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false, applyHeightToLastDescent: false),
+                textHeightBehavior: const TextHeightBehavior(
+                    applyHeightToFirstAscent: false,
+                    applyHeightToLastDescent: false),
                 style: TextStyle(
                   fontSize: TextSize.font36(context),
                   fontWeight: FontWeight.bold,
@@ -144,7 +146,9 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
               ),
               Text(
                 'Days'.localized(context),
-                textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false, applyHeightToLastDescent: false),
+                textHeightBehavior: const TextHeightBehavior(
+                    applyHeightToFirstAscent: false,
+                    applyHeightToLastDescent: false),
                 style: TextStyle(
                   fontSize: TextSize.font16(context),
                   fontWeight: FontWeight.bold,
@@ -310,7 +314,8 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
                 margin: const EdgeInsets.only(right: 4),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(2),
-                  color: isActive ? AppColors.primary : AppColors.primaryShade300,
+                  color:
+                      isActive ? AppColors.primary : AppColors.primaryShade300,
                 ),
               ),
             );
@@ -432,7 +437,8 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
               ),
               const SizedBox(height: 6),
               Text(
-                'We are right here to help you. Give us a call anything between  10am-7pm'.localized(context),
+                'We are right here to help you. Give us a call anything between  10am-7pm'
+                    .localized(context),
                 style: TextStyle(
                   fontSize: TextSize.font14(context),
                   fontWeight: FontWeight.w400,
@@ -473,7 +479,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
                   ),
                   const SizedBox(width: 20),
                   InkWell(
-                    onTap: () => openWhatsApp('1305345665'),
+                    onTap: () => openWhatsApp('1305455665'),
                     child: Row(
                       children: [
                         Container(
@@ -491,7 +497,7 @@ class _UpgradePackageScreenState extends ConsumerState<UpgradePackageScreen> {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          '01305-345665',
+                          '01305-455665',
                           style: TextStyle(
                             fontSize: TextSize.font14(context),
                             fontWeight: FontWeight.w500,

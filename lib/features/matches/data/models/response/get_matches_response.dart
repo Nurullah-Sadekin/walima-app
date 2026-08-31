@@ -1,3 +1,5 @@
+import 'package:walima_llc/features/matches/domain/enums/match_connection_state.dart';
+
 class GetMatchesResponse {
   GetMatchesResponse({
     this.code,
@@ -18,11 +20,9 @@ class GetMatchesResponse {
 
     final payload = _extractPayload(raw);
 
-    if (payload['data'] != null) {
-      data = [];
-      payload['data'].forEach((v) {
-        data?.add(MatchProfile.fromJson(v));
-      });
+    final rawData = payload['data'];
+    if (rawData is List) {
+      data = rawData.map(MatchProfile.fromJson).toList(growable: false);
     }
     pagination = payload['pagination'] != null
         ? MatchesPagination.fromJson(payload['pagination'])
@@ -42,6 +42,11 @@ class GetMatchesResponse {
   String? traceId;
   int? statusCode;
 
+  bool get isSuccess {
+    if (code != null) return code?.toUpperCase() == 'SUCCESS';
+    return statusCode != null && statusCode! >= 200 && statusCode! < 300;
+  }
+
   String? firstErrorFor(String field) {
     final fieldErrors = errors?[field];
     if (fieldErrors == null || fieldErrors.isEmpty) return null;
@@ -52,18 +57,12 @@ class GetMatchesResponse {
     final map = <String, dynamic>{};
     map['code'] = code;
     map['message'] = message;
-    if (data != null) {
-      map['data'] = data?.map((item) => item.toJson()).toList();
-    }
-    if (pagination != null) {
-      map['pagination'] = pagination?.toJson();
-    }
-    if (savedSearch != null) {
-      map['savedSearch'] = savedSearch?.toJson();
-    }
-    if (errors != null) {
-      map['errors'] = errors;
-    }
+    map['response'] = <String, dynamic>{
+      if (data != null) 'data': data?.map((item) => item.toJson()).toList(),
+      if (pagination != null) 'pagination': pagination?.toJson(),
+      if (savedSearch != null) 'savedSearch': savedSearch?.toJson(),
+      if (errors != null) 'errors': errors,
+    };
     map['traceId'] = traceId;
     map['statusCode'] = statusCode;
     return map;
@@ -100,7 +99,7 @@ class MatchProfile {
     profilePhoto = json['profilePhoto'] != null
         ? MatchProfilePhoto.fromJson(json['profilePhoto'])
         : null;
-    age = json['age'];
+    age = _parseInt(json['age']);
     height = _parseNum(json['height']);
     gender = json['gender'];
     location = json['location'] != null
@@ -142,6 +141,11 @@ class MatchProfile {
   bool? isPremium;
   MatchCompatibility? compatibility;
   MatchConnection? connection;
+
+  MatchConnectionState get connectionState =>
+      connection?.state ?? MatchConnectionState.none;
+
+  bool get canConnect => connectionState.canConnect;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -238,6 +242,8 @@ class MatchCompatibility {
     this.matchedCriteria,
     this.totalCriteria,
     this.label,
+    this.criteria,
+    this.scoreBreakdown,
   });
 
   MatchCompatibility.fromJson(dynamic json) {
@@ -245,14 +251,22 @@ class MatchCompatibility {
     matchedCriteria = json['matchedCriteria'] != null
         ? List<String>.from(json['matchedCriteria'])
         : null;
-    totalCriteria = json['totalCriteria'];
+    totalCriteria = _parseInt(json['totalCriteria']);
     label = json['label'];
+    criteria = json['criteria'] is Map
+        ? Map<String, dynamic>.from(json['criteria'])
+        : null;
+    scoreBreakdown = json['scoreBreakdown'] is Map
+        ? Map<String, dynamic>.from(json['scoreBreakdown'])
+        : null;
   }
 
   num? matchPercentage;
   List<String>? matchedCriteria;
   int? totalCriteria;
   String? label;
+  Map<String, dynamic>? criteria;
+  Map<String, dynamic>? scoreBreakdown;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -260,6 +274,8 @@ class MatchCompatibility {
     map['matchedCriteria'] = matchedCriteria;
     map['totalCriteria'] = totalCriteria;
     map['label'] = label;
+    map['criteria'] = criteria;
+    map['scoreBreakdown'] = scoreBreakdown;
     return map;
   }
 }
@@ -268,6 +284,7 @@ class MatchConnection {
   MatchConnection({
     this.id,
     this.status,
+    this.rawStatus,
     this.direction,
     this.requestType,
     this.message,
@@ -288,17 +305,21 @@ class MatchConnection {
 
   MatchConnection.fromJson(dynamic json) {
     id = json['id'];
-    status = json['status'];
     direction = json['direction'];
+    rawStatus = json['status']?.toString();
+    status = normalizeMatchConnectionState(
+      rawStatus,
+      direction: direction,
+    ).apiValue;
     requestType = json['requestType'];
     message = json['message'];
     responseMessage = json['responseMessage'];
     respondedAt = json['respondedAt'];
     expiresAt = json['expiresAt'];
     isPriority = json['isPriority'];
-    viewCount = json['viewCount'];
+    viewCount = _parseInt(json['viewCount']);
     lastViewedAt = json['lastViewedAt'];
-    reminderCount = json['reminderCount'];
+    reminderCount = _parseInt(json['reminderCount']);
     lastReminderAt = json['lastReminderAt'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
@@ -309,6 +330,7 @@ class MatchConnection {
 
   String? id;
   String? status;
+  String? rawStatus;
   String? direction;
   String? requestType;
   String? message;
@@ -326,10 +348,15 @@ class MatchConnection {
   bool? isOnline;
   String? lastSeenAt;
 
+  MatchConnectionState get state => normalizeMatchConnectionState(
+        rawStatus ?? status,
+        direction: direction,
+      );
+
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['id'] = id;
-    map['status'] = status;
+    map['status'] = rawStatus ?? status;
     map['direction'] = direction;
     map['requestType'] = requestType;
     map['message'] = message;
@@ -359,16 +386,18 @@ class MatchesPagination {
   });
 
   MatchesPagination.fromJson(dynamic json) {
-    total = json['total'];
-    page = json['page'];
-    size = json['size'];
-    totalPages = json['totalPages'];
+    total = _parseInt(json['total']);
+    page = _parseInt(json['page']);
+    size = _parseInt(json['size']);
+    totalPages = _parseInt(json['totalPages']);
   }
 
   int? total;
   int? page;
   int? size;
   int? totalPages;
+
+  bool get hasNextPage => (page ?? 1) < (totalPages ?? 0);
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -416,6 +445,12 @@ num? _parseNum(dynamic value) {
   return num.tryParse(value.toString());
 }
 
+int? _parseInt(dynamic value) {
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  return int.tryParse(value?.toString() ?? '');
+}
+
 Map<String, dynamic> _ensureMap(dynamic json) {
   if (json is Map<String, dynamic>) return json;
   if (json is Map) return Map<String, dynamic>.from(json);
@@ -426,7 +461,7 @@ Map<String, dynamic> _extractPayload(Map<String, dynamic> root) {
   final response = root['response'];
   if (response is Map<String, dynamic>) return response;
   if (response is Map) return Map<String, dynamic>.from(response);
-  return root;
+  return const <String, dynamic>{};
 }
 
 Map<String, List<String>>? _parseErrors(dynamic raw) {

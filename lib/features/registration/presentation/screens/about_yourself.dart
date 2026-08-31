@@ -23,9 +23,15 @@ class AboutYourselfScreen extends ConsumerStatefulWidget {
 }
 
 class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
-  static const String _contactEditFlowSource = 'aboutYourself';
+  static const List<String> _quickBioSnippets = <String>[
+    'Family-oriented',
+    'Kind and supportive',
+    'Values faith',
+    'Enjoys travelling',
+  ];
 
   late RegistrationProvider provider;
+  String? _bioError;
 
   @override
   void initState() {
@@ -96,8 +102,6 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
                     ),
                     bioTemplateActionButtons(),
                     dataInsertField(),
-                    const SizedBox(height: 20),
-                    verificationTypes(),
                     const Spacer(),
                     bottomAction(),
                     const SizedBox(height: 20),
@@ -108,136 +112,6 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
           );
         },
       ),
-    );
-  }
-
-  Widget verificationTypes() {
-    return Column(
-      spacing: 10,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Verification Type'.localized(context),
-          style: TextStyle(
-            fontSize: TextSize.font14(context),
-            fontWeight: FontWeight.w500,
-            color: AppColors.textSecondaryLight,
-          ),
-        ),
-        ...List.generate(provider.verificationList.length, (index) {
-          final verificationType = provider.verificationList[index];
-          final isMobile = verificationType.name.toLowerCase() == 'mobile';
-          final contactValue = isMobile
-              ? _formattedPhoneNumber()
-              : _valueOrPlaceholder(provider.emailController.text);
-
-          return Material(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            child: InkWell(
-              key: ValueKey('verification-${verificationType.name}'),
-              borderRadius: BorderRadius.circular(10),
-              onTap: () => provider.selectedVerificationTypeIndex(index),
-              child: Container(
-                width: double.infinity,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: verificationType.isSelected
-                        ? AppColors.primary
-                        : AppColors.inputBorderColor,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      verificationType.isSelected
-                          ? Icons.radio_button_checked
-                          : Icons.radio_button_unchecked,
-                      size: TextSize.font20(context),
-                      color: verificationType.isSelected
-                          ? AppColors.primary
-                          : AppColors.hintTextColor,
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            verificationType.name.localized(context),
-                            style: TextStyle(
-                              color: AppColors.textPrimaryLight,
-                              fontSize: TextSize.font13(context),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            contactValue,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: AppColors.textSecondaryLight,
-                              fontSize: TextSize.font12(context),
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    TextButton.icon(
-                      key: ValueKey('edit-${verificationType.name}'),
-                      onPressed: _openContactDetails,
-                      style: TextButton.styleFrom(
-                        foregroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 6,
-                        ),
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      icon: const Icon(Icons.edit_outlined, size: 16),
-                      label: Text(
-                        'Edit'.localized(context),
-                        style: TextStyle(
-                          fontSize: TextSize.font12(context),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        }),
-      ],
-    );
-  }
-
-  String _formattedPhoneNumber() {
-    final phone = provider.phoneController.text.trim();
-    if (phone.isEmpty) return 'Not added'.localized(context);
-    if (phone.startsWith('+')) return phone;
-
-    final dialCode = provider.selectedCountry.phoneCode.trim();
-    return dialCode.isEmpty ? phone : '+$dialCode $phone';
-  }
-
-  String _valueOrPlaceholder(String value) {
-    final normalized = value.trim();
-    return normalized.isEmpty ? 'Not added'.localized(context) : normalized;
-  }
-
-  Future<void> _openContactDetails() async {
-    await context.pushNamed(
-      Routes.emailPhone,
-      queryParameters: const {'fromScreen': _contactEditFlowSource},
-      extra: _contactEditFlowSource,
     );
   }
 
@@ -414,26 +288,71 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
   }
 
   Widget dataInsertField() {
+    final bioLength = provider.aboutYourselfController.text.characters.length;
     return Column(
-      spacing: 20,
+      spacing: 12,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         PrimaryTextField(
           controller: provider.aboutYourselfController,
           headLine: 'About Yourself',
           hintText: 'Write here ',
           isRequired: true,
-          errorText: null,
+          errorText: _bioError,
           onTap: () {},
+          onChanged: (_) => setState(() => _bioError = null),
           maxLine: 5,
           minLine: 5,
+          length: 500,
+        ),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _quickBioSnippets
+              .map(
+                (snippet) => ActionChip(
+                  label: Text(snippet),
+                  onPressed: () => _appendBioSnippet(snippet),
+                ),
+              )
+              .toList(growable: false),
+        ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: Text(
+            '$bioLength/500',
+            style: TextStyle(
+              color:
+                  bioLength > 500 ? Colors.red : AppColors.textSecondaryLight,
+              fontSize: TextSize.font12(context),
+            ),
+          ),
         ),
       ],
     );
   }
 
+  void _appendBioSnippet(String snippet) {
+    final controller = provider.aboutYourselfController;
+    final current = controller.text.trim();
+    if (current.toLowerCase().contains(snippet.toLowerCase())) return;
+    final separator = current.isEmpty ? '' : ' • ';
+    final updated = '$current$separator$snippet';
+    if (updated.characters.length > 500) return;
+    controller.text = updated;
+    controller.selection = TextSelection.collapsed(offset: updated.length);
+    setState(() => _bioError = null);
+  }
+
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: provider.aboutYourselfController.text.isNotEmpty
+      buttonStyle: provider.aboutYourselfController.text
+                      .trim()
+                      .characters
+                      .length >=
+                  20 &&
+              provider.aboutYourselfController.text.trim().characters.length <=
+                  500
           ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
       verticalPadding: 14,
@@ -445,6 +364,16 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
   }
 
   Future<void> _handleContinue() async {
+    final bioLength =
+        provider.aboutYourselfController.text.trim().characters.length;
+    if (bioLength < 20 || bioLength > 500) {
+      setState(() {
+        _bioError = bioLength < 20
+            ? 'Please write at least 20 characters.'
+            : 'Your bio cannot exceed 500 characters.';
+      });
+      return;
+    }
     final screenProvider = ref.read(registrationScreenStateProvider);
     if (provider.aboutYourselfController.text.isNotEmpty) {
       await provider.signUpViaOtp(context).then((success) {

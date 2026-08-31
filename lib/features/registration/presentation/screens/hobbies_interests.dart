@@ -189,13 +189,24 @@ class _HobbiesInterestsScreenState
 
   Widget bottomAction() {
     final selected = provider.selectedHobbiesCount();
+    final hasMinimum = selected >= RegistrationProvider.hobbiesSelectionMinimum;
     return PrimaryButtons(
-      buttonStyle: ButtonsStyle.iconicDynamicButton,
+      buttonStyle: hasMinimum
+          ? ButtonsStyle.iconicDynamicButton
+          : ButtonsStyle.disableButton,
       verticalPadding: 14,
       borderRadius: 50,
       title:
-          '${'Save & Continue'.localized(context)} ($selected/${RegistrationProvider.hobbiesSelectionMax})',
+          '${'Save & Continue'.localized(context)} ($selected/${RegistrationProvider.hobbiesSelectionMinimum} minimum)',
       onTap: () async {
+        if (!hasMinimum) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Please select at least 5 interests.'),
+            ),
+          );
+          return;
+        }
         // show the save selected hobbies dialog
         final screenProvider = ref.watch(registrationScreenStateProvider);
         screenProvider.updateViewState(

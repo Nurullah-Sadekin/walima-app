@@ -13,7 +13,7 @@ class ResendCodeTimer extends StatefulWidget {
   const ResendCodeTimer({
     super.key,
     required this.onResend,
-    this.duration = const Duration(seconds: 60),
+    this.duration = const Duration(seconds: 30),
     this.autoStart = true,
   });
 
@@ -88,9 +88,7 @@ class _ResendCodeTimerState extends State<ResendCodeTimer> {
         isActive ? 'Resend Code' : 'Resend Code in $_formattedTime',
         style: TextStyle(
           fontSize: TextSize.font14(context),
-          color: isActive
-              ? AppColors.primary
-              : AppColors.textSecondaryLight,
+          color: isActive ? AppColors.primary : AppColors.textSecondaryLight,
           fontWeight: FontWeight.w500,
           decorationColor: AppColors.textPrimaryLight,
           decorationThickness: 1,

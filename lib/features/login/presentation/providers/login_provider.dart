@@ -49,6 +49,20 @@ class LoginProvider extends BaseChangeNotifier {
   String createPasswordError = '';
   String confirmPasswordError = '';
   String otpCode = '';
+  String phoneDialCode = '+880';
+
+  String get authIdentifier {
+    final value = mobileNoOrEmailController.text.trim();
+    if (value.isEmpty || value.contains('@') || value.startsWith('+')) {
+      return value;
+    }
+    return '$phoneDialCode$value';
+  }
+
+  void setPhoneDialCode(String value) {
+    phoneDialCode = value.startsWith('+') ? value : '+$value';
+    notifyListeners();
+  }
 
   List<TextEditingController> get _managedControllers => [
         mobileNoOrEmailController,
@@ -150,7 +164,7 @@ class LoginProvider extends BaseChangeNotifier {
     final otp = otpControllers.map((c) => c.text).join();
     _showLoading();
     final body = OtVerifyBody(
-      identifier: mobileNoOrEmailController.text,
+      identifier: authIdentifier,
       otpCode: otp,
       purpose: _authPurpose,
     );
@@ -178,14 +192,15 @@ class LoginProvider extends BaseChangeNotifier {
       return LoginResponse(code: 'FAILED', message: 'Validation failed');
     }
     final body = SetPasswordBody(
-      identifier: mobileNoOrEmailController.text,
+      identifier: authIdentifier,
       otpCode: otpCode,
       newPassword: createPasswordController.text,
       confirmPassword: confirmPasswordController.text,
     );
     final response = await LoginRepository.setNewPassword(body);
     if (!context.mounted) {
-      return LoginResponse(code: 'FAILED', message: 'Context is no longer available');
+      return LoginResponse(
+          code: 'FAILED', message: 'Context is no longer available');
     }
     return response;
   }
@@ -198,7 +213,7 @@ class LoginProvider extends BaseChangeNotifier {
     }
     _showLoading();
     final body = ResendOtpBody(
-      identifier: mobileNoOrEmailController.text,
+      identifier: authIdentifier,
       purpose: _authPurpose,
     );
     final response = await LoginRepository.resendOtp(body);
@@ -241,7 +256,7 @@ class LoginProvider extends BaseChangeNotifier {
       return;
     }
     _showLoading();
-    final body = LoginWithOtpBody(identifier: mobileNoOrEmailController.text);
+    final body = LoginWithOtpBody(identifier: authIdentifier);
     final response =
         await LoginRepository.loginWithOtp(body, isForgotPass: forgotPassword);
     if (!context.mounted) return;
@@ -366,7 +381,7 @@ class LoginProvider extends BaseChangeNotifier {
 
   LoginBody _buildLoginBody() {
     return LoginBody(
-      identifier: mobileNoOrEmailController.text,
+      identifier: authIdentifier,
       password: passwordController.text,
     );
   }

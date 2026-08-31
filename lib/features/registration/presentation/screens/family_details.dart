@@ -76,7 +76,10 @@ class _FamilyDetailsScreenState extends ConsumerState<FamilyDetailsScreen> {
         child: Column(
           spacing: 10,
           children: [
-            const StaticTextWidget(title: 'Family Details', subtitle: 'This is optional - you can add later',isOptional: true),
+            const StaticTextWidget(
+                title: 'Family Details',
+                subtitle: 'This is optional - you can add later',
+                isOptional: true),
             dataInsertField(),
             const Spacer(),
             bottomAction(),
@@ -91,6 +94,14 @@ class _FamilyDetailsScreenState extends ConsumerState<FamilyDetailsScreen> {
     return Column(
       spacing: 20,
       children: [
+        DropDownField(
+          headLine: 'Family Type',
+          hintText: 'Select',
+          popUpHeader: 'Select Family Type',
+          items: const ['Joint Family', 'Nuclear Family', 'Other'],
+          controller: provider.familyTypeController,
+          isSearch: false,
+        ),
         // Income Range Dropdown
         DropDownField(
           headLine: 'Mother\'s Details',
@@ -123,7 +134,6 @@ class _FamilyDetailsScreenState extends ConsumerState<FamilyDetailsScreen> {
                 isSearch: false,
               ),
             ),
-
             Expanded(
               child: DropDownField(
                 headLine: 'No. of Brothers',
@@ -136,7 +146,6 @@ class _FamilyDetailsScreenState extends ConsumerState<FamilyDetailsScreen> {
             ),
           ],
         ),
-
       ],
     );
   }
@@ -145,26 +154,30 @@ class _FamilyDetailsScreenState extends ConsumerState<FamilyDetailsScreen> {
     final hasAnyValue = provider.motherDetailsController.text.isNotEmpty ||
         provider.fatherDetailsController.text.isNotEmpty ||
         provider.noOfSisterController.text.isNotEmpty ||
-        provider.noOfBrotherController.text.isNotEmpty;
+        provider.noOfBrotherController.text.isNotEmpty ||
+        provider.familyTypeController.text.isNotEmpty;
 
     return PrimaryButtons(
       buttonStyle: provider.motherDetailsController.text.isNotEmpty ||
               provider.fatherDetailsController.text.isNotEmpty ||
               provider.noOfSisterController.text.isNotEmpty ||
-              provider.noOfBrotherController.text.isNotEmpty
+              provider.noOfBrotherController.text.isNotEmpty ||
+              provider.familyTypeController.text.isNotEmpty
           ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
       verticalPadding: 14,
       borderRadius: 50,
       svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
-      onTap: () async{
+      onTap: () async {
         if (!hasAnyValue) return;
         final screenProvider = ref.read(registrationScreenStateProvider);
-        screenProvider.updateViewState(loadingState: RegistrationScreenStates.isProfileFor);
-         final updated = await provider.updateFamilyDetails(context);
-        screenProvider.updateViewState(screenStates: RegistrationScreenStates.loadingComplete);
-        if(updated && mounted){
+        screenProvider.updateViewState(
+            loadingState: RegistrationScreenStates.isProfileFor);
+        final updated = await provider.updateFamilyDetails(context);
+        screenProvider.updateViewState(
+            screenStates: RegistrationScreenStates.loadingComplete);
+        if (updated && mounted) {
           context.push(Paths.financialStatus);
         }
         // proceed

@@ -113,8 +113,9 @@ class _ConnectMatchesState extends ConsumerState<ConnectMatches> {
             profession: match.profession ?? 'Profession',
             age: _formatAge(match),
             height: _formatHeight(match),
-            religion: _formatReligion(match),
+            religion: _formatReligionAndMaritalStatus(match),
             location: _formatLocation(match),
+            blurPhoto: _shouldBlurPhoto(match),
           ),
         );
       },
@@ -138,8 +139,8 @@ class _ConnectMatchesState extends ConsumerState<ConnectMatches> {
         title: isBusy
             ? 'Sending...'
             : hasSelection
-                ? 'Send Connection'
-                : 'Select Matches',
+                ? 'Select Matches (${provider.selectedConnectMatchIds.length})'
+                : 'Select Matches (0)',
         onTap: () async {
           if (!hasSelection || isBusy) return;
 
@@ -151,7 +152,7 @@ class _ConnectMatchesState extends ConsumerState<ConnectMatches> {
           if (result.isSuccessDialog) {
             await DialogUtils.showSuccessDialog(
               context: dialogContext,
-              title: 'Connection Sent',
+              title: 'Connections Sent!',
               message: result.message,
               autoClose: false,
               onButtonPressed: () {
@@ -203,12 +204,29 @@ class _ConnectMatchesState extends ConsumerState<ConnectMatches> {
     return '$feet Feet $inches Inches';
   }
 
-  String _formatReligion(MatchProfile match) {
+  String _formatReligionAndMaritalStatus(MatchProfile match) {
     final parts = <String>[
       if ((match.religion ?? '').trim().isNotEmpty) match.religion!.trim(),
-      if ((match.community ?? '').trim().isNotEmpty) match.community!.trim(),
+      if ((match.maritalStatus ?? '').trim().isNotEmpty)
+        _humanize(match.maritalStatus!),
     ];
     return parts.isEmpty ? 'Religion not available' : parts.join(', ');
+  }
+
+  bool _shouldBlurPhoto(MatchProfile match) {
+    final visibility =
+        match.profilePhoto?.visibilityStatus?.trim().toLowerCase() ?? '';
+    return visibility.isNotEmpty &&
+        visibility != 'visible' &&
+        visibility != 'public';
+  }
+
+  String _humanize(String value) {
+    final words = value.trim().replaceAll('_', ' ').split(RegExp(r'\s+'));
+    return words
+        .where((word) => word.isNotEmpty)
+        .map((word) => '${word[0].toUpperCase()}${word.substring(1)}')
+        .join(' ');
   }
 
   String _formatLocation(MatchProfile match) {

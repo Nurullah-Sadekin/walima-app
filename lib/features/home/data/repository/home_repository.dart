@@ -14,9 +14,8 @@ class HomeRepository {
       );
       return HomepageTopMatchesResponse.fromJson(response.data);
     } catch (e) {
-      final errorMessage = e is DioException
-          ? e.response?.data['message'] ?? e.message
-          : e.toString();
+      final errorMessage =
+          e is DioException ? _messageFromException(e) : e.toString();
       return HomepageTopMatchesResponse(
         code: 'FAILED',
         message: errorMessage,
@@ -39,7 +38,10 @@ class HomeRepository {
           'responseFormat': responseFormat,
         },
       );
-      return RecentVisitorsResponse.fromJson(response.data);
+      return RecentVisitorsResponse.fromJson(
+        response.data,
+        statusCode: response.statusCode,
+      );
     } catch (e) {
       final errorMessage = e is DioException
           ? e.response?.data['message'] ?? e.message
@@ -47,6 +49,39 @@ class HomeRepository {
       return RecentVisitorsResponse(
         code: 'FAILED',
         message: errorMessage,
+        traceId: _traceIdFromException(e),
+        statusCode: e is DioException ? e.response?.statusCode : 0,
+      );
+    }
+  }
+
+  static Future<RecentVisitorsResponse> getRecentlyViewed({
+    int page = 1,
+    int size = 10,
+    String responseFormat = 'short',
+  }) async {
+    try {
+      final response = await DioClient().get(
+        AppUrls.getRecentlyViewed,
+        isTokenRequired: true,
+        queryParameters: {
+          'page': page,
+          'size': size,
+          'responseFormat': responseFormat,
+        },
+      );
+      return RecentVisitorsResponse.fromJson(
+        response.data,
+        statusCode: response.statusCode,
+      );
+    } catch (e) {
+      final errorMessage =
+          e is DioException ? _messageFromException(e) : e.toString();
+      return RecentVisitorsResponse(
+        code: 'FAILED',
+        message: errorMessage,
+        traceId: _traceIdFromException(e),
+        statusCode: e is DioException ? e.response?.statusCode : 0,
       );
     }
   }
@@ -76,4 +111,17 @@ class HomeRepository {
       );
     }
   }
+}
+
+String? _traceIdFromException(Object error) {
+  if (error is! DioException || error.response?.data is! Map) return null;
+  return (error.response!.data as Map)['traceId']?.toString();
+}
+
+String _messageFromException(DioException error) {
+  final data = error.response?.data;
+  if (data is Map && data['message'] != null) {
+    return data['message'].toString();
+  }
+  return error.message ?? 'Request failed';
 }

@@ -1,0 +1,879 @@
+   WALIMA APP
+
+
+              Client Report Implementation Status
+   Review of WALIMA - App Onboarding Flow | Source dated May 2026 | App review dated 27 August 2026
+
+
+
+
+      9                                    12                                   6
+                  FIXED                               PARTIAL                             NOT FIXED
+
+
+
+
+   Review outcome
+   Frontend-only fixes were adopted without introducing new endpoint paths or changing the existing request-envelope
+   shapes. Items marked Partial include a completed subset plus either a remaining UI refinement or backend dependency.
+   Items marked Not Fixed are intentionally deferred because implementing them safely requires an API contract change.
+
+
+                       What is complete                                        What remains
+
+
+                       DOB and profile-manager submission;                     WhatsApp OTP fallback; new onboarding
+                       OTP timing/masking; registration                        fields; exact lookup datasets; ten-category
+                       verification placement; bio rules;                      interest persistence; parent statuses;
+                       marital/diet/sibling rules; family type;                financial enum alignment; preference
+                       photo removal; minimum hobbies;                         Open To All semantics; match
+                       profile-complete animation; preference                  verification/entitlement flags; authoritative
+                       ranges; suggested-match                                 premium feature limits.
+                       preselection/count; FAQ and support
+                       number.
+
+
+
+
+   How to read this document
+   The next 10 pages preserve the client-supplied PDF and carry a review stamp. The detailed item-by-item matrix follows those
+   source pages. The final appendix specifies the API changes needed to complete every backend-dependent requirement.
+
+
+                        Scope note
+                        This status reflects the current local Flutter source. It is not a production API certification and does
+                        not claim backend behavior that cannot be verified from the mobile repository.
+
+
+
+
+Walima onboarding implementation review - 27 August 2026                                                                           Page 1
+                                                                                              IMPLEMENTATION REVIEW - 27 AUG 2026
+
+
+
+
+               WALIMA — App Onboarding Flow
+
+               Developer Reference | May 2026
+
+
+
+                       Onboarding
+
+
+               Welcome Screen (Login)
+                     Full-screen couple photo background with Walima logo
+
+                     4 login buttons: Continue with Phone (primary pink), Continue with Email (glass),
+                     Apple + Google (side by side)
+
+                     Help modal: “Trouble with OTP?” + “Contact support”
+
+                     Language selector: English
+
+
+
+
+               OTP / Email Verify
+                     Phone OTP: WhatsApp first → SMS fallback, 6-digit input, 30s timer, auto-focus + paste
+                     support
+
+                     Email OTP: Same 6-digit layout, masked email, 30s timer
+
+                     Verify & Log In button
+
+
+
+
+               Step 1 — Profile For + Gender
+                     Profile For (single select chips): Myself, Son, Daughter, Brother, Sister, Friend, Relative
+
+                     Gender (single select chips): Male, Female
+
+
+
+
+               Step 2 — Name + DOB
+                     First Name — text input
+
+
+
+CLIENT SOURCE PAGE - preserved for reference                                                            Source 1 of 10 | Status matrix follows
+                                                                                                 IMPLEMENTATION REVIEW - 27 AUG 2026
+
+
+
+                     Last Name — text input
+
+                     Date of Birth — custom dark modal picker (Day / Month / Year scrollers), auto age
+                     calculation, 18+ validation
+
+
+
+
+               Step 3 — Religion + Country + City
+                     Religion (dropdown): Open To All, Islam, Hinduism, Christianity, Buddhism, Others
+
+                     Country (dropdown, searchable): Bangladesh default + 20+ countries
+
+                     City (dropdown, searchable, dynamic): Changes based on country. Bangladesh = 64
+                     districts
+
+
+
+
+               Step 3B — Religious Practice (NEW, after Religion)
+                     Title: “How important is faith in your daily life?”
+
+                     5 options (radio cards):
+
+                           Very religious — “I pray 5 times, fast regularly, and follow my faith strictly every day”
+
+                           Moderately religious — “I try to pray and follow my faith but sometimes I miss”
+
+                           Somewhat religious — “I practise mainly during Ramadan, Eid, and other special
+                           occasions”
+
+                           Not very religious — “I believe in my faith but don’t actively practise”
+
+                           Prefer not to say — “I’d rather keep this private”
+
+                     Skip option. Auto-skip if “Open To All” religion selected
+
+
+
+
+               Step 3C — Marriage Intention (NEW, after Religious Practice)
+                     Title: “What are your plans for marriage?”
+
+                     Q1: “I’d like to know someone on Walima for” — 1-3 months, 3-6 months, 6-12 months,
+                     1-2 years
+
+                     Q2: “I’d like to get married within” — Within 6 months, 6-12 months, 1-2 years, 2-3
+                     years, No rush, Decide together
+
+                     Both required to continue. Skip option available
+
+
+
+CLIENT SOURCE PAGE - preserved for reference                                                               Source 2 of 10 | Status matrix follows
+                                                                                            IMPLEMENTATION REVIEW - 27 AUG 2026
+
+
+
+
+               Step 4 — Email + Phone
+                     Email Address — text input, email validation
+
+                     Phone Number — country code selector (42 countries with flags, BD +880 default) +
+                     phone input
+
+
+
+
+               Step 5 — Family (Yes/No) + Residency
+                     You Live with Your Family — Yes / No toggle
+
+                     Residency Status (dropdown): Citizen, Permanent Resident, Work Visa, Student Visa,
+                     Temporary Visa, Other
+
+
+
+
+               Step 6 — Marital Status + Height + Diet
+                     Marital Status (dropdown): Never Married, Married, Divorced, Widowed, Separated
+
+                     Height (dropdown, scrollable): 4ft 6in to 7ft 0in (shows ft/in + cm)
+
+                     Dietary Preference (chips, optional): Halal Only, Non Vegetarian, Vegetarian, Vegan,
+                     Occasionally Non-Veg
+
+
+
+
+               Step 7 — Education + Institute
+                     Highest Qualification (dropdown): Below SSC, SSC/O-Level, HSC/A-Level, Diploma,
+                     Bachelor’s/Honours, Master’s, PhD/Doctorate, Professional Degree, Hafez/Islamic
+                     Studies, Other
+
+                     Institute / University — text input
+
+                     Additional Institute — text input (optional)
+
+
+
+
+               Step 8 — Income + Work Sector + Profession + Company
+                     Annual Income (optional): Yearly/Monthly toggle, income range dropdown (dynamic
+                     BDT ranges), hide income toggle
+
+                     Work Sector (dropdown): Private Company, Government, Self-employed, Business
+                     Owner, Freelance, NGO, Not Working, Student, Retired, Other
+
+
+
+CLIENT SOURCE PAGE - preserved for reference                                                          Source 3 of 10 | Status matrix follows
+                                                                                             IMPLEMENTATION REVIEW - 27 AUG 2026
+
+
+
+                     Profession (dropdown, searchable): 18 options — Banker/Finance, IT/Software, Doctor,
+                     Engineer, Lawyer, Accountant, Businessman, Teacher, Architect, Journalist, Government
+                     Officer, Military, Pharmacist, Nurse, Freelancer, Student, Homemaker, Other
+
+                     Company / Organisation — text input (optional)
+
+
+
+
+               Step 9 — About Yourself (bio)
+                     Bio textarea — max 500 chars, min 20 chars, character counter
+
+                     Quick add chips: “Family oriented.” “Practicing Muslim.” “Love to travel.” “Career
+                     focused.” “Simple and humble.” “Looking for a life partner who shares my values.”
+
+                     Helper: “A well-written bio helps you get 3x more profile views”
+
+
+
+
+               Photo Upload
+                     Upload area: dashed circle + “Upload Image” + “Use Camera”
+
+                     Photo preview with X remove
+
+                     Photo Guidelines accordion (Good: Close Up, Half View, Full View / Bad: Side Face,
+                     Group, Unclear)
+
+                     Know More accordion (formats, size limits, rules)
+
+                     Skip: “Add Photos Later >”
+
+
+
+
+               Hobbies & Interests
+                     Minimum 5 selections required
+
+                     10 categories (86+ items total):
+
+                      1. Creative (15) — Writing, Cooking, Singing, Photography, Painting, etc.
+
+                      2. Reading & Learning (8) — Books, Podcasts, Online courses, etc.
+
+                      3. Outdoor Activities (10) — Hiking, Camping, Swimming, etc.
+
+                      4. Fitness & Sports (15) — Running, Yoga, Cricket, Football, etc.
+
+                      5. Travel & Leisure (9) — Solo travel, Road trips, Adventure, etc.
+
+                      6. Food & Lifestyle (7) — Cooking, Baking, Street food, etc.
+
+
+CLIENT SOURCE PAGE - preserved for reference                                                           Source 4 of 10 | Status matrix follows
+                                                                                           IMPLEMENTATION REVIEW - 27 AUG 2026
+
+
+
+                      7. Faith & Community (7) — Quran recitation, Volunteering, Charity, etc.
+
+                      8. Technology & Gaming (7) — Coding, Gaming, AI & Tech, etc.
+
+                      9. Entertainment (8) — Movies, TV series, Board games, etc.
+
+                    10. Social & Lifestyle (8) — Socializing, Shopping, Fashion, etc.
+
+                     Skip option available
+
+
+
+
+               Family Details (optional)
+                     Father’s Status (dropdown): Employed, Self-employed/Business, Retired, Not
+                     Employed, Deceased, Prefer not to say
+
+                     Mother’s Status (dropdown): Homemaker, Employed, Self-employed/Business, Retired,
+                     Deceased, Prefer not to say
+
+                     No. of Brothers + Sisters (side by side dropdowns): None to 10+
+
+                     Family Type (dropdown): Joint Family, Nuclear Family, Other
+
+                     All optional. Skip button available
+
+
+
+
+               Financial Status (optional)
+                     4 options (radio cards):
+
+                           Wealthy — “Affluent family with significant assets”
+
+                           Upper Middle Class — “Comfortable lifestyle with good income”
+
+                           Middle Class — “Stable family with moderate income”
+
+                           Prefer not to say — “Keep this information private”
+
+                     Skip button available
+
+
+
+
+                      Profile Complete
+                     Animated checkmark + confetti
+
+                     “Well done!” message
+
+                     Continue button → Partner Preferences
+
+
+
+CLIENT SOURCE PAGE - preserved for reference                                                         Source 5 of 10 | Status matrix follows
+                                                                                           IMPLEMENTATION REVIEW - 27 AUG 2026
+
+
+
+
+                       Partner Preferences
+
+
+               Intro Screen
+                     Heart + person icon
+
+                     “Partner Preferences” title
+
+                     3 benefits: Smarter Matches, Save Time, You’re in Control
+
+                     Skip + Continue
+
+
+
+
+               Age Range + Height Range + Marital Status
+                     Age Range — dual slider, 18-60, default 25-35
+
+                     Height Range — dual slider, 4’0”-7’0”, default 5’0”-5’11”
+
+                     Marital Status (multi-select chips): Open To All, Never Married, Divorced, Widowed,
+                     Separated
+
+
+
+
+               Religion + Mother Tongue
+                     Religion (dropdown): Open To All, Islam, Hinduism, Christianity, Buddhism, Others
+
+                     Mother Tongue (dropdown): Open To All, Bangla, English, Hindi, Urdu, Arabic, Malay,
+                     Turkish, Persian, French, Other
+
+
+
+
+               Country + City
+                     Country (dropdown, searchable): 24 countries + “Open To All”
+
+                     City (dropdown, searchable, dynamic): “Open To All — Any City” first, then       Top
+                     Cities, then all cities. Changes based on country
+
+
+
+
+               Education Qualification
+
+
+
+CLIENT SOURCE PAGE - preserved for reference                                                         Source 6 of 10 | Status matrix follows
+                                                                                            IMPLEMENTATION REVIEW - 27 AUG 2026
+
+
+
+                     Education (dropdown, multi-select, searchable): Open To All, SSC/O-Level, HSC/A-
+                     Level, Diploma, Bachelor’s/Honours, Master’s, PhD/Doctorate, MBBS/Medical, BDS
+                     (Dental), Engineering (BSc/B.Tech), BBA/MBA, Law (LLB/LLM), CA/ACCA/CMA,
+                     Pharmacy (B.Pharm), Nursing, Hafez/Islamic Studies
+
+                     Selected items show as pink tags with ✕ remove
+
+
+
+
+               Work Sector + Profession + Income
+                     Work Sector (dropdown): Open To All + 8 sectors
+
+                     Profession (dropdown, searchable): Open To All + 28 professions
+
+                     Annual Income (dropdown): Open To All, Under ৳3,00,000 to Above ৳50,00,000, Prefer
+                     not to say
+
+
+
+
+                       Post-Preferences
+
+
+               Suggested Matches
+                     Compact list cards: photo left, info right (Name   , Age/Height, Religion·Marital,
+                     Profession bold, Location)
+
+                     Some photos clear, some blurred (premium)
+
+                     All pre-selected. Checkbox to toggle
+
+                     “Select Matches (X)” button → “Connections Sent!” modal
+
+
+
+
+               Premium Plans
+                     21-Day Money Back Guarantee badge
+
+                     5 swipeable plans:
+
+
+                   Plan                        Duration             Price                  /month
+
+                   Harmony                     3 mo                 ৳2,925                 ৳975
+
+
+
+
+CLIENT SOURCE PAGE - preserved for reference                                                          Source 7 of 10 | Status matrix follows
+                                                                                                    IMPLEMENTATION REVIEW - 27 AUG 2026
+
+
+
+                   Promise                        3 mo                ৳4,050                       ৳1,350
+
+                   Soulmate                       6 mo                ৳6,300                       ৳1,050
+
+                   Forever                        6 mo                ৳11,250                      ৳1,875
+
+                   Destiny                        12 mo               ৳40,000                      ৳3,333
+
+
+                     Features: Contact views (30→500), Daily matches (15→100), WhatsApp Connect,
+                     Family contact info, Handpicked matches, Personal matchmaker, Premium badge,
+                     Walima Events
+
+                     6 FAQ accordions
+
+                     Support:             01305-455665 |   WhatsApp 01305-455665
+
+
+
+
+               → Dashboard / Home
+
+
+
+
+                       Removed (Duplicate Fields)
+
+                   Field                                   Kept In              Removed From
+
+                   City                                    Step 3               Step 5
+
+                   Marital Status                          Step 6               Step 5
+
+                   Live with Family                        Step 5               Financial Status
+
+                   Verification Type                       OTP flow             Step 9
+
+                   Profile Manage by                       Step 1               Separate screen
+
+                   Jain Vegetarian                         —                    Diet (BD irrelevant)
+
+                   Partner Community                       —                    PP2
+
+
+
+
+                       All 29 App Screen Files
+                1. walima-welcome-screen.html
+
+
+CLIENT SOURCE PAGE - preserved for reference                                                                  Source 8 of 10 | Status matrix follows
+                                                                    IMPLEMENTATION REVIEW - 27 AUG 2026
+
+
+
+                2. walima-login-screen.html
+
+                3. walima-email-login-screen.html
+
+                4. walima-otp-verify-screen.html
+
+                5. walima-profile-step1-screen.html
+
+                6. walima-profile-step2-screen.html
+
+                7. walima-profile-step3-screen.html
+
+                8. walima-religious-practice.html
+
+                9. walima-marriage-intention.html
+
+              10. walima-profile-step4-screen.html
+
+              11. walima-profile-step5-screen.html
+
+              12. walima-profile-step6-screen.html
+
+              13. walima-profile-step7-screen.html
+
+              14. walima-profile-step8-screen.html
+
+              15. walima-profile-step9-about.html
+
+              16. walima-profile-step9-screen.html (Photo Upload)
+
+              17. walima-profile-step10-screen.html (Hobbies)
+
+              18. walima-verify-email-reg.html
+
+              19. walima-profile-family-details.html
+
+              20. walima-profile-family-financial.html
+
+              21. walima-profile-complete.html
+
+              22. walima-partner-pref-intro.html
+
+              23. walima-partner-pref-screen.html
+
+              24. walima-partner-pref-screen2.html
+
+              25. walima-partner-pref-screen3.html
+
+              26. walima-partner-pref-screen4.html
+
+              27. walima-partner-pref-screen5.html
+
+
+
+
+CLIENT SOURCE PAGE - preserved for reference                                  Source 9 of 10 | Status matrix follows
+                                                            IMPLEMENTATION REVIEW - 27 AUG 2026
+
+
+
+              28. walima-suggested-matches.html
+
+              29. walima-premium-plans.html
+
+
+
+
+               Support: +8801305455665 | hello@walima.app
+
+
+
+
+CLIENT SOURCE PAGE - preserved for reference                         Source 10 of 10 | Status matrix follows
+                      Detailed Implementation Matrix
+FIXED means the requested behavior is present in the current Flutter source. PARTIAL means only the stated subset is
+complete. NOT FIXED means the requirement remains deferred.
+
+         ID     Client requirement           Status        Current implementation and remaining work
+
+         01     Welcome Screen                  FIXED      Language shows English; OTP help and contact support were added; Apple
+                                                           and Google use the requested side-by-side iOS layout.
+
+         02     OTP / Email Verify             PARTIAL     30-second timer, six-digit UI, paste/focus behavior, masked email, and
+                                                           country-code handling are present. WhatsApp-first delivery with SMS fallback
+                                                           still needs API-01.
+
+         03     Profile For + Gender            FIXED      The requested choices are present. Profile manager submission now maps
+                                                           the selected relationship instead of always sending self.
+
+         04     Name + Date of Birth            FIXED      The dark date picker and adult validation are present. The selected DOB is
+                                                           now sent instead of a hardcoded date.
+
+         05     Religion + Country + City      PARTIAL     Dynamic religion/location flows exist, but the exact client option set,
+                                                           Bangladesh default coverage, and 64-district contract require lookup and
+                                                           location API alignment (API-03).
+
+         06     Religious Practice               NOT       No supported onboarding field or persistence contract exists. Requires
+                                                FIXED      API-02 before the screen can be completed safely.
+
+
+         07     Marriage Intention               NOT       The requested two-question values are not supported by the onboarding
+                                                FIXED      payload. Requires API-02.
+
+
+         08     Email + Phone                   FIXED      Email, phone, country code, availability checks, and verification-channel
+                                                           selection are implemented using the current API contract.
+
+         09     Live with Family +              FIXED      The existing onboarding payload already supports liveWithFamily and
+                Residency                                  residencyStatus.
+
+         10     Marital Status + Height +       FIXED      Client marital options are filtered, the height selector remains supported, and
+                Diet                                       Jain Vegetarian was removed from the displayed diet list.
+
+         11     Education + Institute          PARTIAL     Qualification is integrated. Institute and additional institute are visible but are
+                                                           not part of the onboarding submission contract; API-02 is required.
+
+         12     Income + Work +                PARTIAL     Existing income/work/profession fields are used. hideIncome persistence and
+                Profession                                 the exact BDT/work/profession datasets require API-02 and API-03.
+
+         13     About Yourself                  FIXED      Bio validation is 20-500 characters with a counter and quick-add chips.
+                                                           Verification type was removed from this step.
+
+         14     Photo Upload                   PARTIAL     Photo selection, camera, validation, guidance, skip, and X removal are
+                                                           present. The exact dashed-circle presentation still needs a small frontend
+                                                           refinement.
+
+         15     Hobbies & Interests            PARTIAL     Minimum five selection is enforced. The requested ten-category, 86-plus-item
+                                                           taxonomy cannot be persisted by the current six-array contract; API-04 is
+                                                           required.
+
+         16     Family Details                 PARTIAL     Sibling range and family type are fixed using existing fields. Father/mother
+                                                           status values need dedicated fields and enums from API-05.
+
+
+Walima onboarding implementation review - 27 August 2026                                                                                         Page 1
+Detailed Implementation Matrix - continued
+         ID     Client requirement           Status        Current implementation and remaining work
+
+         17     Financial Status                 NOT       The requested four values do not align with the current
+                                                FIXED      familyEconomicCondition enum. Requires API-05.
+
+
+         18     Profile Complete                FIXED      Animated checkmark/confetti, message, and continuation to partner
+                                                           preferences are implemented.
+
+         19     Partner Preferences Intro       FIXED      The existing intro flow already covers the benefits and continue/skip behavior.
+
+
+         20     Preference Age + Height        PARTIAL     Age 18-60 and height 4ft0in-7ft0in defaults/limits are updated. The exact
+                + Marital                                  Open To All marital behavior still needs contract confirmation in API-06.
+
+         21     Preference Religion +          PARTIAL     Expanded mother-tongue choices are present. Open To All semantics and
+                Mother Tongue                              removal of partner community are not fully aligned; API-06 is required.
+
+         22     Preference Country +             NOT       The exact 24-country list, Any City option, top-city grouping, and complete city
+                City                            FIXED      results require API-03/API-06.
+
+
+         23     Preference Education             NOT       The exact multi-select education taxonomy must be supplied and accepted
+                                                FIXED      consistently by API-03/API-06.
+
+
+         24     Preference Work +                NOT       Exact sector, profession, and income-range datasets plus Open To All
+                Profession + Income             FIXED      semantics require API-03/API-06.
+
+
+         25     Suggested Matches              PARTIAL     All returned matches are preselected; count, toggle, restricted-photo blur, and
+                                                           success copy are updated. A profile-level verified badge and explicit
+                                                           entitlement flags require API-07; badge rendering remains frontend work.
+
+         26     Premium Plans                  PARTIAL     Six FAQs and both support numbers are corrected. Guarantee, exact plan
+                                                           feature limits, and entitlement availability must be authoritative in API-08.
+
+         27     Duplicate Field Removal        PARTIAL     Verification type and Jain diet duplication are fixed; profile manager uses Step
+                                                           1. Partner community and every historical duplicate route still need final
+                                                           cleanup after API-06 alignment.
+
+
+
+
+Walima onboarding implementation review - 27 August 2026                                                                                      Page 2
+                                     Required API Changes
+The following contracts are proposed implementation requirements. Existing endpoint paths are reused where possible.
+Field names are recommendations and should be finalized jointly by mobile and backend teams.
+
+         ID             Priority                                    Blocks
+
+         API-01         P0 - blocks WhatsApp-first OTP              WhatsApp-first OTP
+
+         API-02         P0 - blocks three requested                 Religious practice, marriage intention, institute, hide income
+                        onboarding sections
+
+         API-03         P1 - blocks exact dropdown parity           Exact lookup/location parity
+
+         API-04         P1 - blocks full hobbies requirement        Ten interest categories
+
+         API-05         P1 - blocks family/financial parity         Parent status and financial values
+
+         API-06         P1 - blocks exact preference behavior       Open To All preference behavior
+
+         API-07         P1 - blocks exact badge/blur rules          Verified badge and photo gating
+
+         API-08         P2 - makes premium screen                   Authoritative premium content
+                        authoritative
+
+
+
+
+          API-01         OTP delivery channel and fallback
+
+         Priority                  P0 - blocks WhatsApp-first OTP
+
+         Affected                  POST /auth/signin-with-otp; POST /auth/sign-up-with-otp; POST /auth/resend-otp; POST
+         endpoints                 /auth/verify-otp
+
+         Current gap               The app can request and verify OTP, but the response does not expose which transport was used or
+                                   whether WhatsApp failed over to SMS.
+
+         Required change           Accept deliveryChannel (email, whatsapp, sms) and fallbackChannel. For phone OTP, attempt
+                                   WhatsApp first and fall back server-side to SMS. Return deliveryChannelUsed, fallbackAttempted,
+                                   maskedIdentifier, otpLength, and retryAfterSeconds.
+
+         Acceptance                A phone request produces one logical OTP transaction; verification uses the same transaction
+         criteria                  regardless of transport; resend respects a server-supplied 30-second retry window.
+
+
+
+
+Walima onboarding implementation review - 27 August 2026                                                                              Page 3
+          API-02         Onboarding profile fields and persistence
+
+         Priority                P0 - blocks three requested onboarding sections
+
+         Affected                POST /users/onboarding; GET /users/profile; relevant PUT /users/profile/* endpoints
+         endpoints
+
+         Current gap             The current SignUpRequestBody has no religious-practice, two marriage-intention, institute,
+                                 additional-institute, or hide-income fields.
+
+         Required change         Add religiousPractice; connectionTimeline; marriageTimeline; institute; additionalInstitute; hideIncome.
+                                 Recommended enum values: very_religious, moderately_religious, somewhat_religious,
+                                 not_very_religious, prefer_not_to_say; 1_3_months, 3_6_months, 6_12_months, 1_2_years;
+                                 within_6_months, 6_12_months, 1_2_years, 2_3_years, no_rush, decide_together.
+
+         Acceptance              Create, read, and update return the same canonical values; optional fields may be omitted; Open To All
+         criteria                religion permits religiousPractice to be null.
+
+
+
+          API-03         Authoritative lookup and location datasets
+
+         Priority                P1 - blocks exact dropdown parity
+
+         Affected                GET /lookups; GET /countries; GET /cities
+         endpoints
+
+         Current gap             The client report requires exact religion, education, work-sector, profession, income, country, and city
+                                 datasets. Current client fallbacks and returned datasets are not guaranteed to match.
+
+         Required change         Publish versioned categories for religions, education_levels, work_sectors, professions,
+                                 income_ranges, and mother_tongues. Country/city responses should include stable id, code, label,
+                                 sortOrder, isActive, and isTopCity. Cities must support country, search, page, and size.
+
+         Acceptance              Bangladesh resolves all 64 districts; required country counts are available; mobile clients render labels
+         criteria                but submit stable keys; removed keys remain backwards compatible during migration.
+
+
+
+          API-04         Ten-category interests taxonomy
+
+         Priority                P1 - blocks full hobbies requirement
+
+         Affected                GET /lookups?category=interests (or GET /interests/taxonomy); PUT /users/profile/interests
+         endpoints
+
+         Current gap             The existing update body uses six fixed arrays and cannot represent all ten client categories reliably.
+
+         Required change         Return category objects with id, key, label, sortOrder, minimumSelection, and items. Accept
+                                 selectedInterestIds as a flat stable-id array, or accept categories [{categoryKey, itemKeys}]. Keep the
+                                 old six arrays during a deprecation window.
+
+         Acceptance              At least 86 active items can be returned; the server validates a minimum of five unique selections; GET
+         criteria                returns the selected IDs after PUT.
+
+
+
+
+Walima onboarding implementation review - 27 August 2026                                                                                     Page 4
+          API-05         Family status and financial enum alignment
+
+         Priority                P1 - blocks family/financial parity
+
+         Affected                PUT /users/profile/family; GET /users/profile/family
+         endpoints
+
+         Current gap             The current model has fatherProfession and motherProfession but no parent-status fields. Existing
+                                 familyEconomicCondition values do not match the four client choices.
+
+         Required change         Add fatherStatus and motherStatus. Support employed, self_employed_business, retired,
+                                 not_employed, homemaker (mother), deceased, prefer_not_to_say. Align financialStatus to wealthy,
+                                 upper_middle_class, middle_class, prefer_not_to_say, or publish a documented mapping from the
+                                 legacy field.
+
+         Acceptance              All fields are optional; sibling counts accept 0-10; read-after-write preserves Prefer not to say without
+         criteria                converting it to null.
+
+
+
+          API-06         Partner-preference filtering semantics
+
+         Priority                P1 - blocks exact preference behavior
+
+         Affected                PUT/GET /users/profile/preferences; GET /matches
+         endpoints
+
+         Current gap             Open To All is ambiguous across marital status, religion, mother tongue, location, education, profession,
+                                 and income. Community is still supported although the client report removes it.
+
+         Required change         Define Open To All as an omitted/empty filter or accept a canonical open_to_all key consistently.
+                                 Document whether mixed selections containing open_to_all are rejected or normalized. Confirm
+                                 whether communityPreference is deprecated. Accept stable lookup keys in all arrays.
+
+         Acceptance              Saved preferences and match-query behavior are identical; Open To All never accidentally filters out
+         criteria                profiles; deprecated community data remains readable during migration.
+
+
+
+          API-07         Suggested-match verification and photo entitlements
+
+         Priority                P1 - blocks exact badge/blur rules
+
+         Affected                GET /matches; POST /connections/bulk-send
+         endpoints
+
+         Current gap             The match response has nested photo visibility and photo verification data, but no unambiguous
+                                 profile-level verified badge or explicit can-view-photo entitlement.
+
+         Required change         Return profileVerified (or verificationStatus), profilePhoto.canView, profilePhoto.blurRequired, and
+                                 profilePhoto.blurReason. Keep visibilityStatus for compatibility. Bulk-send should return per-user
+                                 success/failure and ignore already-connected profiles idempotently.
+
+         Acceptance              The client never infers verification from premium status; clear versus blurred photos are decided by
+         criteria                response flags; all preselected eligible IDs can be submitted safely.
+
+
+
+
+Walima onboarding implementation review - 27 August 2026                                                                                     Page 5
+          API-08         Premium plan content and entitlement contract
+
+         Priority                P2 - makes premium screen authoritative
+
+         Affected                GET /plans; GET /payments/subscription; POST /payments/initiate
+         endpoints
+
+         Current gap             Plan prices are dynamic, but the client report also specifies guarantee days and exact feature limits.
+                                 These must not depend on hardcoded mobile copy.
+
+         Required change         Return moneyBackGuaranteeDays, ordered features [{key,label,limit,enabled}], plan ranking,
+                                 durationMonths, price, monthlyEquivalent, currency, and support configuration. Return active
+                                 entitlements separately for runtime gating.
+
+         Acceptance              The five plans and their limits render from server data; purchase and subscription responses use the
+         criteria                same plan IDs and feature keys; support/contact configuration is environment-safe.
+
+
+
+
+Recommended implementation sequence
+1. Finalize API-02 and API-05 payloads. 2. Publish API-03/API-04 lookup contracts. 3. Define API-06 Open To All behavior. 4. Add
+API-01 transport metadata and fallback. 5. Add API-07/API-08 entitlement fields. 6. Complete the remaining Flutter screens and
+run end-to-end contract tests.
+
+
+
+
+Walima onboarding implementation review - 27 August 2026                                                                                  Page 6
+

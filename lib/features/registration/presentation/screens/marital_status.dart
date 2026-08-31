@@ -7,7 +7,6 @@ import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/global/components/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:walima_llc/core/providers/providers.dart';
-import 'package:walima_llc/features/registration/domain/single_string_model.dart';
 import 'package:walima_llc/features/registration/presentation/providers/registration_provider.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
@@ -58,7 +57,11 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.maritalStatus, totalProgressCount: 10, currentIndexProgress: 5,showProgress: true),
+                    const UpperLayer(
+                        imagePath: AppImages.maritalStatus,
+                        totalProgressCount: 10,
+                        currentIndexProgress: 5,
+                        showProgress: true),
                     body(),
                   ],
                 ),
@@ -74,7 +77,9 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
         child: Column(
           spacing: 10,
           children: [
-            const StaticTextWidget(title: 'Personal Details', subtitle: 'Tell us a bit more about yourself'),
+            const StaticTextWidget(
+                title: 'Personal Details',
+                subtitle: 'Tell us a bit more about yourself'),
             dataInsertField(),
             bottomAction(),
             const SizedBox(height: 20),
@@ -95,7 +100,7 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
             hintText: 'Select',
             isRequired: true,
             popUpHeader: 'Select Marital Status',
-            items: maritalStatusListDataInserted
+            items: provider.registrationMaritalStatusDataList
                 .map((item) => item.name)
                 .toList(growable: false),
             controller: provider.maritalStatusController,
@@ -124,10 +129,9 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
               Text(
                 'Diet',
                 style: TextStyle(
-                  fontSize: TextSize.font14(context),
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textSecondaryLight
-                ),
+                    fontSize: TextSize.font14(context),
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textSecondaryLight),
               ),
               Text(
                 '(optional)',

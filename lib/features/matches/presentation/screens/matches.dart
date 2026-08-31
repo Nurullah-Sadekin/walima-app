@@ -86,6 +86,8 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
                     spacing: 10,
                     children: [
                       _headerSection(provider),
+                      if (provider.selectedTabIndex == 5)
+                        _moreMatchesTypeSelector(provider),
                       Expanded(child: _tabContent(provider)),
                     ],
                   ),
@@ -177,6 +179,41 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
     );
   }
 
+  Widget _moreMatchesTypeSelector(MatchesProvider provider) {
+    const types = <MatchType>[
+      MatchType.suggestedMembers,
+      MatchType.premiumMatches,
+      MatchType.peopleWhoMayLikeMe,
+    ];
+
+    return SizedBox(
+      height: 38,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: types.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final type = types[index];
+          final selected = provider.moreMatchesType == type;
+          return ChoiceChip(
+            label: Text(type.label),
+            selected: selected,
+            onSelected: (_) =>
+                ref.read(matchesProvider).setMoreMatchesType(type),
+            selectedColor: AppColors.primary,
+            labelStyle: TextStyle(
+              color: selected ? AppColors.white : AppColors.textPrimaryLight,
+            ),
+            backgroundColor: AppColors.white,
+            side: BorderSide(
+              color: selected ? AppColors.primary : AppColors.greyLight,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Widget _buildTabItem({
     required int index,
     required MatchesProvider provider,
@@ -235,7 +272,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
 
   Widget _tabContent(MatchesProvider provider) {
     if (provider.isLoadingMatches && provider.matches.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
+      return _matchesSkeleton();
     }
 
     if (provider.matchesError != null && provider.matches.isEmpty) {
@@ -301,108 +338,138 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
       child: ListView.separated(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.only(bottom: 12),
-        itemCount: provider.matches.length,
+        itemCount:
+            provider.matches.length + (provider.isLoadingMoreMatches ? 1 : 0),
         separatorBuilder: (_, __) => const SizedBox(height: 10),
         itemBuilder: (context, index) {
+          if (index == provider.matches.length) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (index == provider.matches.length - 1 &&
+              provider.canLoadMoreMatches) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ref.read(matchesProvider).loadMoreMatches();
+            });
+          }
           final match = provider.matches[index];
           final imagePath = match.profilePhoto?.url ??
               (match.gender == 'female'
                   ? AppImages.womenAvatar
                   : AppImages.manAvatar);
           return ProfileComprehensiveCard(
-              onTapCard: () {
-                context.pushNamed(Routes.profilePreview,
-                    extra: {'userId': match.id});
-              },
-              imagePath: imagePath,
-              leftIconPath: AppImages.favouriteIcon,
-              isPremiumConnect: match.isPremium ?? false,
-              isVerified: match.profilePhoto?.isVerified ?? false,
-              name: match.displayName ?? 'Unknown',
-              age: match.age != null ? '${match.age} Yr' : null,
-              height: HeightUtils.formatHeight(match.height.toString()),
-              location: _matchLocation(match),
-              activeStatusText: _activeStatusText(match),
-              menu: false,
-              photoRequest: false,
-              profession:
-                  CamelCaseUtils.formatCamelCase(match.maritalStatus ?? ''),
-              maritalStatus:
-                  CamelCaseUtils.formatCamelCase(match.community ?? ''),
-              religion: CamelCaseUtils.formatCamelCase(match.religion ?? ''),
-              noButton: false,
-              onTapLeftButton: () async {
-                provider.updateViewState(
-                  screenStates: MatchesProviderScreenStates.transParentLoading,
-                );
-                await ref.read(homeProvider).connect(
-                      context,
-                      match.id ?? '',
-                      match.displayName ?? 'Unknown',
-                      ConnectionRequestType.match.apiValue,
+            key: ValueKey(match.id ?? match.userReference ?? index),
+            onTapCard: () {
+              context.pushNamed(
+                Routes.profilePreview,
+                extra: {'userId': match.userReference ?? match.id},
+              );
+            },
+            imagePath: imagePath,
+            leftIconPath: AppImages.favouriteIcon,
+            isPremiumConnect: match.isPremium ?? false,
+            isVerified: match.profilePhoto?.isVerified ?? false,
+            name: match.displayName ?? 'Unknown',
+            age: match.age != null ? '${match.age} Yr' : null,
+            height: HeightUtils.formatHeight(match.height.toString()),
+            location: _matchLocation(match),
+            activeStatusText: _activeStatusText(match),
+            menu: false,
+            photoRequest: false,
+            profession:
+                CamelCaseUtils.formatCamelCase(match.maritalStatus ?? ''),
+            maritalStatus:
+                CamelCaseUtils.formatCamelCase(match.community ?? ''),
+            religion: CamelCaseUtils.formatCamelCase(match.religion ?? ''),
+            noButton: false,
+            showLeftButton: match.canConnect,
+            onTapLeftButton: match.canConnect
+                ? () async {
+                    provider.updateViewState(
+                      screenStates:
+                          MatchesProviderScreenStates.transParentLoading,
                     );
-                await ref
-                    .read(matchesProvider)
-                    .loadMatchesForSelectedTab(force: true);
-              },
-              leftButtonColor: match.connection?.status == 'none'
-                  ? AppColors.greenButtonColor
-                  : AppColors.disableBackground,
-              leftButtonTextColor: match.connection?.status == 'none'
-                  ? AppColors.white
-                  : AppColors.disableText,
-              leftButtonIconColor: match.connection?.status == 'none'
-                  ? AppColors.white
-                  : AppColors.disableText,
-              leftButtonBorderColor: match.connection?.status == 'none'
-                  ? AppColors.greenButtonColor
-                  : AppColors.disableBackground,
-              onTapRightButton: () async {
-                final userId = match.id?.trim();
-                if (userId == null || userId.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        content: Text('User id not found'.localized(context))),
-                  );
-                  return;
-                }
-
-                await BottomSheetUtils.open(
-                  context: context,
-                  fullHeight: false,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: ViewContactBottomSheet(
-                      userId: userId,
-                      userName: match.displayName ?? 'Walima Member',
-                      profileImagePath: imagePath,
-                      description: match.connection?.message,
-                      isDescriptionVisible: false,
-                      onWalimaChatPressed: match.id == null
-                          ? null
-                          : () {
-                              context.pushNamed(
-                                Routes.chatScreen,
-                                extra: {
-                                  'conversationId':
-                                      match.connection?.conversationId,
-                                  'participant': {
-                                    'userId': match.id,
-                                    'displayName': match.displayName,
-                                    'profilePictureUrl':
-                                        match.profilePhoto?.url,
-                                    'isOnline': match.isOnline,
-                                  },
-                                },
-                              );
-                            },
-                    ),
+                    await ref.read(homeProvider).connect(
+                          context,
+                          match.id ?? '',
+                          match.displayName ?? 'Unknown',
+                          ConnectionRequestType.match.apiValue,
+                        );
+                    await ref
+                        .read(matchesProvider)
+                        .loadMatchesForSelectedTab(force: true);
+                  }
+                : null,
+            leftButtonColor: match.canConnect
+                ? AppColors.greenButtonColor
+                : AppColors.disableBackground,
+            leftButtonTextColor:
+                match.canConnect ? AppColors.white : AppColors.disableText,
+            leftButtonIconColor:
+                match.canConnect ? AppColors.white : AppColors.disableText,
+            leftButtonBorderColor: match.canConnect
+                ? AppColors.greenButtonColor
+                : AppColors.disableBackground,
+            onTapRightButton: () async {
+              final userId = match.id?.trim();
+              if (userId == null || userId.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('User id not found'.localized(context)),
                   ),
                 );
-              },
-              isOnline: match.isOnline ?? false,
-              viewOnAccept: false);
+                return;
+              }
+
+              await BottomSheetUtils.open(
+                context: context,
+                fullHeight: false,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: ViewContactBottomSheet(
+                    userId: userId,
+                    userName: match.displayName ?? 'Walima Member',
+                    profileImagePath: imagePath,
+                    description: match.connection?.message,
+                    isDescriptionVisible: false,
+                    onWalimaChatPressed: match.id == null
+                        ? null
+                        : () {
+                            context.pushNamed(
+                              Routes.chatScreen,
+                              extra: {
+                                'conversationId':
+                                    match.connection?.conversationId,
+                                'participant': {
+                                  'userId': match.id,
+                                  'displayName': match.displayName,
+                                  'profilePictureUrl': match.profilePhoto?.url,
+                                  'isOnline': match.isOnline,
+                                },
+                              },
+                            );
+                          },
+                  ),
+                ),
+              );
+            },
+            isOnline: match.isOnline ?? false,
+            viewOnAccept: false,
+          );
         },
+      ),
+    );
+  }
+
+  Widget _matchesSkeleton() {
+    return ListView.separated(
+      itemCount: 2,
+      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      itemBuilder: (_, __) => Container(
+        height: 420,
+        decoration: BoxDecoration(
+          color: AppColors.disableBackground,
+          borderRadius: BorderRadius.circular(16),
+        ),
       ),
     );
   }

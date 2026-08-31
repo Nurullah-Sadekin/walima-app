@@ -337,14 +337,35 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
                 )
               : GestureDetector(
                   onTap: () => _pickImage(ImageSource.gallery),
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(50)),
-                    child: Image.file(
-                      File(_selectedImagePath!),
-                      width: 110,
-                      height: 110,
-                      fit: BoxFit.fill,
-                    ),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      ClipRRect(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(50)),
+                        child: Image.file(
+                          File(_selectedImagePath!),
+                          width: 110,
+                          height: 110,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      Positioned(
+                        right: -8,
+                        top: -8,
+                        child: IconButton.filled(
+                          tooltip: 'Remove photo',
+                          onPressed: _removeSelectedImage,
+                          icon: const Icon(Icons.close, size: 18),
+                          style: IconButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            minimumSize: const Size(32, 32),
+                            padding: EdgeInsets.zero,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
           Center(
@@ -392,6 +413,11 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
         ],
       ),
     );
+  }
+
+  void _removeSelectedImage() {
+    setState(() => _selectedImagePath = null);
+    provider.resetPhotoUploadFlow();
   }
 
   Widget _photoActionButton({

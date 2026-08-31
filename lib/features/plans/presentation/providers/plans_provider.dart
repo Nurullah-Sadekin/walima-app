@@ -47,6 +47,10 @@ class PlansProvider extends BaseChangeNotifier {
         'Yes, you can temporarily pause your subscription if you need a break. During this time, your profile will not appear in searches until you reactivate it.',
     'What support do you provide?':
         'Our support team is here to assist with account, payment, or profile-related questions. You can contact us anytime through chat, email, or phone support.',
+    'Can I change my plan later?':
+        'Yes. You can move to another available plan whenever your account is eligible for an upgrade.',
+    'Are subscription payments secure?':
+        'Yes. Payments are processed through the secure payment options shown during checkout.',
   };
 
   final List<UpgradePackageItem> packageItems = packageItemsDataInserted;

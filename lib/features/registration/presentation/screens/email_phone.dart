@@ -83,6 +83,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
                         'We\'ll use these to verify and secure your account',
                   ),
                   dataInsertField(),
+                  verificationChoice(),
                   const Spacer(),
                   bottomAction(),
                   const SizedBox(height: 20),
@@ -92,6 +93,40 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
           ),
         );
       },
+    );
+  }
+
+  Widget verificationChoice() {
+    final provider = ref.watch(registrationProvider);
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Verify account with',
+            style: TextStyle(
+              fontSize: TextSize.font14(context),
+              fontWeight: FontWeight.w500,
+              color: AppColors.textSecondaryLight,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            children: List<Widget>.generate(provider.verificationList.length,
+                (index) {
+              final item = provider.verificationList[index];
+              return ChoiceChip(
+                label: Text(item.name),
+                selected: item.isSelected,
+                onSelected: (_) =>
+                    provider.selectedVerificationTypeIndex(index),
+              );
+            }),
+          ),
+        ],
+      ),
     );
   }
 

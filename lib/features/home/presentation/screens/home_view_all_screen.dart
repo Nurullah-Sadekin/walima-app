@@ -6,6 +6,7 @@ import 'package:walima_llc/core/global/components/bottom_sheet.dart';
 import 'package:walima_llc/core/global/components/custom_back_appbar.dart';
 import 'package:walima_llc/core/global/enums/enums.dart';
 import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/date_time_utils.dart';
 import 'package:walima_llc/core/utils/height_utils.dart';
 import 'package:walima_llc/features/home/data/model/response/recent_visitors_response.dart';
@@ -14,6 +15,7 @@ import 'package:walima_llc/features/matches/data/models/response/get_matches_res
 import 'package:walima_llc/features/connections/presentation/widgets/view_contact_bottom_sheet.dart';
 import 'package:walima_llc/features/matches/presentation/widgets/profile_comprehensive_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 enum HomeViewAllType {
   premiumMatches,
@@ -52,8 +54,8 @@ class _HomeViewAllScreenState extends ConsumerState<HomeViewAllScreen> {
     final isPremiumPage = widget.type == HomeViewAllType.premiumMatches;
     final title = isPremiumPage ? 'Premium Matches' : 'Recent Visitors';
     final subtitle = isPremiumPage
-        ? '${provider.premiumMatches.length} Profiles Found'
-        : '${provider.recentVisitors.length} Profiles Found';
+        ? '${provider.premiumMatchesTotal} Profiles Found'
+        : '${provider.recentVisitorsTotal} Profiles Found';
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -95,12 +97,15 @@ class _HomeViewAllScreenState extends ConsumerState<HomeViewAllScreen> {
 
   Widget _premiumMatchesBody(HomeProvider provider) {
     if (provider.isLoadingPremiumMatches) {
-      return const Center(child: CircularProgressIndicator());
+      return _loadingList();
     }
 
     if (provider.premiumMatchesError != null &&
         provider.premiumMatches.isEmpty) {
-      return _emptyState(provider.premiumMatchesError!);
+      return _errorState(
+        provider.premiumMatchesError!,
+        () => provider.loadPremiumMatches(force: true),
+      );
     }
 
     if (provider.premiumMatches.isEmpty) {
@@ -118,24 +123,56 @@ class _HomeViewAllScreenState extends ConsumerState<HomeViewAllScreen> {
 
   Widget _recentVisitorsBody(HomeProvider provider) {
     if (provider.isLoadingRecentVisitors) {
-      return const Center(child: CircularProgressIndicator());
+      return _loadingList();
     }
 
     if (provider.recentVisitorsError != null &&
         provider.recentVisitors.isEmpty) {
-      return _emptyState(provider.recentVisitorsError!);
+      return _errorState(
+        provider.recentVisitorsError!,
+        () => provider.loadRecentVisitors(force: true),
+      );
     }
 
     if (provider.recentVisitors.isEmpty) {
       return _emptyState('No recent visitors yet.');
     }
 
+    final showLoadingMore = provider.isLoadingMoreRecentVisitors;
     return ListView.separated(
-      itemCount: provider.recentVisitors.length,
+      itemCount: provider.recentVisitors.length + (showLoadingMore ? 1 : 0),
       separatorBuilder: (_, __) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
-        return _buildRecentVisitorCard(provider.recentVisitors[index]);
+        if (index == provider.recentVisitors.length) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (index == provider.recentVisitors.length - 1 &&
+            provider.canLoadMoreRecentVisitors) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ref.read(homeProvider).loadMoreRecentVisitors();
+          });
+        }
+        return _buildRecentVisitorCard(
+          provider.recentVisitors[index],
+          isLocked: provider.isRecentVisitorLockedAt(index),
+        );
       },
+    );
+  }
+
+  Widget _errorState(String text, Future<void> Function() retry) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(text, textAlign: TextAlign.center),
+          const SizedBox(height: 12),
+          FilledButton(
+            onPressed: retry,
+            child: const Text('Retry'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -153,6 +190,20 @@ class _HomeViewAllScreenState extends ConsumerState<HomeViewAllScreen> {
     );
   }
 
+  Widget _loadingList() {
+    return ListView.separated(
+      itemCount: 2,
+      separatorBuilder: (_, __) => const SizedBox(height: 16),
+      itemBuilder: (_, __) => Container(
+        height: 420,
+        decoration: BoxDecoration(
+          color: AppColors.disableBackground,
+          borderRadius: BorderRadius.circular(16),
+        ),
+      ),
+    );
+  }
+
   Widget _buildPremiumMatchCard(MatchProfile match) {
     final location = _formatMatchLocation(match);
     final heightText = _formatMatchHeight(match.height);
@@ -161,34 +212,38 @@ class _HomeViewAllScreenState extends ConsumerState<HomeViewAllScreen> {
     final imagePath = match.profilePhoto?.url;
 
     return ProfileComprehensiveCard(
+      key: ValueKey(match.id ?? match.userReference),
+      onTapCard: () => context.pushNamed(
+        Routes.profilePreview,
+        extra: {'userId': match.userReference ?? match.id},
+      ),
       imagePath: imagePath ??
           (match.gender == 'female'
               ? AppImages.womenAvatar
               : AppImages.manAvatar),
       imageHeight: 300,
-      isPremiumConnect: match.isPremium ?? true,
+      isPremiumConnect: match.isPremium == true,
       isVerified: match.profilePhoto?.isVerified ?? false,
       name: match.displayName ?? 'Walima Member',
       age: '${match.age ?? 'Undefine'} Yr',
       height: HeightUtils.formatHeight(heightText),
       location: location,
       profession: profession,
-      leftButtonColor: match.connection?.status == 'none'
+      leftButtonColor: match.canConnect
           ? AppColors.greenButtonColor
           : AppColors.disableBackground,
-      leftButtonTextColor: match.connection?.status == 'none'
-          ? AppColors.white
-          : AppColors.disableText,
-      leftButtonIconColor: match.connection?.status == 'none'
-          ? AppColors.white
-          : AppColors.disableText,
-      leftButtonBorderColor: match.connection?.status == 'none'
+      leftButtonTextColor:
+          match.canConnect ? AppColors.white : AppColors.disableText,
+      leftButtonIconColor:
+          match.canConnect ? AppColors.white : AppColors.disableText,
+      leftButtonBorderColor: match.canConnect
           ? AppColors.greenButtonColor
           : AppColors.disableBackground,
       viewOnAccept:
           match.profilePhoto?.visibilityStatus == 'visible' ? true : false,
       religion: match.religion,
       isOnline: match.isOnline ?? false,
+      showLeftButton: match.canConnect,
       onTapRightButton: () async {
         await BottomSheetUtils.open(
           context: context,
@@ -200,19 +255,21 @@ class _HomeViewAllScreenState extends ConsumerState<HomeViewAllScreen> {
           ),
         );
       },
-      onTapLeftButton: () {
-        ref.read(homeProvider).connect(
-              context,
-              match.id ?? '',
-              match.displayName ?? 'Unknown',
-              ConnectionRequestType.match.apiValue,
-            );
-      },
+      onTapLeftButton: match.canConnect
+          ? () {
+              ref.read(homeProvider).connect(
+                    context,
+                    match.id ?? '',
+                    match.displayName ?? 'Unknown',
+                    ConnectionRequestType.match.apiValue,
+                  );
+            }
+          : null,
       activeStatusText: activeStatus,
     );
   }
 
-  Widget _buildRecentVisitorCard(Data visitor) {
+  Widget _buildRecentVisitorCard(Data visitor, {required bool isLocked}) {
     final location = _formatRecentVisitorLocation(visitor.location);
     final imageUrl = visitor.profilePhoto?.url?.toString();
     final imagePath = (imageUrl?.isNotEmpty ?? false)
@@ -222,47 +279,64 @@ class _HomeViewAllScreenState extends ConsumerState<HomeViewAllScreen> {
             : AppImages.manAvatar);
 
     return ProfileComprehensiveCard(
+      key: ValueKey(visitor.id ?? visitor.userReference),
+      onTapCard: () {
+        if (isLocked) {
+          context.pushNamed(Routes.upgradePackage, extra: Routes.anchor);
+          return;
+        }
+        context.pushNamed(
+          Routes.profilePreview,
+          extra: {'userId': visitor.userReference ?? visitor.id},
+        );
+      },
       imagePath: imagePath,
       imageHeight: 300,
       isPremiumConnect: visitor.isPremium ?? false,
       isVerified: visitor.isVerified ?? false,
       name: visitor.displayName ?? 'Walima Member',
       age: '${visitor.age?.toInt() ?? 'Undefine'} Yr',
-      height: HeightUtils.formatHeight(visitor.height.toString()),
+      height: visitor.height == null
+          ? null
+          : HeightUtils.formatHeight(visitor.height.toString()),
       location: location,
-      leftButtonColor: visitor.connection?.status == 'none'
+      leftButtonColor: visitor.canConnect
           ? AppColors.greenButtonColor
           : AppColors.disableBackground,
-      leftButtonTextColor: visitor.connection?.status == 'none'
-          ? AppColors.white
-          : AppColors.disableText,
-      leftButtonIconColor: visitor.connection?.status == 'none'
-          ? AppColors.white
-          : AppColors.disableText,
-      leftButtonBorderColor: visitor.connection?.status == 'none'
+      leftButtonTextColor:
+          visitor.canConnect ? AppColors.white : AppColors.disableText,
+      leftButtonIconColor:
+          visitor.canConnect ? AppColors.white : AppColors.disableText,
+      leftButtonBorderColor: visitor.canConnect
           ? AppColors.greenButtonColor
           : AppColors.disableBackground,
       viewOnAccept: visitor.profilePhoto?.visibilityStatus == 'visible',
       activeStatusText: _recentVisitorStatus(visitor),
-      onTapRightButton: () async {
-        await BottomSheetUtils.open(
-          context: context,
-          fullHeight: false,
-          child: Consumer(
-            builder: (context, ref, _) {
-              return _contactVisitorBottomSheet(visitor);
+      isLocked: isLocked,
+      showLeftButton: visitor.canConnect,
+      onTapRightButton: isLocked
+          ? null
+          : () async {
+              await BottomSheetUtils.open(
+                context: context,
+                fullHeight: false,
+                child: Consumer(
+                  builder: (context, ref, _) {
+                    return _contactVisitorBottomSheet(visitor);
+                  },
+                ),
+              );
             },
-          ),
-        );
-      },
-      onTapLeftButton: () {
-        ref.read(homeProvider).connect(
-              context,
-              visitor.id ?? '',
-              visitor.displayName ?? 'Unknown',
-              ConnectionRequestType.match.apiValue,
-            );
-      },
+      onTapLeftButton: !isLocked && visitor.canConnect
+          ? () {
+              ref.read(homeProvider).connect(
+                    context,
+                    visitor.id ?? '',
+                    visitor.displayName ?? 'Unknown',
+                    ConnectionRequestType.match.apiValue,
+                  );
+            }
+          : null,
     );
   }
 
@@ -275,8 +349,8 @@ class _HomeViewAllScreenState extends ConsumerState<HomeViewAllScreen> {
         profileImagePath: (match.profilePhoto?.url?.isNotEmpty ?? false)
             ? match.profilePhoto!.url!
             : (match.gender == 'female'
-            ? AppImages.womenAvatar
-            : AppImages.manAvatar),
+                ? AppImages.womenAvatar
+                : AppImages.manAvatar),
         description: match.connection?.message,
         isDescriptionVisible: false,
       ),
@@ -292,8 +366,8 @@ class _HomeViewAllScreenState extends ConsumerState<HomeViewAllScreen> {
         profileImagePath: (visitor.profilePhoto?.url?.isNotEmpty ?? false)
             ? visitor.profilePhoto!.url!
             : (visitor.gender == 'female'
-            ? AppImages.womenAvatar
-            : AppImages.manAvatar),
+                ? AppImages.womenAvatar
+                : AppImages.manAvatar),
         description: visitor.connection?.message,
         isDescriptionVisible: false,
       ),

@@ -304,7 +304,15 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
-  List<SingleStringModel> maritalStatusDataList = maritalStatusListDataInserted;
+  List<SingleStringModel> maritalStatusDataList = maritalStatusListDataInserted
+      .where(
+        (item) => !<String>{
+          RegistrationMaritalStatus.openToAll.apiValue,
+          RegistrationMaritalStatus.awaitingDivorce.apiValue,
+          RegistrationMaritalStatus.annulled.apiValue,
+        }.contains(item.value),
+      )
+      .toList(growable: false);
   List<LookupOption> educationLookupOptions = <LookupOption>[];
   List<SingleStringModel> educationDataList = <SingleStringModel>[];
   List<SingleStringModel> profileManageByDataList =
@@ -357,12 +365,12 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
       TextEditingController();
 
   final int ageMinLimit = 18;
-  final int ageMaxLimit = 70;
+  final int ageMaxLimit = 60;
   int ageStart = 25;
   int ageEnd = 35;
-  final int heightMinLimit = 120;
-  final int heightMaxLimit = 220;
-  int heightStart = 160;
+  final int heightMinLimit = 122;
+  final int heightMaxLimit = 213;
+  int heightStart = 152;
   int heightEnd = 180;
 
   Future<void> loadEducationLookupData() async {
@@ -455,12 +463,14 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   void toggleMaritalStatus(int index) {
     if (index < 0 || index >= maritalStatusDataList.length) return;
     final item = maritalStatusDataList[index];
+    final itemValue = (item.value ?? item.name).trim();
     item.isSelected = !item.isSelected;
     if (item.isSelected) {
-      if (!preferableMaritalStatuses.contains(item.name))
-        preferableMaritalStatuses.add(item.name);
+      if (!preferableMaritalStatuses.contains(itemValue)) {
+        preferableMaritalStatuses.add(itemValue);
+      }
     } else {
-      preferableMaritalStatuses.remove(item.name);
+      preferableMaritalStatuses.remove(itemValue);
     }
     notifyListeners();
   }
@@ -569,8 +579,16 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
 
       if (response.code == 'SUCCESS') {
         connectMatches = response.data ?? <MatchProfile>[];
+        selectedConnectMatchIds
+          ..clear()
+          ..addAll(
+            connectMatches
+                .map((match) => match.id?.trim() ?? '')
+                .where((id) => id.isNotEmpty),
+          );
       } else {
         connectMatches = <MatchProfile>[];
+        selectedConnectMatchIds.clear();
         connectMatchesError = response.message ?? 'Failed to load matches.';
       }
     } catch (e) {
@@ -691,7 +709,13 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     if (preferableMaritalStatuses.isEmpty) return null;
 
     final resolved = preferableMaritalStatuses
-        .map((item) => MatchMaritalStatus.fromLabel(item)?.apiValue)
+        .map((item) {
+          final normalized = item.trim().toLowerCase();
+          for (final status in MatchMaritalStatus.values) {
+            if (status.apiValue == normalized) return status.apiValue;
+          }
+          return MatchMaritalStatus.fromLabel(item)?.apiValue;
+        })
         .whereType<String>()
         .toList();
 

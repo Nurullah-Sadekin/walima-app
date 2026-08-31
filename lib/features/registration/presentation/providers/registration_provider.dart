@@ -12,7 +12,6 @@ import 'package:walima_llc/core/global/enums/enums.dart';
 import 'package:walima_llc/core/utils/app_error_reporting_service.dart';
 import 'package:walima_llc/core/utils/dialog_utils.dart';
 import 'package:walima_llc/core/utils/firebase_messaging_service.dart';
-import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/core/utils/prefs_helper.dart';
 import 'package:walima_llc/features/login/data/models/resend_otp_body.dart';
 import 'package:walima_llc/features/profile/data/repository/profile_photo_upload_service.dart';
@@ -41,6 +40,7 @@ import 'package:intl/intl.dart';
 class RegistrationProvider extends BaseChangeNotifier {
   RegistrationProvider() {
     _applyDefaultIncomePeriod();
+    _applyDefaultVerificationType();
   }
 
   VoidCallback? _controllersListener;
@@ -87,6 +87,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   final TextEditingController fatherDetailsController = TextEditingController();
   final TextEditingController noOfSisterController = TextEditingController();
   final TextEditingController noOfBrotherController = TextEditingController();
+  final TextEditingController familyTypeController = TextEditingController();
 
   List<ProfileForModel> profileForList = profileForListInserted;
   List<GenderProfileForModel> genderForList = genderForListInserted;
@@ -108,7 +109,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       fatherDetailsItemListDataInserted;
   List<SingleStringModel> siblingCountList = siblingCountListDataInserted;
   List<SingleStringModel> verificationList = verificationTypeList;
-  static const int hobbiesSelectionMax = 5;
+  static const int hobbiesSelectionMinimum = 5;
   final List<String> selectedHobbies = [];
 
   bool creativeSectionSelected = false;
@@ -138,6 +139,21 @@ class RegistrationProvider extends BaseChangeNotifier {
   List<LookupOption> educationLevelOptions = <LookupOption>[];
   List<LookupOption> professionOptions = <LookupOption>[];
   List<LookupOption> incomeRangeOptions = <LookupOption>[];
+  final List<SingleStringModel> registrationMaritalStatusDataList =
+      RegistrationMaritalStatus.values
+          .where(
+            (status) =>
+                status != RegistrationMaritalStatus.openToAll &&
+                status != RegistrationMaritalStatus.awaitingDivorce &&
+                status != RegistrationMaritalStatus.annulled,
+          )
+          .map(
+            (status) => SingleStringModel(
+              name: status.label,
+              value: status.apiValue,
+            ),
+          )
+          .toList(growable: false);
   List<String> religionDropdownItems = <String>[];
   List<String> communityDropdownItems = <String>[];
   bool isReligionDataLoading = false;
@@ -317,6 +333,7 @@ class RegistrationProvider extends BaseChangeNotifier {
         fatherDetailsController,
         noOfSisterController,
         noOfBrotherController,
+        familyTypeController,
       ];
 
   void setCreativeSectionSelected(bool v) {
@@ -419,9 +436,9 @@ class RegistrationProvider extends BaseChangeNotifier {
       c.clear();
     }
     final body = ResendOtpBody(
-      identifier: selectedVerificationType == 'email'
+      identifier: _isEmailVerification
           ? emailController.text
-          : phoneController.text,
+          : _resolveSubmissionPhoneNumber(),
       purpose: 'signup',
     );
     final response = await RegistrationRepository.resendOtp(body);
@@ -481,6 +498,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     _clearAllControllers();
     _resetAllSelections();
     _applyDefaultIncomePeriod();
+    _applyDefaultVerificationType();
     selectedHobbies.clear();
     verificationDone = false;
     phoneAvailabilityErrorMessage = '';
@@ -578,6 +596,13 @@ class RegistrationProvider extends BaseChangeNotifier {
     for (final item in incomePeriodDataList) {
       item.isSelected =
           item.name.toLowerCase() == defaultIncomePeriod.toLowerCase();
+    }
+  }
+
+  void _applyDefaultVerificationType() {
+    selectedVerificationType = 'email';
+    for (final item in verificationList) {
+      item.isSelected = item.name.toLowerCase() == 'email';
     }
   }
 
@@ -1251,21 +1276,6 @@ class RegistrationProvider extends BaseChangeNotifier {
     final currentlySelected = dataList[index].isSelected;
 
     if (!currentlySelected) {
-      if (selectedHobbies.length >= hobbiesSelectionMax) {
-        if (context != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'You can select up to $hobbiesSelectionMax hobbies.'
-                    .localized(context),
-              ),
-              duration: const Duration(seconds: 2),
-            ),
-          );
-        }
-        return;
-      }
-
       dataList[index].isSelected = true;
       selectedHobbies.add(dataList[index].name);
     } else {
@@ -1506,6 +1516,7 @@ class RegistrationProvider extends BaseChangeNotifier {
         'fatherDetails': fatherDetailsController.text,
         'noOfSister': noOfSisterController.text,
         'noOfBrother': noOfBrotherController.text,
+        'familyType': familyTypeController.text,
       },
     };
 
@@ -1578,6 +1589,8 @@ class RegistrationProvider extends BaseChangeNotifier {
             noOfSisterController, controllerValues['noOfSister']);
         _restoreControllerText(
             noOfBrotherController, controllerValues['noOfBrother']);
+        _restoreControllerText(
+            familyTypeController, controllerValues['familyType']);
       }
 
       selectedProfileName = _asStringOrNull(decoded['selectedProfileName']);
@@ -1915,6 +1928,24 @@ class RegistrationProvider extends BaseChangeNotifier {
       return candidate;
     }
     return 'others';
+  }
+
+  String _resolveProfileManagedByValue() {
+    switch (selectedProfileName?.trim().toLowerCase()) {
+      case 'my son':
+      case 'my daughter':
+        return RegistrationProfileManagedBy.parent.apiValue;
+      case 'my brother':
+      case 'my sister':
+        return RegistrationProfileManagedBy.sibling.apiValue;
+      case 'my friend':
+        return RegistrationProfileManagedBy.friend.apiValue;
+      case 'my relative':
+        return RegistrationProfileManagedBy.relative.apiValue;
+      case 'myself':
+      default:
+        return RegistrationProfileManagedBy.self.apiValue;
+    }
   }
 
   String _resolveResidencyStatusValue() {
@@ -2288,7 +2319,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     final countryCodeValue = _resolveCountryCodeValue();
 
     return SignUpRequestBody(
-      profileManagedBy: 'self',
+      profileManagedBy: _resolveProfileManagedByValue(),
       gender: selectedGenderName?.toLowerCase() ?? '',
       firstName: firstNameController.text,
       lastName: lastNameController.text,
@@ -2296,7 +2327,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       community: _resolveCommunityValue(),
       livingIn: livingInController.text,
       cityName: cityController.text,
-      dateOfBirth: '1990-01-01',
+      dateOfBirth: dateOfBirthController.text.trim(),
       email: emailController.text,
       phoneNumber: _resolveSubmissionPhoneNumber(),
       residencyStatus: residencyStatusValue,
@@ -2353,7 +2384,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     final locationTypeValue = _resolveLocationTypeValue(residencyStatusValue);
 
     return SignUpRequestBody(
-      profileManagedBy: 'self',
+      profileManagedBy: _resolveProfileManagedByValue(),
       gender: _valueOrDefault(selectedGenderName ?? '', 'male').toLowerCase(),
       firstName: firstName,
       lastName: lastName,
@@ -2363,7 +2394,10 @@ class RegistrationProvider extends BaseChangeNotifier {
           : 'sunni',
       livingIn: _valueOrDefault(livingInController.text, fallbackCountryName),
       cityName: _valueOrDefault(cityController.text, 'Dhaka'),
-      dateOfBirth: '1990-01-01',
+      dateOfBirth: _valueOrDefault(
+        dateOfBirthController.text,
+        '1990-01-01',
+      ),
       email: _valueOrDefault(emailController.text, 'debug@example.com'),
       phoneNumber: resolvedPhoneNumber,
       residencyStatus: residencyStatusValue,
@@ -2409,10 +2443,11 @@ class RegistrationProvider extends BaseChangeNotifier {
   }
 
   String _resolveVerificationTypeValue() {
-    return selectedVerificationType.toLowerCase() == 'email'
-        ? 'email'
-        : 'phone';
+    return _isEmailVerification ? 'email' : 'phone';
   }
+
+  bool get _isEmailVerification =>
+      selectedVerificationType.trim().toLowerCase() == 'email';
 
   String _resolveSubmissionPhoneNumber() {
     final cachedPhoneNumber = phoneNumber.trim();
@@ -2503,9 +2538,9 @@ class RegistrationProvider extends BaseChangeNotifier {
       registrationSource: 'referral',
       firstName: firstNameController.text,
       lastName: lastNameController.text,
-      identifier: selectedVerificationType.toLowerCase() == 'email'
+      identifier: _isEmailVerification
           ? emailController.text
-          : phoneController.text,
+          : _resolveSubmissionPhoneNumber(),
     );
     final response = await RegistrationRepository.signUpWithOTP(body);
     if (response.code == 'SUCCESS') {
@@ -2589,6 +2624,9 @@ class RegistrationProvider extends BaseChangeNotifier {
     if (normalized.isEmpty) {
       return null;
     }
+    if (normalized.toLowerCase() == 'none') {
+      return 0;
+    }
 
     final matched = RegExp(r'\d+').firstMatch(normalized);
     if (matched == null) {
@@ -2596,6 +2634,19 @@ class RegistrationProvider extends BaseChangeNotifier {
     }
 
     return int.tryParse(matched.group(0)!);
+  }
+
+  String? _resolveFamilyTypeValue() {
+    switch (familyTypeController.text.trim().toLowerCase()) {
+      case 'joint family':
+        return FamilyType.joint.apiValue;
+      case 'nuclear family':
+        return FamilyType.nuclear.apiValue;
+      case 'other':
+        return FamilyType.others.apiValue;
+      default:
+        return null;
+    }
   }
 
   Future<bool> _submitFamilyUpdate(
@@ -2622,6 +2673,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   Future<bool> updateFamilyDetails(BuildContext context) async {
     try {
       final body = UpdateFamilyRequestBody(
+        familyType: _resolveFamilyTypeValue(),
         fatherProfession: _toTrimmedOrNull(fatherDetailsController.text),
         motherProfession: _toTrimmedOrNull(motherDetailsController.text),
         brothers: _parseSiblingCount(noOfBrotherController.text),

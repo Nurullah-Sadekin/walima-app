@@ -136,6 +136,8 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
   }
 
   Widget staticText() {
+    final identifier = provider.mobileNoOrEmailController.text.trim();
+    final isEmail = identifier.contains('@');
     return Column(
       spacing: 12,
       children: [
@@ -153,7 +155,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
               ),
             ),
             Text(
-              'phone number',
+              isEmail ? 'email address' : 'phone number',
               style: TextStyle(
                 color: AppColors.primary,
                 fontWeight: FontWeight.bold,
@@ -179,7 +181,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  '+880 ${provider.mobileNoOrEmailController.text}',
+                  isEmail ? _maskEmail(identifier) : provider.authIdentifier,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: AppColors.textPrimaryLight,
@@ -205,10 +207,11 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
   }
 
   Widget contactSupport() {
+    final isEmail = provider.mobileNoOrEmailController.text.contains('@');
     return Column(
       children: [
         Text(
-          'Didn\'t receive the SMS?',
+          isEmail ? 'Didn\'t receive the email?' : 'Didn\'t receive the SMS?',
           textAlign: TextAlign.center,
           style: TextStyle(
             color: AppColors.hintTextColor,
@@ -245,6 +248,14 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
         ),
       ],
     );
+  }
+
+  String _maskEmail(String email) {
+    final parts = email.split('@');
+    if (parts.length != 2 || parts.first.isEmpty) return email;
+    final local = parts.first;
+    final visible = local.substring(0, local.length > 2 ? 2 : 1);
+    return '$visible***@${parts.last}';
   }
 
   Widget loginDataField() {
