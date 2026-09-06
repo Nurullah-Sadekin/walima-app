@@ -902,16 +902,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Shimmer.fromColors(
       baseColor: AppColors.disableBackground,
       highlightColor: AppColors.white,
-      child: Row(
-        children: List.generate(
-          2,
-          (index) => Container(
-            width: 300,
-            height: 380,
-            margin: const EdgeInsets.only(right: 10),
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(16),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: List.generate(
+            2,
+            (index) => Container(
+              width: 300,
+              height: 380,
+              margin: const EdgeInsets.only(right: 10),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
             ),
           ),
         ),
