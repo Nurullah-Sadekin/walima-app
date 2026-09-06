@@ -540,9 +540,28 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     if (selected == null || selected.isEmpty) return;
 
     workSectorPreferenceController.text = selected;
+    professionPreferenceController.clear();
+    annualIncomePreferenceController.clear();
     preferableWorkingAs
       ..clear()
       ..add(_resolveWorkSectorPreference());
+    notifyListeners();
+  }
+
+  void selectProfession(String? value) {
+    final selected = value?.trim();
+    if (selected == null || selected.isEmpty) return;
+
+    professionPreferenceController.text = selected;
+    annualIncomePreferenceController.clear();
+    notifyListeners();
+  }
+
+  void selectAnnualIncome(String? value) {
+    final selected = value?.trim();
+    if (selected == null || selected.isEmpty) return;
+
+    annualIncomePreferenceController.text = selected;
     notifyListeners();
   }
 

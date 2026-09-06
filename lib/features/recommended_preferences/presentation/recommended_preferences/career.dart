@@ -115,6 +115,7 @@ class _CareerScreenState extends ConsumerState<CareerScreen> {
             items: provider.professionDataList,
             controller: provider.professionPreferenceController,
             onTap: provider.loadCareerLookupData,
+            onConfirm: (value) => provider.selectProfession(value?.toString()),
             isSearch: true,
           ),
           DropDownField(
@@ -124,6 +125,8 @@ class _CareerScreenState extends ConsumerState<CareerScreen> {
             items: provider.incomeRangeDataList,
             controller: provider.annualIncomePreferenceController,
             onTap: provider.loadCareerLookupData,
+            onConfirm: (value) =>
+                provider.selectAnnualIncome(value?.toString()),
             isSearch: true,
           ),
         ],
