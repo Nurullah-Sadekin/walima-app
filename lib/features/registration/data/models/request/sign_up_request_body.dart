@@ -8,6 +8,9 @@ class SignUpRequestBody {
     this.motherTongue,
     this.dateOfBirth,
     this.religionName,
+    this.religiousPractice,
+    this.walimaIntroductionTimeline,
+    this.marriageTimeline,
     this.community,
     this.livingIn,
     this.cityName,
@@ -40,6 +43,9 @@ class SignUpRequestBody {
   String? motherTongue;
   String? dateOfBirth;
   String? religionName;
+  String? religiousPractice;
+  String? walimaIntroductionTimeline;
+  String? marriageTimeline;
   String? community;
   String? livingIn;
   String? cityName;
@@ -74,6 +80,9 @@ class SignUpRequestBody {
     map['motherTongue'] = motherTongue;
     map['dateOfBirth'] = dateOfBirth;
     map['religionName'] = religionName;
+    map['religiousPractice'] = religiousPractice;
+    map['walimaIntroductionTimeline'] = walimaIntroductionTimeline;
+    map['marriageTimeline'] = marriageTimeline;
     map['community'] = community;
     map['livingIn'] = livingIn;
     map['cityName'] = cityName;

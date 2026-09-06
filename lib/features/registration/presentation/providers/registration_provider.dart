@@ -62,6 +62,12 @@ class RegistrationProvider extends BaseChangeNotifier {
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController dateOfBirthController = TextEditingController();
   final TextEditingController religionController = TextEditingController();
+  final TextEditingController religiousPracticeController =
+      TextEditingController();
+  final TextEditingController walimaIntroductionTimelineController =
+      TextEditingController();
+  final TextEditingController marriageTimelineController =
+      TextEditingController();
   final TextEditingController communityController = TextEditingController();
   final TextEditingController livingInController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -135,6 +141,9 @@ class RegistrationProvider extends BaseChangeNotifier {
   final BioTemplateRepository _bioTemplateRepository = BioTemplateRepository();
 
   List<LookupOption> religionOptions = <LookupOption>[];
+  List<LookupOption> religiousPracticeOptions = <LookupOption>[];
+  List<LookupOption> walimaIntroductionTimelineOptions = <LookupOption>[];
+  List<LookupOption> marriageTimelineOptions = <LookupOption>[];
   List<LookupOption> communityOptions = <LookupOption>[];
   List<LookupOption> educationLevelOptions = <LookupOption>[];
   List<LookupOption> workSectorOptions = <LookupOption>[];
@@ -313,6 +322,9 @@ class RegistrationProvider extends BaseChangeNotifier {
         lastNameController,
         dateOfBirthController,
         religionController,
+        religiousPracticeController,
+        walimaIntroductionTimelineController,
+        marriageTimelineController,
         communityController,
         livingInController,
         emailController,
@@ -532,7 +544,11 @@ class RegistrationProvider extends BaseChangeNotifier {
     if (livingInController.text.isNotEmpty) {
       try {
         selectedCountry = Country.parse(livingInController.text);
-        context.push(Paths.emailPhone);
+        context.push(
+          _resolveReligionValue() == 'open_to_all'
+              ? Paths.marriageIntention
+              : Paths.religiousPractice,
+        );
       } catch (_) {}
     }
   }
@@ -622,6 +638,49 @@ class RegistrationProvider extends BaseChangeNotifier {
         religionOptions.map((item) => item.label).toList(growable: false);
     await _syncCommunityOptionsFromSelectedReligion();
     notifyListeners();
+  }
+
+  Future<void> loadMarriageOnboardingLookups() async {
+    if (religiousPracticeOptions.isNotEmpty &&
+        walimaIntroductionTimelineOptions.isNotEmpty &&
+        marriageTimelineOptions.isNotEmpty) {
+      notifyListeners();
+      return;
+    }
+
+    try {
+      final results = await Future.wait<List<LookupOption>>([
+        _lookupRepository.getLookups(LookupCategory.religiousPractice),
+        _lookupRepository.getLookups(
+          LookupCategory.walimaIntroductionTimeline,
+        ),
+        _lookupRepository.getLookups(LookupCategory.marriageTimeline),
+      ]);
+      religiousPracticeOptions = results[0];
+      walimaIntroductionTimelineOptions = results[1];
+      marriageTimelineOptions = results[2];
+      notifyListeners();
+    } catch (_) {
+      notifyListeners();
+    }
+  }
+
+  void selectReligiousPractice(String? value) {
+    if (value == null || value.trim().isEmpty) return;
+    religiousPracticeController.text = value.trim();
+    _notifyAndPersist();
+  }
+
+  void selectWalimaIntroductionTimeline(String? value) {
+    if (value == null || value.trim().isEmpty) return;
+    walimaIntroductionTimelineController.text = value.trim();
+    _notifyAndPersist();
+  }
+
+  void selectMarriageTimeline(String? value) {
+    if (value == null || value.trim().isEmpty) return;
+    marriageTimelineController.text = value.trim();
+    _notifyAndPersist();
   }
 
   Future<void> loadCommunityData() async {
@@ -1503,6 +1562,9 @@ class RegistrationProvider extends BaseChangeNotifier {
         'lastName': lastNameController.text,
         'dateOfBirth': dateOfBirthController.text,
         'religion': religionController.text,
+        'religiousPractice': religiousPracticeController.text,
+        'walimaIntroductionTimeline': walimaIntroductionTimelineController.text,
+        'marriageTimeline': marriageTimelineController.text,
         'community': communityController.text,
         'livingIn': livingInController.text,
         'email': emailController.text,
@@ -1558,6 +1620,16 @@ class RegistrationProvider extends BaseChangeNotifier {
             dateOfBirthController, controllerValues['dateOfBirth']);
         _restoreControllerText(
             religionController, controllerValues['religion']);
+        _restoreControllerText(
+            religiousPracticeController, controllerValues['religiousPractice']);
+        _restoreControllerText(
+          walimaIntroductionTimelineController,
+          controllerValues['walimaIntroductionTimeline'],
+        );
+        _restoreControllerText(
+          marriageTimelineController,
+          controllerValues['marriageTimeline'],
+        );
         _restoreControllerText(
             communityController, controllerValues['community']);
         _restoreControllerText(
@@ -2134,6 +2206,12 @@ class RegistrationProvider extends BaseChangeNotifier {
     return null;
   }
 
+  String _lookupKey(List<LookupOption> options, String selected) {
+    final value = selected.trim();
+    if (value.isEmpty) return '';
+    return _findLookupOption(options, value)?.key ?? value;
+  }
+
   String _resolveLocationTypeValue(String residencyStatusValue) {
     if (residencyStatusValue == 'citizen' ||
         residencyStatusValue == 'permanent_resident') {
@@ -2332,6 +2410,18 @@ class RegistrationProvider extends BaseChangeNotifier {
       firstName: firstNameController.text,
       lastName: lastNameController.text,
       religionName: religionValue,
+      religiousPractice: _lookupKey(
+        religiousPracticeOptions,
+        religiousPracticeController.text,
+      ),
+      walimaIntroductionTimeline: _lookupKey(
+        walimaIntroductionTimelineOptions,
+        walimaIntroductionTimelineController.text,
+      ),
+      marriageTimeline: _lookupKey(
+        marriageTimelineOptions,
+        marriageTimelineController.text,
+      ),
       community: _resolveCommunityValue(),
       livingIn: livingInController.text,
       cityName: cityController.text,
@@ -2397,6 +2487,18 @@ class RegistrationProvider extends BaseChangeNotifier {
       firstName: firstName,
       lastName: lastName,
       religionName: religionValue,
+      religiousPractice: _lookupKey(
+        religiousPracticeOptions,
+        religiousPracticeController.text,
+      ),
+      walimaIntroductionTimeline: _lookupKey(
+        walimaIntroductionTimelineOptions,
+        walimaIntroductionTimelineController.text,
+      ),
+      marriageTimeline: _lookupKey(
+        marriageTimelineOptions,
+        marriageTimelineController.text,
+      ),
       community: _resolveCommunityValue().isNotEmpty
           ? _resolveCommunityValue()
           : 'sunni',
