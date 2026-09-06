@@ -1,2 +1,8 @@
 Walima QA 0.0.1 (build 5)
 - Environment -development
+
+QA Fixes
+- Fixed a Home screen loading-state layout overflow in the Recently Viewed/Matches section.
+- Cause: two fixed-width loading cards were displayed in a non-scrollable horizontal Row on smaller screens.
+- Fix: loading cards now use horizontal scrolling, matching the loaded profile-card layout.
+- QA check: open the Home screen while match data is loading and confirm there is no yellow/black RenderFlex overflow warning; the loading cards can scroll horizontally.
