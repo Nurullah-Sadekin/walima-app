@@ -137,6 +137,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   List<LookupOption> religionOptions = <LookupOption>[];
   List<LookupOption> communityOptions = <LookupOption>[];
   List<LookupOption> educationLevelOptions = <LookupOption>[];
+  List<LookupOption> workSectorOptions = <LookupOption>[];
   List<LookupOption> professionOptions = <LookupOption>[];
   List<LookupOption> incomeRangeOptions = <LookupOption>[];
   final List<SingleStringModel> registrationMaritalStatusDataList =
@@ -740,7 +741,9 @@ class RegistrationProvider extends BaseChangeNotifier {
   Future<void> loadProfessionLookupData() async {
     if (isLookupDataLoading) return;
 
-    if (professionOptions.isNotEmpty && incomeRangeOptions.isNotEmpty) {
+    if (workSectorOptions.isNotEmpty &&
+        professionOptions.isNotEmpty &&
+        incomeRangeOptions.isNotEmpty) {
       notifyListeners();
       return;
     }
@@ -751,12 +754,17 @@ class RegistrationProvider extends BaseChangeNotifier {
 
     try {
       final results = await Future.wait<List<LookupOption>>([
+        _lookupRepository.getLookups(LookupCategory.workSector),
         _lookupRepository.getLookups(LookupCategory.professions),
         _lookupRepository.getLookups(LookupCategory.incomeRange),
       ]);
 
-      professionOptions = results[0];
-      incomeRangeOptions = results[1];
+      workSectorOptions = results[0];
+      professionOptions = results[1];
+      incomeRangeOptions = results[2];
+      if (workSectorOptions.isNotEmpty) {
+        yourWorkList = _toSingleStringModels(workSectorOptions);
+      }
       incomeRangeList = _toSingleStringModels(incomeRangeOptions);
       youWorkAsList = _toSingleStringModels(professionOptions);
       _applySingleSelectionByName(

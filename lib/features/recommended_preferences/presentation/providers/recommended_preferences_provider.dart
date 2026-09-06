@@ -327,8 +327,10 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   List<SingleStringModel> countryDataList = countryListDataInserted;
   List<SingleStringModel> dietDataList = dietDataListInserted;
   List<LookupOption> professionLookupOptions = <LookupOption>[];
+  List<LookupOption> workSectorLookupOptions = <LookupOption>[];
   List<LookupOption> incomeRangeLookupOptions = <LookupOption>[];
   List<SingleStringModel> incomeRangeDataList = <SingleStringModel>[];
+  List<SingleStringModel> workSectorDataList = <SingleStringModel>[];
   List<SingleStringModel> professionDataList = <SingleStringModel>[];
   List<MatchProfile> connectMatches = <MatchProfile>[];
   final Set<String> selectedConnectMatchIds = <String>{};
@@ -356,6 +358,8 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   final TextEditingController countryPreferenceController =
       TextEditingController();
   final TextEditingController professionPreferenceController =
+      TextEditingController();
+  final TextEditingController workSectorPreferenceController =
       TextEditingController();
   final TextEditingController annualIncomePreferenceController =
       TextEditingController();
@@ -418,7 +422,8 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   Future<void> loadCareerLookupData() async {
     if (isCareerLookupLoading) return;
 
-    if (professionLookupOptions.isNotEmpty &&
+    if (workSectorLookupOptions.isNotEmpty &&
+        professionLookupOptions.isNotEmpty &&
         incomeRangeLookupOptions.isNotEmpty) {
       notifyListeners();
       return;
@@ -430,12 +435,22 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
 
     try {
       final results = await Future.wait<List<LookupOption>>([
+        _lookupRepository.getLookups(LookupCategory.workSector),
         _lookupRepository.getLookups(LookupCategory.professions),
         _lookupRepository.getLookups(LookupCategory.incomeRange),
       ]);
 
-      professionLookupOptions = results[0];
-      incomeRangeLookupOptions = results[1];
+      workSectorLookupOptions = results[0];
+      professionLookupOptions = results[1];
+      incomeRangeLookupOptions = results[2];
+      workSectorDataList = workSectorLookupOptions
+          .map(
+            (item) => SingleStringModel(
+              name: item.label,
+              value: item.key,
+            ),
+          )
+          .toList(growable: false);
       professionDataList = professionLookupOptions
           .map(
             (item) => SingleStringModel(
@@ -502,6 +517,32 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     } else {
       preferableProfileManagedBy.remove(itemValue);
     }
+    notifyListeners();
+  }
+
+  void toggleWorkSector(int index) {
+    if (index < 0 || index >= workSectorDataList.length) return;
+    final item = workSectorDataList[index];
+    final itemValue = (item.value ?? item.name).trim();
+
+    for (final option in workSectorDataList) {
+      option.isSelected = false;
+    }
+    preferableWorkingAs
+      ..clear()
+      ..add(itemValue);
+    item.isSelected = true;
+    notifyListeners();
+  }
+
+  void selectWorkSector(String? value) {
+    final selected = value?.trim();
+    if (selected == null || selected.isEmpty) return;
+
+    workSectorPreferenceController.text = selected;
+    preferableWorkingAs
+      ..clear()
+      ..add(_resolveWorkSectorPreference());
     notifyListeners();
   }
 
@@ -830,6 +871,20 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     return selected;
   }
 
+  String _resolveWorkSectorPreference() {
+    final selected = workSectorPreferenceController.text.trim();
+    if (selected.isEmpty) return '';
+
+    for (final option in workSectorLookupOptions) {
+      if (option.label.toLowerCase() == selected.toLowerCase() ||
+          option.key.toLowerCase() == selected.toLowerCase()) {
+        return option.key;
+      }
+    }
+
+    return selected;
+  }
+
   String? _resolveAnnualIncomePreference() {
     final selected = annualIncomePreferenceController.text.trim().toLowerCase();
     if (selected.isEmpty) return null;
@@ -972,6 +1027,9 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
         preferredCountries: _toListOrNull(countryPreferenceController.text),
         professionPreference:
             _toListOrNull(professionPreferenceController.text),
+        workingAsPreference: workSectorPreferenceController.text.trim().isEmpty
+            ? null
+            : <String>[_resolveWorkSectorPreference()],
         annualIncomePreference:
             _toListOrNull(annualIncomePreferenceController.text),
         profileManagedByPreference: preferableProfileManagedBy.isNotEmpty

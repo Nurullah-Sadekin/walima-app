@@ -120,6 +120,19 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
               return ChoiceChip(
                 label: Text(item.name),
                 selected: item.isSelected,
+                selectedColor: AppColors.primary,
+                backgroundColor: AppColors.white,
+                side: BorderSide(
+                  color:
+                      item.isSelected ? AppColors.primary : AppColors.greyLight,
+                ),
+                labelStyle: TextStyle(
+                  color: item.isSelected
+                      ? AppColors.white
+                      : AppColors.textPrimaryLight,
+                  fontSize: TextSize.font14(context),
+                  fontWeight: FontWeight.w500,
+                ),
                 onSelected: (_) =>
                     provider.selectedVerificationTypeIndex(index),
               );

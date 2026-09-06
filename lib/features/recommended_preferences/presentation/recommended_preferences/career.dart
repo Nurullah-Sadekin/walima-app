@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:walima_llc/core/config/text_responsive.dart';
-import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/global/components/dropdown_field.dart';
 import 'package:walima_llc/core/global/components/gradient_background.dart';
-import 'package:walima_llc/core/global/components/selection_card.dart';
 import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/global/components/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -46,21 +43,24 @@ class _CareerScreenState extends ConsumerState<CareerScreen> {
   Widget build(BuildContext context) {
     final provider = ref.watch(recommendedPreferencesProvider);
     return TransparentLoading(
-      isLoading: provider.loaderState == RecommendedPreferencesScreenStates.preferences ||
+      isLoading: provider.loaderState ==
+              RecommendedPreferencesScreenStates.preferences ||
           provider.isCareerLookupLoading,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: provider.screenStates == RecommendedPreferencesScreenStates.preferences
+          child: provider.screenStates ==
+                  RecommendedPreferencesScreenStates.preferences
               ? const Loading()
               : Column(
                   children: [
-                    UpperLayer(imagePath: AppImages.recommendedPreferences,
+                    UpperLayer(
+                      imagePath: AppImages.recommendedPreferences,
                       isShowAppbar: true,
                       isBackButton: true,
                       isTrailing: true,
                       trailingText: 'Skip',
-                      onTrailingTap: (){
+                      onTrailingTap: () {
                         context.push(Paths.connectMatches);
                       },
                     ),
@@ -98,41 +98,15 @@ class _CareerScreenState extends ConsumerState<CareerScreen> {
         spacing: 10,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Work Sector',
-            style: TextStyle(
-              fontSize: TextSize.font14(context),
-              fontWeight: FontWeight.w500,
-              color: AppColors.textSecondaryLight
-            ),
-          ),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              const double spacing = 10.0;
-              return Consumer(builder: (context, ref, _) {
-                final provider = ref.watch(recommendedPreferencesProvider);
-                return Wrap(
-                  spacing: spacing,
-                  runSpacing: spacing,
-                  children: List.generate(provider.professionDataList.length, (index) {
-                    final item = provider.professionDataList[index];
-
-                    return SelectionCard(
-
-                      borderRadius: 40,
-                      buttonStyle: item.isSelected
-                          ? SelectionStyle.selectedCheckbox
-                          : SelectionStyle.unSelectedCheckbox,
-                      onTap: () {
-                        provider.toggleProfession(index);
-                      },
-                      isSelected: item.isSelected,
-                      title: item.name,
-                    );
-                  }),
-                );
-              });
-            },
+          DropDownField(
+            headLine: 'Work Sector',
+            hintText: 'Select',
+            popUpHeader: 'Select Work Sector',
+            items: provider.workSectorDataList,
+            controller: provider.workSectorPreferenceController,
+            onTap: provider.loadCareerLookupData,
+            onConfirm: (value) => provider.selectWorkSector(value?.toString()),
+            isSearch: true,
           ),
           DropDownField(
             headLine: 'Profession',
@@ -164,7 +138,7 @@ class _CareerScreenState extends ConsumerState<CareerScreen> {
       borderRadius: 50,
       svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
-      onTap: () async{
+      onTap: () async {
         final success = await provider.updatePreferences(context);
         if (success && context.mounted) {
           if (provider.isDrawerEditFlow) {

@@ -1928,7 +1928,8 @@ enum HttpMethod implements ApiUiEnum {
 enum LookupCategory implements ApiUiEnum {
   educationLevels('education-levels'),
   qualificationLevel('qualification-level'),
-  professions('professions'),
+  workSector('work-sector'),
+  professions('profession'),
   incomeRange('income-range'),
   creativePursuits('creative-pursuits'),
   outdoorActivities('outdoor-activities'),
