@@ -78,4 +78,39 @@ void main() {
     expect(response.isSuccess, isFalse);
     expect(response.firstErrorFor('type'), 'Unsupported type');
   });
+
+  test('parses the documented list-shaped error envelope', () {
+    final response = GetMatchesResponse.fromJson(<String, dynamic>{
+      'code': 'E_UNAUTHORIZED',
+      'message': 'User access required',
+      'response': <String, dynamic>{
+        'errors': <String>['Authentication failed'],
+      },
+    });
+
+    expect(response.isSuccess, isFalse);
+    expect(response.firstErrorFor('general'), 'Authentication failed');
+  });
+
+  test('preserves photo visibility setting from short card payloads', () {
+    final response = GetMatchesResponse.fromJson(<String, dynamic>{
+      'code': 'SUCCESS',
+      'response': <String, dynamic>{
+        'data': <Map<String, dynamic>>[
+          <String, dynamic>{
+            'id': 'member-1',
+            'profilePhoto': <String, dynamic>{
+              'url': 'https://cdn.walima.app/photo.webp',
+              'visibilitySetting': 'visible_to_all',
+            },
+          },
+        ],
+      },
+    });
+
+    expect(
+      response.data!.single.profilePhoto!.visibilitySetting,
+      'visible_to_all',
+    );
+  });
 }

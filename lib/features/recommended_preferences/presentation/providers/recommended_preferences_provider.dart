@@ -637,7 +637,7 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
         ),
       );
 
-      if (response.code == 'SUCCESS') {
+      if (response.isSuccess) {
         connectMatches = response.data ?? <MatchProfile>[];
         selectedConnectMatchIds
           ..clear()
@@ -694,7 +694,7 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
         BulkSendConnectionsRequestBody(
           matchUserIds: matchUserIds,
           requestType: 'connection',
-          message: 'string',
+          message: 'I would like to connect with you.',
           isPriority: false,
         ),
       );

@@ -197,12 +197,12 @@ class AppUrls {
   static final String getConnectionStats = '$baseUrl/connections/stats'; //GET
   static final String viewContact = '$baseUrl/connections/view-contact/'; //GET
   static String performConnectionAction(String id) =>
-      '$baseUrl/connections/$id/action'; //PATCH
+      '$baseUrl/connections/$id'; //PATCH
   static final String createConnection = '$baseUrl/connections'; //POST
   static final String bulkSendConnectionRequests =
       '$baseUrl/connections/bulk-send'; //POST
   static final String sendReminder = '$baseUrl/connections/{id}/remind'; //POST
-  static final String updateConnection = '$baseUrl/connections/{id}'; //PUT
+  static final String updateConnection = '$baseUrl/connections/{id}'; //PATCH
   //
 
   // --- Matches & Compatibility ---
@@ -212,12 +212,18 @@ class AppUrls {
   static final String getTopMatches = '$baseUrl/matches/top-matches'; //GET
   static final String getHomepageTopMatches =
       '$baseUrl/matches/homepage/top'; //GET
+  static final String getAiPoweredHomepageTopMatches =
+      '$baseUrl/matches/homepage/top/ai-powered'; //GET
   static final String getCompatibilityResult =
       '$baseUrl/matches/compatibility/{userId}'; //GET
   static final String getMatchPreview =
       '$baseUrl/matches/preview/{userId}'; //GET
   static final String getMatchCompare =
       '$baseUrl/matches/compare/{userId}'; //GET
+  static final String getMatchFilterSchema =
+      '$baseUrl/matches/filters/schema'; //GET
+  static final String getMatchFilterDefaults =
+      '$baseUrl/matches/filters/defaults'; //GET
 
   // --- Plans & Subscriptions ---
   static final String getActivePlan = '$baseUrl/plans/active-plan'; //GET
@@ -247,10 +253,13 @@ class AppUrls {
   static final String contactFilters =
       '$baseUrl/settings/contact-filters'; //GET,PUT
   static final String getShortlistedUsers =
-      '$baseUrl/activities/shortlist'; //GET
-  static final String addToShortlist = '$baseUrl/activities/shortlist'; //POST
-  static final String removeFromShortlist =
-      '$baseUrl/activities/shortlist/{userId}'; //DELETE
+      '$baseUrl/engagement/shortlists'; //GET
+  static String addToShortlist(String userId) =>
+      '$baseUrl/engagement/shortlists/$userId'; //POST
+  static String removeFromShortlist(String userId) =>
+      '$baseUrl/engagement/shortlists/$userId'; //DELETE
+  static String getShortlistStatus(String userId) =>
+      '$baseUrl/engagement/shortlists/$userId/status'; //GET
   static final String getBlockedUsers = '$baseUrl/interactions/blocks'; //GET
   static final String getReports = '$baseUrl/interactions/reports'; //GET
   static final String blockUser = '$baseUrl/interactions/block'; //POST

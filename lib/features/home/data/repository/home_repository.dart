@@ -10,7 +10,7 @@ class HomeRepository {
     try {
       final response = await DioClient().get(
         AppUrls.getHomepageTopMatches,
-        isTokenRequired: true,
+        isTokenRequired: false,
       );
       return HomepageTopMatchesResponse.fromJson(response.data);
     } catch (e) {

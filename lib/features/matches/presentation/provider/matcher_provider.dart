@@ -240,7 +240,7 @@ class MatchesProvider extends BaseChangeNotifier {
   String _tabType(int index) {
     switch (index) {
       case 0:
-        return 'recommendations';
+        return 'suggested_members';
       case 1:
         return 'new';
       case 2:
@@ -252,7 +252,7 @@ class MatchesProvider extends BaseChangeNotifier {
       case 5:
         return moreMatchesType.apiValue;
       default:
-        return 'recommendations';
+        return 'suggested_members';
     }
   }
 

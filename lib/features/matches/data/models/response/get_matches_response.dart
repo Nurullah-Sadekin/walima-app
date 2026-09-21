@@ -184,23 +184,27 @@ class MatchProfilePhoto {
   MatchProfilePhoto({
     this.url,
     this.visibilityStatus,
+    this.visibilitySetting,
     this.isVerified,
   });
 
   MatchProfilePhoto.fromJson(dynamic json) {
     url = json['url']?.toString();
     visibilityStatus = json['visibilityStatus'];
+    visibilitySetting = json['visibilitySetting'];
     isVerified = json['isVerified'];
   }
 
   String? url;
   String? visibilityStatus;
+  String? visibilitySetting;
   bool? isVerified;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['url'] = url;
     map['visibilityStatus'] = visibilityStatus;
+    map['visibilitySetting'] = visibilitySetting;
     map['isVerified'] = isVerified;
     return map;
   }
@@ -465,6 +469,15 @@ Map<String, dynamic> _extractPayload(Map<String, dynamic> root) {
 }
 
 Map<String, List<String>>? _parseErrors(dynamic raw) {
+  if (raw is List) {
+    final messages = raw
+        .where((value) => value != null)
+        .map((value) => value.toString())
+        .toList(growable: false);
+    return messages.isEmpty
+        ? null
+        : <String, List<String>>{'general': messages};
+  }
   if (raw is! Map) return null;
 
   final parsed = <String, List<String>>{};

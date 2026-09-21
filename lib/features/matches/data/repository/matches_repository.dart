@@ -56,7 +56,7 @@ class MatchesRepository {
       final response = await DioClient().get(
         AppUrls.getPublicMatches,
         queryParameters: params.toJson(),
-        isTokenRequired: true,
+        isTokenRequired: false,
       );
 
       final data = response.data;

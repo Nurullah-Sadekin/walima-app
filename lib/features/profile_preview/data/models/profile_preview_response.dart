@@ -10,7 +10,9 @@ class ProfilePreviewResponse {
     if (json is! Map) return ProfilePreviewResponse();
     final map = Map<String, dynamic>.from(json);
     final response = map['response'];
-    final responseData = response is Map ? response['data'] : null;
+    final responseData = response is Map
+        ? (response['data'] is Map ? response['data'] : response)
+        : null;
     return ProfilePreviewResponse(
       code: map['code']?.toString(),
       message: map['message']?.toString(),
@@ -44,17 +46,29 @@ class ProfilePreviewData {
     this.galleryImages = const <String>[],
     this.preferences,
     this.connection,
+    this.matchNarrative,
   });
 
   factory ProfilePreviewData.fromJson(Map<String, dynamic> json) {
+    final rawProfile = _asMap(json['profile']) ?? const <String, dynamic>{};
+    final appearance = _asMap(rawProfile['appearance']);
+    final profile = Map<String, dynamic>.from(rawProfile);
+    if (profile['height'] == null && appearance?['height'] != null) {
+      profile['height'] = appearance!['height'];
+    }
+    final gallery = json['galleryImages'];
+    if (profile['profilePictures'] == null && gallery is List) {
+      profile['profilePictures'] = gallery;
+    }
+    final firstEducation = _firstMap(json['educations']);
+    final firstProfession = _firstMap(json['professions']);
+
     return ProfilePreviewData(
       user: _asMap(json['user']) != null
           ? PreviewUser.fromJson(_asMap(json['user'])!)
           : null,
-      profile: _asMap(json['profile']) != null
-          ? PreviewProfile.fromJson(_asMap(json['profile'])!)
-          : null,
-      about: json['about']?.toString(),
+      profile: rawProfile.isNotEmpty ? PreviewProfile.fromJson(profile) : null,
+      about: json['about']?.toString() ?? rawProfile['aboutMe']?.toString(),
       interests: _asMap(json['interests']) != null
           ? PreviewInterests.fromJson(_asMap(json['interests'])!)
           : null,
@@ -63,25 +77,35 @@ class ProfilePreviewData {
           : null,
       religion: _asMap(json['religion']) != null
           ? PreviewReligion.fromJson(_asMap(json['religion'])!)
-          : null,
+          : rawProfile['religion'] != null || rawProfile['community'] != null
+              ? PreviewReligion.fromJson(<String, dynamic>{
+                  'religion': rawProfile['religion'],
+                  'community': rawProfile['community'],
+                })
+              : null,
       locations: (json['locations'] is List)
           ? (json['locations'] as List)
               .whereType<Map>()
-              .map((e) => PreviewLocation.fromJson(Map<String, dynamic>.from(e)))
+              .map(
+                (e) => PreviewLocation.fromJson(
+                  Map<String, dynamic>.from(e),
+                ),
+              )
               .toList(growable: false)
           : const <PreviewLocation>[],
       family: _asMap(json['family']) != null
           ? PreviewFamily.fromJson(_asMap(json['family'])!)
           : null,
-      educations: _asMap(json['educations']) != null
-          ? PreviewEducation.fromJson(_asMap(json['educations'])!)
+      educations: firstEducation != null
+          ? PreviewEducation.fromJson(firstEducation)
           : null,
-      professions: _asMap(json['professions']) != null
-          ? PreviewProfession.fromJson(_asMap(json['professions'])!)
+      professions: firstProfession != null
+          ? PreviewProfession.fromJson(firstProfession)
           : null,
       galleryImages: (json['galleryImages'] is List)
           ? (json['galleryImages'] as List)
-              .map((e) => e.toString())
+              .map((e) => e is Map ? e['url']?.toString() : e.toString())
+              .whereType<String>()
               .toList(growable: false)
           : const <String>[],
       preferences: _asMap(json['preferences']) != null
@@ -90,6 +114,7 @@ class ProfilePreviewData {
       connection: _asMap(json['connection']) != null
           ? PreviewConnection.fromJson(_asMap(json['connection'])!)
           : null,
+      matchNarrative: json['matchNarrative']?.toString(),
     );
   }
 
@@ -106,6 +131,7 @@ class ProfilePreviewData {
   final List<String> galleryImages;
   final PreviewPreferences? preferences;
   final PreviewConnection? connection;
+  final String? matchNarrative;
 
   PreviewLocation? get presentLocation {
     for (final loc in locations) {
@@ -220,13 +246,15 @@ class PreviewProfile {
         profilePictures: (json['profilePictures'] is List)
             ? (json['profilePictures'] as List)
                 .whereType<Map>()
-                .map((e) => PreviewProfilePicture.fromJson(
-                      Map<String, dynamic>.from(e),
-                    ))
+                .map(
+                  (e) => PreviewProfilePicture.fromJson(
+                    Map<String, dynamic>.from(e),
+                  ),
+                )
                 .toList(growable: false)
             : const <PreviewProfilePicture>[],
         motherTongue: json['motherTongue']?.toString(),
-        religionName: json['religionName']?.toString(),
+        religionName: (json['religionName'] ?? json['religion'])?.toString(),
         community: json['community']?.toString(),
         countryCode: json['countryCode']?.toString(),
         liveWithFamily: json['liveWithFamily'] as bool?,
@@ -295,7 +323,7 @@ class PreviewLifestyle {
       PreviewLifestyle(
         smoking: json['smoking']?.toString(),
         drinking: json['drinking']?.toString(),
-        diet: json['diet']?.toString(),
+        diet: (json['diet'] ?? json['dietType'])?.toString(),
       );
 
   final String? smoking;
@@ -401,8 +429,9 @@ class PreviewEducation {
   factory PreviewEducation.fromJson(Map<String, dynamic> json) =>
       PreviewEducation(
         educationLevel: json['educationLevel']?.toString(),
-        fieldOfStudy: json['fieldOfStudy']?.toString(),
-        institutionName: json['institutionName']?.toString(),
+        fieldOfStudy: (json['fieldOfStudy'] ?? json['degree'])?.toString(),
+        institutionName:
+            (json['institutionName'] ?? json['institution'])?.toString(),
       );
 
   final String? educationLevel;
@@ -422,9 +451,9 @@ class PreviewProfession {
   factory PreviewProfession.fromJson(Map<String, dynamic> json) =>
       PreviewProfession(
         workingWith: json['workingWith']?.toString(),
-        workingAs: json['workingAs']?.toString(),
+        workingAs: (json['workingAs'] ?? json['profession'])?.toString(),
         employerName: json['employerName']?.toString(),
-        incomeRange: json['incomeRange']?.toString(),
+        incomeRange: (json['incomeRange'] ?? json['annualIncome'])?.toString(),
         incomeFrequency: json['incomeFrequency']?.toString(),
       );
 
@@ -517,6 +546,16 @@ Map<String, dynamic>? _asMap(dynamic value) {
   if (value is Map<String, dynamic>) return value;
   if (value is Map) return Map<String, dynamic>.from(value);
   return null;
+}
+
+Map<String, dynamic>? _firstMap(dynamic value) {
+  if (value is List) {
+    for (final item in value) {
+      final map = _asMap(item);
+      if (map != null) return map;
+    }
+  }
+  return _asMap(value);
 }
 
 List<String> _asStringList(dynamic value) {
