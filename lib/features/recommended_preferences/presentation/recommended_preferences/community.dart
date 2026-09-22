@@ -119,19 +119,18 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
               provider.onReligionPreferenceSelected(value?.toString()),
           isSearch: true,
         ),
-        provider.religionPreferenceController.text.isEmpty
-            ? const SizedBox.shrink()
-            : DropDownField(
-                headLine: 'Partner Community',
-                hintText: 'Select',
-                popUpHeader: 'Select Community',
-                items: provider.communityDropdownItems,
-                controller: provider.communityPreferenceController,
-                onTap: () {},
-                onConfirm: (value) =>
-                    provider.onCommunityPreferenceSelected(value?.toString()),
-                isSearch: true,
-              ),
+        if (provider.showCommunityField)
+          DropDownField(
+            headLine: 'Partner Community',
+            hintText: 'Select',
+            popUpHeader: 'Select Community',
+            items: provider.communityDropdownItems,
+            controller: provider.communityPreferenceController,
+            onTap: () {},
+            onConfirm: (value) =>
+                provider.onCommunityPreferenceSelected(value?.toString()),
+            isSearch: true,
+          ),
         DropDownField(
           headLine: 'Partner Mother Tongue',
           hintText: 'Select',

@@ -16,11 +16,8 @@ import 'package:walima_llc/features/recommended_preferences/data/repository/pref
 import 'package:walima_llc/features/registration/data/models/lookup_option.dart';
 import 'package:walima_llc/features/registration/data/repository/location_data_repository_impl.dart';
 import 'package:walima_llc/features/registration/data/repository/lookup_repository.dart';
-import 'package:walima_llc/features/registration/data/repository/religion_data_repository_impl.dart';
 import 'package:walima_llc/features/registration/domain/location_data_model.dart';
-import 'package:walima_llc/features/registration/domain/religion_option_model.dart';
 import 'package:walima_llc/features/registration/domain/repository/location_data_repository.dart';
-import 'package:walima_llc/features/registration/domain/repository/religion_data_repository.dart';
 import 'package:walima_llc/features/registration/domain/single_string_model.dart';
 
 class RecommendedPreferencesProvider extends BaseChangeNotifier {
@@ -31,14 +28,13 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   bool isLoading = false;
 
   final PreferencesRepository _preferencesRepository = PreferencesRepository();
-  final ReligionDataRepository _religionDataRepository =
-      ReligionDataRepositoryImpl();
   final LocationDataRepository _locationDataRepository =
       LocationDataRepositoryImpl();
   final LookupRepository _lookupRepository = LookupRepository();
   VoidCallback? _controllersListener;
 
-  List<ReligionOptionModel> religionOptions = <ReligionOptionModel>[];
+  List<LookupOption> religionOptions = <LookupOption>[];
+  List<LookupOption> communityOptions = <LookupOption>[];
   List<String> religionDropdownItems = <String>[];
   List<String> communityDropdownItems = <String>[];
   bool isReligionDataLoading = false;
@@ -67,30 +63,15 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     await loadReligionData();
   }
 
+  /// Religion is a static enum shared with web — only the dependent community
+  /// list comes from the API.
   Future<void> loadReligionData() async {
     if (isReligionDataLoading) return;
 
-    if (religionOptions.isNotEmpty) {
-      _syncCommunityOptions();
-      notifyListeners();
-      return;
-    }
-
-    isReligionDataLoading = true;
-    religionDataError = null;
-    notifyListeners();
-
-    try {
-      religionOptions = await _religionDataRepository.getReligionOptions();
-      religionDropdownItems =
-          religionOptions.map((item) => item.name).toList(growable: false);
-      _syncCommunityOptions();
-    } catch (e) {
-      religionDataError = e.toString();
-    } finally {
-      isReligionDataLoading = false;
-      notifyListeners();
-    }
+    religionOptions = List<LookupOption>.from(religionLookupOptions);
+    religionDropdownItems =
+        religionOptions.map((item) => item.label).toList(growable: false);
+    await _syncCommunityOptions();
   }
 
   void onReligionPreferenceSelected(String? value) {
@@ -102,8 +83,7 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
       communityPreferenceController.clear();
     }
 
-    _syncCommunityOptions();
-    notifyListeners();
+    unawaited(_syncCommunityOptions());
   }
 
   void onCommunityPreferenceSelected(String? value) {
@@ -113,31 +93,49 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
-  void _syncCommunityOptions() {
-    final selectedReligion = religionPreferenceController.text.trim();
-    if (selectedReligion.isEmpty) {
-      communityDropdownItems = <String>[];
-      return;
-    }
+  /// Whether the community field should be shown at all — web hides it for
+  /// `open_to_all` and `others`, which have no community category.
+  bool get showCommunityField =>
+      religionHasCommunityOptions(_selectedReligionKey);
 
-    final normalized = selectedReligion.toLowerCase();
-    ReligionOptionModel? matched;
+  String? get _selectedReligionKey {
+    final selected = religionPreferenceController.text.trim();
+    if (selected.isEmpty) return null;
+
+    final normalized = selected.toLowerCase();
     for (final option in religionOptions) {
-      if (option.name.toLowerCase() == normalized ||
-          option.value.toLowerCase() == normalized) {
-        matched = option;
-        break;
+      if (option.key.toLowerCase() == normalized ||
+          option.label.toLowerCase() == normalized) {
+        return option.key;
       }
     }
+    return null;
+  }
 
-    if (matched == null) {
+  Future<void> _syncCommunityOptions() async {
+    final religionKey = _selectedReligionKey;
+    if (religionKey == null || !religionHasCommunityOptions(religionKey)) {
+      communityOptions = <LookupOption>[];
       communityDropdownItems = <String>[];
+      communityPreferenceController.clear();
+      notifyListeners();
       return;
     }
 
-    communityDropdownItems = matched.community.flattenCommunityLabels();
-    if (communityDropdownItems.isEmpty) {
-      communityDropdownItems = matched.community.topLevelLabels();
+    isReligionDataLoading = true;
+    religionDataError = null;
+    notifyListeners();
+
+    try {
+      communityOptions = await _lookupRepository.getLookupsBySlug(religionKey);
+      communityDropdownItems =
+          communityOptions.map((item) => item.label).toList(growable: false);
+    } catch (e) {
+      communityOptions = <LookupOption>[];
+      communityDropdownItems = <String>[];
+      religionDataError = e.toString();
+    } finally {
+      isReligionDataLoading = false;
     }
 
     if (communityPreferenceController.text.isNotEmpty) {
@@ -147,6 +145,7 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
           .any((item) => item.toLowerCase() == selectedCommunity);
       if (!exists) communityPreferenceController.clear();
     }
+    notifyListeners();
   }
 
   Future<void> loadLocationData() async {
@@ -626,7 +625,7 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
           religion: _resolveReligionPreference(),
           motherTongue: _trimmedOrNull(motherTonguePreferenceController.text),
           countryLivingIn: _singleListOrNull(countryPreferenceController.text),
-          community: _singleListOrNull(communityPreferenceController.text),
+          community: _singleListOrNull(_resolveCommunityPreference() ?? ''),
           stateLivingIn: preferableCity.isNotEmpty
               ? List<String>.from(preferableCity)
               : null,
@@ -752,16 +751,24 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   }
 
   String? _resolveReligionPreference() {
-    final selected = religionPreferenceController.text.trim().toLowerCase();
+    final selected = religionPreferenceController.text.trim();
+    if (selected.isEmpty) return null;
+    return _selectedReligionKey ?? selected.toLowerCase();
+  }
+
+  /// The dropdown writes the display label into the controller, but the API
+  /// matches on the lookup key.
+  String? _resolveCommunityPreference() {
+    final selected = communityPreferenceController.text.trim();
     if (selected.isEmpty) return null;
 
-    for (final option in religionOptions) {
-      if (option.name.toLowerCase() == selected ||
-          option.value.toLowerCase() == selected) {
-        return option.value;
+    final normalized = selected.toLowerCase();
+    for (final option in communityOptions) {
+      if (option.label.toLowerCase() == normalized ||
+          option.key.toLowerCase() == normalized) {
+        return option.key;
       }
     }
-
     return selected;
   }
 
@@ -1039,8 +1046,11 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
         preferredCities: preferableCity.isNotEmpty
             ? List<String>.from(preferableCity)
             : null,
-        religionPreference: _toListOrNull(religionPreferenceController.text),
-        communityPreference: _toListOrNull(communityPreferenceController.text),
+        // Send api values / lookup keys, not the display labels the dropdown
+        // writes into the controllers.
+        religionPreference: _singleListOrNull(_resolveReligionPreference() ?? ''),
+        communityPreference:
+            _singleListOrNull(_resolveCommunityPreference() ?? ''),
         motherTonguePreference:
             _toListOrNull(motherTonguePreferenceController.text),
         preferredCountries: _toListOrNull(countryPreferenceController.text),

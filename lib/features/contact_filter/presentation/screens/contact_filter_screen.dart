@@ -140,9 +140,11 @@ class _ContactFilterScreenState extends ConsumerState<ContactFilterScreen> {
         return _selectionBody(
           items: provider.communityOptions,
           onTap: provider.toggleCommunity,
-          helperText: provider.religionOptions.every((item) => !item.isSelected)
-              ? 'Select religion first to load community options.'
-              : null,
+          helperText: provider.showCommunityFilter
+              ? null
+              : provider.religionOptions.every((item) => !item.isSelected)
+                  ? 'Select religion first to load community options.'
+                  : 'No community options for the selected religion.',
           searchController: _communitySearchController,
           searchHintText: 'Search community',
         );

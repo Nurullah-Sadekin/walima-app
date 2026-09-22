@@ -110,8 +110,13 @@ class _NewFilterScreenState extends ConsumerState<NewFilterScreen> {
         const SizedBox(height: 8),
         InfoTile(
           title: 'Community',
-          value: newFilter.selectedCommunities.isEmpty ? 'Not selected' : newFilter.selectedCommunities.join(', '),
-          onTap: () => setState(() => _step = FilterStep.community),
+          value: newFilter.selectedCommunityLabels.isEmpty
+              ? 'Not selected'
+              : newFilter.selectedCommunityLabels.join(', '),
+          onTap: () {
+            newFilter.loadCommunityData();
+            setState(() => _step = FilterStep.community);
+          },
           trailingImagePath: AppImages.editWrite,
           leadingImagePath: AppImages.groupsIcon,
         ),

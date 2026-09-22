@@ -278,7 +278,9 @@ extension _ProfileSectionEditLookupDynamicPart
       _ProfileSectionEditScreenState._religionOptions,
       religionInput,
     );
-    if (religionKey == null) {
+    // `open_to_all` and `others` have no community category server-side, so skip
+    // the round trip entirely — same as web.
+    if (religionKey == null || !religionHasCommunityOptions(religionKey)) {
       if (!mounted) return;
       setState(() {
         _communityOptions = <LookupOption>[];

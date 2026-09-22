@@ -1,8 +1,14 @@
+import 'dart:async';
+
 import 'package:walima_llc/core/providers/base_change_notifier.dart';
+import 'package:walima_llc/features/registration/data/models/lookup_option.dart';
+import 'package:walima_llc/features/registration/data/repository/lookup_repository.dart';
 import 'package:walima_llc/features/registration/domain/single_string_model.dart';
 
 class MyMatchFilterProvider extends BaseChangeNotifier {
   MyMatchFilterProvider();
+
+  final LookupRepository _lookupRepository = LookupRepository();
 
   static final List<SingleStringModel> _professionFallbackList =
       <SingleStringModel>[
@@ -15,7 +21,11 @@ class MyMatchFilterProvider extends BaseChangeNotifier {
 
   // Lists used for selection UIs
   List<SingleStringModel> countries = List.from(countryListDataInserted);
-  List<SingleStringModel> communities = List.from(communityListDataInserted);
+
+  /// Populated from `GET /lookups?categorySlug={religion}` once a religion is
+  /// picked — same dependency web models via `dependsOn.buildUrl`.
+  List<SingleStringModel> communities = <SingleStringModel>[];
+  bool isCommunityLoading = false;
   List<SingleStringModel> maritalStatusList = List.from(maritalStatusListDataInserted);
   List<SingleStringModel> incomeRangeList = List.from(incomeRangeListInserted);
   List<SingleStringModel> yourWorkList = List.from(yourWorkListInserted);
@@ -45,7 +55,9 @@ class MyMatchFilterProvider extends BaseChangeNotifier {
     SingleStringModel(name: 'Master'),
     SingleStringModel(name: 'PhD'),
   ];
-  List<SingleStringModel> religionList = communityListDataInserted.where((e) => ['Sunni','Shia','Ahmadi','Islam','Hindu','Buddhist','Christian','Jain'].contains(e.name)).toList();
+  List<SingleStringModel> religionList = religionLookupOptions
+      .map((item) => SingleStringModel(name: item.label, value: item.key))
+      .toList();
   List<SingleStringModel> motherTongues = [
     SingleStringModel(name: 'Bengali'),
     SingleStringModel(name: 'English'),
@@ -103,6 +115,50 @@ class MyMatchFilterProvider extends BaseChangeNotifier {
     if (index < 0 || index >= religionList.length) return;
     religionList[index].isSelected = !religionList[index].isSelected;
     notifyListeners();
+    unawaited(loadCommunityData());
+  }
+
+  /// Communities depend on the selected religion. `open_to_all` and `others`
+  /// have no community category server-side, so nothing is fetched for them.
+  Future<void> loadCommunityData() async {
+    final slugs = selectedReligion
+        .where(religionHasCommunityOptions)
+        .toList(growable: false);
+
+    if (slugs.isEmpty) {
+      communities = <SingleStringModel>[];
+      notifyListeners();
+      return;
+    }
+
+    isCommunityLoading = true;
+    notifyListeners();
+
+    try {
+      final results = await Future.wait<List<LookupOption>>(
+        slugs.map((slug) => _lookupRepository.getLookupsBySlug(slug)),
+      );
+
+      final previouslySelected = selectedCommunities.toSet();
+      final merged = <String, SingleStringModel>{};
+
+      for (final result in results) {
+        for (final option in result) {
+          merged[option.key] = SingleStringModel(
+            name: option.label,
+            value: option.key,
+            isSelected: previouslySelected.contains(option.key),
+          );
+        }
+      }
+
+      communities = merged.values.toList(growable: false);
+    } catch (_) {
+      communities = <SingleStringModel>[];
+    } finally {
+      isCommunityLoading = false;
+      notifyListeners();
+    }
   }
 
   void toggleMotherTongue(int index) {
@@ -137,19 +193,27 @@ class MyMatchFilterProvider extends BaseChangeNotifier {
   void selectActiveMembersOption(int index) => _selectSingle(activeMembersOptions, index);
   void selectIncomeRange(int index) => _selectSingle(incomeRangeList, index);
   void selectEducationLevel(int index) => _selectSingle(educationLevelList, index);
-  void selectReligion(int index) => _selectSingle(religionList, index);
+  void selectReligion(int index) {
+    _selectSingle(religionList, index);
+    unawaited(loadCommunityData());
+  }
+
   void selectCountry(int index) => _selectSingle(countries, index);
   void selectCommunity(int index) => _selectSingle(communities, index);
   void selectProfileManagedBy(int index) => _selectSingle(profileManagedByList, index);
   void selectEatingHabits(int index) => _selectSingle(eatingHabitsList, index);
 
   List<String> get selectedCountries => countries.where((c) => c.isSelected).map((e) => e.name).toList();
-  List<String> get selectedCommunities => communities.where((c) => c.isSelected).map((e) => e.name).toList();
+  // Religion and community submit their API value (`islam`, `sunni`), never the
+  // display label — the backend matches on the lookup key.
+  List<String> get selectedCommunities =>
+      communities.where((c) => c.isSelected).map((e) => e.value ?? e.name).toList();
   List<String> get selectedMaritalStatus => maritalStatusList.where((c) => c.isSelected).map((e) => e.name).toList();
   List<String> get selectedIncomeRanges => incomeRangeList.where((c) => c.isSelected).map((e) => e.name).toList();
   List<String> get selectedYourWork => yourWorkList.where((c) => c.isSelected).map((e) => e.name).toList();
   List<String> get selectedYouWorkAs => youWorkAsList.where((c) => c.isSelected).map((e) => e.name).toList();
-  List<String> get selectedReligion => religionList.where((c) => c.isSelected).map((e) => e.name).toList();
+  List<String> get selectedReligion =>
+      religionList.where((c) => c.isSelected).map((e) => e.value ?? e.name).toList();
   List<String> get selectedMotherTongues => motherTongues.where((c) => c.isSelected).map((e) => e.name).toList();
   List<String> get selectedProfileManagedBy => profileManagedByList.where((c) => c.isSelected).map((e) => e.name).toList();
   List<String> get selectedEatingHabits => eatingHabitsList.where((c) => c.isSelected).map((e) => e.name).toList();

@@ -979,19 +979,25 @@ enum WorkingAsPreference implements ApiUiEnum {
   String get label => _label ?? EnumMapper.labelFromValue(apiValue);
 }
 
+/// Mirrors the web `Religion` enum (`walima-frontend/src/enums/index.ts`) exactly —
+/// same values, same order. Religion is never fetched from the API; only the
+/// dependent community list is (`GET /lookups?categorySlug={apiValue}`).
 enum Religion implements ApiUiEnum {
+  openToAll('open_to_all'),
   islam('islam'),
   hinduism('hinduism'),
   christianity('christianity'),
   buddhism('buddhism'),
-  judaism('judaism'),
-  sikhism('sikhism'),
-  jainism('jainism'),
-  others('others'),
-  noReligion('no_religion'),
-  spiritual('spiritual');
+  others('others');
 
   const Religion(this.apiValue, [this._label]);
+
+  /// Religions with no community lookup — web hides the community field for
+  /// these rather than issuing a request that always comes back empty.
+  static const Set<String> valuesWithoutCommunity = <String>{
+    'open_to_all',
+    'others',
+  };
 
   @override
   final String apiValue;
@@ -999,6 +1005,8 @@ enum Religion implements ApiUiEnum {
 
   @override
   String get label => _label ?? EnumMapper.labelFromValue(apiValue);
+
+  bool get hasCommunityOptions => !valuesWithoutCommunity.contains(apiValue);
 }
 
 enum ReligiousBackground implements ApiUiEnum {

@@ -90,5 +90,4 @@ flutter:
      - assets/biodata/designEight/
      - assets/biodata/designEleven/
      - assets/sounds/chat_sound.mp3
-     - lib/features/registration/domain/json/religion_name_options.json
      - lib/features/registration/domain/json/residency_status_options.json

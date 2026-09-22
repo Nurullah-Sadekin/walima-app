@@ -9,9 +9,7 @@ import 'package:walima_llc/features/contact_filter/data/repository/contact_filte
 import 'package:walima_llc/features/registration/data/models/lookup_option.dart';
 import 'package:walima_llc/features/registration/data/repository/location_data_repository_impl.dart';
 import 'package:walima_llc/features/registration/data/repository/lookup_repository.dart';
-import 'package:walima_llc/features/registration/data/repository/religion_data_repository_impl.dart';
 import 'package:walima_llc/features/registration/domain/repository/location_data_repository.dart';
-import 'package:walima_llc/features/registration/domain/repository/religion_data_repository.dart';
 import 'package:walima_llc/features/registration/domain/single_string_model.dart';
 
 class ContactFilterProvider extends BaseChangeNotifier {
@@ -20,8 +18,6 @@ class ContactFilterProvider extends BaseChangeNotifier {
   final LookupRepository _lookupRepository = LookupRepository();
   final LocationDataRepository _locationDataRepository =
       LocationDataRepositoryImpl();
-  final ReligionDataRepository _religionDataRepository =
-      ReligionDataRepositoryImpl();
 
   List<SingleStringModel> religionOptions = <SingleStringModel>[];
 
@@ -137,13 +133,33 @@ class ContactFilterProvider extends BaseChangeNotifier {
     }
   }
 
+  /// Mirrors web's contact-filter visibility rules
+  /// (`walima-frontend/src/app/(site)/account/profile/settings/contact-filters/page.tsx`):
+  /// hidden when no religion has a community category, and — product rule —
+  /// hidden when Christianity is the only selected religion.
+  bool get showCommunityFilter {
+    final selected = selectedReligionValues
+        .where(religionHasCommunityOptions)
+        .toList(growable: false);
+
+    if (selected.isEmpty) return false;
+    if (selected.length == 1 && selected.first == 'christianity') return false;
+    return true;
+  }
+
   Future<void> loadCommunityData() async {
     final selectedReligions = religionOptions
         .where((item) => item.isSelected)
         .map((item) => item.value ?? item.name.toLowerCase())
         .toList(growable: false);
 
-    if (selectedReligions.isEmpty) {
+    // `open_to_all` and `others` have no community category server-side.
+    final slugsWithCommunities =
+        selectedReligions.where(religionHasCommunityOptions).toList(
+              growable: false,
+            );
+
+    if (slugsWithCommunities.isEmpty || !showCommunityFilter) {
       communityOptions = <SingleStringModel>[];
       notifyListeners();
       return;
@@ -154,7 +170,7 @@ class ContactFilterProvider extends BaseChangeNotifier {
 
     try {
       final results = await Future.wait<List<LookupOption>>(
-        selectedReligions.map(
+        slugsWithCommunities.map(
           (slug) => _lookupRepository.getLookupsBySlug(slug),
         ),
       );
@@ -275,33 +291,10 @@ class ContactFilterProvider extends BaseChangeNotifier {
     }
   }
 
+  /// Religion is a static enum shared with web — there is no `religion` lookup
+  /// category on the API, so nothing to fetch here.
   Future<List<SingleStringModel>> _loadReligionOptions() async {
-    try {
-      final options = await _religionDataRepository.getReligionOptions();
-      if (options.isNotEmpty) {
-        return options
-            .map(
-              (item) => SingleStringModel(
-                name: item.name,
-                value: item.value,
-              ),
-            )
-            .toList(growable: false);
-      }
-    } catch (_) {
-      // Fall back to lookup slugs or static options below.
-    }
-
-    return _loadLookupItemsByPrioritySlugs(
-      const <String>['religion', 'religions'],
-      fallback: const <LookupOption>[
-        LookupOption(key: 'islam', label: 'Islam'),
-        LookupOption(key: 'hinduism', label: 'Hinduism'),
-        LookupOption(key: 'christianity', label: 'Christianity'),
-        LookupOption(key: 'buddhism', label: 'Buddhism'),
-        LookupOption(key: 'others', label: 'Others'),
-      ].map(_lookupToItem).toList(growable: false),
-    );
+    return religionLookupOptions.map(_lookupToItem).toList(growable: false);
   }
 
   Future<List<SingleStringModel>> _loadLookupItemsByPrioritySlugs(

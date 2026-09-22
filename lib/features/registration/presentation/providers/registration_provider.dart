@@ -202,14 +202,6 @@ class RegistrationProvider extends BaseChangeNotifier {
   bool canRetryProfileImageUpload = false;
   PhotoUploadFlowState photoUploadFlowState = PhotoUploadFlowState.idle;
 
-  static const List<LookupOption> _staticReligionOptions = <LookupOption>[
-    LookupOption(key: 'islam', label: 'Islam'),
-    LookupOption(key: 'hinduism', label: 'Hinduism'),
-    LookupOption(key: 'christianity', label: 'Christianity'),
-    LookupOption(key: 'buddhism', label: 'Buddhism'),
-    LookupOption(key: 'others', label: 'Others'),
-  ];
-
   static const Set<String> _allowedResidencyStatusValues = <String>{
     'citizen',
     'permanent_resident',
@@ -633,7 +625,7 @@ class RegistrationProvider extends BaseChangeNotifier {
   }
 
   Future<void> loadReligionData() async {
-    religionOptions = List<LookupOption>.from(_staticReligionOptions);
+    religionOptions = List<LookupOption>.from(religionLookupOptions);
     religionDropdownItems =
         religionOptions.map((item) => item.label).toList(growable: false);
     await _syncCommunityOptionsFromSelectedReligion();
@@ -687,6 +679,16 @@ class RegistrationProvider extends BaseChangeNotifier {
     await _syncCommunityOptionsFromSelectedReligion();
   }
 
+  /// Web hides the community field for religions that have no community
+  /// category (`open_to_all`, `others`) — mirror that here.
+  bool get showCommunityField {
+    final selected = religionController.text.trim();
+    if (selected.isEmpty) return false;
+
+    final matched = _findReligionOption(selected);
+    return matched != null && religionHasCommunityOptions(matched.key);
+  }
+
   void onReligionSelected(String? value) {
     final selectedValue = value?.trim() ?? '';
     if (selectedValue.isEmpty) return;
@@ -718,9 +720,13 @@ class RegistrationProvider extends BaseChangeNotifier {
     }
 
     final matchedReligion = _findReligionOption(selectedReligion);
-    if (matchedReligion == null) {
+    // `open_to_all` and `others` have no community category server-side, so skip
+    // the round trip entirely — same as web.
+    if (matchedReligion == null ||
+        !religionHasCommunityOptions(matchedReligion.key)) {
       communityOptions = <LookupOption>[];
       communityDropdownItems = <String>[];
+      communityController.clear();
       notifyListeners();
       return;
     }
@@ -2004,7 +2010,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     final candidate =
         matchedReligion?.key.trim().toLowerCase() ?? _toSnakeCase(selected);
 
-    if (_staticReligionOptions.any((item) => item.key == candidate)) {
+    if (religionLookupOptions.any((item) => item.key == candidate)) {
       return candidate;
     }
     return 'others';

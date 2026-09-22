@@ -244,18 +244,23 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
             popUpHeader: 'Your Religion',
             items: provider.religionDropdownItems,
             controller: provider.religionController,
+            onConfirm: (value) =>
+                provider.onReligionSelected(value?.toString()),
             isSearch: true,
           ),
           SizedBox(height: TextSize.font12(context)),
-          headLineText('Community'),
-          DropDownField(
-            hintText: 'Select',
-            popUpHeader: 'Community',
-            items: provider.communityDropdownItems,
-            controller: provider.communityController,
-            isSearch: true,
-          ),
-          SizedBox(height: TextSize.font12(context)),
+          if (provider.showCommunityField) ...[
+            headLineText('Community'),
+            DropDownField(
+              hintText: 'Select',
+              popUpHeader: 'Community',
+              items: provider.communityDropdownItems,
+              controller: provider.communityController,
+              onTap: provider.loadCommunityData,
+              isSearch: true,
+            ),
+            SizedBox(height: TextSize.font12(context)),
+          ],
           headLineText('Mother Tongue'),
           DropDownField(
             hintText: 'Select',
@@ -505,10 +510,12 @@ class _SearchFilterScreenState extends ConsumerState<SearchFilterScreen> {
           'heightMin': int.tryParse(provider.heightFromController.text.trim()),
           'heightMax': int.tryParse(provider.heightToController.text.trim()),
           'maritalStatus': provider.maritalStatusController.text.trim(),
-          'religion': provider.religionController.text.trim(),
-          'community': provider.communityController.text.trim().isEmpty
+          // Send api values / lookup keys, not the display labels the dropdown
+          // writes into the controllers.
+          'religion': provider.selectedReligionKey ?? '',
+          'community': provider.selectedCommunityKey == null
               ? <String>[]
-              : <String>[provider.communityController.text.trim()],
+              : <String>[provider.selectedCommunityKey!],
           'motherTongue': provider.motherTongueController.text.trim(),
           'countryLivingIn':
               provider.countryLivingController.text.trim().isEmpty

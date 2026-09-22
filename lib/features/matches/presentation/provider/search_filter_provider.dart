@@ -50,7 +50,10 @@ class SearchFilterProvider extends BaseChangeNotifier {
         (item) => SingleStringModel(name: item.label, value: item.apiValue),
       ),
     ];
-    List<SingleStringModel> communityDropdownItems = communityListDataInserted;
+    // Populated from `GET /lookups?categorySlug={religion}` once a religion is
+    // picked — same dependency web models via `dependsOn.buildUrl`.
+    List<SingleStringModel> communityDropdownItems = <SingleStringModel>[];
+    bool isCommunityLoading = false;
     List<SingleStringModel> countryDropdownItems = countryListDataInserted;
     List<SingleStringModel> residencyStatusDropdownItems = [
       ...ResidencyStatus.values.map(
@@ -204,6 +207,85 @@ class SearchFilterProvider extends BaseChangeNotifier {
       }
 
       return const <LookupOption>[];
+    }
+
+    /// The religion key currently typed into [religionController], resolved
+    /// from either the display label or the api value.
+    String? get selectedReligionKey {
+      final selected = religionController.text.trim();
+      if (selected.isEmpty) return null;
+
+      final normalized = selected.toLowerCase();
+      for (final option in religionDropdownItems) {
+        if (option.name.toLowerCase() == normalized ||
+            (option.value ?? '').toLowerCase() == normalized) {
+          return option.value ?? option.name.toLowerCase();
+        }
+      }
+      return null;
+    }
+
+    /// The community lookup key for the selected label. The dropdown writes the
+    /// display label into the controller, but the API matches on the key.
+    String? get selectedCommunityKey {
+      final selected = communityController.text.trim();
+      if (selected.isEmpty) return null;
+
+      final normalized = selected.toLowerCase();
+      for (final option in communityDropdownItems) {
+        if (option.name.toLowerCase() == normalized ||
+            (option.value ?? '').toLowerCase() == normalized) {
+          return option.value ?? option.name.toLowerCase();
+        }
+      }
+      return null;
+    }
+
+    /// Web hides the community field for `open_to_all` and `others`, which have
+    /// no community category.
+    bool get showCommunityField =>
+        religionHasCommunityOptions(selectedReligionKey);
+
+    void onReligionSelected(String? value) {
+      final selected = value?.trim() ?? '';
+      if (selected.isEmpty) return;
+
+      if (religionController.text != selected) {
+        religionController.text = selected;
+        communityController.clear();
+      }
+      loadCommunityData();
+    }
+
+    Future<void> loadCommunityData() async {
+      final religionKey = selectedReligionKey;
+      if (religionKey == null || !religionHasCommunityOptions(religionKey)) {
+        communityDropdownItems = <SingleStringModel>[];
+        communityController.clear();
+        notifyListeners();
+        return;
+      }
+
+      isCommunityLoading = true;
+      notifyListeners();
+
+      try {
+        final options = await _lookupRepository.getLookupsBySlug(religionKey);
+        communityDropdownItems = _lookupToSingleStrings(options);
+      } catch (_) {
+        communityDropdownItems = <SingleStringModel>[];
+      } finally {
+        isCommunityLoading = false;
+      }
+
+      if (communityController.text.isNotEmpty) {
+        final selected = communityController.text.trim().toLowerCase();
+        final exists = communityDropdownItems.any(
+          (item) => item.name.toLowerCase() == selected,
+        );
+        if (!exists) communityController.clear();
+      }
+      notifyListeners();
     }
 
     List<SingleStringModel> _lookupToSingleStrings(List<LookupOption> options) {

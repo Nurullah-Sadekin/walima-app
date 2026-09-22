@@ -109,10 +109,8 @@ class _YourRegionState extends ConsumerState<YourReligion> {
         ),
         SizedBox(height: TextSize.font20(context)),
 
-        if(provider.religionController.text.isNotEmpty)...[
-          provider.religionController.text.isEmpty
-              ? const SizedBox.shrink()
-              : DropDownField(
+        if (provider.showCommunityField) ...[
+          DropDownField(
             headLine: 'Community',
             hintText: 'Select',
             isOptional: true,

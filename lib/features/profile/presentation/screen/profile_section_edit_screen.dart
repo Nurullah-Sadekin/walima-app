@@ -214,13 +214,7 @@ class _ProfileSectionEditScreenState extends _ProfileSectionEditScreenFields {
         RegistrationFamilyEconomicCondition.lowerMiddleClass.apiValue,
   };
 
-  static const List<LookupOption> _religionOptions = <LookupOption>[
-    LookupOption(key: 'islam', label: 'Islam'),
-    LookupOption(key: 'hinduism', label: 'Hinduism'),
-    LookupOption(key: 'christianity', label: 'Christianity'),
-    LookupOption(key: 'buddhism', label: 'Buddhism'),
-    LookupOption(key: 'others', label: 'Others'),
-  ];
+  static final List<LookupOption> _religionOptions = religionLookupOptions;
 
   static final List<int> _heightInchOptions = List<int>.generate(
     33,
