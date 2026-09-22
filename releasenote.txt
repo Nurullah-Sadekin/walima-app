@@ -1,4 +1,4 @@
-Walima QA 0.0.1 (build 6)
+Walima QA 0.0.1 (build 7)
 - Environment -development
 
 QA Fixes
