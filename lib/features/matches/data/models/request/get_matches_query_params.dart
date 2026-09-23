@@ -216,7 +216,15 @@ class GetMatchesQueryParams {
     addValue('heightMin', normalizedHeightMin);
     addValue('heightMax', normalizedHeightMax);
     addValue('maritalStatus', normalizedMaritalStatus);
-    addValue('religion', normalizedReligion);
+    // `open_to_all` is a preference wildcard, rather than a value stored on
+    // profiles. Sending it to the matches endpoint turns it into a literal
+    // equality filter and therefore produces no results.
+    addValue(
+      'religion',
+      normalizedReligion == Religion.openToAll.apiValue
+          ? null
+          : normalizedReligion,
+    );
     addValue('motherTongue', normalizedMotherTongue);
     addValue('countryLivingIn', csv(normalizedCountryLivingIn));
     addValue('community', csv(normalizedCommunity));

@@ -59,18 +59,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _userSubscription = ref.listenManual<String>(
       globalProvider.select((provider) => provider.currentUserId),
       (previous, next) {
-        final home = ref.read(homeProvider);
-        home.setAuthenticatedUser(next);
-        if (next.isNotEmpty) {
-          unawaited(home.ensureHomeDataLoaded());
-        }
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+
+          final home = ref.read(homeProvider);
+          home.setAuthenticatedUser(next);
+          if (next.isNotEmpty) {
+            unawaited(home.ensureHomeDataLoaded());
+          }
+        });
       },
       fireImmediately: true,
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(profileProvider).getProfile(context);
       ref.read(profileProvider).getDashboard();
-      ref.read(homeProvider).ensureHomeDataLoaded();
     });
   }
 

@@ -611,7 +611,7 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await MatchesRepository.getMatches(
+      var response = await MatchesRepository.getMatches(
         GetMatchesQueryParams(
           type: 'today',
           page: 1,
@@ -627,6 +627,20 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
           qualification: _resolveEducationPreferences(),
         ),
       );
+
+      // The onboarding form can combine several optional preferences into a
+      // filter that has no exact matches yet. In that case, still offer the
+      // personalised "today" suggestions rather than showing an empty bulk
+      // connection screen.
+      if (response.isSuccess && (response.data?.isEmpty ?? true)) {
+        response = await MatchesRepository.getMatches(
+          GetMatchesQueryParams(
+            type: 'today',
+            page: 1,
+            size: 10,
+          ),
+        );
+      }
 
       if (response.isSuccess) {
         connectMatches = response.data ?? <MatchProfile>[];
