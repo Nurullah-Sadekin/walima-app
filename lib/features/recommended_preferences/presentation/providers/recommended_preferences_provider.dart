@@ -9,7 +9,6 @@ import 'package:walima_llc/features/matches/data/models/request/get_matches_quer
 import 'package:walima_llc/features/matches/data/models/response/get_matches_response.dart';
 import 'package:walima_llc/features/matches/data/repository/matches_repository.dart';
 import 'package:walima_llc/features/matches/domain/enums/match_education_level.dart';
-import 'package:walima_llc/features/matches/domain/enums/match_marital_status.dart';
 import 'package:walima_llc/features/matches/domain/request/bulk_send_connections_request_body.dart';
 import 'package:walima_llc/features/recommended_preferences/data/models/request/update_preferences_request_body.dart';
 import 'package:walima_llc/features/recommended_preferences/data/repository/preferences_repository.dart';
@@ -621,18 +620,11 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
           ageMax: ageEnd,
           heightMin: heightStart,
           heightMax: heightEnd,
-          maritalStatus: _resolveMaritalStatusPreference(),
           religion: _resolveReligionPreference(),
           motherTongue: _trimmedOrNull(motherTonguePreferenceController.text),
           countryLivingIn: _singleListOrNull(countryPreferenceController.text),
           community: _singleListOrNull(_resolveCommunityPreference() ?? ''),
-          stateLivingIn: preferableCity.isNotEmpty
-              ? List<String>.from(preferableCity)
-              : null,
           qualification: _resolveEducationPreferences(),
-          professionArea: _resolveProfessionPreference(),
-          annualIncome: _resolveAnnualIncomePreference(),
-          eatingHabits: preferableDiet.isNotEmpty ? preferableDiet.first : null,
         ),
       );
 
@@ -772,23 +764,6 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     return selected;
   }
 
-  String? _resolveMaritalStatusPreference() {
-    if (preferableMaritalStatuses.isEmpty) return null;
-
-    final resolved = preferableMaritalStatuses
-        .map((item) {
-          final normalized = item.trim().toLowerCase();
-          for (final status in MatchMaritalStatus.values) {
-            if (status.apiValue == normalized) return status.apiValue;
-          }
-          return MatchMaritalStatus.fromLabel(item)?.apiValue;
-        })
-        .whereType<String>()
-        .toList();
-
-    return resolved.isEmpty ? null : resolved.first;
-  }
-
   List<String>? _resolveEducationPreferences() {
     if (preferableEducations.isEmpty) return null;
 
@@ -883,20 +858,6 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     return null;
   }
 
-  String? _resolveProfessionPreference() {
-    final selected = professionPreferenceController.text.trim().toLowerCase();
-    if (selected.isEmpty) return null;
-
-    for (final option in professionLookupOptions) {
-      if (option.label.toLowerCase() == selected ||
-          option.key.toLowerCase() == selected) {
-        return option.key;
-      }
-    }
-
-    return selected;
-  }
-
   String _resolveWorkSectorPreference() {
     final selected = workSectorPreferenceController.text.trim();
     if (selected.isEmpty) return '';
@@ -904,20 +865,6 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     for (final option in workSectorLookupOptions) {
       if (option.label.toLowerCase() == selected.toLowerCase() ||
           option.key.toLowerCase() == selected.toLowerCase()) {
-        return option.key;
-      }
-    }
-
-    return selected;
-  }
-
-  String? _resolveAnnualIncomePreference() {
-    final selected = annualIncomePreferenceController.text.trim().toLowerCase();
-    if (selected.isEmpty) return null;
-
-    for (final option in incomeRangeLookupOptions) {
-      if (option.label.toLowerCase() == selected ||
-          option.key.toLowerCase() == selected) {
         return option.key;
       }
     }
