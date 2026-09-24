@@ -58,7 +58,7 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.qualification, totalProgressCount: 10, currentIndexProgress: 6,showProgress: true),
+                    const UpperLayer(imagePath: AppImages.qualification, totalProgressCount: 10, currentIndexProgress: 8,showProgress: true),
                     body(),
                   ],
                 ),

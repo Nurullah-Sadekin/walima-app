@@ -60,7 +60,7 @@ class _MaritalStatusScreenState extends ConsumerState<MaritalStatusScreen> {
                     const UpperLayer(
                         imagePath: AppImages.maritalStatus,
                         totalProgressCount: 10,
-                        currentIndexProgress: 5,
+                        currentIndexProgress: 7,
                         showProgress: true),
                     body(),
                   ],

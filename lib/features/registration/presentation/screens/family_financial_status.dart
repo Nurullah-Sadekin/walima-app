@@ -151,7 +151,7 @@ class _FamilyFinancialStatusScreenState
               spacing: 10,
               children: [
                 CustomExpansionTile(
-                  title: RegistrationFamilyEconomicCondition.eliteClass.label,
+                  title: 'Wealthy',
                   borderColor: AppColors.primary,
                   backgroundColor: AppColors.primaryVariant,
                   isLeading: true,
@@ -174,7 +174,7 @@ class _FamilyFinancialStatusScreenState
                         height: 12,
                       ),
                       KnowMoreItemCard(
-                        text: 'Your Photo should be front facing and your entire face should be visible.',
+                        text: 'Affluent family with significant assets',
                         icon: Icons.circle,
                         iconSize: TextSize.font10(context) / 2,
                         iconPadding: TextSize.font10(context) / 2,
@@ -187,7 +187,7 @@ class _FamilyFinancialStatusScreenState
                   ),
                 ),
                 CustomExpansionTile(
-                  title: RegistrationFamilyEconomicCondition.upperClass.label,
+                  title: 'Upper Middle Class',
                   borderColor: AppColors.primary,
                   backgroundColor: AppColors.primaryVariant,
                   isLeading: true,
@@ -211,7 +211,7 @@ class _FamilyFinancialStatusScreenState
                       ),
                       KnowMoreItemCard(
                         text:
-                            'Your Photo should be front facing and your entire face should be visible.',
+                            'Comfortable lifestyle with good income.',
                         icon: Icons.circle,
                         iconSize: TextSize.font10(context) / 2,
                         iconPadding: TextSize.font10(context) / 2,
@@ -224,7 +224,7 @@ class _FamilyFinancialStatusScreenState
                   ),
                 ),
                 CustomExpansionTile(
-                  title: RegistrationFamilyEconomicCondition.middleClass.label,
+                  title: 'Middle Class',
                   borderColor: AppColors.primary,
                   backgroundColor: AppColors.primaryVariant,
                   isLeading: true,
@@ -248,7 +248,7 @@ class _FamilyFinancialStatusScreenState
                       ),
                       KnowMoreItemCard(
                         text:
-                            'Your Photo should be front facing and your entire face should be visible.',
+                            'Stable family with moderate income.',
                         icon: Icons.circle,
                         iconSize: TextSize.font10(context) / 2,
                         iconPadding: TextSize.font10(context) / 2,
@@ -261,9 +261,7 @@ class _FamilyFinancialStatusScreenState
                   ),
                 ),
                 CustomExpansionTile(
-                  title: RegistrationFamilyEconomicCondition
-                      .lowerMiddleClass
-                      .label,
+                  title: 'Prefer not to say',
                   borderColor: AppColors.primary,
                   backgroundColor: AppColors.primaryVariant,
                   isLeading: true,
@@ -289,7 +287,7 @@ class _FamilyFinancialStatusScreenState
                       ),
                       KnowMoreItemCard(
                         text:
-                            'Your Photo should be front facing and your entire face should be visible.',
+                            'Keep this information private',
                         icon: Icons.circle,
                         iconSize: TextSize.font10(context) / 2,
                         iconPadding: TextSize.font10(context) / 2,

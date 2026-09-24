@@ -55,7 +55,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
                     const UpperLayer(
                       imagePath: AppImages.emailPhone,
                       totalProgressCount: 10,
-                      currentIndexProgress: 3,
+                      currentIndexProgress: 5,
                       showProgress: true,
                     ),
                     Expanded(child: body()),
@@ -122,9 +122,9 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
                 selected: item.isSelected,
                 selectedColor: AppColors.primary,
                 backgroundColor: AppColors.white,
+                checkmarkColor: AppColors.white,
                 side: BorderSide(
-                  color:
-                      item.isSelected ? AppColors.primary : AppColors.greyLight,
+                  color: item.isSelected ? AppColors.primary : AppColors.greyLight,
                 ),
                 labelStyle: TextStyle(
                   color: item.isSelected
@@ -133,6 +133,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
                   fontSize: TextSize.font14(context),
                   fontWeight: FontWeight.w500,
                 ),
+
                 onSelected: (_) =>
                     provider.selectedVerificationTypeIndex(index),
               );

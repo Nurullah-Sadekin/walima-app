@@ -29,12 +29,12 @@ class AppConfig {
       case 'dev':
         return const AppConfig._(AppFlavor.dev);
       case 'prod':
-        return const AppConfig._(AppFlavor.prod);
+        return const AppConfig._(AppFlavor.dev);
       default:
         throw ArgumentError.value(
           value,
           'APP_FLAVOR',
-          'Unsupported flavor. Use "dev" or "prod".',
+          'Unsupported flavor. Use "dev" or "dev".',
         );
     }
   }

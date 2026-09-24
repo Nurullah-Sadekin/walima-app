@@ -71,7 +71,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                       imagePath: AppImages.otp,
                       trailingText: 'Skip',
                       totalProgressCount: 10,
-                      showProgress: true,
+                      showProgress: false,
                       currentIndexProgress: 9,
                       isTrailing: false,
                       onTrailingTap: () async {},

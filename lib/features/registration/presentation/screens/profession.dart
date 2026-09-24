@@ -63,7 +63,7 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
                     const UpperLayer(
                         imagePath: AppImages.profession,
                         totalProgressCount: 10,
-                        currentIndexProgress: 7,
+                        currentIndexProgress: 9,
                         showProgress: true),
                     Expanded(child: body()),
                   ],
