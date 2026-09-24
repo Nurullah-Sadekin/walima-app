@@ -57,7 +57,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.location, totalProgressCount: 10, currentIndexProgress: 6,showProgress: true),
+                    const UpperLayer(imagePath: AppImages.location, totalProgressCount: 11, currentIndexProgress: 6,showProgress: true),
                     body(),
                   ],
                 ),

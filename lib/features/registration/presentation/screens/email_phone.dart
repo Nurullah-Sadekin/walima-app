@@ -54,7 +54,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
                   children: [
                     const UpperLayer(
                       imagePath: AppImages.emailPhone,
-                      totalProgressCount: 10,
+                      totalProgressCount: 11,
                       currentIndexProgress: 5,
                       showProgress: true,
                     ),

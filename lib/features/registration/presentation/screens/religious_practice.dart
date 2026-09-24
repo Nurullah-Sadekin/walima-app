@@ -42,7 +42,7 @@ class _ReligiousPracticeScreenState
             children: [
               UpperLayer(
                 imagePath: AppImages.religion,
-                totalProgressCount: 10,
+                totalProgressCount: 11,
                 currentIndexProgress: 3,
                 showProgress: true,
                 isTrailing: true,

@@ -65,7 +65,7 @@ class _AboutYourScreenState extends ConsumerState<AboutYouScreen> {
                   children: [
                     const UpperLayer(
                         imagePath: AppImages.aboutYou,
-                        totalProgressCount: 10,
+                        totalProgressCount: 11,
                         currentIndexProgress: 1,
                         showProgress: true),
                     body(),

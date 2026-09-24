@@ -46,7 +46,7 @@ class _MarriageIntentionScreenState
             children: [
               UpperLayer(
                 imagePath: AppImages.maritalStatus,
-                totalProgressCount: 10,
+                totalProgressCount: 11,
                 currentIndexProgress: 4,
                 showProgress: true,
                 isTrailing: true,
