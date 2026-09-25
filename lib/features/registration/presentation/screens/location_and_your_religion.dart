@@ -119,7 +119,7 @@ class _LocationAndYourReligionState extends ConsumerState<LocationAndYourReligio
         Column(
           children: [
             PrimaryTextField(
-              headLine: 'Living In',
+              headLine: 'Where do you live',
               hintText: 'Select',
               controller: provider.livingInController,
               errorText: '',
@@ -134,22 +134,22 @@ class _LocationAndYourReligionState extends ConsumerState<LocationAndYourReligio
               ),
             ),
             SizedBox(height: TextSize.font10(context)),
-            Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                  child: Text(
-                    'Select the country you currently live in',
-                    style: TextStyle(
-                      fontSize: TextSize.font12(context),
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.hintTextColor,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: TextSize.font20(context)),
+            SizedBox(height: TextSize.font10(context)),
+            // Row(
+            //   children: [
+            //     Padding(
+            //       padding: const EdgeInsets.symmetric(horizontal: 6.0),
+            //       child: Text(
+            //         'Select the country you currently live in',
+            //         style: TextStyle(
+            //           fontSize: TextSize.font12(context),
+            //           fontWeight: FontWeight.w400,
+            //           color: AppColors.hintTextColor,
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+            // ),
           ],
         ),
         provider.livingInController.text.isEmpty
