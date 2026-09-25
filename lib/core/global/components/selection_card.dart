@@ -11,6 +11,7 @@ class SelectionCard extends StatelessWidget {
     required this.buttonStyle,
     required this.onTap,
     required this.title,
+    this.subtitle,
     this.isSelected,
     this.isExpand = false,
     this.noBorder = false,
@@ -21,6 +22,7 @@ class SelectionCard extends StatelessWidget {
   final SelectionStyle buttonStyle;
   final VoidCallback onTap;
   final String? title;
+  final String? subtitle;
   final bool? isSelected;
   final bool isExpand;
   final bool noBorder;
@@ -48,12 +50,51 @@ class SelectionCard extends StatelessWidget {
 
   String _title(BuildContext context) => (title ?? '').localized(context);
 
+  String _subtitle(BuildContext context) => (subtitle ?? '').localized(context);
+
+  Widget _radioText({
+    required BuildContext context,
+    required Color titleColor,
+    required FontWeight titleWeight,
+  }) {
+    final hasSubtitle = subtitle?.trim().isNotEmpty ?? false;
+    return Flexible(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            _title(context),
+            style: TextStyle(
+              color: titleColor,
+              fontSize: TextSize.font13(context),
+              fontWeight: titleWeight,
+            ),
+          ),
+          if (hasSubtitle) ...[
+            const SizedBox(height: 3),
+            Text(
+              _subtitle(context),
+              style: TextStyle(
+                color: AppColors.textSecondaryLight,
+                fontSize: TextSize.font10(context),
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   Widget selectedRadio(bool isSelected, BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.symmetric(
-            vertical: noBorder ? 0 : 12, horizontal: noBorder ? 0 : 12),
+          vertical: noBorder ? 0 : 12,
+          horizontal: noBorder ? 0 : 12,
+        ),
         decoration: ShapeDecoration(
           color: radiaBackgroundColor ?? Colors.white,
           shape: RoundedRectangleBorder(
@@ -74,15 +115,10 @@ class SelectionCard extends StatelessWidget {
               width: TextSize.font20(context),
               height: TextSize.font20(context),
             ),
-            Flexible(
-              child: Text(
-                _title(context),
-                style: TextStyle(
-                  color: AppColors.textPrimaryLight,
-                  fontSize: TextSize.font13(context),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+            _radioText(
+              context: context,
+              titleColor: AppColors.textPrimaryLight,
+              titleWeight: FontWeight.w500,
             ),
           ],
         ),
@@ -95,7 +131,9 @@ class SelectionCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.symmetric(
-            vertical: noBorder ? 0 : 12, horizontal: noBorder ? 0 : 12),
+          vertical: noBorder ? 0 : 12,
+          horizontal: noBorder ? 0 : 12,
+        ),
         decoration: ShapeDecoration(
           color: radiaBackgroundColor ?? Colors.white,
           shape: RoundedRectangleBorder(
@@ -116,15 +154,10 @@ class SelectionCard extends StatelessWidget {
               width: TextSize.font20(context),
               height: TextSize.font20(context),
             ),
-            Flexible(
-              child: Text(
-                _title(context),
-                style: TextStyle(
-                  color: AppColors.textSecondaryLight,
-                  fontSize: TextSize.font13(context),
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
+            _radioText(
+              context: context,
+              titleColor: AppColors.textSecondaryLight,
+              titleWeight: FontWeight.w400,
             ),
           ],
         ),
@@ -185,10 +218,10 @@ class SelectionCard extends StatelessWidget {
           color: AppColors.primaryVariant,
           shape: RoundedRectangleBorder(
             side: BorderSide(
-                width: 1,
-                color: isSelected
-                    ? AppColors.primary
-                    : AppColors.inputBorderColor),
+              width: 1,
+              color:
+                  isSelected ? AppColors.primary : AppColors.inputBorderColor,
+            ),
             borderRadius: BorderRadius.circular(borderRadius ?? 6),
           ),
         ),
