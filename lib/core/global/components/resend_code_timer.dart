@@ -13,7 +13,7 @@ class ResendCodeTimer extends StatefulWidget {
   const ResendCodeTimer({
     super.key,
     required this.onResend,
-    this.duration = const Duration(seconds: 30),
+    this.duration = const Duration(minutes: 1),
     this.autoStart = true,
   });
 

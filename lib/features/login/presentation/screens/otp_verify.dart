@@ -73,14 +73,10 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
           staticText(),
           SizedBox(height: MediaQuery.sizeOf(context).height * 0.02),
           loginDataField(),
-          const SizedBox(height: 10),
-          ResendCodeTimer(
-            onResend: () async {
-              await provider.resendOtp(context);
-            },
+          Padding(
+            padding: const EdgeInsets.only(top: 14),
+            child: verificationActions(),
           ),
-          const SizedBox(height: 10),
-          bottomAction(),
           SizedBox(height: MediaQuery.sizeOf(context).height * 0.01),
           contactSupport(),
           Expanded(
@@ -132,6 +128,22 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
           SizedBox(height: MediaQuery.sizeOf(context).height * 0.005),
         ],
       ),
+    );
+  }
+
+  /// Keeps the resend control and primary action visually grouped while
+  /// preserving a predictable touch-target gap on every screen size.
+  Widget verificationActions() {
+    return Column(
+      children: [
+        ResendCodeTimer(
+          onResend: () async {
+            await provider.resendOtp(context);
+          },
+        ),
+        const SizedBox(height: 18),
+        bottomAction(),
+      ],
     );
   }
 

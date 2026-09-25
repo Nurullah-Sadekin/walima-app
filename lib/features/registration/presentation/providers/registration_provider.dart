@@ -2440,6 +2440,17 @@ class RegistrationProvider extends BaseChangeNotifier {
     bool skipOtp = false,
     bool useDebugTemplate = false,
   }) async {
+    // A saved draft or debug flow can reach this point without going through
+    // the date-of-birth step again. Avoid a generic server-side validation
+    // error and keep the requirement consistent with that screen.
+    if (dateOfBirthController.text.trim().isNotEmpty && age() < 18) {
+      DialogUtils.showErrorDialog(
+        context: context,
+        message: 'You must be at least 18 years old to register on Walima.',
+      );
+      return false;
+    }
+
     if (!skipOtp && otpControllers.any((c) => c.text.isEmpty)) {
       DialogUtils.showErrorDialog(
         context: context,

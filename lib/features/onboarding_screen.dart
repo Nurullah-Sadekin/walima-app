@@ -18,6 +18,8 @@ import 'package:go_router/go_router.dart';
 import 'package:walima_llc/core/utils/link_opener.dart';
 import 'package:walima_llc/features/login/presentation/providers/login_provider.dart';
 
+const _signInButtonHeight = 56.0;
+
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -389,7 +391,7 @@ class _SocialButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 54,
+      height: _signInButtonHeight,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(50),
@@ -492,7 +494,7 @@ class _CtaButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(50),
         onTap: onTap,
         child: Container(
-          height: 54,
+          height: _signInButtonHeight,
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 18),
           child: Row(
