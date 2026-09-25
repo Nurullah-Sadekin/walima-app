@@ -94,7 +94,7 @@ extension _ProfileSectionEditPrefillMainPart on _ProfileSectionEditScreenState {
     _prefillLookup(
       controller: _religionController,
       raw: _firstNonEmpty(religion?.religion, profileData?.religionName),
-      options: _ProfileSectionEditScreenState._religionOptions,
+      options: _ProfileSectionEditScreenState._selfReligionOptions,
       fieldKey: 'religion',
     );
     _prefillLookup(
@@ -256,7 +256,7 @@ extension _ProfileSectionEditPrefillMainPart on _ProfileSectionEditScreenState {
     _prefillLookup(
       controller: _prefReligionController,
       raw: _firstOrNull(preferences?.religionPreference),
-      options: _ProfileSectionEditScreenState._religionOptions,
+      options: _ProfileSectionEditScreenState._partnerReligionOptions,
       fieldKey: 'prefReligion',
     );
     _prefCommunityController.text =

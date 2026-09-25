@@ -35,6 +35,16 @@ final List<LookupOption> religionLookupOptions = Religion.values
     .map((item) => LookupOption(key: item.apiValue, label: item.label))
     .toList(growable: false);
 
+/// Religions available for the account holder. The product currently supports
+/// only Islam and Others for self-reported religion.
+final List<LookupOption> selfReligionLookupOptions = religionLookupOptions
+    .where(
+      (item) =>
+          item.key == Religion.islam.apiValue ||
+          item.key == Religion.others.apiValue,
+    )
+    .toList(growable: false);
+
 /// Whether a religion key has a community lookup category server-side.
 /// `open_to_all` and `others` do not, so web hides the community field for them
 /// instead of issuing a request that always comes back empty.

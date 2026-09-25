@@ -118,8 +118,13 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
             setState(() {});
           }
 
-          DateTime selectedDate =
-              DateTime.now().subtract(const Duration(days: 365 * 19));
+          final now = DateTime.now();
+          // Date arithmetic is calendar-based so the boundary remains correct
+          // around leap years. A duration of 18 * 365 days would allow some
+          // under-18 dates to slip through.
+          final latestAllowedDate = DateTime(now.year - 18, now.month, now.day);
+          final earliestAllowedDate = DateTime(1950);
+          DateTime selectedDate = latestAllowedDate;
 
           try {
             final existing =
@@ -133,6 +138,14 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
               }
             }
           } catch (_) {}
+
+          // A DOB may have been saved before the adult-age rule was added.
+          // Keep the picker valid and do not let that value be re-selected.
+          if (selectedDate.isAfter(latestAllowedDate)) {
+            selectedDate = latestAllowedDate;
+          } else if (selectedDate.isBefore(earliestAllowedDate)) {
+            selectedDate = earliestAllowedDate;
+          }
 
           await showCupertinoModalPopup(
             context: context,
@@ -226,8 +239,8 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
                         child: CupertinoDatePicker(
                           mode: CupertinoDatePickerMode.date,
                           initialDateTime: selectedDate,
-                          minimumDate: DateTime(1950),
-                          maximumDate: DateTime(2050),
+                          minimumDate: earliestAllowedDate,
+                          maximumDate: latestAllowedDate,
                           use24hFormat: true,
                           onDateTimeChanged: (DateTime value) {
                             selectedDate = value;

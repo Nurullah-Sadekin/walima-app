@@ -275,7 +275,7 @@ extension _ProfileSectionEditLookupDynamicPart
 
   Future<void> _loadCommunityOptionsForReligion(String? religionInput) async {
     final religionKey = _resolveLookupKey(
-      _ProfileSectionEditScreenState._religionOptions,
+      _ProfileSectionEditScreenState._partnerReligionOptions,
       religionInput,
     );
     // `open_to_all` and `others` have no community category server-side, so skip

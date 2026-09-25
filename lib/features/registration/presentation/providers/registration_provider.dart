@@ -663,9 +663,12 @@ class RegistrationProvider extends BaseChangeNotifier {
   }
 
   Future<void> loadReligionData() async {
-    religionOptions = List<LookupOption>.from(religionLookupOptions);
-    religionDropdownItems =
-        religionOptions.map((item) => item.label).toList(growable: false);
+    religionOptions = List<LookupOption>.from(selfReligionLookupOptions);
+    religionDropdownItems = religionOptions
+        .map(
+          (item) => item.label,
+        )
+        .toList(growable: false);
     await _syncCommunityOptionsFromSelectedReligion();
     notifyListeners();
   }
@@ -2089,7 +2092,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     final candidate =
         matchedReligion?.key.trim().toLowerCase() ?? _toSnakeCase(selected);
 
-    if (religionLookupOptions.any((item) => item.key == candidate)) {
+    if (selfReligionLookupOptions.any((item) => item.key == candidate)) {
       return candidate;
     }
     return 'others';

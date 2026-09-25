@@ -15,12 +15,10 @@ class ReligiousPracticeScreen extends ConsumerStatefulWidget {
   const ReligiousPracticeScreen({super.key});
 
   @override
-  ConsumerState<ReligiousPracticeScreen> createState() =>
-      _ReligiousPracticeScreenState();
+  ConsumerState<ReligiousPracticeScreen> createState() => _ReligiousPracticeScreenState();
 }
 
-class _ReligiousPracticeScreenState
-    extends ConsumerState<ReligiousPracticeScreen> {
+class _ReligiousPracticeScreenState extends ConsumerState<ReligiousPracticeScreen> {
   @override
   void initState() {
     super.initState();
@@ -62,20 +60,13 @@ class _ReligiousPracticeScreenState
                       Expanded(
                         child: ListView.separated(
                           itemCount: options.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(height: 10),
+                          separatorBuilder: (_, __) => const SizedBox(height: 10),
                           itemBuilder: (context, index) {
                             final option = options[index];
-                            final selected = provider
-                                    .religiousPracticeController.text
-                                    .trim()
-                                    .toLowerCase() ==
-                                option.label.trim().toLowerCase();
+                            final selected = provider.religiousPracticeController.text.trim().toLowerCase() == option.label.trim().toLowerCase();
                             return SelectionCard(
                               borderRadius: 14,
-                              buttonStyle: selected
-                                  ? SelectionStyle.selectedRadio
-                                  : SelectionStyle.unSelectedRadio,
+                              buttonStyle: selected ? SelectionStyle.selectedRadio : SelectionStyle.unSelectedRadio,
                               isSelected: selected,
                               title: option.label,
                               onTap: () => provider.selectReligiousPractice(
@@ -86,9 +77,7 @@ class _ReligiousPracticeScreenState
                         ),
                       ),
                       PrimaryButtons(
-                        buttonStyle: provider.religiousPracticeController.text
-                                .trim()
-                                .isNotEmpty
+                        buttonStyle: provider.religiousPracticeController.text.trim().isNotEmpty
                             ? ButtonsStyle.iconicDynamicButton
                             : ButtonsStyle.disableButton,
                         verticalPadding: 14,
@@ -96,9 +85,7 @@ class _ReligiousPracticeScreenState
                         svgIconPath: AppImages.arrowRightSvgIcon,
                         title: 'Continue',
                         onTap: () {
-                          if (provider.religiousPracticeController.text
-                              .trim()
-                              .isEmpty) {
+                          if (provider.religiousPracticeController.text.trim().isEmpty) {
                             return;
                           }
                           context.push(Paths.marriageIntention);

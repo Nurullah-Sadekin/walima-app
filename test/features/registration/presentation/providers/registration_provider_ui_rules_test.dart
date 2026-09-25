@@ -39,4 +39,15 @@ void main() {
       isTrue,
     );
   });
+
+  test('self religion offers only Islam and Others', () async {
+    final provider = RegistrationProvider();
+
+    await provider.loadReligionData();
+
+    expect(
+      provider.religionOptions.map((option) => option.key),
+      <String>['islam', 'others'],
+    );
+  });
 }

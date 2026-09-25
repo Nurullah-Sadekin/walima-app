@@ -14,13 +14,13 @@ import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:walima_llc/features/registration/presentation/widgets/static_text_widget.dart';
 
-class YourReligion extends ConsumerStatefulWidget {
-  const YourReligion({super.key});
+class LocationAndYourReligion extends ConsumerStatefulWidget {
+  const LocationAndYourReligion({super.key});
   @override
-  ConsumerState<YourReligion> createState() => _YourRegionState();
+  ConsumerState<LocationAndYourReligion> createState() => _LocationAndYourReligionState();
 }
 
-class _YourRegionState extends ConsumerState<YourReligion> {
+class _LocationAndYourReligionState extends ConsumerState<LocationAndYourReligion> {
   late RegistrationProvider provider;
 
   @override
@@ -48,22 +48,15 @@ class _YourRegionState extends ConsumerState<YourReligion> {
     final screenProvider = ref.watch(registrationScreenStateProvider);
     return TransparentLoading(
       isLoading:
-          screenProvider.loaderState == RegistrationScreenStates.isProfileFor ||
-              provider.isReligionDataLoading ||
-              provider.isLocationDataLoading,
+          screenProvider.loaderState == RegistrationScreenStates.isProfileFor || provider.isReligionDataLoading || provider.isLocationDataLoading,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: screenProvider.screenStates ==
-                  RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates == RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(
-                        imagePath: AppImages.religion,
-                        totalProgressCount: 11,
-                        currentIndexProgress: 2,
-                        showProgress: true),
+                    const UpperLayer(imagePath: AppImages.religion, totalProgressCount: 11, currentIndexProgress: 2, showProgress: true),
                     body(),
                   ],
                 ),
@@ -108,7 +101,6 @@ class _YourRegionState extends ConsumerState<YourReligion> {
           isSearch: true,
         ),
         SizedBox(height: TextSize.font20(context)),
-
         if (provider.showCommunityField) ...[
           DropDownField(
             headLine: 'Community',
@@ -119,8 +111,7 @@ class _YourRegionState extends ConsumerState<YourReligion> {
             items: provider.communityDropdownItems,
             controller: provider.communityController,
             onTap: provider.loadLocationData,
-            onConfirm: (value) =>
-                provider.onCommunitySelected(value?.toString()),
+            onConfirm: (value) => provider.onCommunitySelected(value?.toString()),
             isSearch: true,
           ),
           SizedBox(height: TextSize.font20(context)),
@@ -165,9 +156,7 @@ class _YourRegionState extends ConsumerState<YourReligion> {
             ? const SizedBox.shrink()
             : PrimaryTextField(
                 headLine: 'City',
-                hintText: provider.livingInController.text.isEmpty
-                    ? 'Select Living In first'
-                    : 'Select',
+                hintText: provider.livingInController.text.isEmpty ? 'Select Living In first' : 'Select',
                 controller: provider.cityController,
                 errorText: '',
                 enabled: provider.livingInController.text.isNotEmpty,
@@ -187,19 +176,16 @@ class _YourRegionState extends ConsumerState<YourReligion> {
 
   Widget bottomAction() {
     return PrimaryButtons(
-      buttonStyle: provider.religionController.text.isNotEmpty &&
-              provider.cityController.text.isNotEmpty &&
-              provider.livingInController.text.isNotEmpty
-          ? ButtonsStyle.iconicDynamicButton
-          : ButtonsStyle.disableButton,
+      buttonStyle:
+          provider.religionController.text.isNotEmpty && provider.cityController.text.isNotEmpty && provider.livingInController.text.isNotEmpty
+              ? ButtonsStyle.iconicDynamicButton
+              : ButtonsStyle.disableButton,
       verticalPadding: 14,
       borderRadius: 50,
       svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
       onTap: () {
-        if (provider.religionController.text.isEmpty ||
-            provider.cityController.text.isEmpty ||
-            provider.livingInController.text.isEmpty) {
+        if (provider.religionController.text.isEmpty || provider.cityController.text.isEmpty || provider.livingInController.text.isEmpty) {
           return;
         }
         provider.setSelectedCountryCode(context);
@@ -207,10 +193,8 @@ class _YourRegionState extends ConsumerState<YourReligion> {
     );
   }
 
-
   Future<void> _openCountryPicker() async {
-    await provider.loadCountryData(
-        reset: provider.countryDropdownItems.isEmpty);
+    await provider.loadCountryData(reset: provider.countryDropdownItems.isEmpty);
     if (!mounted) {
       return;
     }
@@ -220,8 +204,7 @@ class _YourRegionState extends ConsumerState<YourReligion> {
       title: 'Select Living In',
       searchHintText: 'Search country',
       items: provider.countryDropdownItems,
-      isInitialLoading:
-          provider.isCountryLoading && provider.countryDropdownItems.isEmpty,
+      isInitialLoading: provider.isCountryLoading && provider.countryDropdownItems.isEmpty,
       isLoadingMore: provider.isCountryLoadingMore,
       hasMoreItems: provider.hasMoreCountries,
       initialQuery: provider.countrySearchQuery,

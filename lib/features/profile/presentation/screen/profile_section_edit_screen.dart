@@ -214,7 +214,10 @@ class _ProfileSectionEditScreenState extends _ProfileSectionEditScreenFields {
         RegistrationFamilyEconomicCondition.lowerMiddleClass.apiValue,
   };
 
-  static final List<LookupOption> _religionOptions = religionLookupOptions;
+  static final List<LookupOption> _selfReligionOptions =
+      selfReligionLookupOptions;
+  static final List<LookupOption> _partnerReligionOptions =
+      religionLookupOptions;
 
   static final List<int> _heightInchOptions = List<int>.generate(
     33,

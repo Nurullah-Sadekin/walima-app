@@ -182,7 +182,7 @@ extension _ProfileSectionEditUiSectionBodyPart
         _lookupDropdown(
           label: 'Religion',
           controller: _religionController,
-          options: _ProfileSectionEditScreenState._religionOptions,
+          options: _ProfileSectionEditScreenState._selfReligionOptions,
           popupHeader: 'Select Religion',
           fieldKey: 'religion',
           onSelected: (_) {
@@ -437,7 +437,7 @@ extension _ProfileSectionEditUiSectionBodyPreferencePart
         _lookupDropdown(
           label: 'Religion'.localized(context),
           controller: _prefReligionController,
-          options: _ProfileSectionEditScreenState._religionOptions,
+          options: _ProfileSectionEditScreenState._partnerReligionOptions,
           popupHeader: 'Select Religion'.localized(context),
           fieldKey: 'prefReligion',
           onSelected: (_) {

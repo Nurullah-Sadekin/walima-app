@@ -46,7 +46,7 @@ import 'package:walima_llc/features/registration/presentation/screens/profile_cr
 import 'package:walima_llc/features/registration/presentation/screens/profile_is_for.dart';
 import 'package:walima_llc/features/registration/presentation/screens/verify_number.dart';
 import 'package:walima_llc/features/registration/presentation/screens/verify_otp_for_sign_up.dart';
-import 'package:walima_llc/features/registration/presentation/screens/your_religion.dart';
+import 'package:walima_llc/features/registration/presentation/screens/location_and_your_religion.dart';
 import 'package:walima_llc/features/settings/presentation/screens/language_settings_screen.dart';
 import 'package:walima_llc/features/settings/presentation/screens/settings_screen.dart';
 import 'package:walima_llc/features/support/presentation/screens/contact_support_screen.dart';
@@ -224,7 +224,7 @@ GoRouter goRouter(Ref ref) {
       GoRoute(
         path: Paths.yourReligion,
         name: Routes.yourReligion,
-        builder: (context, state) => const YourReligion(),
+        builder: (context, state) => const LocationAndYourReligion(),
       ),
       GoRoute(
         path: Paths.religiousPractice,
