@@ -86,6 +86,10 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
   }
 
   Widget dataInsertField() {
+    final hasNoFormalEducation =
+        provider.highestQualification.text.trim().toLowerCase() ==
+        'no formal education';
+
     return Column(
       spacing: 20,
       children: [
@@ -100,35 +104,47 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
           onConfirm: (value) {
             if (value == null) return;
             provider.highestQualification.text = value.toString();
+            if (value.toString().trim().toLowerCase() ==
+                'no formal education') {
+              provider.instituteController.clear();
+              provider.anotherInstituteController.clear();
+            }
           },
           isSearch: true,
         ),
-        PrimaryTextField(
-          controller: provider.instituteController,
-          isRequired: true,
-          headLine: 'Institute / University Name',
-          hintText: 'e.g. University of Dhaka',
-          errorText: null,
-          noPrefix: true,
-          onTap: () {},
-        ),
-        PrimaryTextField(
-          controller: provider.anotherInstituteController,
-          headLine: 'Another Institute',
-          isOptional : true,
-          hintText: 'e.g. North South University',
-          errorText: null,
-          noPrefix: true,
-          onTap: () {},
-        ),
+        if (!hasNoFormalEducation) ...[
+          PrimaryTextField(
+            controller: provider.instituteController,
+            isRequired: true,
+            headLine: 'Institute / University Name',
+            hintText: 'e.g. University of Dhaka',
+            errorText: null,
+            noPrefix: true,
+            onTap: () {},
+          ),
+          PrimaryTextField(
+            controller: provider.anotherInstituteController,
+            headLine: 'Another Institute',
+            isOptional: true,
+            hintText: 'e.g. North South University',
+            errorText: null,
+            noPrefix: true,
+            onTap: () {},
+          ),
+        ],
       ],
     );
   }
 
   Widget bottomAction() {
+    final hasNoFormalEducation =
+        provider.highestQualification.text.trim().toLowerCase() ==
+        'no formal education';
+    final canContinue = provider.highestQualification.text.isNotEmpty &&
+        (hasNoFormalEducation || provider.instituteController.text.isNotEmpty);
+
     return PrimaryButtons(
-      buttonStyle: provider.highestQualification.text.isNotEmpty &&
-              provider.instituteController.text.isNotEmpty
+      buttonStyle: canContinue
           ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
       verticalPadding: 14,
@@ -136,8 +152,7 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
       svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
       onTap: () {
-        if (provider.highestQualification.text.isEmpty ||
-            provider.instituteController.text.isEmpty) {
+        if (!canContinue) {
           return;
         }
         context.push(Paths.profession);

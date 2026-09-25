@@ -104,64 +104,14 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
                     staticText(),
                     SizedBox(height: MediaQuery.sizeOf(context).height * 0.01),
                     loginDataField(),
-                    const SizedBox(height: 10),
-                    ResendCodeTimer(
-                      onResend: () async {
-                        final screenProvider =
-                            ref.read(registrationScreenStateProvider);
-                        screenProvider.updateViewState(
-                          loadingState: RegistrationScreenStates.isProfileFor,
-                        );
-                        await provider.resendOtp(context);
-                        screenProvider.updateViewState(
-                          loadingState:
-                              RegistrationScreenStates.loadingComplete,
-                        );
-                      },
+                    Padding(
+                      padding: const EdgeInsets.only(top: 14),
+                      child: verificationActions(),
                     ),
-                    bottomAction(),
                     SizedBox(height: MediaQuery.sizeOf(context).height * 0.01),
                     SizedBox(height: MediaQuery.sizeOf(context).height * 0.01),
                     contactSupport(),
                     const Spacer(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      spacing: 6,
-                      children: [
-                        Text(
-                          "Don't have an account?",
-                          style: TextStyle(
-                            color: AppColors.hintTextColor,
-                            fontWeight: FontWeight.w500,
-                            fontSize: TextSize.font14(context),
-                          ),
-                        ),
-                        InkWell(
-                          onTap: () {
-                            context.pushNamed(Routes.onboarding);
-                          },
-                          child: Row(
-                            spacing: 4,
-                            children: [
-                              Text(
-                                'Sign Up Free',
-                                style: TextStyle(
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: TextSize.font16(context),
-                                ),
-                              ),
-                              const Icon(
-                                Icons.arrow_forward_ios,
-                                color: AppColors.primary,
-                                size: 8,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: MediaQuery.sizeOf(context).height * 0.005),
                   ],
                 ),
               ),
@@ -169,6 +119,29 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifySignUpScreen> {
           );
         },
       ),
+    );
+  }
+
+  /// Keeps the resend control and primary action visually grouped while
+  /// preserving a predictable touch-target gap on every screen size.
+  Widget verificationActions() {
+    return Column(
+      children: [
+        ResendCodeTimer(
+          onResend: () async {
+            final screenProvider = ref.read(registrationScreenStateProvider);
+            screenProvider.updateViewState(
+              loadingState: RegistrationScreenStates.isProfileFor,
+            );
+            await provider.resendOtp(context);
+            screenProvider.updateViewState(
+              loadingState: RegistrationScreenStates.loadingComplete,
+            );
+          },
+        ),
+        const SizedBox(height: 18),
+        bottomAction(),
+      ],
     );
   }
 
