@@ -4,6 +4,7 @@ class LookupOption {
   const LookupOption({
     required this.key,
     required this.label,
+    this.description,
     this.parentKey,
   });
 
@@ -18,12 +19,16 @@ class LookupOption {
     return LookupOption(
       key: (json['key'] ?? '').toString(),
       label: (json['label'] ?? '').toString(),
+      description: json['description']?.toString(),
       parentKey: parentKey?.toString(),
     );
   }
 
   final String key;
   final String label;
+
+  /// Optional explanatory copy supplied by the lookup API.
+  final String? description;
 
   /// The lookup key of this option's parent, when the API returns a hierarchy.
   final String? parentKey;

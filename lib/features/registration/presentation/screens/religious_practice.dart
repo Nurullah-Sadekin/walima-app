@@ -21,17 +21,6 @@ class ReligiousPracticeScreen extends ConsumerStatefulWidget {
 
 class _ReligiousPracticeScreenState
     extends ConsumerState<ReligiousPracticeScreen> {
-  static const _practiceDescriptions = {
-    'very religious':
-        'I pray 5 times, fast regularly, and follow my faith strictly every day',
-    'moderately religious':
-        'I try to pray and follow my faith but sometimes I miss',
-    'somewhat religious':
-        'I practise mainly during Ramadan, Eid, and other special occasions',
-    'not very religious': 'I believe in my faith but don\'t actively practise',
-    'prefer not to say': 'I\'d rather keep this private',
-  };
-
   @override
   void initState() {
     super.initState();
@@ -50,6 +39,7 @@ class _ReligiousPracticeScreenState
         backgroundColor: Colors.transparent,
         body: GradientBackground(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               UpperLayer(
                 imagePath: AppImages.religion,
@@ -64,14 +54,17 @@ class _ReligiousPracticeScreenState
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const StaticTextWidget(
                         title: 'Religious Practice',
                         subtitle: 'How important is faith in your daily life?',
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
+                      
                       Expanded(
                         child: ListView.separated(
+                          padding: const EdgeInsets.only(top: 0, bottom: 20),
                           itemCount: options.length,
                           separatorBuilder: (_, __) =>
                               const SizedBox(height: 10),
@@ -89,8 +82,7 @@ class _ReligiousPracticeScreenState
                                   : SelectionStyle.unSelectedRadio,
                               isSelected: selected,
                               title: option.label,
-                              subtitle: _practiceDescriptions[
-                                  option.label.trim().toLowerCase()],
+                              subtitle: option.description,
                               onTap: () => provider.selectReligiousPractice(
                                 option.label,
                               ),
