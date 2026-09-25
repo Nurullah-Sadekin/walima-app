@@ -6,7 +6,6 @@ import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/global/components/upper_layer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:walima_llc/core/global/components/primary_textField.dart';
-import 'package:walima_llc/core/global/components/selection_card.dart';
 import 'package:walima_llc/core/global/components/dropdown_field.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/features/matches/presentation/widgets/setting_switcher_title.dart';
@@ -86,7 +85,6 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
             dataInsertField(),
             const SizedBox(height: 20),
             bottomAction(),
-            
             const SizedBox(height: 20),
           ],
         ),
@@ -176,19 +174,21 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
               items: provider.incomeRangeDropdownItems,
               controller: provider.incomeRangeController,
               onTap: provider.loadProfessionLookupData,
-              onConfirm: (value) => provider.selectIncomeRange(value?.toString()),
+              onConfirm: (value) =>
+                  provider.selectIncomeRange(value?.toString()),
               isSearch: true,
             ),
             const SizedBox(height: 10),
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 12,horizontal: 16),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(6),
                 color: AppColors.disableBackground,
               ),
               child: SettingsSwitchTile(
                 title: 'Hide income from others',
-                subtitle: 'Income helps us find better matches but won\'t be shown to others',
+                subtitle:
+                    'Income helps us find better matches but won\'t be shown to others',
                 value: provider.hideIncome,
                 onChanged: (bool value) {
                   provider.hideIncome = value;
@@ -224,17 +224,33 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
           ],
         ),
 
-        // YourWork Dropdown
+        // Work sector is selected in two levels when the lookup API supplies
+        // parent/child relationships. Selecting a category clears any prior
+        // leaf from a different branch.
         DropDownField(
           headLine: 'Work Sector',
           hintText: 'Select',
           isRequired: true,
-          popUpHeader: 'Select Your Work',
-          items: provider.yourWorkList,
-          controller: provider.yourWorkController,
-          onConfirm: (value) => provider.selectYourWork(value?.toString()),
+          popUpHeader: 'Select Work Sector',
+          items: provider.workSectorCategoryItems,
+          controller: provider.workSectorCategoryController,
+          onTap: provider.loadProfessionLookupData,
+          onConfirm: (value) =>
+              provider.selectWorkSectorCategory(value?.toString()),
           isSearch: false,
         ),
+
+        if (provider.workSectorNeedsSubcategory)
+          DropDownField(
+            headLine: 'Work Category',
+            hintText: 'Select',
+            isRequired: true,
+            popUpHeader: 'Select Work Category',
+            items: provider.workSectorSubcategoryItems,
+            controller: provider.yourWorkController,
+            onConfirm: (value) => provider.selectYourWork(value?.toString()),
+            isSearch: false,
+          ),
 
         // You Work As Dropdown
         DropDownField(
@@ -264,11 +280,11 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
 
   Widget bottomAction() {
     final hasAnyValue = provider.youWorkAsController.text.isEmpty ||
-        provider.yourWorkController.text.isEmpty;
+        !provider.hasSelectedWorkSector;
 
     return PrimaryButtons(
       buttonStyle: provider.youWorkAsController.text.isNotEmpty &&
-              provider.yourWorkController.text.isNotEmpty
+              provider.hasSelectedWorkSector
           ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
       verticalPadding: 14,

@@ -27,8 +27,7 @@ import 'core/config/size_config.dart';
 Future<void> main() async {
   AppConfig.initialize(); // Set the desired flavor here
 
-  runZonedGuarded(
-    () async {
+  runZonedGuarded(() async {
       WidgetsFlutterBinding.ensureInitialized();
       if (!kIsWeb && Firebase.apps.isEmpty) {
         if (defaultTargetPlatform == TargetPlatform.android) {

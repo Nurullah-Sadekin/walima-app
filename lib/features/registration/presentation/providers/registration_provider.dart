@@ -23,6 +23,7 @@ import 'package:walima_llc/features/biodata/domain/model/bio_template.dart';
 import 'package:walima_llc/features/registration/data/models/response/onboarding_response.dart';
 import 'package:walima_llc/features/registration/data/models/response/upload_media_response.dart';
 import 'package:walima_llc/features/registration/data/models/lookup_option.dart';
+import 'package:walima_llc/features/registration/domain/work_sector_hierarchy.dart';
 import 'package:walima_llc/features/biodata/data/repository/bio_template_repository.dart';
 import 'package:walima_llc/features/registration/data/repository/interests_repository.dart';
 import 'package:walima_llc/features/registration/data/repository/family_repository.dart';
@@ -88,6 +89,8 @@ class RegistrationProvider extends BaseChangeNotifier {
       TextEditingController();
   final TextEditingController incomeRangeController = TextEditingController();
   final TextEditingController yourWorkController = TextEditingController();
+  final TextEditingController workSectorCategoryController =
+      TextEditingController();
   final TextEditingController youWorkAsController = TextEditingController();
   final TextEditingController motherDetailsController = TextEditingController();
   final TextEditingController fatherDetailsController = TextEditingController();
@@ -170,6 +173,40 @@ class RegistrationProvider extends BaseChangeNotifier {
   String? religionDataError;
   bool isLookupDataLoading = false;
   String? lookupDataError;
+
+  WorkSectorHierarchy get workSectorHierarchy =>
+      WorkSectorHierarchy(workSectorOptions);
+
+  List<String> get workSectorCategoryItems => workSectorHierarchy.roots
+      .map((option) => option.label)
+      .toList(growable: false);
+
+  List<String> get workSectorSubcategoryItems {
+    final category =
+        workSectorHierarchy.find(workSectorCategoryController.text);
+    if (category == null) return const <String>[];
+    return workSectorHierarchy
+        .childrenOf(category.key)
+        .map((option) => option.label)
+        .toList(growable: false);
+  }
+
+  bool get workSectorNeedsSubcategory => workSectorSubcategoryItems.isNotEmpty;
+
+  bool get hasSelectedWorkSector =>
+      yourWorkController.text.trim().isNotEmpty &&
+      (!workSectorNeedsSubcategory ||
+          _isSelectedWorkSectorChildOfCurrentCategory);
+
+  bool get _isSelectedWorkSectorChildOfCurrentCategory {
+    final category =
+        workSectorHierarchy.find(workSectorCategoryController.text);
+    final selection = workSectorHierarchy.find(yourWorkController.text);
+    if (category == null || selection == null) return false;
+    return workSectorHierarchy
+        .childrenOf(category.key)
+        .any((option) => option.key == selection.key);
+  }
 
   List<ResidencyStatusOptionModel> residencyStatusOptions =
       <ResidencyStatusOptionModel>[];
@@ -333,6 +370,7 @@ class RegistrationProvider extends BaseChangeNotifier {
         currentCompanyNameController,
         incomeRangeController,
         yourWorkController,
+        workSectorCategoryController,
         youWorkAsController,
         motherDetailsController,
         fatherDetailsController,
@@ -829,6 +867,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       incomeRangeOptions = results[2];
       if (workSectorOptions.isNotEmpty) {
         yourWorkList = _toSingleStringModels(workSectorOptions);
+        _syncWorkSectorCategoryFromSelection();
       }
       incomeRangeList = _toSingleStringModels(incomeRangeOptions);
       youWorkAsList = _toSingleStringModels(professionOptions);
@@ -1335,6 +1374,38 @@ class RegistrationProvider extends BaseChangeNotifier {
     _notifyAndPersist();
   }
 
+  void selectWorkSectorCategory(String? value) {
+    if (value == null) return;
+
+    workSectorCategoryController.text = value;
+    final category = workSectorHierarchy.find(value);
+    final children = category == null
+        ? const <LookupOption>[]
+        : workSectorHierarchy.childrenOf(category.key);
+
+    // A category with children is not itself a valid final answer. Clearing
+    // the previous leaf prevents retaining a sibling from another category.
+    if (children.isNotEmpty) {
+      yourWorkController.clear();
+      selectedYourWork = null;
+    } else {
+      selectYourWork(value);
+      return;
+    }
+    _notifyAndPersist();
+  }
+
+  void _syncWorkSectorCategoryFromSelection() {
+    final selected = selectedYourWork?.trim().isNotEmpty == true
+        ? selectedYourWork!
+        : yourWorkController.text;
+    final option = workSectorHierarchy.find(selected);
+    if (option == null) return;
+
+    final parent = workSectorHierarchy.find(option.parentKey ?? '');
+    workSectorCategoryController.text = parent?.label ?? option.label;
+  }
+
   void selectYouWorkAs(String? value) {
     if (value == null) return;
     youWorkAsController.text = value;
@@ -1586,6 +1657,7 @@ class RegistrationProvider extends BaseChangeNotifier {
         'aboutYourself': aboutYourselfController.text,
         'currentCompanyName': currentCompanyNameController.text,
         'incomeRange': incomeRangeController.text,
+        'workSectorCategory': workSectorCategoryController.text,
         'yourWork': yourWorkController.text,
         'youWorkAs': youWorkAsController.text,
         'motherDetails': motherDetailsController.text,
@@ -1664,6 +1736,10 @@ class RegistrationProvider extends BaseChangeNotifier {
         _restoreControllerText(
             incomeRangeController, controllerValues['incomeRange']);
         _restoreControllerText(
+          workSectorCategoryController,
+          controllerValues['workSectorCategory'],
+        );
+        _restoreControllerText(
             yourWorkController, controllerValues['yourWork']);
         _restoreControllerText(
             youWorkAsController, controllerValues['youWorkAs']);
@@ -1690,6 +1766,9 @@ class RegistrationProvider extends BaseChangeNotifier {
           incomeRangeController.text;
       selectedYourWork = _asStringOrNull(decoded['selectedYourWork']) ??
           yourWorkController.text;
+      if (workSectorCategoryController.text.trim().isEmpty) {
+        _syncWorkSectorCategoryFromSelection();
+      }
       selectedYouWorkAs = _asStringOrNull(decoded['selectedYouWorkAs']) ??
           youWorkAsController.text;
       selectedFamilyEconomicCondition =

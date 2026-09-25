@@ -4,17 +4,29 @@ class LookupOption {
   const LookupOption({
     required this.key,
     required this.label,
+    this.parentKey,
   });
 
   factory LookupOption.fromJson(Map<String, dynamic> json) {
+    final parent = json['parent'];
+    final parentKey = json['parentKey'] ??
+        json['parent_key'] ??
+        json['parentId'] ??
+        json['parent_id'] ??
+        (parent is Map ? parent['key'] ?? parent['id'] : parent);
+
     return LookupOption(
       key: (json['key'] ?? '').toString(),
       label: (json['label'] ?? '').toString(),
+      parentKey: parentKey?.toString(),
     );
   }
 
   final String key;
   final String label;
+
+  /// The lookup key of this option's parent, when the API returns a hierarchy.
+  final String? parentKey;
 }
 
 /// The single source of truth for religion dropdowns across the app. Kept in
