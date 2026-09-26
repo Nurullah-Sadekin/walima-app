@@ -73,7 +73,7 @@ class UpdatePreferencesRequestBody {
     addValue('annualIncomePreference', annualIncomePreference);
     addValue('preferredCountries', preferredCountries);
     addValue('preferredStates', preferredStates);
-    addValue('preferredCities', preferredCities);
+    if (preferredCities != null) map['preferredCities'] = preferredCities;
     addValue('profileManagedByPreference', profileManagedByPreference);
     addValue('spouseWorkStudyAllowed', spouseWorkStudyAllowed);
     addValue('postMarriageLivingPreference', postMarriageLivingPreference);
