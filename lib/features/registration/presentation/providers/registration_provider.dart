@@ -193,10 +193,37 @@ class RegistrationProvider extends BaseChangeNotifier {
 
   bool get workSectorNeedsSubcategory => workSectorSubcategoryItems.isNotEmpty;
 
-  bool get hasSelectedWorkSector =>
-      yourWorkController.text.trim().isNotEmpty &&
-      (!workSectorNeedsSubcategory ||
-          _isSelectedWorkSectorChildOfCurrentCategory);
+  String get selectedWorkSector {
+    if (selectedYourWork?.trim().isNotEmpty == true) {
+      return selectedYourWork!.trim();
+    }
+    if (yourWorkController.text.trim().isNotEmpty) {
+      return yourWorkController.text.trim();
+    }
+    return workSectorCategoryController.text.trim();
+  }
+
+  bool get isNotWorking =>
+      resolveWorkSectorType(selectedWorkSector) == WorkSectorType.notWorking;
+
+  List<LookupOption> get filteredProfessionOptions {
+    if (!hasSelectedWorkSector) {
+      return const <LookupOption>[];
+    }
+    return WorkSectorHierarchy.filterProfessionsForWorkSector(
+      selectedWorkSector,
+      professionOptions,
+    );
+  }
+
+  bool get hasSelectedWorkSector {
+    final hasValue = yourWorkController.text.trim().isNotEmpty ||
+        (!workSectorNeedsSubcategory &&
+            workSectorCategoryController.text.trim().isNotEmpty);
+    return hasValue &&
+        (!workSectorNeedsSubcategory ||
+            _isSelectedWorkSectorChildOfCurrentCategory);
+  }
 
   bool get _isSelectedWorkSectorChildOfCurrentCategory {
     final category =
@@ -886,6 +913,7 @@ class RegistrationProvider extends BaseChangeNotifier {
         (item) => item.name,
         (item, selected) => item.isSelected = selected,
       );
+      _syncProfessionWithSector();
     } catch (e) {
       lookupDataError = e.toString();
     } finally {
@@ -974,8 +1002,9 @@ class RegistrationProvider extends BaseChangeNotifier {
   List<String> get educationLevelDropdownItems =>
       educationLevelOptions.map((item) => item.label).toList(growable: false);
 
-  List<String> get professionDropdownItems =>
-      professionOptions.map((item) => item.label).toList(growable: false);
+  List<String> get professionDropdownItems => filteredProfessionOptions
+      .map((item) => item.label)
+      .toList(growable: false);
 
   List<String> get incomeRangeDropdownItems =>
       incomeRangeOptions.map((item) => item.label).toList(growable: false);
@@ -1374,6 +1403,7 @@ class RegistrationProvider extends BaseChangeNotifier {
     if (value == null) return;
     yourWorkController.text = value;
     selectedYourWork = value;
+    _syncProfessionWithSector();
     _notifyAndPersist();
   }
 
@@ -1395,7 +1425,29 @@ class RegistrationProvider extends BaseChangeNotifier {
       selectYourWork(value);
       return;
     }
+    _syncProfessionWithSector();
     _notifyAndPersist();
+  }
+
+  void _syncProfessionWithSector() {
+    if (isNotWorking) {
+      youWorkAsController.clear();
+      selectedYouWorkAs = null;
+      currentCompanyNameController.clear();
+      return;
+    }
+
+    final currentProfession = youWorkAsController.text.trim();
+    if (currentProfession.isNotEmpty) {
+      final validLabels = professionDropdownItems;
+      if (!validLabels.any(
+        (label) =>
+            label.trim().toLowerCase() == currentProfession.toLowerCase(),
+      )) {
+        youWorkAsController.clear();
+        selectedYouWorkAs = null;
+      }
+    }
   }
 
   void _syncWorkSectorCategoryFromSelection() {
@@ -1772,6 +1824,7 @@ class RegistrationProvider extends BaseChangeNotifier {
       if (workSectorCategoryController.text.trim().isEmpty) {
         _syncWorkSectorCategoryFromSelection();
       }
+      _syncProfessionWithSector();
       selectedYouWorkAs = _asStringOrNull(decoded['selectedYouWorkAs']) ??
           youWorkAsController.text;
       selectedFamilyEconomicCondition =
@@ -2252,7 +2305,11 @@ class RegistrationProvider extends BaseChangeNotifier {
   }
 
   String _resolveWorkTypeValue() {
-    final selected = selectedYourWork?.trim() ?? yourWorkController.text.trim();
+    final selected = selectedYourWork?.trim().isNotEmpty == true
+        ? selectedYourWork!.trim()
+        : yourWorkController.text.trim().isNotEmpty
+            ? yourWorkController.text.trim()
+            : workSectorCategoryController.text.trim();
     if (selected.isEmpty) return '';
 
     for (final option in yourWorkList) {
@@ -2268,6 +2325,10 @@ class RegistrationProvider extends BaseChangeNotifier {
   }
 
   String _resolveWorkingAsValue() {
+    if (isNotWorking) {
+      return 'not_working';
+    }
+
     final selected = youWorkAsController.text.trim();
     if (selected.isEmpty) return '';
 
@@ -2742,7 +2803,10 @@ class RegistrationProvider extends BaseChangeNotifier {
     }
   }
 
-  Future<bool> signUpViaOtp(BuildContext context) async {
+  Future<bool> signUpViaOtp(
+    BuildContext context, {
+    VoidCallback? onResponse,
+  }) async {
     final body = SignUpOtpBody(
       registrationSource: 'referral',
       firstName: firstNameController.text,
@@ -2752,6 +2816,7 @@ class RegistrationProvider extends BaseChangeNotifier {
           : _resolveSubmissionPhoneNumber(),
     );
     final response = await RegistrationRepository.signUpWithOTP(body);
+    onResponse?.call();
     if (response.code == 'SUCCESS') {
       verificationDone = true;
       _notifyAndPersist();

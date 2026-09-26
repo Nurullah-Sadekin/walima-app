@@ -32,6 +32,7 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
 
   late RegistrationProvider provider;
   String? _bioError;
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -58,7 +59,7 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(registrationScreenStateProvider);
     return TransparentLoading(
-      isLoading:
+      isLoading: _isSubmitting ||
           screenProvider.loaderState == RegistrationScreenStates.isProfileFor,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
@@ -364,6 +365,7 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
   }
 
   Future<void> _handleContinue() async {
+    if (_isSubmitting) return;
     final bioLength =
         provider.aboutYourselfController.text.trim().characters.length;
     if (bioLength < 20 || bioLength > 500) {
@@ -376,20 +378,32 @@ class _AboutYourselfScreenState extends ConsumerState<AboutYourselfScreen> {
     }
     final screenProvider = ref.read(registrationScreenStateProvider);
     if (provider.aboutYourselfController.text.isNotEmpty) {
-      await provider.signUpViaOtp(context).then((success) {
+      setState(() => _isSubmitting = true);
+      try {
+        final success = await provider.signUpViaOtp(
+          context,
+          onResponse: _stopSubmitting,
+        );
+        if (!mounted) return;
         if (success) {
           screenProvider.updateViewState(
             screenStates: RegistrationScreenStates.loadingComplete,
           );
-          if (mounted) {
-            context.push(Paths.otpVerifyForSignUp);
-          }
+          context.push(Paths.otpVerifyForSignUp);
         } else {
           screenProvider.updateViewState(
             loadingState: RegistrationScreenStates.loadingComplete,
           );
         }
-      });
+      } finally {
+        _stopSubmitting();
+      }
+    }
+  }
+
+  void _stopSubmitting() {
+    if (mounted && _isSubmitting) {
+      setState(() => _isSubmitting = false);
     }
   }
 }

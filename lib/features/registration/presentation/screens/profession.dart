@@ -63,7 +63,7 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
                         imagePath: AppImages.profession,
                         totalProgressCount: 11,
                         currentIndexProgress: 9,
-                        showProgress: true),
+                        showProgress: true,),
                     Expanded(child: body()),
                   ],
                 ),
@@ -81,7 +81,7 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
           children: [
             const StaticTextWidget(
                 title: 'Work Details',
-                subtitle: 'Tell us about your career & income'),
+                subtitle: 'Tell us about your career & income',),
             dataInsertField(),
             const SizedBox(height: 20),
             bottomAction(),
@@ -117,7 +117,7 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
                       style: TextStyle(
                           fontSize: TextSize.font10(context),
                           fontWeight: FontWeight.w400,
-                          color: AppColors.hintTextColor),
+                          color: AppColors.hintTextColor,),
                     ),
                   ],
                 ),
@@ -126,7 +126,7 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(30),
                       border:
-                          Border.all(width: 1, color: AppColors.disableText)),
+                          Border.all(width: 1, color: AppColors.disableText),),
                   child: Row(
                     children: List.generate(
                       provider.incomePeriodDataList.length,
@@ -142,7 +142,7 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
                             duration: const Duration(milliseconds: 250),
                             alignment: Alignment.center,
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 4),
+                                horizontal: 10, vertical: 4,),
                             decoration: BoxDecoration(
                               color: incomePeriod.isSelected
                                   ? const Color(0xFFE83E7A)
@@ -164,7 +164,7 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
                       },
                     ),
                   ),
-                )
+                ),
               ],
             ),
             // Income Range Dropdown
@@ -195,7 +195,7 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
                   provider.notifyListeners();
                 },
               ),
-            )
+            ),
             // Wrap(
             //   spacing: 10,
             //   runSpacing: 10,
@@ -252,39 +252,44 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
             isSearch: false,
           ),
 
-        // You Work As Dropdown
-        DropDownField(
-          headLine: 'Your Profession',
-          hintText: 'Select',
-          isRequired: true,
-          popUpHeader: 'Select Profession',
-          items: provider.professionDropdownItems,
-          controller: provider.youWorkAsController,
-          onTap: provider.loadProfessionLookupData,
-          onConfirm: (value) => provider.selectYouWorkAs(value?.toString()),
-          isSearch: true,
-        ),
+        if (!provider.isNotWorking) ...[
+          // You Work As Dropdown
+          DropDownField(
+            headLine: 'Your Profession',
+            hintText: provider.hasSelectedWorkSector
+                ? 'Select'
+                : 'Select Work Sector first',
+            enabled: provider.hasSelectedWorkSector,
+            isRequired: true,
+            popUpHeader: 'Select Profession',
+            items: provider.professionDropdownItems,
+            controller: provider.youWorkAsController,
+            onTap: provider.loadProfessionLookupData,
+            onConfirm: (value) => provider.selectYouWorkAs(value?.toString()),
+            isSearch: true,
+          ),
 
-        PrimaryTextField(
-          controller: provider.currentCompanyNameController,
-          headLine: 'Company / Organisation',
-          hintText: 'e.g. BRAC Bank, Grameenphone',
-          isOptional: true,
-          errorText: null,
-          noPrefix: true,
-          onTap: () {},
-        ),
+          PrimaryTextField(
+            controller: provider.currentCompanyNameController,
+            headLine: 'Company / Organisation',
+            hintText: 'e.g. BRAC Bank, Grameenphone',
+            isOptional: true,
+            errorText: null,
+            noPrefix: true,
+            onTap: () {},
+          ),
+        ],
       ],
     );
   }
 
   Widget bottomAction() {
-    final hasAnyValue = provider.youWorkAsController.text.isEmpty ||
-        !provider.hasSelectedWorkSector;
+    final canContinue = provider.hasSelectedWorkSector &&
+        (provider.isNotWorking ||
+            provider.youWorkAsController.text.trim().isNotEmpty);
 
     return PrimaryButtons(
-      buttonStyle: provider.youWorkAsController.text.isNotEmpty &&
-              provider.hasSelectedWorkSector
+      buttonStyle: canContinue
           ? ButtonsStyle.iconicDynamicButton
           : ButtonsStyle.disableButton,
       verticalPadding: 14,
@@ -292,9 +297,8 @@ class _ProfessionScreenState extends ConsumerState<ProfessionScreen> {
       svgIconPath: AppImages.arrowRightSvgIcon,
       title: 'Continue',
       onTap: () {
-        if (hasAnyValue) return;
+        if (!canContinue) return;
         context.push(Paths.aboutYourself);
-        // proceed
       },
     );
   }
