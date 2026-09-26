@@ -19,6 +19,7 @@ import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/anchor_point/achore_appbar.dart';
 import 'package:walima_llc/features/drawer/presentation/app_drawer.dart';
 import 'package:walima_llc/features/home/data/model/response/recent_visitors_response.dart';
+import 'package:walima_llc/features/home/domain/premium_match_card_actions.dart';
 import 'package:walima_llc/features/home/presentation/providers/home_provider.dart';
 import 'package:walima_llc/features/home/presentation/screens/widgets/complete_profile_section.dart';
 import 'package:walima_llc/features/home/presentation/screens/widgets/profile_summery_section.dart';
@@ -414,6 +415,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildPremiumMatchCard(MatchProfile match) {
+    final shortlistId = match.id ?? match.userReference;
+    final isShortlisted = ref.watch(homeProvider).isShortlisted(shortlistId);
+    final actions =
+        PremiumMatchCardActions(match, isShortlisted: isShortlisted);
+    final isConnected = actions.isConnected;
+    final canConnect = actions.canConnect;
     final location = _formatMatchLocation(match);
     final heightText = _formatMatchHeight(match.height);
     final activeStatus = _activeStatusText(match);
@@ -444,22 +451,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           height: HeightUtils.formatHeight(heightText),
           location: location?.localized(context),
           profession: profession?.localized(context),
-          leftButtonColor: match.canConnect
+          rightButtonText: actions.secondaryLabel,
+          rightIconPath:
+              isConnected ? AppImages.callIcon : AppImages.favouriteIcon,
+          rightButtonColor: !isConnected && isShortlisted
+              ? const Color(0xFFFFF1F5)
+              : AppColors.white,
+          rightButtonBorderColor: !isConnected && isShortlisted
+              ? const Color(0xFFE05271)
+              : AppColors.greyLight,
+          rightButtonIconColor: const Color(0xFFE05271),
+          leftButtonText: actions.primaryLabel,
+          leftButtonColor: isConnected || canConnect
               ? AppColors.greenButtonColor
               : AppColors.disableBackground,
-          leftButtonTextColor:
-              match.canConnect ? AppColors.white : AppColors.disableText,
-          leftButtonIconColor:
-              match.canConnect ? AppColors.white : AppColors.disableText,
-          leftButtonBorderColor: match.canConnect
+          leftButtonTextColor: isConnected || canConnect
+              ? AppColors.white
+              : AppColors.disableText,
+          leftButtonIconColor: isConnected || canConnect
+              ? AppColors.white
+              : AppColors.disableText,
+          leftButtonBorderColor: isConnected || canConnect
               ? AppColors.greenButtonColor
               : AppColors.disableBackground,
           viewOnAccept:
               match.profilePhoto?.visibilityStatus == 'visible' ? true : false,
           religion: match.religion?.localized(context),
           isOnline: match.isOnline ?? false,
-          showLeftButton: match.canConnect,
+          showLeftButton: actions.showPrimaryButton,
+          showRightButton: actions.showSecondaryButton,
           onTapRightButton: () async {
+            if (!isConnected) {
+              ref.read(homeProvider).toggleShortlist(shortlistId);
+              return;
+            }
             await BottomSheetUtils.open(
               context: context,
               fullHeight: false,
@@ -470,16 +495,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             );
           },
-          onTapLeftButton: match.canConnect
+          onTapLeftButton: isConnected
               ? () {
-                  ref.read(homeProvider).connect(
-                        context,
-                        match.id ?? '',
-                        match.displayName ?? 'Unknown'.localized(context),
-                        ConnectionRequestType.match.apiValue,
-                      );
+                  context.pushNamed(
+                    Routes.chatScreen,
+                    extra: {
+                      'conversationId': match.connection?.conversationId,
+                      'participant': {
+                        'userId': match.id,
+                        'displayName': match.displayName,
+                        'profilePictureUrl': match.profilePhoto?.url,
+                        'isOnline': match.isOnline,
+                      },
+                    },
+                  );
                 }
-              : null,
+              : canConnect
+                  ? () {
+                      ref.read(homeProvider).connect(
+                            context,
+                            match.id ?? '',
+                            match.displayName ?? 'Unknown'.localized(context),
+                            ConnectionRequestType.match.apiValue,
+                          );
+                    }
+                  : null,
           activeStatusText: activeStatus,
         ),
       ),
