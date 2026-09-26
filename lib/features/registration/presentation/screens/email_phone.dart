@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -124,7 +126,8 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
                 backgroundColor: AppColors.white,
                 checkmarkColor: AppColors.white,
                 side: BorderSide(
-                  color: item.isSelected ? AppColors.primary : AppColors.greyLight,
+                  color:
+                      item.isSelected ? AppColors.primary : AppColors.greyLight,
                 ),
                 labelStyle: TextStyle(
                   color: item.isSelected
@@ -133,7 +136,6 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
                   fontSize: TextSize.font14(context),
                   fontWeight: FontWeight.w500,
                 ),
-
                 onSelected: (_) =>
                     provider.selectedVerificationTypeIndex(index),
               );
@@ -170,7 +172,7 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
           prefixIcon: InkWell(
             onTap: _openCountryPicker,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -213,48 +215,35 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
   }
 
   Future<void> _openCountryPicker() async {
-    final provider = ref.read(registrationProvider);
-    showCountryPicker(
+    final country = await showModalBottomSheet<Country>(
       context: context,
-      showPhoneCode: true,
-      countryListTheme: CountryListThemeData(
-        backgroundColor: Colors.white,
-        textStyle: const TextStyle(
-          color: Colors.black,
-          fontSize: 14,
-        ),
-        searchTextStyle: const TextStyle(
-          color: Colors.black,
-          fontSize: 14,
-        ),
-        inputDecoration: InputDecoration(
-          hintText: 'Search country',
-          hintStyle: TextStyle(
-            fontSize: TextSize.font16(context),
-            color: AppColors.textSecondaryLight,
-          ),
-          prefixIcon: Icon(
-            Icons.search,
-            color: AppColors.textSecondaryLight,
-            size: TextSize.font22(context),
-          ),
-          filled: true,
-          fillColor: AppColors.greyLight.withValues(alpha: 0.5),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
-        ),
-        borderRadius: BorderRadius.circular(12),
-        bottomSheetHeight: 600,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: AppColors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
       ),
-      onSelect: (Country country) {
-        provider.selectedCountry = country;
-        provider.selectedCountryCodeForNumber = country.countryCode;
-        setState(() {});
-        // _showCountryError.value = false;
+      builder: (sheetContext) {
+        final availableHeight = MediaQuery.sizeOf(sheetContext).height -
+            MediaQuery.paddingOf(sheetContext).top -
+            MediaQuery.viewInsetsOf(sheetContext).bottom;
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.viewInsetsOf(sheetContext).bottom,
+          ),
+          child: SizedBox(
+            height: math.min(600, availableHeight),
+            child: const _CompactCountryPicker(),
+          ),
+        );
       },
     );
+    if (!mounted || country == null) return;
+
+    final provider = ref.read(registrationProvider);
+    provider.selectedCountry = country;
+    provider.selectedCountryCodeForNumber = country.countryCode;
+    setState(() {});
   }
 
   Widget bottomAction() {
@@ -319,6 +308,124 @@ class _EmailPhoneScreenState extends ConsumerState<EmailPhoneScreen> {
         }
         // context.push(Paths.maritalStatus);
       },
+    );
+  }
+}
+
+class _CompactCountryPicker extends StatefulWidget {
+  const _CompactCountryPicker();
+
+  @override
+  State<_CompactCountryPicker> createState() => _CompactCountryPickerState();
+}
+
+class _CompactCountryPickerState extends State<_CompactCountryPicker> {
+  final _searchController = TextEditingController();
+  final _countries = CountryService().getAll();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = CountryLocalizations.of(context);
+    final countries = _query.isEmpty
+        ? _countries
+        : _countries
+            .where((country) => country.startsWith(_query, localizations))
+            .toList();
+
+    return Column(
+      children: [
+        const SizedBox(height: 8),
+        Center(
+          child: Container(
+            width: 22,
+            height: 3,
+            decoration: BoxDecoration(
+              color: AppColors.textPrimaryLight,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: TextField(
+            controller: _searchController,
+            onChanged: (value) => setState(() => _query = value.trim()),
+            style: const TextStyle(color: Colors.black, fontSize: 14),
+            decoration: InputDecoration(
+              isDense: true,
+              hintText: 'Search country',
+              hintStyle: TextStyle(
+                fontSize: TextSize.font16(context),
+                color: AppColors.textSecondaryLight,
+              ),
+              prefixIcon: Icon(
+                Icons.search,
+                color: AppColors.textSecondaryLight,
+                size: TextSize.font22(context),
+              ),
+              filled: true,
+              fillColor: AppColors.greyLight.withValues(alpha: 0.5),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Expanded(
+          child: ListView.builder(
+            itemCount: countries.length,
+            itemBuilder: (context, index) {
+              final country = countries[index];
+              final name = localizations
+                      ?.countryName(countryCode: country.countryCode)
+                      ?.replaceAll(RegExp(r'\s+'), ' ') ??
+                  country.name;
+              return InkWell(
+                onTap: () {
+                  country.nameLocalized = name;
+                  Navigator.pop(context, country);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 7,
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        country.flagEmoji,
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                      const SizedBox(width: 12),
+                      SizedBox(
+                        width: 42,
+                        child: Text(
+                          '+${country.phoneCode}',
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(name, style: const TextStyle(fontSize: 14)),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

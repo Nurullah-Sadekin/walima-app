@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:walima_llc/core/global/components/custom_back_appbar.dart';
-import 'package:walima_llc/core/global/components/custom_expansion_tile.dart';
 import 'package:walima_llc/core/global/components/gradient_background.dart';
 import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
@@ -14,6 +13,7 @@ import 'package:walima_llc/features/registration/presentation/providers/registra
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
+import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/core/global/components/loading_widget.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:go_router/go_router.dart';
@@ -227,79 +227,93 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
 
   Widget body(BuildContext context) {
     return Expanded(
-      child: Container(
+      child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
-        child: Column(
-          spacing: 10,
-          children: [
-            photoUploadField(),
-            _bodyScrollable(context),
-            bottomAction(),
-            const SizedBox(height: 20),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              photoUploadField(),
+              const SizedBox(height: 20),
+              _informationCard('Photo Guidelines', _photoGuidelines()),
+              const SizedBox(height: 10),
+              _informationCard('Know More', _knowMore()),
+              const SizedBox(height: 20),
+              bottomAction(),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _bodyScrollable(BuildContext context) {
-    return Expanded(
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 10,
-            ),
-            CustomExpansionTile(
-              title: 'Photo Guidelines',
-              initiallyExpanded: true,
-              child: _photoGuidelines(),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            const CustomExpansionTile(
-              title: 'Know More',
-              initiallyExpanded: true,
-              child: Column(
-                spacing: 8,
-                children: [
-                  KnowMoreItemCard(
-                    text:
-                        'Your photo should be front-facing, clear, and show your full face.',
-                    isActive: true,
-                  ),
-                  KnowMoreItemCard(
-                    text:
-                        'We verify photos with AI before upload, so use a real and recent solo photo.',
-                    isActive: true,
-                  ),
-                  KnowMoreItemCard(
-                    text: 'You can upload upto 20 Photos to your Profile.',
-                    isActive: true,
-                  ),
-                  KnowMoreItemCard(
-                    text:
-                        'Each photo must be under 5 MB and use jpg, jpeg, png, webp, gif, avif, heic, or heif.',
-                    isActive: true,
-                  ),
-                  KnowMoreItemCard(
-                    text:
-                        'AI-generated, watermarked, morphed, or publicly reused photos will be rejected.',
-                    isActive: false,
-                  ),
-                  KnowMoreItemCard(
-                    text:
-                        'Irrelevant Photographs will lead to deactivation of your Profile and Membership.',
-                    isActive: false,
-                  ),
-                  SizedBox(height: 12),
-                ],
+  Widget _informationCard(String title, Widget content) {
+    // Keep both sections open; the former expand/collapse controls are removed.
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        border: Border.all(color: AppColors.greyLight),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+            child: Text(
+              title.localized(context),
+              style: TextStyle(
+                fontSize: TextSize.font16(context),
+                fontWeight: FontWeight.w500,
+                color: AppColors.textPrimaryLight,
               ),
             ),
-          ],
-        ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: content,
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _knowMore() {
+    return const Column(
+      spacing: 8,
+      children: [
+        KnowMoreItemCard(
+          text:
+              'Your photo should be front-facing, clear, and show your full face.',
+          isActive: true,
+        ),
+        KnowMoreItemCard(
+          text:
+              'We verify photos with AI before upload, so use a real and recent solo photo.',
+          isActive: true,
+        ),
+        KnowMoreItemCard(
+          text: 'You can upload upto 20 Photos to your Profile.',
+          isActive: true,
+        ),
+        KnowMoreItemCard(
+          text:
+              'Each photo must be under 5 MB and use jpg, jpeg, png, webp, gif, avif, heic, or heif.',
+          isActive: true,
+        ),
+        KnowMoreItemCard(
+          text:
+              'AI-generated, watermarked, morphed, or publicly reused photos will be rejected.',
+          isActive: false,
+        ),
+        KnowMoreItemCard(
+          text:
+              'Irrelevant Photographs will lead to deactivation of your Profile and Membership.',
+          isActive: false,
+        ),
+        SizedBox(height: 12),
+      ],
     );
   }
 

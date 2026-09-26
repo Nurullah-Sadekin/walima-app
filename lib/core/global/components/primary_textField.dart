@@ -333,7 +333,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
     } else {
       if (widget.isCountryDropdown == true) {
         return Container(
-          width: 96,
+          width: 112,
           decoration: const BoxDecoration(
             border: Border(
               right: BorderSide(
