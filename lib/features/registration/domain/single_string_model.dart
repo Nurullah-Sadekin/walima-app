@@ -159,12 +159,14 @@ List<SingleStringModel> siblingCountListDataInserted = [
 ];
 
 List<SingleStringModel> maritalStatusListDataInserted = [
-  ...RegistrationMaritalStatus.values.map(
-    (status) => SingleStringModel(
-      name: status.label,
-      value: status.apiValue,
-    ),
-  ),
+  ...RegistrationMaritalStatus.values
+      .where((status) => status != RegistrationMaritalStatus.married)
+      .map(
+        (status) => SingleStringModel(
+          name: status.label,
+          value: status.apiValue,
+        ),
+      ),
 ];
 
 List<SingleStringModel> countryListDataInserted = [

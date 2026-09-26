@@ -16,10 +16,13 @@ import 'package:walima_llc/features/registration/data/models/lookup_option.dart'
 import 'package:walima_llc/features/registration/data/repository/location_data_repository_impl.dart';
 import 'package:walima_llc/features/registration/data/repository/lookup_repository.dart';
 import 'package:walima_llc/features/registration/domain/location_data_model.dart';
+import 'package:walima_llc/features/registration/domain/work_sector_hierarchy.dart';
 import 'package:walima_llc/features/registration/domain/repository/location_data_repository.dart';
 import 'package:walima_llc/features/registration/domain/single_string_model.dart';
 
 class RecommendedPreferencesProvider extends BaseChangeNotifier {
+  static const openToAllCitiesLabel = 'Open to All';
+
   RecommendedPreferencesScreenStates screenStates =
       RecommendedPreferencesScreenStates.defaultLoading;
   RecommendedPreferencesScreenStates loaderState =
@@ -185,6 +188,7 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     if (!isSameCountry) {
       cityDropdownItems = <String>[];
       preferableCity.clear();
+      isOpenToAllCities = false;
       hasMoreCities = true;
       _cityPage = 1;
       _selectedCityCountry = selected;
@@ -297,8 +301,15 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     if (preferableCity.contains(cityName)) {
       preferableCity.remove(cityName);
     } else {
+      isOpenToAllCities = false;
       preferableCity.add(cityName);
     }
+    notifyListeners();
+  }
+
+  void toggleOpenToAllCities() {
+    isOpenToAllCities = !isOpenToAllCities;
+    if (isOpenToAllCities) preferableCity.clear();
     notifyListeners();
   }
 
@@ -344,6 +355,7 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   final List<String> preferableEducations = [];
   final List<String> preferableProfileManagedBy = [];
   final List<String> preferableCity = [];
+  bool isOpenToAllCities = false;
   final List<String> preferableWorkingAs = [];
   final List<String> preferableDiet = [];
 
@@ -545,6 +557,10 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
       ..add(_resolveWorkSectorPreference());
     notifyListeners();
   }
+
+  bool get isNotWorkingSector =>
+      resolveWorkSectorType(_resolveWorkSectorPreference()) ==
+      WorkSectorType.notWorking;
 
   void selectProfession(String? value) {
     final selected = value?.trim();
@@ -1004,24 +1020,29 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
         dietPreference: preferableDiet.isNotEmpty
             ? List<String>.from(preferableDiet)
             : null,
-        preferredCities: preferableCity.isNotEmpty
-            ? List<String>.from(preferableCity)
-            : null,
+        preferredCities: isOpenToAllCities
+            ? <String>[]
+            : preferableCity.isNotEmpty
+                ? List<String>.from(preferableCity)
+                : null,
         // Send api values / lookup keys, not the display labels the dropdown
         // writes into the controllers.
-        religionPreference: _singleListOrNull(_resolveReligionPreference() ?? ''),
+        religionPreference:
+            _singleListOrNull(_resolveReligionPreference() ?? ''),
         communityPreference:
             _singleListOrNull(_resolveCommunityPreference() ?? ''),
         motherTonguePreference:
             _toListOrNull(motherTonguePreferenceController.text),
         preferredCountries: _toListOrNull(countryPreferenceController.text),
-        professionPreference:
-            _toListOrNull(professionPreferenceController.text),
+        professionPreference: isNotWorkingSector
+            ? <String>[]
+            : _toListOrNull(professionPreferenceController.text),
         workingAsPreference: workSectorPreferenceController.text.trim().isEmpty
             ? null
             : <String>[_resolveWorkSectorPreference()],
-        annualIncomePreference:
-            _toListOrNull(annualIncomePreferenceController.text),
+        annualIncomePreference: isNotWorkingSector
+            ? <String>[]
+            : _toListOrNull(annualIncomePreferenceController.text),
         profileManagedByPreference: preferableProfileManagedBy.isNotEmpty
             ? List<String>.from(preferableProfileManagedBy)
             : _toListOrNull(profileManagePreferenceController.text),

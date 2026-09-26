@@ -157,6 +157,7 @@ class RegistrationProvider extends BaseChangeNotifier {
           .where(
             (status) =>
                 status != RegistrationMaritalStatus.openToAll &&
+                status != RegistrationMaritalStatus.married &&
                 status != RegistrationMaritalStatus.awaitingDivorce &&
                 status != RegistrationMaritalStatus.annulled,
           )

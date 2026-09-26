@@ -267,7 +267,6 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
           controller: provider.mobileNoOrEmailController,
           headLine: 'Email address',
           hintText: 'you@example.com',
-          borderRadius: 50,
           prefixIcon: ShowImage(
             imagePath: AppImages.emailSvgIcon,
             color: provider.mobileNoOrEmailController.text.isEmpty
@@ -293,7 +292,6 @@ class _LoginWithEmailScreenState extends ConsumerState<LoginWithEmailScreen> {
               width: TextSize.font16(context),
               height: TextSize.font16(context),
             ),
-            borderRadius: 50,
             errorText: provider.passwordError,
             showPassIcon: true,
             onTap: () {},

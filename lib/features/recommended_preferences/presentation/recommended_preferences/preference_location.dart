@@ -78,7 +78,7 @@ class _PreferenceLocationScreenState
                       isBackButton: true,
                       isTrailing: true,
                       trailingText: 'Skip',
-                      onTrailingTap: (){
+                      onTrailingTap: () {
                         context.push(Paths.education);
                       },
                     ),
@@ -99,8 +99,7 @@ class _PreferenceLocationScreenState
           children: [
             const StaticTextWidget(
               title: 'Partner Location Preference',
-              subtitle:
-              'Select preference country and city',
+              subtitle: 'Select preference country and city',
             ),
             dataField(),
             bottomAction(),
@@ -136,21 +135,6 @@ class _PreferenceLocationScreenState
                       final provider =
                           ref.watch(recommendedPreferencesProvider);
 
-                      if (provider.isCityLoading &&
-                          provider.cityDropdownItems.isEmpty) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-
-                      if (provider.cityDropdownItems.isEmpty) {
-                        return const Center(
-                          child: Text(
-                            'No cities available for the selected country.',
-                          ),
-                        );
-                      }
-
                       const double spacing = 10.0;
                       return SingleChildScrollView(
                         controller: _cityScrollController,
@@ -159,33 +143,52 @@ class _PreferenceLocationScreenState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                            'City',
-                            style: TextStyle(
-                              fontSize: TextSize.font14(context),
-                              fontWeight: FontWeight.w500,
+                              'City',
+                              style: TextStyle(
+                                fontSize: TextSize.font14(context),
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),                             
-                          const SizedBox(height: spacing),
+                            const SizedBox(height: spacing),
                             Wrap(
                               spacing: spacing,
                               runSpacing: spacing,
-                              children:
-                                  provider.cityDropdownItems.map((cityName) {
-                                final isSelected =
-                                    provider.preferableCity.contains(cityName);
-                                return SelectionCard(
+                              children: [
+                                SelectionCard(
                                   borderRadius: 40,
-                                  buttonStyle: isSelected
+                                  buttonStyle: provider.isOpenToAllCities
                                       ? SelectionStyle.selectedCheckbox
                                       : SelectionStyle.unSelectedCheckbox,
-                                  onTap: () {
-                                    provider.togglePreferableCity(cityName);
-                                  },
-                                  isSelected: isSelected,
-                                  title: cityName,
-                                );
-                              }).toList(),
+                                  onTap: provider.toggleOpenToAllCities,
+                                  isSelected: provider.isOpenToAllCities,
+                                  title: RecommendedPreferencesProvider
+                                      .openToAllCitiesLabel,
+                                ),
+                                ...provider.cityDropdownItems.map((cityName) {
+                                  final isSelected = provider.preferableCity
+                                      .contains(cityName);
+                                  return SelectionCard(
+                                    borderRadius: 40,
+                                    buttonStyle: isSelected
+                                        ? SelectionStyle.selectedCheckbox
+                                        : SelectionStyle.unSelectedCheckbox,
+                                    onTap: () {
+                                      provider.togglePreferableCity(cityName);
+                                    },
+                                    isSelected: isSelected,
+                                    title: cityName,
+                                  );
+                                }),
+                              ],
                             ),
+                            if (provider.isCityLoading &&
+                                provider.cityDropdownItems.isEmpty)
+                              const Center(child: CircularProgressIndicator()),
+                            if (!provider.isCityLoading &&
+                                provider.cityDropdownItems.isEmpty)
+                              const Text(
+                                'No cities available for the selected country.',
+                              ),
                             if (provider.isCityLoadingMore)
                               const Padding(
                                 padding: EdgeInsets.symmetric(vertical: 16),

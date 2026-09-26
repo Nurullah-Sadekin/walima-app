@@ -262,7 +262,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           noPrefix: true,
           errorText: provider.mobileOrEmailError,
           onTap: null,
-          borderRadius: 50,
         ),
         SizedBox(height: MediaQuery.sizeOf(context).height * 0.02),
         PrimaryButtons(

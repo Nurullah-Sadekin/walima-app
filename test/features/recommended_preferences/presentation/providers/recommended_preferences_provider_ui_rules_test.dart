@@ -23,7 +23,6 @@ void main() {
       provider.maritalStatusDataList.map((item) => item.name),
       <String>[
         'Never Married',
-        'Married',
         'Divorced',
         'Widowed',
         'Separated',

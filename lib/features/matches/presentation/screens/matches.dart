@@ -17,6 +17,7 @@ import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/anchor_point/achore_appbar.dart';
 import 'package:walima_llc/features/connections/presentation/widgets/view_contact_bottom_sheet.dart';
 import 'package:walima_llc/features/matches/data/models/response/get_matches_response.dart';
+import 'package:walima_llc/features/matches/presentation/models/match_card_actions.dart';
 import 'package:walima_llc/features/matches/presentation/provider/matcher_provider.dart';
 import 'package:walima_llc/features/matches/presentation/screens/filters/more_matches.dart';
 import 'package:walima_llc/features/matches/presentation/widgets/filter_widget.dart';
@@ -64,6 +65,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = ref.watch(matchesProvider);
+    ref.watch(homeProvider);
 
     if (_lastCenteredTabIndex != provider.selectedTabIndex) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -352,6 +354,10 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             });
           }
           final match = provider.matches[index];
+          final shortlistId = match.id ?? match.userReference;
+          final isShortlisted =
+              ref.read(homeProvider).isShortlisted(shortlistId);
+          final actions = MatchCardActions(match, isShortlisted: isShortlisted);
           final imagePath = match.profilePhoto?.url ??
               (match.gender == 'female'
                   ? AppImages.womenAvatar
@@ -365,7 +371,6 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
               );
             },
             imagePath: imagePath,
-            leftIconPath: AppImages.favouriteIcon,
             isPremiumConnect: match.isPremium ?? false,
             isVerified: match.profilePhoto?.isVerified ?? false,
             name: match.displayName ?? 'Unknown',
@@ -381,35 +386,69 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
                 CamelCaseUtils.formatCamelCase(match.community ?? ''),
             religion: CamelCaseUtils.formatCamelCase(match.religion ?? ''),
             noButton: false,
-            showLeftButton: match.canConnect,
-            onTapLeftButton: match.canConnect
-                ? () async {
-                    provider.updateViewState(
-                      screenStates:
-                          MatchesProviderScreenStates.transParentLoading,
+            rightButtonText: actions.secondaryLabel,
+            rightIconPath: actions.isConnected
+                ? AppImages.callIcon
+                : AppImages.favouriteIcon,
+            rightButtonColor: !actions.isConnected && isShortlisted
+                ? const Color(0xFFFFF1F5)
+                : AppColors.white,
+            rightButtonBorderColor: !actions.isConnected && isShortlisted
+                ? const Color(0xFFE05271)
+                : AppColors.greyLight,
+            rightButtonIconColor: const Color(0xFFE05271),
+            leftButtonText: actions.primaryLabel,
+            showLeftButton: actions.showPrimaryButton,
+            showRightButton: actions.showSecondaryButton,
+            onTapLeftButton: actions.isConnected
+                ? () {
+                    context.pushNamed(
+                      Routes.chatScreen,
+                      extra: {
+                        'conversationId': match.connection?.conversationId,
+                        'participant': {
+                          'userId': match.id,
+                          'displayName': match.displayName,
+                          'profilePictureUrl': match.profilePhoto?.url,
+                          'isOnline': match.isOnline,
+                        },
+                      },
                     );
-                    await ref.read(homeProvider).connect(
-                          context,
-                          match.id ?? '',
-                          match.displayName ?? 'Unknown',
-                          ConnectionRequestType.match.apiValue,
-                        );
-                    await ref
-                        .read(matchesProvider)
-                        .loadMatchesForSelectedTab(force: true);
                   }
-                : null,
-            leftButtonColor: match.canConnect
+                : actions.canConnect
+                    ? () async {
+                        provider.updateViewState(
+                          screenStates:
+                              MatchesProviderScreenStates.transParentLoading,
+                        );
+                        await ref.read(homeProvider).connect(
+                              context,
+                              match.id ?? '',
+                              match.displayName ?? 'Unknown',
+                              ConnectionRequestType.match.apiValue,
+                            );
+                        await ref
+                            .read(matchesProvider)
+                            .loadMatchesForSelectedTab(force: true);
+                      }
+                    : null,
+            leftButtonColor: actions.showPrimaryButton
                 ? AppColors.greenButtonColor
                 : AppColors.disableBackground,
-            leftButtonTextColor:
-                match.canConnect ? AppColors.white : AppColors.disableText,
-            leftButtonIconColor:
-                match.canConnect ? AppColors.white : AppColors.disableText,
-            leftButtonBorderColor: match.canConnect
+            leftButtonTextColor: actions.showPrimaryButton
+                ? AppColors.white
+                : AppColors.disableText,
+            leftButtonIconColor: actions.showPrimaryButton
+                ? AppColors.white
+                : AppColors.disableText,
+            leftButtonBorderColor: actions.showPrimaryButton
                 ? AppColors.greenButtonColor
                 : AppColors.disableBackground,
             onTapRightButton: () async {
+              if (!actions.isConnected) {
+                ref.read(homeProvider).toggleShortlist(shortlistId);
+                return;
+              }
               final userId = match.id?.trim();
               if (userId == null || userId.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(

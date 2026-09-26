@@ -30,6 +30,18 @@ class HomeProvider extends BaseChangeNotifier {
   MatchesRepository matchesRepository = MatchesRepository();
 
   final List<MatchProfile> premiumMatches = [];
+  final Set<String> _shortlistedProfileIds = <String>{};
+
+  bool isShortlisted(String? profileId) =>
+      profileId != null && _shortlistedProfileIds.contains(profileId.trim());
+
+  void toggleShortlist(String? profileId) {
+    final id = profileId?.trim();
+    if (id == null || id.isEmpty) return;
+    if (!_shortlistedProfileIds.add(id)) _shortlistedProfileIds.remove(id);
+    notifyListeners();
+  }
+
   bool isLoadingPremiumMatches = false;
   String? premiumMatchesError;
   MatchesPagination? premiumMatchesPagination;
@@ -94,6 +106,7 @@ class HomeProvider extends BaseChangeNotifier {
     if (_profileStrengthUserId == nextUserId) return;
 
     _profileStrengthUserId = nextUserId;
+    _shortlistedProfileIds.clear();
     _resetProfileStrengthState();
     _resetMoreMatchesState();
     notifyListeners();

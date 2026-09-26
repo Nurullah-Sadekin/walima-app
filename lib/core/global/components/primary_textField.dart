@@ -26,7 +26,6 @@ class PrimaryTextField extends StatefulWidget {
     this.minLine,
     this.isCountryDropdown = false,
     this.maxLine,
-    this.borderRadius = 10,
     this.readOnly,
     required this.onTap,
     this.prefixIcon,
@@ -66,7 +65,6 @@ class PrimaryTextField extends StatefulWidget {
   final String? Function(String? value)? validator;
   final int? minLine;
   final int? maxLine;
-  final double? borderRadius;
   final bool? readOnly;
   final Widget? prefixIcon;
   final bool? showPassIcon;
@@ -80,6 +78,7 @@ class PrimaryTextField extends StatefulWidget {
 }
 
 class _PrimaryTextFieldState extends State<PrimaryTextField> {
+  static const double _borderRadius = 50;
   bool viewPassword = true;
   TextEditingController? _internalController;
 
@@ -281,18 +280,17 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
             const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         prefix: _getPrefix(),
         prefixIcon: _getPrefixIcon(),
-        border: InputBorderStyle.border(widget.borderRadius ?? 6,
+        border: InputBorderStyle.border(_borderRadius,
             borderColor: widget.borderColor),
-        focusedBorder: InputBorderStyle.focusedBorder(widget.borderRadius ?? 6),
+        focusedBorder: InputBorderStyle.focusedBorder(_borderRadius),
         enabledBorder:
             (widget.controller?.text ?? _internalController?.text ?? '')
                     .isNotEmpty
-                ? InputBorderStyle.validBorder(widget.borderRadius ?? 6,
+                ? InputBorderStyle.validBorder(_borderRadius,
                     borderColor: widget.borderColor)
-                : InputBorderStyle.border(widget.borderRadius ?? 6),
-        focusedErrorBorder:
-            InputBorderStyle.focusedErrorBorder(widget.borderRadius ?? 6),
-        errorBorder: InputBorderStyle.errorBorder(widget.borderRadius ?? 6),
+                : InputBorderStyle.border(_borderRadius),
+        focusedErrorBorder: InputBorderStyle.focusedErrorBorder(_borderRadius),
+        errorBorder: InputBorderStyle.errorBorder(_borderRadius),
         hintStyle: TextStyle(
           color: const Color(0xFFA3A3A3),
           fontSize: TextSize.font14(context),
@@ -305,7 +303,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
           color: Colors.red,
           fontSize: TextSize.font12(context),
         ),
-        disabledBorder: InputBorderStyle.disabledBorder(60),
+        disabledBorder: InputBorderStyle.disabledBorder(_borderRadius),
         suffixIcon: widget.showPassIcon != null
             ? Padding(
                 padding: EdgeInsets.only(right: screenWidth * 0.025),
@@ -333,7 +331,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
     } else {
       if (widget.isCountryDropdown == true) {
         return Container(
-          width: 96,
+          width: 112,
           decoration: const BoxDecoration(
             border: Border(
               right: BorderSide(
