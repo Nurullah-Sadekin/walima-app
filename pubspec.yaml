@@ -73,6 +73,7 @@ flutter:
   
   assets:
      - assets/images/
+     - assets/images/photo_guidelines/
      - assets/icons/
      - assets/svgs/
      - assets/svgIcons/

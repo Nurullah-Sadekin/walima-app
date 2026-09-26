@@ -16,8 +16,7 @@ import 'package:walima_llc/features/registration/presentation/widgets/static_tex
 class QualificationScreen extends ConsumerStatefulWidget {
   const QualificationScreen({super.key});
   @override
-  ConsumerState<QualificationScreen> createState() =>
-      _QualificationScreenState();
+  ConsumerState<QualificationScreen> createState() => _QualificationScreenState();
 }
 
 class _QualificationScreenState extends ConsumerState<QualificationScreen> {
@@ -31,7 +30,6 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
       provider.getInitialData();
       provider.initControllersListener();
       provider.loadEducationLookupData();
-      
     });
   }
 
@@ -46,19 +44,16 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
     provider = ref.watch(registrationProvider);
     final screenProvider = ref.watch(registrationScreenStateProvider);
     return TransparentLoading(
-      isLoading:
-          screenProvider.loaderState == RegistrationScreenStates.isProfileFor ||
-              provider.isLookupDataLoading,
+      isLoading: screenProvider.loaderState == RegistrationScreenStates.isProfileFor || provider.isLookupDataLoading,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         body: GradientBackground(
-          child: screenProvider.screenStates ==
-                  RegistrationScreenStates.isProfileFor
+          child: screenProvider.screenStates == RegistrationScreenStates.isProfileFor
               ? const Loading()
               : Column(
                   children: [
-                    const UpperLayer(imagePath: AppImages.qualification, totalProgressCount: 11, currentIndexProgress: 8,showProgress: true),
+                    const UpperLayer(imagePath: AppImages.qualification, totalProgressCount: 11, currentIndexProgress: 8, showProgress: true),
                     body(),
                   ],
                 ),
@@ -86,9 +81,7 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
   }
 
   Widget dataInsertField() {
-    final hasNoFormalEducation =
-        provider.highestQualification.text.trim().toLowerCase() ==
-        'no formal education';
+    final hasNoFormalEducation = provider.highestQualification.text.trim().toLowerCase() == 'no formal education';
 
     return Column(
       spacing: 20,
@@ -104,8 +97,7 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
           onConfirm: (value) {
             if (value == null) return;
             provider.highestQualification.text = value.toString();
-            if (value.toString().trim().toLowerCase() ==
-                'no formal education') {
+            if (value.toString().trim().toLowerCase() == 'no formal education') {
               provider.instituteController.clear();
               provider.anotherInstituteController.clear();
             }
@@ -137,16 +129,11 @@ class _QualificationScreenState extends ConsumerState<QualificationScreen> {
   }
 
   Widget bottomAction() {
-    final hasNoFormalEducation =
-        provider.highestQualification.text.trim().toLowerCase() ==
-        'no formal education';
-    final canContinue = provider.highestQualification.text.isNotEmpty &&
-        (hasNoFormalEducation || provider.instituteController.text.isNotEmpty);
+    final hasNoFormalEducation = provider.highestQualification.text.trim().toLowerCase() == 'no formal education';
+    final canContinue = provider.highestQualification.text.isNotEmpty && (hasNoFormalEducation || provider.instituteController.text.isNotEmpty);
 
     return PrimaryButtons(
-      buttonStyle: canContinue
-          ? ButtonsStyle.iconicDynamicButton
-          : ButtonsStyle.disableButton,
+      buttonStyle: canContinue ? ButtonsStyle.iconicDynamicButton : ButtonsStyle.disableButton,
       verticalPadding: 14,
       borderRadius: 50,
       svgIconPath: AppImages.arrowRightSvgIcon,

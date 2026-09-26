@@ -252,23 +252,15 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
             ),
             CustomExpansionTile(
               title: 'Photo Guidelines',
-              child: Column(
-                children: [
-                  ShowImage(
-                    imagePath: AppImages.photoGuidelines,
-                    width: double.infinity,
-                    height: MediaQuery.of(context).size.height * 0.3,
-                    fit: BoxFit.fill,
-                  ),
-                  const SizedBox(height: 12),
-                ],
-              ),
+              initiallyExpanded: true,
+              child: _photoGuidelines(),
             ),
             const SizedBox(
               height: 10,
             ),
             const CustomExpansionTile(
               title: 'Know More',
+              initiallyExpanded: true,
               child: Column(
                 spacing: 8,
                 children: [
@@ -308,6 +300,111 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _photoGuidelines() {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: _guidelineItem(
+                AppImages.guidelineCloseUp,
+                'Close Up',
+                true,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _guidelineItem(
+                AppImages.guidelineHalfView,
+                'Half View',
+                true,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _guidelineItem(
+                AppImages.guidelineFullView,
+                'Full View',
+                true,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+        Row(
+          children: [
+            Expanded(
+              child: _guidelineItem(
+                AppImages.guidelineSideFace,
+                'Side Face',
+                false,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _guidelineItem(
+                AppImages.guidelineGroup,
+                'Group',
+                false,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _guidelineItem(
+                AppImages.guidelineBlurry,
+                'Unclear',
+                false,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+      ],
+    );
+  }
+
+  Widget _guidelineItem(String imagePath, String label, bool recommended) {
+    final statusColor = recommended ? AppColors.success : AppColors.primary;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AspectRatio(
+          aspectRatio: 1,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(5),
+            child: Image.asset(imagePath, fit: BoxFit.cover),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: [
+            CircleAvatar(
+              radius: 7,
+              backgroundColor: statusColor,
+              child: Icon(
+                recommended ? Icons.check : Icons.close,
+                size: 10,
+                color: AppColors.white,
+              ),
+            ),
+            const SizedBox(width: 5),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: TextSize.font12(context),
+                  color: AppColors.textPrimaryLight,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 

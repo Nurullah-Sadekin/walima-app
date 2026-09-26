@@ -4,7 +4,12 @@ class AppImages {
   AppImages._();
 
   // Image asset paths
-  static const String photoGuidelines = 'assets/images/photo_guidelines.png';
+  static const String guidelineCloseUp = 'assets/images/photo_guidelines/close_up.png';
+  static const String guidelineHalfView = 'assets/images/photo_guidelines/half_view.png';
+  static const String guidelineFullView = 'assets/images/photo_guidelines/full_view.png';
+  static const String guidelineSideFace = 'assets/images/photo_guidelines/side_face.png';
+  static const String guidelineGroup = 'assets/images/photo_guidelines/group.png';
+  static const String guidelineBlurry = 'assets/images/photo_guidelines/blurry.png';
   static const String demoProfile =  'assets/images/men_avatar.jpg';
   static const String demoProfile2 = 'assets/images/women_avatar.jpg';
   static const String manAvatar = 'assets/images/men_avatar.jpg';
