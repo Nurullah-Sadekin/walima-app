@@ -314,7 +314,7 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
   Widget photoUploadField() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(32.0),
+      padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: AppColors.white,
         border: Border.all(color: AppColors.greyLight, width: 1),
@@ -331,8 +331,8 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
                   child: const ShowImage(
                     imagePath: AppImages.photoUpload,
                     radius: BorderRadius.all(Radius.circular(50)),
-                    width: 110,
-                    height: 110,
+                    width: 100,
+                    height: 100,
                   ),
                 )
               : GestureDetector(
@@ -345,8 +345,8 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
                             const BorderRadius.all(Radius.circular(50)),
                         child: Image.file(
                           File(_selectedImagePath!),
-                          width: 110,
-                          height: 110,
+                          width: 100,
+                          height: 100,
                           fit: BoxFit.cover,
                         ),
                       ),
