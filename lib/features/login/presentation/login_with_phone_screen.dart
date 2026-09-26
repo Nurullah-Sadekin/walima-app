@@ -269,7 +269,6 @@ class _LoginWithPhoneScreenState extends ConsumerState<LoginWithPhoneScreen> {
           controller: provider.mobileNoOrEmailController,
           headLine: 'Mobile No.',
           hintText: '01XXXXXXXXX',
-          borderRadius: 50,
           isCountryDropdown: true,
           prefixIcon: InkWell(
             onTap: _openCountryPicker,
@@ -324,7 +323,6 @@ class _LoginWithPhoneScreenState extends ConsumerState<LoginWithPhoneScreen> {
               width: TextSize.font16(context),
               height: TextSize.font16(context),
             ),
-            borderRadius: 50,
             errorText: provider.passwordError,
             showPassIcon: true,
             onTap: () {},
