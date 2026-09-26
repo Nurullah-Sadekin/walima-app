@@ -108,27 +108,30 @@ class _CareerScreenState extends ConsumerState<CareerScreen> {
             onConfirm: (value) => provider.selectWorkSector(value?.toString()),
             isSearch: true,
           ),
-          DropDownField(
-            headLine: 'Profession',
-            hintText: 'Select',
-            popUpHeader: 'Select Profession',
-            items: provider.professionDataList,
-            controller: provider.professionPreferenceController,
-            onTap: provider.loadCareerLookupData,
-            onConfirm: (value) => provider.selectProfession(value?.toString()),
-            isSearch: true,
-          ),
-          DropDownField(
-            headLine: 'Annual Income',
-            hintText: 'Select',
-            popUpHeader: 'Annual Income',
-            items: provider.incomeRangeDataList,
-            controller: provider.annualIncomePreferenceController,
-            onTap: provider.loadCareerLookupData,
-            onConfirm: (value) =>
-                provider.selectAnnualIncome(value?.toString()),
-            isSearch: true,
-          ),
+          if (!rec.isNotWorkingSector) ...[
+            DropDownField(
+              headLine: 'Profession',
+              hintText: 'Select',
+              popUpHeader: 'Select Profession',
+              items: provider.professionDataList,
+              controller: provider.professionPreferenceController,
+              onTap: provider.loadCareerLookupData,
+              onConfirm: (value) =>
+                  provider.selectProfession(value?.toString()),
+              isSearch: true,
+            ),
+            DropDownField(
+              headLine: 'Annual Income',
+              hintText: 'Select',
+              popUpHeader: 'Annual Income',
+              items: provider.incomeRangeDataList,
+              controller: provider.annualIncomePreferenceController,
+              onTap: provider.loadCareerLookupData,
+              onConfirm: (value) =>
+                  provider.selectAnnualIncome(value?.toString()),
+              isSearch: true,
+            ),
+          ],
         ],
       ),
     );

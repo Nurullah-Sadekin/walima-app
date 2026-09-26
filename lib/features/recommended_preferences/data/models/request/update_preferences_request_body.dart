@@ -65,12 +65,16 @@ class UpdatePreferencesRequestBody {
     addValue('heightMax', heightMax);
     addValue('maritalStatusPreference', maritalStatusPreference);
     addValue('educationPreference', educationPreference);
-    addValue('professionPreference', professionPreference);
+    if (professionPreference != null) {
+      map['professionPreference'] = professionPreference;
+    }
     addValue('workingAsPreference', workingAsPreference);
     addValue('religionPreference', religionPreference);
     addValue('communityPreference', communityPreference);
     addValue('motherTonguePreference', motherTonguePreference);
-    addValue('annualIncomePreference', annualIncomePreference);
+    if (annualIncomePreference != null) {
+      map['annualIncomePreference'] = annualIncomePreference;
+    }
     addValue('preferredCountries', preferredCountries);
     addValue('preferredStates', preferredStates);
     if (preferredCities != null) map['preferredCities'] = preferredCities;

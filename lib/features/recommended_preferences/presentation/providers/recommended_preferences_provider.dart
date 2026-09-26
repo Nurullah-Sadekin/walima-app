@@ -16,6 +16,7 @@ import 'package:walima_llc/features/registration/data/models/lookup_option.dart'
 import 'package:walima_llc/features/registration/data/repository/location_data_repository_impl.dart';
 import 'package:walima_llc/features/registration/data/repository/lookup_repository.dart';
 import 'package:walima_llc/features/registration/domain/location_data_model.dart';
+import 'package:walima_llc/features/registration/domain/work_sector_hierarchy.dart';
 import 'package:walima_llc/features/registration/domain/repository/location_data_repository.dart';
 import 'package:walima_llc/features/registration/domain/single_string_model.dart';
 
@@ -557,6 +558,10 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
+  bool get isNotWorkingSector =>
+      resolveWorkSectorType(_resolveWorkSectorPreference()) ==
+      WorkSectorType.notWorking;
+
   void selectProfession(String? value) {
     final selected = value?.trim();
     if (selected == null || selected.isEmpty) return;
@@ -1029,13 +1034,15 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
         motherTonguePreference:
             _toListOrNull(motherTonguePreferenceController.text),
         preferredCountries: _toListOrNull(countryPreferenceController.text),
-        professionPreference:
-            _toListOrNull(professionPreferenceController.text),
+        professionPreference: isNotWorkingSector
+            ? <String>[]
+            : _toListOrNull(professionPreferenceController.text),
         workingAsPreference: workSectorPreferenceController.text.trim().isEmpty
             ? null
             : <String>[_resolveWorkSectorPreference()],
-        annualIncomePreference:
-            _toListOrNull(annualIncomePreferenceController.text),
+        annualIncomePreference: isNotWorkingSector
+            ? <String>[]
+            : _toListOrNull(annualIncomePreferenceController.text),
         profileManagedByPreference: preferableProfileManagedBy.isNotEmpty
             ? List<String>.from(preferableProfileManagedBy)
             : _toListOrNull(profileManagePreferenceController.text),
