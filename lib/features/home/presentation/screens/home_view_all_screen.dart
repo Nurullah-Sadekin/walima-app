@@ -10,7 +10,7 @@ import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/date_time_utils.dart';
 import 'package:walima_llc/core/utils/height_utils.dart';
 import 'package:walima_llc/features/home/data/model/response/recent_visitors_response.dart';
-import 'package:walima_llc/features/home/domain/premium_match_card_actions.dart';
+import 'package:walima_llc/features/matches/presentation/models/match_card_actions.dart';
 import 'package:walima_llc/features/home/presentation/providers/home_provider.dart';
 import 'package:walima_llc/features/matches/data/models/response/get_matches_response.dart';
 import 'package:walima_llc/features/connections/presentation/widgets/view_contact_bottom_sheet.dart';
@@ -207,9 +207,8 @@ class _HomeViewAllScreenState extends ConsumerState<HomeViewAllScreen> {
 
   Widget _buildPremiumMatchCard(MatchProfile match) {
     final shortlistId = match.id ?? match.userReference;
-    final isShortlisted = ref.watch(homeProvider).isShortlisted(shortlistId);
-    final actions =
-        PremiumMatchCardActions(match, isShortlisted: isShortlisted);
+    final isShortlisted = ref.read(homeProvider).isShortlisted(shortlistId);
+    final actions = MatchCardActions(match, isShortlisted: isShortlisted);
     final isConnected = actions.isConnected;
     final canConnect = actions.canConnect;
     final location = _formatMatchLocation(match);

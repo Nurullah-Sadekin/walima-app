@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:walima_llc/features/home/domain/premium_match_card_actions.dart';
+import 'package:walima_llc/features/matches/presentation/models/match_card_actions.dart';
 import 'package:walima_llc/features/matches/data/models/response/get_matches_response.dart';
 
 void main() {
@@ -10,7 +10,7 @@ void main() {
 
   test('unconnected profiles show Shortlist and Connect', () {
     final actions =
-        PremiumMatchCardActions(matchWithStatus('none'), isShortlisted: false);
+        MatchCardActions(matchWithStatus('none'), isShortlisted: false);
 
     expect(actions.secondaryLabel, 'Shortlist');
     expect(actions.primaryLabel, 'Connect');
@@ -20,13 +20,13 @@ void main() {
 
   test('local shortlist changes the secondary label', () {
     final actions =
-        PremiumMatchCardActions(matchWithStatus('none'), isShortlisted: true);
+        MatchCardActions(matchWithStatus('none'), isShortlisted: true);
 
     expect(actions.secondaryLabel, 'Shortlisted');
   });
 
   test('accepted connections show Contact and Message', () {
-    final actions = PremiumMatchCardActions(
+    final actions = MatchCardActions(
       matchWithStatus('accepted'),
       isShortlisted: false,
     );
@@ -37,7 +37,7 @@ void main() {
   });
 
   test('pending requests do not offer Connect or Contact', () {
-    final actions = PremiumMatchCardActions(
+    final actions = MatchCardActions(
       matchWithStatus('pending'),
       isShortlisted: false,
     );
