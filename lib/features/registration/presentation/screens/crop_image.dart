@@ -76,7 +76,7 @@ class _CropImageScreenState extends ConsumerState<CropImageScreen> {
               : Column(
                   children: [
                     CustomBackAppBar(
-                      isTrailing: true,
+                      isTrailing: !_isFromCompleteProfile,
                       trailingText: 'Skip',
                       onTrailingTap: () {
                         provider.resetPhotoUploadFlow();

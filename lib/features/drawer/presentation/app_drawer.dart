@@ -81,6 +81,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   ref.invalidate(inboxProvider);
                   ref.invalidate(chatProvider);
                   ref.invalidate(globalProvider);
+                  ref.invalidate(recommendedPreferencesProvider);
                   router.go(Paths.onboarding);
                 });
               },

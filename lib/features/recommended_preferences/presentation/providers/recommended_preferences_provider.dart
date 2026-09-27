@@ -10,6 +10,8 @@ import 'package:walima_llc/features/matches/data/models/response/get_matches_res
 import 'package:walima_llc/features/matches/data/repository/matches_repository.dart';
 import 'package:walima_llc/features/matches/domain/enums/match_education_level.dart';
 import 'package:walima_llc/features/matches/domain/request/bulk_send_connections_request_body.dart';
+import 'package:walima_llc/features/profile/data/model/response/get_complete_profile_response.dart';
+import 'package:walima_llc/features/profile/data/repository/profile_repository.dart';
 import 'package:walima_llc/features/recommended_preferences/data/models/request/update_preferences_request_body.dart';
 import 'package:walima_llc/features/recommended_preferences/data/repository/preferences_repository.dart';
 import 'package:walima_llc/features/registration/data/models/lookup_option.dart';
@@ -49,6 +51,8 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   String? connectMatchesError;
   bool isBulkSendingConnections = false;
   bool isDrawerEditFlow = false;
+  bool isSavedPreferencesLoading = false;
+  String? savedPreferencesError;
 
   List<CountryLocationModel> countryOptions = <CountryLocationModel>[];
   List<String> countryDropdownItems = <String>[];
@@ -63,6 +67,123 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
 
   Future<void> getInitialData() async {
     await loadReligionData();
+  }
+
+  Future<void> loadSavedPreferences() async {
+    if (isSavedPreferencesLoading) return;
+    isSavedPreferencesLoading = true;
+    savedPreferencesError = null;
+    notifyListeners();
+
+    try {
+      final result = await ProfileRepository.getCompleteProfile();
+      if (result.code != 'SUCCESS' || result.response == null) {
+        savedPreferencesError =
+            result.message ?? 'Unable to load your saved preferences.';
+        return;
+      }
+
+      final preferences = result.response!.preferences;
+      // These fields determine which dependent lookup lists must be loaded.
+      religionPreferenceController.text =
+          _firstPreference(preferences?.religionPreference);
+      countryPreferenceController.text =
+          _firstPreference(preferences?.preferredCountries);
+
+      await Future.wait([
+        loadReligionData(),
+        loadLocationData(),
+        loadEducationLookupData(),
+        loadCareerLookupData(),
+      ]);
+      applySavedPreferences(preferences);
+    } catch (error) {
+      savedPreferencesError = error.toString();
+    } finally {
+      isSavedPreferencesLoading = false;
+      notifyListeners();
+    }
+  }
+
+  static String _firstPreference(List<String>? values) =>
+      values == null || values.isEmpty ? '' : values.first.trim();
+
+  static String _displayLookup(String raw, List<LookupOption> options) {
+    final normalized = raw.toLowerCase();
+    for (final option in options) {
+      if (option.key.toLowerCase() == normalized ||
+          option.label.toLowerCase() == normalized) {
+        return option.label;
+      }
+    }
+    return raw;
+  }
+
+  static void _selectSavedOptions(
+    List<SingleStringModel> options,
+    List<String> selectedValues,
+  ) {
+    final selected = selectedValues.map((value) => value.toLowerCase()).toSet();
+    for (final option in options) {
+      option.isSelected = selected.contains(option.value?.toLowerCase()) ||
+          selected.contains(option.name.toLowerCase());
+    }
+  }
+
+  void applySavedPreferences(Preferences? preferences) {
+    ageStart = (preferences?.ageMin ?? 25).clamp(ageMinLimit, ageMaxLimit);
+    ageEnd = (preferences?.ageMax ?? 35).clamp(ageMinLimit, ageMaxLimit);
+    if (ageStart > ageEnd) ageEnd = ageStart;
+    heightStart =
+        (preferences?.heightMin ?? 152).clamp(heightMinLimit, heightMaxLimit);
+    heightEnd =
+        (preferences?.heightMax ?? 180).clamp(heightMinLimit, heightMaxLimit);
+    if (heightStart > heightEnd) heightEnd = heightStart;
+
+    preferableMaritalStatuses
+      ..clear()
+      ..addAll(preferences?.maritalStatusPreference ?? const <String>[]);
+    preferableEducations
+      ..clear()
+      ..addAll(preferences?.educationPreference ?? const <String>[]);
+    preferableProfileManagedBy
+      ..clear()
+      ..addAll(preferences?.profileManagedByPreference ?? const <String>[]);
+    preferableDiet
+      ..clear()
+      ..addAll(preferences?.dietPreference ?? const <String>[]);
+    preferableCity
+      ..clear()
+      ..addAll(preferences?.preferredCities ?? const <String>[]);
+    isOpenToAllCities = preferableCity.isEmpty &&
+        (preferences?.preferredCountries?.isNotEmpty ?? false);
+
+    _selectSavedOptions(maritalStatusDataList, preferableMaritalStatuses);
+    _selectSavedOptions(educationDataList, preferableEducations);
+    _selectSavedOptions(profileManageByDataList, preferableProfileManagedBy);
+    _selectSavedOptions(dietDataList, preferableDiet);
+
+    religionPreferenceController.text = _displayLookup(
+        _firstPreference(preferences?.religionPreference), religionOptions);
+    communityPreferenceController.text = _displayLookup(
+        _firstPreference(preferences?.communityPreference), communityOptions);
+    motherTonguePreferenceController.text =
+        _firstPreference(preferences?.motherTonguePreference);
+    countryPreferenceController.text =
+        _firstPreference(preferences?.preferredCountries);
+    workSectorPreferenceController.text = _displayLookup(
+      _firstPreference(preferences?.workingAsPreference),
+      workSectorLookupOptions,
+    );
+    professionPreferenceController.text = _displayLookup(
+      _firstPreference(preferences?.professionPreference),
+      professionLookupOptions,
+    );
+    annualIncomePreferenceController.text = _displayLookup(
+      _firstPreference(preferences?.annualIncomePreference),
+      incomeRangeLookupOptions,
+    );
+    notifyListeners();
   }
 
   /// Religion is a static enum shared with web — only the dependent community
@@ -283,12 +404,6 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
       isCityLoadingMore = false;
     }
 
-    // Remove any city selections that are no longer valid
-    preferableCity.removeWhere(
-      (city) => !cityDropdownItems
-          .any((item) => item.toLowerCase() == city.toLowerCase()),
-    );
-
     if (notify) notifyListeners();
   }
 
@@ -321,6 +436,7 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
           RegistrationMaritalStatus.annulled.apiValue,
         }.contains(item.value),
       )
+      .map((item) => item.copyWith(isSelected: false))
       .toList(growable: false);
   List<LookupOption> educationLookupOptions = <LookupOption>[];
   List<SingleStringModel> educationDataList = <SingleStringModel>[];
@@ -334,7 +450,9 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
           )
           .toList(growable: false);
   List<SingleStringModel> countryDataList = countryListDataInserted;
-  List<SingleStringModel> dietDataList = dietDataListInserted;
+  List<SingleStringModel> dietDataList = dietDataListInserted
+      .map((item) => item.copyWith(isSelected: false))
+      .toList(growable: false);
   List<LookupOption> professionLookupOptions = <LookupOption>[];
   List<LookupOption> workSectorLookupOptions = <LookupOption>[];
   List<LookupOption> incomeRangeLookupOptions = <LookupOption>[];
@@ -346,6 +464,7 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
   final MatchesRepository _matchesRepository = MatchesRepository();
 
   void setPreferenceFlowSource({required bool isFromDrawer}) {
+    if (!isFromDrawer) savedPreferencesError = null;
     if (isDrawerEditFlow == isFromDrawer) return;
     isDrawerEditFlow = isFromDrawer;
     notifyListeners();
@@ -421,6 +540,7 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
             .map((e) => SingleStringModel(value: e.apiValue, name: e.label))
             .toList(growable: false);
       }
+      _selectSavedOptions(educationDataList, preferableEducations);
     } catch (e) {
       educationLookupError = e.toString();
     } finally {
@@ -902,6 +1022,17 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
     return selected;
   }
 
+  String _resolveLookupValue(String selected, List<LookupOption> options) {
+    final normalized = selected.trim().toLowerCase();
+    for (final option in options) {
+      if (option.key.toLowerCase() == normalized ||
+          option.label.toLowerCase() == normalized) {
+        return option.key;
+      }
+    }
+    return selected.trim();
+  }
+
   void setAgeRange(RangeValues values) {
     ageStart = values.start.round().clamp(ageMinLimit, ageMaxLimit);
     ageEnd = values.end.round().clamp(ageMinLimit, ageMaxLimit);
@@ -1036,13 +1167,19 @@ class RecommendedPreferencesProvider extends BaseChangeNotifier {
         preferredCountries: _toListOrNull(countryPreferenceController.text),
         professionPreference: isNotWorkingSector
             ? <String>[]
-            : _toListOrNull(professionPreferenceController.text),
+            : _toListOrNull(_resolveLookupValue(
+                professionPreferenceController.text,
+                professionLookupOptions,
+              )),
         workingAsPreference: workSectorPreferenceController.text.trim().isEmpty
             ? null
             : <String>[_resolveWorkSectorPreference()],
         annualIncomePreference: isNotWorkingSector
             ? <String>[]
-            : _toListOrNull(annualIncomePreferenceController.text),
+            : _toListOrNull(_resolveLookupValue(
+                annualIncomePreferenceController.text,
+                incomeRangeLookupOptions,
+              )),
         profileManagedByPreference: preferableProfileManagedBy.isNotEmpty
             ? List<String>.from(preferableProfileManagedBy)
             : _toListOrNull(profileManagePreferenceController.text),

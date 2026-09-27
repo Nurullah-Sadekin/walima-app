@@ -5,7 +5,6 @@ import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/image_viewer.dart';
 import 'package:walima_llc/features/recommended_preferences/presentation/providers/recommended_preferences_provider.dart';
 import 'package:walima_llc/core/global/components/upper_layer.dart';
-import 'package:walima_llc/features/anchor_point/anchor_point.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
@@ -36,10 +35,15 @@ class _PartnerPreferencesScreenState
   void initState() {
     super.initState();
     provider = ref.read(recommendedPreferencesProvider);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
       provider.setPreferenceFlowSource(isFromDrawer: widget.isFromDrawer);
-      provider.getInitialData();
       provider.initControllersListener();
+      if (widget.isFromDrawer) {
+        await provider.loadSavedPreferences();
+      } else {
+        await provider.getInitialData();
+      }
     });
   }
 
@@ -54,7 +58,8 @@ class _PartnerPreferencesScreenState
     provider = ref.watch(recommendedPreferencesProvider);
     return TransparentLoading(
       isLoading: provider.loaderState ==
-          RecommendedPreferencesScreenStates.preferences,
+              RecommendedPreferencesScreenStates.preferences ||
+          provider.isSavedPreferencesLoading,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: GradientBackground(
@@ -99,6 +104,15 @@ class _PartnerPreferencesScreenState
               subtitle:
                   'Set your preferences so we can find the right partner for you.',
             ),
+            if (provider.savedPreferencesError != null && widget.isFromDrawer)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Text(
+                  provider.savedPreferencesError!,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
             SizedBox(height: MediaQuery.sizeOf(context).height * 0.02),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -232,8 +246,15 @@ class _PartnerPreferencesScreenState
       verticalPadding: 14,
       borderRadius: 50,
       svgIconPath: AppImages.arrowRightSvgIcon,
-      title: 'Continue',
-      onTap: () {
+      title: provider.savedPreferencesError != null && widget.isFromDrawer
+          ? 'Retry'
+          : 'Continue',
+      onTap: () async {
+        if (provider.isSavedPreferencesLoading) return;
+        if (provider.savedPreferencesError != null && widget.isFromDrawer) {
+          await provider.loadSavedPreferences();
+          return;
+        }
         context.push(Paths.basicDetails);
       },
     );

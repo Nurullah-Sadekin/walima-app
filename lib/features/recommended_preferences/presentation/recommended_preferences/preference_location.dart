@@ -164,7 +164,10 @@ class _PreferenceLocationScreenState
                                   title: RecommendedPreferencesProvider
                                       .openToAllCitiesLabel,
                                 ),
-                                ...provider.cityDropdownItems.map((cityName) {
+                                ...{
+                                  ...provider.preferableCity,
+                                  ...provider.cityDropdownItems,
+                                }.map((cityName) {
                                   final isSelected = provider.preferableCity
                                       .contains(cityName);
                                   return SelectionCard(
@@ -185,7 +188,8 @@ class _PreferenceLocationScreenState
                                 provider.cityDropdownItems.isEmpty)
                               const Center(child: CircularProgressIndicator()),
                             if (!provider.isCityLoading &&
-                                provider.cityDropdownItems.isEmpty)
+                                provider.cityDropdownItems.isEmpty &&
+                                provider.preferableCity.isEmpty)
                               const Text(
                                 'No cities available for the selected country.',
                               ),

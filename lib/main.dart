@@ -27,7 +27,8 @@ import 'core/config/size_config.dart';
 Future<void> main() async {
   AppConfig.initialize(); // Set the desired flavor here
 
-  runZonedGuarded(() async {
+  runZonedGuarded(
+    () async {
       WidgetsFlutterBinding.ensureInitialized();
       if (!kIsWeb && Firebase.apps.isEmpty) {
         if (defaultTargetPlatform == TargetPlatform.android) {
@@ -105,6 +106,7 @@ class _MyAppState extends ConsumerState<MyApp> {
     DioClient().setLogoutHandler(() {
       ref.read(chatProvider).clearChatState();
       ref.read(globalProvider).clearSessionState();
+      ref.invalidate(recommendedPreferencesProvider);
       SocketService.instance.disconnect(reason: 'session expired logout');
       router.go(Paths.onboarding);
     });
