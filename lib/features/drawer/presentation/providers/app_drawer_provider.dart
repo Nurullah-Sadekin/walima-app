@@ -3,7 +3,7 @@ import 'package:walima_llc/core/providers/base_change_notifier.dart';
 import 'package:walima_llc/core/network/dio_client.dart';
 import 'package:walima_llc/core/utils/app_error_reporting_service.dart';
 import 'package:walima_llc/core/utils/firebase_messaging_service.dart';
-import 'package:walima_llc/core/utils/prefs_helper.dart';
+import 'package:walima_llc/core/utils/logout_cache_cleaner.dart';
 import 'package:walima_llc/features/chat/data/socket/socket_service.dart';
 import 'package:walima_llc/features/drawer/data/repository/logout_repository.dart';
 
@@ -18,10 +18,7 @@ class DrawerProvider extends BaseChangeNotifier {
     SocketService.instance.disconnect(reason: 'user logout');
     await FirebaseMessagingService.instance.dispose();
     await AppErrorReportingService.instance.clearUserContext();
-    await PrefsHelper.clearTokens(); // clears access + refresh + FCM token
-    await PrefsHelper
-        .clearMeSnapshot(); // prevents stale user on next cold start
-    await PrefsHelper.clearQuotaSnapshot();
+    await LogoutCacheCleaner.clear();
     updateViewState(loadingState: DrawerScreenStates.defaultState);
     onLogout();
   }

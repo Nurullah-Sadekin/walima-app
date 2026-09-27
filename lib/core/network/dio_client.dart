@@ -11,6 +11,7 @@ import 'package:walima_llc/core/network/app_urls.dart';
 import 'package:walima_llc/core/network/api_response_message.dart';
 import 'package:walima_llc/core/utils/app_error_reporting_service.dart';
 import 'package:walima_llc/core/utils/dialog_utils.dart';
+import 'package:walima_llc/core/utils/logout_cache_cleaner.dart';
 import 'package:walima_llc/core/utils/prefs_helper.dart';
 
 /// Singleton Dio client for handling all API calls
@@ -36,21 +37,6 @@ class DioClient {
         },
       ),
     );
-
-    // Add pretty logger interceptor (debug only)
-    if (kDebugMode) {
-      _dio.interceptors.add(
-        PrettyDioLogger(
-          requestHeader: true,
-          requestBody: true,
-          responseBody: true,
-          responseHeader: false,
-          error: true,
-          compact: true,
-          maxWidth: 90,
-        ),
-      );
-    }
 
     // Add custom interceptor for token handling
     _dio.interceptors.add(
@@ -117,6 +103,21 @@ class DioClient {
         },
       ),
     );
+
+    // Log requests after token handling so Authorization appears in debug output.
+    if (kDebugMode) {
+      _dio.interceptors.add(
+        PrettyDioLogger(
+          requestHeader: true,
+          requestBody: true,
+          responseBody: true,
+          responseHeader: false,
+          error: true,
+          compact: true,
+          maxWidth: 90,
+        ),
+      );
+    }
   }
   // Singleton instance
   static final DioClient _instance = DioClient._internal();
@@ -343,7 +344,7 @@ class DioClient {
   }
 
   Future<void> _logoutUser() async {
-    await PrefsHelper.clearTokens();
+    await LogoutCacheCleaner.clear();
     removeAuthToken();
     await AppErrorReportingService.instance.clearUserContext();
     _onLogout?.call();

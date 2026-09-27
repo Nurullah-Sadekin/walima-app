@@ -96,6 +96,18 @@ class PrefsHelper {
     await prefs.remove(StorageKeys.fcmToken);
   }
 
+  /// Keep only the saved onboarding progress when ending a session.
+  static Future<void> clearForLogout() async {
+    final prefs = await SharedPreferences.getInstance();
+    const onboardingKeys = {
+      StorageKeys.registrationDraft,
+      StorageKeys.registrationVerificationDone,
+    };
+    for (final key in prefs.getKeys().difference(onboardingKeys)) {
+      await prefs.remove(key);
+    }
+  }
+
   static Future<void> setRegistrationDraft(String draftJson) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(StorageKeys.registrationDraft, draftJson);
