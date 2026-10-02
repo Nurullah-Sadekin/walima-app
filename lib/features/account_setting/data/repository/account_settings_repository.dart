@@ -95,6 +95,87 @@ class AccountSettingsRepository {
     }
   }
 
+  /// Adds a phone to the signed-in user's contacts and sends an SMS OTP.
+  /// Success only means the OTP was sent; the phone is still unverified.
+  static Future<ApiResponse> addPhoneContact(
+    String phone, {
+    String? label,
+  }) async {
+    try {
+      final response = await DioClient().post(
+        AppUrls.contactPhone,
+        isTokenRequired: true,
+        data: <String, dynamic>{
+          'phone': phone,
+          if (label != null && label.isNotEmpty) 'label': label,
+        },
+      );
+      return _withApiMessage(response);
+    } catch (e) {
+      return _mapError(e);
+    }
+  }
+
+  static Future<ApiResponse> resendPhoneOtp(String phone) async {
+    try {
+      final response = await DioClient().post(
+        AppUrls.contactPhoneOtp,
+        isTokenRequired: true,
+        data: <String, dynamic>{'phone': phone},
+      );
+      return _withApiMessage(response);
+    } catch (e) {
+      return _mapError(e);
+    }
+  }
+
+  static Future<ApiResponse> verifyPhoneContact(
+    String phone,
+    String otpCode,
+  ) async {
+    try {
+      final response = await DioClient().post(
+        AppUrls.contactPhoneVerify,
+        isTokenRequired: true,
+        data: <String, dynamic>{'phone': phone, 'otpCode': otpCode},
+      );
+      final result = _withApiMessage(response);
+      if (!result.isSuccess) return result;
+
+      // Expected body: { response: { success: true, verified: true } }
+      final data = response.data;
+      final payload = data is Map ? (data['response'] ?? data) : null;
+      if (payload is Map && payload['verified'] == false) {
+        return ApiResponse.error(
+          message: result.message.isNotEmpty
+              ? result.message
+              : 'Phone verification failed',
+          statusCode: result.statusCode,
+          data: data,
+        );
+      }
+      return result;
+    } catch (e) {
+      return _mapError(e);
+    }
+  }
+
+  static Future<ApiResponse> setPrimaryContact({
+    required String type,
+    required String value,
+  }) async {
+    try {
+      final response = await DioClient().put(
+        AppUrls.contactEntryPrimary,
+        isTokenRequired: true,
+        data: <String, dynamic>{'type': type, 'value': value},
+      );
+      return _withApiMessage(response);
+    } catch (e) {
+      return _mapError(e);
+    }
+  }
+
   static Future<ApiResponse<PremiumSettings>> getPremiumSettings() async {
     try {
       final response = await DioClient().get(

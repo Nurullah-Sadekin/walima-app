@@ -7,8 +7,11 @@ import 'package:walima_llc/core/global/components/primary_button.dart';
 import 'package:walima_llc/core/global/components/primary_textField.dart';
 import 'package:walima_llc/core/network/dio_client.dart';
 import 'package:walima_llc/core/providers/providers.dart';
+import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/camel_case_utils.dart';
+import 'package:walima_llc/core/utils/image_viewer.dart';
 import 'package:walima_llc/core/utils/localized_text.dart';
+import 'package:walima_llc/features/account_setting/data/models/contact_settings.dart';
 import 'package:walima_llc/features/account_setting/data/repository/account_settings_repository.dart';
 import 'package:walima_llc/features/account_setting/presentation/providers/account_setting_provider.dart';
 import 'package:walima_llc/features/account_setting/presentation/screens/widgets/alert_status.dart';
@@ -19,9 +22,15 @@ import 'package:walima_llc/features/matches/presentation/widgets/filter_widget.d
 import 'package:walima_llc/features/matches/presentation/widgets/into_tile.dart';
 import 'package:walima_llc/features/matches/presentation/widgets/setting_switcher_title.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class AccountSettingScreen extends ConsumerStatefulWidget {
-  const AccountSettingScreen({super.key});
+  const AccountSettingScreen({
+    super.key,
+    this.initialStep = AccountSettingStep.accountSetting,
+  });
+
+  final AccountSettingStep initialStep;
 
   @override
   ConsumerState<AccountSettingScreen> createState() =>
@@ -30,7 +39,7 @@ class AccountSettingScreen extends ConsumerStatefulWidget {
 
 class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
   late AccountSettingProvider provider;
-  AccountSettingStep _step = AccountSettingStep.accountSetting;
+  late AccountSettingStep _step = widget.initialStep;
 
   late final bool hasPassword =
       ref.read(globalProvider).currentUser?.hasPassword ?? false;
@@ -39,6 +48,10 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
   void initState() {
     super.initState();
     provider = ref.read(accountSettingProvider);
+    if (_step == AccountSettingStep.myContactSettings) {
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => provider.loadContactSettings());
+    }
   }
 
   @override
@@ -46,7 +59,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     provider = ref.watch(accountSettingProvider);
 
     return PopScope(
-      canPop: _step == AccountSettingStep.accountSetting,
+      canPop: _step == AccountSettingStep.accountSetting ||
+          _step == widget.initialStep,
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop && _step != AccountSettingStep.accountSetting) {
           setState(() => _step = AccountSettingStep.accountSetting);
@@ -73,7 +87,8 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
       title: Text(_titleForStep(_step).localized(context)),
       backgroundColor: Colors.transparent,
       onBackPressed: () {
-        if (_step == AccountSettingStep.accountSetting) {
+        if (_step == AccountSettingStep.accountSetting ||
+            _step == widget.initialStep) {
           Navigator.of(context).maybePop();
           return;
         }
@@ -435,65 +450,302 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final contact = provider.contactSettings?.primaryContact;
-    final isEmail = contact?.isEmail ?? false;
-    final contactTitle = isEmail ? 'Email Address' : 'Phone Number';
-    final contactIcon = isEmail ? AppImages.emailSvgIcon : AppImages.callIcon;
-    final contactValue = contact?.value ?? '-';
+    final contacts = provider.contactSettings?.contacts ?? const <ContactItem>[];
+    final phones = contacts.where((c) => c.isPhone).toList(growable: false);
+    final emails = contacts.where((c) => c.isEmail).toList(growable: false);
     final selectedIndex = provider.selectedContactDisplayStatusIndex;
+    // Account-level flag from /auth/me (same source as the dashboard badge).
+    final isAccountPhoneVerified = ref.watch(
+      globalProvider.select((p) => p.currentUser?.isPhoneVerified),
+    );
 
-    return Column(
-      spacing: 10,
-      children: [
-        InfoTile(
-          title: contactTitle,
-          value: contactValue,
-          leadingImagePath: contactIcon,
-          showTrailingImage: false,
-          showLeadingImage: true,
-          borderRadius: 8,
-          trailingText: 'Primary',
-          padding: const EdgeInsets.all(16),
-        ),
-        CardBorder(
-          widget: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: 12,
+        children: [
+          const SizedBox(height: 4),
+          _contactSection(
+            title: 'Phone Numbers',
+            subtitle: isAccountPhoneVerified == false
+                ? 'Verify your number to get the verified badge.'
+                : null,
+            action: TextButton.icon(
+              onPressed: provider.isContactSaving
+                  ? null
+                  : () => _openPhoneVerification(),
+              icon: const Icon(Icons.add, size: 16),
+              label: Text('Add'.localized(context)),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                visualDensity: VisualDensity.compact,
+                textStyle: TextStyle(fontSize: TextSize.font13(context)),
+              ),
+            ),
+            rows: phones.isEmpty
+                ? [_emptyContactText('No phone number added yet.')]
+                : phones.map(_contactRow).toList(),
+          ),
+          if (emails.isNotEmpty)
+            _contactSection(
+              title: 'Email Address',
+              rows: emails.map(_contactRow).toList(),
+            ),
+          CardBorder(
+            verticalPadding: 12,
+            widget: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Contact Display Status'.localized(context),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: TextSize.font15(context),
+                      color: AppColors.textPrimaryLight,
+                    )),
+                const SizedBox(
+                  height: 12,
+                ),
+                FilterWidget(
+                  items: provider.contactDisplayStatus
+                      .asMap()
+                      .entries
+                      .map(
+                        (entry) => FilterItem(
+                          name: entry.value.label,
+                          isSelected: entry.key == selectedIndex,
+                        ),
+                      )
+                      .toList(),
+                  spacing: 0,
+                  itemSpacing: 10,
+                  onItemTap: (index) async {
+                    if (provider.isContactSaving) return;
+                    final response =
+                        await provider.saveContactDisplayStatusByIndex(index);
+                    if (!mounted || response == null) return;
+                    _showResponseSnackBar(response);
+                  },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  /// A bordered group: title (+ optional action/subtitle), then rows
+  /// separated by dividers. Matches the "Contact Display Status" card.
+  Widget _contactSection({
+    required String title,
+    String? subtitle,
+    Widget? action,
+    required List<Widget> rows,
+  }) {
+    return CardBorder(
+      verticalPadding: 12,
+      widget: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
             children: [
-              Text('Contact Display Status'.localized(context),
+              Expanded(
+                child: Text(
+                  title.localized(context),
                   style: TextStyle(
                     fontWeight: FontWeight.w500,
-                    fontSize: TextSize.font16(context),
+                    fontSize: TextSize.font15(context),
                     color: AppColors.textPrimaryLight,
-                  )),
-              const SizedBox(
-                height: 16,
+                  ),
+                ),
               ),
-              FilterWidget(
-                items: provider.contactDisplayStatus
-                    .asMap()
-                    .entries
-                    .map(
-                      (entry) => FilterItem(
-                        name: entry.value.label,
-                        isSelected: entry.key == selectedIndex,
-                      ),
-                    )
-                    .toList(),
-                spacing: 0,
-                itemSpacing: 10,
-                onItemTap: (index) async {
-                  if (provider.isContactSaving) return;
-                  final response =
-                      await provider.saveContactDisplayStatusByIndex(index);
-                  if (!mounted || response == null) return;
-                  _showResponseSnackBar(response);
-                },
-              ),
+              if (action != null) action,
             ],
           ),
-        ),
-      ],
+          if (subtitle != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Text(
+                subtitle.localized(context),
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontSize: TextSize.font12(context),
+                ),
+              ),
+            ),
+          const SizedBox(height: 4),
+          for (var i = 0; i < rows.length; i++) ...[
+            if (i > 0) const Divider(height: 1, color: AppColors.greyLight),
+            rows[i],
+          ],
+        ],
+      ),
     );
+  }
+
+  Widget _emptyContactText(String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Text(
+        text.localized(context),
+        style: TextStyle(
+          color: AppColors.hintTextColor,
+          fontSize: TextSize.font14(context),
+        ),
+      ),
+    );
+  }
+
+  /// One contact with its own `isVerified` / `isPrimary` (per-number status,
+  /// independent of the account badge) and, for phones, the next action.
+  Widget _contactRow(ContactItem contact) {
+    final isVerified = contact.isVerified ?? false;
+    final isPrimary = contact.isPrimary ?? false;
+    final canVerify = contact.isPhone && !isVerified;
+    final canMakePrimary = contact.isPhone && isVerified && !isPrimary;
+    final label = contact.label;
+    final statusColor =
+        isVerified ? AppColors.greenButtonColor : AppColors.primary;
+    final extras = [
+      if (isPrimary) 'Primary'.localized(context),
+      if (label != null && label.isNotEmpty)
+        CamelCaseUtils.formatCamelCase(label),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        spacing: 12,
+        children: [
+          ShowImage(
+            imagePath:
+                contact.isEmail ? AppImages.emailSvgIcon : AppImages.callIcon,
+            width: 18,
+            height: 18,
+            color: AppColors.textSecondaryLight,
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 2,
+              children: [
+                Text(
+                  contact.value ?? '-',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: AppColors.textPrimaryLight,
+                    fontSize: TextSize.font13(context),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Row(
+                  spacing: 4,
+                  children: [
+                    Icon(
+                      isVerified
+                          ? Icons.check_circle_rounded
+                          : Icons.error_outline_rounded,
+                      size: TextSize.font12(context),
+                      color: statusColor,
+                    ),
+                    Flexible(
+                      child: Text.rich(
+                        TextSpan(
+                          text: (isVerified ? 'Verified' : 'Not verified')
+                              .localized(context),
+                          style: TextStyle(color: statusColor),
+                          children: [
+                            for (final extra in extras)
+                              TextSpan(
+                                text: '  ·  $extra',
+                                style: const TextStyle(
+                                  color: AppColors.textSecondaryLight,
+                                ),
+                              ),
+                          ],
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: TextSize.font12(context)),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          if (canVerify)
+            FilledButton(
+              onPressed: () => _openPhoneVerification(phone: contact.value),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                minimumSize: const Size(0, 32),
+                textStyle: TextStyle(
+                  fontSize: TextSize.font13(context),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              child: Text('Verify'.localized(context)),
+            )
+          else if (canMakePrimary)
+            TextButton(
+              onPressed: provider.isContactSaving
+                  ? null
+                  : () => _confirmMakePrimary(contact),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                visualDensity: VisualDensity.compact,
+                textStyle: TextStyle(fontSize: TextSize.font13(context)),
+              ),
+              child: Text('Make Primary'.localized(context)),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _openPhoneVerification({String? phone}) async {
+    await context.pushNamed<bool>(Routes.phoneVerification, extra: phone);
+    if (!mounted) return;
+    // Re-sync even if the user backed out, in case a verify landed.
+    provider.loadContactSettings();
+  }
+
+  Future<void> _confirmMakePrimary(ContactItem contact) async {
+    if (provider.isContactSaving) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('Make Primary'.localized(dialogContext)),
+        content: Text(
+          '${'Use this number as your primary phone?'.localized(dialogContext)}\n${contact.value ?? ''}',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text('Cancel'.localized(dialogContext)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text('Confirm'.localized(dialogContext)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final response = await provider.makePrimaryPhone(contact);
+    if (!mounted) return;
+    _showResponseSnackBar(response);
+    if (response.isSuccess) {
+      await ref
+          .read(globalProvider)
+          .refreshCurrentUserAndQuota(silent: true, force: true);
+    }
   }
 
   Widget _privacyOptions() {

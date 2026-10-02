@@ -324,7 +324,7 @@ class AppUrls {
   // --- Identity Verification (Didit KYC) ---
   // Flutter talks only to the Walima backend; the backend owns the Didit API key.
   static final String verificationSession =
-      '$baseUrl/verification/session'; //POST
+      '$baseUrl/verification/session'; //POST, DELETE
   static final String verificationStatus = '$baseUrl/verification/status'; //GET
   static final String verificationSessions =
       '$baseUrl/verification/sessions'; //GET
@@ -332,6 +332,14 @@ class AppUrls {
   //------  Account Settings ------
   static final String updateNameAndEmail = '$baseUrl/settings/account'; //GET
   static final String contactSettings = '$baseUrl/settings/contact'; //GET, PUT
+  static final String contactPhone =
+      '$baseUrl/settings/contact/phone'; //POST (add + send OTP)
+  static final String contactPhoneVerify =
+      '$baseUrl/settings/contact/phone/verify'; //POST
+  static final String contactPhoneOtp =
+      '$baseUrl/settings/contact/phone/otp'; //POST (resend OTP)
+  static final String contactEntryPrimary =
+      '$baseUrl/settings/contact/entry/primary'; //PUT
   static final String premiumSettings = '$baseUrl/settings/premium'; //GET, PUT
   static final String messagesSettings = '$baseUrl/settings/messages'; //GET
 

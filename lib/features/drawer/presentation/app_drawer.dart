@@ -15,6 +15,8 @@ import 'package:walima_llc/core/utils/link_opener.dart';
 import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/core/utils/picker_dialog.dart';
 import 'package:walima_llc/features/anchor_point/anchor_point.dart';
+import 'package:walima_llc/features/identity_verification/data/models/identity_verification_models.dart';
+import 'package:walima_llc/features/account_setting/presentation/screens/widgets/phone_verification_status_tile.dart';
 import 'package:walima_llc/features/drawer/presentation/providers/app_drawer_provider.dart';
 import 'package:walima_llc/features/profile/presentation/providers/profile_provider.dart';
 import 'package:walima_llc/features/profile/presentation/utils/profile_summary_utils.dart';
@@ -52,6 +54,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   children: [
                     _topBar(context),
                     _profileSummary(context),
+                    const PhoneVerificationStatusTile(),
                     _account(),
                     _findYourMatches(),
                     _optionsAndControls(),
@@ -82,6 +85,9 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   ref.invalidate(chatProvider);
                   ref.invalidate(globalProvider);
                   ref.invalidate(recommendedPreferencesProvider);
+                  // Per-user verification/contact state.
+                  ref.invalidate(identityVerificationProvider);
+                  ref.invalidate(accountSettingProvider);
                   router.go(Paths.onboarding);
                 });
               },
@@ -127,6 +133,12 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
     final expiryText =
         formatExpiry(profileData?.membership?.membershipExpiresAt);
     final gender = ref.read(globalProvider).currentUser?.gender;
+    // Verified badge = identity approved per GET /verification/status.
+    final isIdentityVerified = ref.watch(
+      identityVerificationProvider.select(
+        (p) => p.statusData?.state == IdentityVerificationState.approved,
+      ),
+    );
 
     return ProfileSummaryCard(
       displayName: displayName,
@@ -135,7 +147,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
       expiryText: expiryText,
       profileImagePath: profileData?.profilePicture?.url ??
           (gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar),
-      showTopIcon: profileData?.isVerified ?? true,
+      showTopIcon: isIdentityVerified,
       showBottomIcon: true,
       topIconPath: AppImages.verifiedBadgeSvgIcon,
       bottomIconPath: AppImages.cameraSvgIcon,

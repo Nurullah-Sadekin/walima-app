@@ -4,18 +4,19 @@ import 'package:walima_llc/core/network/dio_client.dart';
 import 'package:walima_llc/features/identity_verification/data/models/identity_verification_models.dart';
 
 /// Talks to the Walima backend verification endpoints. The backend is the only
-/// component that talks to Didit (guide §15).
+/// component that talks to Didit.
 ///
 /// All responses are wrapped by the global transform interceptor as:
-/// `{ code, message, response: { data, message }, traceId }`.
+/// `{ code, message, response: { data }, traceId }` (message is top-level).
 /// The helpers below unwrap down to the inner `response.data`.
 class IdentityVerificationRepository {
   const IdentityVerificationRepository._();
 
   /// `POST /api/v1/verification/session`
   ///
-  /// Creates (or resumes) a Didit session. The backend returns the existing
-  /// non-terminal session when one is active, and marks the user as `pending`.
+  /// Creates (or reuses) a Didit session. The backend returns the latest
+  /// non-terminal session with `isExisting: true` when one is active.
+  /// Creation does NOT mark the user pending — re-read status afterwards.
   static Future<ApiResponse<CreateVerificationSessionData>> createSession({
     bool isIframe = false,
   }) async {
@@ -88,6 +89,31 @@ class IdentityVerificationRepository {
     }
   }
 
+  /// `DELETE /api/v1/verification/session`
+  ///
+  /// Cancels the latest unfinished session (deletes it at Didit). 404 when no
+  /// session exists, 409 when it is no longer cancellable — refresh either way.
+  static Future<ApiResponse<void>> cancelSession() async {
+    try {
+      final response = await DioClient().delete(
+        AppUrls.verificationSession,
+        isTokenRequired: true,
+      );
+      return response.isSuccess
+          ? ApiResponse.success(
+              data: null,
+              message: response.message,
+              statusCode: response.statusCode,
+            )
+          : ApiResponse.error(
+              message: response.message,
+              statusCode: response.statusCode,
+            );
+    } catch (e) {
+      return _mapError(e);
+    }
+  }
+
   /// `GET /api/v1/verification/sessions`
   ///
   /// All sessions for the current user, newest first. Useful for history but
@@ -122,7 +148,7 @@ class IdentityVerificationRepository {
     }
   }
 
-  /// Unwraps the envelope to the inner `response` map (`{ data, message }`).
+  /// Unwraps the envelope to the inner `response` map (`{ data }`).
   static Map<String, dynamic>? _container(dynamic body) {
     if (body is! Map) return null;
     final response = body['response'];

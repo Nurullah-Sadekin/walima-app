@@ -7,6 +7,7 @@ import 'package:walima_llc/core/providers/providers.dart';
 import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/dialog_utils.dart';
 import 'package:walima_llc/core/utils/picker_dialog.dart';
+import 'package:walima_llc/features/identity_verification/data/models/identity_verification_models.dart';
 import 'package:walima_llc/features/profile/presentation/utils/profile_summary_utils.dart';
 import 'package:walima_llc/features/profile/data/model/response/dashboard_response.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -30,6 +31,12 @@ class ProfileSummerySection extends ConsumerWidget {
     final planName = resolvePlanName(profile?.membership);
     final expiryText = formatExpiry(profile?.membership?.membershipExpiresAt);
     final gender = ref.read(globalProvider).currentUser?.gender;
+    // Verified badge = identity approved per GET /verification/status.
+    final isIdentityVerified = ref.watch(
+      identityVerificationProvider.select(
+        (p) => p.statusData?.state == IdentityVerificationState.approved,
+      ),
+    );
 
     return Column(
       children: [
@@ -39,7 +46,7 @@ class ProfileSummerySection extends ConsumerWidget {
           planName: planName,
           expiryText: expiryText,
           profileImagePath: profile?.profilePicture?.url ?? (gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar),
-          showTopIcon: profile?.profilePicture?.status == 'approved'? true : false,
+          showTopIcon: isIdentityVerified,
           showBottomIcon: true,
           topIconPath: AppImages.verifiedBadgeSvgIcon,
           bottomIconPath: AppImages.cameraSvgIcon,

@@ -4,12 +4,14 @@ class ContactItem {
     this.value,
     this.isPrimary,
     this.isVerified,
+    this.label,
   });
 
   final String? type;
   final String? value;
   final bool? isPrimary;
   final bool? isVerified;
+  final String? label;
 
   bool get isEmail => (type ?? '').toLowerCase() == 'email';
   bool get isPhone {
@@ -25,6 +27,7 @@ class ContactItem {
       value: _readString(map, const ['value']),
       isPrimary: _readBool(map, const ['isPrimary', 'is_primary']),
       isVerified: _readBool(map, const ['isVerified', 'is_verified']),
+      label: _readString(map, const ['label']),
     );
   }
 
@@ -34,6 +37,7 @@ class ContactItem {
       if (value != null) 'value': value,
       if (isPrimary != null) 'isPrimary': isPrimary,
       if (isVerified != null) 'isVerified': isVerified,
+      if (label != null) 'label': label,
     };
   }
 

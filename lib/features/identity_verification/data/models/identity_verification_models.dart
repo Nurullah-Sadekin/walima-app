@@ -12,62 +12,92 @@ enum IdentityVerificationState {
   pending,
   approved,
   rejected,
+
+  /// Raw status not in any recognised bucket. Never shown directly; display
+  /// logic falls back to the user-level status (guide §4).
   unknown,
 }
 
-/// Maps a raw backend/Didit status string to an [IdentityVerificationState].
-///
-/// The buckets follow the current web frontend logic (guide §10). Unrecognised
-/// values resolve to [IdentityVerificationState.unknown] so callers can keep the
-/// last known state and show a neutral fallback.
+/// Normalises a raw status: trim, lowercase, and collapse spaces, hyphens and
+/// underscores to `_` (e.g. `"In Review"` → `in_review`).
+String verificationStatusKey(String? value) => (value ?? '')
+    .trim()
+    .toLowerCase()
+    .replaceAll(RegExp(r'[\s_-]+'), '_');
+
+// Backend mapping (guide §4).
+const _approvedStates = {'approved', 'verified'};
+const _rejectedStates = {'declined', 'rejected', 'failed'};
+const _notSubmittedStates = {
+  'not_started',
+  'expired',
+  'abandoned',
+  'kyc_expired',
+  'cancelled',
+};
+const _pendingStates = {
+  'in_progress',
+  'in_review',
+  'under_review',
+  'processing',
+  'pending',
+  'started',
+  'submitted',
+  'review',
+  'manual_review',
+  'awaiting_review',
+  'awaiting_user',
+  'resubmitted',
+};
+
+// Button / sub-state checks (guide §4, current web rules).
+const _resumeStates = {
+  'not_started',
+  'in_progress',
+  'started',
+  'resubmitted',
+  'awaiting_user',
+};
+const _cancelStates = {'not_started', 'in_progress'};
+const _reviewStates = {
+  'under_review',
+  'in_review',
+  'review',
+  'manual_review',
+  'awaiting_review',
+};
+
+/// Maps a raw Didit session status to an [IdentityVerificationState].
+/// Unrecognised (or empty) values return [IdentityVerificationState.unknown].
 IdentityVerificationState mapVerificationStatus(String? rawStatus) {
-  final normalized = (rawStatus ?? '').trim().toLowerCase().replaceAll(' ', '_');
-
-  if (normalized.isEmpty) return IdentityVerificationState.notSubmitted;
-
-  const notSubmitted = {
-    'unverified',
-    'not_verified',
-    'none',
-    'not_submitted',
-    'unsubmitted',
-  };
-  const approved = {
-    'approved',
-    'verified',
-  };
-  const pending = {
-    'under_review',
-    'in_review',
-    'in_progress',
-    'processing',
-    'pending',
-    'started',
-    'submitted',
-    'review',
-    'manual_review',
-    'awaiting_review',
-    'not_started',
-    'awaiting_user',
-    'resubmitted',
-  };
-  const rejected = {
-    'declined',
-    'rejected',
-    'failed',
-    'expired',
-    'kyc_expired',
-    'abandoned',
-  };
-
-  if (notSubmitted.contains(normalized)) {
+  final key = verificationStatusKey(rawStatus);
+  if (_approvedStates.contains(key)) return IdentityVerificationState.approved;
+  if (_rejectedStates.contains(key)) return IdentityVerificationState.rejected;
+  if (_notSubmittedStates.contains(key)) {
     return IdentityVerificationState.notSubmitted;
   }
-  if (approved.contains(normalized)) return IdentityVerificationState.approved;
-  if (rejected.contains(normalized)) return IdentityVerificationState.rejected;
-  if (pending.contains(normalized)) return IdentityVerificationState.pending;
-
+  if (_pendingStates.contains(key)) return IdentityVerificationState.pending;
   return IdentityVerificationState.unknown;
+}
+
+/// Display state, matching the web: a recognised latest-session status wins;
+/// otherwise the user-level enum (`approved` / `pending` / `rejected` /
+/// `not_submitted`); anything invalid or missing is `notSubmitted`.
+///
+/// For rendering only — never treat this as authorisation.
+IdentityVerificationState resolveVerificationDisplayState({
+  String? sessionStatus,
+  String? userStatus,
+}) {
+  final fromSession = mapVerificationStatus(sessionStatus);
+  if (fromSession != IdentityVerificationState.unknown) return fromSession;
+
+  return switch (verificationStatusKey(userStatus)) {
+    'approved' => IdentityVerificationState.approved,
+    'pending' => IdentityVerificationState.pending,
+    'rejected' => IdentityVerificationState.rejected,
+    _ => IdentityVerificationState.notSubmitted,
+  };
 }
 
 /// Response payload of `POST /api/v1/verification/session`.
@@ -120,9 +150,18 @@ class LatestSession {
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
-  IdentityVerificationState get state => mapVerificationStatus(status);
+  String get statusKey => verificationStatusKey(status);
 
   bool get hasOpenableUrl => (verificationUrl?.isNotEmpty ?? false);
+
+  /// Unfinished session the user can continue (needs a URL).
+  bool get canResume => _resumeStates.contains(statusKey) && hasOpenableUrl;
+
+  /// Backend re-checks; only `Not Started` / `In Progress` are cancellable.
+  bool get canCancel => _cancelStates.contains(statusKey);
+
+  /// Pending and waiting on review (no Resume/Cancel).
+  bool get isUnderReview => _reviewStates.contains(statusKey);
 }
 
 /// Response payload of `GET /api/v1/verification/status`.
@@ -149,34 +188,21 @@ class IdentityVerificationStatusData {
   final bool isVerified;
   final LatestSession? latestSession;
 
-  /// Overall state for the screen, combining the user-level status, the
-  /// `isVerified` flag and the latest session as a fallback.
-  IdentityVerificationState get state {
-    if (isVerified) return IdentityVerificationState.approved;
+  /// Display state (guide §4): latest session status first, then the
+  /// user-level status. `isVerified` is derived server-side from the user
+  /// status, so it is not consulted separately.
+  IdentityVerificationState get state => resolveVerificationDisplayState(
+        sessionStatus: latestSession?.status,
+        userStatus: identityVerificationStatus,
+      );
 
-    final fromStatus = mapVerificationStatus(identityVerificationStatus);
-    if (fromStatus == IdentityVerificationState.approved ||
-        fromStatus == IdentityVerificationState.rejected ||
-        fromStatus == IdentityVerificationState.pending) {
-      return fromStatus;
-    }
+  bool get canStart =>
+      state == IdentityVerificationState.notSubmitted ||
+      state == IdentityVerificationState.rejected;
 
-    // Status was notSubmitted/unknown — consult the latest session.
-    final fromSession = mapVerificationStatus(latestSession?.status);
-    if (fromSession == IdentityVerificationState.approved ||
-        fromSession == IdentityVerificationState.rejected ||
-        fromSession == IdentityVerificationState.pending) {
-      return fromSession;
-    }
-
-    if (fromStatus == IdentityVerificationState.notSubmitted) {
-      return IdentityVerificationState.notSubmitted;
-    }
-    // Unknown user status: lean on whether any session exists.
-    return latestSession == null
-        ? IdentityVerificationState.notSubmitted
-        : IdentityVerificationState.pending;
-  }
+  bool get canResume => latestSession?.canResume ?? false;
+  bool get canCancel => latestSession?.canCancel ?? false;
+  bool get isUnderReview => latestSession?.isUnderReview ?? false;
 }
 
 String? _trimmedOrNull(dynamic value) {

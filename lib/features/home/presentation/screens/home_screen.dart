@@ -22,6 +22,7 @@ import 'package:walima_llc/features/home/data/model/response/recent_visitors_res
 import 'package:walima_llc/features/matches/presentation/models/match_card_actions.dart';
 import 'package:walima_llc/features/home/presentation/providers/home_provider.dart';
 import 'package:walima_llc/features/home/presentation/screens/widgets/complete_profile_section.dart';
+import 'package:walima_llc/features/home/presentation/screens/widgets/verification_status_section.dart';
 import 'package:walima_llc/features/home/presentation/screens/widgets/profile_summery_section.dart';
 import 'package:walima_llc/features/home/presentation/screens/widgets/social_media_icon.dart';
 import 'package:walima_llc/features/matches/data/models/response/get_matches_response.dart';
@@ -75,6 +76,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(profileProvider).getProfile(context);
       ref.read(profileProvider).getDashboard();
+      // Dashboard phone badge reads /auth/me; never trust only the cache.
+      ref.read(globalProvider).refreshCurrentUserAndQuota(silent: true);
+      // Government ID card: authoritative status incl. latest session.
+      ref.read(identityVerificationProvider).loadStatus(showLoader: false);
     });
   }
 
@@ -89,11 +94,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       return false;
     }
 
-    if (notification.direction == ScrollDirection.reverse &&
-        _showProfileSummary) {
+    if (notification.direction == ScrollDirection.reverse && _showProfileSummary) {
       setState(() => _showProfileSummary = false);
-    } else if (notification.direction == ScrollDirection.forward &&
-        !_showProfileSummary) {
+    } else if (notification.direction == ScrollDirection.forward && !_showProfileSummary) {
       setState(() => _showProfileSummary = true);
     }
 
@@ -102,10 +105,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isHomeLoading = ref.watch(homeProvider).screenStates ==
-        HomeScreenStates.transparentLoading;
-    final isProfileImageUploading =
-        ref.watch(profileProvider).loaderState == ProfileScreenStates.loading;
+    final isHomeLoading = ref.watch(homeProvider).screenStates == HomeScreenStates.transparentLoading;
+    final isProfileImageUploading = ref.watch(profileProvider).loaderState == ProfileScreenStates.loading;
 
     return TransparentLoading(
       isLoading: isHomeLoading || isProfileImageUploading,
@@ -197,6 +198,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
               children: [
+                const VerificationStatusSection(),
                 const CompleteProfileSection(),
                 _premiumMatches(),
                 _recentlyViewed(),
@@ -218,6 +220,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ref.read(homeProvider).loadRecentlyViewed(force: true),
       ref.read(profileProvider).getProfile(context),
       ref.read(profileProvider).getDashboard(),
+      ref.read(globalProvider).refreshCurrentUserAndQuota(silent: true),
+      ref.read(identityVerificationProvider).loadStatus(showLoader: false),
     ]);
   }
 
@@ -238,9 +242,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final matches = provider.premiumMatches;
     final isLoading = provider.isLoadingPremiumMatches;
     final errorText = provider.premiumMatchesError;
-    final subtitleText = isLoading
-        ? 'Fetching premium matches'.localized(context)
-        : '${provider.premiumMatchesTotal} ${'Profiles Found'.localized(context)}';
+    final subtitleText =
+        isLoading ? 'Fetching premium matches'.localized(context) : '${provider.premiumMatchesTotal} ${'Profiles Found'.localized(context)}';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -345,10 +348,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Row(
                   children: [
                     ...matches.take(2).map(_buildPremiumMatchCard),
-                    if (currentPlan == 'free')
-                      _buildUpgradeWidget(matches.length - 2),
-                    if (currentPlan != 'free')
-                      ...matches.skip(2).map(_buildPremiumMatchCard),
+                    if (currentPlan == 'free') _buildUpgradeWidget(matches.length - 2),
+                    if (currentPlan != 'free') ...matches.skip(2).map(_buildPremiumMatchCard),
                   ],
                 ),
               );
@@ -360,9 +361,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildUpgradeWidget(int remainingCount, {bool? isForVisitors}) {
-    String subText = isForVisitors == true
-        ? 'recent visitors'.localized(context)
-        : 'premium matches'.localized(context);
+    String subText = isForVisitors == true ? 'recent visitors'.localized(context) : 'premium matches'.localized(context);
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -437,44 +436,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               extra: {'userId': match.userReference ?? match.id},
             );
           },
-          imagePath: imagePath ??
-              (match.gender == 'female'
-                  ? AppImages.womenAvatar
-                  : AppImages.manAvatar),
+          imagePath: imagePath ?? (match.gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar),
           imageHeight: 250,
           isPremiumConnect: match.isPremium == true,
           isVerified: match.profilePhoto?.isVerified ?? false,
           name: match.displayName ?? 'Walima Member'.localized(context),
-          age:
-              '${match.age ?? 'Undefine'.localized(context)} ${'Yr'.localized(context)}',
+          age: '${match.age ?? 'Undefine'.localized(context)} ${'Yr'.localized(context)}',
           height: HeightUtils.formatHeight(heightText),
           location: location?.localized(context),
           profession: profession?.localized(context),
           rightButtonText: actions.secondaryLabel,
-          rightIconPath:
-              isConnected ? AppImages.callIcon : AppImages.favouriteIcon,
-          rightButtonColor: !isConnected && isShortlisted
-              ? const Color(0xFFFFF1F5)
-              : AppColors.white,
-          rightButtonBorderColor: !isConnected && isShortlisted
-              ? const Color(0xFFE05271)
-              : AppColors.greyLight,
+          rightIconPath: isConnected ? AppImages.callIcon : AppImages.favouriteIcon,
+          rightButtonColor: !isConnected && isShortlisted ? const Color(0xFFFFF1F5) : AppColors.white,
+          rightButtonBorderColor: !isConnected && isShortlisted ? const Color(0xFFE05271) : AppColors.greyLight,
           rightButtonIconColor: const Color(0xFFE05271),
           leftButtonText: actions.primaryLabel,
-          leftButtonColor: isConnected || canConnect
-              ? AppColors.greenButtonColor
-              : AppColors.disableBackground,
-          leftButtonTextColor: isConnected || canConnect
-              ? AppColors.white
-              : AppColors.disableText,
-          leftButtonIconColor: isConnected || canConnect
-              ? AppColors.white
-              : AppColors.disableText,
-          leftButtonBorderColor: isConnected || canConnect
-              ? AppColors.greenButtonColor
-              : AppColors.disableBackground,
-          viewOnAccept:
-              match.profilePhoto?.visibilityStatus == 'visible' ? true : false,
+          leftButtonColor: isConnected || canConnect ? AppColors.greenButtonColor : AppColors.disableBackground,
+          leftButtonTextColor: isConnected || canConnect ? AppColors.white : AppColors.disableText,
+          leftButtonIconColor: isConnected || canConnect ? AppColors.white : AppColors.disableText,
+          leftButtonBorderColor: isConnected || canConnect ? AppColors.greenButtonColor : AppColors.disableBackground,
+          viewOnAccept: match.profilePhoto?.visibilityStatus == 'visible' ? true : false,
           religion: match.religion?.localized(context),
           isOnline: match.isOnline ?? false,
           showLeftButton: actions.showPrimaryButton,
@@ -573,10 +554,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       location?.city,
       location?.state,
       location?.country,
-    ]
-        .where((value) => value != null && value.trim().isNotEmpty)
-        .map((value) => value!.trim())
-        .toList();
+    ].where((value) => value != null && value.trim().isNotEmpty).map((value) => value!.trim()).toList();
     if (parts.isEmpty) return null;
     return parts.join(', ');
   }
@@ -596,9 +574,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final visitors = provider.recentVisitors;
     final isLoading = provider.isLoadingRecentVisitors;
     final errorText = provider.recentVisitorsError;
-    final subtitleText = isLoading
-        ? 'Loading recent visitors'.localized(context)
-        : '${provider.recentVisitorsTotal} ${'Profiles Found'.localized(context)}';
+    final subtitleText =
+        isLoading ? 'Loading recent visitors'.localized(context) : '${provider.recentVisitorsTotal} ${'Profiles Found'.localized(context)}';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -724,11 +701,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }) {
     final location = _formatRecentVisitorLocation(visitor.location);
     final imageUrl = visitor.profilePhoto?.url?.toString();
-    final imagePath = (imageUrl?.isNotEmpty ?? false)
-        ? imageUrl!
-        : (visitor.gender == 'female'
-            ? AppImages.womenAvatar
-            : AppImages.manAvatar);
+    final imagePath = (imageUrl?.isNotEmpty ?? false) ? imageUrl! : (visitor.gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar);
 
     return Padding(
       padding: const EdgeInsets.only(right: 10.0),
@@ -751,26 +724,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           isPremiumConnect: visitor.isPremium ?? false,
           isVerified: visitor.isVerified ?? false,
           name: visitor.displayName ?? 'Walima Member'.localized(context),
-          age:
-              '${visitor.age?.toInt() ?? 'Undefine'.localized(context)} ${'Yr'.localized(context)}',
-          height: visitor.height == null
-              ? null
-              : HeightUtils.formatHeight(visitor.height.toString()),
+          age: '${visitor.age?.toInt() ?? 'Undefine'.localized(context)} ${'Yr'.localized(context)}',
+          height: visitor.height == null ? null : HeightUtils.formatHeight(visitor.height.toString()),
           location: location,
-          leftButtonColor: visitor.canConnect
-              ? AppColors.greenButtonColor
-              : AppColors.disableBackground,
-          leftButtonTextColor:
-              visitor.canConnect ? AppColors.white : AppColors.disableText,
-          leftButtonIconColor:
-              visitor.canConnect ? AppColors.white : AppColors.disableText,
-          leftButtonBorderColor: visitor.canConnect
-              ? AppColors.greenButtonColor
-              : AppColors.disableBackground,
+          leftButtonColor: visitor.canConnect ? AppColors.greenButtonColor : AppColors.disableBackground,
+          leftButtonTextColor: visitor.canConnect ? AppColors.white : AppColors.disableText,
+          leftButtonIconColor: visitor.canConnect ? AppColors.white : AppColors.disableText,
+          leftButtonBorderColor: visitor.canConnect ? AppColors.greenButtonColor : AppColors.disableBackground,
           viewOnAccept: visitor.profilePhoto?.visibilityStatus == 'visible',
-          activeStatusText: recentlyViewed
-              ? _recentlyViewedStatus(visitor)
-              : _recentVisitorStatus(visitor),
+          activeStatusText: recentlyViewed ? _recentlyViewedStatus(visitor) : _recentVisitorStatus(visitor),
           isLocked: isLocked,
           showLeftButton: visitor.canConnect,
           onTapRightButton: isLocked
@@ -839,17 +801,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       location?.city,
       location?.state?.toString(),
       location?.country,
-    ]
-        .where((value) => value != null && value.trim().isNotEmpty)
-        .map((value) => value!.trim())
-        .toList();
+    ].where((value) => value != null && value.trim().isNotEmpty).map((value) => value!.trim()).toList();
     if (parts.isEmpty) return null;
     return parts.join(', ');
   }
 
   String _recentVisitorStatus(Data visitor) {
-    final visitedAt =
-        DateTimeUtils.formatDate(DateTime.tryParse(visitor.visitedAt ?? ''));
+    final visitedAt = DateTimeUtils.formatDate(DateTime.tryParse(visitor.visitedAt ?? ''));
     return visitedAt;
   }
 
@@ -864,9 +822,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final profiles = provider.recentlyViewed;
     final isLoading = provider.isLoadingRecentlyViewed;
     final errorText = provider.recentlyViewedError;
-    final subtitle = isLoading
-        ? 'Loading recently viewed profiles'.localized(context)
-        : '${provider.recentlyViewedTotal} ${'Profiles Found'.localized(context)}';
+    final subtitle =
+        isLoading ? 'Loading recently viewed profiles'.localized(context) : '${provider.recentlyViewedTotal} ${'Profiles Found'.localized(context)}';
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -908,8 +865,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 if (errorText != null && profiles.isEmpty) {
                   return _sectionError(
                     errorText,
-                    () =>
-                        ref.read(homeProvider).loadRecentlyViewed(force: true),
+                    () => ref.read(homeProvider).loadRecentlyViewed(force: true),
                   );
                 }
                 if (profiles.isEmpty) {
@@ -1046,8 +1002,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                            'Whatsapp link is not configured yet'
-                                .localized(context),
+                            'Whatsapp link is not configured yet'.localized(context),
                           ),
                         ),
                       );

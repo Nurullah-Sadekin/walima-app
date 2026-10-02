@@ -15,10 +15,14 @@ import 'package:walima_llc/features/identity_verification/presentation/providers
 
 /// Identity verification (Didit KYC) screen.
 ///
-/// Behaviour (guide §8):
-///  - On open, reads `GET /verification/status` and renders the latest state.
-///  - "Start verification" creates a session and opens the hosted page.
-///  - Always offers a manual refresh; backend status is the source of truth.
+/// Follows FLUTTER_DIDIT_IDENTITY_VERIFICATION_GUIDE.md:
+///  - On open, reads `GET /verification/status`; display state uses the
+///    latest session status first, then the user status (§4).
+///  - Start / Resume / Try again all call `POST /verification/session` (the
+///    backend reuses an active session) and open the hosted page.
+///  - On return, re-reads status in a short bounded burst; returning never
+///    proves approval. Cached `/auth/me` is refreshed so badges catch up.
+///  - Cancel (`DELETE`) only for cancellable sessions, after confirmation.
 class IdentityVerificationScreen extends ConsumerStatefulWidget {
   const IdentityVerificationScreen({super.key});
 
@@ -34,9 +38,23 @@ class _IdentityVerificationScreenState
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(identityVerificationProvider).loadStatus();
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _refresh());
+  }
+
+  /// Reads backend status, then refreshes the cached current user so the
+  /// home/drawer badges reflect it.
+  Future<void> _refresh({bool burst = false}) async {
+    final ok = await ref.read(identityVerificationProvider).loadStatus(
+          burst: burst,
+          keepGoing: () =>
+              mounted &&
+              WidgetsBinding.instance.lifecycleState ==
+                  AppLifecycleState.resumed,
+        );
+    if (!ok || !mounted) return;
+    await ref
+        .read(globalProvider)
+        .refreshCurrentUserAndQuota(silent: true, force: true);
   }
 
   @override
@@ -54,8 +72,7 @@ class _IdentityVerificationScreenState
         ),
         trailingWidget: IconButton(
           tooltip: 'Refresh'.localized(context),
-          onPressed:
-              provider.isLoadingStatus ? null : () => provider.loadStatus(),
+          onPressed: provider.isLoadingStatus ? null : () => _refresh(),
           icon: const Icon(
             Icons.refresh_rounded,
             color: AppColors.textSecondaryLight,
@@ -80,15 +97,15 @@ class _IdentityVerificationScreenState
     if (!provider.hasLoadedStatus && provider.statusError != null) {
       return _ErrorRetry(
         message: provider.statusError!,
-        onRetry: () => provider.loadStatus(),
+        onRetry: () => _refresh(),
       );
     }
 
     final state = provider.verificationState;
-    final view = _VerificationView.of(state);
+    final view = _VerificationView.of(state, provider.isUnderReview);
 
     return RefreshIndicator(
-      onRefresh: () => provider.loadStatus(showLoader: false),
+      onRefresh: () => _refresh(),
       color: AppColors.primary,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -100,6 +117,27 @@ class _IdentityVerificationScreenState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              if (provider.isLoadingStatus)
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 16),
+                  child: LinearProgressIndicator(
+                    minHeight: 2,
+                    color: AppColors.primary,
+                    backgroundColor: AppColors.primaryVariant,
+                  ),
+                ),
+              if (provider.statusError != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(
+                    provider.statusError!,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppColors.error,
+                      fontSize: TextSize.font13(context),
+                    ),
+                  ),
+                ),
               _StatusHero(view: view),
               const SizedBox(height: 24),
               if (state != IdentityVerificationState.approved)
@@ -119,67 +157,65 @@ class _IdentityVerificationScreenState
     IdentityVerificationProvider provider,
     IdentityVerificationState state,
   ) {
-    final busy = _isLaunchingFlow || provider.isCreatingSession;
+    final busy = _isLaunchingFlow ||
+        provider.isCreatingSession ||
+        provider.isCancelling ||
+        provider.isLoadingStatus;
 
-    switch (state) {
-      case IdentityVerificationState.approved:
-        return [
-          PrimaryButtons(
-            buttonStyle: ButtonsStyle.activeSecondaryButton,
-            onTap: () => context.pop(),
-            title: 'Done',
-          ),
-        ];
-
-      case IdentityVerificationState.pending:
-        return [
-          if (provider.canResumeSession)
-            PrimaryButtons(
-              buttonStyle: ButtonsStyle.activePrimaryButton,
-              onTap: busy
-                  ? () {}
-                  : () => _launchFlow(
-                        resumeUrl: provider.latestSession?.verificationUrl,
-                      ),
-              title: busy ? 'Please wait...' : 'Continue verification',
-            ),
-          if (provider.canResumeSession) const SizedBox(height: 12),
-          PrimaryButtons(
-            buttonStyle: provider.canResumeSession
-                ? ButtonsStyle.activeSecondaryButton
-                : ButtonsStyle.activePrimaryButton,
-            onTap: provider.isLoadingStatus
-                ? () {}
-                : () => provider.loadStatus(),
-            title: 'Refresh status',
-          ),
-        ];
-
-      case IdentityVerificationState.rejected:
-        return [
-          PrimaryButtons(
-            buttonStyle: ButtonsStyle.activePrimaryButton,
-            onTap: busy ? () {} : () => _launchFlow(),
-            title: busy ? 'Please wait...' : 'Try again',
-          ),
-        ];
-
-      case IdentityVerificationState.notSubmitted:
-      case IdentityVerificationState.unknown:
-        return [
-          PrimaryButtons(
-            buttonStyle: ButtonsStyle.activePrimaryButton,
-            onTap: busy ? () {} : () => _launchFlow(),
-            title: busy ? 'Please wait...' : 'Start verification',
-          ),
-        ];
+    if (state == IdentityVerificationState.approved) {
+      return [
+        PrimaryButtons(
+          buttonStyle: ButtonsStyle.activeSecondaryButton,
+          onTap: () => context.pop(),
+          title: 'Done',
+        ),
+      ];
     }
+
+    // Start for not-submitted/rejected; Resume for an eligible unfinished
+    // session (guide §4). Under-review sessions get neither.
+    final showStart = provider.canStart || provider.canResume;
+    final startTitle = provider.canResume
+        ? 'Resume verification'
+        : state == IdentityVerificationState.rejected
+            ? 'Try again'
+            : 'Start verification';
+
+    return [
+      if (showStart) ...[
+        PrimaryButtons(
+          buttonStyle: busy
+              ? ButtonsStyle.disableButton
+              : ButtonsStyle.activePrimaryButton,
+          onTap: busy ? () {} : _launchFlow,
+          title: _isLaunchingFlow || provider.isCreatingSession
+              ? 'Please wait...'
+              : startTitle,
+        ),
+        const SizedBox(height: 12),
+      ],
+      PrimaryButtons(
+        buttonStyle: showStart
+            ? ButtonsStyle.activeSecondaryButton
+            : ButtonsStyle.activePrimaryButton,
+        onTap: busy ? () {} : () => _refresh(),
+        title: 'Refresh status',
+      ),
+      if (provider.canCancel) ...[
+        const SizedBox(height: 4),
+        TextButton(
+          onPressed: busy ? null : _confirmCancel,
+          style: TextButton.styleFrom(foregroundColor: AppColors.error),
+          child: Text('Cancel verification'.localized(context)),
+        ),
+      ],
+    ];
   }
 
-  /// Creates (or resumes) a session, opens the hosted page, then re-reads the
-  /// backend status. [resumeUrl] reopens an existing session without creating a
-  /// duplicate.
-  Future<void> _launchFlow({String? resumeUrl}) async {
+  /// Creates (or reuses) a session, opens the hosted page, then re-reads the
+  /// backend status. The backend returns the active session when one exists,
+  /// so Start and Resume share this path.
+  Future<void> _launchFlow() async {
     if (_isLaunchingFlow) return;
     setState(() => _isLaunchingFlow = true);
 
@@ -197,37 +233,66 @@ class _IdentityVerificationScreenState
         }
       }
 
-      var url = resumeUrl?.trim();
-
-      if (url == null || url.isEmpty) {
-        final session = await provider.startSession();
-        if (!mounted) return;
-        if (session == null) {
-          _showSnack(
-            provider.statusError ?? 'Unable to start verification right now.',
-          );
-          return;
-        }
-        url = session.verificationUrl?.trim();
-      }
-
-      if (url == null || url.isEmpty) {
-        _showSnack('Verification link is unavailable. Please try again.');
+      final session = await provider.startSession();
+      if (!mounted) return;
+      if (session == null) {
+        _showSnack(
+          provider.statusError ?? 'Unable to start verification right now.',
+        );
         return;
       }
 
-      if (!mounted) return;
+      final rawUrl = session.verificationUrl;
+      final uri = rawUrl == null ? null : Uri.tryParse(rawUrl);
+      if (uri == null || uri.scheme != 'https' || uri.host.isEmpty) {
+        _showSnack('Verification link is unavailable. Refresh and retry.');
+        return;
+      }
+
       await context.pushNamed<bool>(
         Routes.diditVerificationWebView,
-        extra: url,
+        extra: uri.toString(),
       );
-
       if (!mounted) return;
-      // Backend status — not the webview — is the source of truth.
-      await provider.loadStatus();
     } finally {
       if (mounted) setState(() => _isLaunchingFlow = false);
     }
+
+    // Closing/returning never proves approval; the backend may still be
+    // syncing, so re-read a few times while it is still `Not Started`.
+    await _refresh(burst: true);
+  }
+
+  Future<void> _confirmCancel() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('Cancel verification?'.localized(dialogContext)),
+        content: Text(
+          'This deletes the unfinished verification session and captured data. You can start again afterward.'
+              .localized(dialogContext),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text('Keep session'.localized(dialogContext)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: Text('Cancel verification'.localized(dialogContext)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final error = await ref.read(identityVerificationProvider).cancelSession();
+    if (!mounted) return;
+    _showSnack(error ?? 'Verification cancelled.');
+    await ref
+        .read(globalProvider)
+        .refreshCurrentUserAndQuota(silent: true, force: true);
   }
 
   void _showSnack(String message) {
@@ -252,7 +317,10 @@ class _VerificationView {
   final String title;
   final String description;
 
-  static _VerificationView of(IdentityVerificationState state) {
+  static _VerificationView of(
+    IdentityVerificationState state,
+    bool isUnderReview,
+  ) {
     switch (state) {
       case IdentityVerificationState.approved:
         return const _VerificationView(
@@ -263,18 +331,26 @@ class _VerificationView {
               'Your identity has been verified. The verified badge now appears on your profile.',
         );
       case IdentityVerificationState.pending:
-        return const _VerificationView(
-          icon: Icons.hourglass_top_rounded,
-          accentColor: AppColors.warning,
-          title: 'Verification in review',
-          description:
-              'We have received your details and are reviewing them. This can take a little while — check back or refresh for updates.',
-        );
+        return isUnderReview
+            ? const _VerificationView(
+                icon: Icons.hourglass_top_rounded,
+                accentColor: AppColors.warning,
+                title: 'Under review',
+                description:
+                    'We have received your details and are reviewing them. This can take a little while — check back or refresh for updates.',
+              )
+            : const _VerificationView(
+                icon: Icons.pending_actions_rounded,
+                accentColor: AppColors.warning,
+                title: 'Verification in progress',
+                description:
+                    'Your verification has started but is not finished yet. Complete any remaining steps, or refresh for updates.',
+              );
       case IdentityVerificationState.rejected:
         return const _VerificationView(
           icon: Icons.error_outline_rounded,
           accentColor: AppColors.error,
-          title: 'Verification unsuccessful',
+          title: 'Verification needs attention',
           description:
               'Your verification could not be completed. Please review your documents and try again.',
         );

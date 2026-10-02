@@ -72,10 +72,18 @@ class GlobalProvider extends BaseChangeNotifier {
     } catch (_) {}
   }
 
-  Future<bool> refreshCurrentUserAndQuota({bool silent = false}) async {
+  /// Pass [force] after a server-side change (e.g. phone verification) so a
+  /// request that started before the change cannot satisfy this call.
+  Future<bool> refreshCurrentUserAndQuota({
+    bool silent = false,
+    bool force = false,
+  }) async {
     final activeRefresh = _refreshCompleter;
     if (activeRefresh != null) {
-      return activeRefresh.future;
+      if (!force) return activeRefresh.future;
+      await activeRefresh.future;
+      final next = _refreshCompleter;
+      if (next != null) return next.future;
     }
 
     _refreshCompleter = Completer<bool>();

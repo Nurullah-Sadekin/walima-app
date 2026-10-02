@@ -71,6 +71,7 @@ abstract class Paths {
   static const myMatchFilter = '/myMatchFilter';
   static const contactFilter = '/contactFilter';
   static const accountSetting = '/accountSetting';
+  static const phoneVerification = '/phoneVerification';
   static const contactSupport = '/contactSupport';
   static const helpDesk = '/helpDesk';
   static const aiSupport = '/aiSupport';
@@ -157,6 +158,7 @@ abstract class Routes {
   static const myMatchFilter = 'myMatchFilter';
   static const contactFilter = 'contactFilter';
   static const accountSetting = 'accountSetting';
+  static const phoneVerification = 'phoneVerification';
   static const contactSupport = 'contactSupport';
   static const helpDesk = 'helpDesk';
   static const aiSupport = 'aiSupport';
