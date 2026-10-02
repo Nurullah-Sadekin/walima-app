@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
 import 'package:walima_llc/core/global/components/primary_button.dart';
@@ -48,6 +49,9 @@ class ProfileSummerySection extends ConsumerWidget {
           profileImagePath: profile?.profilePicture?.url ?? (gender == 'female' ? AppImages.womenAvatar : AppImages.manAvatar),
           showTopIcon: isIdentityVerified,
           showBottomIcon: true,
+          imageSize: 80,
+          iconSize: 18,
+          nameFontSize: TextSize.font18(context),
           topIconPath: AppImages.verifiedBadgeSvgIcon,
           bottomIconPath: AppImages.cameraSvgIcon,
           onTapImage: () async {
@@ -67,9 +71,9 @@ class ProfileSummerySection extends ConsumerWidget {
             }
           },
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         _headerActions(context),
-        const SizedBox(height: 20),
+        const SizedBox(height: 14),
       ],
     );
   }
@@ -85,6 +89,9 @@ class ProfileSummerySection extends ConsumerWidget {
             borderColor: AppColors.greyLight,
             svgIconPath: AppImages.editProfileSvgIcon,
             svgIconColor: AppColors.textSecondaryLight,
+            verticalPadding: 8,
+            titleSize: TextSize.font13(context),
+            iconSize: 16,
             iconLeftPosition: false,
             onTap: () {
               context.pushNamed(Routes.editProfile);
@@ -100,6 +107,9 @@ class ProfileSummerySection extends ConsumerWidget {
             bgColor: AppColors.primary,
             svgIconPath: AppImages.premiumSvgIcon,
             iconLeftPosition: false,
+            verticalPadding: 8,
+            titleSize: TextSize.font13(context),
+            iconSize: 16,
             onTap: () {
               context.pushNamed(
                 Routes.upgradePackage,

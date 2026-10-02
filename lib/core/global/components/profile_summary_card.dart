@@ -20,6 +20,7 @@ class ProfileSummaryCard extends StatelessWidget {
     this.imageSize = 97,
     this.profileImageVerificationStatus = 'none',
     this.iconSize = 20,
+    this.nameFontSize,
     this.onTapImage,
     this.onBottomIconPressed,
   });
@@ -36,13 +37,16 @@ class ProfileSummaryCard extends StatelessWidget {
   final String? bottomIconPath;
   final double imageSize;
   final double iconSize;
+
+  /// Defaults to `TextSize.font20`.
+  final double? nameFontSize;
   final VoidCallback? onTapImage;
   final VoidCallback? onBottomIconPressed;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 100,
+      height: imageSize + 3,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -78,7 +82,7 @@ class ProfileSummaryCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: AppColors.textPrimaryLight,
-              fontSize: TextSize.font20(context),
+              fontSize: nameFontSize ?? TextSize.font20(context),
               fontWeight: FontWeight.w600,
             ),
           ),

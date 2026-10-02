@@ -213,7 +213,7 @@ class PrimaryButtons extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: textColor ?? Colors.white,
-                fontSize: TextSize.font14(context),
+                fontSize: titleSize ?? TextSize.font14(context),
                 fontWeight: FontWeight.w500,
               ),
             ),
