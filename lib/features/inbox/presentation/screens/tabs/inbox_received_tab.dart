@@ -151,6 +151,10 @@ class _InboxReceivedTabState extends ConsumerState<InboxReceivedTab> {
                         );
 
                 if (!mounted) return;
+                // Backend removes the pair from both shortlists on accept.
+                if (success) {
+                  ref.read(shortlistProvider).onConnectionAccepted();
+                }
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(

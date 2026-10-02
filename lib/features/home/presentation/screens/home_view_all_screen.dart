@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:walima_llc/features/shortlist/presentation/shortlist_actions.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
@@ -52,6 +53,7 @@ class _HomeViewAllScreenState extends ConsumerState<HomeViewAllScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = ref.watch(homeProvider);
+    ref.watch(shortlistProvider); // Rebuild card shortlist buttons.
     final isPremiumPage = widget.type == HomeViewAllType.premiumMatches;
     final title = isPremiumPage ? 'Premium Matches' : 'Recent Visitors';
     final subtitle = isPremiumPage
@@ -206,8 +208,9 @@ class _HomeViewAllScreenState extends ConsumerState<HomeViewAllScreen> {
   }
 
   Widget _buildPremiumMatchCard(MatchProfile match) {
-    final shortlistId = match.id ?? match.userReference;
-    final isShortlisted = ref.read(homeProvider).isShortlisted(shortlistId);
+    // Shortlist API needs the member UUID (not userReference).
+    final shortlistId = match.id;
+    final isShortlisted = ref.read(shortlistProvider).isShortlisted(shortlistId);
     final actions = MatchCardActions(match, isShortlisted: isShortlisted);
     final isConnected = actions.isConnected;
     final canConnect = actions.canConnect;
@@ -263,7 +266,7 @@ class _HomeViewAllScreenState extends ConsumerState<HomeViewAllScreen> {
       showRightButton: actions.showSecondaryButton,
       onTapRightButton: () async {
         if (!isConnected) {
-          ref.read(homeProvider).toggleShortlist(shortlistId);
+          await toggleShortlistWithFeedback(context, ref, shortlistId);
           return;
         }
         await BottomSheetUtils.open(

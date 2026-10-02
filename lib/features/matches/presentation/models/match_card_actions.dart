@@ -12,9 +12,8 @@ class MatchCardActions {
   bool get hasProfileId => match.id?.trim().isNotEmpty ?? false;
   bool get canConnect => !isConnected && hasProfileId && match.canConnect;
   bool get showPrimaryButton => hasProfileId && (isConnected || canConnect);
-  bool get showSecondaryButton => isConnected
-      ? hasProfileId
-      : (match.id ?? match.userReference)?.trim().isNotEmpty ?? false;
+  // Contact and Shortlist both need the member UUID.
+  bool get showSecondaryButton => hasProfileId;
   String get primaryLabel => isConnected ? 'Message' : 'Connect';
   String get secondaryLabel => isConnected
       ? 'Contact'

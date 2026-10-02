@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:walima_llc/features/shortlist/presentation/shortlist_actions.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
@@ -66,6 +67,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
   Widget build(BuildContext context) {
     final provider = ref.watch(matchesProvider);
     ref.watch(homeProvider);
+    ref.watch(shortlistProvider); // Rebuild card shortlist buttons.
 
     if (_lastCenteredTabIndex != provider.selectedTabIndex) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -354,9 +356,10 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
             });
           }
           final match = provider.matches[index];
-          final shortlistId = match.id ?? match.userReference;
+          // Shortlist API needs the member UUID (not userReference).
+          final shortlistId = match.id;
           final isShortlisted =
-              ref.read(homeProvider).isShortlisted(shortlistId);
+              ref.read(shortlistProvider).isShortlisted(shortlistId);
           final actions = MatchCardActions(match, isShortlisted: isShortlisted);
           final imagePath = match.profilePhoto?.url ??
               (match.gender == 'female'
@@ -446,7 +449,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
                 : AppColors.disableBackground,
             onTapRightButton: () async {
               if (!actions.isConnected) {
-                ref.read(homeProvider).toggleShortlist(shortlistId);
+                await toggleShortlistWithFeedback(context, ref, shortlistId);
                 return;
               }
               final userId = match.id?.trim();

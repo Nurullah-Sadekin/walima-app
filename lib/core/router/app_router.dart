@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:walima_llc/features/shortlist/presentation/screens/shortlist_screen.dart';
 import 'package:walima_llc/core/utils/localized_text.dart';
 import 'package:walima_llc/features/biodata/presentation/screens/biodata_generator_screen.dart';
 import 'package:walima_llc/features/login/presentation/login_with_email_screen.dart';
@@ -538,6 +539,11 @@ GoRouter goRouter(Ref ref) {
               ? state.extra as AccountSettingStep
               : AccountSettingStep.accountSetting,
         ),
+      ),
+      GoRoute(
+        path: Paths.shortlist,
+        name: Routes.shortlist,
+        builder: (context, state) => const ShortlistScreen(),
       ),
       GoRoute(
         path: Paths.phoneVerification,

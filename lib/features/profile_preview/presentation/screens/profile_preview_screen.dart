@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:walima_llc/features/shortlist/presentation/shortlist_actions.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
@@ -40,8 +41,13 @@ class _ProfilePreviewScreenState extends ConsumerState<ProfilePreviewScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(profilePreviewProvider).loadPreview(widget.userId);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref.read(profilePreviewProvider).loadPreview(widget.userId);
+      if (!mounted) return;
+      // Initialise the shortlist button from the server (member UUID).
+      await ref.read(shortlistProvider).loadStatus(
+            ref.read(profilePreviewProvider).preview?.user?.id,
+          );
     });
   }
 
@@ -51,7 +57,7 @@ class _ProfilePreviewScreenState extends ConsumerState<ProfilePreviewScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: _appBar(context),
+      appBar: _appBar(context, provider.preview?.user?.id),
       body: _body(context, provider),
       floatingActionButton:
           provider.preview != null ? _actionButtons(context, provider) : null,
@@ -59,8 +65,26 @@ class _ProfilePreviewScreenState extends ConsumerState<ProfilePreviewScreen> {
     );
   }
 
-  PreferredSizeWidget _appBar(BuildContext context) {
+  PreferredSizeWidget _appBar(BuildContext context, String? memberId) {
+    final shortlist = ref.watch(shortlistProvider);
+    final isShortlisted = shortlist.isShortlisted(memberId);
     return CustomBackAppBar(
+      isTrailing: memberId != null,
+      leadingPadding: 4,
+      trailingWidget: memberId == null
+          ? null
+          : IconButton(
+              tooltip: (isShortlisted ? 'Shortlisted' : 'Shortlist')
+                  .localized(context),
+              onPressed: () =>
+                  toggleShortlistWithFeedback(context, ref, memberId),
+              icon: Icon(
+                isShortlisted
+                    ? Icons.favorite_rounded
+                    : Icons.favorite_border_rounded,
+                color: const Color(0xFFE05271),
+              ),
+            ),
       backgroundColor: Colors.white,
       isBackButton: true,
       backIconBackground: Colors.transparent,

@@ -21,6 +21,7 @@ import 'package:walima_llc/features/identity_verification/presentation/providers
 import 'package:walima_llc/features/contact_filter/presentation/providers/contact_filter_provider.dart';
 import 'package:walima_llc/features/support/presentation/provider/support_provider.dart';
 import 'package:walima_llc/features/support/presentation/provider/ai_support_provider.dart';
+import 'package:walima_llc/features/shortlist/presentation/providers/shortlist_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final loginProvider = ChangeNotifierProvider<LoginProvider>((ref) {
@@ -93,6 +94,10 @@ final accountSettingProvider =
 final identityVerificationProvider =
     ChangeNotifierProvider<IdentityVerificationProvider>((ref) {
   return IdentityVerificationProvider();
+});
+
+final shortlistProvider = ChangeNotifierProvider<ShortlistProvider>((ref) {
+  return ShortlistProvider();
 });
 
 final contactFilterProvider =

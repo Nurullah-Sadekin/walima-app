@@ -88,6 +88,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   // Per-user verification/contact state.
                   ref.invalidate(identityVerificationProvider);
                   ref.invalidate(accountSettingProvider);
+                  ref.invalidate(shortlistProvider);
                   router.go(Paths.onboarding);
                 });
               },
@@ -231,6 +232,11 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
             ref.read(currentTabProvider.notifier).state = 1;
             context.goNamed(Routes.anchor);
           },
+        ),
+        ProfileActionTile(
+          iconImagePath: AppImages.favouriteIcon,
+          title: 'Shortlisted Profiles',
+          onTap: () => context.pushNamed(Routes.shortlist),
         ),
         ProfileActionTile(
           iconImagePath: AppImages.emailSvgIcon,

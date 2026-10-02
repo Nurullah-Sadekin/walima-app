@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:walima_llc/features/shortlist/presentation/shortlist_actions.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
 import 'package:walima_llc/core/constants/app_image.dart';
@@ -80,6 +81,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ref.read(globalProvider).refreshCurrentUserAndQuota(silent: true);
       // Government ID card: authoritative status incl. latest session.
       ref.read(identityVerificationProvider).loadStatus(showLoader: false);
+      // Card Shortlist buttons reflect server membership.
+      ref.read(shortlistProvider).syncMembership();
     });
   }
 
@@ -106,6 +109,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final isHomeLoading = ref.watch(homeProvider).screenStates == HomeScreenStates.transparentLoading;
+    ref.watch(shortlistProvider); // Rebuild card shortlist buttons.
     final isProfileImageUploading = ref.watch(profileProvider).loaderState == ProfileScreenStates.loading;
 
     return TransparentLoading(
@@ -222,6 +226,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ref.read(profileProvider).getDashboard(),
       ref.read(globalProvider).refreshCurrentUserAndQuota(silent: true),
       ref.read(identityVerificationProvider).loadStatus(showLoader: false),
+      ref.read(shortlistProvider).syncMembership(),
     ]);
   }
 
@@ -414,8 +419,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildPremiumMatchCard(MatchProfile match) {
-    final shortlistId = match.id ?? match.userReference;
-    final isShortlisted = ref.read(homeProvider).isShortlisted(shortlistId);
+    // Shortlist API needs the member UUID (not userReference).
+    final shortlistId = match.id;
+    final isShortlisted = ref.read(shortlistProvider).isShortlisted(shortlistId);
     final actions = MatchCardActions(match, isShortlisted: isShortlisted);
     final isConnected = actions.isConnected;
     final canConnect = actions.canConnect;
@@ -462,7 +468,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           showRightButton: actions.showSecondaryButton,
           onTapRightButton: () async {
             if (!isConnected) {
-              ref.read(homeProvider).toggleShortlist(shortlistId);
+              await toggleShortlistWithFeedback(context, ref, shortlistId);
               return;
             }
             await BottomSheetUtils.open(

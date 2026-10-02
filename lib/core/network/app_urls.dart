@@ -252,14 +252,15 @@ class AppUrls {
   // --- Settings ---
   static final String contactFilters =
       '$baseUrl/settings/contact-filters'; //GET,PUT
+  // Shortlist (SHORTLIST_API_GUIDE.md). `userId` is the target member UUID.
   static final String getShortlistedUsers =
-      '$baseUrl/engagement/shortlists'; //GET
+      '$baseUrl/engagement/shortlists/get-all-shortlist'; //GET ?page&size
   static String addToShortlist(String userId) =>
-      '$baseUrl/engagement/shortlists/$userId'; //POST
+      '$baseUrl/engagement/shortlists/add-to-shortlist/${Uri.encodeComponent(userId)}'; //POST
   static String removeFromShortlist(String userId) =>
-      '$baseUrl/engagement/shortlists/$userId'; //DELETE
+      '$baseUrl/engagement/shortlists/remove-from-shortlist/${Uri.encodeComponent(userId)}'; //DELETE
   static String getShortlistStatus(String userId) =>
-      '$baseUrl/engagement/shortlists/$userId/status'; //GET
+      '$baseUrl/engagement/shortlists/${Uri.encodeComponent(userId)}/status'; //GET
   static final String getBlockedUsers = '$baseUrl/interactions/blocks'; //GET
   static final String getReports = '$baseUrl/interactions/reports'; //GET
   static final String blockUser = '$baseUrl/interactions/block'; //POST
