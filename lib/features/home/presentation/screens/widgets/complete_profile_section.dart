@@ -186,7 +186,7 @@ class _CompleteProfileSectionState
                       .invalidateAndRefreshProfileStrength(),
                 ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(10, 8, 10, 12),
+                padding: const EdgeInsets.fromLTRB(8, 2, 8, 6),
                 child: Column(
                   children: [
                     for (final section in visibleIncomplete)
@@ -276,7 +276,7 @@ class _ProfileStrengthHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+      padding: const EdgeInsets.fromLTRB(14, 10, 14, 4),
       child: Row(
         children: [
           Expanded(
@@ -284,7 +284,7 @@ class _ProfileStrengthHeader extends StatelessWidget {
               l10n.profileStrengthTitle,
               style: TextStyle(
                 color: AppColors.textPrimaryLight,
-                fontSize: TextSize.font18(context),
+                fontSize: TextSize.font16(context),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -310,15 +310,15 @@ class _OverallScore extends StatelessWidget {
       label: l10n.profileStrengthSemantics(score),
       excludeSemantics: true,
       child: SizedBox.square(
-        dimension: 52,
+        dimension: 40,
         child: Stack(
           alignment: Alignment.center,
           children: [
             SizedBox.square(
-              dimension: 48,
+              dimension: 36,
               child: CircularProgressIndicator(
                 value: visualScore / 100,
-                strokeWidth: 4,
+                strokeWidth: 3,
                 strokeCap: StrokeCap.round,
                 color: color,
                 backgroundColor: const Color(0xFFF3F4F6),
@@ -328,7 +328,7 @@ class _OverallScore extends StatelessWidget {
               '$score',
               style: TextStyle(
                 color: color,
-                fontSize: TextSize.font14(context),
+                fontSize: TextSize.font12(context),
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -372,7 +372,7 @@ class _ProfileStrengthRow extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(12),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 7),
             child: Row(
               children: [
                 Expanded(
@@ -386,7 +386,7 @@ class _ProfileStrengthRow extends StatelessWidget {
                               label,
                               style: TextStyle(
                                 color: AppColors.textPrimaryLight,
-                                fontSize: TextSize.font14(context),
+                                fontSize: TextSize.font13(context),
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -402,12 +402,12 @@ class _ProfileStrengthRow extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 7),
+                      const SizedBox(height: 5),
                       ClipRRect(
                         borderRadius: BorderRadius.circular(20),
                         child: LinearProgressIndicator(
                           value: visualPercent / 100,
-                          minHeight: 6,
+                          minHeight: 4,
                           color: color,
                           backgroundColor: const Color(0xFFF3F4F6),
                         ),
@@ -415,18 +415,18 @@ class _ProfileStrengthRow extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 10),
                 if (section.completed)
                   const Icon(
                     Icons.check_circle_outline,
                     color: Color(0xFF10B981),
-                    size: 20,
+                    size: 18,
                   )
                 else
                   Icon(
                     Icons.arrow_forward_ios_rounded,
                     color: AppColors.hintTextColor,
-                    size: TextSize.font14(context),
+                    size: TextSize.font12(context),
                   ),
               ],
             ),
@@ -452,14 +452,15 @@ class _ProfileStrengthExpansionControl extends StatelessWidget {
     final label = isExpanded ? l10n.seeLess : l10n.seeMore;
 
     return Padding(
-      padding: const EdgeInsets.only(top: 4),
+      padding: EdgeInsets.zero,
       child: TextButton(
         key: const ValueKey<String>('profile-strength-expansion-control'),
         onPressed: onTap,
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primary,
+          visualDensity: VisualDensity.compact,
           textStyle: TextStyle(
-            fontSize: TextSize.font14(context),
+            fontSize: TextSize.font13(context),
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -470,7 +471,7 @@ class _ProfileStrengthExpansionControl extends StatelessWidget {
             const SizedBox(width: 4),
             Icon(
               isExpanded ? Icons.expand_less : Icons.expand_more,
-              size: TextSize.font18(context),
+              size: TextSize.font16(context),
             ),
           ],
         ),
@@ -516,8 +517,8 @@ class _TipsPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: const Color(0xFFFFFBEB),
         borderRadius: BorderRadius.circular(12),
@@ -533,10 +534,10 @@ class _TipsPanel extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           for (final tip in tips)
             Padding(
-              padding: const EdgeInsets.only(bottom: 4),
+              padding: const EdgeInsets.only(bottom: 2),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
