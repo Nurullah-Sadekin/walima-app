@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:walima_llc/core/config/text_responsive.dart';
 import 'package:walima_llc/core/constants/app_colors.dart';
+import 'package:walima_llc/core/constants/input_border_style.dart';
 import 'package:walima_llc/core/global/components/custom_back_appbar.dart';
 import 'package:walima_llc/core/global/components/resend_code_timer.dart';
 import 'package:walima_llc/core/network/dio_client.dart';
@@ -33,6 +34,9 @@ class PhoneVerificationScreen extends ConsumerStatefulWidget {
 class _PhoneVerificationScreenState
     extends ConsumerState<PhoneVerificationScreen> {
   static const _otpLength = 6;
+
+  /// Pill-shaped fields, matching `PrimaryTextField`.
+  static const double _fieldRadius = 50;
 
   final _phoneFormKey = GlobalKey<FormState>();
   final _phoneController = TextEditingController();
@@ -231,7 +235,14 @@ class _PhoneVerificationScreenState
             decoration: InputDecoration(
               labelText: 'Phone Number'.localized(context),
               hintText: _country.example,
-              border: const OutlineInputBorder(),
+              border: InputBorderStyle.border(_fieldRadius),
+              enabledBorder: InputBorderStyle.enabledBorder(_fieldRadius),
+              focusedBorder: InputBorderStyle.focusedBorder(_fieldRadius),
+              errorBorder: InputBorderStyle.errorBorder(_fieldRadius),
+              focusedErrorBorder: InputBorderStyle.focusedErrorBorder(_fieldRadius),
+              disabledBorder: InputBorderStyle.disabledBorder(_fieldRadius),
+              fillColor: Colors.white,
+              filled: true,
               prefixIcon: _countryCodeButton(),
             ),
             validator: (value) {
@@ -345,10 +356,17 @@ class _PhoneVerificationScreenState
             fontWeight: FontWeight.w600,
             letterSpacing: 8,
           ),
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             counterText: '',
             hintText: '------',
-            border: OutlineInputBorder(),
+            border: InputBorderStyle.border(_fieldRadius),
+            enabledBorder: InputBorderStyle.enabledBorder(_fieldRadius),
+            focusedBorder: InputBorderStyle.focusedBorder(_fieldRadius),
+            errorBorder: InputBorderStyle.errorBorder(_fieldRadius),
+            focusedErrorBorder: InputBorderStyle.focusedErrorBorder(_fieldRadius),
+            disabledBorder: InputBorderStyle.disabledBorder(_fieldRadius),
+            fillColor: Colors.white,
+            filled: true,
           ),
           onSubmitted: (_) => _verify(),
         ),

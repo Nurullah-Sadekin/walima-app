@@ -7,6 +7,7 @@ import 'package:walima_llc/features/login/presentation/login_with_phone_screen.d
 import 'package:walima_llc/features/matches/presentation/screens/filters/new_filter.dart';
 import 'package:walima_llc/features/contact_filter/presentation/screens/contact_filter_screen.dart';
 import 'package:walima_llc/features/account_setting/presentation/screens/account_setting_screen.dart';
+import 'package:walima_llc/features/account_setting/presentation/screens/email_verification_screen.dart';
 import 'package:walima_llc/features/account_setting/presentation/screens/phone_verification_screen.dart';
 import 'package:walima_llc/features/profile/presentation/screen/edit_profile.dart';
 import 'package:walima_llc/features/profile/presentation/screen/profile_edit_section.dart';
@@ -550,6 +551,13 @@ GoRouter goRouter(Ref ref) {
         name: Routes.phoneVerification,
         builder: (context, state) => PhoneVerificationScreen(
           phone: state.extra is String ? state.extra as String : null,
+        ),
+      ),
+      GoRoute(
+        path: Paths.emailVerification,
+        name: Routes.emailVerification,
+        builder: (context, state) => EmailVerificationScreen(
+          email: state.extra is String ? state.extra as String : null,
         ),
       ),
       GoRoute(

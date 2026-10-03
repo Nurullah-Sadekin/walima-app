@@ -72,6 +72,7 @@ abstract class Paths {
   static const contactFilter = '/contactFilter';
   static const accountSetting = '/accountSetting';
   static const phoneVerification = '/phoneVerification';
+  static const emailVerification = '/emailVerification';
   static const shortlist = '/shortlist';
   static const contactSupport = '/contactSupport';
   static const helpDesk = '/helpDesk';
@@ -160,6 +161,7 @@ abstract class Routes {
   static const contactFilter = 'contactFilter';
   static const accountSetting = 'accountSetting';
   static const phoneVerification = 'phoneVerification';
+  static const emailVerification = 'emailVerification';
   static const shortlist = 'shortlist';
   static const contactSupport = 'contactSupport';
   static const helpDesk = 'helpDesk';

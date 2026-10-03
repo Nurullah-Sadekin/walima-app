@@ -484,13 +484,30 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
             ),
             rows: phones.isEmpty
                 ? [_emptyContactText('No phone number added yet.')]
-                : phones.map(_contactRow).toList(),
+                : phones
+                    .map((c) => _contactRow(c, hasSiblings: phones.length > 1))
+                    .toList(),
           ),
-          if (emails.isNotEmpty)
-            _contactSection(
-              title: 'Email Address',
-              rows: emails.map(_contactRow).toList(),
+          _contactSection(
+            title: 'Email Address',
+            action: TextButton.icon(
+              onPressed: provider.isContactSaving
+                  ? null
+                  : () => _openEmailVerification(),
+              icon: const Icon(Icons.add, size: 16),
+              label: Text('Add'.localized(context)),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                visualDensity: VisualDensity.compact,
+                textStyle: TextStyle(fontSize: TextSize.font13(context)),
+              ),
             ),
+            rows: emails.isEmpty
+                ? [_emptyContactText('No email added yet.')]
+                : emails
+                    .map((c) => _contactRow(c, hasSiblings: emails.length > 1))
+                    .toList(),
+          ),
           CardBorder(
             verticalPadding: 12,
             widget: Column(
@@ -597,13 +614,14 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     );
   }
 
-  /// One contact with its own `isVerified` / `isPrimary` (per-number status,
-  /// independent of the account badge) and, for phones, the next action.
-  Widget _contactRow(ContactItem contact) {
+  /// One contact with its own `isVerified` / `isPrimary` (per-contact status,
+  /// independent of the account badge) and its next action. Same rules as web:
+  /// promote only a verified, non-primary contact that has a sibling of its type.
+  Widget _contactRow(ContactItem contact, {required bool hasSiblings}) {
     final isVerified = contact.isVerified ?? false;
     final isPrimary = contact.isPrimary ?? false;
-    final canVerify = contact.isPhone && !isVerified;
-    final canMakePrimary = contact.isPhone && isVerified && !isPrimary;
+    final canVerify = !isVerified;
+    final canMakePrimary = isVerified && !isPrimary && hasSiblings;
     final label = contact.label;
     final statusColor =
         isVerified ? AppColors.greenButtonColor : AppColors.primary;
@@ -678,7 +696,9 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           ),
           if (canVerify)
             FilledButton(
-              onPressed: () => _openPhoneVerification(phone: contact.value),
+              onPressed: () => contact.isEmail
+                  ? _openEmailVerification(email: contact.value)
+                  : _openPhoneVerification(phone: contact.value),
               style: FilledButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 visualDensity: VisualDensity.compact,
@@ -703,6 +723,19 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
               ),
               child: Text('Make Primary'.localized(context)),
             ),
+          if (!isPrimary)
+            IconButton(
+              onPressed: provider.isContactSaving
+                  ? null
+                  : () => _confirmDeleteContact(contact),
+              tooltip: 'Remove'.localized(context),
+              icon: const Icon(Icons.delete_outline_rounded),
+              color: AppColors.error,
+              iconSize: 20,
+              visualDensity: VisualDensity.compact,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            ),
         ],
       ),
     );
@@ -715,6 +748,12 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     provider.loadContactSettings();
   }
 
+  Future<void> _openEmailVerification({String? email}) async {
+    await context.pushNamed<bool>(Routes.emailVerification, extra: email);
+    if (!mounted) return;
+    provider.loadContactSettings();
+  }
+
   Future<void> _confirmMakePrimary(ContactItem contact) async {
     if (provider.isContactSaving) return;
     final confirmed = await showDialog<bool>(
@@ -722,7 +761,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
       builder: (dialogContext) => AlertDialog(
         title: Text('Make Primary'.localized(dialogContext)),
         content: Text(
-          '${'Use this number as your primary phone?'.localized(dialogContext)}\n${contact.value ?? ''}',
+          '${(contact.isEmail ? 'Use this address as your primary email?' : 'Use this number as your primary phone?').localized(dialogContext)}\n${contact.value ?? ''}',
         ),
         actions: [
           TextButton(
@@ -738,7 +777,7 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
     );
     if (confirmed != true || !mounted) return;
 
-    final response = await provider.makePrimaryPhone(contact);
+    final response = await provider.makePrimaryContact(contact);
     if (!mounted) return;
     _showResponseSnackBar(response);
     if (response.isSuccess) {
@@ -746,6 +785,35 @@ class _AccountSettingScreenState extends ConsumerState<AccountSettingScreen> {
           .read(globalProvider)
           .refreshCurrentUserAndQuota(silent: true, force: true);
     }
+  }
+
+  Future<void> _confirmDeleteContact(ContactItem contact) async {
+    if (provider.isContactSaving) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('Remove Contact'.localized(dialogContext)),
+        content: Text(
+          '${'Are you sure you want to remove this contact?'.localized(dialogContext)}\n${contact.value ?? ''}',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text('Cancel'.localized(dialogContext)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: Text('Remove'.localized(dialogContext)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final response = await provider.deleteContact(contact);
+    if (!mounted) return;
+    _showResponseSnackBar(response);
   }
 
   Widget _privacyOptions() {

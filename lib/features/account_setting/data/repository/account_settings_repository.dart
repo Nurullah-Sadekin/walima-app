@@ -160,6 +160,68 @@ class AccountSettingsRepository {
     }
   }
 
+  static Future<ApiResponse> addEmailContact(
+    String email, {
+    String? label,
+  }) async {
+    try {
+      final response = await DioClient().post(
+        AppUrls.contactEmail,
+        isTokenRequired: true,
+        data: <String, dynamic>{
+          'email': email,
+          if (label != null && label.isNotEmpty) 'label': label,
+        },
+      );
+      return _withApiMessage(response);
+    } catch (e) {
+      return _mapError(e);
+    }
+  }
+
+  static Future<ApiResponse> resendEmailOtp(String email) async {
+    try {
+      final response = await DioClient().post(
+        AppUrls.contactEmailOtp,
+        isTokenRequired: true,
+        data: <String, dynamic>{'email': email},
+      );
+      return _withApiMessage(response);
+    } catch (e) {
+      return _mapError(e);
+    }
+  }
+
+  static Future<ApiResponse> verifyEmailContact(
+    String email,
+    String otpCode,
+  ) async {
+    try {
+      final response = await DioClient().post(
+        AppUrls.contactEmailVerify,
+        isTokenRequired: true,
+        data: <String, dynamic>{'email': email, 'otpCode': otpCode},
+      );
+      final result = _withApiMessage(response);
+      if (!result.isSuccess) return result;
+
+      final data = response.data;
+      final payload = data is Map ? (data['response'] ?? data) : null;
+      if (payload is Map && payload['verified'] == false) {
+        return ApiResponse.error(
+          message: result.message.isNotEmpty
+              ? result.message
+              : 'Email verification failed',
+          statusCode: result.statusCode,
+          data: data,
+        );
+      }
+      return result;
+    } catch (e) {
+      return _mapError(e);
+    }
+  }
+
   static Future<ApiResponse> setPrimaryContact({
     required String type,
     required String value,
@@ -167,6 +229,22 @@ class AccountSettingsRepository {
     try {
       final response = await DioClient().put(
         AppUrls.contactEntryPrimary,
+        isTokenRequired: true,
+        data: <String, dynamic>{'type': type, 'value': value},
+      );
+      return _withApiMessage(response);
+    } catch (e) {
+      return _mapError(e);
+    }
+  }
+
+  static Future<ApiResponse> deleteContact({
+    required String type,
+    required String value,
+  }) async {
+    try {
+      final response = await DioClient().delete(
+        AppUrls.contactEntry,
         isTokenRequired: true,
         data: <String, dynamic>{'type': type, 'value': value},
       );

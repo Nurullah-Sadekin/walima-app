@@ -374,19 +374,49 @@ class AccountSettingProvider extends BaseChangeNotifier {
     notifyListeners();
   }
 
-  /// Promotes a verified secondary phone to primary, then reloads contacts.
-  /// The caller should also refresh `/auth/me` for the account badge.
-  Future<ApiResponse> makePrimaryPhone(ContactItem contact) async {
+  /// Promotes a verified secondary phone or email to primary, then reloads
+  /// contacts. The caller should also refresh `/auth/me` for the account badge.
+  Future<ApiResponse> makePrimaryContact(ContactItem contact) async {
     final value = contact.value;
     if (value == null || value.isEmpty) {
-      return ApiResponse.error(message: 'Invalid phone number', statusCode: 0);
+      return ApiResponse.error(message: 'Invalid contact', statusCode: 0);
     }
 
     isContactSaving = true;
     notifyListeners();
 
     final response = await AccountSettingsRepository.setPrimaryContact(
-      type: 'phone',
+      type: contact.isEmail ? 'email' : 'phone',
+      value: value,
+    );
+
+    isContactSaving = false;
+    if (response.isSuccess) {
+      await loadContactSettings();
+    } else {
+      notifyListeners();
+    }
+    return response;
+  }
+
+  /// Removes a non-primary phone or email, then reloads contacts.
+  Future<ApiResponse> deleteContact(ContactItem contact) async {
+    final value = contact.value;
+    if (value == null || value.isEmpty) {
+      return ApiResponse.error(message: 'Invalid contact', statusCode: 0);
+    }
+    if (contact.isPrimary ?? false) {
+      return ApiResponse.error(
+        message: 'Make another contact primary before removing this one',
+        statusCode: 0,
+      );
+    }
+
+    isContactSaving = true;
+    notifyListeners();
+
+    final response = await AccountSettingsRepository.deleteContact(
+      type: contact.isEmail ? 'email' : 'phone',
       value: value,
     );
 

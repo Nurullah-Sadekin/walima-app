@@ -339,6 +339,14 @@ class AppUrls {
       '$baseUrl/settings/contact/phone/verify'; //POST
   static final String contactPhoneOtp =
       '$baseUrl/settings/contact/phone/otp'; //POST (resend OTP)
+  static final String contactEmail =
+      '$baseUrl/settings/contact/email'; //POST (add + send OTP)
+  static final String contactEmailVerify =
+      '$baseUrl/settings/contact/email/verify'; //POST
+  static final String contactEmailOtp =
+      '$baseUrl/settings/contact/email/otp'; //POST (resend OTP)
+  static final String contactEntry =
+      '$baseUrl/settings/contact/entry'; //DELETE
   static final String contactEntryPrimary =
       '$baseUrl/settings/contact/entry/primary'; //PUT
   static final String premiumSettings = '$baseUrl/settings/premium'; //GET, PUT
