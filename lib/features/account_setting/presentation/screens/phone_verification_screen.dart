@@ -1,3 +1,4 @@
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,6 +41,15 @@ class _PhoneVerificationScreenState
   /// The exact phone string the OTP was requested for; sent back on verify.
   String? _pendingPhone;
   bool _isBusy = false;
+  Country _country = Country.parse('BD');
+
+  /// National number length for the selected country, taken from its
+  /// example mobile number (e.g. BD "1812345678" -> 10 digits).
+  int get _nationalLength {
+    final length = _country.example.length;
+    // E.164 caps the full number at 15 digits.
+    return length > 0 ? length : 15 - _country.phoneCode.length;
+  }
 
   bool get _isOtpStep => _pendingPhone != null;
 
@@ -63,7 +73,7 @@ class _PhoneVerificationScreenState
 
   Future<void> _sendOtpForNewPhone() async {
     if (_isBusy || !_phoneFormKey.currentState!.validate()) return;
-    final phone = _phoneController.text.trim();
+    final phone = '+${_country.phoneCode}${_phoneController.text.trim()}';
     setState(() => _isBusy = true);
     final response = await AccountSettingsRepository.addPhoneContact(phone);
     if (!mounted) return;
@@ -205,23 +215,100 @@ class _PhoneVerificationScreenState
           TextFormField(
             controller: _phoneController,
             keyboardType: TextInputType.phone,
-            autofillHints: const [AutofillHints.telephoneNumber],
+            autofillHints: const [AutofillHints.telephoneNumberNational],
+            // Re-validate as the user types once an error is shown, so a
+            // stale "required" message clears as soon as they fix it.
+            autovalidateMode: AutovalidateMode.onUserInteractionIfError,
+            maxLength: _nationalLength,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              // The dial code already covers the trunk prefix, so drop a
+              // leading 0 (01812... -> 1812...) unless numbers start with 0.
+              if (!_country.example.startsWith('0'))
+                FilteringTextInputFormatter.deny(RegExp(r'^0+')),
+              LengthLimitingTextInputFormatter(_nationalLength),
+            ],
             decoration: InputDecoration(
               labelText: 'Phone Number'.localized(context),
-              hintText: '+8801712345678',
+              hintText: _country.example,
               border: const OutlineInputBorder(),
+              prefixIcon: _countryCodeButton(),
             ),
             validator: (value) {
               final v = value?.trim() ?? '';
               if (v.isEmpty) return 'This field is required'.localized(context);
-              if (!v.startsWith('+')) {
-                return 'Include the country code, e.g. +880'
-                    .localized(context);
+              if (v.length != _nationalLength) {
+                return '${'Enter a valid phone number'.localized(context)} '
+                    '($_nationalLength ${'digits'.localized(context)})';
               }
               return null;
             },
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _countryCodeButton() {
+    return InkWell(
+      onTap: _isBusy ? null : _openCountryPicker,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 12, right: 4),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _country.flagEmoji,
+              style: TextStyle(fontSize: TextSize.font18(context)),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              '+${_country.phoneCode}',
+              style: TextStyle(
+                color: AppColors.textPrimaryLight,
+                fontSize: TextSize.font14(context),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const Icon(
+              Icons.arrow_drop_down,
+              color: AppColors.textSecondaryLight,
+              size: 20,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _openCountryPicker() {
+    showCountryPicker(
+      context: context,
+      showPhoneCode: true,
+      useSafeArea: true,
+      onSelect: (country) {
+        if (country.countryCode == _country.countryCode) return;
+        setState(() => _country = country);
+        // The old digits rarely fit the new country's format.
+        _phoneController.clear();
+      },
+      countryListTheme: CountryListThemeData(
+        backgroundColor: Colors.white,
+        inputDecoration: InputDecoration(
+          hintText: 'Search country'.localized(context),
+          prefixIcon: const Icon(
+            Icons.search,
+            color: AppColors.textSecondaryLight,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: AppColors.inputBorderColor),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: AppColors.primary),
+          ),
+        ),
       ),
     );
   }

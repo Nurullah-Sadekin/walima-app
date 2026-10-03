@@ -34,7 +34,7 @@ class ForegroundAlertService {
       android: androidSettings,
       iOS: iosSettings,
     );
-    await _notifications.initialize(settings);
+    await _notifications.initialize(settings: settings);
 
     await _notifications
         .resolvePlatformSpecificImplementation<
@@ -131,7 +131,12 @@ class ForegroundAlertService {
 
     final id = Random().nextInt(1 << 31);
     try {
-      await _notifications.show(id, title, body, details);
+      await _notifications.show(
+        id: id,
+        title: title,
+        body: body,
+        notificationDetails: details,
+      );
     } catch (e) {
       debugPrint('[ForegroundAlertService] notification error: $e');
     }
