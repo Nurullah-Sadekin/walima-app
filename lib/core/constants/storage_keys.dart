@@ -12,4 +12,5 @@ class StorageKeys {
   static const String registrationDraft = 'registration_draft';
   static const String registrationVerificationDone =
       'registration_verification_done';
+  static const String pendingAppleName = 'pending_apple_name';
 }

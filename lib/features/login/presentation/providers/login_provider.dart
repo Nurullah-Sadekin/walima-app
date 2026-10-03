@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
@@ -9,6 +12,7 @@ import 'package:walima_llc/core/providers/base_change_notifier.dart';
 import 'package:walima_llc/core/router/route_name.dart';
 import 'package:walima_llc/core/utils/auth_session_manager.dart';
 import 'package:walima_llc/core/utils/dialog_utils.dart';
+import 'package:walima_llc/core/utils/prefs_helper.dart';
 import 'package:walima_llc/core/utils/social_sign_in_service.dart';
 import 'package:walima_llc/core/utils/validators.dart';
 import 'package:walima_llc/features/login/data/models/login_body.dart';
@@ -29,6 +33,7 @@ class LoginProvider extends BaseChangeNotifier {
   LoginScreenStates screenStates = LoginScreenStates.defaultState;
   LoginScreenStates loaderState = LoginScreenStates.defaultState;
   bool isLoading = false;
+  bool _appleSignInBusy = false;
   VoidCallback? _controllersListener;
 
   bool keepMeLoggedIn = false;
@@ -300,6 +305,8 @@ class LoginProvider extends BaseChangeNotifier {
       );
       return;
     }
+    if (_appleSignInBusy) return;
+    _appleSignInBusy = true;
 
     _showLoading();
     try {
@@ -309,35 +316,96 @@ class LoginProvider extends BaseChangeNotifier {
         return;
       }
 
+      final name = await _resolveAppleName(result);
       final response = await LoginRepository.signInWithApple(
-        identityToken: result.identityToken,
-        authorizationCode: result.authorizationCode,
-        nonce: result.nonce,
-        email: result.email,
-        givenName: result.givenName,
-        familyName: result.familyName,
+        idToken: result.idToken,
+        firstName: name.firstName,
+        lastName: name.lastName,
       );
+
+      final applied =
+          response.code == 'SUCCESS' &&
+          await AuthSessionManager.applyLoginResponse(response);
+      if (!applied) {
+        await SocialSignInService.signOutFirebase();
+        if (!context.mounted) return;
+        _handleLoginFailure(
+          context,
+          response.message ?? 'Apple sign-in failed. Please try again.',
+        );
+        return;
+      }
+
+      await PrefsHelper.clearPendingAppleName();
       if (!context.mounted) return;
-      await _handleLoginResult(context, response);
+      _handleLoginSuccess(context);
     } on SignInWithAppleAuthorizationException catch (e) {
       _hideLoading();
       if (!context.mounted) return;
       if (e.code == AuthorizationErrorCode.canceled) return;
-      final message = e.message;
       DialogUtils.showErrorDialog(
         context: context,
-        message: message.isNotEmpty
-            ? message
-            : 'Apple sign-in failed. Please try again.',
+        message: 'Apple sign-in failed. Please try again.',
       );
-    } catch (e) {
+    } on FirebaseAuthException catch (e) {
+      _hideLoading();
+      if (!context.mounted) return;
+      if (_appleCancelledCodes.contains(e.code)) return;
+      DialogUtils.showErrorDialog(
+        context: context,
+        message: 'Apple sign-in failed. Please try again.',
+      );
+    } catch (_) {
+      await SocialSignInService.signOutFirebase();
       _hideLoading();
       if (!context.mounted) return;
       DialogUtils.showErrorDialog(
         context: context,
-        message: e.toString(),
+        message: 'Login failed. Please retry.',
       );
+    } finally {
+      _appleSignInBusy = false;
     }
+  }
+
+  static const Set<String> _appleCancelledCodes = {
+    'canceled',
+    'cancelled',
+    'user-cancelled',
+    'web-context-cancelled',
+    'popup-closed-by-user',
+    'cancelled-popup-request',
+  };
+
+  /// Apple supplies the name only on first authorization. Persist it so a
+  /// failed backend exchange can be retried without losing it.
+  Future<({String? firstName, String? lastName})> _resolveAppleName(
+    AppleSignInResult result,
+  ) async {
+    if (result.givenName != null || result.familyName != null) {
+      await PrefsHelper.setPendingAppleName(
+        jsonEncode({
+          'firstName': result.givenName,
+          'lastName': result.familyName,
+        }),
+      );
+      return (firstName: result.givenName, lastName: result.familyName);
+    }
+
+    final saved = await PrefsHelper.getPendingAppleName();
+    if (saved.isEmpty) return (firstName: null, lastName: null);
+    try {
+      final decoded = jsonDecode(saved);
+      if (decoded is Map) {
+        final first = decoded['firstName'];
+        final last = decoded['lastName'];
+        return (
+          firstName: first is String ? first : null,
+          lastName: last is String ? last : null,
+        );
+      }
+    } catch (_) {}
+    return (firstName: null, lastName: null);
   }
 
   Future<void> _gotoOtpVerificationScreen(BuildContext context) async {

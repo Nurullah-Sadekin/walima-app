@@ -21,18 +21,14 @@ class GoogleSignInResult {
 
 class AppleSignInResult {
   const AppleSignInResult({
-    required this.identityToken,
-    required this.authorizationCode,
-    required this.nonce,
-    this.email,
+    required this.idToken,
     this.givenName,
     this.familyName,
   });
 
-  final String identityToken;
-  final String authorizationCode;
-  final String nonce;
-  final String? email;
+  /// Firebase ID token obtained after Apple authentication. This is what the
+  /// Walima backend verifies; never send Apple's raw identity token instead.
+  final String idToken;
   final String? givenName;
   final String? familyName;
 }
@@ -92,7 +88,7 @@ class SocialSignInService {
     final rawNonce = _generateNonce();
     final nonce = _sha256OfString(rawNonce);
 
-    final credential = await SignInWithApple.getAppleIDCredential(
+    final appleCredential = await SignInWithApple.getAppleIDCredential(
       scopes: const [
         AppleIDAuthorizationScopes.email,
         AppleIDAuthorizationScopes.fullName,
@@ -100,21 +96,45 @@ class SocialSignInService {
       nonce: nonce,
     );
 
-    final identityToken = credential.identityToken?.trim() ?? '';
-    final authorizationCode = credential.authorizationCode.trim();
-
-    if (identityToken.isEmpty || authorizationCode.isEmpty) {
+    final identityToken = appleCredential.identityToken?.trim() ?? '';
+    if (identityToken.isEmpty) {
       throw StateError('Apple sign-in returned empty credentials.');
     }
 
-    return AppleSignInResult(
-      identityToken: identityToken,
-      authorizationCode: authorizationCode,
-      nonce: rawNonce,
-      email: credential.email,
-      givenName: credential.givenName,
-      familyName: credential.familyName,
+    final givenName = _nonEmpty(appleCredential.givenName);
+    final familyName = _nonEmpty(appleCredential.familyName);
+
+    final credential = AppleAuthProvider.credentialWithIDToken(
+      identityToken,
+      rawNonce,
+      AppleFullPersonName(givenName: givenName, familyName: familyName),
     );
+    final userCredential = await FirebaseAuth.instance.signInWithCredential(
+      credential,
+    );
+    final firebaseIdToken =
+        (await userCredential.user?.getIdToken(true))?.trim() ?? '';
+
+    if (firebaseIdToken.isEmpty) {
+      throw StateError('Firebase sign-in returned empty ID token.');
+    }
+
+    return AppleSignInResult(
+      idToken: firebaseIdToken,
+      givenName: givenName,
+      familyName: familyName,
+    );
+  }
+
+  static Future<void> signOutFirebase() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+    } catch (_) {}
+  }
+
+  static String? _nonEmpty(String? value) {
+    final trimmed = value?.trim() ?? '';
+    return trimmed.isEmpty ? null : trimmed;
   }
 
   static String _generateNonce([int length = 32]) {

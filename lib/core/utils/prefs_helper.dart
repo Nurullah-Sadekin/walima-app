@@ -102,6 +102,7 @@ class PrefsHelper {
     const onboardingKeys = {
       StorageKeys.registrationDraft,
       StorageKeys.registrationVerificationDone,
+      StorageKeys.pendingAppleName,
     };
     for (final key in prefs.getKeys().difference(onboardingKeys)) {
       await prefs.remove(key);
@@ -132,5 +133,22 @@ class PrefsHelper {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(StorageKeys.registrationDraft);
     await prefs.remove(StorageKeys.registrationVerificationDone);
+  }
+
+  /// Apple only shares the user's name on first authorization, so keep it
+  /// until the backend exchange succeeds.
+  static Future<void> setPendingAppleName(String json) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(StorageKeys.pendingAppleName, json);
+  }
+
+  static Future<String> getPendingAppleName() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(StorageKeys.pendingAppleName) ?? '';
+  }
+
+  static Future<void> clearPendingAppleName() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(StorageKeys.pendingAppleName);
   }
 }

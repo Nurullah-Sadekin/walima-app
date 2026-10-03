@@ -118,33 +118,53 @@ class LoginRepository {
   }
 
   static Future<LoginResponse> signInWithApple({
-    required String identityToken,
-    required String authorizationCode,
-    required String nonce,
-    String? email,
-    String? givenName,
-    String? familyName,
+    required String idToken,
+    String? firstName,
+    String? lastName,
   }) async {
     try {
       final response = await DioClient().post(
         AppUrls.appleSignin,
         data: <String, dynamic>{
-          'identityToken': identityToken,
-          'authorizationCode': authorizationCode,
-          'nonce': nonce,
-          if (email != null && email.trim().isNotEmpty) 'email': email.trim(),
-          if (givenName != null && givenName.trim().isNotEmpty)
-            'givenName': givenName.trim(),
-          if (familyName != null && familyName.trim().isNotEmpty)
-            'familyName': familyName.trim(),
+          'idToken': idToken.trim(),
+          if (firstName != null && firstName.trim().isNotEmpty)
+            'firstName': _limit(firstName.trim(), 100),
+          if (lastName != null && lastName.trim().isNotEmpty)
+            'lastName': _limit(lastName.trim(), 100),
+          'registrationSource': 'apple',
         },
       );
       return LoginResponse.fromJson(response.data);
     } catch (e) {
-      final errorMessage = e is DioException
-          ? e.response?.data['message'] ?? e.message
-          : e.toString();
-      return LoginResponse(code: 'FAILED', message: errorMessage);
+      return LoginResponse(code: 'FAILED', message: _appleErrorMessage(e));
     }
+  }
+
+  static String _limit(String value, int maxLength) =>
+      value.length > maxLength ? value.substring(0, maxLength) : value;
+
+  static String _appleErrorMessage(Object error) {
+    if (error is! DioException) {
+      return 'Apple sign-in failed. Please try again.';
+    }
+    final data = error.response?.data;
+    final serverMessage = data is Map && data['message'] is String
+        ? data['message'] as String
+        : null;
+    final statusCode = error.response?.statusCode;
+    if (statusCode == null) {
+      return 'Unable to reach the server. '
+          'Please check your connection and try again.';
+    }
+    if (statusCode == 429) {
+      return 'Too many sign-in attempts. Please wait a moment and try again.';
+    }
+    if (statusCode >= 500) {
+      return 'Something went wrong on our side. Please try again later.';
+    }
+    if (statusCode == 401) {
+      return serverMessage ?? 'Your Apple sign-in could not be accepted.';
+    }
+    return serverMessage ?? 'Apple sign-in failed. Please try again.';
   }
 }
