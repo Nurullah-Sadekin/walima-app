@@ -90,6 +90,7 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: _isExpanded ? widget.backgroundColor : AppColors.white,
         border: Border.all(
@@ -101,89 +102,94 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
           Radius.circular(widget.borderRadius ?? 8),
         ),
       ),
-      child: Theme(
-        data: Theme.of(context).copyWith(
-          dividerColor: Colors.transparent,
-        ),
-        child: ExpansionTile(
-          initiallyExpanded: widget.initiallyExpanded,
-          onExpansionChanged: (v) => setState(() => _isExpanded = v),
-          collapsedIconColor:
-              widget.collapsedIconColor ?? AppColors.hintTextColor,
-          iconColor: widget.iconColor ?? AppColors.hintTextColor,
-          leading: widget.isLeading
-              ? GestureDetector(
-                  onTap: () {
-                    // allow selecting/deselecting via leading
-                    _handleSelectToggle();
-                  },
-                  child: Container(
-                    height: TextSize.font16(context),
-                    width: TextSize.font16(context),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color:
-                            _selected ? AppColors.primary : AppColors.greyLight,
-                        width: _selected ? 3 : 1,
+      // ListTile paints ink on the nearest Material; keep it above the
+      // decorated background so splashes stay visible.
+      child: Material(
+        type: MaterialType.transparency,
+        child: Theme(
+          data: Theme.of(context).copyWith(
+            dividerColor: Colors.transparent,
+          ),
+          child: ExpansionTile(
+            initiallyExpanded: widget.initiallyExpanded,
+            onExpansionChanged: (v) => setState(() => _isExpanded = v),
+            collapsedIconColor:
+                widget.collapsedIconColor ?? AppColors.hintTextColor,
+            iconColor: widget.iconColor ?? AppColors.hintTextColor,
+            leading: widget.isLeading
+                ? GestureDetector(
+                    onTap: () {
+                      // allow selecting/deselecting via leading
+                      _handleSelectToggle();
+                    },
+                    child: Container(
+                      height: TextSize.font16(context),
+                      width: TextSize.font16(context),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color:
+                              _selected ? AppColors.primary : AppColors.greyLight,
+                          width: _selected ? 3 : 1,
+                        ),
                       ),
+                      child: _selected
+                          ? const Center(
+                              child: CircleAvatar(
+                                radius: 6,
+                                backgroundColor: Colors.white,
+                              ),
+                            )
+                          : null,
                     ),
-                    child: _selected
-                        ? const Center(
-                            child: CircleAvatar(
-                              radius: 6,
-                              backgroundColor: Colors.white,
-                            ),
-                          )
-                        : null,
-                  ),
-                )
-              : null,
-          title: GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: widget.isLeading
-                ? () {
-                    // when leading is present, tapping the title should also toggle selection
-                    _handleSelectToggle();
-                  }
+                  )
                 : null,
-            child: Text(
-              widget.title.localized(context),
-              style: TextStyle(
-                fontSize: TextSize.font16(context),
-                fontWeight: FontWeight.w500,
-                color: AppColors.textPrimaryLight,
+            title: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: widget.isLeading
+                  ? () {
+                      // when leading is present, tapping the title should also toggle selection
+                      _handleSelectToggle();
+                    }
+                  : null,
+              child: Text(
+                widget.title.localized(context),
+                style: TextStyle(
+                  fontSize: TextSize.font16(context),
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textPrimaryLight,
+                ),
               ),
             ),
-          ),
-          children: [
-            Container(
-              width: double.infinity,
-              color: Colors.white,
-              padding: widget.padding ??
-                  const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Builder(builder: (context) {
-                final maxChildHeight = MediaQuery.of(context).size.height * 0.6;
-                return ConstrainedBox(
-                  constraints: BoxConstraints(maxHeight: maxChildHeight),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment:
-                          widget.crossAxisAlignment ?? CrossAxisAlignment.start,
-                      mainAxisAlignment:
-                          widget.mainAxisAlignment ?? MainAxisAlignment.start,
-                      children: [
-                        widget.child,
-                      ],
+            children: [
+              Container(
+                width: double.infinity,
+                color: Colors.white,
+                padding: widget.padding ??
+                    const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Builder(builder: (context) {
+                  final maxChildHeight = MediaQuery.of(context).size.height * 0.6;
+                  return ConstrainedBox(
+                    constraints: BoxConstraints(maxHeight: maxChildHeight),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment:
+                            widget.crossAxisAlignment ?? CrossAxisAlignment.start,
+                        mainAxisAlignment:
+                            widget.mainAxisAlignment ?? MainAxisAlignment.start,
+                        children: [
+                          widget.child,
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              }),
-            ),
-            widget.bottomMargin != null
-                ? SizedBox(height: widget.bottomMargin)
-                : const SizedBox.shrink(),
-          ],
+                  );
+                }),
+              ),
+              widget.bottomMargin != null
+                  ? SizedBox(height: widget.bottomMargin)
+                  : const SizedBox.shrink(),
+            ],
+          ),
         ),
       ),
     );

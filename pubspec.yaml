@@ -1,7 +1,7 @@
 name: walima_llc
 description: Walima is a halal Muslim matrimonial app for adults (18+) seeking marriage. Not a dating app a serious, family-friendly matchmaking platform for the global Muslim ummah.
 publish_to: 'none'
-version: 0.0.1+12
+version: 0.0.1+13
 
 environment:
   sdk: ^3.13.0

@@ -32,6 +32,7 @@ class FirebaseMessagingService {
 
   bool _initialized = false;
   StreamSubscription<String>? _tokenRefreshSubscription;
+  bool _pendingRegistrationRetry = false;
   StreamSubscription<RemoteMessage>? _foregroundMessageSubscription;
   StreamSubscription<RemoteMessage>? _messageOpenedSubscription;
 
@@ -60,7 +61,7 @@ class FirebaseMessagingService {
       provisional: false,
     );
 
-    final token = await messaging.getToken();
+    final token = await _getFcmToken(messaging);
     await _persistToken(token);
 
     _tokenRefreshSubscription = FirebaseMessaging.instance.onTokenRefresh.listen(
@@ -129,11 +130,13 @@ class FirebaseMessagingService {
         return;
       }
       final messaging = FirebaseMessaging.instance;
-      final token = (await messaging.getToken())?.trim() ?? (await PrefsHelper.getFcmToken()).trim();
+      final token = (await _getFcmToken(messaging))?.trim() ??
+          (await PrefsHelper.getFcmToken()).trim();
       if (token.isEmpty) {
         debugPrint(
           '[FirebaseMessagingService] skipping device token registration: no FCM token',
         );
+        _retryRegistrationOnTokenRefresh(messaging);
         return;
       }
 
@@ -166,6 +169,49 @@ class FirebaseMessagingService {
     _foregroundMessageSubscription = null;
     _messageOpenedSubscription = null;
     _initialized = false;
+  }
+
+  /// The token-refresh listener in [initialize] already re-registers; only
+  /// add a one-off retry when it is not active (e.g. right after login).
+  void _retryRegistrationOnTokenRefresh(FirebaseMessaging messaging) {
+    if (_tokenRefreshSubscription != null || _pendingRegistrationRetry) return;
+    _pendingRegistrationRetry = true;
+    messaging.onTokenRefresh.first.then((token) async {
+      _pendingRegistrationRetry = false;
+      await _persistToken(token);
+      await registerDeviceToken();
+    }).catchError((Object error) {
+      _pendingRegistrationRetry = false;
+      debugPrint('[FirebaseMessagingService] token refresh retry error: $error');
+    });
+  }
+
+  /// On iOS, FCM can only issue a token once APNs has delivered one. Wait
+  /// briefly for it; if it is still missing, `onTokenRefresh` will fire once
+  /// the token arrives and registration is retried from there.
+  Future<String?> _getFcmToken(FirebaseMessaging messaging) async {
+    if (Platform.isIOS) {
+      String? apnsToken;
+      for (var attempt = 0; attempt < 5 && apnsToken == null; attempt++) {
+        apnsToken = await messaging.getAPNSToken();
+        if (apnsToken == null) {
+          await Future<void>.delayed(const Duration(seconds: 1));
+        }
+      }
+      if (apnsToken == null) {
+        debugPrint(
+          '[FirebaseMessagingService] APNS token not available yet; '
+          'waiting for token refresh',
+        );
+        return null;
+      }
+    }
+    try {
+      return await messaging.getToken();
+    } catch (error) {
+      debugPrint('[FirebaseMessagingService] getToken error: $error');
+      return null;
+    }
   }
 
   Future<void> _ensureFirebaseInitialized() async {
